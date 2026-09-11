@@ -8,7 +8,7 @@ The milestone owner approved this recovery variation on September 11, 2026: use 
 
 Taurus is explicitly a teaching sign, not the player's Sun sign. Its guided Earth family precedes the Fire transfer family. Guided rule reminders are Level 2; adding Count never makes a rule-revealing response eligible. Worked demonstrations are exposure only. An optional one-problem Air probe has no additional reward and preserves the completed six-seat lesson record.
 
-Sensitivity (55 logical pixels per detent), 120 ms snap, first-drag resistance (70%), maximum one-detent inertia, screen dimensions, and presentation remain provisional. `DialView.firstDragResistance` and `inertiaEnabled` can be disabled for test comparisons. Reduced motion always disables inertia. The test does not settle the larger repeatable loop, final review ratios, final art, rewards, room scope, or navigation.
+Sensitivity (55 logical pixels per detent), 120 ms snap, maximum one-detent inertia, screen dimensions, and presentation remain provisional. First-drag resistance (70%) is off by default after the September 11 solo playtest found it unnoticeable; `DialView.firstDragResistance` re-enables it and `inertiaEnabled` can be disabled for test comparisons. All Caspar panel copy is placeholder text written plainly in his canon tone (patient, observant, learned, restrained); it is not final narrative. Reduced motion always disables inertia. The test does not settle the larger repeatable loop, final review ratios, final art, rewards, room scope, or navigation.
 
 ## Reproducible checks
 
@@ -50,7 +50,7 @@ Record device, viewport, input, observed result, and evidence for each check. Un
 - [ ] A third recovery encounter cannot create a fourth through sign changes. Pause without a Key if eligible evidence is missing.
 - [ ] Start positioning and successful-problem home returns produce no player detent events. Home is visible before the next start aligns.
 - [ ] Reduced motion disables inertia; default OS reduced-motion preference is respected in WebGL. Knowledge does not depend on animation, sound, or color.
-- [ ] Seat labels expose sign, position, framed/not-framed state, and revealed element. Browser focus is visible; selected destination and neutral count are announced where the assistive technology supports live regions.
+- [ ] Seat labels expose sign, position, under-the-marker state, and revealed element. Browser focus is visible; selected destination and neutral count are announced where the assistive technology supports live regions.
 - [ ] Complete both families: six lit, six dormant, two connections. Key 1 appears only with eligible evidence. No Retained, Sealed, permanent restoration, or durable-mastery claim appears.
 - [ ] Optional probe is voluntary, logs offer and acceptance, and awards no additional Key.
 - [ ] Answer logs contain start, relationship, destination, correctness, selected input method, hint level, attempt, response time, and evidence eligibility.
@@ -59,4 +59,4 @@ Record device, viewport, input, observed result, and evidence for each check. Un
 
 Local JSON events are prefixed `[CelestialDial]` in the Editor/player or browser console. They use session-relative timing and no production analytics service. Browser semantic controls call `WebAction`, which reaches the same selection and evaluator used by Unity buttons and drag. Native Editor screen-reader support is not claimed; WebGL uses native HTML buttons and a polite live region via Unity's documented JavaScript plug-in bridge. Actual screen-reader and switch hardware compatibility must be observed on the target device/browser combination.
 
-Human validation remains **PENDING**. For a single-designer pass use [the solo playtest checklist](SOLO-PLAYTEST.md); it can support REVISE or FAIL findings but cannot establish PASS on naive-tester comprehension. Use [the observation sheet](OBSERVATIONS.md) when naive participants are available.
+Gameplay validation is the owner's solo playtest against [the solo checklist](SOLO-PLAYTEST.md); decisions are recorded on the ClickUp task. The September 11 pass recorded **REVISE**, which this revision addresses.
