@@ -22,7 +22,9 @@ namespace Ascendant.CelestialDial
         bool recovering;
         int family = 1;
         int lastStart;
-        public string Message { get; private set; } = "Teaching sign: Taurus.\nNot assigned as your Sun sign.";
+        // Caspar speaks every line: patient, observant, learned, restrained, plainly worded.
+        // Placeholder copy for the greybox; no lore, no dialogue system.
+        public string Message { get; private set; } = "Welcome to the wheel. We will practice with Taurus.\nIt stands in for your own sign today.";
         public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional;
         public DialLesson(Func<double> clock) { Dial = new DialModel(clock); }
         public void Continue()
@@ -30,7 +32,7 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Encounter)
             {
                 Phase = LessonPhase.Rule; Lit[1] = true; Dial.PositionSilently(1);
-                Message = "Fire, Earth, Air, Water: four families.\nTaurus belongs to Earth.";
+                Message = "Every sign belongs to one of four families:\nFire, Earth, Air, or Water. Taurus is Earth.";
             }
             else if (Phase == LessonPhase.Rule)
             {
@@ -48,8 +50,9 @@ namespace Ascendant.CelestialDial
             lastStart = Zodiac.Wrap(start);
             Dial.Begin(lastStart, hint);
             if (hint >= 2) exposedProblems.Add(lastStart);
-            Message = hint >= 2 ? "Move four positions forward.\nStart at zero. Inspect, then Seal." :
-                "Find the next member of this family.\nMove, inspect, then Seal.";
+            string sign = Zodiac.Seats[lastStart].Name;
+            Message = hint >= 2 ? "Count four signs forward from " + sign + ". " + sign + " is zero.\nStop on the fourth sign, check it, then press the Seal." :
+                "Your turn. Find the next sign in this family from " + sign + ".\nTurn the wheel, check the sign, then press the Seal.";
         }
         public DialEvent Seal()
         {
@@ -59,9 +62,9 @@ namespace Ascendant.CelestialDial
             {
                 if (RecoveryEncounters == 0) RecoveryEncounters = 1;
                 if (Dial.HintLevel >= 2) exposedProblems.Add(Dial.Start);
-                Message = Dial.Attempts == 1 ? "Check your distance.\nYou can adjust from here." :
-                    Dial.Attempts == 2 ? "Move four positions forward.\nStart at zero. Check, then Seal." :
-                    "Watch one relationship.\nThen try a different starting sign.";
+                Message = Dial.Attempts == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
+                    Dial.Attempts == 2 ? "Here is the rule: count four signs forward. Your start sign is zero.\nCheck the sign under the marker, then press the Seal." :
+                    "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;
         }
@@ -71,7 +74,7 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
-                Message = "Optional problem complete.\nThe six-seat lesson remains complete.";
+                Message = "Well done. That one was for its own sake.\nYour six lit seats stay as they are.";
                 return;
             }
             Lit[result.selected_destination] = true;
@@ -89,7 +92,7 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
-                Message = "Optional probe finished.\nWorked examples do not create evidence.";
+                Message = "That one was practice only.\nYour lesson record is unchanged.";
                 return;
             }
             QueueFresh();
@@ -112,12 +115,12 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Guided)
             {
                 Dial.Home(); Phase = LessonPhase.Transfer;
-                Message = "Earth family complete.\nTry the Fire family with less guidance.";
+                Message = "The three Earth signs are joined. You see how it goes.\nNow the Fire family. I will say less this time.";
             }
             else if (IndependentEvidence)
             {
                 Dial.Home(); Phase = LessonPhase.Complete; KeyEarned = true;
-                Message = "Two of four families. Six seats lit.\nKeeper Key 1: you demonstrated the idea.";
+                Message = "Two families found. Six seats are lit.\nYou showed me the pattern yourself. Keeper Key 1 is yours.";
                 Dial.Log("key1_earned", true, true);
                 Dial.Log("optional_problem_offered");
             }
@@ -131,7 +134,7 @@ namespace Ascendant.CelestialDial
             if (RecoveryEncounters >= 3 || fresh.Length == 0)
             {
                 Dial.Home(); Phase = LessonPhase.Paused;
-                Message = "Pause here. The idea goes to later review.\nNo Key yet. Try again in a later activity.";
+                Message = "Let us stop here for now. No Key yet.\nWe will come back to this another day.";
                 return;
             }
             RecoveryEncounters++;
@@ -145,13 +148,13 @@ namespace Ascendant.CelestialDial
             Phase = LessonPhase.Optional;
             // A separate one-problem third-family probe; never changes the six-seat lesson record.
             StartProblem(2, 0);
-            Message = "Optional: try the Air family from Gemini.\nNo additional reward. Inspect, then Seal.";
+            Message = "One more, if you like. Start from Gemini, in the Air family.\nNo reward for this one. Just the wheel.";
         }
         public string SeatLabel(int seat)
         {
             var sign = Zodiac.Seats[seat];
             return sign.Name + ", position " + (seat + 1) + " of 12, " +
-                (Dial.Selected == seat ? "framed" : "not framed") +
+                (Dial.Selected == seat ? "under the marker" : "not under the marker") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }
     }
