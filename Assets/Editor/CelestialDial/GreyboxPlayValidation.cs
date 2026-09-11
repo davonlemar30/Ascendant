@@ -41,7 +41,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View!=null,"scene creates Dial view");var c=UnityEngine.Object.FindFirstObjectByType<Canvas>(); Debug.Log("[GreyboxDimensions] screen="+Screen.width+"x"+Screen.height+" canvas="+c.pixelRect+" scale="+c.scaleFactor+" root="+c.transform.Find("Portrait").localScale);Capture("editor-390-encounter.png");});
             Steps.Enqueue(()=>Click("Continue"));
             Steps.Enqueue(()=>{Check(View.Lesson.Lit[1],"teaching sign reveal");Click("Continue");});
-            Steps.Enqueue(()=>{for(int i=0;i<5;i++)Click("Forward\nStep");Click("Back\nStep");Check(View.Lesson.Dial.Selected==5 && View.Lesson.Dial.Attempts==0,"button overshoot/correction does not submit");Click("KEEPER'S\nSEAL");});
+            Steps.Enqueue(()=>{for(int i=0;i<5;i++)Click("Next");Click("Previous");Check(View.Lesson.Dial.Selected==5 && View.Lesson.Dial.Attempts==0,"button overshoot/correction does not submit");Click("KEEPER'S\nSEAL");});
             Steps.Enqueue(()=>{Check(View.Lesson.Dial.Start==5,"correct Seal advances after silent home");View.WebAction("seat:9");Check(View.Lesson.Dial.Attempts==0,"accessible direct select does not submit");View.WebAction("seal");});
             Steps.Enqueue(()=>{Check(View.Lesson.Phase==LessonPhase.Transfer,"guided family completes");Capture("editor-390-guided.png");Click("Continue");});
             Steps.Enqueue(()=>{View.WebAction("motion");Check(!View.Lesson.Dial.CanInertia,"reduced motion disables inertia");for(int i=0;i<4;i++)View.WebAction("keyboard-forward");View.WebAction("seal");});

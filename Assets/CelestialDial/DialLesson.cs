@@ -51,8 +51,8 @@ namespace Ascendant.CelestialDial
             Dial.Begin(lastStart, hint);
             if (hint >= 2) exposedProblems.Add(lastStart);
             string sign = Zodiac.Seats[lastStart].Name;
-            Message = hint >= 2 ? "Count four signs forward from " + sign + ". " + sign + " is zero.\nStop on the fourth sign, check it, then press the Seal." :
-                "Your turn. Find the next sign in this family from " + sign + ".\nTurn the wheel, check the sign, then press the Seal.";
+            Message = hint >= 2 ? "Start at " + sign + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
+                "Your turn. Find the next sign in this family from " + sign + ".\nMove the wheel, inspect the framed sign, then press Seal.";
         }
         public DialEvent Seal()
         {
@@ -63,7 +63,7 @@ namespace Ascendant.CelestialDial
                 if (RecoveryEncounters == 0) RecoveryEncounters = 1;
                 if (Dial.HintLevel >= 2) exposedProblems.Add(Dial.Start);
                 Message = Dial.Attempts == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
-                    Dial.Attempts == 2 ? "Here is the rule: count four signs forward. Your start sign is zero.\nCheck the sign under the marker, then press the Seal." :
+                    Dial.Attempts == 2 ? "Start at " + Zodiac.Seats[Dial.Start].Name + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
                     "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;
@@ -154,7 +154,7 @@ namespace Ascendant.CelestialDial
         {
             var sign = Zodiac.Seats[seat];
             return sign.Name + ", position " + (seat + 1) + " of 12, " +
-                (Dial.Selected == seat ? "under the marker" : "not under the marker") +
+                (Dial.Selected == seat ? "framed" : "not framed") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }
     }

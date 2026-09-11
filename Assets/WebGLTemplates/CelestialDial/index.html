@@ -15,7 +15,7 @@
 <section id="semantic" aria-label="Celestial Dial controls" aria-describedby="instructions">
 <p id="instructions" class="sr"></p>
 <div id="seats" role="group" aria-label="Zodiac seats in order"></div>
-<button id="back">Back Step</button><button id="seal">Keeper's Seal</button><button id="forward">Forward Step</button>
+<button id="back">Previous</button><button id="seal">Keeper's Seal</button><button id="forward">Next</button>
 <button id="count">Count</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
 </section>
 <div id="announcement" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -36,7 +36,7 @@
   }
   function layout(){
     // Semantic focus targets follow the selected seat orientation and the canvas reference layout.
-    const selected=state?state.seats.findIndex(s=>s.includes(', under the marker')):0;
+    const selected=state?state.seats.findIndex(s=>s.includes(', framed')):0;
     for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;box('seat-'+i,Math.cos(angle)*136,270-Math.sin(angle)*136,52,52);}
     box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
     box('count',0,714,80,48);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',0,768,216,48);
@@ -45,7 +45,7 @@
   window.ascendantDial={
     receive(next){
       state=next;
-      byId('instructions').textContent=[state.start,state.message,'Use left and right arrows to step. Tab navigates controls. Enter or Space activates the focused control. Only Keeper’s Seal submits.'].join(' ');
+      byId('instructions').textContent=[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Keeper’s Seal submits.'].join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
       for(const id of ['back','forward','seal','count'])byId(id).disabled=!state.active;
       byId('continue').disabled=!state.canContinue;byId('optional').disabled=!state.canOptional;
@@ -55,7 +55,7 @@
       if(announcement!==lastAnnouncement){byId('announcement').textContent=announcement;lastAnnouncement=announcement;}
       layout();
       if(document.activeElement===document.body || document.activeElement.disabled){
-        const focus=state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', under the marker')))):state.canOptional?byId('optional'):byId('motion');
+        const focus=state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', framed')))):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});
       }
     },

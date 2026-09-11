@@ -82,16 +82,16 @@ namespace Ascendant.CelestialDial
             start = Label(root,"",0,223,188,30,13);
             destination = Label(root,"",0,271,188,50,17);
             count = Label(root,"",0,319,178,36,15);
-            Label(root,"Turn  >  Check  >  Seal",0,441,340,24,14);
+            Label(root,"Move  >  Inspect  >  Seal",0,441,340,24,14);
             var panel = Rect("Caspar instruction panel",root,0,526,324,128);
             panel.gameObject.AddComponent<Image>().color = new Color(.13f,.13f,.15f);
             Label(panel,"CASPAR",0,18,290,22,13);
             message = Label(panel,"",0,74,306,96,14);
             phase = Label(root,"",0,608,330,28,13);
-            back = MakeButton(root,"Back\nStep",-122,654,64,56,()=>Step(-1,ClickMethod(DialInput.BackStep)));
+            back = MakeButton(root,"Previous",-122,654,64,56,()=>Step(-1,ClickMethod(DialInput.BackStep)));
             seal = MakeButton(root,"KEEPER'S\nSEAL",0,654,146,56,Commit);
             seal.GetComponent<Image>().color=Crimson; sealText=seal.GetComponentInChildren<Text>();
-            forward = MakeButton(root,"Forward\nStep",122,654,64,56,()=>Step(1,ClickMethod(DialInput.ForwardStep)));
+            forward = MakeButton(root,"Next",122,654,64,56,()=>Step(1,ClickMethod(DialInput.ForwardStep)));
             countButton=MakeButton(root,"Count",0,714,80,48,()=> { Lesson.Dial.Count(); Refresh(); });
             next=MakeButton(root,"Continue",0,654,190,56,ContinueLesson);
             optional=MakeButton(root,"Try one more (optional)",0,714,244,48,()=> { Lesson.BeginOptional(); AlignStart(); });
@@ -218,7 +218,7 @@ namespace Ascendant.CelestialDial
             {
                 yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .08f : .22f);
                 Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
-                message.text="Watch. I count four forward from "+Zodiac.Seats[beginning].Name+".\n"+n+": "+Zodiac.Seats[Zodiac.Wrap(beginning+n)].Name;
+                message.text="Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it.\n"+n+": "+Zodiac.Seats[Zodiac.Wrap(beginning+n)].Name;
                 LayoutRing(); RefreshSeats(); Publish();
             }
             Lesson.RevealDemonstration();
@@ -238,8 +238,8 @@ namespace Ascendant.CelestialDial
         void Refresh()
         {
             message.text=Lesson.Message;
-            destination.text=(dragging ? "Passing: " : "Under the marker: ")+Zodiac.Seats[Lesson.Dial.Selected].Name;
-            start.text=Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name+" (counts as 0)" : "Practice sign: Taurus";
+            destination.text=(dragging ? "Passing: " : "Framed: ")+Zodiac.Seats[Lesson.Dial.Selected].Name;
+            start.text=Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : "Teaching sign: Taurus";
             count.text=Lesson.Dial.Counting ? "Count: "+Lesson.Dial.MovementCount : "";
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Six seats lit, six still dark · The room is waking" :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :

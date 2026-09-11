@@ -27,7 +27,20 @@ Production: [Ascendant](https://davonlemar30.github.io/Ascendant/).
 - Before starting the greybox, merge the documentation prerequisite with required checks green, then branch from updated `main` as `codex/celestial-dial-greybox`.
 - Preserve unrelated local Unity changes and untracked files. Do not include them in the milestone.
 
-This checkpoint adds documentation only. No Celestial Dial implementation or human gameplay validation is claimed.
+## Current vertical-slice status — September 11, 2026
+
+The Celestial Dial greybox is implemented, deployed, and solo-playtested by the owner (the only playtester). The mechanic and flow are provisionally accepted: movement felt smooth, snapping and inertia were acceptable, alternate inputs matched dragging, the six-seat lesson and the optional problem completed, and both portrait layouts fit. The recorded decision on [task 86bbyd0vw](https://app.clickup.com/t/86bbyd0vw) is **REVISE for copy clarity only**. iPhone VoiceOver and Android TalkBack remain untested.
+
+The clarity issue was wording, not rotation: "Forward" felt visually contradictory because the wheel appears to move downward when advancing and upward when reversing. The copy-clarity pass (branch `codex/celestial-dial-copy-clarity`) therefore uses less visually loaded wording and changes nothing else:
+
+- Action sequence **Move > Inspect > Seal**; readout **Framed: [sign]**; step controls **Previous** and **Next**; introductory label **Teaching sign: Taurus**.
+- Counting explained as "Start at [sign]. Count each sign after it: one, two, three, four. Inspect the framed sign, then press Seal."
+- No player-facing "under the marker", "counts as 0", "your start sign is zero", or up/down/clockwise wording, in Unity UI, the WebGL template, or the accessibility labels.
+- Evaluator, rotation direction, snapping, inertia, recovery limits, evidence rules, reward logic, input parity, and layout geometry are unchanged.
+
+Validation of the copy pass (Unity 6000.3.24f1, local): `git diff --check` clean; stale-string sweep clean; mechanical validation 75/75; Play Mode validation 24/24 with captures at 390 × 844 and 360 × 800; headless WebGL build 0 errors / 0 warnings; browser suite 29/29 against the served build. Untested: VoiceOver / TalkBack on a device.
+
+**Versioning:** the Unity project reports bundle version `1.0`. `0.0.0.1` is not the configured version and is a four-part label rather than semantic versioning. `0.1.0` would be a clearer early-prototype label, but changing the project version is outside the copy pass and needs a separate release/versioning decision.
 
 ## Greybox boundaries and delivery
 

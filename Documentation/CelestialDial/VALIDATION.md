@@ -42,7 +42,7 @@ Record device, viewport, input, observed result, and evidence for each check. Un
 - [ ] Twelve ordered seats, Aries at the fixed 9 o'clock home marker, counterclockwise zodiac order; forward rotates the ring clockwise.
 - [ ] 390 × 844 and 360 × 800 fit without vertical scrolling; all seats and Count have at least 48 × 48 effective targets; primary controls are at least 56 high.
 - [ ] Drag four detents, release between detents, and verify nearest-seat snapping, no bounce, and no more than one additional detent of inertia.
-- [ ] Forward, Back, direct seat selection, keyboard arrows, Tab/Shift-Tab + Enter/Space, and screen-reader/switch activation reach equivalent committed outcomes.
+- [ ] Next, Previous, direct seat selection, keyboard arrows, Tab/Shift-Tab + Enter/Space, and screen-reader/switch activation reach equivalent committed outcomes.
 - [ ] Selection never submits. Keeper's Seal submits once. Five forward then one back before Seal is not a mistake.
 - [ ] Starting seat counts as zero. Pisces-to-Aries wraparound is correct. Every neutral count has identical emphasis, including four.
 - [ ] First incorrect Seal leaves the ring in place and nudges. Second leaves it in place and reveals the Level 2 rule. Third demonstrates, resets, and queues a different start within the same family if allowed.
@@ -50,7 +50,7 @@ Record device, viewport, input, observed result, and evidence for each check. Un
 - [ ] A third recovery encounter cannot create a fourth through sign changes. Pause without a Key if eligible evidence is missing.
 - [ ] Start positioning and successful-problem home returns produce no player detent events. Home is visible before the next start aligns.
 - [ ] Reduced motion disables inertia; default OS reduced-motion preference is respected in WebGL. Knowledge does not depend on animation, sound, or color.
-- [ ] Seat labels expose sign, position, under-the-marker state, and revealed element. Browser focus is visible; selected destination and neutral count are announced where the assistive technology supports live regions.
+- [ ] Seat labels expose sign, position, framed state, and revealed element. Browser focus is visible; selected destination and neutral count are announced where the assistive technology supports live regions.
 - [ ] Complete both families: six lit, six dormant, two connections. Key 1 appears only with eligible evidence. No Retained, Sealed, permanent restoration, or durable-mastery claim appears.
 - [ ] Optional probe is voluntary, logs offer and acceptance, and awards no additional Key.
 - [ ] Answer logs contain start, relationship, destination, correctness, selected input method, hint level, attempt, response time, and evidence eligibility.
