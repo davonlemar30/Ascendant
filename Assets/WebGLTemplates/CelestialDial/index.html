@@ -36,7 +36,7 @@
   }
   function layout(){
     // Semantic focus targets follow the selected seat orientation and the canvas reference layout.
-    const selected=state?state.seats.findIndex(s=>s.includes(', framed')):0;
+    const selected=state?state.seats.findIndex(s=>s.includes(', under the marker')):0;
     for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;box('seat-'+i,Math.cos(angle)*136,270-Math.sin(angle)*136,52,52);}
     box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
     box('count',0,714,80,48);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',0,768,216,48);
@@ -55,7 +55,7 @@
       if(announcement!==lastAnnouncement){byId('announcement').textContent=announcement;lastAnnouncement=announcement;}
       layout();
       if(document.activeElement===document.body || document.activeElement.disabled){
-        const focus=state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', framed')))):state.canOptional?byId('optional'):byId('motion');
+        const focus=state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', under the marker')))):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});
       }
     },
@@ -76,7 +76,7 @@
 createUnityInstance(document.getElementById('unity-canvas'),{
   dataUrl:'Build/{{{ DATA_FILENAME }}}',frameworkUrl:'Build/{{{ FRAMEWORK_FILENAME }}}',codeUrl:'Build/{{{ CODE_FILENAME }}}',
   streamingAssetsUrl:'StreamingAssets',companyName:{{{ JSON.stringify(COMPANY_NAME) }}},productName:{{{ JSON.stringify(PRODUCT_NAME) }}},productVersion:{{{ JSON.stringify(PRODUCT_VERSION) }}},
-  devicePixelRatio:1
+  devicePixelRatio:Math.min(window.devicePixelRatio||1,2)
 },progress=>document.getElementById('loading').textContent='Loading the Celestial Dial… '+Math.round(progress*100)+'%').then(instance=>{
   document.getElementById('loading').remove();window.ascendantDial.ready(instance);
 }).catch(error=>{
