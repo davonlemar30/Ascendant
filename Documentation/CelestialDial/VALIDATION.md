@@ -59,4 +59,4 @@ Record device, viewport, input, observed result, and evidence for each check. Un
 
 Local JSON events are prefixed `[CelestialDial]` in the Editor/player or browser console. They use session-relative timing and no production analytics service. Browser semantic controls call `WebAction`, which reaches the same selection and evaluator used by Unity buttons and drag. Native Editor screen-reader support is not claimed; WebGL uses native HTML buttons and a polite live region via Unity's documented JavaScript plug-in bridge. Actual screen-reader and switch hardware compatibility must be observed on the target device/browser combination.
 
-Human validation remains **PENDING**. Use [the observation sheet](OBSERVATIONS.md) before recording a milestone decision.
+Human validation remains **PENDING**. For a single-designer pass use [the solo playtest checklist](SOLO-PLAYTEST.md); it can support REVISE or FAIL findings but cannot establish PASS on naive-tester comprehension. Use [the observation sheet](OBSERVATIONS.md) when naive participants are available.
