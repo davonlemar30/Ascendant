@@ -1,0 +1,90 @@
+# Builds the Unity Web (WebGL) player from source and deploys it to GitHub Pages.
+#
+#   push to main / manual run on main  -> build + deploy to https://<owner>.github.io/Ascendant/
+#   pull requests targeting main       -> build only (artifact is produced, nothing is deployed)
+#
+# Requires the repository secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD (Unity Personal
+# activation performed by game-ci). Pull requests from forks cannot read secrets, so their builds
+# stop at license activation; that is expected.
+name: Web
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# One run per ref: superseded PR builds are cancelled, an in-flight main deployment is not.
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Web player
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Cache Unity Library
+        uses: actions/cache@v6
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-
+
+      # The Unity version comes from ProjectSettings/ProjectVersion.txt (unityVersion: auto).
+      # Build entry point: Assets/Editor/Build/WebBuild.cs (same one used for local CLI builds).
+      - name: Build with Unity
+        uses: game-ci/unity-builder@adaf7cd8f42fd48fbbf2d4f5f67ca30d87f819f1 # v5.0.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+          buildName: Web
+          buildMethod: Ascendant.Build.WebBuild.Build
+          versioning: None
+
+      # Gzip + decompression fallback (Player Settings) names the payload files *.unityweb so a
+      # static host needs no Content-Encoding headers. Fail early if any required file is missing.
+      - name: Verify build output
+        run: |
+          set -euo pipefail
+          out=build/WebGL/Web
+          for f in index.html Build/Web.loader.js Build/Web.framework.js.unityweb \
+                   Build/Web.data.unityweb Build/Web.wasm.unityweb; do
+            test -f "$out/$f" || { echo "::error::Missing required Web build file: $out/$f"; exit 1; }
+          done
+          ls -la "$out" "$out/Build"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: build/WebGL/Web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    # Only main publishes the production Pages site; PR builds stop at the artifact above.
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write    # create the Pages deployment
+      id-token: write # OIDC token deploy-pages uses to prove the deployment's origin
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
