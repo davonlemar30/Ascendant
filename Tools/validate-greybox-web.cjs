@@ -14,7 +14,9 @@ const path=require('path');
     page.on('console',msg=>{const text=msg.text(),mark=text.indexOf('[CelestialDial] ');if(mark>=0){try{events.push(JSON.parse(text.slice(mark+16)));}catch{}}});
     const state=()=>page.evaluate(()=>window.ascendantDial.snapshot());
     const ready=async()=>page.waitForFunction(()=>window.ascendantDial?.snapshot()?.canContinue,{},{timeout:120000});
-    const waitActive=async(start)=>page.waitForFunction(s=>window.ascendantDial.snapshot()?.active && window.ascendantDial.snapshot().start===('Start: '+s+' (0)'),start,{timeout:15000});
+    // Unity ignores pointer input in the first frame after a phase transition (the button is activated in
+    // that same frame), so settle briefly after the state flips. A person cannot tap that fast.
+    const waitActive=async(start)=>{await page.waitForFunction(s=>window.ascendantDial.snapshot()?.active && window.ascendantDial.snapshot().start===('Start: '+s+' (0)'),start,{timeout:15000});await page.waitForTimeout(150);};
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await page.mouse.click(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await page.waitForTimeout(70);};
     const semantic=async(id)=>page.locator('#'+id).evaluate(b=>b.click());
     await page.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await ready();await page.locator("#loading").waitFor({state:"detached"});
@@ -63,7 +65,7 @@ const path=require('path');
   await recovery.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
   await recovery.waitForFunction(()=>window.ascendantDial?.snapshot()?.canContinue,{},{timeout:120000});
   const action=async(id)=>recovery.locator('#'+id).evaluate(b=>b.click());
-  const active=async(sign)=>recovery.waitForFunction(s=>window.ascendantDial.snapshot().active && window.ascendantDial.snapshot().start==='Start: '+s+' (0)',sign,{timeout:15000});
+  const active=async(sign)=>{await recovery.waitForFunction(s=>window.ascendantDial.snapshot().active && window.ascendantDial.snapshot().start==='Start: '+s+' (0)',sign,{timeout:15000});await recovery.waitForTimeout(150);};
   check(await recovery.evaluate(()=>window.ascendantDial.snapshot().reducedMotion),'OS reduced-motion preference reaches Unity');
   await action('continue');await action('continue');await active('Taurus');
   await action('seat-5');await action('seal');await active('Virgo');
