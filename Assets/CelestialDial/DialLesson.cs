@@ -1,0 +1,158 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Ascendant.CelestialDial
+{
+    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional }
+
+    public sealed class DialLesson
+    {
+        public readonly DialModel Dial;
+        public readonly bool[] Lit = new bool[12];
+        public readonly bool[] Kin = new bool[12];
+        readonly HashSet<int> exposedProblems = new HashSet<int>();
+        readonly HashSet<int> recoveryStarts = new HashSet<int>();
+        public LessonPhase Phase { get; private set; } = LessonPhase.Encounter;
+        public bool KeyEarned { get; private set; }
+        public bool IndependentEvidence { get; private set; }
+        // User-approved provisional authoring rule: initial failed encounter + two replacements,
+        // shared across the whole activity. Different zodiac starts never reset this budget.
+        public int RecoveryEncounters { get; private set; }
+        bool recovering;
+        int family = 1;
+        int lastStart;
+        public string Message { get; private set; } = "Teaching sign: Taurus.\nNot assigned as your Sun sign.";
+        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional;
+        public DialLesson(Func<double> clock) { Dial = new DialModel(clock); }
+        public void Continue()
+        {
+            if (Phase == LessonPhase.Encounter)
+            {
+                Phase = LessonPhase.Rule; Lit[1] = true; Dial.PositionSilently(1);
+                Message = "Fire, Earth, Air, Water: four families.\nTaurus belongs to Earth.";
+            }
+            else if (Phase == LessonPhase.Rule)
+            {
+                Phase = LessonPhase.Guided;
+                StartProblem(1, 2);
+            }
+            else if (Phase == LessonPhase.Transfer)
+            {
+                family = 0; Phase = LessonPhase.Independent; Lit[0] = true;
+                StartProblem(0, 0);
+            }
+        }
+        void StartProblem(int start, int hint)
+        {
+            lastStart = Zodiac.Wrap(start);
+            Dial.Begin(lastStart, hint);
+            if (hint >= 2) exposedProblems.Add(lastStart);
+            Message = hint >= 2 ? "Move four positions forward.\nStart at zero. Inspect, then Seal." :
+                "Find the next member of this family.\nMove, inspect, then Seal.";
+        }
+        public DialEvent Seal()
+        {
+            var result = Dial.Commit();
+            if (result == null) return null;
+            if (!result.correctness)
+            {
+                if (RecoveryEncounters == 0) RecoveryEncounters = 1;
+                if (Dial.HintLevel >= 2) exposedProblems.Add(Dial.Start);
+                Message = Dial.Attempts == 1 ? "Check your distance.\nYou can adjust from here." :
+                    Dial.Attempts == 2 ? "Move four positions forward.\nStart at zero. Check, then Seal." :
+                    "Watch one relationship.\nThen try a different starting sign.";
+            }
+            return result;
+        }
+        public void AfterCorrect(DialEvent result)
+        {
+            if (result == null || !result.correctness) return;
+            if (Phase == LessonPhase.Optional)
+            {
+                Dial.Home(); Phase = LessonPhase.Complete;
+                Message = "Optional problem complete.\nThe six-seat lesson remains complete.";
+                return;
+            }
+            Lit[result.selected_destination] = true;
+            if (Phase == LessonPhase.Independent && result.evidence_eligible) IndependentEvidence = true;
+            if (recovering) { Dial.Log("problem_recovered", true, result.evidence_eligible); recovering = false; }
+            AdvanceOrRecover(result.hint_level >= 2 && Phase == LessonPhase.Independent);
+        }
+        public void RevealDemonstration()
+        {
+            if (Phase != LessonPhase.Optional) Lit[Zodiac.Destination(lastStart)] = true;
+            // Worked exposure illuminates but never writes eligible answer evidence.
+        }
+        public void AfterDemonstration()
+        {
+            if (Phase == LessonPhase.Optional)
+            {
+                Dial.Home(); Phase = LessonPhase.Complete;
+                Message = "Optional probe finished.\nWorked examples do not create evidence.";
+                return;
+            }
+            QueueFresh();
+        }
+        void AdvanceOrRecover(bool needsFresh)
+        {
+            bool complete = Enumerable.Range(0, 3).All(i => Lit[family + i * 4]);
+            if (complete && !Kin[family])
+            {
+                for (int i = 0; i < 3; i++) Kin[family + 4 * i] = true;
+                Dial.Log("family_completed");
+            }
+            if (needsFresh) { QueueFresh(); return; }
+            if (!complete)
+            {
+                int nextDestination = Enumerable.Range(0, 3).Select(i => family + i * 4).First(s => !Lit[s]);
+                StartProblem(Zodiac.Wrap(nextDestination - 4), Phase == LessonPhase.Guided ? 2 : 0);
+                return;
+            }
+            if (Phase == LessonPhase.Guided)
+            {
+                Dial.Home(); Phase = LessonPhase.Transfer;
+                Message = "Earth family complete.\nTry the Fire family with less guidance.";
+            }
+            else if (IndependentEvidence)
+            {
+                Dial.Home(); Phase = LessonPhase.Complete; KeyEarned = true;
+                Message = "Two of four families. Six seats lit.\nKeeper Key 1: you demonstrated the idea.";
+                Dial.Log("key1_earned", true, true);
+                Dial.Log("optional_problem_offered");
+            }
+            else QueueFresh();
+        }
+        void QueueFresh()
+        {
+            if (RecoveryEncounters == 0) RecoveryEncounters = 1;
+            var fresh = Enumerable.Range(0, 3).Select(i => family + i * 4)
+                .Where(s => s != lastStart && !exposedProblems.Contains(s) && !recoveryStarts.Contains(s)).ToArray();
+            if (RecoveryEncounters >= 3 || fresh.Length == 0)
+            {
+                Dial.Home(); Phase = LessonPhase.Paused;
+                Message = "Pause here. The idea goes to later review.\nNo Key yet. Try again in a later activity.";
+                return;
+            }
+            RecoveryEncounters++;
+            int start = fresh[0]; recoveryStarts.Add(start); recovering = true;
+            StartProblem(start, 0);
+        }
+        public void BeginOptional()
+        {
+            if (Phase != LessonPhase.Complete || !KeyEarned) return;
+            Dial.Log("optional_problem_accepted");
+            Phase = LessonPhase.Optional;
+            // A separate one-problem third-family probe; never changes the six-seat lesson record.
+            StartProblem(2, 0);
+            Message = "Optional: try the Air family from Gemini.\nNo additional reward. Inspect, then Seal.";
+        }
+        public string SeatLabel(int seat)
+        {
+            var sign = Zodiac.Seats[seat];
+            return sign.Name + ", position " + (seat + 1) + " of 12, " +
+                (Dial.Selected == seat ? "framed" : "not framed") +
+                (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
+        }
+    }
+}
