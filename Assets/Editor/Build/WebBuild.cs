@@ -27,6 +27,9 @@ namespace Ascendant.Build
 
         public static void Build()
         {
+            // The greybox domain checks run in both local and CI builds.
+            GreyboxValidation.Run();
+
             string[] args = Environment.GetCommandLineArgs();
             string outputPath = GetArgValue(args, "-buildOutput")
                 ?? GetArgValue(args, "-customBuildPath")

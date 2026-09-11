@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ascendant — Celestial Dial greybox</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#131317;color:#f0e8dc;font:16px system-ui}main{position:relative;width:100%;height:100dvh;overflow:hidden}canvas{width:100%;height:100%;display:block;touch-action:none}#loading{position:absolute;top:45%;width:100%;text-align:center}#semantic{position:absolute;inset:0;pointer-events:none}#semantic button{position:absolute;border:0;background:transparent;color:transparent;pointer-events:none;padding:0;font:13px system-ui;border-radius:0}#semantic button:focus-visible{outline:3px solid #f0e8dc;background:#222;color:#fff;z-index:10}#semantic button:disabled{display:none}#seats button:disabled{display:block}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#fallback{display:none}#failure{position:absolute;inset:30% 10%;text-align:center}
+</style>
+</head>
+<body>
+<main aria-label="The Zodiac Wing — Celestial Dial greybox">
+<canvas id="unity-canvas" tabindex="-1" aria-hidden="true"></canvas>
+<div id="loading" role="status">Loading the Celestial Dial…</div>
+<section id="semantic" aria-label="Celestial Dial controls" aria-describedby="instructions">
+<p id="instructions" class="sr"></p>
+<div id="seats" role="group" aria-label="Zodiac seats in order"></div>
+<button id="back">Back Step</button><button id="seal">Keeper's Seal</button><button id="forward">Forward Step</button>
+<button id="count">Count</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
+</section>
+<div id="announcement" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
+</main>
+<script>
+(function(){
+  'use strict';
+  let instance, state, pendingMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const byId=id=>document.getElementById(id);
+  const send=command=>{if(instance)instance.SendMessage('CelestialDial','WebAction',command);};
+  for(let i=0;i<12;i++){
+    const b=document.createElement('button');b.id='seat-'+i;b.textContent='Zodiac position '+(i+1);b.onclick=()=>send('seat:'+i);byId('seats').appendChild(b);
+  }
+  for(const id of ['back','seal','forward','count','continue','optional','motion'])byId(id).onclick=()=>send(id);
+  function box(id,x,y,w,h){
+    const scale=Math.min(innerWidth/360,innerHeight/800), left=(innerWidth-360*scale)/2, top=(innerHeight-800*scale)/2;
+    Object.assign(byId(id).style,{left:(left+(180+x-w/2)*scale)+'px',top:(top+(y-h/2)*scale)+'px',width:(w*scale)+'px',height:(h*scale)+'px'});
+  }
+  function layout(){
+    // Semantic focus targets follow the selected seat orientation and the canvas reference layout.
+    const selected=state?state.seats.findIndex(s=>s.includes(', framed')):0;
+    for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;box('seat-'+i,Math.cos(angle)*136,270-Math.sin(angle)*136,52,52);}
+    box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
+    box('count',0,714,80,48);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',0,768,216,48);
+  }
+  let lastAnnouncement='';
+  window.ascendantDial={
+    receive(next){
+      state=next;
+      byId('instructions').textContent=[state.start,state.message,'Use left and right arrows to step. Tab navigates controls. Enter or Space activates the focused control. Only Keeper’s Seal submits.'].join(' ');
+      for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
+      for(const id of ['back','forward','seal','count'])byId(id).disabled=!state.active;
+      byId('continue').disabled=!state.canContinue;byId('optional').disabled=!state.canOptional;
+      byId('motion').setAttribute('aria-pressed',String(state.reducedMotion));
+      byId('motion').setAttribute('aria-label','Reduced motion: '+(state.reducedMotion?'on':'off'));
+      const announcement=[state.destination,state.count,state.message].filter(Boolean).join('. ');
+      if(announcement!==lastAnnouncement){byId('announcement').textContent=announcement;lastAnnouncement=announcement;}
+      layout();
+      if(document.activeElement===document.body || document.activeElement.disabled){
+        const focus=state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', framed')))):state.canOptional?byId('optional'):byId('motion');
+        focus.focus({preventScroll:true});
+      }
+    },
+    ready(unity){instance=unity;if(pendingMotion)send('motion-on');},
+    // Read-only test evidence; actions still enter C# through the same public bridge.
+    snapshot:()=>state
+  };
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();if(!e.repeat)send(e.key==='ArrowRight'?'keyboard-forward':'keyboard-back');}
+  });
+  window.addEventListener('resize',layout);
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{pendingMotion=e.matches;if(e.matches)send('motion-on');});
+  layout();
+})();
+</script>
+<script src="Build/{{{ LOADER_FILENAME }}}"></script>
+<script>
+createUnityInstance(document.getElementById('unity-canvas'),{
+  dataUrl:'Build/{{{ DATA_FILENAME }}}',frameworkUrl:'Build/{{{ FRAMEWORK_FILENAME }}}',codeUrl:'Build/{{{ CODE_FILENAME }}}',
+  streamingAssetsUrl:'StreamingAssets',companyName:{{{ JSON.stringify(COMPANY_NAME) }}},productName:{{{ JSON.stringify(PRODUCT_NAME) }}},productVersion:{{{ JSON.stringify(PRODUCT_VERSION) }}},
+  devicePixelRatio:1
+},progress=>document.getElementById('loading').textContent='Loading the Celestial Dial… '+Math.round(progress*100)+'%').then(instance=>{
+  document.getElementById('loading').remove();window.ascendantDial.ready(instance);
+}).catch(error=>{
+  const failure=document.getElementById('loading');failure.id='failure';failure.textContent='The greybox could not load. '+String(error);
+});
+</script>
+</body>
+</html>

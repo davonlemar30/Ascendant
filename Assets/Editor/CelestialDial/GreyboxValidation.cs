@@ -1,0 +1,90 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+using Ascendant.CelestialDial;
+
+namespace Ascendant.Build
+{
+    // Deterministic domain checks runnable by the same pinned Editor, without adding packages.
+    public static class GreyboxValidation
+    {
+        static readonly List<string> Passed=new List<string>();
+        static void Check(bool condition,string name) { if(!condition)throw new Exception("FAIL: "+name);Passed.Add(name); }
+        static DialLesson Transfer()
+        {
+            var lesson=new DialLesson(()=>10);
+            lesson.Continue();lesson.Continue();
+            Answer(lesson);Answer(lesson);lesson.Continue();return lesson;
+        }
+        static DialEvent Answer(DialLesson lesson)
+        {
+            lesson.Dial.Select(Zodiac.Destination(lesson.Dial.Start),DialInput.DirectSeat);
+            var result=lesson.Seal();lesson.AfterCorrect(result);return result;
+        }
+        static void Wrong(DialLesson lesson,int times)
+        {
+            for(int i=0;i<times;i++){lesson.Dial.Select(lesson.Dial.Start,DialInput.DirectSeat);lesson.Seal();}
+        }
+        [MenuItem("Ascendant/Greybox/Run mechanical validation")]
+        public static void Run()
+        {
+            Passed.Clear();
+            Check(Zodiac.Seats.Count==12 && Zodiac.Seats.Select(x=>x.Name).Distinct().Count()==12,"12 unique ordered signs");
+            Check(Zodiac.Seats[0].Name=="Aries" && Zodiac.Seats[11].Name=="Pisces","Aries home and Pisces boundary");
+            foreach(int start in Enumerable.Range(0,12))
+            {
+                int end=Zodiac.Destination(start);
+                Check(Zodiac.Seats[start].Element==Zodiac.Seats[end].Element,"same-element offset from "+start);
+                Check(Zodiac.Evaluate(start,4,(start+4)%12),"four forward with zero start and wrap from "+start);
+                Check(!Zodiac.Evaluate(start,4,(start+3)%12),"inclusive-counting error rejected from "+start);
+            }
+            foreach(DialInput method in Enum.GetValues(typeof(DialInput)))
+            {
+                var dial=new DialModel(()=>5);dial.Begin(10,0);
+                dial.Step(5,method);dial.Step(-1,method);dial.Frame();
+                Check(dial.Selected==2 && dial.Attempts==0 && dial.Active,"selection and corrected overshoot do not submit: "+method);
+                var answer=dial.Commit();Check(answer.correctness && answer.evidence_eligible && answer.input_method==method.ToString(),"equivalent evaluator and independent evidence: "+method);
+            }
+            var direct=new DialModel(()=>5);direct.Begin(11,0);direct.Select(3,DialInput.DirectSeat);
+            Check(direct.Attempts==0 && direct.Selected==3,"direct tap frames without sealing");
+            direct.Count();Check(direct.HintLevel==1 && direct.Counting,"Level 1 is neutral counting");
+            Check(direct.Commit().evidence_eligible,"Level 1 eligible evidence");
+            var errors=new DialModel(()=>5);errors.Begin(0,0);errors.Select(2,DialInput.Keyboard);errors.Commit();
+            Check(errors.Selected==2 && errors.HintLevel==1 && errors.Active,"first rejection stays in place with nudge");
+            errors.Commit();Check(errors.Selected==2 && errors.HintLevel==2 && !errors.CanInertia,"second rejection stays in place at Level 2 without inertia");
+            errors.Count();Check(errors.HintLevel==2,"counter never downgrades Level 2");
+            errors.Commit();Check(errors.Selected==2 && errors.HintLevel==3 && !errors.Active && !errors.CanInertia,"third rejection requests worked recovery");
+            var silence=new DialModel(()=>0);silence.Begin(7,0);silence.Home();silence.Begin(9,0);
+            Check(silence.Events.All(e=>e.event_name=="problem_started"),"automatic start and home emit no detent/frame events");
+            silence.ReducedMotion=true;Check(!silence.CanInertia,"reduced motion disables inertia at Level 0");
+            var neutral=new DialModel(()=>0);neutral.Begin(0,0);neutral.Count();neutral.Step(6,DialInput.Drag);
+            Check(neutral.Events.Where(e=>e.event_name=="dial_rotated").Select(e=>e.movement_count).SequenceEqual(new[]{1,2,3,4,5,6}),"all counting detents use identical event path");
+            var happy=Transfer();Check(happy.Lit.Count(v=>v)==4 && !happy.KeyEarned,"guided family plus transfer start, no premature Key");
+            Check(happy.Dial.Events.Where(e=>e.event_name=="answer_correct").All(e=>!e.evidence_eligible),"guided rule exposure is never independent evidence");
+            Answer(happy);Answer(happy);
+            Check(happy.Phase==LessonPhase.Complete && happy.Lit.Count(v=>v)==6 && happy.Kin.Count(v=>v)==6,"two completed families; six lit and six dormant");
+            Check(happy.KeyEarned && happy.IndependentEvidence,"Key 1 requires challenge completion and independent evidence");
+            Check(happy.Dial.Selected==0,"completion returns home");
+            var assisted=Transfer();Wrong(assisted,2);var assistedAnswer=Answer(assisted);
+            Check(!assistedAnswer.evidence_eligible && assisted.Dial.Start!=assistedAnswer.start_seat && assisted.Dial.HintLevel==0,"Level 2 completion queues a different fresh Level 0 problem");
+            Answer(assisted);Check(assisted.KeyEarned,"fresh equivalent can earn Key after assisted completion");
+            var recovery=Transfer();int firstStart=recovery.Dial.Start;Wrong(recovery,3);recovery.RevealDemonstration();recovery.AfterDemonstration();
+            Check(recovery.Dial.Start!=firstStart && recovery.RecoveryEncounters==2 && recovery.Dial.HintLevel==0,"worked recovery resets to a fresh equivalent, encounter two");
+            Wrong(recovery,3);recovery.RevealDemonstration();recovery.AfterDemonstration();
+            Check(recovery.RecoveryEncounters==3,"third encounter uses final shared recovery slot");
+            Wrong(recovery,3);recovery.RevealDemonstration();recovery.AfterDemonstration();
+            Check(recovery.Phase==LessonPhase.Paused && !recovery.KeyEarned && !recovery.Dial.Active,"cap pauses without a Key or extra fourth encounter");
+            Check(recovery.Dial.Events.All(e=>!e.evidence_eligible),"demonstrations never create evidence");
+            happy.BeginOptional();Check(happy.Phase==LessonPhase.Optional && happy.Dial.Start==2,"optional third-family probe offered and accepted");
+            Answer(happy);Check(happy.Lit.Count(v=>v)==6 && happy.Phase==LessonPhase.Complete,"optional probe preserves the completed six-seat record");
+            Check(happy.Dial.Events.Count(e=>e.event_name=="key1_earned")==1,"optional probe does not award another Key");
+            double time=2;var timed=new DialModel(()=>time);timed.Begin(0,0);time=5;timed.Step(4,DialInput.Keyboard);var logged=timed.Commit();
+            Check(logged.response_time==3 && logged.attempt_number==1 && logged.start_sign=="Aries" && logged.destination_sign=="Leo" && logged.requested_relationship=="forward_offset_4","answer log carries timing, attempt, relationship and seats");
+            Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
+            Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
+        }
+    }
+}
