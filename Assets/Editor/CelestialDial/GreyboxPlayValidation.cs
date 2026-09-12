@@ -39,9 +39,10 @@ namespace Ascendant.Build
         {
             Report.Clear();Steps.Clear();RuntimeErrors.Clear();Application.logMessageReceived+=CaptureLog;
             Steps.Enqueue(()=>{Check(View!=null,"scene creates Dial view");var c=UnityEngine.Object.FindFirstObjectByType<Canvas>(); Debug.Log("[GreyboxDimensions] screen="+Screen.width+"x"+Screen.height+" canvas="+c.pixelRect+" scale="+c.scaleFactor+" root="+c.transform.Find("Portrait").localScale);Capture("editor-390-encounter.png");});
-            Steps.Enqueue(()=>Click("Continue"));
-            Steps.Enqueue(()=>{Check(View.Lesson.Lit[1],"teaching sign reveal");Click("Continue");});
-            Steps.Enqueue(()=>{for(int i=0;i<5;i++)Click("Next");Click("Previous");Check(View.Lesson.Dial.Selected==5 && View.Lesson.Dial.Attempts==0,"button overshoot/correction does not submit");Click("KEEPER'S\nSEAL");});
+            Steps.Enqueue(()=>{Check(View.Lesson.DialDormant,"Dial starts dormant");Click("Continue");});
+            for(int i=0;i<6;i++) Steps.Enqueue(()=>Click("Continue"));
+            Steps.Enqueue(()=>{Check(!View.Lesson.DialDormant && View.Lesson.Lit[1] && View.Lesson.Phase==LessonPhase.Guided,"intro completes: sun sign lit and guided problem begins");});
+            Steps.Enqueue(()=>{for(int i=0;i<5;i++)Click("Next");Click("Previous");Check(View.Lesson.Dial.Selected==5 && View.Lesson.Dial.Attempts==0,"button overshoot/correction does not submit");Click("SEAL");});
             Steps.Enqueue(()=>{Check(View.Lesson.Dial.Start==5,"correct Seal advances after silent home");View.WebAction("seat:9");Check(View.Lesson.Dial.Attempts==0,"accessible direct select does not submit");View.WebAction("seal");});
             Steps.Enqueue(()=>{Check(View.Lesson.Phase==LessonPhase.Transfer,"guided family completes");Capture("editor-390-guided.png");Click("Continue");});
             Steps.Enqueue(()=>{View.WebAction("motion");Check(!View.Lesson.Dial.CanInertia,"reduced motion disables inertia");for(int i=0;i<4;i++)View.WebAction("keyboard-forward");View.WebAction("seal");});
@@ -71,6 +72,7 @@ namespace Ascendant.Build
             if(EditorApplication.isPaused){Debug.LogWarning("[GreyboxPlayValidation] Resuming paused Editor for fixture.");EditorApplication.isPaused=false;}
             EditorApplication.QueuePlayerLoopUpdate();
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
+            var view=View; if(view!=null && view.Busy)return; // Beats (wake, hesitation, count, demo) own the frame.
             nextAt=EditorApplication.timeSinceStartup+4;
             try{Steps.Dequeue()();}
             catch(Exception e)

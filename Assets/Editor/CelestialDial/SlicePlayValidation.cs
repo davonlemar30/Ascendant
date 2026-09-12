@@ -42,11 +42,13 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View!=null && View.Flow.Screen==SliceScreen.Identity,"slice opens on the identity screen");Capture("slice-390-identity.png");});
             Steps.Enqueue(()=>{Act("name:Tester");Check(View.Flow.DisplayName=="Tester","name reaches the flow through the bridge");Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth,"birth prompt follows identity");Capture("slice-390-birth.png");});
-            Steps.Enqueue(()=>{Act("next-screen");Check(View.Flow.Screen==SliceScreen.Birth,"birth prompt blocks continue until a choice");Act("birth:unknown");Act("next-screen");});
+            Steps.Enqueue(()=>{Act("next-screen");Check(View.Flow.Screen==SliceScreen.Birth,"birth prompt blocks continue until a choice");Act("birth:unknown");Check(View.Flow.HasSunSign && View.Flow.Note.Contains("choose one for you"),"I don't know assigns a sun sign");Act("birth:");Check(!View.Flow.HasSunSign,"the answer can be changed");Act("birth:known");Act("sign:1");Check(View.Flow.SunSign==1 && View.Flow.Note.Contains("Taurus"),"a known sign is accepted");Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Atrium && !View.Busy,"white light leads to the atrium");Capture("slice-390-atrium.png");});
-            Steps.Enqueue(()=>{Act("next-screen");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.UiCanvas.gameObject.activeSelf,"atrium continues into the wing with the Dial visible");Capture("slice-390-wing.png");});
-            Steps.Enqueue(()=>{Act("continue");Act("continue");Act("seat:5");Act("seal");});
+            Steps.Enqueue(()=>{for(int i=0;i<SliceView.AtriumPages.Length;i++)Act("next-screen");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.UiCanvas.gameObject.activeSelf && View.Dial.Lesson.DialDormant && View.Dial.Lesson.Sun==1,"atrium continues into the wing; the Dial is dormant and knows the sun sign");Capture("slice-390-wing.png");});
+            for(int i=0;i<7;i++) Steps.Enqueue(()=>Act("continue"));
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Guided && !View.Dial.Lesson.DialDormant,"seven intro beats reach the guided problem");Capture("slice-390-wing-guided.png");});
+            Steps.Enqueue(()=>{Act("seat:5");Act("seal");});
             Steps.Enqueue(()=>{Act("seat:9");Act("seal");});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Transfer,"guided family completes inside the slice");Act("continue");for(int i=0;i<4;i++)Act("keyboard-forward");Act("seal");});
             Steps.Enqueue(()=>{Act("seat:8");Act("seal");});
@@ -54,8 +56,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.KeyRevealed && !View.Busy,"the Dial reveals the Key after completion");Check(View.Dial.Lesson.Message.StartsWith("Aah"),"Caspar's reveal line follows the locked line");Capture("slice-390-wing-reveal.png");});
             Steps.Enqueue(()=>{Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.AtriumReturn,"wing continues to the atrium return");Capture("slice-390-atrium-return.png");});
-            Steps.Enqueue(()=>{Act("next-screen");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Chamber,"atrium return leads to the chamber");Capture("slice-390-chamber.png");});
+            Steps.Enqueue(()=>{for(int i=0;i<SliceView.ReturnPages.Length;i++)Act("next-screen");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Chamber,"atrium return leads to the chamber");Act("insert");Check(!View.Flow.KeyInserted,"insert waits for Caspar to finish");for(int i=1;i<SliceView.ChamberPages.Length;i++)Act("next-screen");Capture("slice-390-chamber.png");});
             Steps.Enqueue(()=>{Act("insert");});
             Steps.Enqueue(()=>{Check(View.Flow.KeyInserted && View.Flow.LocksFilled==1 && View.Flow.Ended && !View.Busy,"one key fills one of three locks and ends the prototype");Capture("slice-390-chamber-end.png");});
             Steps.Enqueue(()=>{GreyboxPlayValidation.SetSize(360,800);});
@@ -76,6 +78,7 @@ namespace Ascendant.Build
             if(EditorApplication.isPaused){Debug.LogWarning("[SlicePlayValidation] Resuming paused Editor for fixture.");EditorApplication.isPaused=false;}
             EditorApplication.QueuePlayerLoopUpdate();
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
+            var view=View; if(view!=null && (view.Busy || view.Dial.Busy))return; // Beats own the frame.
             nextAt=EditorApplication.timeSinceStartup+4;
             try{Steps.Dequeue()();}
             catch(Exception e)
