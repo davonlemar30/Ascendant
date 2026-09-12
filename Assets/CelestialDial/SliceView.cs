@@ -17,6 +17,7 @@ namespace Ascendant.CelestialDial
         public bool Busy => busy;
         public int Page { get; private set; }
         public bool Resumed { get; private set; }
+        public bool ChamberPaging => chamberContinue.gameObject.activeSelf && !insert.gameObject.activeSelf; // fixture evidence
         public const string SaveKey = "ascendant.v02.save";
         Canvas canvas, flashCanvas; RectTransform root; Font font;
         RectTransform identity, birth, atrium, atriumReturn, chamber, hub, review, birthChoices, birthDate, birthSigns, glyphs;
@@ -568,9 +569,11 @@ namespace Ascendant.CelestialDial
             returnText.text = ReturnPages[Mathf.Min(Page, ReturnPages.Length - 1)];
             if (!Flow.KeyInserted) chamberText.text = ChamberPages[Mathf.Min(Page, ChamberPages.Length - 1)];
             bool chamberReady = Flow.Screen == SliceScreen.Chamber && Page >= ChamberPages.Length - 1;
-            insert.gameObject.SetActive(Flow.Screen == SliceScreen.Chamber && !Flow.KeyInserted);
+            // A visible Continue turns Caspar's pages; the glowing Insert appears only on his last page. (The hidden
+            // screen-reader Continue was the only page-turn before, which left touch players stuck here.)
+            insert.gameObject.SetActive(Flow.Screen == SliceScreen.Chamber && !Flow.KeyInserted && chamberReady);
             insert.interactable = chamberReady && !busy;
-            chamberContinue.gameObject.SetActive(Flow.Screen == SliceScreen.Chamber && Flow.Ended && !busy);
+            chamberContinue.gameObject.SetActive(Flow.Screen == SliceScreen.Chamber && !busy && (Flow.Ended || (!Flow.KeyInserted && !chamberReady)));
             if (!chamberReady && insertGlow != null) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
         }
         void LightWing() { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .8f); candle.color = LampLit; }

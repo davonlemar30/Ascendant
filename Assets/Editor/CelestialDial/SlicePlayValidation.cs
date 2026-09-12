@@ -59,7 +59,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.AtriumReturn,"wing continues to the atrium return");Capture("slice-390-atrium-return.png");});
             Steps.Enqueue(()=>{for(int i=0;i<SliceView.ReturnPages.Length;i++)Act("next-screen");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Chamber,"atrium return leads to the chamber");Act("insert");Check(!View.Flow.KeyInserted,"insert waits for Caspar to finish");for(int i=1;i<SliceView.ChamberPages.Length;i++)Act("next-screen");Capture("slice-390-chamber.png");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Chamber,"atrium return leads to the chamber");Act("insert");Check(!View.Flow.KeyInserted,"insert waits for Caspar to finish");Check(View.ChamberPaging,"a visible Continue turns the pages and Insert is not yet shown");for(int i=1;i<SliceView.ChamberPages.Length;i++)Act("next-screen");Check(!View.ChamberPaging && View.Flow.Screen==SliceScreen.Chamber,"on the last page Continue gives way to Insert the Key");Capture("slice-390-chamber.png");});
             Steps.Enqueue(()=>{Act("insert");});
             Steps.Enqueue(()=>{Check(View.Flow.KeyInserted && View.Flow.LocksFilled==1 && View.Flow.Ended && !View.Busy,"one key fills one of three locks and ends the prototype");Capture("slice-390-chamber-end.png");});
             // ---- v0.2: the return ----
