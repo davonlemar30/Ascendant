@@ -27,19 +27,16 @@ Production: [Ascendant](https://davonlemar30.github.io/Ascendant/).
 - Before starting the greybox, merge the documentation prerequisite with required checks green, then branch from updated `main` as `codex/celestial-dial-greybox`.
 - Preserve unrelated local Unity changes and untracked files. Do not include them in the milestone.
 
-## Current vertical-slice status — September 11, 2026
+## Current vertical-slice status — September 12, 2026
 
-The Celestial Dial greybox is built, deployed, and solo-accepted (owner is the only playtester; REVISE narrowed to copy clarity, then addressed in PR #6). The last three prototype locks closed on September 11: [First Reward](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24114), [Navigation](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24154), and [Room Scope](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24174). The **vertical slice v0.1** (branch `codex/vertical-slice`, [task 86bbzm11t](https://app.clickup.com/t/86bbzm11t)) wraps the Dial in the locked bookends:
+The vertical slice v0.1 is live and was solo-playtested by the owner on September 12 (**PASS**, [record](https://app.clickup.com/90141007990/docs/2kyd583p-6954)). The September 11 copy session then rewrote every player-facing line; the [v0.1 Copy Deck](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24554) is the copy source of truth and the [Decisions Log continuation](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24574) records four canon amendments: the "Two of four" line, the dormant Dial with simulated hesitation, "Keeper's Seal" → "Seal", and the Chamber ending. The copy-session build (branch `codex/slice-copy-session`, [task 86bbzm11t](https://app.clickup.com/t/86bbzm11t)) implements all of it plus the playtest findings:
 
-1. Darkness / Identity: name entry (blank becomes "Keeper") and the birth prompt with three choices. No chart is calculated; every path uses the labeled teaching sign.
-2. Grand Atrium: Stage 1 "Forgotten" placeholders and Caspar's orientation.
-3. Zodiac Wing: the Dial with the Q07 props. On the sixth lit seat Caspar says the locked "Two of four. The rest will wait for you."; the Dial splits, a Keeper Key rises, "Aah... the Library stirs."
-4. Grand Atrium: Caspar leads onward.
-5. Crystal Book Chamber: seven sealed Books, three locks each; the Key fills 1/3; chandelier, mechanism one degree, "So he was right." End of prototype.
+- Birth prompt sets the sun sign for the session: a birth month and day derives it (common almanac boundaries; time and place unused), a known sign is picked from twelve, "I don't know" assigns one at random and Caspar says so. No chart is generated. The Dial teaches the sun sign's own family first.
+- Zodiac Wing entrance: dormant Dial that wakes to the player, Caspar's reaction, a simulated hesitation with no input, disbelief, composure, then teaching. Seven beats, two automatic.
+- Count beats: Level 2 problems show the count once, one click per number, then return the ring; Level 3 demonstrations use the same beats. Ending beats hold longer.
+- Copy from the deck throughout; long Caspar passages paged by Continue; the "Framed:" readout removed; SEAL; "Two families complete. Two remain."; glowing "Insert the Key" once Caspar finishes; the name box no longer shows over the loading screen.
 
-Screens link by Continue only. Placeholder art and copy throughout; only locked lines are verbatim. No save, no inventory (a Key indicator), no hub, no map. The shipped scene is `Assets/Scenes/VerticalSlice.unity`; `Assets/Scenes/CelestialDial.unity` stays for the Dial-only fixture. iPhone VoiceOver and Android TalkBack remain untested.
-
-Validation of the slice (Unity 6000.3.24f1, local): mechanical validation 85/85 (flow rules and the locked completion line included); slice Play Mode fixture 16/16 with captures of every screen at 390 × 844 and the ending at 360 × 800; Dial-only Play Mode fixture 24/24; headless WebGL build 0 errors / 0 warnings; browser suite 44/44 against the served build, walking the bookends before and after the Dial in both viewports plus the recovery path.
+Validation (Unity 6000.3.24f1, local): mechanical validation 104/104 (sun-sign table, family selection for a non-Taurus sign, intro beats, count-beat rules, amended lines); slice Play Mode fixture 21/21 with a capture per screen at 390 × 844 and the ending at 360 × 800; Dial-only fixture 25/25; headless WebGL build 0 errors / 0 warnings; browser suite 51/51 against the served build, including the date-derived and random sun-sign paths. iPhone VoiceOver and Android TalkBack remain untested (skipped by approval).
 
 **Versioning:** the Unity project reports bundle version `1.0`. `0.1.0` would be a clearer early-prototype label; changing it needs a separate release/versioning decision.
 

@@ -26,6 +26,15 @@ namespace Ascendant.CelestialDial
         public static int Wrap(int position) => (position % 12 + 12) % 12;
         public static int Destination(int start, int forward = 4) => Wrap(start + forward);
         public static bool Evaluate(int start, int offset, int destination) => Destination(start, offset) == destination;
+        // Tropical sun-sign date ranges (common almanac boundaries; cusp days can vary by year). Returns -1 for an invalid date.
+        static readonly int[] SignStartDay = { 20, 19, 21, 20, 21, 21, 23, 23, 23, 23, 22, 22 }; // Jan..Dec: day the next sign begins
+        static readonly int[] SignStartSeat = { 10, 11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };            // sign that begins in that month
+        public static int SunSign(int month, int day)
+        {
+            if (month < 1 || month > 12 || day < 1 || day > 31) return -1;
+            int m = month - 1;
+            return day >= SignStartDay[m] ? SignStartSeat[m] : SignStartSeat[(m + 11) % 12];
+        }
     }
 
     [Serializable]

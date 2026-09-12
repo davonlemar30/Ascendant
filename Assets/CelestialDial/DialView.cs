@@ -52,9 +52,10 @@ namespace Ascendant.CelestialDial
         {
             public string message, destination, start, phase, count;
             public string[] seats;
-            public bool active, canContinue, canOptional, reducedMotion, keyEarned;
+            public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy;
             public string screen = "wing", playerName = "", caspar = "", note = "";
-            public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth;
+            public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
+            public string sunSign = "";
             public int locksFilled;
         }
         void Awake()
@@ -93,16 +94,16 @@ namespace Ascendant.CelestialDial
             Bar(bracket,-27,29,3,58); Bar(bracket,27,29,3,58);
             Bar(bracket,0,1,56,3); Bar(bracket,0,57,56,3);
             start = Label(root,"",0,223,188,30,13);
-            destination = Label(root,"",0,271,188,50,17);
+            destination = Label(root,"",0,271,188,50,17); destination.gameObject.SetActive(false); // Removed from view (Sept 11): the marker is self-evident.
             count = Label(root,"",0,319,178,36,15);
             Label(root,"Move  >  Inspect  >  Seal",0,441,340,24,14);
             var panel = Rect("Caspar instruction panel",root,0,526,324,128);
             panel.gameObject.AddComponent<Image>().color = new Color(.13f,.13f,.15f);
             Label(panel,"CASPAR",0,18,290,22,13);
-            message = Label(panel,"",0,74,306,96,14);
+            message = Label(panel,"",0,74,306,96,13);
             phase = Label(root,"",0,608,330,28,13);
             back = MakeButton(root,"Previous",-122,654,64,56,()=>Step(-1,ClickMethod(DialInput.BackStep)));
-            seal = MakeButton(root,"KEEPER'S\nSEAL",0,654,146,56,Commit);
+            seal = MakeButton(root,"SEAL",0,654,146,56,Commit); // Amended canon (Sept 11): "Keeper's Seal" renamed to "Seal".
             seal.GetComponent<Image>().color=Crimson; sealText=seal.GetComponentInChildren<Text>();
             forward = MakeButton(root,"Next",122,654,64,56,()=>Step(1,ClickMethod(DialInput.ForwardStep)));
             countButton=MakeButton(root,"Count",0,714,80,48,()=> { Lesson.Dial.Count(); Refresh(); });
@@ -144,6 +145,8 @@ namespace Ascendant.CelestialDial
                 }
             }
 #endif
+            if(!busy && !dragging && Lesson.IntroAuto) StartCoroutine(IntroBeat());
+            if(!busy && !dragging && Lesson.CountBeatPending && Lesson.Dial.Active) StartCoroutine(CountBeat());
             if(!dragging && Mathf.Abs(turns-targetTurns)>.001f)
             {
                 turns=Lesson.Dial.ReducedMotion ? targetTurns : Mathf.Lerp(snapFrom,targetTurns,Mathf.Clamp01((Time.unscaledTime-snapAt)/SnapSeconds));
@@ -217,25 +220,64 @@ namespace Ascendant.CelestialDial
         {
             busy=true;
             Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional;
-            message.text="Yes. "+Zodiac.Seats[result.selected_destination].Name+" is "+Zodiac.Seats[result.selected_destination].Element+", like your start sign.\n"+(result.evidence_eligible ? "You found that one on your own." : "We found that one together.");
+            message.text=Lesson.CorrectLine(result);
             RefreshSeats(); Publish();
-            yield return new WaitForSecondsRealtime(.65f);
+            yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .6f : 1.1f);
             yield return ReturnHome();
             Lesson.AfterCorrect(result); busy=false; AlignStart();
+        }
+        // One click per count beat, synchronized with the displayed number (Sept 11 build note).
+        public const float BeatSeconds=.9f, ReducedBeatSeconds=.5f;
+        float Beat => Lesson.Dial.ReducedMotion ? ReducedBeatSeconds : BeatSeconds;
+        bool waking;
+        static string Number(int n) => n==1 ? "one" : n==2 ? "two" : n==3 ? "three" : "four";
+        IEnumerator IntroBeat()
+        {
+            busy=true; Refresh();
+            if(Lesson.IntroStep==1)
+            {
+                // The Dial wakes to the player: seats brighten one by one.
+                waking=true;
+                if(Lesson.Dial.ReducedMotion) { RefreshSeats(); yield return new WaitForSecondsRealtime(.6f); }
+                else for(int i=0;i<12;i++){ RefreshSeats(); yield return new WaitForSecondsRealtime(.09f); }
+                yield return new WaitForSecondsRealtime(.6f);
+            }
+            else yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? 1f : 2.2f); // Simulated hesitation: no input asked.
+            Lesson.Continue(); busy=false; AlignStart();
+        }
+        IEnumerator CountBeat()
+        {
+            // Level 2 shows the count once: start seat, then one click per number. Then the ring goes back where it was.
+            busy=true; int beginning=Lesson.Dial.Start, before=Lesson.Dial.Selected; string rule=Lesson.Message;
+            Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing(); RefreshSeats(); Publish();
+            yield return new WaitForSecondsRealtime(Beat);
+            for(int n=1;n<=4;n++)
+            {
+                Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
+                count.text=Number(n);
+                LayoutRing(); RefreshSeats(); Publish();
+                yield return new WaitForSecondsRealtime(Beat);
+            }
+            Lesson.Dial.PositionSilently(before); targetTurns=turns=before; count.text="";
+            Lesson.CountBeatShown(); busy=false; LayoutRing(); Refresh(); message.text=rule;
         }
         IEnumerator Demonstrate()
         {
             busy=true; int beginning=Lesson.Dial.Start;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing();
+            message.text="Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
+            yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=4;n++)
             {
-                yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .08f : .22f);
                 Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
                 message.text="Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it.\n"+n+": "+Zodiac.Seats[Zodiac.Wrap(beginning+n)].Name;
+                count.text=Number(n);
                 LayoutRing(); RefreshSeats(); Publish();
+                yield return new WaitForSecondsRealtime(Beat);
             }
+            count.text="";
             Lesson.RevealDemonstration();
-            yield return new WaitForSecondsRealtime(.65f);
+            yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .6f : 1.2f);
             yield return ReturnHome(); Lesson.AfterDemonstration(); busy=false; AlignStart();
         }
         IEnumerator ReturnHome()
@@ -245,23 +287,23 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(.25f);
             turns=0; LayoutRing();
         }
-        void ContinueLesson() { if(busy)return; Lesson.Continue(); AlignStart(); }
+        void ContinueLesson() { if(busy || Lesson.IntroAuto)return; Lesson.Continue(); AlignStart(); }
         void AlignStart() { targetTurns=Lesson.Dial.Selected; turns=targetTurns; LayoutRing(); Refresh(); }
         void ToggleMotion() { Lesson.Dial.ReducedMotion=!Lesson.Dial.ReducedMotion; if(Lesson.Dial.ReducedMotion) turns=targetTurns; Refresh(); }
         void Refresh()
         {
             message.text=Lesson.Message;
-            destination.text=(dragging ? "Passing: " : "Framed: ")+Zodiac.Seats[Lesson.Dial.Selected].Name;
-            start.text=Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : "Teaching sign: Taurus";
+            destination.text=(dragging ? "Passing: " : "Selected: ")+Zodiac.Seats[Lesson.Dial.Selected].Name;
+            start.text=Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
             count.text=Lesson.Dial.Counting ? "Count: "+Lesson.Dial.MovementCount : "";
-            phase.text=Lesson.Phase==LessonPhase.Complete ? "Six seats lit, six still dark · The room is waking" :
+            phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
                 Lesson.IsProblem ? "Help level "+Lesson.Dial.HintLevel+" · "+(Lesson.Phase==LessonPhase.Guided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example";
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;
             countButton.gameObject.SetActive(Lesson.IsProblem); countButton.interactable=active;
-            next.gameObject.SetActive(Lesson.Phase==LessonPhase.Encounter || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer);
+            next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer) && !busy);
             optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned);
             motionText.text="Reduced motion: "+(Lesson.Dial.ReducedMotion ? "on" : "off");
             RefreshSeats(); LayoutRing(); Publish();
@@ -272,7 +314,10 @@ namespace Ascendant.CelestialDial
             {
                 bool selected=Lesson.Dial.Selected==i;
                 seatTexts[i].text=(selected && Lesson.Dial.Rejected ? "× " : "")+Zodiac.Seats[i].Name+(Lesson.Lit[i] ? "\n"+Zodiac.Seats[i].Element : "");
-                seats[i].GetComponent<Image>().color=Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f);
+                bool dormant=Lesson.DialDormant && !waking;
+                seatTexts[i].color=dormant ? new Color(Bone.r,Bone.g,Bone.b,.3f) : Bone;
+                seats[i].GetComponent<Image>().color=dormant ? new Color(.1f,.1f,.12f) : Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f);
+                geometry.Dormant=dormant;
                 seats[i].interactable=Lesson.Dial.Active && !busy;
             }
         }
@@ -290,7 +335,7 @@ namespace Ascendant.CelestialDial
             var labels=new string[12];for(int i=0;i<12;i++) labels[i]=Lesson.SeatLabel(i);
             var state=new WebState {message=message.text,destination=destination.text,start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
-                reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned};
+                reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy};
             Slice?.Fill(state); return state;
         }
         public void Publish()

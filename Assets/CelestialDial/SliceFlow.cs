@@ -7,11 +7,13 @@ namespace Ascendant.CelestialDial
     // The locked v0.1 flow (Q06): five Continue-linked screens around the Dial. Pure state, no Unity types.
     public sealed class SliceFlow
     {
-        public const string TeachingSign = "Taurus";
         public SliceScreen Screen { get; private set; } = SliceScreen.Identity;
         public string PlayerName { get; private set; } = "";
         public string BirthChoice { get; private set; } = "";
         public string Note { get; private set; } = "";
+        // Sept 11 decision: the birth prompt determines the sun sign for the session. No chart.
+        public int SunSign { get; private set; } = -1;
+        public bool HasSunSign => SunSign >= 0;
         public bool KeyRevealed { get; private set; }
         public bool KeyInserted { get; private set; }
         public bool Ended { get; private set; }
@@ -19,18 +21,34 @@ namespace Ascendant.CelestialDial
         public const int LocksPerBook = 3;
         public const int Books = 7;
         public event Action<string> Logged;
+        readonly Func<int> random;
+        public SliceFlow() : this(null) { }
+        public SliceFlow(Func<int> randomSeat) { random = randomSeat ?? (() => new Random().Next(12)); }
         public string DisplayName => string.IsNullOrEmpty(PlayerName) ? "Keeper" : PlayerName;
         public void SetName(string name) { PlayerName = (name ?? "").Trim(); }
         public void ChooseBirth(string choice)
         {
             if (Screen != SliceScreen.Birth) return;
-            BirthChoice = choice;
-            // v0.1 never calculates a chart. Every path leads to the labeled teaching sign.
-            Note = choice == "unknown" ? "" : "Chart entry is not part of this build. We will use a teaching sign for now.";
+            BirthChoice = choice; SunSign = -1; Note = "";
+            if (choice == "unknown") { SunSign = Zodiac.Wrap(random()); Note = "Then I will choose one for you.\nYour sun sign is " + Zodiac.Seats[SunSign].Name + "."; }
             Logged?.Invoke("birth_choice:" + choice);
         }
+        // Choice 1: a birth date. Only the sun sign is derived; time and place are not used in v0.1.
+        public bool SetBirthDate(int month, int day)
+        {
+            if (Screen != SliceScreen.Birth || BirthChoice != "chart") return false;
+            int seat = Zodiac.SunSign(month, day);
+            if (seat < 0) return false;
+            SunSign = seat; Note = "Your sun sign is " + Zodiac.Seats[seat].Name + "."; Logged?.Invoke("sun_sign_derived"); return true;
+        }
+        // Choice 2: the player already knows their sign.
+        public bool SetKnownSign(int seat)
+        {
+            if (Screen != SliceScreen.Birth || BirthChoice != "known" || seat < 0 || seat > 11) return false;
+            SunSign = seat; Note = "Your sun sign is " + Zodiac.Seats[seat].Name + "."; Logged?.Invoke("sun_sign_entered"); return true;
+        }
         public bool CanContinue =>
-            Screen == SliceScreen.Identity || (Screen == SliceScreen.Birth && BirthChoice != "") ||
+            Screen == SliceScreen.Identity || (Screen == SliceScreen.Birth && HasSunSign) ||
             Screen == SliceScreen.Atrium || (Screen == SliceScreen.Wing && KeyRevealed) || Screen == SliceScreen.AtriumReturn;
         public bool Continue()
         {

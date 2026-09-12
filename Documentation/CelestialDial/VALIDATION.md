@@ -39,13 +39,15 @@ Required output: `index.html`, `Build/Web.loader.js`, `Build/Web.framework.js.un
 
 The shipped scene is `Assets/Scenes/VerticalSlice.unity` (created through **Ascendant → Greybox → Create vertical slice scene**), which wraps the Dial in the locked bookends: identity and birth prompt, Grand Atrium, Zodiac Wing with the Q07 props and the Q04 Key reveal, Atrium return, Crystal Book Chamber ending. `SliceFlow` is the pure five-screen state machine; `SliceView` builds the placeholder screens and beats. The Dial-only scene remains for its fixture.
 
+September 11 copy session (v0.1 Copy Deck, Decisions Log continuation): all player-facing text comes from the deck. The birth prompt sets the sun sign for the session: a date derives it (`Zodiac.SunSign`, common almanac boundaries, no time or place), a known sign is picked from twelve, and "I don't know" assigns one at random with Caspar saying so. The Dial then teaches the sun sign's own family first, hands over a second family, and offers a third. The Zodiac Wing opens with a dormant Dial that wakes to the player, a simulated hesitation with no input, Caspar's disbelief, then teaching: seven beats, two automatic. Level 2 problems show the count once, one click per beat with the number, then return the ring; Level 3 demonstrations use the same beats. "Seal" replaces "Keeper's Seal"; the "Framed:" readout is gone from the screen (screen-reader labels say selected); the completion line and the Chamber ending are the amended lines. Long Caspar passages are paged by Continue; the Insert the Key button glows once he finishes. Ending beats hold longer by owner request.
+
 Run **Ascendant → Greybox → Run vertical slice Play Mode validation** or:
 
 ```sh
 Unity -batchmode -projectPath . -executeMethod Ascendant.Build.SlicePlayValidation.Begin -sliceAutoExit -logFile Logs/slice-play.log
 ```
 
-It walks every screen through the same bridge the HTML layer uses, writes `Logs/slice-play-validation.txt`, and captures each screen under `Logs/Evidence/slice-*.png`. The mechanical validation covers the flow rules; the browser suite now walks the bookends before and after the Dial. Only locked lines are verbatim; other copy is placeholder in Caspar's tone. Nothing is saved between runs. No inventory system: a Key indicator only.
+It walks every screen through the same bridge the HTML layer uses (known sign Taurus so expectations stay fixed, plus the random and change-answer paths), waits out every automatic beat, writes `Logs/slice-play-validation.txt`, and captures each screen under `Logs/Evidence/slice-*.png`. The mechanical validation covers the flow rules, the sun-sign table, family selection for a non-Taurus sign, and the intro beats; the browser suite walks the bookends before and after the Dial, derives a sun sign from a date through the HTML date input, and waits for the count beats. Only deck lines are verbatim; nothing is saved between runs. No inventory system: a Key indicator only.
 
 ## Manual acceptance checklist
 

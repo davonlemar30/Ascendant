@@ -20,29 +20,64 @@ namespace Ascendant.CelestialDial
         // shared across the whole activity. Different zodiac starts never reset this budget.
         public int RecoveryEncounters { get; private set; }
         bool recovering;
-        int family = 1;
+        int family;
         int lastStart;
-        // Caspar speaks every line: patient, observant, learned, restrained, plainly worded.
-        // Placeholder copy for the greybox; no lore, no dialogue system.
-        public string Message { get; private set; } = "Welcome to the wheel. We will practice with Taurus.\nIt stands in for your own sign today.";
+        // The player's sun sign (Sept 11 copy session: derived or assigned at the birth prompt; no chart).
+        public int Sun { get; private set; } = 1;
+        public int GuidedFamily => Sun % 4;
+        public int SecondFamily => (GuidedFamily + 3) % 4;
+        public int OptionalFamily => (GuidedFamily + 1) % 4;
+        // Zodiac Wing entrance (Sept 11 decision): dormant Dial wakes to the player, Caspar reacts,
+        // a simulated hesitation, disbelief, composure, then teaching. Linear; no branching.
+        public int IntroStep { get; private set; }
+        public const int IntroTeaching = 7;
+        public bool IntroAuto => Phase == LessonPhase.Encounter && (IntroStep == 1 || IntroStep == 4);
+        public bool DialDormant => Phase == LessonPhase.Encounter && IntroStep <= 1;
+        // A Level 2 problem shows the count once, one click per beat, before the player takes over.
+        public bool CountBeatPending { get; private set; }
+        public string Message { get; private set; }
         public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional;
-        public DialLesson(Func<double> clock) { Dial = new DialModel(clock); }
+        public DialLesson(Func<double> clock) { Dial = new DialModel(clock); family = GuidedFamily; Message = IntroLine(0); }
+        static string SignName(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Name;
+        static string Element(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Element;
+        static string FamilyMembers(int f) => SignName(f) + ", " + SignName(f + 4) + ", and " + SignName(f + 8);
+        public void SetSunSign(int seat)
+        {
+            if (Phase != LessonPhase.Encounter || IntroStep != 0) return;
+            Sun = Zodiac.Wrap(seat); family = GuidedFamily;
+        }
+        string IntroLine(int step)
+        {
+            switch (step)
+            {
+                case 0: return "This is the Zodiac Wing. The wheel at its center has been still for as long as I can remember.\nGo ahead. Step closer.";
+                case 1: return "The Dial stirs. Faded symbols along the rim begin to glow. The ring shifts.";
+                case 2: return "It responds to you.\nI have stood in this room a thousand times and it never so much as flickered for me. You carry the Ancestor's blood. There is no question now.";
+                case 3: return "It wants you to solve it. Go ahead.";
+                case 4: return "...";
+                case 5: return "You... do not know astrology.\nThe Keeper of this Library does not know astrology. How is that possible?";
+                case 6: return "No matter. I cannot touch the wheel. It must be you.\nBut I can teach you. Look here.";
+                default: return "Your sun sign is " + SignName(Sun) + ". " + SignName(Sun) + " is a " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. There is much more to a chart than that, but this is where we start.";
+            }
+        }
+        public string TeachingLine =>
+            "Every sign on this wheel carries one of four elements: Fire, Earth, Air, or Water. Each element binds three signs together, like a family.\nThe " + Element(Sun) + " family is " + FamilyMembers(GuidedFamily) + ".\nLook at where they sit on the wheel. They are not side by side. They are spaced apart, evenly. That spacing is the pattern. Let me show you how to find it.";
         public void Continue()
         {
             if (Phase == LessonPhase.Encounter)
             {
-                Phase = LessonPhase.Rule; Lit[1] = true; Dial.PositionSilently(1);
-                Message = "Every sign belongs to one of four families:\nFire, Earth, Air, or Water. Taurus is Earth.";
+                if (IntroStep < IntroTeaching) { IntroStep++; Message = IntroLine(IntroStep); if (IntroStep == IntroTeaching) { Lit[Sun] = true; Dial.PositionSilently(Sun); } return; }
+                Phase = LessonPhase.Rule; Message = TeachingLine;
             }
             else if (Phase == LessonPhase.Rule)
             {
                 Phase = LessonPhase.Guided;
-                StartProblem(1, 2);
+                StartProblem(Sun, 2);
             }
             else if (Phase == LessonPhase.Transfer)
             {
-                family = 0; Phase = LessonPhase.Independent; Lit[0] = true;
-                StartProblem(0, 0);
+                family = SecondFamily; Phase = LessonPhase.Independent; Lit[family] = true;
+                StartProblem(family, 0);
             }
         }
         void StartProblem(int start, int hint)
@@ -50,10 +85,12 @@ namespace Ascendant.CelestialDial
             lastStart = Zodiac.Wrap(start);
             Dial.Begin(lastStart, hint);
             if (hint >= 2) exposedProblems.Add(lastStart);
-            string sign = Zodiac.Seats[lastStart].Name;
+            CountBeatPending = hint >= 2;
+            string sign = SignName(lastStart);
             Message = hint >= 2 ? "Start at " + sign + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
                 "Your turn. Find the next sign in this family from " + sign + ".\nMove the wheel, inspect the framed sign, then press Seal.";
         }
+        public void CountBeatShown() { CountBeatPending = false; }
         public DialEvent Seal()
         {
             var result = Dial.Commit();
@@ -62,19 +99,23 @@ namespace Ascendant.CelestialDial
             {
                 if (RecoveryEncounters == 0) RecoveryEncounters = 1;
                 if (Dial.HintLevel >= 2) exposedProblems.Add(Dial.Start);
+                if (Dial.Attempts == 2) CountBeatPending = true;
                 Message = Dial.Attempts == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
-                    Dial.Attempts == 2 ? "Start at " + Zodiac.Seats[Dial.Start].Name + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
+                    Dial.Attempts == 2 ? "Start at " + SignName(Dial.Start) + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
                     "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;
         }
+        public string CorrectLine(DialEvent result) =>
+            "Yes. " + SignName(result.selected_destination) + " is a " + Element(result.selected_destination) + " sign, like your sun sign.\n" +
+            (result.evidence_eligible ? "You found that one on your own." : "We found that one together.");
         public void AfterCorrect(DialEvent result)
         {
             if (result == null || !result.correctness) return;
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
-                Message = "Well done. That one was for its own sake.\nYour six lit seats stay as they are.";
+                Message = "Well done. You are picking it up naturally.\nKeep it up.";
                 return;
             }
             Lit[result.selected_destination] = true;
@@ -115,12 +156,12 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Guided)
             {
                 Dial.Home(); Phase = LessonPhase.Transfer;
-                Message = "The three Earth signs are joined. You see how it goes.\nNow the Fire family. I will say less this time.";
+                Message = "There. Three " + Element(family) + " signs, all joined. You are a quick study.\nNow " + Element(SecondFamily) + ". Same pattern. I will let you lead.";
             }
             else if (IndependentEvidence)
             {
                 Dial.Home(); Phase = LessonPhase.Complete; KeyEarned = true;
-                Message = "Two of four. The rest will wait for you."; // Locked First Curriculum Unit line.
+                Message = "Two families down. You are halfway through the wheel.\nThe other two will be here when you are ready."; // Amended canon line (Sept 11).
                 Dial.Log("key1_earned", true, true);
                 Dial.Log("optional_problem_offered");
             }
@@ -134,7 +175,7 @@ namespace Ascendant.CelestialDial
             if (RecoveryEncounters >= 3 || fresh.Length == 0)
             {
                 Dial.Home(); Phase = LessonPhase.Paused;
-                Message = "Let us stop here for now. No Key yet.\nWe will come back to this another day.";
+                Message = "Let us stop here for now. No Key yet.\nWe will try again later.";
                 return;
             }
             RecoveryEncounters++;
@@ -147,15 +188,15 @@ namespace Ascendant.CelestialDial
             Dial.Log("optional_problem_accepted");
             Phase = LessonPhase.Optional;
             // A separate one-problem third-family probe; never changes the six-seat lesson record.
-            StartProblem(2, 0);
-            Message = "One more, if you like. Start from Gemini, in the Air family.\nNo reward for this one. Just the wheel.";
+            StartProblem(OptionalFamily, 0);
+            Message = "One more, if you like. Start from " + SignName(OptionalFamily) + ", in the " + Element(OptionalFamily) + " family.\nIt'll be good practice.";
         }
         public void Say(string text) { Message = text; } // Slice beats speak through the same panel.
         public string SeatLabel(int seat)
         {
             var sign = Zodiac.Seats[seat];
             return sign.Name + ", position " + (seat + 1) + " of 12, " +
-                (Dial.Selected == seat ? "framed" : "not framed") +
+                (Dial.Selected == seat ? "selected" : "not selected") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }
     }
