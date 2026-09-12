@@ -49,6 +49,12 @@ Unity -batchmode -projectPath . -executeMethod Ascendant.Build.SlicePlayValidati
 
 It walks every screen through the same bridge the HTML layer uses (known sign Taurus so expectations stay fixed, plus the random and change-answer paths), waits out every automatic beat, writes `Logs/slice-play-validation.txt`, and captures each screen under `Logs/Evidence/slice-*.png`. The mechanical validation covers the flow rules, the sun-sign table, family selection for a non-Taurus sign, and the intro beats; the browser suite walks the bookends before and after the Dial, derives a sun sign from a date through the HTML date input, and waits for the count beats. Only deck lines are verbatim; nothing is saved between runs. No inventory system: a Key indicator only.
 
+## v0.2: the return (Q05)
+
+After the Chamber ending, Continue leads to the Atrium in Stage 2 "Stirring" with two entrances: the Zodiac Wing and Check the Seals. `ReviewDeck` holds the twelve sign-element items on the locked 1/3/7/14/30-day ladder; items enter as Introduced when the Hub is first reached, become Practicing on Level 0/1 evidence, step forward on eligible review success and back on a miss. A review batch is six due items alternating the compressed Dial (start seat framed, one line, Seal; one nudge then reveal) and direct tap of the element; the proportion is a test variable. The Wing continues Unit 1.1 with the two remaining families at Level 0 on the same lesson model (`BeginContinuation`), lights the wheel, awards no Key, and returns the player to the Atrium in Stage 3, which is the v0.2 end boundary. A local save (`PlayerPrefs`, key `ascendant.v02.save`) keeps sun sign, lit seats, families, Key, deck, day offset, and stage; a second sitting resumes at the Hub; Start over wipes it. "Advance one day (test)" shifts the review clock and is not shipped copy. Caspar's v0.2 lines are placeholders for the owner to write.
+
+The mechanical validation covers the deck ladder and evidence rules, the flow through hub, seals, review, continuation, save and restore, and the lesson's continuation and review phases. The slice Play Mode fixture and the browser suite walk the loop end to end, including the review batch, both families, the reload-resume, and Start over.
+
 ## Manual acceptance checklist
 
 Record device, viewport, input, observed result, and evidence for each check. Untested entries are pending, never assumed passed.
