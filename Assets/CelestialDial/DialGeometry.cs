@@ -7,6 +7,7 @@ namespace Ascendant.CelestialDial
     public sealed class DialGeometry : MonoBehaviour
     {
         public DialView View;
+        public bool Dormant;
         readonly RectTransform[] lines = new RectTransform[60];
         public void Redraw()
         {
@@ -23,7 +24,7 @@ namespace Ascendant.CelestialDial
             {
                 float a=i*Mathf.PI*2/48, b=(i+1)*Mathf.PI*2/48;
                 Line(i,new Vector2(Mathf.Cos(a),Mathf.Sin(a))*136,
-                    new Vector2(Mathf.Cos(b),Mathf.Sin(b))*136,new Color(.38f,.38f,.4f));
+                    new Vector2(Mathf.Cos(b),Mathf.Sin(b))*136,Dormant ? new Color(.2f,.2f,.22f) : new Color(.38f,.38f,.4f));
             }
             for(int family=0;family<4;family++)
                 for(int i=0;i<3;i++)
