@@ -90,6 +90,39 @@ const path=require('path');
     check(events.some(e=>e.event_name==='key_inserted') && events.some(e=>e.event_name==='prototype_ended'),'chamber events at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber-end.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the ending at '+viewport.width);
+    // ---- v0.2: the return ----
+    const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'],ELEMENTS=['Fire','Earth','Air','Water'],ELEMENT_OF=i=>ELEMENTS[i%4];
+    await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
+    check((await state()).atriumStage===2 && (await state()).dueCount===0,'the Chamber leads to the Hub in Stage 2 with nothing due at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-hub.png')});
+    check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
+    await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().hubNote.includes('Nothing is due'));
+    await semantic('advance-day');await page.waitForFunction(()=>window.ascendantDial.snapshot().dueCount===12);
+    await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial');
+    for(let n=0;n<6;n++){
+      try{await page.waitForFunction(i=>window.ascendantDial.snapshot().reviewIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().reviewMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});}
+      catch(e){console.error('review loop stalled at item '+n+': '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-12).map(x=>x.event_name+'@'+x.input_method)));throw e;}
+      const s=await state();const seat=SIGNS.indexOf(s.reviewSign);
+      if(s.reviewMode==='dial'){await semantic('seat-'+((seat+4)%12));await semantic('seal');}
+      else{if(n===1)await page.screenshot({path:path.join(out,viewport.width+'-review-tap.png')});await semantic('element-'+(seat%4));}
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().reviewMode==='done'&&window.ascendantDial.snapshot().canLeaveReview,{},{timeout:20000});
+    check((await state()).reviewSummary.startsWith('6 of 6'),'six seals held through compressed Dial and direct tap at '+viewport.width);
+    check(events.some(e=>e.event_name==='review_started') && events.some(e=>e.event_name==='review_finished'),'review events at '+viewport.width);
+    await semantic('leave-review');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
+    await semantic('enter-wing');await waitActive('Gemini');
+    check((await state()).phase.includes('Help level 0'),'Unit 1.1 continues on the player\'s own at '+viewport.width);
+    for(const [from,to] of [[2,6],[6,10],[3,7],[7,11]]){await waitActive(SIGNS[from]);await semantic('seat-'+to);await semantic('seal');}
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().wheelComplete&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
+    check((await state()).seats.every(x=>!x.includes('dormant')) && events.filter(e=>e.event_name==='key1_earned').length===1,'twelve seats lit with no second Key at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-wing-lit.png')});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===3);
+    check((await state()).v02Complete,'one more return completes v0.2 at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-hub-complete.png')});
+    await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    check((await state()).atriumStage===3 && (await state()).v02Complete,'a reload resumes at the Hub from the local save at '+viewport.width);
+    await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);
     fs.writeFileSync(path.join(out,viewport.width+'-events.json'),JSON.stringify(events,null,2));
     await context.close();

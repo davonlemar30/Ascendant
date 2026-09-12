@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional }
+    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review }
 
     public sealed class DialLesson
     {
@@ -36,7 +36,48 @@ namespace Ascendant.CelestialDial
         // A Level 2 problem shows the count once, one click per beat, before the player takes over.
         public bool CountBeatPending { get; private set; }
         public string Message { get; private set; }
-        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional;
+        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review;
+        // v0.2 (Q05): Unit 1.1 continuation on the same Dial, and compressed review problems.
+        public int FamiliesComplete => Enumerable.Range(0, 4).Count(f => Kin[f]);
+        public bool WheelComplete => Lit.All(v => v);
+        LessonPhase phaseBeforeReview;
+        public event Action<int, bool, bool> ReviewFinished; // seat, correct, eligible
+        public bool CanContinueUnit => KeyEarned && !WheelComplete && (Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || Phase == LessonPhase.Continuation);
+        int NextUnlitFamily() { for (int f = 0; f < 4; f++) if (!Kin[f]) return f; return -1; }
+        public bool BeginContinuation()
+        {
+            if (!CanContinueUnit) return false;
+            if (Phase == LessonPhase.Continuation && Dial.Active) return true;
+            RecoveryEncounters = 0; exposedProblems.Clear(); recoveryStarts.Clear(); recovering = false;
+            family = NextUnlitFamily(); if (family < 0) return false;
+            Phase = LessonPhase.Continuation; Lit[family] = true;
+            StartProblem(family, 0);
+            // Placeholder copy (owner writes; Q05 decision 7): third family with less guidance, fourth on the player's own.
+            Message = FamiliesComplete == 2
+                ? "Now the " + Element(family) + " family. You have done this twice.\nStart at " + SignName(family) + ". I will only watch."
+                : "The last family. " + Element(family) + ".\nStart at " + SignName(family) + ". This one is all yours.";
+            Dial.Log("unit11_family_started");
+            return true;
+        }
+        public bool BeginReview(int seat)
+        {
+            if (Phase == LessonPhase.Review || IsProblem) return false;
+            phaseBeforeReview = Phase; Phase = LessonPhase.Review;
+            Dial.Begin(seat, 0); CountBeatPending = false;
+            Message = "Find the next sign in this family."; // Compressed form: start already framed, one line, Seal.
+            return true;
+        }
+        public void EndReview() { if (Phase != LessonPhase.Review) return; Dial.Home(); Phase = phaseBeforeReview; }
+        // Second sitting (Q05 decision 5): rebuild lesson state from the local save. The intro is already behind the player.
+        public void RestoreProgress(int sun, bool[] lit, bool[] kin, bool keyEarned)
+        {
+            Sun = Zodiac.Wrap(sun); family = GuidedFamily;
+            for (int i = 0; i < 12; i++) { Lit[i] = lit != null && i < lit.Length && lit[i]; Kin[i] = kin != null && i < kin.Length && kin[i]; }
+            KeyEarned = keyEarned; IndependentEvidence = keyEarned; IntroStep = IntroTeaching;
+            Phase = !keyEarned ? LessonPhase.Rule : WheelComplete ? LessonPhase.AllLit : LessonPhase.Complete;
+            Dial.Home();
+            Message = WheelComplete ? "The whole wheel is lit." : "Welcome back. The wheel remembers you.";
+        }
         public DialLesson(Func<double> clock) { Dial = new DialModel(clock); family = GuidedFamily; Message = IntroLine(0); }
         static string SignName(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Name;
         static string Element(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Element;
@@ -95,6 +136,13 @@ namespace Ascendant.CelestialDial
         {
             var result = Dial.Commit();
             if (result == null) return null;
+            if (Phase == LessonPhase.Review)
+            {
+                if (result.correctness) { Message = "Yes. " + SignName(result.selected_destination) + " is " + Element(result.selected_destination) + "."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, true, result.hint_level <= 1); }
+                else if (Dial.Attempts >= 2) { Message = "It is " + SignName(Zodiac.Destination(Dial.Start)) + ". We will come back to it."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, false, false); }
+                else { Message = "Not that one. Try once more."; }
+                return result;
+            }
             if (!result.correctness)
             {
                 if (RecoveryEncounters == 0) RecoveryEncounters = 1;
@@ -112,6 +160,7 @@ namespace Ascendant.CelestialDial
         public void AfterCorrect(DialEvent result)
         {
             if (result == null || !result.correctness) return;
+            if (Phase == LessonPhase.Review) return;
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -121,7 +170,7 @@ namespace Ascendant.CelestialDial
             Lit[result.selected_destination] = true;
             if (Phase == LessonPhase.Independent && result.evidence_eligible) IndependentEvidence = true;
             if (recovering) { Dial.Log("problem_recovered", true, result.evidence_eligible); recovering = false; }
-            AdvanceOrRecover(result.hint_level >= 2 && Phase == LessonPhase.Independent);
+            AdvanceOrRecover(result.hint_level >= 2 && (Phase == LessonPhase.Independent || Phase == LessonPhase.Continuation));
         }
         public void RevealDemonstration()
         {
@@ -151,6 +200,14 @@ namespace Ascendant.CelestialDial
             {
                 int nextDestination = Enumerable.Range(0, 3).Select(i => family + i * 4).First(s => !Lit[s]);
                 StartProblem(Zodiac.Wrap(nextDestination - 4), Phase == LessonPhase.Guided ? 2 : 0);
+                return;
+            }
+            if (Phase == LessonPhase.Continuation)
+            {
+                Dial.Home();
+                int next = NextUnlitFamily();
+                if (next < 0) { Phase = LessonPhase.AllLit; Message = "Twelve seats. Four families. The whole wheel is lit.\nThe room is warmer for it. Come, let us go back."; Dial.Log("wheel_completed"); }
+                else { Phase = LessonPhase.Complete; BeginContinuation(); }
                 return;
             }
             if (Phase == LessonPhase.Guided)
@@ -184,7 +241,7 @@ namespace Ascendant.CelestialDial
         }
         public void BeginOptional()
         {
-            if (Phase != LessonPhase.Complete || !KeyEarned) return;
+            if (Phase != LessonPhase.Complete || !KeyEarned || FamiliesComplete > 2) return;
             Dial.Log("optional_problem_accepted");
             Phase = LessonPhase.Optional;
             // A separate one-problem third-family probe; never changes the six-seat lesson record.

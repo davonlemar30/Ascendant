@@ -4,6 +4,8 @@ This is for you to play the game once, start to finish, and write down what happ
 
 Play here: https://davonlemar30.github.io/Ascendant/  ·  Write your decision here: https://app.clickup.com/t/86bbzm11t
 
+This build keeps your progress on your phone. To start fresh, use "Start over (test only)" on the Atrium screen.
+
 Check a box only if you saw it happen. An empty box means you did not test it. What matters is what your hand did, not whether it sounded fun.
 
 The sections are grouped by what they check, not by play order. Play the whole game once, then go back and check the boxes. Play it again for the "Getting it wrong on purpose" section.
@@ -36,7 +38,7 @@ This checks that the wheel feels right and that the first family teaches the pat
 - [ ] Drag four clicks in one sweep of your thumb. You should feel every click the same. The fourth click is not special.
 - [ ] Let go between two signs. You should see the wheel settle on the closest sign, fast, with no bounce.
 - [ ] Flick the wheel. You should see it coast one extra click at most, never more.
-- [ ] Look at the middle of the wheel. You should see no "Framed" label. The bracket alone shows which sign is selected. Nothing is sent until you press Seal.
+- [ ] Look at the middle of the wheel. You should see the name of the sign that is under the bracket, and it changes as the wheel turns. Nothing is sent until you press Seal.
 - [ ] Press Seal on the sign four clicks after your sign. You should see it light up and show its element. Then the wheel goes back to Aries by itself, quietly, and moves to that sign by itself for the next problem, with no clicks counted.
 - [ ] Finish the third sign of the family. You should see a line join the three signs. Caspar says three signs are joined and names the next element. You should not see any new astrology words.
 
@@ -85,6 +87,20 @@ This checks the screens before and after the wheel, and the two reward moments.
 - [ ] Turn "Reduced motion" on and play the whole game again. You should see every moment still finish, with no white flash and no animation.
 - [ ] Go through every screen on your phone. You should see no screen that needs scrolling. Do the same in the small window (360 wide, 800 tall).
 
+## The return (v0.2)
+
+This checks the loop: coming back to the Library, checking the seals, and finishing the wheel.
+
+- [ ] After "Let us continue, shall we?", press Continue. You should see the Grand Atrium again, changed: one lamp lit, the desk uncovered, the Zodiac Wing door open with light in it, the other doors sealed with locks. Caspar points at the dark seats and mentions the seals. Write down if the room felt changed: ___
+- [ ] Look at the bottom of the Atrium. You should see two big buttons, "The Zodiac Wing" and "Check the Seals," and two small test buttons: "Advance one day (test)" and "Start over (test only)."
+- [ ] Press "Check the Seals" right away. You should see a note that nothing is due today. Nothing else happens.
+- [ ] Press "Advance one day (test)" once. You should see the Seals button say "12 due." Press it. You should see the wheel with your sign already framed and Caspar asking for the next sign in its family. Move and press Seal. You should see "Yes." or the right answer, then the next item.
+- [ ] Keep going. You should see the items alternate: some on the wheel, some as a question with four family buttons (Fire, Earth, Air, Water). Get one wrong on purpose. You should see one "Try once more," and if you miss again, the answer and a move on. After six items, you should see "N of 6 seals held." and a button back to the Atrium.
+- [ ] Press "The Zodiac Wing." You should see the wheel with six seats lit and Caspar starting the third family from its first sign, with almost no help. Finish it. You should see him hand you the last family with even less. Finish that.
+- [ ] When the twelfth seat lights, you should see four family lines, the floor marks fully bright, Caspar say the whole wheel is lit, and no new Key. Press "Back to the Atrium." You should see a second lamp lit and a line that this is the end of prototype v0.2.
+- [ ] Close the game and open it again. You should see the Atrium, not the dark opening, with everything as you left it. Press "Start over (test only)." You should see the dark opening again.
+- [ ] Turn "Reduced motion" on and check the seals again after advancing a day. You should see everything still work with no sliding.
+
 ## Does it fit on the phone?
 
 This checks that nothing is cut off or too small.
@@ -105,6 +121,8 @@ Answer in your own words. Short is fine.
 6. Was the extra problem good practice, or a chore? ___
 7. Did the wheel waking up, and Caspar's surprise, make sense? Too slow, too fast, or about right? ___
 8. Did the ending in the Chamber land? Too slow, too fast, or about right? ___
+9. When you came back to the Atrium, did you want to go back into the Wing, or check the seals, or neither? ___
+10. Did checking the seals feel like care for the Library, or like a quiz? ___
 
 ## Dev notes (skip if you're just playing)
 
@@ -114,6 +132,7 @@ Answer in your own words. Short is fine.
 - Count beats: `DialView.BeatSeconds` (0.9 s) and `ReducedBeatSeconds` (0.5 s) pace the Level 2 count and the Level 3 demonstration.
 - First-drag resistance is off by default; `DialView.firstDragResistance` re-enables it for comparison. Inertia is `DialView.inertiaEnabled`.
 - Known and not a defect: automated pointer input in the very first frame after a phase transition is ignored; not reachable by a human.
+- Progress is saved on this device only (browser storage). "Advance one day (test)" shifts the review clock; real reviews come due on the 1, 3, 7, 14, 30 day ladder.
 - Scripted checks (mechanical, Play Mode, browser) are described in `VALIDATION.md`. They are not this playtest.
 
 ## Solo decision (provisional)

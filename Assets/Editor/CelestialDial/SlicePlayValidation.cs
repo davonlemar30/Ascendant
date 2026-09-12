@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine.SceneManagement;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -60,9 +61,19 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Chamber,"atrium return leads to the chamber");Act("insert");Check(!View.Flow.KeyInserted,"insert waits for Caspar to finish");for(int i=1;i<SliceView.ChamberPages.Length;i++)Act("next-screen");Capture("slice-390-chamber.png");});
             Steps.Enqueue(()=>{Act("insert");});
             Steps.Enqueue(()=>{Check(View.Flow.KeyInserted && View.Flow.LocksFilled==1 && View.Flow.Ended && !View.Busy,"one key fills one of three locks and ends the prototype");Capture("slice-390-chamber-end.png");});
-            Steps.Enqueue(()=>{GreyboxPlayValidation.SetSize(360,800);});
+            // ---- v0.2: the return ----
+            Steps.Enqueue(()=>{Act("next-screen");Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==2 && View.Flow.DueCount==0 && UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"the Chamber leads to the Hub in Stage 2 with a save written");Capture("slice-390-hub.png");});
+            Steps.Enqueue(()=>{Act("enter-seals");Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.Note.Contains("Nothing is due"),"nothing is due on the first sitting");Act("advance-day");Check(View.Flow.DueCount==12,"advance one day (test) makes the deck due");Act("enter-seals");Check(View.Flow.Screen==SliceScreen.Review && View.Flow.ReviewQueue.Count==6 && View.Dial.Lesson.Phase==LessonPhase.Review && View.Dial.UiCanvas.gameObject.activeSelf,"Check the Seals opens with a compressed Dial item");Capture("slice-390-review-dial.png");});
+            for(int i=0;i<6;i++) Steps.Enqueue(()=>{var task=View.Flow.CurrentReview;Check(task!=null && !task.done,"a review item is waiting");if(task.Mode==ReviewMode.Dial){Act("seat:"+Zodiac.Destination(task.seat));Act("seal");}else{if(View.Flow.ReviewIndex==1)Capture("slice-390-review-tap.png");Act("element:"+System.Array.IndexOf(new[]{"Fire","Earth","Air","Water"},Zodiac.Seats[task.seat].Element));}});
+            Steps.Enqueue(()=>{Check(View.Flow.ReviewDone && View.Flow.ReviewSummary.StartsWith("6 of 6") && View.Flow.Deck.Practicing>=3,"six seals held; eligible answers advance their items");Capture("slice-390-review-done.png");Act("leave-review");Check(View.Flow.Screen==SliceScreen.Hub,"back to the Hub after the review");});
+            Steps.Enqueue(()=>{Act("enter-wing");Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase==LessonPhase.Continuation && View.Dial.Lesson.Dial.Start==2 && View.Dial.Lesson.Dial.HintLevel==0,"the Wing continues with the third family on the player's own");Capture("slice-390-wing-unit11.png");});
+            for(int i=0;i<4;i++) Steps.Enqueue(()=>{Act("seat:"+Zodiac.Destination(View.Dial.Lesson.Dial.Start));Act("seal");});
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.AllLit && View.Flow.WheelComplete && View.Dial.Lesson.Lit.All(v=>v) && !View.Dial.Lesson.KeyEarned==false && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key1_earned")==1,"twelve seats lit with no second Key");Capture("slice-390-wing-lit.png");Act("leave-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.V02Complete,"one more return completes v0.2");Capture("slice-390-hub-complete.png");Act("reload");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.WheelComplete && View.Flow.AtriumStage==3 && View.Dial.Lesson.WheelComplete,"a reload resumes at the Hub from the local save");Act("restart");});
+            Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});
             Steps.Enqueue(()=>{
-                Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport for the chamber");Capture("slice-360-chamber-end.png");
+                Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");
                 Check(RuntimeErrors.Count==0,"no runtime errors: "+string.Join("; ",RuntimeErrors));
                 Application.logMessageReceived-=CaptureLog;
                 Directory.CreateDirectory("Logs");File.WriteAllLines(ReportPath,Report);

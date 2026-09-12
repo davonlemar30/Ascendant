@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ascendant — Celestial Dial greybox</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#131317;color:#f0e8dc;font:16px system-ui}main{position:relative;width:100%;height:100dvh;overflow:hidden}canvas{width:100%;height:100%;display:block;touch-action:none}#loading{position:absolute;top:45%;width:100%;text-align:center}#semantic{position:absolute;inset:0;pointer-events:none}#semantic button{position:absolute;border:0;background:transparent;color:transparent;pointer-events:none;padding:0;font:13px system-ui;border-radius:0}#semantic button:focus-visible{outline:3px solid #f0e8dc;background:#222;color:#fff;z-index:10}#semantic button:disabled{display:none}#semantic input{position:absolute;pointer-events:auto;background:#36363d;color:#f0e8dc;border:0;font:16px system-ui;padding:0 8px;border-radius:0}#semantic input:focus-visible{outline:3px solid #f0e8dc}#semantic input[hidden]{display:none}#seats button:disabled{display:block}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#fallback{display:none}#failure{position:absolute;inset:30% 10%;text-align:center}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#131317;color:#f0e8dc;font:16px system-ui}main{position:relative;width:100%;height:100dvh;overflow:hidden}canvas{width:100%;height:100%;display:block;touch-action:none}#loading{position:absolute;top:45%;width:100%;text-align:center}#semantic{position:absolute;inset:0;pointer-events:none}#semantic button{position:absolute;border:0;background:transparent;color:transparent;pointer-events:none;padding:0;font:13px system-ui;border-radius:0}#semantic.kb button:focus-visible{outline:3px solid #f0e8dc;background:#222;color:#fff;z-index:10}#semantic.kb input:focus-visible{outline:3px solid #f0e8dc}#semantic button:disabled{display:none}#semantic input{position:absolute;pointer-events:auto;background:#36363d;color:#f0e8dc;border:0;font:16px system-ui;padding:0 8px;border-radius:0}#semantic input:focus-visible{outline:3px solid #f0e8dc}#semantic input[hidden]{display:none}#seats button:disabled{display:block}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#fallback{display:none}#failure{position:absolute;inset:30% 10%;text-align:center}
 </style>
 </head>
 <body>
@@ -23,6 +23,8 @@
 <div id="signs" role="group" aria-label="Choose your sign"></div>
 <button id="birth-chart">Enter birth date, time, place</button><button id="birth-known">Enter what I already know</button><button id="birth-unknown">I don't know</button>
 <button id="next-screen">Continue</button><button id="insert">Insert the Key</button><button id="restart">Start over, test only</button>
+<button id="enter-wing">The Zodiac Wing</button><button id="enter-seals">Check the Seals</button><button id="leave-wing">Back to the Atrium</button><button id="leave-review">Back to the Atrium</button><button id="advance-day">Advance one day, test only</button>
+<div id="elements" role="group" aria-label="Which family?"><button id="element-0">Fire</button><button id="element-1">Earth</button><button id="element-2">Air</button><button id="element-3">Water</button></div>
 </section>
 <div id="announcement" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
 </main>
@@ -37,7 +39,8 @@
     const b=document.createElement('button');b.id='seat-'+i;b.textContent='Zodiac position '+(i+1);b.onclick=()=>send('seat:'+i);byId('seats').appendChild(b);
     const sb=document.createElement('button');sb.id='sign-'+i;sb.textContent=SIGNS[i];sb.onclick=()=>send('sign:'+i);byId('signs').appendChild(sb);
   }
-  for(const id of ['back','seal','forward','count','continue','optional','motion','insert','restart'])byId(id).onclick=()=>send(id);
+  for(const id of ['back','seal','forward','count','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','advance-day'])byId(id).onclick=()=>send(id);
+  for(let i=0;i<4;i++)byId('element-'+i).onclick=()=>send('element:'+i);
   byId('next-screen').onclick=()=>send('next-screen');
   for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
   byId('name').addEventListener('change',e=>send('name:'+e.target.value));
@@ -50,40 +53,46 @@
   }
   function layout(){
     // Semantic focus targets follow the selected seat orientation and the canvas reference layout.
-    const selected=state?state.seats.findIndex(s=>s.includes(', framed')):0;
+    const selected=state?state.seats.findIndex(s=>s.includes(', selected')):0;
     for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;box('seat-'+i,Math.cos(angle)*136,270-Math.sin(angle)*136,52,52);}
     box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
     box('count',0,714,80,48);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',0,768,216,48);
     box('name',0,300,260,48);for(let i=0;i<3;i++)box(['birth-chart','birth-known','birth-unknown'][i],0,300+i*64,300,52);
     box('next-screen',0,654,190,56);box('insert',0,654,190,56);box('restart',0,768,216,48);
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
+    box('enter-wing',0,610,300,52);box('enter-seals',0,668,300,52);box('advance-day',-88,772,170,40);box('leave-wing',0,654,190,56);box('leave-review',0,654,190,56);
+    for(let i=0;i<4;i++)box('element-'+i,-78+(i%2)*156,300+Math.floor(i/2)*64,150,56);
     for(let i=0;i<12;i++)box('sign-'+i,-110+(i%3)*110,316+Math.floor(i/3)*58,100,52);
   }
   let lastAnnouncement='',autoFocused=null;
   window.ascendantDial={
     receive(next){
       state=next;
-      byId('instructions').textContent=(state.screen||'wing')==='wing'?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):[state.caspar,state.note,'Tab moves between controls. Enter or Space activates the focused control.'].join(' ');
+      const wing=(state.screen||'wing')==='wing'||(state.screen==='review'&&state.reviewMode==='dial');
+      byId('instructions').textContent=wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):[state.caspar,state.note,'Tab moves between controls. Enter or Space activates the focused control.'].join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
-      const wing=(state.screen||'wing')==='wing';
       for(const id of ['back','forward','seal','count'])byId(id).disabled=!(wing&&state.active);
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
       byId('motion').disabled=false;
-      byId('next-screen').disabled=!state.canSliceContinue;byId('insert').disabled=!state.canInsert;byId('restart').disabled=!state.ended;
+      byId('next-screen').disabled=!state.canSliceContinue;byId('insert').disabled=!state.canInsert;byId('restart').disabled=!(state.ended||state.screen==='hub');
       for(const c of ['chart','known','unknown'])byId('birth-'+c).disabled=!state.canBirth;
       byId('birthdate').hidden=!state.canBirthDate;byId('use-date').disabled=!state.canBirthDate;byId('change-birth').disabled=!state.canChangeBirth;
       for(let i=0;i<12;i++)byId('sign-'+i).disabled=!state.canSignPick;
       byId('signs').hidden=!state.canSignPick;
+      byId('enter-wing').disabled=!state.canEnterWing;byId('enter-seals').disabled=!state.canEnterSeals;byId('advance-day').disabled=!state.canAdvanceDay;
+      byId('leave-wing').disabled=!state.canLeaveWing;byId('leave-review').disabled=!state.canLeaveReview;
+      byId('enter-seals').textContent=state.dueCount>0?'Check the Seals, '+state.dueCount+' due':'Check the Seals';
+      const tap=state.screen==='review'&&state.reviewMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
       byId('name').hidden=!state.canName;if(state.canName&&document.activeElement!==byId('name')&&byId('name').value===''&&state.playerName!=='Keeper')byId('name').value=state.playerName;
       byId('seats').hidden=!wing;
       byId('motion').setAttribute('aria-pressed',String(state.reducedMotion));
       byId('motion').setAttribute('aria-label','Reduced motion: '+(state.reducedMotion?'on':'off'));
-      const announcement=(state.screen||'wing')==='wing'?[state.destination,state.count,state.message].filter(Boolean).join('. '):[state.caspar,state.note].filter(Boolean).join('. ');
+      const announcement=wing?[state.destination,state.count,state.message].filter(Boolean).join('. '):[state.caspar,state.note].filter(Boolean).join('. ');
       if(announcement!==lastAnnouncement){byId('announcement').textContent=announcement;lastAnnouncement=announcement;}
       layout();
       // Refocus when nothing useful is focused, or when the last focus was ours (not the player's own Tab).
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
-        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', framed')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
+        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):tap?byId('element-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});autoFocused=focus;
       }
     },
@@ -91,7 +100,9 @@
     // Read-only test evidence; actions still enter C# through the same public bridge.
     snapshot:()=>state
   };
-  document.addEventListener('keydown',e=>{
+  const semantic=byId('semantic');
+  document.addEventListener('pointerdown',()=>semantic.classList.remove('kb'),true);
+  document.addEventListener('keydown',e=>{if(e.key==='Tab'||e.key.startsWith('Arrow')||e.key==='Enter'||e.key===' ')semantic.classList.add('kb');
     if(e.target&&(e.target.id==='name'||e.target.id==='birthdate'))return;
     if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();if(!e.repeat)send(e.key==='ArrowRight'?'keyboard-forward':'keyboard-back');}
   });
