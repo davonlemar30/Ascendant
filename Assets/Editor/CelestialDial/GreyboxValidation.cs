@@ -116,7 +116,7 @@ namespace Ascendant.Build
             Check(wrongTwice.SeatLabel(wrongTwice.Dial.Selected).Contains(", selected") && wrongTwice.SeatLabel(Zodiac.Wrap(wrongTwice.Dial.Selected+1)).Contains(", not selected"),"screen reader labels say selected");
             // ---- v0.2: the return (Q05) ----
             var deck=new ReviewDeck();deck.IntroduceAll(0);
-            Check(deck.Items.All(i=>i.entered && i.State==ItemState.Introduced && i.dueDay==1) && deck.Due(0).Count==0 && deck.Due(1).Count==12,"twelve sign-element items enter the deck as Introduced, due next day");
+            Check(deck.Items.Where(i=>i.Kind==ItemKind.Element).All(i=>i.entered && i.State==ItemState.Introduced && i.dueDay==1) && deck.Items.Where(i=>i.Kind==ItemKind.Glyph).All(i=>!i.entered) && deck.Due(0).Count==0 && deck.Due(1).Count==12,"twelve sign-element items enter the deck as Introduced, due next day; glyph items wait");
             deck.RecordLesson(5,true,0);Check(deck.Items[5].State==ItemState.Practicing && deck.Items[5].streak==1 && deck.Practicing==1,"a Level 0/1 lesson answer makes the item Practicing and starts its streak");
             deck.RecordLesson(9,false,0);Check(deck.Items[9].State==ItemState.Introduced,"an assisted lesson answer stays Introduced");
             deck.RecordReview(5,true,true,1);Check(deck.Items[5].interval==1 && deck.Items[5].dueDay==4 && deck.Items[5].streak==2,"an eligible review success moves one interval forward: 1 to 3 days");
@@ -125,7 +125,7 @@ namespace Ascendant.Build
             for(int n=0;n<6;n++)deck.RecordReview(2,true,true,n*30);Check(deck.Items[2].interval==4,"the ladder caps at 30 days");
             deck.RecordReview(3,true,false,1);Check(deck.Items[3].State==ItemState.Introduced && deck.Items[3].interval==0,"an assisted correct review neither advances nor sets back");
             int day=0;var loop=new SliceFlow(()=>1,()=>day);loop.Continue();loop.ChooseBirth("known");loop.SetKnownSign(1);loop.Continue();loop.Continue();loop.RevealKey();loop.Continue();loop.Continue();loop.InsertKey();loop.End();
-            Check(loop.Screen==SliceScreen.Chamber && loop.CanContinue && loop.Continue() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2 && loop.Deck.Items.All(i=>i.entered),"after the ending, Continue reaches the Hub in Stage 2 and the deck opens");
+            Check(loop.Screen==SliceScreen.Chamber && loop.CanContinue && loop.Continue() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2 && loop.Deck.Items.Where(i=>i.Kind==ItemKind.Element).All(i=>i.entered),"after the ending, Continue reaches the Hub in Stage 2 and the deck opens");
             Check(!loop.EnterSeals() && loop.Note.Contains("Nothing is due") && loop.Screen==SliceScreen.Hub,"nothing is due on the first sitting; the Seals do not block");
             loop.AdvanceDay();Check(loop.Day==1 && loop.DueCount==12 && loop.EnterSeals() && loop.Screen==SliceScreen.Review && loop.ReviewQueue.Count==ReviewDeck.BatchSize,"advance one day (test) makes items due; a batch of six begins");
             Check(loop.ReviewQueue[0].Mode==ReviewMode.Dial && loop.ReviewQueue[1].Mode==ReviewMode.Tap,"review alternates compressed Dial and direct tap");
@@ -156,6 +156,44 @@ namespace Ascendant.Build
             rv.EndReview();Check(rv.Phase==LessonPhase.Complete && rv.BeginReview(0),"review ends back in the prior phase and another can begin");
             rv.Dial.Select(1,DialInput.DirectSeat);rv.Seal();Check(rv.Dial.Active && rv.Message.Contains("Try once more"),"first review miss nudges and allows a retry");
             rv.Seal();Check(rvSeat==0 && !rvCorrect && rv.Message.Contains("It is Leo"),"second review miss reveals the answer and moves on");
+            // ---- v0.3: glyphs and Key 2 ----
+            var glyphFont=Resources.Load<Font>("Fonts/NotoSansSymbols");Check(glyphFont!=null && Enumerable.Range(0,12).All(i=>glyphFont.HasCharacter(Zodiac.Seats[i].Glyph[0])),"the placeholder glyph font carries all twelve zodiac symbols");
+            var g=new DialLesson(()=>0);g.SetSunSign(1);EnterGuided(g);Answer(g);Answer(g);g.Continue();Answer(g);Answer(g);g.BeginContinuation();Answer(g);Answer(g);Answer(g);Answer(g);
+            Check(g.WheelComplete && g.CanBeginGlyphs && g.BeginGlyphs() && g.Phase==LessonPhase.GlyphNames && g.CurrentGlyph==0 && g.GlyphsShown,"glyph unit begins after the wheel is lit, Part A first");
+            Check(Enumerable.Range(0,12).All(seat=>{var o=g.GlyphOptions(seat);return o.Length==4 && o.Distinct().Count()==4 && o.Contains(seat);}),"every glyph offers four distinct names including its own");
+            Check(g.AnswerGlyphName(0) && g.GlyphNamed[0] && g.CurrentGlyph==1 && g.Dial.Events.Last(e=>e.event_name=="glyph_named").evidence_eligible,"a correct first tap names the glyph at Level 0");
+            Check(!g.AnswerGlyphName(5) && g.GlyphMisses==1 && g.Message.Contains("Not that one") && g.CurrentGlyph==1,"first miss nudges without naming");
+            Check(g.AnswerGlyphName(1) && g.CurrentGlyph==2 && g.Dial.Events.Last(e=>e.event_name=="glyph_named").evidence_eligible,"a correct tap after one nudge is Level 1 evidence");
+            Check(!g.AnswerGlyphName(6) && !g.AnswerGlyphName(7) && g.GlyphNamed[2] && g.CurrentGlyph==3 && g.Message.Contains("mark of Gemini") && !g.Dial.Events.Last(e=>e.event_name=="glyph_named").evidence_eligible,"second miss reveals the name, no evidence, and moves on");
+            for(int seat=3;seat<12;seat++) g.AnswerGlyphName(seat);
+            Check(g.Phase==LessonPhase.GlyphWheel && g.Dial.Active && g.Dial.Start==0 && g.Dial.Target==0 && g.NamesHidden && g.SeatLabel(5).StartsWith("Mark") && !g.SeatLabel(5).Contains("Virgo") && g.Dial.Relationship=="seat_of_sign","Part B starts with names hidden, Aries first, labels that do not leak names, and the seat-of-sign relationship");
+            void Place(DialLesson l,int seat){l.Dial.Select(seat,DialInput.DirectSeat);var r=l.Seal();l.AfterCorrect(r);}
+            Place(g,0);Check(g.GlyphPlaced[0] && g.GlyphEvidence && g.Dial.Target==1,"sealing on the target places the glyph and counts as evidence");
+            g.Dial.Select(5,DialInput.DirectSeat);g.Seal();Check(g.Dial.Active && g.Dial.HintLevel==1 && g.Message.Contains("count forward"),"first wrong Seal in Part B nudges");
+            g.Seal();Check(g.NameRevealed[1] && g.Dial.HintLevel==2 && !g.SeatLabel(1).StartsWith("Mark"),"second wrong Seal reveals the name on its seat and in its label");
+            g.Dial.Select(1,DialInput.DirectSeat);var placed=g.Seal();g.AfterCorrect(placed);Check(placed.correctness && !placed.evidence_eligible && g.GlyphPlaced[1] && g.Dial.Target==2,"a Level 2 placement counts for completion, not evidence");
+            g.Dial.Select(8,DialInput.DirectSeat);g.Seal();g.Seal();g.Seal();Check(!g.Dial.Active && g.Dial.HintLevel==3,"third wrong Seal in Part B asks for a demonstration");
+            g.RevealDemonstration();g.AfterDemonstration();Check(g.GlyphPlaced[2] && g.NameRevealed[2] && g.Dial.Target==3 && g.Dial.Active,"the demonstration places the glyph without evidence and moves to the next mark");
+            for(int seat=3;seat<12;seat++) Place(g,seat);
+            Check(g.Key2Earned && g.Phase==LessonPhase.Key2 && g.Keys==2 && g.GlyphsShown && !g.NamesHidden && g.Dial.Events.Count(e=>e.event_name=="key2_earned")==1,"twelve placed with at least one Level 0/1 answer earns Key 2 once");
+            var noEvidence=new DialLesson(()=>0);noEvidence.SetSunSign(1);EnterGuided(noEvidence);Answer(noEvidence);Answer(noEvidence);noEvidence.Continue();Answer(noEvidence);Answer(noEvidence);noEvidence.BeginContinuation();Answer(noEvidence);Answer(noEvidence);Answer(noEvidence);Answer(noEvidence);noEvidence.BeginGlyphs();
+            for(int seat=0;seat<12;seat++) noEvidence.AnswerGlyphName(seat);
+            for(int seat=0;seat<12;seat++){noEvidence.Dial.Select(Zodiac.Wrap(seat+1),DialInput.DirectSeat);noEvidence.Seal();noEvidence.Seal();Place(noEvidence,seat);}
+            Check(!noEvidence.Key2Earned && noEvidence.Phase==LessonPhase.Paused && noEvidence.Keys==1,"twelve assisted placements pause cleanly without Key 2");
+            var gd=new ReviewDeck();gd.IntroduceAll(0);gd.IntroduceAll(0,ItemKind.Glyph);Check(gd.Items.Length==24 && gd.Due(1).Count==24 && gd.Item(3,ItemKind.Glyph).Kind==ItemKind.Glyph,"the deck holds twelve element and twelve glyph items");
+            gd.RecordLesson(4,true,0,ItemKind.Glyph);Check(gd.Item(4,ItemKind.Glyph).State==ItemState.Practicing && gd.Item(4,ItemKind.Element).State==ItemState.Introduced,"glyph evidence advances only the glyph item");
+            int gday=0;var gflow=new SliceFlow(()=>1,()=>gday);gflow.Continue();gflow.ChooseBirth("known");gflow.SetKnownSign(1);gflow.Continue();gflow.Continue();gflow.RevealKey();gflow.Continue();gflow.Continue();gflow.InsertKey();gflow.End();gflow.Continue();
+            gflow.MarkWheelComplete();gflow.EnterWing();gflow.LeaveWing();gflow.StartGlyphs();Check(gflow.GlyphsStarted && gflow.Deck.Due(gflow.Day+1).Count(i=>i.Kind==ItemKind.Glyph)==12,"starting the glyph unit introduces twelve glyph items");
+            gflow.MarkKey2();gflow.EnterWing();gflow.LeaveWing();Check(gflow.Keys==2 && gflow.AtriumStage==4 && gflow.V03Complete,"Key 2 and one more return complete v0.3");
+            gflow.AdvanceDay();Check(gflow.EnterSeals() && gflow.ReviewQueue.Count==6 && gflow.ReviewQueue.All(t=>t.Mode!=ReviewMode.Glyph),"element items are due before glyph items in the batch order");
+            var gsave=gflow.ToSave(new bool[12],new bool[12],true);var gres=new SliceFlow(()=>1,()=>gday);Check(gres.Restore(gsave) && gres.Keys==2 && gres.GlyphStage==2 && gres.V03Complete && gres.Deck.Item(0,ItemKind.Glyph).entered,"a save carries Keys, glyph stage, and glyph items");
+            var greview=new SliceFlow(()=>1,()=>gday);greview.Continue();greview.ChooseBirth("known");greview.SetKnownSign(1);greview.Continue();greview.Continue();greview.RevealKey();greview.Continue();greview.Continue();greview.InsertKey();greview.End();greview.Continue();
+            foreach(var it in greview.Deck.Items) if(it.Kind==ItemKind.Element){it.dueDay=99;} greview.StartGlyphs();greview.AdvanceDay();
+            Check(greview.EnterSeals() && greview.ReviewQueue.All(t=>t.Mode==ReviewMode.Glyph),"glyph items review in the glyph form");
+            var gt=greview.CurrentReview;var gopts=greview.GlyphReviewOptions(gt.seat);int wrongSeat=gopts.First(o=>o!=gt.seat);
+            Check(!greview.AnswerGlyph(wrongSeat) && greview.Note.Contains("Try once more") && greview.AnswerGlyph(gt.seat) && gt.done && gt.correct && greview.Note.Contains("mark of"),"a glyph review nudges once then accepts the name");
+            var grl=new DialLesson(()=>0);grl.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl.RestoreGlyphs(2,12,true);Check(grl.Key2Earned && grl.Keys==2 && grl.Phase==LessonPhase.Key2 && !grl.CanBeginGlyphs,"restored Key 2 does not reopen the glyph unit");
+            var grl2=new DialLesson(()=>0);grl2.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl2.RestoreGlyphs(0,5,false);Check(grl2.CanBeginGlyphs && grl2.BeginGlyphs() && grl2.CurrentGlyph==5,"restored Part A progress resumes at the next mark");
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }
