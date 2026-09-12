@@ -82,8 +82,9 @@ const path=require('path');
     for(let n=0;n<4&&(await state()).screen==='atriumreturn';n++){await semantic('next-screen');await page.waitForTimeout(150);}
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamber');
     check(!(await state()).canInsert,'the Key cannot be inserted before Caspar finishes at '+viewport.width);
-    for(let n=0;n<4&&!(await state()).canInsert;n++){await semantic('next-screen');await page.waitForTimeout(150);}
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().canInsert);
+    for(let n=0;n<4&&!(await state()).canInsert;n++){await tap(0,654);await page.waitForTimeout(200);} // the visible Continue on the canvas, where a thumb lands
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().canInsert,{},{timeout:5000});
+    check(true,'a visible Continue turns Caspar\'s pages in the Chamber at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber.png')});
     await semantic('insert');await page.waitForFunction(()=>window.ascendantDial.snapshot().ended,{},{timeout:40000});
     check((await state()).locksFilled===1 && (await state()).caspar.includes('Let us continue, shall we?'),'one Key fills one lock and the amended ending plays at '+viewport.width);
