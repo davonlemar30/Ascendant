@@ -69,6 +69,11 @@ namespace Ascendant.CelestialDial
             public string reviewMode = "", reviewSign = "", reviewSummary = "", hubNote = "";
             public string sunSign = "";
             public int locksFilled;
+            // v0.4 tap-to-move
+            public string room = "", walkTarget = "", avatarAt = "", walkSpeed = "";
+            public float avatarX;
+            public bool walking, canWalk, canEnterDial;
+            public string[] pois, poiLabels;
         }
         void Awake()
         {
