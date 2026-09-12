@@ -119,8 +119,32 @@ const path=require('path');
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===3);
     check((await state()).v02Complete,'one more return completes v0.2 at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub-complete.png')});
+    // ---- v0.3: glyphs and Key 2 ----
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
+    check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'Part A shows a mark and four names at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
+    for(let n=0;n<12;n++){
+      await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+      const s=await state();
+      const target=SIGNS.findIndex(name=>s.glyphChar===['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'][SIGNS.indexOf(name)]);
+      const slot=s.glyphOptions.indexOf(SIGNS[target]);
+      await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
+    check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Mark')),'Part B hides every name, labels included, at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
+    for(let n=0;n<12;n++){
+      await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+      const target=SIGNS.indexOf((await state()).glyphTarget);
+      await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().key2&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
+    check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve marks placed earns Key 2 once at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-key2.png')});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4);
+    check((await state()).v03Complete,'one more return completes v0.3 at '+viewport.width);
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-    check((await state()).atriumStage===3 && (await state()).v02Complete,'a reload resumes at the Hub from the local save at '+viewport.width);
+    check((await state()).atriumStage===4 && (await state()).keys===2,'a reload resumes at the Hub from the local save with Key 2 at '+viewport.width);
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);

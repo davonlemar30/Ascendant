@@ -55,6 +55,10 @@ After the Chamber ending, Continue leads to the Atrium in Stage 2 "Stirring" wit
 
 The mechanical validation covers the deck ladder and evidence rules, the flow through hub, seals, review, continuation, save and restore, and the lesson's continuation and review phases. The slice Play Mode fixture and the browser suite walk the loop end to end, including the review batch, both families, the reload-resume, and Start over.
 
+## v0.3: glyphs and Key 2
+
+Unit 1.1's second half, in the form the owner chose on September 12: **Part A** names each glyph by direct tap (four names, one nudge then reveal), **Part B** finds each named sign's glyph on the wheel in zodiac order with names hidden (`DialModel.Begin(start, hint, targetSeat)` gives the evaluator a target seat; the relationship logs as `seat_of_sign`; same hint ladder, Level 2 reveals the name on its seat, Level 3 demonstrates by counting forward from Aries). Key 2 after both parts with at least one Level 0/1 answer in Part B; twelve assisted placements pause without a Key. Twelve glyph items enter the review deck as Introduced when Part A begins and review in a glyph form. Glyphs render with the Unicode zodiac symbols in Noto Sans Symbols (OFL, `Assets/CelestialDial/Resources/Fonts`); not final glyph art. Seat labels never name a hidden seat. Key 2 is earned, not spent, in v0.3; the Atrium reaches Stage 4 and shows the v0.3 end card. Caspar's glyph lines are placeholders (copy deck section 8).
+
 ## Manual acceptance checklist
 
 Record device, viewport, input, observed result, and evidence for each check. Untested entries are pending, never assumed passed.

@@ -32,6 +32,7 @@ namespace Ascendant.Build
         public static void Begin()
         {
             EditorSceneManager.OpenScene("Assets/Scenes/VerticalSlice.unity");
+            PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save(); // a stale local save from an earlier run would resume at the Hub
             GreyboxPlayValidation.SetSize(390,844);SessionState.SetBool("AscendantSlicePlayValidation",true);
             EditorApplication.EnterPlaymode();
         }
@@ -69,8 +70,20 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Act("enter-wing");Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase==LessonPhase.Continuation && View.Dial.Lesson.Dial.Start==2 && View.Dial.Lesson.Dial.HintLevel==0,"the Wing continues with the third family on the player's own");Capture("slice-390-wing-unit11.png");});
             for(int i=0;i<4;i++) Steps.Enqueue(()=>{Act("seat:"+Zodiac.Destination(View.Dial.Lesson.Dial.Start));Act("seal");});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.AllLit && View.Flow.WheelComplete && View.Dial.Lesson.Lit.All(v=>v) && !View.Dial.Lesson.KeyEarned==false && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key1_earned")==1,"twelve seats lit with no second Key");Capture("slice-390-wing-lit.png");Act("leave-wing");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.V02Complete,"one more return completes v0.2");Capture("slice-390-hub-complete.png");Act("reload");});
-            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.WheelComplete && View.Flow.AtriumStage==3 && View.Dial.Lesson.WheelComplete,"a reload resumes at the Hub from the local save");Act("restart");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.V02Complete,"one more return completes v0.2");Capture("slice-390-hub-complete.png");});
+            // ---- v0.3: glyphs and Key 2 ----
+            Steps.Enqueue(()=>{Act("enter-wing");Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase==LessonPhase.GlyphNames && View.Flow.GlyphsStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Glyph && i.entered)==12,"the lit Wing opens the glyph unit, Part A, and introduces glyph items");Capture("slice-390-glyphs-a.png");});
+            for(int i=0;i<14;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphNames)return;int target=l.CurrentGlyph;int slot=System.Array.IndexOf(l.GlyphOptions(target),target);if(l.GlyphIndex==2)Act("glyph-name:"+((slot+1)%4));Act("glyph-name:"+slot);});
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.GlyphWheel && View.Dial.Lesson.NamesHidden && View.Dial.Lesson.Dial.Target==0,"Part A done; Part B hides the names and asks for Aries first");Capture("slice-390-glyphs-b.png");});
+            bool missedOnce=false; // one deliberate miss on the fourth mark; a second would climb the ladder and skip the placement
+            for(int i=0;i<12;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphWheel)return;int target=l.Dial.Target;if(l.GlyphIndex==3 && !missedOnce){missedOnce=true;Act("seat:"+Zodiac.Wrap(target+2));Act("seal");return;}Act("seat:"+target);Act("seal");});
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase==LessonPhase.GlyphWheel){Act("seat:"+l.Dial.Target);Act("seal");}});
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Key2Earned && View.Flow.Keys==2 && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key2_earned")==1,"twelve marks placed earns Key 2 once");Capture("slice-390-key2.png");});
+            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==4 && View.Flow.V03Complete,"one more return completes v0.3");Capture("slice-390-hub-v03.png");Act("advance-day");Act("enter-seals");});
+            for(int i=0;i<6;i++) Steps.Enqueue(()=>{var task=View.Flow.CurrentReview;if(task==null||task.done)return;if(task.Mode==ReviewMode.Dial){Act("seat:"+Zodiac.Destination(task.seat));Act("seal");}else if(task.Mode==ReviewMode.Tap){Act("element:"+System.Array.IndexOf(new[]{"Fire","Earth","Air","Water"},Zodiac.Seats[task.seat].Element));}else{int slot=System.Array.IndexOf(View.Flow.GlyphReviewOptions(task.seat),task.seat);if(View.Flow.ReviewIndex==0)Capture("slice-390-review-glyph.png");Act("glyph-name:"+slot);}});
+            Steps.Enqueue(()=>{Check(View.Flow.ReviewDone,"a review batch with the deck open completes");Act("leave-review");Act("reload");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.WheelComplete && View.Flow.AtriumStage==4 && View.Flow.Keys==2 && View.Dial.Lesson.Key2Earned,"a reload resumes at the Hub from the local save with Key 2");Act("restart");});
             Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});
             Steps.Enqueue(()=>{
                 Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");

@@ -10,19 +10,20 @@ namespace Ascendant.CelestialDial
     {
         public readonly string Name;
         public readonly string Element;
-        public ZodiacSeat(string name, string element) { Name = name; Element = element; }
+        public readonly string Glyph; // Placeholder: the Unicode zodiac symbol. Not final glyph art.
+        public ZodiacSeat(string name, string element, string glyph) { Name = name; Element = element; Glyph = glyph; }
     }
 
     public static class Zodiac
     {
         // One ordered source for geometry, labels, lesson content, and evaluation.
         public static readonly IReadOnlyList<ZodiacSeat> Seats = Array.AsReadOnly(new[] {
-            new ZodiacSeat("Aries", "Fire"), new ZodiacSeat("Taurus", "Earth"),
-            new ZodiacSeat("Gemini", "Air"), new ZodiacSeat("Cancer", "Water"),
-            new ZodiacSeat("Leo", "Fire"), new ZodiacSeat("Virgo", "Earth"),
-            new ZodiacSeat("Libra", "Air"), new ZodiacSeat("Scorpio", "Water"),
-            new ZodiacSeat("Sagittarius", "Fire"), new ZodiacSeat("Capricorn", "Earth"),
-            new ZodiacSeat("Aquarius", "Air"), new ZodiacSeat("Pisces", "Water") });
+            new ZodiacSeat("Aries", "Fire", "\u2648"), new ZodiacSeat("Taurus", "Earth", "\u2649"),
+            new ZodiacSeat("Gemini", "Air", "\u264A"), new ZodiacSeat("Cancer", "Water", "\u264B"),
+            new ZodiacSeat("Leo", "Fire", "\u264C"), new ZodiacSeat("Virgo", "Earth", "\u264D"),
+            new ZodiacSeat("Libra", "Air", "\u264E"), new ZodiacSeat("Scorpio", "Water", "\u264F"),
+            new ZodiacSeat("Sagittarius", "Fire", "\u2650"), new ZodiacSeat("Capricorn", "Earth", "\u2651"),
+            new ZodiacSeat("Aquarius", "Air", "\u2652"), new ZodiacSeat("Pisces", "Water", "\u2653") });
         public static int Wrap(int position) => (position % 12 + 12) % 12;
         public static int Destination(int start, int forward = 4) => Wrap(start + forward);
         public static bool Evaluate(int start, int offset, int destination) => Destination(start, offset) == destination;
@@ -78,9 +79,12 @@ namespace Ascendant.CelestialDial
         public DialInput LastInput { get; private set; }
         public DialModel(Func<double> clock) { now = clock; }
 
-        public void Begin(int start, int hintLevel)
+        public int Target { get; private set; } = -1;   // -1: the default forward-offset-4 relationship
+        public string Relationship => Target >= 0 ? "seat_of_sign" : "forward_offset_4";
+        public void Begin(int start, int hintLevel) { Begin(start, hintLevel, -1); }
+        public void Begin(int start, int hintLevel, int targetSeat)
         {
-            Start = Zodiac.Wrap(start);
+            Start = Zodiac.Wrap(start); Target = targetSeat < 0 ? -1 : Zodiac.Wrap(targetSeat);
             Selected = Start; // Automatic positioning does not emit a movement tick.
             HintLevel = hintLevel;
             Attempts = MovementCount = 0;
@@ -139,7 +143,7 @@ namespace Ascendant.CelestialDial
         {
             if (!Active) return null;
             Attempts++;
-            bool correct = Zodiac.Evaluate(Start, 4, Selected);
+            bool correct = Target >= 0 ? Selected == Target : Zodiac.Evaluate(Start, 4, Selected);
             bool evidence = correct && HintLevel <= 1;
             Log("answer_committed", correct, evidence);
             var result = Log(correct ? "answer_correct" : "answer_rejected", correct, evidence);
@@ -154,7 +158,7 @@ namespace Ascendant.CelestialDial
         {
             var item = new DialEvent {
                 event_name = name, problem_id = problemId, start_seat = Start,
-                start_sign = Zodiac.Seats[Start].Name, requested_relationship = "forward_offset_4",
+                start_sign = Zodiac.Seats[Start].Name, requested_relationship = Relationship,
                 selected_destination = Selected, destination_sign = Zodiac.Seats[Selected].Name,
                 correctness = correct, input_method = method ?? LastInput.ToString(),
                 hint_level = HintLevel, attempt_number = Attempts,
