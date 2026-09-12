@@ -81,7 +81,7 @@ namespace Ascendant.Build
         }
         static void Capture(string file)
         {Directory.CreateDirectory("Logs/Evidence");ScreenCapture.CaptureScreenshot("Logs/Evidence/"+file);}
-        static void SetSize(int width,int height)
+        public static void SetSize(int width,int height)
         {
             // Editor-only test fixture: add a fixed Game View size through the Editor API.
             var assembly=typeof(Editor).Assembly;

@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/CelestialDial.unity
-    guid: 73ee503e8c6c2463ab1f253d7b1ee06c
+    path: Assets/Scenes/VerticalSlice.unity
+    guid: 62e9e38a414d7461c9fb5cfa3031604d
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

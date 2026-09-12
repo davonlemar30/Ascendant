@@ -120,7 +120,7 @@ namespace Ascendant.CelestialDial
             else if (IndependentEvidence)
             {
                 Dial.Home(); Phase = LessonPhase.Complete; KeyEarned = true;
-                Message = "Two families found. Six seats are lit.\nYou showed me the pattern yourself. Keeper Key 1 is yours.";
+                Message = "Two of four. The rest will wait for you."; // Locked First Curriculum Unit line.
                 Dial.Log("key1_earned", true, true);
                 Dial.Log("optional_problem_offered");
             }
@@ -150,6 +150,7 @@ namespace Ascendant.CelestialDial
             StartProblem(2, 0);
             Message = "One more, if you like. Start from Gemini, in the Air family.\nNo reward for this one. Just the wheel.";
         }
+        public void Say(string text) { Message = text; } // Slice beats speak through the same panel.
         public string SeatLabel(int seat)
         {
             var sign = Zodiac.Seats[seat];

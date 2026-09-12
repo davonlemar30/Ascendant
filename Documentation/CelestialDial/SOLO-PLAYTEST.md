@@ -53,6 +53,18 @@ Tick what you observed. Anything unticked is untested, not passed. Write short n
 - [ ] Reduced motion on: no snap animation, no inertia, everything still completes.
 - [ ] Every path reaches the same accepted answer as dragging.
 
+## Bookends (vertical slice)
+
+- [ ] Opens in darkness with "WHO ARE YOU?". Type a name or leave it blank; blank becomes "Keeper". Continue works either way.
+- [ ] "Do you know when you were born?" shows three choices. Continue stays off until you pick one. The first two say chart entry is not in this build; "I don't know" says nothing extra. All three lead to the same teaching sign.
+- [ ] A white flash, then the Grand Atrium: dust, covered furniture, sealed doors, one candle, Caspar's orientation. Continue leads to the Wing.
+- [ ] After the sixth seat lights, Caspar says "Two of four. The rest will wait for you." Then the Dial splits along its seam and a Keeper Key rises. Caspar: "Aah... the Library stirs." Did the split read as a reveal, or as something breaking? ___
+- [ ] "Keeper Key: 1" appears. The floor markings brighten and the candle lights. Continue appears; the optional problem is still offered.
+- [ ] Atrium again: Caspar leads onward. Continue leads to the Chamber.
+- [ ] Chamber: seven sealed Books, three locks each, chandelier dark. Insert the Key: one lock lights, the chandelier flickers twice then fully lights, the mechanism turns one degree, "So he was right.", "End of prototype." Did the ending land? ___
+- [ ] Reduced motion on: every beat still completes with no flash and no animation.
+- [ ] No screen needs scrolling at 390 × 844 or 360 × 800.
+
 ## Layout
 
 - [ ] 390 × 844: no vertical scrolling during the Dial, Dial dominates, Seal dominates the control row.

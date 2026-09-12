@@ -19,6 +19,7 @@ namespace Ascendant.Build
             lesson.Continue();lesson.Continue();
             Answer(lesson);Answer(lesson);lesson.Continue();return lesson;
         }
+        static bool LessonMessageIsLocked(DialLesson lesson)=>lesson.Message=="Two of four. The rest will wait for you.";
         static DialEvent Answer(DialLesson lesson)
         {
             lesson.Dial.Select(Zodiac.Destination(lesson.Dial.Start),DialInput.DirectSeat);
@@ -68,6 +69,7 @@ namespace Ascendant.Build
             Check(happy.Phase==LessonPhase.Complete && happy.Lit.Count(v=>v)==6 && happy.Kin.Count(v=>v)==6,"two completed families; six lit and six dormant");
             Check(happy.KeyEarned && happy.IndependentEvidence,"Key 1 requires challenge completion and independent evidence");
             Check(happy.Dial.Selected==0,"completion returns home");
+            Check(LessonMessageIsLocked(happy),"six-seat completion speaks the locked curriculum line");
             var assisted=Transfer();Wrong(assisted,2);var assistedAnswer=Answer(assisted);
             Check(!assistedAnswer.evidence_eligible && assisted.Dial.Start!=assistedAnswer.start_seat && assisted.Dial.HintLevel==0,"Level 2 completion queues a different fresh Level 0 problem");
             Answer(assisted);Check(assisted.KeyEarned,"fresh equivalent can earn Key after assisted completion");
@@ -83,6 +85,15 @@ namespace Ascendant.Build
             Check(happy.Dial.Events.Count(e=>e.event_name=="key1_earned")==1,"optional probe does not award another Key");
             double time=2;var timed=new DialModel(()=>time);timed.Begin(0,0);time=5;timed.Step(4,DialInput.Keyboard);var logged=timed.Commit();
             Check(logged.response_time==3 && logged.attempt_number==1 && logged.start_sign=="Aries" && logged.destination_sign=="Leo" && logged.requested_relationship=="forward_offset_4","answer log carries timing, attempt, relationship and seats");
+            var flow=new SliceFlow();Check(flow.Screen==SliceScreen.Identity && flow.DisplayName=="Keeper","slice starts at identity with a default Keeper name");
+            flow.SetName("  Astra ");Check(flow.DisplayName=="Astra" && flow.Continue() && flow.Screen==SliceScreen.Birth,"name trimmed; identity continues to birth prompt");
+            Check(!flow.Continue(),"birth prompt requires a choice");
+            flow.ChooseBirth("chart");Check(flow.Note.Contains("teaching sign") && flow.Continue() && flow.Screen==SliceScreen.Atrium,"chart entry is a labeled placeholder leading to the teaching sign");
+            Check(!flow.InsertKey() && flow.Continue() && flow.Screen==SliceScreen.Wing,"atrium continues to the wing; no key insertion outside the chamber");
+            Check(!flow.Continue() && flow.RevealKey() && !flow.RevealKey() && flow.Continue() && flow.Screen==SliceScreen.AtriumReturn,"wing needs the key reveal once before continuing");
+            Check(flow.Continue() && flow.Screen==SliceScreen.Chamber && !flow.Continue(),"chamber is the last screen");
+            Check(flow.InsertKey() && flow.LocksFilled==1 && !flow.InsertKey() && flow.End() && flow.Ended && !flow.End(),"one key fills one lock of three and ends the prototype once");
+            var unknown=new SliceFlow();unknown.Continue();unknown.ChooseBirth("unknown");Check(unknown.Note=="" && unknown.CanContinue,"I don't know is the neutral path with no note");
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }

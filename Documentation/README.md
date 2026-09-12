@@ -29,18 +29,19 @@ Production: [Ascendant](https://davonlemar30.github.io/Ascendant/).
 
 ## Current vertical-slice status — September 11, 2026
 
-The Celestial Dial greybox is implemented, deployed, and solo-playtested by the owner (the only playtester). The mechanic and flow are provisionally accepted: movement felt smooth, snapping and inertia were acceptable, alternate inputs matched dragging, the six-seat lesson and the optional problem completed, and both portrait layouts fit. The recorded decision on [task 86bbyd0vw](https://app.clickup.com/t/86bbyd0vw) is **REVISE for copy clarity only**. iPhone VoiceOver and Android TalkBack remain untested.
+The Celestial Dial greybox is built, deployed, and solo-accepted (owner is the only playtester; REVISE narrowed to copy clarity, then addressed in PR #6). The last three prototype locks closed on September 11: [First Reward](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24114), [Navigation](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24154), and [Room Scope](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-24174). The **vertical slice v0.1** (branch `codex/vertical-slice`, [task 86bbzm11t](https://app.clickup.com/t/86bbzm11t)) wraps the Dial in the locked bookends:
 
-The clarity issue was wording, not rotation: "Forward" felt visually contradictory because the wheel appears to move downward when advancing and upward when reversing. The copy-clarity pass (branch `codex/celestial-dial-copy-clarity`) therefore uses less visually loaded wording and changes nothing else:
+1. Darkness / Identity: name entry (blank becomes "Keeper") and the birth prompt with three choices. No chart is calculated; every path uses the labeled teaching sign.
+2. Grand Atrium: Stage 1 "Forgotten" placeholders and Caspar's orientation.
+3. Zodiac Wing: the Dial with the Q07 props. On the sixth lit seat Caspar says the locked "Two of four. The rest will wait for you."; the Dial splits, a Keeper Key rises, "Aah... the Library stirs."
+4. Grand Atrium: Caspar leads onward.
+5. Crystal Book Chamber: seven sealed Books, three locks each; the Key fills 1/3; chandelier, mechanism one degree, "So he was right." End of prototype.
 
-- Action sequence **Move > Inspect > Seal**; readout **Framed: [sign]**; step controls **Previous** and **Next**; introductory label **Teaching sign: Taurus**.
-- Counting explained as "Start at [sign]. Count each sign after it: one, two, three, four. Inspect the framed sign, then press Seal."
-- No player-facing "under the marker", "counts as 0", "your start sign is zero", or up/down/clockwise wording, in Unity UI, the WebGL template, or the accessibility labels.
-- Evaluator, rotation direction, snapping, inertia, recovery limits, evidence rules, reward logic, input parity, and layout geometry are unchanged.
+Screens link by Continue only. Placeholder art and copy throughout; only locked lines are verbatim. No save, no inventory (a Key indicator), no hub, no map. The shipped scene is `Assets/Scenes/VerticalSlice.unity`; `Assets/Scenes/CelestialDial.unity` stays for the Dial-only fixture. iPhone VoiceOver and Android TalkBack remain untested.
 
-Validation of the copy pass (Unity 6000.3.24f1, local): `git diff --check` clean; stale-string sweep clean; mechanical validation 75/75; Play Mode validation 24/24 with captures at 390 × 844 and 360 × 800; headless WebGL build 0 errors / 0 warnings; browser suite 29/29 against the served build. Untested: VoiceOver / TalkBack on a device.
+Validation of the slice (Unity 6000.3.24f1, local): mechanical validation 85/85 (flow rules and the locked completion line included); slice Play Mode fixture 16/16 with captures of every screen at 390 × 844 and the ending at 360 × 800; Dial-only Play Mode fixture 24/24; headless WebGL build 0 errors / 0 warnings; browser suite 44/44 against the served build, walking the bookends before and after the Dial in both viewports plus the recovery path.
 
-**Versioning:** the Unity project reports bundle version `1.0`. `0.0.0.1` is not the configured version and is a four-part label rather than semantic versioning. `0.1.0` would be a clearer early-prototype label, but changing the project version is outside the copy pass and needs a separate release/versioning decision.
+**Versioning:** the Unity project reports bundle version `1.0`. `0.1.0` would be a clearer early-prototype label; changing it needs a separate release/versioning decision.
 
 ## Greybox boundaries and delivery
 

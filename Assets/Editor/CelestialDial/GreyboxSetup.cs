@@ -25,5 +25,25 @@ namespace Ascendant.Build
             AssetDatabase.SaveAssets();
             Debug.Log("[GreyboxSetup] Scene and Web template configured through Unity.");
         }
+
+        [MenuItem("Ascendant/Greybox/Create vertical slice scene")]
+        public static void ConfigureSlice()
+        {
+            const string path="Assets/Scenes/VerticalSlice.unity";
+            if (!System.IO.File.Exists(path))
+            {
+                var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+                var camera=new GameObject("Main Camera",typeof(Camera));camera.tag="MainCamera";
+                camera.GetComponent<Camera>().clearFlags=CameraClearFlags.SolidColor;
+                camera.GetComponent<Camera>().backgroundColor=new Color(.075f,.075f,.09f);
+                new GameObject("VerticalSlice",typeof(SliceView));
+                EditorSceneManager.SaveScene(scene,path);
+            }
+            // The slice is the shipped scene; the Dial-only scene stays for its own fixture.
+            EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(path,true)};
+            PlayerSettings.WebGL.template="PROJECT:CelestialDial";
+            AssetDatabase.SaveAssets();
+            Debug.Log("[GreyboxSetup] Vertical slice scene configured through Unity.");
+        }
     }
 }
