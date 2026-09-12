@@ -101,6 +101,19 @@ This checks the loop: coming back to the Library, checking the seals, and finish
 - [ ] Close the game and open it again. You should see the Atrium, not the dark opening, with everything as you left it. Press "Start over (test only)." You should see the dark opening again.
 - [ ] Turn "Reduced motion" on and check the seals again after advancing a day. You should see everything still work with no sliding.
 
+## The marks (v0.3)
+
+This checks the glyph unit: naming the twelve marks, finding them on the wheel, and earning Key 2.
+
+- [ ] With all twelve seats lit, press "The Zodiac Wing." You should see a big mark on a card and four sign names below it, with Caspar's line about the twelve marks.
+- [ ] Tap the right name. You should see "Yes. [sign]." and the next mark. Tap a wrong name on purpose. You should see one hint that only names the element, and a second chance. Miss again. You should see the name revealed and the next mark.
+- [ ] After twelve marks, you should see the wheel with the names hidden and only the marks showing. Caspar names a sign. Turn until that sign's mark is under the bracket and press Seal. You should see "Yes. [sign], in its place." and the next name.
+- [ ] Get one wrong on purpose. You should see "Aries is here at the start; count forward from it." Miss again. You should see that sign's name appear on its seat. Miss a third time. You should see Caspar count forward to it himself, then the next mark.
+- [ ] After all twelve, you should see "Keeper Key 2 is yours," the names back on the wheel beside their marks, and "Keeper Keys: 2" at the top. Press "Back to the Atrium." You should see the end card say v0.3.
+- [ ] Advance a day and check the seals. You should see some items show a mark with four names instead of a family question. They work the same way: one hint, then the answer.
+- [ ] Close and reopen the game. You should see the Atrium with two Keys. Press "Start over (test only)" to reset.
+- [ ] Turn "Reduced motion" on and do the marks again after starting over. You should see everything still work.
+
 ## Does it fit on the phone?
 
 This checks that nothing is cut off or too small.
@@ -123,6 +136,7 @@ Answer in your own words. Short is fine.
 8. Did the ending in the Chamber land? Too slow, too fast, or about right? ___
 9. When you came back to the Atrium, did you want to go back into the Wing, or check the seals, or neither? ___
 10. Did checking the seals feel like care for the Library, or like a quiz? ___
+11. Did the marks feel learnable, or like memorizing squiggles? Which part helped more, naming them or finding them on the wheel? ___
 
 ## Dev notes (skip if you're just playing)
 
