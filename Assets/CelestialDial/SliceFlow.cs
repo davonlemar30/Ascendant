@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review }
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom }
     public enum ReviewMode { Dial, Tap, Glyph }
 
     [Serializable]
@@ -39,6 +39,8 @@ namespace Ascendant.CelestialDial
         public int DayOffset { get; private set; }          // test-only "advance one day"
         public int FirstDay { get; private set; } = -1;
         public int ReviewsChecked { get; private set; }
+        // v0.4: the marker that walks the Atrium and the Wing room (Q06 phase 2).
+        public readonly Walker Walk = new Walker();
         public readonly List<ReviewTask> ReviewQueue = new List<ReviewTask>();
         public int ReviewIndex { get; private set; }
         public ReviewTask CurrentReview => ReviewIndex < ReviewQueue.Count ? ReviewQueue[ReviewIndex] : null;
@@ -53,6 +55,7 @@ namespace Ascendant.CelestialDial
             random = randomSeat ?? (() => new Random().Next(12));
             realDay = realDayNumber ?? (() => (int)(DateTime.UtcNow - new DateTime(2026, 1, 1)).TotalDays);
             Deck.Logged += n => Logged?.Invoke(n);
+            Walk.Logged += n => Logged?.Invoke(n);
         }
         public int Day { get { if (FirstDay < 0) FirstDay = realDay(); return realDay() - FirstDay + DayOffset; } }
         public string DisplayName => string.IsNullOrEmpty(PlayerName) ? "Keeper" : PlayerName;
@@ -88,7 +91,7 @@ namespace Ascendant.CelestialDial
                 Screen == SliceScreen.Atrium ? SliceScreen.Wing :
                 Screen == SliceScreen.Wing ? SliceScreen.AtriumReturn :
                 Screen == SliceScreen.AtriumReturn ? SliceScreen.Chamber : SliceScreen.Hub;
-            if (Screen == SliceScreen.Hub) { Note = ""; if (AtriumStage < 2) { AtriumStage = 2; Deck.IntroduceAll(Day); } }
+            if (Screen == SliceScreen.Hub) { Note = ""; if (AtriumStage < 2) { AtriumStage = 2; Deck.IntroduceAll(Day); } Walk.Enter(Room.Atrium, "entry"); }
             Logged?.Invoke("screen_entered:" + Screen);
             return true;
         }
@@ -110,18 +113,41 @@ namespace Ascendant.CelestialDial
         // ---- v0.2: the return ----
         public bool AtHub => Screen == SliceScreen.Hub;
         public bool CanEnterWing => AtHub;
+        // v0.4: the Wing doorway leads into the Wing room; the Dial is a point of interest inside it.
         public bool EnterWing()
         {
             if (!CanEnterWing) return false;
+            Screen = SliceScreen.WingRoom; Note = ""; Walk.Enter(Room.Wing, "atrium-door"); Logged?.Invoke("screen_entered:wingroom"); return true;
+        }
+        public bool AtWingRoom => Screen == SliceScreen.WingRoom;
+        public bool EnterDial()
+        {
+            if (!AtWingRoom) return false;
             Screen = SliceScreen.Wing; Logged?.Invoke("screen_entered:wing"); return true;
+        }
+        public bool LeaveDial()
+        {
+            if (Screen != SliceScreen.Wing || AtriumStage < 2) return false;
+            Screen = SliceScreen.WingRoom; Logged?.Invoke("screen_entered:wingroom"); return true;
         }
         public bool LeaveWing()
         {
-            if (Screen != SliceScreen.Wing || AtriumStage < 2) return false;
-            Screen = SliceScreen.Hub;
+            if (Screen != SliceScreen.WingRoom || AtriumStage < 2) return false;
+            Screen = SliceScreen.Hub; Note = "";
             if (WheelComplete && AtriumStage < 3) { AtriumStage = 3; Logged?.Invoke("atrium_stage_3"); }
             if (Keys >= 2 && AtriumStage < 4) { AtriumStage = 4; Logged?.Invoke("atrium_stage_4"); }
-            Logged?.Invoke("screen_entered:hub"); return true;
+            Walk.Enter(Room.Atrium, "wing-door"); Logged?.Invoke("screen_entered:hub"); return true;
+        }
+        // Sealed doors only say they are sealed (Q06 phase 2, decision 2).
+        public bool TouchSealedDoor()
+        {
+            if (!AtHub) return false;
+            Note = "Sealed. It does not answer to you yet."; Logged?.Invoke("sealed_door_touched"); return true; // placeholder (owner writes)
+        }
+        public bool ApproachCaspar()
+        {
+            if (!AtHub) return false;
+            Note = "Caspar looks up from the desk and waits."; Logged?.Invoke("caspar_approached"); return true; // placeholder (owner writes)
         }
         public void MarkWheelComplete() { if (!WheelComplete) { WheelComplete = true; Logged?.Invoke("wheel_completed"); } }
         public void MarkKeyEarned() { if (Keys < 1) { Keys = 1; } }
@@ -192,7 +218,7 @@ namespace Ascendant.CelestialDial
         public bool LeaveReview()
         {
             if (Screen != SliceScreen.Review || !ReviewDone) return false;
-            Screen = SliceScreen.Hub; Note = ""; Logged?.Invoke("screen_entered:hub"); return true;
+            Screen = SliceScreen.Hub; Note = ""; Walk.Enter(Room.Atrium, "desk"); Logged?.Invoke("screen_entered:hub"); return true;
         }
         public void AdvanceDay() { DayOffset++; Logged?.Invoke("test_day_advanced"); }
         public bool V02Complete => WheelComplete && AtriumStage >= 3;
@@ -211,7 +237,7 @@ namespace Ascendant.CelestialDial
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; DayOffset = save.dayOffset; FirstDay = save.firstDay; ReviewsChecked = save.reviewsChecked;
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
             if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < 2) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
-            Screen = SliceScreen.Hub; Logged?.Invoke("session_resumed"); return true;
+            Screen = SliceScreen.Hub; Walk.Enter(Room.Atrium, "entry"); Logged?.Invoke("session_resumed"); return true;
         }
     }
 }

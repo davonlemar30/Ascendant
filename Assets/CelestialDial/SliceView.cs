@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -22,6 +23,10 @@ namespace Ascendant.CelestialDial
         Text birthNote, atriumText, returnText, chamberText, chamberEnd, keyIndicator, keyLabel, dateHint;
         Text hubText, hubNote, hubCaption, endCard, reviewProgress, reviewQuestion, reviewNote, reviewSummary, reviewGlyph;
         Text glyphCard, glyphProgress, glyphCaspar, glyphNote;
+        // v0.4 tap-to-move (Q06 phase 2): two walkable rooms, a placeholder marker, fades at doorways.
+        RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
+        Button enterDial, wingRoomBack, walkSpeed;
+        const float BandY = 436f, FadeSeconds = .35f; // floor band and fade length are test variables (Q06 phase 2, decision 7)
         readonly Button[] glyphNameButtons = new Button[4];
         readonly Button[] reviewGlyphButtons = new Button[4];
         InputField nameField, dateField;
@@ -76,7 +81,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth();
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue);
-            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildWingExtras();
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildWingExtras(); BuildWingRoom(); BuildAvatar(); BuildFade();
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -87,6 +92,7 @@ namespace Ascendant.CelestialDial
         void Update()
         {
             if (canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f);
+            if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
             if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Review) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
@@ -183,26 +189,32 @@ namespace Ascendant.CelestialDial
             hub = ScreenPanel("Hub");
             Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
             Block(hub, "Shelves, mostly empty", -130, 200, 60, 120);
-            var desk = Block(hub, "Desk, uncovered", 30, 215, 110, 50);
+            var floor = Rect("Floor band", hub, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
+            var desk = Block(hub, "Desk, uncovered", -125, 426, 70, 30); Tappable(desk, () => Walk("desk"));
+            var casparMark = Rect("Caspar", hub, 100, 418, 14, 40); var casparBody = casparMark.gameObject.AddComponent<Image>(); casparBody.color = Muted; casparBody.raycastTarget = false;
+            var casparHead = Rect("Caspar head", hub, 100, 392, 12, 12); var casparHeadImage = casparHead.gameObject.AddComponent<Image>(); casparHeadImage.color = Muted; casparHeadImage.raycastTarget = false;
+            Label(hub, "Caspar", 100, 452, 60, 14, 10).color = Muted;
+            var casparTap = Rect("Caspar, tap to walk", hub, 100, 420, 44, 76); var casparTapImage = casparTap.gameObject.AddComponent<Image>(); casparTapImage.color = new Color(0, 0, 0, 0); Tappable(casparTap, () => Walk("caspar"));
             var lamp1 = Rect("Lamp", hub, -40, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false;
             var lamp2 = Rect("Lamp", hub, 60, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false;
             string[] doors = { "Sealed", "Zodiac Wing, open", "Sealed" };
             for (int i = 0; i < 3; i++)
             {
-                var door = Block(hub, doors[i], -120 + i * 120, 355, 70, 100);
+                var door = Block(hub, doors[i], -120 + i * 120, 325, 70, 100); string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "sealed-right"; Tappable(door, () => Walk(poi));
                 if (i == 1) { var light = Rect("Doorway light", door, 0, 50, 50, 82); doorOpenLight = light.gameObject.AddComponent<Image>(); doorOpenLight.color = new Color(.95f, .8f, .5f, .35f); doorOpenLight.raycastTarget = false; }
                 else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; }
             }
-            hubCaption = Label(hub, "", 0, 446, 340, 20, 12); hubCaption.color = Muted;
-            var panel = Rect("Caspar panel", hub, 0, 520, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
+            hubCaption = Label(hub, "", 0, 470, 340, 20, 12); hubCaption.color = Muted;
+            var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
-            enterWing = MakeButton(hub, "The Zodiac Wing", 0, 610, 300, 52, EnterWing);
-            enterSeals = MakeButton(hub, "Check the Seals", 0, 668, 300, 52, EnterSeals); enterSealsLabel = enterSeals.GetComponentInChildren<Text>();
-            hubNote = Label(hub, "", 0, 708, 330, 20, 12); hubNote.color = Muted;
-            endCard = Label(hub, "End of prototype v0.2. Glyphs and Key 2 come next.", 0, 732, 330, 20, 12); endCard.gameObject.SetActive(false);
-            advanceDay = MakeButton(hub, "Advance one day (test)", -88, 772, 170, 40, () => { Flow.AdvanceDay(); Save(); ShowHub(); Publish(); }); advanceDay.GetComponent<Image>().color = PanelColor; advanceDay.GetComponentInChildren<Text>().fontSize = 12;
-            hubRestart = MakeButton(hub, "Start over (test only)", 88, 772, 170, 40, Restart); hubRestart.GetComponent<Image>().color = PanelColor; hubRestart.GetComponentInChildren<Text>().fontSize = 12;
+            enterWing = MakeButton(hub, "The Zodiac Wing", 0, 624, 300, 52, EnterWing);
+            enterSeals = MakeButton(hub, "Check the Seals", 0, 680, 300, 52, EnterSeals); enterSealsLabel = enterSeals.GetComponentInChildren<Text>();
+            hubNote = Label(hub, "", 0, 718, 330, 20, 12); hubNote.color = Muted;
+            endCard = Label(hub, "End of prototype v0.2. Glyphs and Key 2 come next.", 0, 738, 330, 20, 12); endCard.gameObject.SetActive(false);
+            advanceDay = TestButton(hub, "Next day (test)", -118, 774, () => { Flow.AdvanceDay(); Save(); ShowHub(); Publish(); });
+            walkSpeed = TestButton(hub, "Walk: normal (test)", 0, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
+            hubRestart = TestButton(hub, "Start over (test)", 118, 774, Restart);
         }
         void BuildReview()
         {
@@ -251,6 +263,56 @@ namespace Ascendant.CelestialDial
             wingContinue = MakeButton(r, "Continue", 0, 654, 190, 56, WingContinue); wingContinue.name = "Slice Continue"; wingContinue.gameObject.SetActive(false);
         }
 
+        void BuildWingRoom()
+        {
+            // Q06 phase 2, decision 2: the Wing as a room with two points of interest, the Dial and the doorway back.
+            wingRoom = ScreenPanel("Wing room");
+            Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
+            Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
+            var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36);
+            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); book.gameObject.AddComponent<Image>().color = new Color(.3f, .28f, .3f); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
+            var dial = Rect("The Dial", wingRoom, 30, 250, 200, 200); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
+            RingLines(dial, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(dial, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
+            var dialLabel = Label(wingRoom, "The Dial", 30, 352, 120, 16, 10); dialLabel.color = Muted;
+            Tappable(dial, () => Walk("dial"));
+            var door = Block(wingRoom, "Doorway back", -130, 325, 70, 100); Tappable(door, () => Walk("atrium-door"));
+            var light = Rect("Doorway light", door, 0, 50, 50, 82); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, .25f); lightImage.raycastTarget = false;
+            var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
+            wingRoomCaption = Label(wingRoom, "The Dial waits at the center of the room. The doorway leads back.", 0, 478, 340, 36, 12); // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
+            enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
+            wingRoomBack = MakeButton(wingRoom, "Back to the Atrium", 0, 680, 300, 52, LeaveWing);
+        }
+        void BuildAvatar()
+        {
+            // Q06 phase 2, decision 3: a placeholder upright marker with a walk bob and one idle pose. No face, no clothing.
+            avatar = Rect("Keeper", root, 0, BandY - 16, 20, 44);
+            var body = Rect("Body", avatar, 0, 26, 16, 30); var bodyImage = body.gameObject.AddComponent<Image>(); bodyImage.color = new Color(.85f, .8f, .72f); bodyImage.raycastTarget = false;
+            avatarHead = Rect("Head", avatar, 0, 7, 12, 12); var headImage = avatarHead.gameObject.AddComponent<Image>(); headImage.color = new Color(.85f, .8f, .72f); headImage.raycastTarget = false;
+            avatar.gameObject.SetActive(false);
+        }
+        void BuildFade()
+        {
+            var fade = Rect("Fade", root, 0, 400, 360, 800); fadeImage = fade.gameObject.AddComponent<Image>(); fadeImage.color = new Color(0, 0, 0, 0); fadeImage.raycastTarget = false;
+        }
+        void PlaceAvatar()
+        {
+            var walk = Flow.Walk;
+            avatar.anchoredPosition = new Vector2(walk.X, -(BandY - 16) + walk.Bob);
+            avatarHead.anchoredPosition = new Vector2(walk.Facing * 2, -7);
+        }
+        void Tappable(RectTransform r, Action action)
+        {
+            var image = r.GetComponent<Image>(); image.raycastTarget = true;
+            var button = r.gameObject.AddComponent<Button>(); button.onClick.AddListener(() => action());
+            var colors = button.colors; colors.highlightedColor = new Color(1, 1, 1, .9f); colors.pressedColor = new Color(.8f, .8f, .8f); colors.selectedColor = new Color(.85f, .7f, .55f); button.colors = colors;
+            Dial.RegisterNavigation(button);
+        }
+        Button TestButton(Transform parent, string text, float x, float top, UnityEngine.Events.UnityAction action)
+        {
+            var b = MakeButton(parent, text, x, top, 112, 40, action); b.GetComponent<Image>().color = PanelColor;
+            var t = b.GetComponentInChildren<Text>(); t.fontSize = 11; t.horizontalOverflow = HorizontalWrapMode.Overflow; return b;
+        }
+
         // ---- actions (all input paths, including the Web bridge, arrive here) ----
         public void WebAction(string command)
         {
@@ -263,6 +325,9 @@ namespace Ascendant.CelestialDial
             else if (command == "restart") Restart();
             else if (command == "reload") { if (!busy) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); } // test-only: resume from the local save
             else if (command == "enter-wing") EnterWing();
+            else if (command == "enter-dial") Walk("dial");
+            else if (command.StartsWith("walk:")) Walk(command.Substring(5));
+            else if (command == "walk-speed") CycleWalkSpeed();
             else if (command == "enter-seals") EnterSeals();
             else if (command == "leave-wing") LeaveWing();
             else if (command == "leave-review") LeaveReview();
@@ -307,13 +372,58 @@ namespace Ascendant.CelestialDial
         void WingContinue() { if (Flow.AtriumStage >= 2) LeaveWing(); else Continue(); }
         void Insert() { if (busy || Page < ChamberPages.Length - 1 || !Flow.InsertKey()) return; StartCoroutine(Chandelier()); }
         void Restart() { if (busy) return; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
-        void EnterWing()
+        // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
+        void EnterWing() { Walk("wing-door"); }
+        void EnterDialNow()
         {
-            if (busy || !Flow.EnterWing()) return;
+            if (!Flow.EnterDial()) return;
             Dial.SliceHidesOptional = true;
             if (Dial.Lesson.CanContinueUnit) Dial.Lesson.BeginContinuation();
             else if (Dial.Lesson.CanBeginGlyphs) { if (Dial.Lesson.BeginGlyphs()) { Flow.StartGlyphs(); Save(); } }
             Show(); Dial.Realign(); Publish();
+        }
+        void Walk(string id)
+        {
+            if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom)) return;
+            var poi = Flow.Walk.Find(id); if (poi == null) return;
+            if (!poi.Walkable) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; }
+            if (!Flow.Walk.GoTo(id)) return;
+            StartCoroutine(Travel(id));
+        }
+        IEnumerator Travel(string id)
+        {
+            busy = true; hubNote.text = ""; Publish();
+            var walk = Flow.Walk;
+            if (ReducedMotion) walk.Jump(); // decision 4: reduced motion jumps
+            else while (!walk.Tick(Time.unscaledDeltaTime)) { PlaceAvatar(); yield return null; }
+            PlaceAvatar();
+            yield return Arrive(id);
+            busy = false; Show(); Publish();
+        }
+        IEnumerator Arrive(string id)
+        {
+            if (id == "wing-door" || id == "atrium-door")
+            {
+                yield return FadeTo(1);
+                if (id == "wing-door") Flow.EnterWing(); else { Flow.LeaveWing(); Save(); }
+                Show(); PlaceAvatar(); Publish();
+                yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
+                yield return FadeTo(0);
+            }
+            else if (id == "desk") { if (!Flow.EnterSeals()) hubNote.text = Flow.Note; else { Show(); StartReviewItem(); } }
+            else if (id == "caspar") { Flow.ApproachCaspar(); hubNote.text = Flow.Note; }
+            else if (id == "dial") EnterDialNow();
+        }
+        IEnumerator FadeTo(float alpha)
+        {
+            fadeImage.raycastTarget = true; float from = fadeImage.color.a;
+            yield return Tween(ReducedMotion ? 0 : FadeSeconds, k => fadeImage.color = new Color(0, 0, 0, Mathf.Lerp(from, alpha, k)));
+            fadeImage.raycastTarget = alpha > 0;
+        }
+        void CycleWalkSpeed()
+        {
+            if (busy) return;
+            Flow.Walk.CycleSpeed(); walkSpeedLabel.text = "Walk: " + Flow.Walk.SpeedName + " (test)"; Publish();
         }
         void AnswerGlyphName(int slot)
         {
@@ -339,13 +449,13 @@ namespace Ascendant.CelestialDial
             reviewNote.text = Flow.Note; Save(); Publish();
             if (task.done) StartCoroutine(AfterTap());
         }
-        void LeaveWing() { if (busy || Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveWing()) return; Save(); Show(); Publish(); }
-        void EnterSeals()
+        void LeaveWing()
         {
             if (busy) return;
-            if (!Flow.EnterSeals()) { hubNote.text = Flow.Note; Publish(); return; }
-            Show(); StartReviewItem();
+            if (Flow.Screen == SliceScreen.Wing) { if (Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveDial()) return; Save(); Show(); Publish(); }
+            if (Flow.Screen == SliceScreen.WingRoom) Walk("atrium-door"); // one press from the Dial walks back out through the room
         }
+        void EnterSeals() { Walk("desk"); }
         void StartReviewItem()
         {
             var task = Flow.CurrentReview;
@@ -388,6 +498,11 @@ namespace Ascendant.CelestialDial
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth);
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber); hub.gameObject.SetActive(s == SliceScreen.Hub);
+            wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
+            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom;
+            if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : wingRoom, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
+            avatar.gameObject.SetActive(roomScreen);
+            if (s == SliceScreen.WingRoom) { enterDial.interactable = !busy; wingRoomBack.interactable = !busy; }
             bool partA = s == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames;
             review.gameObject.SetActive(s == SliceScreen.Review && !reviewOnDial);
             glyphs.gameObject.SetActive(partA);
@@ -428,7 +543,7 @@ namespace Ascendant.CelestialDial
             int due = Flow.DueCount;
             enterSealsLabel.text = due > 0 ? "Check the Seals · " + due + " due" : "Check the Seals";
             enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
-            endCard.text = Flow.Keys >= 2 ? "End of prototype v0.3. Tap-to-move comes next." : "End of prototype v0.2. Glyphs and Key 2 come next.";
+            endCard.text = Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.V03Complete);
         }
@@ -501,6 +616,16 @@ namespace Ascendant.CelestialDial
             }
             if (glyphItem) state.reviewMode = "glyph";
             state.v03Complete = Flow.V03Complete;
+            // v0.4
+            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom;
+            var walk = Flow.Walk;
+            state.room = !roomScreen ? "" : walk.Room == Room.Atrium ? "atrium" : "wing";
+            state.avatarX = walk.X; state.walking = walk.Walking; state.walkTarget = walk.TargetId; state.avatarAt = walk.At; state.walkSpeed = walk.SpeedName;
+            var pois = roomScreen ? Rooms.Visible(walk.Room).ToArray() : new PointOfInterest[0];
+            state.pois = pois.Select(p => p.Id).ToArray(); state.poiLabels = pois.Select(p => (p.Walkable ? "Walk to " : "") + p.Label).ToArray();
+            state.canWalk = roomScreen && !busy; state.canEnterDial = s == SliceScreen.WingRoom && !busy;
+            if (s == SliceScreen.WingRoom) { state.caspar = wingRoomCaption.text; state.canLeaveWing = !busy; }
+            if (roomScreen && !busy) state.note = hubNote.text;
         }
 
         // ---- save / restore (Q05 decision 5) ----
