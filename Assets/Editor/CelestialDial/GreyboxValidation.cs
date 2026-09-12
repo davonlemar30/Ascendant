@@ -138,8 +138,8 @@ namespace Ascendant.Build
             Check(tap3.done && !tap3.correct && loop.Note.Contains("We will come back"),"two tap misses reveal the element and move on");
             loop.FinishReview(true,true);var last=loop.CurrentReview;loop.AnswerTap(Zodiac.Seats[last.seat].Element);
             Check(loop.ReviewDone && loop.ReviewSummary.EndsWith("of 6 seals held.") && loop.ReviewsChecked==1 && loop.LeaveReview() && loop.Screen==SliceScreen.Hub,"six items finish the batch with a summary; back to the Hub");
-            Check(loop.EnterWing() && loop.Screen==SliceScreen.Wing && loop.LeaveWing() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2,"the Wing can be entered from the Hub and left back to it");
-            loop.MarkWheelComplete();loop.EnterWing();loop.LeaveWing();Check(loop.AtriumStage==3 && loop.V02Complete,"twelve lit seats and one more return complete v0.2");
+            Check(loop.EnterWing() && loop.Screen==SliceScreen.WingRoom && loop.EnterDial() && loop.Screen==SliceScreen.Wing && loop.LeaveDial() && loop.Screen==SliceScreen.WingRoom && loop.LeaveWing() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2,"the Wing can be entered from the Hub through its room and left back to it");
+            loop.MarkWheelComplete();loop.EnterWing();loop.EnterDial();loop.LeaveDial();loop.LeaveWing();Check(loop.AtriumStage==3 && loop.V02Complete,"twelve lit seats and one more return complete v0.2");
             var save=loop.ToSave(new bool[12],new bool[12],true);var resumed=new SliceFlow(()=>1,()=>day);
             Check(resumed.Restore(save) && resumed.Screen==SliceScreen.Hub && resumed.SunSign==1 && resumed.AtriumStage==3 && resumed.WheelComplete && resumed.DayOffset==1 && resumed.Deck.Items[5].State==loop.Deck.Items[5].State && resumed.ReviewsChecked==1,"a saved session resumes at the Hub with deck, day, and stage");
             Check(!new SliceFlow().Restore(new SaveData{atriumStage=1,sunSign=1}),"a save from before the Hub does not resume");
@@ -194,6 +194,30 @@ namespace Ascendant.Build
             Check(!greview.AnswerGlyph(wrongSeat) && greview.Note.Contains("Try once more") && greview.AnswerGlyph(gt.seat) && gt.done && gt.correct && greview.Note.Contains("mark of"),"a glyph review nudges once then accepts the name");
             var grl=new DialLesson(()=>0);grl.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl.RestoreGlyphs(2,12,true);Check(grl.Key2Earned && grl.Keys==2 && grl.Phase==LessonPhase.Key2 && !grl.CanBeginGlyphs,"restored Key 2 does not reopen the glyph unit");
             var grl2=new DialLesson(()=>0);grl2.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl2.RestoreGlyphs(0,5,false);Check(grl2.CanBeginGlyphs && grl2.BeginGlyphs() && grl2.CurrentGlyph==5,"restored Part A progress resumes at the next mark");
+            // ---- v0.4: tap-to-move (Q06 phase 2 lock) ----
+            Check(Rooms.Visible(Room.Atrium).Count(p=>p.Walkable)==3 && Rooms.Visible(Room.Atrium).Count(p=>!p.Walkable)==2 && Rooms.Visible(Room.Wing).Count()==2 && Rooms.Visible(Room.Wing).All(p=>p.Walkable),"the Atrium offers the doorway, the desk, and Caspar plus two sealed doors; the Wing offers the Dial and the doorway back");
+            var walker=new Walker();var walkLog=new List<string>();walker.Logged+=walkLog.Add;
+            walker.Enter(Room.Atrium,"entry");Check(walker.Room==Room.Atrium && walker.At=="entry" && !walker.Walking && walkLog.Last()=="room_entered:atrium","entering a room places the marker at a point of interest");
+            Check(!walker.GoTo("sealed-left") && !walker.GoTo("dial") && !walker.Walking,"sealed doors and points in other rooms are not walkable");
+            Check(walker.GoTo("desk") && walker.Walking && walker.Facing==-1 && walker.TargetX==-125 && walkLog.Last()=="walk_started:desk","walking to the desk starts a leg facing left");
+            float legSeconds=walker.WalkSeconds("desk");int ticks=0;while(!walker.Tick(.05f))ticks++;
+            Check(Math.Abs(legSeconds-165f/Walker.NormalSpeed)<1e-3 && ticks==(int)Math.Ceiling(legSeconds/.05f)-1 && walker.X==-125 && walker.At=="desk" && !walker.Walking && walkLog.Last()=="walk_arrived:desk","a straight-line walk at the fixed speed arrives after distance over speed");
+            Check(walker.GoTo("desk") && walker.Tick(.05f) && walker.At=="desk","walking to where the marker already stands arrives on the first tick");
+            Check(walker.GoTo("caspar") && walker.Facing==1 && walker.Bob==0 && walker.Tick(.05f)==false && walker.Bob>0,"the walk bob rises only while walking");
+            Check(walker.Jump() && walker.X==76 && walker.At=="caspar" && !walker.Walking,"reduced motion jumps to the point of interest");
+            walker.CycleSpeed();Check(walker.SpeedName=="fast" && walker.Speed==Walker.FastSpeed,"the test speed toggle cycles normal to fast");walker.CycleSpeed();Check(walker.SpeedName=="slow","then slow");walker.CycleSpeed();Check(walker.SpeedName=="normal","then normal again");
+            var wflow=new SliceFlow(()=>4,()=>0);var wlog=new List<string>();wflow.Logged+=wlog.Add;
+            wflow.Continue();wflow.ChooseBirth("known");wflow.SetKnownSign(1);wflow.Continue();wflow.Continue();wflow.RevealKey();wflow.Continue();wflow.Continue();wflow.InsertKey();wflow.End();wflow.Continue();
+            Check(wflow.Screen==SliceScreen.Hub && wflow.Walk.Room==Room.Atrium && wflow.Walk.At=="entry","the Chamber ending leads to the Atrium with the marker where you came in");
+            Check(wflow.TouchSealedDoor() && wflow.Note.StartsWith("Sealed") && wlog.Last()=="sealed_door_touched","a sealed door only says it is sealed");
+            Check(wflow.ApproachCaspar() && wflow.Note.Contains("Caspar") && wlog.Last()=="caspar_approached","approaching Caspar logs the approach");
+            Check(wflow.EnterWing() && wflow.Screen==SliceScreen.WingRoom && wflow.Walk.Room==Room.Wing && wflow.Walk.At=="atrium-door" && wflow.Note=="","the Wing doorway leads into the Wing room at its doorway");
+            Check(!wflow.LeaveDial() && wflow.EnterDial() && wflow.Screen==SliceScreen.Wing && wflow.LeaveDial() && wflow.Screen==SliceScreen.WingRoom && wflow.Walk.At=="atrium-door","the Dial opens from the room and closes back to it");
+            Check(wflow.LeaveWing() && wflow.Screen==SliceScreen.Hub && wflow.Walk.Room==Room.Atrium && wflow.Walk.At=="wing-door","leaving the Wing room places the marker at the Atrium's Wing doorway");
+            wflow.AdvanceDay();Check(wflow.EnterSeals() && wflow.Screen==SliceScreen.Review,"the desk opens Check the Seals");
+            while(!wflow.ReviewDone){var t=wflow.CurrentReview;if(t.Mode==ReviewMode.Tap)wflow.AnswerTap(Zodiac.Seats[t.seat].Element);else if(t.Mode==ReviewMode.Glyph)wflow.AnswerGlyph(t.seat);else wflow.FinishReview(true,true);}
+            Check(wflow.LeaveReview() && wflow.Walk.At=="desk","leaving the review places the marker at the desk");
+            var wsave=wflow.ToSave(new bool[12],new bool[12],true);var wback=new SliceFlow(()=>4,()=>0);Check(wback.Restore(wsave) && wback.Walk.Room==Room.Atrium && wback.Walk.At=="entry","a resumed session starts at the Atrium entry");
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }

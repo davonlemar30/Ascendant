@@ -94,6 +94,13 @@ const path=require('path');
     const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'],ELEMENTS=['Fire','Earth','Air','Water'],ELEMENT_OF=i=>ELEMENTS[i%4];
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
     check((await state()).atriumStage===2 && (await state()).dueCount===0,'the Chamber leads to the Hub in Stage 2 with nothing due at '+viewport.width);
+    // ---- v0.4: tap-to-move ----
+    const atriumState=await state();
+    check(atriumState.room==='atrium' && atriumState.avatarAt==='entry' && ['desk','wing-door','caspar','sealed-left','sealed-right'].every(id=>atriumState.pois.includes(id)),'the Atrium lists its points of interest with the marker where you came in at '+viewport.width);
+    await semantic('poi-sealed-left');await page.waitForFunction(()=>window.ascendantDial.snapshot().note.startsWith('Sealed'));
+    check(!(await state()).walking,'a sealed door only says it is sealed at '+viewport.width);
+    await semantic('poi-caspar');await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='caspar'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).note.includes('Caspar') && events.some(e=>e.event_name==='walk_started_caspar') && events.some(e=>e.event_name==='walk_arrived_caspar'),'tapping Caspar walks the marker to him at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
     await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().hubNote.includes('Nothing is due'));
@@ -110,17 +117,28 @@ const path=require('path');
     check((await state()).reviewSummary.startsWith('6 of 6'),'six seals held through compressed Dial and direct tap at '+viewport.width);
     check(events.some(e=>e.event_name==='review_started') && events.some(e=>e.event_name==='review_finished'),'review events at '+viewport.width);
     await semantic('leave-review');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
-    await semantic('enter-wing');await waitActive('Gemini');
+    check((await state()).avatarAt==='desk','the review leaves the marker at the desk at '+viewport.width);
+    await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().walking&&window.ascendantDial.snapshot().walkTarget==='wing-door',{},{timeout:5000});
+    await page.screenshot({path:path.join(out,viewport.width+'-walk.png')});
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).room==='wing' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,dial' && (await state()).canEnterDial && (await state()).canLeaveWing,'the Wing doorway fades into the Wing room with the Dial and the doorway back at '+viewport.width);
+    check(events.some(e=>e.event_name==='room_entered_wing'),'room events at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-wing-room.png')});
+    await semantic('enter-dial');await waitActive('Gemini');
+    check((await state()).avatarAt==='dial','the Dial opens once the marker reaches it at '+viewport.width);
     check((await state()).phase.includes('Help level 0'),'Unit 1.1 continues on the player\'s own at '+viewport.width);
     for(const [from,to] of [[2,6],[6,10],[3,7],[7,11]]){await waitActive(SIGNS[from]);await semantic('seat-'+to);await semantic('seal');}
     await page.waitForFunction(()=>window.ascendantDial.snapshot().wheelComplete&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).seats.every(x=>!x.includes('dormant')) && events.filter(e=>e.event_name==='key1_earned').length===1,'twelve seats lit with no second Key at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-lit.png')});
-    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===3);
-    check((await state()).v02Complete,'one more return completes v0.2 at '+viewport.width);
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===3&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).v02Complete && (await state()).avatarAt==='wing-door','one more return completes v0.2, the marker back at the Wing doorway at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub-complete.png')});
     // ---- v0.3: glyphs and Key 2 ----
-    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
+    await semantic('enter-wing');
+    try{await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});}
+    catch(e){console.error('wing button stalled: '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-14).map(x=>x.event_name+'@'+x.input_method)));throw e;}
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
     check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'Part A shows a mark and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
     for(let n=0;n<12;n++){
@@ -141,10 +159,10 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key2&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve marks placed earns Key 2 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-key2.png')});
-    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4);
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).v03Complete,'one more return completes v0.3 at '+viewport.width);
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-    check((await state()).atriumStage===4 && (await state()).keys===2,'a reload resumes at the Hub from the local save with Key 2 at '+viewport.width);
+    check((await state()).atriumStage===4 && (await state()).keys===2 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with Key 2 at '+viewport.width);
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);
