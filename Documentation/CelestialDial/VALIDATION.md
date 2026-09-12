@@ -35,6 +35,18 @@ python3 -m http.server 8000 --directory Builds/Web --bind 127.0.0.1
 
 Required output: `index.html`, `Build/Web.loader.js`, `Build/Web.framework.js.unityweb`, `Build/Web.data.unityweb`, and `Build/Web.wasm.unityweb` when the output directory is named Web. PR builds publish an artifact only. No PR preview deployment is configured or requested.
 
+## Vertical slice v0.1
+
+The shipped scene is `Assets/Scenes/VerticalSlice.unity` (created through **Ascendant → Greybox → Create vertical slice scene**), which wraps the Dial in the locked bookends: identity and birth prompt, Grand Atrium, Zodiac Wing with the Q07 props and the Q04 Key reveal, Atrium return, Crystal Book Chamber ending. `SliceFlow` is the pure five-screen state machine; `SliceView` builds the placeholder screens and beats. The Dial-only scene remains for its fixture.
+
+Run **Ascendant → Greybox → Run vertical slice Play Mode validation** or:
+
+```sh
+Unity -batchmode -projectPath . -executeMethod Ascendant.Build.SlicePlayValidation.Begin -sliceAutoExit -logFile Logs/slice-play.log
+```
+
+It walks every screen through the same bridge the HTML layer uses, writes `Logs/slice-play-validation.txt`, and captures each screen under `Logs/Evidence/slice-*.png`. The mechanical validation covers the flow rules; the browser suite now walks the bookends before and after the Dial. Only locked lines are verbatim; other copy is placeholder in Caspar's tone. Nothing is saved between runs. No inventory system: a Key indicator only.
+
 ## Manual acceptance checklist
 
 Record device, viewport, input, observed result, and evidence for each check. Untested entries are pending, never assumed passed.
