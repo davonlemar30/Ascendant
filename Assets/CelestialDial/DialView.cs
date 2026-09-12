@@ -342,7 +342,7 @@ namespace Ascendant.CelestialDial
                 bool showGlyph=Lesson.GlyphsShown && (Lesson.Lit[i] || Lesson.NamesHidden);
                 bool hideName=Lesson.NamesHidden && !Lesson.NameRevealed[i];
                 seatGlyphs[i].gameObject.SetActive(showGlyph); seatGlyphs[i].text=Zodiac.Seats[i].Glyph; seatGlyphs[i].color=Bone;
-                var seatRectTransform=(RectTransform)seatTexts[i].transform; seatRectTransform.anchoredPosition=new Vector2(0,showGlyph ? -16 : 0);
+                var seatRectTransform=(RectTransform)seatTexts[i].transform; seatRectTransform.anchoredPosition=new Vector2(0,showGlyph ? -36 : -26); // top-anchored rect: -26 is the tile center; below the mark when one shows (owner playtest 3: names sat on the tile's top edge)
                 seatTexts[i].fontSize=showGlyph ? 9 : 11;
                 seatTexts[i].text=(selected && Lesson.Dial.Rejected ? "× " : "")+(hideName ? "" : Zodiac.Seats[i].Name+(Lesson.Lit[i] && !showGlyph ? "\n"+Zodiac.Seats[i].Element : ""));
                 bool dormant=Lesson.DialDormant && !waking;

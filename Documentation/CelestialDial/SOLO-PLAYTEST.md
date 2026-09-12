@@ -150,8 +150,8 @@ Answer in your own words. Short is fine.
 7. Did the wheel waking up, and Caspar's surprise, make sense? Too slow, too fast, or about right? ___
 8. Did the ending in the Chamber land? Too slow, too fast, or about right? ___
 9. When you came back to the Atrium, did you want to go back into the Wing, or check the seals, or neither? ___
-10. Did checking the seals feel like care for the Library, or like a quiz? ___
-11. Did the marks feel learnable, or like memorizing squiggles? Which part helped more, naming them or finding them on the wheel? ___
+10. Did checking the seals (the desk in the Atrium) feel like care for the Library, or like a quiz? Skip if you did not check the seals. ___
+11. Did the marks (the twelve symbols, after all twelve seats are lit) feel learnable, or like memorizing squiggles? Which part helped more, naming them or finding them on the wheel? Skip if you did not get to the marks. ___
 12. Did walking make the Library feel like a place you were in, or like waiting? ___
 13. Did the walk slow you down on the way back to the wheel? Too slow, too fast, or about right? ___
 
