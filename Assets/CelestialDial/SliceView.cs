@@ -18,9 +18,12 @@ namespace Ascendant.CelestialDial
         public bool Resumed { get; private set; }
         public const string SaveKey = "ascendant.v02.save";
         Canvas canvas, flashCanvas; RectTransform root; Font font;
-        RectTransform identity, birth, atrium, atriumReturn, chamber, hub, review, birthChoices, birthDate, birthSigns;
+        RectTransform identity, birth, atrium, atriumReturn, chamber, hub, review, birthChoices, birthDate, birthSigns, glyphs;
         Text birthNote, atriumText, returnText, chamberText, chamberEnd, keyIndicator, keyLabel, dateHint;
-        Text hubText, hubNote, hubCaption, endCard, reviewProgress, reviewQuestion, reviewNote, reviewSummary;
+        Text hubText, hubNote, hubCaption, endCard, reviewProgress, reviewQuestion, reviewNote, reviewSummary, reviewGlyph;
+        Text glyphCard, glyphProgress, glyphCaspar, glyphNote;
+        readonly Button[] glyphNameButtons = new Button[4];
+        readonly Button[] reviewGlyphButtons = new Button[4];
         InputField nameField, dateField;
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
         Button enterWing, enterSeals, advanceDay, hubRestart, leaveReview;
@@ -52,6 +55,7 @@ namespace Ascendant.CelestialDial
         const string HubFirstLine = "Look at it. One lamp, and the dust already knows it.\nSix seats still dark in the Wing, when you are ready. And the seals: a Keeper checks them each day. Tonight they hold.";
         const string HubLaterLine = "Welcome back. The Wing waits, and the seals are yours to check.";
         const string HubCompleteLine = "The whole wheel. I have not seen it lit since he left.\nRest now. The seals will want checking tomorrow, and there is more to wake.";
+        const string HubKey2Line = "Two Keys. He left twenty-one locks, and you have opened the way to two of them.\nThat is enough for tonight. The seals will keep."; // placeholder (owner writes)
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
 
         void Awake()
@@ -63,6 +67,8 @@ namespace Ascendant.CelestialDial
             Flow.Logged += name => Dial.Lesson.Dial.Log(name.ToLowerInvariant().Replace(':', '_'), false, false, "slice");
             Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.Phase != LessonPhase.Review) { Flow.RecordLessonAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             Dial.Lesson.ReviewFinished += (seat, correct, eligible) => StartCoroutine(AfterDialReview(correct, eligible));
+            Dial.Lesson.GlyphNamedEvent += (seat, correct, eligible) => { Flow.RecordGlyphAnswer(seat, eligible); Flow.SetGlyphProgress(Dial.Lesson.Phase == LessonPhase.GlyphWheel ? 1 : 0, Dial.Lesson.GlyphIndex); Save(); };
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "glyph_placed") { Flow.RecordGlyphAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             var canvasObject = new GameObject("Slice Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
             canvasObject.transform.SetParent(transform, false);
             canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 1;
@@ -70,7 +76,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth();
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue);
-            BuildChamber(); BuildHub(); BuildReview(); BuildWingExtras();
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildWingExtras();
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -83,6 +89,9 @@ namespace Ascendant.CelestialDial
             if (canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f);
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
+            if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Review) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
+            if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames && !glyphs.gameObject.activeSelf && !busy) { Show(); Publish(); }
+            if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphWheel && glyphs.gameObject.activeSelf && !busy) { Show(); Dial.Realign(); Publish(); }
             if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && !Flow.KeyInserted)
             {
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
@@ -203,9 +212,26 @@ namespace Ascendant.CelestialDial
             reviewProgress = Label(review, "", 0, 62, 300, 20, 12); reviewProgress.color = Muted;
             reviewQuestion = Label(review, "", 0, 200, 330, 44, 18);
             for (int i = 0; i < 4; i++) { string element = Elements[i]; elementButtons[i] = MakeButton(review, element, -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerTap(element)); }
+            var glyphBox = Rect("Review glyph", review, 0, 150, 90, 90); reviewGlyph = Label(glyphBox, "", 0, 45, 90, 90, 60); reviewGlyph.font = Dial.GlyphFont; reviewGlyph.horizontalOverflow = HorizontalWrapMode.Overflow; reviewGlyph.verticalOverflow = VerticalWrapMode.Overflow; reviewGlyph.gameObject.SetActive(false);
+            for (int i = 0; i < 4; i++) { int slot = i; reviewGlyphButtons[i] = MakeButton(review, "", -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerGlyphReview(slot)); reviewGlyphButtons[i].gameObject.SetActive(false); }
             reviewNote = Label(review, "", 0, 440, 330, 50, 14);
             reviewSummary = Label(review, "", 0, 520, 330, 30, 16);
             leaveReview = MakeButton(review, "Back to the Atrium", 0, 654, 190, 56, LeaveReview);
+        }
+        void BuildGlyphs()
+        {
+            // v0.3 Part A: name the glyph by direct tap. Same layout as a review item so the two read as one family.
+            glyphs = ScreenPanel("Glyphs");
+            Label(glyphs, "THE ZODIAC WING", 0, 32, 340, 24, 18);
+            glyphProgress = Label(glyphs, "", 0, 62, 300, 20, 12); glyphProgress.color = Muted;
+            var card = Rect("Glyph card", glyphs, 0, 200, 140, 140); card.gameObject.AddComponent<Image>().color = PanelColor;
+            glyphCard = Label(card, "", 0, 70, 130, 130, 84); glyphCard.font = Dial.GlyphFont; glyphCard.horizontalOverflow = HorizontalWrapMode.Overflow; glyphCard.verticalOverflow = VerticalWrapMode.Overflow;
+            Label(glyphs, "Which sign carries this mark?", 0, 290, 330, 24, 15);
+            for (int i = 0; i < 4; i++) { int slot = i; glyphNameButtons[i] = MakeButton(glyphs, "", -78 + (i % 2) * 156, 340 + (i / 2) * 64, 150, 56, () => AnswerGlyphName(slot)); }
+            var panel = Rect("Caspar panel", glyphs, 0, 520, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
+            Label(panel, "CASPAR", 0, 14, 290, 20, 13);
+            glyphCaspar = Label(panel, "", 0, 70, 306, 90, 12);
+            glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14); // between the name buttons (to 432) and the Caspar panel (from 460)
         }
         void BuildWingExtras()
         {
@@ -242,6 +268,7 @@ namespace Ascendant.CelestialDial
             else if (command == "leave-review") LeaveReview();
             else if (command == "advance-day") { if (!busy && Flow.AtHub) { Flow.AdvanceDay(); Save(); ShowHub(); Publish(); } }
             else if (command.StartsWith("element:") && int.TryParse(command.Substring(8), out int element) && element >= 0 && element < 4) AnswerTap(Elements[element]);
+            else if (command.StartsWith("glyph-name:") && int.TryParse(command.Substring(11), out int slot) && slot >= 0 && slot < 4) { if (Flow.Screen == SliceScreen.Review) AnswerGlyphReview(slot); else AnswerGlyphName(slot); }
         }
         void ChooseBirth(string choice) { if (busy) return; Flow.ChooseBirth(choice); AfterBirthEntry(); }
         void UseDate(string text)
@@ -285,7 +312,32 @@ namespace Ascendant.CelestialDial
             if (busy || !Flow.EnterWing()) return;
             Dial.SliceHidesOptional = true;
             if (Dial.Lesson.CanContinueUnit) Dial.Lesson.BeginContinuation();
+            else if (Dial.Lesson.CanBeginGlyphs) { if (Dial.Lesson.BeginGlyphs()) { Flow.StartGlyphs(); Save(); } }
             Show(); Dial.Realign(); Publish();
+        }
+        void AnswerGlyphName(int slot)
+        {
+            if (busy || Dial.Lesson.Phase != LessonPhase.GlyphNames) return;
+            int target = Dial.Lesson.CurrentGlyph; if (target < 0) return;
+            int seat = Dial.Lesson.GlyphOptions(target)[slot];
+            Dial.Lesson.AnswerGlyphName(seat);
+            glyphNote.text = Dial.Lesson.GlyphNameResult; Publish();
+            StartCoroutine(AfterGlyphName());
+        }
+        IEnumerator AfterGlyphName()
+        {
+            busy = true; ShowGlyphs(); Publish();
+            yield return new WaitForSecondsRealtime(ReducedMotion ? .7f : 1.1f);
+            busy = false; Show(); if (Dial.Lesson.Phase == LessonPhase.GlyphWheel) Dial.Realign(); Publish();
+        }
+        void AnswerGlyphReview(int slot)
+        {
+            if (busy) return;
+            var task = Flow.CurrentReview; if (task == null || task.Mode != ReviewMode.Glyph) return;
+            int seat = Flow.GlyphReviewOptions(task.seat)[slot];
+            Flow.AnswerGlyph(seat);
+            reviewNote.text = Flow.Note; Save(); Publish();
+            if (task.done) StartCoroutine(AfterTap());
         }
         void LeaveWing() { if (busy || Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveWing()) return; Save(); Show(); Publish(); }
         void EnterSeals()
@@ -336,8 +388,11 @@ namespace Ascendant.CelestialDial
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth);
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber); hub.gameObject.SetActive(s == SliceScreen.Hub);
+            bool partA = s == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames;
             review.gameObject.SetActive(s == SliceScreen.Review && !reviewOnDial);
-            Dial.UiCanvas.gameObject.SetActive(s == SliceScreen.Wing || reviewOnDial);
+            glyphs.gameObject.SetActive(partA);
+            Dial.UiCanvas.gameObject.SetActive((s == SliceScreen.Wing && !partA) || reviewOnDial);
+            if (partA) ShowGlyphs();
             if (birthContinue != null) birthContinue.interactable = Flow.CanContinue;
             if (s == SliceScreen.Wing || reviewOnDial)
             {
@@ -350,25 +405,44 @@ namespace Ascendant.CelestialDial
             if (s == SliceScreen.Review) ShowReview();
             ShowPage();
         }
+        void ShowGlyphs()
+        {
+            var lesson = Dial.Lesson; int target = lesson.CurrentGlyph;
+            bool naming = lesson.Phase == LessonPhase.GlyphNames; // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
+            if (naming)
+            {
+                glyphProgress.text = "Mark " + Mathf.Min(lesson.GlyphIndex + 1, 12) + " of 12";
+                glyphCard.text = target >= 0 && target < 12 ? Zodiac.Seats[target].Glyph : "";
+                var options = target >= 0 && target < 12 ? lesson.GlyphOptions(target) : new int[4];
+                for (int i = 0; i < 4; i++) glyphNameButtons[i].GetComponentInChildren<Text>().text = target >= 0 ? Zodiac.Seats[options[i]].Name : "";
+            }
+            for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = naming && !busy && target >= 0;
+            glyphCaspar.text = DialLesson.GlyphIntro; glyphNote.text = busy ? glyphNote.text : "";
+        }
         void ShowHub()
         {
             int stage = Flow.AtriumStage;
             lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark;
             hubCaption.text = stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
-            hubText.text = Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
+            hubText.text = Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
             int due = Flow.DueCount;
             enterSealsLabel.text = due > 0 ? "Check the Seals · " + due + " due" : "Check the Seals";
-            enterWing.GetComponentInChildren<Text>().text = Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
+            enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
+            endCard.text = Flow.Keys >= 2 ? "End of prototype v0.3. Tap-to-move comes next." : "End of prototype v0.2. Glyphs and Key 2 come next.";
             hubNote.text = Flow.Note;
-            endCard.gameObject.SetActive(Flow.V02Complete);
+            endCard.gameObject.SetActive(Flow.V02Complete || Flow.V03Complete);
         }
         void ShowReview()
         {
             var task = Flow.CurrentReview;
             bool done = Flow.ReviewDone;
             reviewProgress.text = done ? "" : (Flow.ReviewIndex + 1) + " of " + Flow.ReviewQueue.Count;
-            reviewQuestion.text = done ? "" : task != null && task.Mode == ReviewMode.Tap ? Zodiac.Seats[task.seat].Name + ". Which family?" : "";
+            bool glyphItem = !done && task != null && task.Mode == ReviewMode.Glyph;
+            reviewQuestion.text = done ? "" : task != null && task.Mode == ReviewMode.Tap ? Zodiac.Seats[task.seat].Name + ". Which family?" : glyphItem ? "Which sign carries this mark?" : "";
             foreach (var b in elementButtons) { b.gameObject.SetActive(!done && task != null && task.Mode == ReviewMode.Tap); b.interactable = !busy && task != null && !task.done; }
+            reviewGlyph.gameObject.SetActive(glyphItem); reviewGlyph.text = glyphItem ? Zodiac.Seats[task.seat].Glyph : "";
+            var opts = glyphItem ? Flow.GlyphReviewOptions(task.seat) : new int[4];
+            for (int i = 0; i < 4; i++) { reviewGlyphButtons[i].gameObject.SetActive(glyphItem); reviewGlyphButtons[i].GetComponentInChildren<Text>().text = glyphItem ? Zodiac.Seats[opts[i]].Name : ""; reviewGlyphButtons[i].interactable = !busy && glyphItem && !task.done; }
             reviewSummary.text = done ? Flow.ReviewSummary : "";
             leaveReview.gameObject.SetActive(done);
             if (done) reviewNote.text = "The seals are checked for today. Placeholder line: the owner writes Caspar's close."; // owner writes
@@ -410,11 +484,23 @@ namespace Ascendant.CelestialDial
             // v0.2
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.day = Flow.Day; state.resumed = Resumed;
             state.canEnterWing = s == SliceScreen.Hub && !busy; state.canEnterSeals = s == SliceScreen.Hub && !busy; state.canAdvanceDay = s == SliceScreen.Hub && !busy;
-            state.canLeaveWing = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy;
+            state.canLeaveWing = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy && Dial.Lesson.Phase != LessonPhase.GlyphNames;
             state.canLeaveReview = s == SliceScreen.Review && Flow.ReviewDone && !busy;
             state.reviewMode = s != SliceScreen.Review ? "" : Flow.ReviewDone ? "done" : task != null && task.Mode == ReviewMode.Dial ? "dial" : "tap";
             state.reviewIndex = Flow.ReviewIndex; state.reviewTotal = Flow.ReviewQueue.Count; state.reviewSign = task != null && !Flow.ReviewDone ? Zodiac.Seats[task.seat].Name : "";
             state.reviewSummary = Flow.ReviewSummary; state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
+            bool partA = s == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames;
+            bool glyphItem = s == SliceScreen.Review && task != null && !Flow.ReviewDone && task.Mode == ReviewMode.Glyph;
+            state.glyphMode = partA ? "name" : glyphItem ? "review" : "";
+            if (partA || glyphItem)
+            {
+                int target = partA ? Dial.Lesson.CurrentGlyph : task.seat;
+                var opts = partA ? Dial.Lesson.GlyphOptions(target) : Flow.GlyphReviewOptions(target);
+                state.glyphChar = Zodiac.Seats[target].Glyph; state.glyphOptions = new[] { Zodiac.Seats[opts[0]].Name, Zodiac.Seats[opts[1]].Name, Zodiac.Seats[opts[2]].Name, Zodiac.Seats[opts[3]].Name };
+                if (partA) state.caspar = "Which sign carries this mark? " + (glyphNote.text ?? "") + " " + DialLesson.GlyphIntro;
+            }
+            if (glyphItem) state.reviewMode = "glyph";
+            state.v03Complete = Flow.V03Complete;
         }
 
         // ---- save / restore (Q05 decision 5) ----
@@ -432,6 +518,8 @@ namespace Ascendant.CelestialDial
             try { save = JsonUtility.FromJson<SaveData>(json); } catch (Exception e) { Debug.LogWarning("[CelestialDial] save unreadable: " + e.Message); }
             if (save == null || !Flow.Restore(save)) return;
             Dial.Lesson.RestoreProgress(save.sunSign, save.lit, save.kin, save.keyEarned);
+            Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2);
+            if (save.keys >= 2) keyIndicator.text = "Keeper Keys: 2";
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f); candle.color = Bone; }
         }

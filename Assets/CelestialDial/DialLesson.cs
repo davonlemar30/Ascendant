@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review }
+    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review, GlyphNames, GlyphWheel, Key2 }
 
     public sealed class DialLesson
     {
@@ -36,7 +36,84 @@ namespace Ascendant.CelestialDial
         // A Level 2 problem shows the count once, one click per beat, before the player takes over.
         public bool CountBeatPending { get; private set; }
         public string Message { get; private set; }
-        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review;
+        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel;
+        // ---- v0.3: glyphs and Key 2 (owner's form, Sept 12: Part A name the glyph by tap, Part B find the glyph on the wheel) ----
+        public readonly bool[] GlyphNamed = new bool[12];    // Part A done for this seat
+        public readonly bool[] GlyphPlaced = new bool[12];   // Part B done for this seat
+        public readonly bool[] NameRevealed = new bool[12];  // Level 2 in Part B shows the name on its seat
+        public int GlyphIndex { get; private set; }          // next seat in zodiac order within the current part
+        public int GlyphMisses { get; private set; }         // Part A misses on the current glyph
+        public bool GlyphEvidence { get; private set; }      // any Level 0/1 answer in Part B (the central skill)
+        public bool Key2Earned { get; private set; }
+        public int Keys => (KeyEarned ? 1 : 0) + (Key2Earned ? 1 : 0);
+        public bool GlyphsShown => Phase == LessonPhase.GlyphNames || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.Key2 || (WheelComplete && Key2Earned);
+        public bool NamesHidden => Phase == LessonPhase.GlyphWheel;
+        public bool CanBeginGlyphs => WheelComplete && !Key2Earned && (Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || Phase == LessonPhase.GlyphNames || Phase == LessonPhase.GlyphWheel);
+        public event Action<int, bool, bool> GlyphNamedEvent; // seat, correct, eligible (Part A)
+        public bool BeginGlyphs()
+        {
+            if (!CanBeginGlyphs) return false;
+            if (Phase == LessonPhase.GlyphNames || Phase == LessonPhase.GlyphWheel) return true;
+            Phase = LessonPhase.GlyphNames; GlyphIndex = 0; GlyphMisses = 0; Dial.Home();
+            for (int i = 0; i < 12; i++) if (GlyphNamed[i]) GlyphIndex = i + 1;
+            if (GlyphIndex >= 12) { StartGlyphWheel(); return true; }
+            Message = GlyphIntro;
+            Dial.Log("glyph_unit_started");
+            return true;
+        }
+        public int CurrentGlyph => Phase == LessonPhase.GlyphNames ? GlyphIndex : Phase == LessonPhase.GlyphWheel ? Dial.Target : -1;
+        // Four names: the answer plus three others, in a stable order per seat so tests and the page agree.
+        public int[] GlyphOptions(int seat)
+        {
+            int[] o = { seat, Zodiac.Wrap(seat + 3), Zodiac.Wrap(seat + 6), Zodiac.Wrap(seat + 9) };
+            int r = seat % 4; var result = new int[4];
+            for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
+            return result;
+        }
+        public const string GlyphIntro = "Every sign carries a mark of its own. Twelve marks, older than the names.\nTell me which sign each one belongs to."; // placeholder (owner writes)
+        public string GlyphNameResult { get; private set; } = ""; // the last Part A result line, kept while the wheel takes over
+        public bool AnswerGlyphName(int seat)
+        {
+            if (Phase != LessonPhase.GlyphNames || GlyphIndex >= 12) return false;
+            int target = GlyphIndex; bool correct = Zodiac.Wrap(seat) == target;
+            if (correct)
+            {
+                bool eligible = GlyphMisses <= 1; // Level 0 or a Level 1 nudge
+                GlyphNamed[target] = true; Message = GlyphNameResult = "Yes. " + SignName(target) + ".";
+                GlyphNamedEvent?.Invoke(target, true, eligible); Dial.Log("glyph_named", true, eligible, "DirectSeat");
+                NextGlyphName(); return true;
+            }
+            GlyphMisses++;
+            if (GlyphMisses == 1) { Message = GlyphNameResult = "Not that one. This mark belongs to a " + Element(target) + " sign."; Dial.Log("hint_requested"); return false; }
+            // Second miss: Level 2 reveals the name; no evidence; move on.
+            GlyphNamed[target] = true; Message = GlyphNameResult = "This is the mark of " + SignName(target) + ". Remember it.";
+            GlyphNamedEvent?.Invoke(target, false, false); Dial.Log("hint_escalated"); Dial.Log("glyph_named", false, false, "DirectSeat");
+            NextGlyphName(); return false;
+        }
+        void NextGlyphName()
+        {
+            GlyphMisses = 0; GlyphIndex++;
+            if (GlyphIndex >= 12) StartGlyphWheel();
+        }
+        void StartGlyphWheel()
+        {
+            Phase = LessonPhase.GlyphWheel; GlyphIndex = 0; RecoveryEncounters = 0; exposedProblems.Clear(); recoveryStarts.Clear();
+            for (int i = 0; i < 12; i++) if (GlyphPlaced[i]) GlyphIndex = i + 1;
+            if (GlyphIndex >= 12) { FinishGlyphs(); return; }
+            Message = "Now the wheel hides its names. Only the marks remain.\nI will name a sign; you turn until its mark sits under the bracket, then press Seal."; // placeholder (owner writes)
+            BeginGlyphProblem(GlyphIndex);
+        }
+        void BeginGlyphProblem(int seat)
+        {
+            Dial.Begin(0, 0, seat); CountBeatPending = false;
+            Message = "Find the mark of " + SignName(seat) + ".\nTurn until it sits under the bracket, then press Seal.";
+        }
+        void FinishGlyphs()
+        {
+            Dial.Home();
+            if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve marks, twelve names, in their order. You read the wheel now.\nKeeper Key 2 is yours."; Dial.Log("key2_earned", true, true); } // placeholder (owner writes)
+            else { Phase = LessonPhase.Paused; Message = "We reached the end of the marks, but I did most of the finding.\nRest, and we will try the marks again another day."; }
+        }
         // v0.2 (Q05): Unit 1.1 continuation on the same Dial, and compressed review problems.
         public int FamiliesComplete => Enumerable.Range(0, 4).Count(f => Kin[f]);
         public bool WheelComplete => Lit.All(v => v);
@@ -75,6 +152,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 12; i++) { Lit[i] = lit != null && i < lit.Length && lit[i]; Kin[i] = kin != null && i < kin.Length && kin[i]; }
             KeyEarned = keyEarned; IndependentEvidence = keyEarned; IntroStep = IntroTeaching;
             Phase = !keyEarned ? LessonPhase.Rule : WheelComplete ? LessonPhase.AllLit : LessonPhase.Complete;
+            Key2Earned = false; GlyphEvidence = false;
             Dial.Home();
             Message = WheelComplete ? "The whole wheel is lit." : "Welcome back. The wheel remembers you.";
         }
@@ -136,6 +214,19 @@ namespace Ascendant.CelestialDial
         {
             var result = Dial.Commit();
             if (result == null) return null;
+            if (Phase == LessonPhase.GlyphWheel)
+            {
+                int target = Dial.Target;
+                if (result.correctness)
+                {
+                    GlyphPlaced[target] = true; if (result.evidence_eligible) GlyphEvidence = true;
+                    Message = "Yes. " + SignName(target) + ", in its place."; Dial.Log("glyph_placed", true, result.evidence_eligible);
+                }
+                else if (Dial.Attempts == 1) Message = "Not that one. Aries is here at the start; count forward from it.";
+                else if (Dial.Attempts == 2) { NameRevealed[target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(target) + ", then press Seal."; }
+                else Message = "Watch me find it.\nThen the next mark.";
+                return result;
+            }
             if (Phase == LessonPhase.Review)
             {
                 if (result.correctness) { Message = "Yes. " + SignName(result.selected_destination) + " is " + Element(result.selected_destination) + "."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, true, result.hint_level <= 1); }
@@ -161,6 +252,7 @@ namespace Ascendant.CelestialDial
         {
             if (result == null || !result.correctness) return;
             if (Phase == LessonPhase.Review) return;
+            if (Phase == LessonPhase.GlyphWheel) { NextGlyphProblem(); return; }
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -172,13 +264,21 @@ namespace Ascendant.CelestialDial
             if (recovering) { Dial.Log("problem_recovered", true, result.evidence_eligible); recovering = false; }
             AdvanceOrRecover(result.hint_level >= 2 && (Phase == LessonPhase.Independent || Phase == LessonPhase.Continuation));
         }
+        void NextGlyphProblem()
+        {
+            GlyphIndex++;
+            if (GlyphIndex >= 12) FinishGlyphs(); else BeginGlyphProblem(GlyphIndex);
+        }
+        public int DemonstrationTarget => Phase == LessonPhase.GlyphWheel ? Dial.Target : Zodiac.Destination(Dial.Start);
         public void RevealDemonstration()
         {
+            if (Phase == LessonPhase.GlyphWheel) { GlyphPlaced[Dial.Target] = true; NameRevealed[Dial.Target] = true; return; } // Worked exposure: no evidence, no fresh equivalent for a fixed set.
             if (Phase != LessonPhase.Optional) Lit[Zodiac.Destination(lastStart)] = true;
             // Worked exposure illuminates but never writes eligible answer evidence.
         }
         public void AfterDemonstration()
         {
+            if (Phase == LessonPhase.GlyphWheel) { Dial.Home(); NextGlyphProblem(); return; }
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -248,11 +348,20 @@ namespace Ascendant.CelestialDial
             StartProblem(OptionalFamily, 0);
             Message = "One more, if you like. Start from " + SignName(OptionalFamily) + ", in the " + Element(OptionalFamily) + " family.\nIt'll be good practice.";
         }
+        public void RestoreGlyphs(int stage, int index, bool key2)
+        {
+            // stage 0: none; 1: Part A done through index (or all); 2: Key 2 earned.
+            for (int i = 0; i < 12; i++) { GlyphNamed[i] = stage >= 2 || (stage == 1 && i < index) || (stage == 0 && false); GlyphPlaced[i] = stage >= 2; }
+            if (stage == 0) for (int i = 0; i < 12; i++) GlyphNamed[i] = i < index;
+            Key2Earned = key2; GlyphEvidence = key2;
+            if (key2) { Phase = LessonPhase.Key2; Message = "Twelve marks, twelve names. You read the wheel."; }
+        }
         public void Say(string text) { Message = text; } // Slice beats speak through the same panel.
         public string SeatLabel(int seat)
         {
             var sign = Zodiac.Seats[seat];
-            return sign.Name + ", position " + (seat + 1) + " of 12, " +
+            if (NamesHidden && !NameRevealed[seat]) return "Mark " + sign.Glyph + ", position " + (seat + 1) + " of 12, " + (Dial.Selected == seat ? "selected" : "not selected");
+            return sign.Name + (GlyphsShown ? ", mark " + sign.Glyph : "") + ", position " + (seat + 1) + " of 12, " +
                 (Dial.Selected == seat ? "selected" : "not selected") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }
