@@ -14,11 +14,21 @@ namespace Ascendant.CelestialDial
     public sealed class DialView : MonoBehaviour
     {
         public DialLesson Lesson { get; private set; }
+        public interface ISliceState { void Fill(WebState state); }
+        public ISliceState Slice;                 // The vertical slice adds its screen state to the same bridge.
+        public Action<string> ExtraActions;       // Slice commands arrive through the same WebAction entry.
+        public RectTransform Root => root;
+        public RectTransform Ring => ring;
+        public Canvas UiCanvas => canvas;
+        public Font UiFont => font;
+        public bool Busy => busy;
+        public void RegisterNavigation(Selectable s) { navigation.Add(s); }
+        public void ForceRefresh() { Refresh(); }
         public bool firstDragResistance = false; // Test variable. Owner dropped it after the solo playtest: it went unnoticed.
         public bool inertiaEnabled = true;
         public const float PixelsPerDetent = 55;
         public const float SnapSeconds = .12f;
-        readonly List<Button> navigation = new List<Button>();
+        readonly List<Selectable> navigation = new List<Selectable>();
         readonly Button[] seats = new Button[12];
         readonly Text[] seatTexts = new Text[12];
         Text message, destination, start, count, phase, sealText, motionText;
@@ -43,6 +53,9 @@ namespace Ascendant.CelestialDial
             public string message, destination, start, phase, count;
             public string[] seats;
             public bool active, canContinue, canOptional, reducedMotion, keyEarned;
+            public string screen = "wing", playerName = "", caspar = "", note = "";
+            public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth;
+            public int locksFilled;
         }
         void Awake()
         {
@@ -111,7 +124,7 @@ namespace Ascendant.CelestialDial
         }
         static DialInput ClickMethod(DialInput pointer) => Keyboard.current != null &&
             (Keyboard.current.enterKey.isPressed || Keyboard.current.spaceKey.isPressed) ? DialInput.Keyboard : pointer;
-        void ScaleCanvas() => canvas.scaleFactor=Mathf.Min(canvas.pixelRect.width/360f,canvas.pixelRect.height/800f);
+        void ScaleCanvas() { if(canvas.pixelRect.width<1)return; canvas.scaleFactor=Mathf.Min(canvas.pixelRect.width/360f,canvas.pixelRect.height/800f); }
         void Update()
         {
             ScaleCanvas();
@@ -275,11 +288,12 @@ namespace Ascendant.CelestialDial
         public WebState Snapshot()
         {
             var labels=new string[12];for(int i=0;i<12;i++) labels[i]=Lesson.SeatLabel(i);
-            return new WebState {message=message.text,destination=destination.text,start=start.text,phase=phase.text,count=count.text,seats=labels,
+            var state=new WebState {message=message.text,destination=destination.text,start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned};
+            Slice?.Fill(state); return state;
         }
-        void Publish()
+        public void Publish()
         {
             if(message==null || next==null)return;
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -304,6 +318,7 @@ namespace Ascendant.CelestialDial
             else if(command=="motion")ToggleMotion();
             else if(command=="motion-on") { Lesson.Dial.ReducedMotion=true; Refresh(); }
             else if(command.StartsWith("seat:") && int.TryParse(command.Substring(5),out int seat) && seat>=0 && seat<12)SelectSeat(seat,DialInput.Accessible);
+            else ExtraActions?.Invoke(command);
         }
         RectTransform Rect(string name,Transform parent,float x,float top,float width,float height)
         {
