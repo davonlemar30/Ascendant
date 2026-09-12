@@ -16,6 +16,7 @@ namespace Ascendant.CelestialDial
         public DialLesson Lesson { get; private set; }
         public interface ISliceState { void Fill(WebState state); }
         public ISliceState Slice;                 // The vertical slice adds its screen state to the same bridge.
+        public bool SliceHidesOptional;           // v0.2: once the loop exists, the optional probe is retired after the first completion.
         public Action<string> ExtraActions;       // Slice commands arrive through the same WebAction entry.
         public RectTransform Root => root;
         public RectTransform Ring => ring;
@@ -24,6 +25,7 @@ namespace Ascendant.CelestialDial
         public bool Busy => busy;
         public void RegisterNavigation(Selectable s) { navigation.Add(s); }
         public void ForceRefresh() { Refresh(); }
+        public void Realign() { AlignStart(); }
         public bool firstDragResistance = false; // Test variable. Owner dropped it after the solo playtest: it went unnoticed.
         public bool inertiaEnabled = true;
         public const float PixelsPerDetent = 55;
@@ -52,9 +54,13 @@ namespace Ascendant.CelestialDial
         {
             public string message, destination, start, phase, count;
             public string[] seats;
-            public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy;
+            public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy, review, wheelComplete;
+            public int familiesComplete;
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
+            public int atriumStage, dueCount, reviewIndex, reviewTotal, day;
+            public bool canEnterWing, canEnterSeals, canAdvanceDay, canLeaveWing, canLeaveReview, v02Complete, resumed;
+            public string reviewMode = "", reviewSign = "", reviewSummary = "", hubNote = "";
             public string sunSign = "";
             public int locksFilled;
         }
@@ -94,7 +100,7 @@ namespace Ascendant.CelestialDial
             Bar(bracket,-27,29,3,58); Bar(bracket,27,29,3,58);
             Bar(bracket,0,1,56,3); Bar(bracket,0,57,56,3);
             start = Label(root,"",0,223,188,30,13);
-            destination = Label(root,"",0,271,188,50,17); destination.gameObject.SetActive(false); // Removed from view (Sept 11): the marker is self-evident.
+            destination = Label(root,"",0,271,188,50,20); // Names the sign under the bracket, live while dragging (owner request, Sept 12; reverses the Sept 11 "no label" row).
             count = Label(root,"",0,319,178,36,15);
             Label(root,"Move  >  Inspect  >  Seal",0,441,340,24,14);
             var panel = Rect("Caspar instruction panel",root,0,526,324,128);
@@ -213,14 +219,15 @@ namespace Ascendant.CelestialDial
             turns=targetTurns; LayoutRing();
             var result=Lesson.Seal(); if(result==null)return;
             Refresh();
+            if(Lesson.Phase==LessonPhase.Review) { AlignStart(); return; } // The lesson settles review outcomes itself; the slice paces the next item.
             if(result.correctness) StartCoroutine(Correct(result));
             else if(Lesson.Dial.Attempts>=3) StartCoroutine(Demonstrate());
         }
         IEnumerator Correct(DialEvent result)
         {
             busy=true;
-            Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional;
-            message.text=Lesson.CorrectLine(result);
+            Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional && Lesson.Phase != LessonPhase.Review; // Reviews never light seats.
+            message.text=Lesson.Phase==LessonPhase.Review ? Lesson.Message : Lesson.CorrectLine(result);
             RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .6f : 1.1f);
             yield return ReturnHome();
@@ -293,18 +300,21 @@ namespace Ascendant.CelestialDial
         void Refresh()
         {
             message.text=Lesson.Message;
-            destination.text=(dragging ? "Passing: " : "Selected: ")+Zodiac.Seats[Lesson.Dial.Selected].Name;
+            destination.text=Zodiac.Seats[Lesson.Dial.Selected].Name;
             start.text=Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
             count.text=Lesson.Dial.Counting ? "Count: "+Lesson.Dial.MovementCount : "";
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
+                Lesson.Phase==LessonPhase.AllLit ? "Four families complete. The whole wheel is lit." :
+                Lesson.Phase==LessonPhase.Review ? "Checking the seals" :
                 Lesson.IsProblem ? "Help level "+Lesson.Dial.HintLevel+" · "+(Lesson.Phase==LessonPhase.Guided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example";
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;
             countButton.gameObject.SetActive(Lesson.IsProblem); countButton.interactable=active;
             next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer) && !busy);
-            optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned);
+            optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned && Lesson.FamiliesComplete<=2 && (Slice==null || !SliceHidesOptional));
+            countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review);
             motionText.text="Reduced motion: "+(Lesson.Dial.ReducedMotion ? "on" : "off");
             RefreshSeats(); LayoutRing(); Publish();
         }
@@ -333,9 +343,9 @@ namespace Ascendant.CelestialDial
         public WebState Snapshot()
         {
             var labels=new string[12];for(int i=0;i<12;i++) labels[i]=Lesson.SeatLabel(i);
-            var state=new WebState {message=message.text,destination=destination.text,start=start.text,phase=phase.text,count=count.text,seats=labels,
+            var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+Zodiac.Seats[Lesson.Dial.Selected].Name,start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
-                reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy};
+                reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete};
             Slice?.Fill(state); return state;
         }
         public void Publish()
