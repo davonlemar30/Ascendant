@@ -33,7 +33,8 @@ namespace Ascendant.Build
         {
             EditorSceneManager.OpenScene("Assets/Scenes/VerticalSlice.unity");
             PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save(); // a stale local save from an earlier run would resume at the Hub
-            GreyboxPlayValidation.SetSize(390,844);SessionState.SetBool("AscendantSlicePlayValidation",true);
+            int scale=Environment.GetCommandLineArgs().Contains("-sliceScale2") ? 2 : 1; // phone pixel density: the same layout at twice the pixels
+            GreyboxPlayValidation.SetSize(390*scale,844*scale);SessionState.SetBool("AscendantSlicePlayValidation",true);
             EditorApplication.EnterPlaymode();
         }
         static void Check(bool value,string text) { if(!value)throw new Exception(text);Report.Add("PASS: "+text); }

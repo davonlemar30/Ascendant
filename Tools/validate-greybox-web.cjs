@@ -1,14 +1,15 @@
 // Run against the real locally served Unity build. Requires Playwright; no production dependency.
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const playwright=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const engine=process.env.BROWSER==='webkit' ? playwright.webkit : playwright.chromium; // BROWSER=webkit approximates iPhone browsers, which all run WebKit
 const fs=require('fs');
 const path=require('path');
 (async()=>{
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
-  const browser=await chromium.launch({headless:true,channel:'chrome'});
+  const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   for(const viewport of [{width:390,height:844},{width:360,height:800}]){
-    const context=await browser.newContext({viewport,deviceScaleFactor:1});
+    const context=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE}); // DEVICE_SCALE=2 MOBILE=1 approximates a phone
     const page=await context.newPage();const events=[],errors=[];
     page.on('pageerror',e=>errors.push(String(e)));
     page.on('console',msg=>{const text=msg.text(),mark=text.indexOf('[CelestialDial] ');if(mark>=0){try{events.push(JSON.parse(text.slice(mark+16)));}catch{}}});
