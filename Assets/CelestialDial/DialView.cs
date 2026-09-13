@@ -103,7 +103,9 @@ namespace Ascendant.CelestialDial
                 seats[i].gameObject.AddComponent<DialDrag>().View = this;
                 seatTexts[i] = seats[i].GetComponentInChildren<Text>(); seatTexts[i].fontSize = 11;
                 seatTexts[i].horizontalOverflow = HorizontalWrapMode.Overflow; // Long names spill past the tile instead of breaking mid-word.
-                seatGlyphs[i] = Label(seats[i].transform, "", 0, 6, 48, 24, 18); // the symbol font sits low in its box, so the box sits high in the tile seatGlyphs[i].font = GlyphFont; seatGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow; seatGlyphs[i].verticalOverflow = VerticalWrapMode.Overflow; seatGlyphs[i].gameObject.SetActive(false);
+                // The symbol font sits low in its box, so the box sits high in the tile. (A v0.4 edit turned the rest of this line into a comment,
+                // which left the seats on the plain text font: no marks on the Web, owner playtest v0.3.)
+                seatGlyphs[i] = Label(seats[i].transform, "", 0, 6, 48, 24, 18); seatGlyphs[i].font = GlyphFont; seatGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow; seatGlyphs[i].verticalOverflow = VerticalWrapMode.Overflow; seatGlyphs[i].gameObject.SetActive(false);
                 var seatRect=(RectTransform)seats[i].transform; seatRect.anchorMin=seatRect.anchorMax=new Vector2(.5f,.5f);
             }
             bracket = Rect("Fixed focus bracket", root, -136,270,58,58);
@@ -330,7 +332,7 @@ namespace Ascendant.CelestialDial
             countButton.gameObject.SetActive(Lesson.IsProblem); countButton.interactable=active;
             next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer) && !busy);
             optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned && Lesson.FamiliesComplete<=2 && (Slice==null || !SliceHidesOptional));
-            countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review);
+            countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review && Lesson.Phase!=LessonPhase.GlyphWheel); // no count in the marks: the target is a symbol, not a distance (owner playtest v0.3)
             motionText.text="Reduced motion: "+(Lesson.Dial.ReducedMotion ? "on" : "off");
             RefreshSeats(); LayoutRing(); Publish();
         }

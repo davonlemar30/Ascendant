@@ -81,7 +81,7 @@
       const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial');
       byId('instructions').textContent=wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
-      for(const id of ['back','forward','seal','count'])byId(id).disabled=!(wing&&state.active);
+      for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('count').disabled=!(wing&&state.active&&!state.glyphWheel);
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
       byId('motion').disabled=false;
       byId('next-screen').disabled=!state.canSliceContinue;byId('insert').disabled=!state.canInsert;byId('restart').disabled=!(state.ended||state.screen==='hub');
@@ -115,7 +115,8 @@
     },
     ready(unity){instance=unity;if(pendingMotion)send('motion-on');},
     // Read-only test evidence; actions still enter C# through the same public bridge.
-    snapshot:()=>state
+    snapshot:()=>state,
+    act:command=>send(command) // test-only: the same bridge the buttons use
   };
   const semantic=byId('semantic');
   document.addEventListener('pointerdown',()=>semantic.classList.remove('kb'),true);
