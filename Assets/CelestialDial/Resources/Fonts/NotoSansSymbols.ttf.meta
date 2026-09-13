@@ -3,15 +3,15 @@ guid: f4cd889f140a7439398646f66bc10d97
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
-  fontSize: 16
-  forceTextureCase: -2
+  fontSize: 96
+  forceTextureCase: 3
   characterSpacing: 0
-  characterPadding: 1
+  characterPadding: 2
   includeFontData: 1
   fontNames:
   - Noto Sans Symbols
   fallbackFontReferences: []
-  customCharacters: 
+  customCharacters: ♈♉♊♋♌♍♎♏♐♑♒♓
   fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0

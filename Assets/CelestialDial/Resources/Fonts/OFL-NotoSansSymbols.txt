@@ -91,3 +91,7 @@ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
 DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
+
+Ascendant note: the shipped NotoSansSymbols.ttf is a static Regular (wght 400) instance generated from the
+variable font NotoSansSymbols[wght].ttf with fontTools, and Unity bakes only the twelve zodiac symbols
+(U+2648 to U+2653) into a texture at import. Same license, unchanged.
