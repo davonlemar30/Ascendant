@@ -63,6 +63,10 @@ Unit 1.1's second half, in the form the owner chose on September 12: **Part A** 
 
 The movement greybox in its locked form: two walkable rooms (Atrium, Wing room), a placeholder marker (`Walker`, pure C#: rooms and points of interest in `Rooms`, straight-line legs at a fixed speed, arrival, reduced-motion jump, test speed toggle), fades at doorways, parity buttons. `SliceFlow` gains `WingRoom` between the Hub and the Dial: `EnterWing` opens the room at its doorway, `EnterDial` and `LeaveDial` open and close the Dial, `LeaveWing` returns to the Hub (stage bumps unchanged) with the marker at the Wing doorway; the review leaves it at the desk; the Chamber and a resume place it at the entry spot. Sealed doors set a note and do not walk. The mechanical validation covers the tables, the walker's timing (distance over speed), and the flow placements; the slice fixture and the browser suite tap points of interest and buttons alike, capture the Atrium with the marker, the walk, and the Wing room, and check `walk_started`, `walk_arrived`, and `room_entered` events. Web actions: `walk:<poi>`, `enter-dial`, `walk-speed` (test), plus the existing `enter-wing`, `enter-seals`, `leave-wing`, which now route through the walk.
 
+## Symbol font and the browser suite's phone mode
+
+The zodiac symbols come from a static Regular instance of Noto Sans Symbols baked at import (custom character set, 96 px), so the Web player never rasterizes them at runtime. The Editor cannot catch a label that lost this font: macOS substitutes a system font for missing symbols, the Web player draws nothing. The browser suite therefore is the check that matters for symbols; `DEVICE_SCALE=2 MOBILE=1` runs it at phone pixel density with touch emulation, and `BROWSER=webkit` runs it on WebKit, which every iPhone browser uses. The template exposes `window.ascendantDial.act(command)` for test probes; it is the same bridge the buttons use.
+
 ## Manual acceptance checklist
 
 Record device, viewport, input, observed result, and evidence for each check. Untested entries are pending, never assumed passed.
