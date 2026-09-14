@@ -95,7 +95,7 @@ const path=require('path');
     // ---- v0.2: the return ----
     const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'],ELEMENTS=['Fire','Earth','Air','Water'],ELEMENT_OF=i=>ELEMENTS[i%4];
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
-    check((await state()).atriumStage===2 && (await state()).dueCount===0,'the Chamber leads to the Hub in Stage 2 with nothing due at '+viewport.width);
+    check((await state()).atriumStage===2 && (await state()).dueCount>=6,'the Chamber leads to the Hub in Stage 2 with a batch of seals ready at once, no in-game time, at '+viewport.width);
     // ---- v0.4: tap-to-move ----
     const atriumState=await state();
     check(atriumState.room==='atrium' && atriumState.avatarAt==='entry' && ['desk','wing-door','caspar','sealed-left','sealed-right'].every(id=>atriumState.pois.includes(id)),'the Atrium lists its points of interest with the marker where you came in at '+viewport.width);
@@ -105,8 +105,6 @@ const path=require('path');
     check((await state()).note.includes('Caspar') && events.some(e=>e.event_name==='walk_started_caspar') && events.some(e=>e.event_name==='walk_arrived_caspar'),'tapping Caspar walks the marker to him at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
-    await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().hubNote.includes('Nothing is due'));
-    await semantic('advance-day');await page.waitForFunction(()=>window.ascendantDial.snapshot().dueCount===12);
     await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial');
     for(let n=0;n<6;n++){
       try{await page.waitForFunction(i=>window.ascendantDial.snapshot().reviewIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().reviewMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});}
@@ -151,9 +149,9 @@ const path=require('path');
       await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
     }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
-    check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Mark')),'Part B hides every name, labels included, at '+viewport.width);
+    check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Symbol')),'Part B hides every name, labels included, at '+viewport.width);
     await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Part A hold ends, then the wheel's labels refresh
-    { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: mark ') && b.start==='' && b.count==='','Part B readouts do not name the sign under the bracket at '+viewport.width); }
+    { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: symbol ') && b.start==='' && b.count==='','Part B readouts do not name the sign under the bracket at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
@@ -161,7 +159,7 @@ const path=require('path');
       await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
     }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key2&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
-    check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve marks placed earns Key 2 once at '+viewport.width);
+    check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve symbols placed earns Key 2 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-key2.png')});
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).v03Complete,'one more return completes v0.3 at '+viewport.width);
