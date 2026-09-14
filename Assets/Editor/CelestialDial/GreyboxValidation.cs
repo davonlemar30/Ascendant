@@ -194,7 +194,7 @@ namespace Ascendant.Build
             var grl=new DialLesson(()=>0);grl.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl.RestoreGlyphs(2,12,true);Check(grl.Key2Earned && grl.Keys==2 && grl.Phase==LessonPhase.Key2 && !grl.CanBeginGlyphs,"restored Key 2 does not reopen the glyph unit");
             var grl2=new DialLesson(()=>0);grl2.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl2.RestoreGlyphs(0,5,false);Check(grl2.CanBeginGlyphs && grl2.BeginGlyphs() && grl2.CurrentGlyph==5,"restored Part A progress resumes at the next mark");
             // ---- v0.4: tap-to-move (Q06 phase 2 lock) ----
-            Check(Rooms.Visible(Room.Atrium).Count(p=>p.Walkable)==3 && Rooms.Visible(Room.Atrium).Count(p=>!p.Walkable)==2 && Rooms.Visible(Room.Wing).Count()==2 && Rooms.Visible(Room.Wing).All(p=>p.Walkable),"the Atrium offers the doorway, the desk, and Caspar plus two sealed doors; the Wing offers the Dial and the doorway back");
+            Check(Rooms.Visible(Room.Atrium).Count(p=>p.Walkable)==3 && Rooms.Visible(Room.Atrium).Count(p=>!p.Walkable)==2 && Rooms.Visible(Room.Wing).Count()==3 && Rooms.Visible(Room.Wing).All(p=>p.Walkable),"the Atrium offers the doorway, the desk, and Caspar plus two sealed doors; the Wing offers the Dial and the doorway back");
             var walker=new Walker();var walkLog=new List<string>();walker.Logged+=walkLog.Add;
             walker.Enter(Room.Atrium,"entry");Check(walker.Room==Room.Atrium && walker.At=="entry" && !walker.Walking && walkLog.Last()=="room_entered:atrium","entering a room places the marker at a point of interest");
             Check(!walker.GoTo("sealed-left") && !walker.GoTo("dial") && !walker.Walking,"sealed doors and points in other rooms are not walkable");
@@ -212,6 +212,13 @@ namespace Ascendant.Build
             Check(wflow.ApproachCaspar() && wflow.Note.Contains("Caspar") && wlog.Last()=="caspar_approached","approaching Caspar logs the approach");
             Check(wflow.EnterWing() && wflow.Screen==SliceScreen.WingRoom && wflow.Walk.Room==Room.Wing && wflow.Walk.At=="atrium-door" && wflow.Note=="","the Wing doorway leads into the Wing room at its doorway");
             Check(!wflow.LeaveDial() && wflow.EnterDial() && wflow.Screen==SliceScreen.Wing && wflow.LeaveDial() && wflow.Screen==SliceScreen.WingRoom && wflow.Walk.At=="atrium-door","the Dial opens from the room and closes back to it");
+            // v0.3 revision: the book of symbols on the shelf
+            Check(!wflow.CanOpenBook && !wflow.EnterBook() && wflow.TouchDarkShelf() && wflow.Note=="shelf-dark" && wflow.Screen==SliceScreen.WingRoom,"before the wheel is lit the shelf is dark and the book does not open");
+            wflow.MarkWheelComplete();Check(wflow.CanOpenBook && !wflow.TouchDarkShelf() && wflow.EnterBook() && wflow.Screen==SliceScreen.Book && wflow.Note=="" && !wflow.EnterDial() && wflow.LeaveBook() && wflow.Screen==SliceScreen.WingRoom,"with the wheel lit the book opens from the room and closes back to it; the Dial does not open from inside the book");
+            var shelfLesson=new DialLesson(()=>0);shelfLesson.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);
+            Check(shelfLesson.CanBeginGlyphs && !shelfLesson.AllNamed,"a lit wheel with no symbols named is ready for the book, not the wheel");
+            shelfLesson.BeginGlyphs();for(int i=0;i<12;i++)shelfLesson.AnswerGlyphName(i);
+            Check(shelfLesson.AllNamed && shelfLesson.Phase==LessonPhase.GlyphWheel,"naming all twelve in the book hands the unit to the wheel");
             Check(wflow.LeaveWing() && wflow.Screen==SliceScreen.Hub && wflow.Walk.Room==Room.Atrium && wflow.Walk.At=="wing-door","leaving the Wing room places the marker at the Atrium's Wing doorway");
             Check(wflow.EnterSeals() && wflow.Screen==SliceScreen.Review,"the desk opens Check the Seals");
             while(!wflow.ReviewDone){var t=wflow.CurrentReview;if(t.Mode==ReviewMode.Tap)wflow.AnswerTap(Zodiac.Seats[t.seat].Element);else if(t.Mode==ReviewMode.Glyph)wflow.AnswerGlyph(t.seat);else wflow.FinishReview(true,true);}
