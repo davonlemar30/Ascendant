@@ -103,9 +103,10 @@ namespace Ascendant.CelestialDial
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
                 insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, a);
             }
-            if (wingContinue != null && Flow.Screen == SliceScreen.Wing && Flow.AtriumStage >= 2)
+            if (wingContinue != null && Flow.AtriumStage >= 2)
             {
-                bool idle = !Dial.Lesson.Dial.Active && !Dial.Busy && !busy && Dial.Lesson.Phase != LessonPhase.Review;
+                // The Wing's Back button belongs to the Wing screen only; left on, it sat over the review's Seal (owner playtest, Sept 14).
+                bool idle = Flow.Screen == SliceScreen.Wing && !Dial.Lesson.Dial.Active && !Dial.Busy && !busy && Dial.Lesson.Phase != LessonPhase.Review;
                 if (wingContinue.gameObject.activeSelf != idle) { wingContinue.gameObject.SetActive(idle); Publish(); }
             }
         }
@@ -527,7 +528,7 @@ namespace Ascendant.CelestialDial
                 enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
                 wingRoomCaption.text = Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
-                    : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? Dial.Lesson.Message
+                    : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "The wheel has hidden its names. Go to the Dial and find each symbol in turn." // placeholder (owner writes)
                     : Dial.Lesson.CanPractice ? (Dial.Lesson.Hard ? "The symbols are yours. The book will test you again, harder." : "The symbols are yours. The book will test you again.") // placeholder (owner writes)
                     : Flow.WheelComplete && !Dial.Lesson.AllNamed ? "The wheel is lit. Something on the shelf has woken with it." // placeholder (owner writes)
                     : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
@@ -572,7 +573,7 @@ namespace Ascendant.CelestialDial
             hubCaption.text = stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
             hubText.text = Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
             int due = Flow.DueCount;
-            enterSealsLabel.text = due > 0 ? "Check the Seals · " + due + " due" : "Check the Seals";
+            enterSealsLabel.text = "Check the Seals"; // no count on the button (owner, Sept 14); the review screen shows n of m
             enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
             endCard.text = Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
             hubNote.text = Flow.Note;

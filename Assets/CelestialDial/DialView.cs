@@ -291,7 +291,7 @@ namespace Ascendant.CelestialDial
         {
             busy=true; int beginning=Lesson.Dial.Start; int steps=Lesson.Phase==LessonPhase.GlyphWheel ? Zodiac.Wrap(Lesson.Dial.Target-beginning) : 4;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing();
-            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch. From "+Zodiac.Seats[beginning].Name+", I count forward to the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+"." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
+            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch. I turn until the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+" sits under the bracket." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=steps;n++)
             {
