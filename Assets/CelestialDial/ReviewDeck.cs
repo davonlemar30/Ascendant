@@ -88,5 +88,6 @@ namespace Ascendant.CelestialDial
         public int glyphStage;      // 0 not started, 1 Part A done, 2 Part B done (Key 2)
         public int glyphIndex;      // next glyph in zodiac order within the current part
         public int reviewsChecked;
+        public int cleanRuns;       // v0.3 revision, build 3
     }
 }
