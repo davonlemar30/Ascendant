@@ -173,8 +173,34 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-key2.png')});
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).v03Complete,'one more return completes v0.3 at '+viewport.width);
+    // ---- v0.3 revision, build 3: a clean replay hardens the symbols ----
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
+    check((await state()).practice && !(await state()).hard,'after Key 2 the book tests again, in order the first time, at '+viewport.width);
+    for(let n=0;n<12;n++){
+      await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+      const s=await state();const target=['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'].indexOf(s.glyphChar);
+      await semantic('glyph-name-'+s.glyphOptions.indexOf(SIGNS[target]));await page.waitForTimeout(200);
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
+    for(let n=0;n<12;n++){
+      await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+      const target=SIGNS.indexOf((await state()).glyphTarget);
+      await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().cleanRuns===1&&!window.ascendantDial.snapshot().practice&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
+    check((await state()).hard && (await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1 && events.some(e=>e.event_name==='symbol_practice_clean'),'a clean replay is recorded once and the next one is hard; Key 2 is not re-earned at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-practice-clean.png')});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
+    { const h=await state(); check(h.hard && h.glyphChar!=='\u2648' && new Set(h.glyphOptions).size===4,'the hard replay shuffles the order and keeps four distinct names at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-practice-hard.png')});
+    await semantic('close-book');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-    check((await state()).atriumStage===4 && (await state()).keys===2 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with Key 2 at '+viewport.width);
+    check((await state()).atriumStage===4 && (await state()).keys===2 && (await state()).cleanRuns===1 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with Key 2 and the clean run at '+viewport.width);
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);

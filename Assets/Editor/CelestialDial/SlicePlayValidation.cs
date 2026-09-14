@@ -92,8 +92,23 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>Act("leave-wing"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==4 && View.Flow.V03Complete,"one more return completes v0.3");Capture("slice-390-hub-v03.png");Act("enter-seals");});
             for(int i=0;i<6;i++) Steps.Enqueue(()=>{var task=View.Flow.CurrentReview;if(task==null||task.done)return;if(task.Mode==ReviewMode.Dial){Act("seat:"+Zodiac.Destination(task.seat));Act("seal");}else if(task.Mode==ReviewMode.Tap){Act("element:"+System.Array.IndexOf(new[]{"Fire","Earth","Air","Water"},Zodiac.Seats[task.seat].Element));}else{int slot=System.Array.IndexOf(View.Flow.GlyphReviewOptions(task.seat),task.seat);if(View.Flow.ReviewIndex==0)Capture("slice-390-review-glyph.png");Act("glyph-name:"+slot);}});
-            Steps.Enqueue(()=>{Check(View.Flow.ReviewDone,"a review batch with the deck open completes");Act("leave-review");Act("reload");});
-            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.WheelComplete && View.Flow.AtriumStage==4 && View.Flow.Keys==2 && View.Dial.Lesson.Key2Earned && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with Key 2");Act("restart");});
+            Steps.Enqueue(()=>{Check(View.Flow.ReviewDone,"a review batch with the deck open completes");Act("leave-review");});
+            // ---- v0.3 revision, build 3: the book tests again after Key 2; a clean replay hardens the next one ----
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub with two Keys");Act("enter-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Lesson.CanPractice,"after Key 2 the shelf offers practice");Act("walk:shelf");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Book && View.Dial.Lesson.Practice && View.Dial.Lesson.Phase==LessonPhase.GlyphNames && !View.Dial.Lesson.Hard && View.Dial.Lesson.SeatAt(0)==0,"the first replay runs in order with the usual names");});
+            for(int i=0;i<12;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphNames)return;int target=l.CurrentGlyph;Act("glyph-name:"+System.Array.IndexOf(l.GlyphOptions(target),target));});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && View.Dial.Lesson.Phase==LessonPhase.GlyphWheel && !View.Busy,"the replayed book closes and hands to the wheel");Act("walk:dial");});
+            for(int i=0;i<12;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphWheel)return;Act("seat:"+l.Dial.Target);Act("seal");});
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase==LessonPhase.GlyphWheel){Act("seat:"+l.Dial.Target);Act("seal");}});
+            Steps.Enqueue(()=>{Check(!View.Dial.Lesson.Practice && View.Dial.Lesson.CleanRuns==1 && View.Flow.CleanRuns==1 && View.Dial.Lesson.Hard && View.Flow.Keys==2 && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key2_earned")==1,"a clean replay is recorded once; Key 2 is not re-earned; the next replay is hard");Capture("slice-390-practice-clean.png");});
+            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub");Act("enter-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"in the Wing room again");Act("walk:shelf");});
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(View.Flow.Screen==SliceScreen.Book && l.Practice && l.Hard && l.SeatAt(0)!=0 && l.GlyphOptions(l.CurrentGlyph).Length==4 && l.GlyphOptions(l.CurrentGlyph).Distinct().Count()==4 && l.GlyphOptions(l.CurrentGlyph).Contains(l.CurrentGlyph),"the hard replay shuffles the order and keeps four distinct names including the answer");Capture("slice-390-practice-hard.png");Act("close-book");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"the book can be closed mid-practice");Act("walk:atrium-door");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub before the reload");Act("reload");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.WheelComplete && View.Flow.AtriumStage==4 && View.Flow.Keys==2 && View.Dial.Lesson.Key2Earned && View.Flow.CleanRuns==1 && View.Dial.Lesson.Hard && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with Key 2");Act("restart");});
             Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});
             Steps.Enqueue(()=>{
                 Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");

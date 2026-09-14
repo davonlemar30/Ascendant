@@ -234,6 +234,22 @@ namespace Ascendant.Build
             var askGlyph=new DialLesson(()=>0);askGlyph.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);askGlyph.BeginGlyphs();for(int i=0;i<12;i++)askGlyph.AnswerGlyphName(i);
             askGlyph.Dial.Select(5,DialInput.DirectSeat);askGlyph.Seal();Check(askGlyph.CanAsk && askGlyph.AskCaspar() && askGlyph.NameRevealed[0] && askGlyph.Dial.HintLevel==2,"in the symbols, asking reveals the name on its seat");
             askGlyph.Dial.Select(0,DialInput.DirectSeat);var askedPlace=askGlyph.Seal();Check(askedPlace.correctness && !askedPlace.evidence_eligible,"a placement after asking earns no evidence toward Key 2");
+            // ---- v0.3 revision, build 3: the difficulty ramp ----
+            Check(Enumerable.Range(0,12).All(seat=>{var o=DialLesson.OptionsFor(seat,true,0);return o.Length==4 && o.Distinct().Count()==4 && o.Contains(seat);}),"hard options are four distinct names that include the answer for every seat");
+            Check(Enumerable.Range(0,12).All(seat=>DialLesson.OptionsFor(seat,true,0).Contains(Zodiac.Wrap(seat+4)) && DialLesson.OptionsFor(seat,true,0).Contains(Zodiac.Wrap(seat+8))),"hard options include both same-element signs");
+            var ramp=new DialLesson(()=>0);ramp.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);ramp.RestoreGlyphs(2,12,true);
+            Check(!ramp.Hard && ramp.CanPractice && ramp.BeginPractice() && ramp.Practice && ramp.Phase==LessonPhase.GlyphNames && ramp.SeatAt(0)==0 && ramp.Dial.Events.Last().event_name=="symbol_practice_started","after Key 2 the book replays, in order the first time");
+            for(int i=0;i<12;i++)ramp.AnswerGlyphName(ramp.CurrentGlyph);Check(ramp.Phase==LessonPhase.GlyphWheel && ramp.Dial.Target==0,"the replayed Part A hands to the wheel");
+            ramp.Dial.Select(3,DialInput.DirectSeat);ramp.Seal();Check(ramp.Message.Contains("Aries is here at the start"),"the first replay keeps the Aries anchor");
+            ramp.Dial.Select(0,DialInput.DirectSeat);var p0=ramp.Seal();ramp.AfterCorrect(p0);
+            for(int i=1;i<12;i++){ramp.Dial.Select(ramp.Dial.Target,DialInput.DirectSeat);var pe=ramp.Seal();ramp.AfterCorrect(pe);}
+            Check(!ramp.Practice && ramp.CleanRuns==1 && ramp.Hard && ramp.Phase==LessonPhase.Key2 && ramp.Dial.Events.Count(e=>e.event_name=="key2_earned")==0 && ramp.Dial.Events.Count(e=>e.event_name=="symbol_practice_clean")==1,"a clean replay counts once, hardens the next, and never re-earns Key 2");
+            Check(ramp.BeginPractice() && ramp.Hard && ramp.SeatAt(0)!=0 && Enumerable.Range(0,12).Select(i=>ramp.SeatAt(i)).Distinct().Count()==12 && ramp.GlyphOptions(ramp.CurrentGlyph).Contains(ramp.CurrentGlyph),"the hard replay shuffles all twelve and still offers the answer");
+            for(int i=0;i<12;i++)ramp.AnswerGlyphName(ramp.CurrentGlyph);ramp.Dial.Select(Zodiac.Wrap(ramp.Dial.Target+2),DialInput.DirectSeat);ramp.Seal();
+            Check(ramp.Phase==LessonPhase.GlyphWheel && !ramp.Message.Contains("Aries") && ramp.Message.Contains("shape"),"the hard replay drops the Aries anchor from the first hint");
+            var rampFlow=new SliceFlow(()=>1);Check(rampFlow.GlyphReviewOptions(5).Contains(Zodiac.Wrap(5+3)),"review names are the usual set before a clean run");rampFlow.RecordCleanRun();
+            Check(rampFlow.CleanRuns==1 && rampFlow.GlyphReviewOptions(5).Contains(Zodiac.Wrap(5+4)) && rampFlow.GlyphReviewOptions(5).Contains(5),"after a clean run the review names harden and still include the answer");
+            var rampSave=rampFlow.ToSave(new bool[12],new bool[12],true);var rampBack=new SliceFlow(()=>1);rampSave.atriumStage=4;rampSave.sunSign=1;Check(rampBack.Restore(rampSave) && rampBack.CleanRuns==1,"the clean-run count survives a save");
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }
