@@ -111,6 +111,8 @@ This checks the symbol unit: naming the twelve symbols, finding them on the whee
 - [ ] Get one wrong on purpose. You should see "Aries is here at the start; count forward from it." and the "Ask Caspar for help" button. Press it, or miss again. Either way you should see that sign's name appear on its seat. Miss a third time. You should see Caspar count forward to it himself, then the next mark.
 - [ ] After all twelve, you should see "Keeper Key 2 is yours," the names back on the wheel beside their symbols, and "Keeper Keys: 2" at the top. Press "Back to the Atrium." You should see the end card say v0.4.
 - [ ] Check the seals again. You should see some items show a symbol with four names instead of a family question. They work the same way: one hint, then the answer.
+- [ ] With Key 2 in hand, go back to the Wing and tap the bookshelf. You should see the book open again, in the same order as before. Name all twelve, then find all twelve on the wheel with at least one on your own. You should see Caspar say it was sharper this time, and no new Key.
+- [ ] Tap the bookshelf once more. You should see the symbols come in a different order, and the four names under each one include a look-alike and the other two signs of the same element. Miss one on the wheel on purpose. You should see the hint no longer mention Aries. Write down whether it felt like a real test: ___
 - [ ] Close and reopen the game. You should see the Atrium with two Keys. Press "Start over (test)" to reset.
 - [ ] Turn "Reduced motion" on and do the symbols again after starting over. You should see everything still work.
 
