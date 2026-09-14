@@ -121,9 +121,11 @@ const path=require('path');
     await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().walking&&window.ascendantDial.snapshot().walkTarget==='wing-door',{},{timeout:5000});
     await page.screenshot({path:path.join(out,viewport.width+'-walk.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).room==='wing' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,dial' && (await state()).canEnterDial && (await state()).canLeaveWing,'the Wing doorway fades into the Wing room with the Dial and the doorway back at '+viewport.width);
+    check((await state()).room==='wing' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,dial,shelf' && (await state()).canEnterDial && !(await state()).canEnterShelf && (await state()).canLeaveWing,'the Wing doorway fades into the Wing room with the Dial, the doorway back, and a dark shelf at '+viewport.width);
     check(events.some(e=>e.event_name==='room_entered_wing'),'room events at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room.png')});
+    await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('shelf is dark'),{},{timeout:5000});
+    check(!(await state()).walking,'before the wheel is lit the shelf only says it is dark at '+viewport.width);
     await semantic('enter-dial');await waitActive('Gemini');
     check((await state()).avatarAt==='dial','the Dial opens once the marker reaches it at '+viewport.width);
     check((await state()).phase.includes('Help level 0'),'Unit 1.1 continues on the player\'s own at '+viewport.width);
@@ -138,8 +140,14 @@ const path=require('path');
     await semantic('enter-wing');
     try{await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});}
     catch(e){console.error('wing button stalled: '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-14).map(x=>x.event_name+'@'+x.input_method)));throw e;}
-    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
-    check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'Part A shows a mark and four names at '+viewport.width);
+    check((await state()).canEnterShelf && (await state()).pois.includes('shelf'),'the lit wheel wakes the bookshelf as a point of interest at '+viewport.width);
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).glyphMode==='' && (await state()).message.includes('wait on the shelf'),'the Dial before the book only points at the shelf at '+viewport.width);
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveWing,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
+    check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'the book opens Part A: a symbol and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -148,7 +156,9 @@ const path=require('path');
       const slot=s.glyphOptions.indexOf(SIGNS[target]);
       await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
     }
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+    check((await state()).glyphWheel,'the twelfth name closes the book and returns to the room at '+viewport.width);
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
     check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Symbol')),'Part B hides every name, labels included, at '+viewport.width);
     await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Part A hold ends, then the wheel's labels refresh
     { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: symbol ') && b.start==='' && b.count==='','Part B readouts do not name the sign under the bracket at '+viewport.width); }

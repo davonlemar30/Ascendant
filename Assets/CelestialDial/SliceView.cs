@@ -26,7 +26,7 @@ namespace Ascendant.CelestialDial
         Text glyphCard, glyphProgress, glyphCaspar, glyphNote;
         // v0.4 tap-to-move (Q06 phase 2): two walkable rooms, a placeholder marker, fades at doorways.
         RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
-        Button enterDial, wingRoomBack, walkSpeed;
+        Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
         const float BandY = 436f, FadeSeconds = .35f; // floor band and fade length are test variables (Q06 phase 2, decision 7)
         readonly Button[] glyphNameButtons = new Button[4];
         readonly Button[] reviewGlyphButtons = new Button[4];
@@ -97,8 +97,6 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
             if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Review) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
-            if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames && !glyphs.gameObject.activeSelf && !busy) { Show(); Publish(); }
-            if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphWheel && glyphs.gameObject.activeSelf && !busy) { Show(); Dial.Realign(); Publish(); }
             if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && !Flow.KeyInserted)
             {
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
@@ -243,7 +241,8 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", glyphs, 0, 520, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             glyphCaspar = Label(panel, "", 0, 70, 306, 90, 12);
-            glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14); // between the name buttons (to 432) and the Caspar panel (from 460)
+            glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14);
+            closeBook = MakeButton(glyphs, "Close the book", 0, 680, 300, 52, CloseBook); // between the name buttons (to 432) and the Caspar panel (from 460)
         }
         void BuildWingExtras()
         {
@@ -271,6 +270,8 @@ namespace Ascendant.CelestialDial
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
             var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36);
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); book.gameObject.AddComponent<Image>().color = new Color(.3f, .28f, .3f); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
+            var glow = Rect("Shelf glow", shelf, 0, 18, 60, 46); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
+            Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
             var dial = Rect("The Dial", wingRoom, 30, 250, 200, 200); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
             RingLines(dial, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(dial, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
             var dialLabel = Label(wingRoom, "The Dial", 30, 352, 120, 16, 10); dialLabel.color = Muted;
@@ -280,6 +281,7 @@ namespace Ascendant.CelestialDial
             var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
             wingRoomCaption = Label(wingRoom, "The Dial waits at the center of the room. The doorway leads back.", 0, 478, 340, 36, 12); // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
+            enterShelf = MakeButton(wingRoom, "The bookshelf", 0, 568, 300, 52, () => Walk("shelf")); enterShelf.gameObject.SetActive(false);
             wingRoomBack = MakeButton(wingRoom, "Back to the Atrium", 0, 680, 300, 52, LeaveWing);
         }
         void BuildAvatar()
@@ -326,6 +328,8 @@ namespace Ascendant.CelestialDial
             else if (command == "reload") { if (!busy) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); } // test-only: resume from the local save
             else if (command == "enter-wing") EnterWing();
             else if (command == "enter-dial") Walk("dial");
+            else if (command == "enter-shelf") Walk("shelf");
+            else if (command == "close-book") CloseBook();
             else if (command.StartsWith("walk:")) Walk(command.Substring(5));
             else if (command == "walk-speed") CycleWalkSpeed();
             else if (command == "enter-seals") EnterSeals();
@@ -378,14 +382,24 @@ namespace Ascendant.CelestialDial
             if (!Flow.EnterDial()) return;
             Dial.SliceHidesOptional = true;
             if (Dial.Lesson.CanContinueUnit) Dial.Lesson.BeginContinuation();
-            else if (Dial.Lesson.CanBeginGlyphs) { if (Dial.Lesson.BeginGlyphs()) { Flow.StartGlyphs(); Save(); } }
+            else if (Dial.Lesson.CanBeginGlyphs && Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) Save(); } // Part B: the wheel hides its names
+            else if (Dial.Lesson.CanBeginGlyphs) Dial.Lesson.Say(DialLesson.ShelfFirst); // the lit wheel, read only, until the book is read
             Show(); Dial.Realign(); Publish();
         }
+        void OpenBook()
+        {
+            if (!Flow.EnterBook()) return;
+            if (Dial.Lesson.CanBeginGlyphs && !Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) { Flow.StartGlyphs(); Save(); } }
+            else Dial.Lesson.Say(DialLesson.ShelfRead); // Part A done or Key 2 earned: the book only shows its pages closed
+            Show(); Publish();
+        }
+        void CloseBook() { if (busy || !Flow.LeaveBook()) return; Save(); Show(); Publish(); }
         void Walk(string id)
         {
             if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom)) return;
             var poi = Flow.Walk.Find(id); if (poi == null) return;
             if (!poi.Walkable) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; }
+            if (id == "shelf" && !Flow.WheelComplete) { if (Flow.TouchDarkShelf()) { wingRoomCaption.text = DialLesson.ShelfDark; Publish(); } return; }
             if (!Flow.Walk.GoTo(id)) return;
             StartCoroutine(Travel(id));
         }
@@ -412,6 +426,7 @@ namespace Ascendant.CelestialDial
             else if (id == "desk") { if (!Flow.EnterSeals()) hubNote.text = Flow.Note; else { Show(); StartReviewItem(); } }
             else if (id == "caspar") { Flow.ApproachCaspar(); hubNote.text = Flow.Note; }
             else if (id == "dial") EnterDialNow();
+            else if (id == "shelf") OpenBook();
         }
         IEnumerator FadeTo(float alpha)
         {
@@ -437,7 +452,9 @@ namespace Ascendant.CelestialDial
         {
             busy = true; ShowGlyphs(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? .7f : 1.1f);
-            busy = false; Show(); if (Dial.Lesson.Phase == LessonPhase.GlyphWheel) Dial.Realign(); Publish();
+            busy = false;
+            if (Dial.Lesson.Phase == LessonPhase.GlyphWheel) { Flow.LeaveBook(); Save(); } // Part A done: back to the room; the wheel runs Part B
+            Show(); Publish();
         }
         void AnswerGlyphReview(int slot)
         {
@@ -498,14 +515,24 @@ namespace Ascendant.CelestialDial
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber); hub.gameObject.SetActive(s == SliceScreen.Hub);
             wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
+            bool book = s == SliceScreen.Book;
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom;
             if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : wingRoom, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
             avatar.gameObject.SetActive(roomScreen);
-            if (s == SliceScreen.WingRoom) { enterDial.interactable = !busy; wingRoomBack.interactable = !busy; }
-            bool partA = s == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames;
+            if (s == SliceScreen.WingRoom)
+            {
+                enterDial.interactable = !busy; wingRoomBack.interactable = !busy;
+                enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
+                shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
+                wingRoomCaption.text = Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
+                    : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? Dial.Lesson.Message
+                    : Flow.WheelComplete && !Dial.Lesson.AllNamed ? "The wheel is lit. Something on the shelf has woken with it." // placeholder (owner writes)
+                    : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
+            }
+            bool partA = book;
             review.gameObject.SetActive(s == SliceScreen.Review && !reviewOnDial);
             glyphs.gameObject.SetActive(partA);
-            Dial.UiCanvas.gameObject.SetActive((s == SliceScreen.Wing && !partA) || reviewOnDial);
+            Dial.UiCanvas.gameObject.SetActive(s == SliceScreen.Wing || reviewOnDial);
             if (partA) ShowGlyphs();
             if (birthContinue != null) birthContinue.interactable = Flow.CanContinue;
             if (s == SliceScreen.Wing || reviewOnDial)
@@ -522,7 +549,9 @@ namespace Ascendant.CelestialDial
         void ShowGlyphs()
         {
             var lesson = Dial.Lesson; int target = lesson.CurrentGlyph;
-            bool naming = lesson.Phase == LessonPhase.GlyphNames; // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
+            bool naming = lesson.Phase == LessonPhase.GlyphNames;
+            closeBook.interactable = !busy;
+            if (!naming) { glyphProgress.text = ""; glyphCard.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].GetComponentInChildren<Text>().text = ""; glyphCaspar.text = lesson.Message; glyphNote.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = false; return; } // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
             if (naming)
             {
                 glyphProgress.text = "Symbol " + Mathf.Min(lesson.GlyphIndex + 1, 12) + " of 12";
@@ -605,7 +634,7 @@ namespace Ascendant.CelestialDial
             state.reviewMode = s != SliceScreen.Review ? "" : Flow.ReviewDone ? "done" : task != null && task.Mode == ReviewMode.Dial ? "dial" : "tap";
             state.reviewIndex = Flow.ReviewIndex; state.reviewTotal = Flow.ReviewQueue.Count; state.reviewSign = task != null && !Flow.ReviewDone ? Zodiac.Seats[task.seat].Name : "";
             state.reviewSummary = Flow.ReviewSummary; state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
-            bool partA = s == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.GlyphNames;
+            bool partA = s == SliceScreen.Book && Dial.Lesson.Phase == LessonPhase.GlyphNames;
             bool glyphItem = s == SliceScreen.Review && task != null && !Flow.ReviewDone && task.Mode == ReviewMode.Glyph;
             state.glyphMode = partA ? "name" : glyphItem ? "review" : "";
             if (partA || glyphItem)
@@ -624,8 +653,10 @@ namespace Ascendant.CelestialDial
             state.avatarX = walk.X; state.walking = walk.Walking; state.walkTarget = walk.TargetId; state.avatarAt = walk.At; state.walkSpeed = walk.SpeedName;
             var pois = roomScreen ? Rooms.Visible(walk.Room).ToArray() : new PointOfInterest[0];
             state.pois = pois.Select(p => p.Id).ToArray(); state.poiLabels = pois.Select(p => (p.Walkable ? "Walk to " : "") + p.Label).ToArray();
-            state.canWalk = roomScreen && !busy; state.canEnterDial = s == SliceScreen.WingRoom && !busy;
+            state.canWalk = roomScreen && !busy; state.canEnterDial = s == SliceScreen.WingRoom && !busy; state.canEnterShelf = s == SliceScreen.WingRoom && Flow.WheelComplete && !busy;
             if (s == SliceScreen.WingRoom) { state.caspar = wingRoomCaption.text; state.canLeaveWing = !busy; }
+            state.canCloseBook = s == SliceScreen.Book && !busy;
+            if (s == SliceScreen.Book && !partA) state.caspar = Dial.Lesson.Message;
             if (roomScreen && !busy) state.note = hubNote.text;
         }
 

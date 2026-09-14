@@ -30,6 +30,7 @@ namespace Ascendant.CelestialDial
         {
             new PointOfInterest("atrium-door", "the doorway back to the Atrium", -130),
             new PointOfInterest("dial", "the Dial", 30),
+            new PointOfInterest("shelf", "the bookshelf", 120),   // v0.3 revision: Part A lives here once the wheel is lit
         };
         public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : Array.Empty<PointOfInterest>();
         public static PointOfInterest Find(Room room, string id) => Of(room).FirstOrDefault(p => p.Id == id);
