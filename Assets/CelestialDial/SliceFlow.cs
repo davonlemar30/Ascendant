@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom }
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book }
     public enum ReviewMode { Dial, Tap, Glyph }
 
     [Serializable]
@@ -120,6 +120,23 @@ namespace Ascendant.CelestialDial
         {
             if (!AtWingRoom) return false;
             Screen = SliceScreen.Wing; Logged?.Invoke("screen_entered:wing"); return true;
+        }
+        // v0.3 revision (Sept 13 lock): Part A, the symbol-naming cards, lives in a book on the Wing's bookshelf.
+        public bool CanOpenBook => AtWingRoom && WheelComplete;
+        public bool EnterBook()
+        {
+            if (!CanOpenBook) return false;
+            Screen = SliceScreen.Book; Note = ""; Logged?.Invoke("screen_entered:book"); return true;
+        }
+        public bool LeaveBook()
+        {
+            if (Screen != SliceScreen.Book) return false;
+            Screen = SliceScreen.WingRoom; Logged?.Invoke("screen_entered:wingroom"); return true;
+        }
+        public bool TouchDarkShelf()
+        {
+            if (!AtWingRoom || WheelComplete) return false;
+            Note = "shelf-dark"; Logged?.Invoke("shelf_dark_touched"); return true;
         }
         public bool LeaveDial()
         {

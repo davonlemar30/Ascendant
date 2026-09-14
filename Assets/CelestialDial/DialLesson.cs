@@ -62,6 +62,10 @@ namespace Ascendant.CelestialDial
             return true;
         }
         public int CurrentGlyph => Phase == LessonPhase.GlyphNames ? GlyphIndex : Phase == LessonPhase.GlyphWheel ? Dial.Target : -1;
+        public bool AllNamed { get { for (int i = 0; i < 12; i++) if (!GlyphNamed[i]) return false; return true; } } // Part A complete
+        public const string ShelfFirst = "The names you know. Their symbols wait on the shelf.\nRead them there first; then the wheel will hide its names."; // placeholder (owner writes)
+        public const string ShelfDark = "The shelf is dark. Light the wheel first."; // placeholder (owner writes)
+        public const string ShelfRead = "Twelve symbols, read. The book has nothing more for now."; // placeholder (owner writes)
         // Four names: the answer plus three others, in a stable order per seat so tests and the page agree.
         public int[] GlyphOptions(int seat)
         {

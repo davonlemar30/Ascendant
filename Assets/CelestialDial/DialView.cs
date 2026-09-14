@@ -72,7 +72,7 @@ namespace Ascendant.CelestialDial
             // v0.4 tap-to-move
             public string room = "", walkTarget = "", avatarAt = "", walkSpeed = "";
             public float avatarX;
-            public bool walking, canWalk, canEnterDial;
+            public bool walking, canWalk, canEnterDial, canEnterShelf, canCloseBook;
             public string[] pois, poiLabels;
         }
         void Awake()
