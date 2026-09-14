@@ -104,9 +104,9 @@ This checks the loop: coming back to the Library, checking the seals, and finish
 
 This checks the symbol unit: naming the twelve symbols, finding them on the wheel, and earning Key 2.
 
-- [ ] With all twelve seats lit, press "The Zodiac Wing" and then tap the Dial in the room. You should see a big symbol on a card and four sign names below it, with Caspar's line about the twelve symbols.
+- [ ] With all twelve seats lit, press "The Zodiac Wing." You should see the bookshelf glowing. Tap the Dial first. You should see the lit wheel and Caspar tell you the symbols wait on the shelf. Go back and tap the bookshelf. You should see the Keeper walk to it, then a book open: a big symbol on a card and four sign names below it, with Caspar's line about the twelve symbols.
 - [ ] Tap the right name. You should see "Yes. [sign]." and the next symbol. Tap a wrong name on purpose. You should see one hint that only names the element, and a second chance. Miss again. You should see the name revealed and the next symbol.
-- [ ] After twelve symbols, you should see the wheel with the names hidden and only the symbols showing. The middle of the wheel shows the symbol under the bracket, never a name. Caspar names a sign. Turn until that sign's symbol is under the bracket and press Seal. You should see "Yes. [sign], in its place." and the next name.
+- [ ] After twelve symbols, you should see the book close and the room again. Tap the Dial. You should see the wheel with the names hidden and only the symbols showing. The middle of the wheel shows the symbol under the bracket, never a name. Caspar names a sign. Turn until that sign's symbol is under the bracket and press Seal. You should see "Yes. [sign], in its place." and the next name.
 - [ ] Get one wrong on purpose. You should see "Aries is here at the start; count forward from it." Miss again. You should see that sign's name appear on its seat. Miss a third time. You should see Caspar count forward to it himself, then the next mark.
 - [ ] After all twelve, you should see "Keeper Key 2 is yours," the names back on the wheel beside their symbols, and "Keeper Keys: 2" at the top. Press "Back to the Atrium." You should see the end card say v0.4.
 - [ ] Check the seals again. You should see some items show a symbol with four names instead of a family question. They work the same way: one hint, then the answer.
@@ -121,7 +121,7 @@ This checks tap-to-move: the Keeper walks the Atrium and the Wing, and the butto
 - [ ] Tap the open Zodiac Wing door. You should see the Keeper walk to it, bobbing a little, then the screen go dark for a moment and come back as the Wing room, with the Keeper by the doorway. Write down what your thumb did first when you saw the Atrium: tapped a door, tapped a button, or something else: ___
 - [ ] In the Wing room, tap the big ring in the middle. You should see the Keeper walk to it, then the wheel open as before.
 - [ ] Press "Back to the Atrium" on the wheel. You should see the room again, the Keeper walk to the doorway, a dark moment, then the Atrium with the Keeper by the Wing door.
-- [ ] Tap a sealed door. You should see a note that it is sealed. The Keeper does not move.
+- [ ] Tap a sealed door. You should see a note that it is sealed. The Keeper does not move. In the Wing room before the wheel is lit, tap the bookshelf. You should see Caspar say the shelf is dark. The Keeper does not move.
 - [ ] Tap the desk. You should see the Keeper walk to it, then Check the Seals open, or a note that the seals hold for now. Tap Caspar. You should see the Keeper walk to him and a short note.
 - [ ] Press the "The Zodiac Wing" button instead of tapping the door. You should see the same walk and the same dark moment. The buttons and the taps do the same thing.
 - [ ] Press "Walk: normal (test)" to change the walking speed to fast, then slow. Walk somewhere each time. Write down which speed felt right: ___
