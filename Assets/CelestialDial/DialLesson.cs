@@ -135,7 +135,7 @@ namespace Ascendant.CelestialDial
         }
         void BeginGlyphProblem(int seat)
         {
-            Dial.Begin(0, 0, seat); CountBeatPending = false;
+            Dial.Begin(Zodiac.Wrap(seat + 3 + (seat * 5) % 7), 0, seat); CountBeatPending = false; // start three to nine seats away, never on or beside the answer (owner playtest, Sept 14)
             Message = "Find the symbol of " + SignName(seat) + ".\nTurn until it sits under the bracket, then press Seal.";
         }
         void FinishGlyphs()
@@ -271,7 +271,7 @@ namespace Ascendant.CelestialDial
                     GlyphPlaced[target] = true; if (result.evidence_eligible) GlyphEvidence = true;
                     Message = "Yes. " + SignName(target) + ", in its place."; Dial.Log("glyph_placed", true, result.evidence_eligible);
                 }
-                else if (step == 1) Message = Hard ? "Not that one. Look at the shape again, then find it on the wheel." : "Not that one. Aries is here at the start; count forward from it."; // no Aries anchor after a clean run
+                else if (step == 1) Message = Hard ? "Not that one. Look at the shape again, then find it on the wheel." : "Not that one. Find Aries first, then count forward to it."; // no Aries anchor after a clean run
                 else if (step == 2) { NameRevealed[target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(target) + ", then press Seal."; }
                 else Message = "Watch me find it.\nThen the next symbol.";
                 return result;

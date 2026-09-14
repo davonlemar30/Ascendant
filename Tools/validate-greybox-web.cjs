@@ -106,11 +106,22 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-hub.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
     await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial');
+    let reloadedMidReview=false;
     for(let n=0;n<6;n++){
       try{await page.waitForFunction(i=>window.ascendantDial.snapshot().reviewIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().reviewMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});}
       catch(e){console.error('review loop stalled at item '+n+': '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-12).map(x=>x.event_name+'@'+x.input_method)));throw e;}
       const s=await state();const seat=SIGNS.indexOf(s.reviewSign);
-      if(s.reviewMode==='dial'){await semantic('seat-'+((seat+4)%12));await semantic('seal');}
+      if(s.reviewMode==='dial'){
+        await semantic('seat-'+((seat+4)%12));
+        if(n===0){ // the owner's thumb path: the Seal on the canvas must not be covered by the Wing's Back button
+          if(!reloadedMidReview){reloadedMidReview=true;const before=(await state()).dueCount;await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+            check((await state()).dueCount===before,'a reload during the review keeps the deck and its ready count at '+viewport.width);
+            await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial',{},{timeout:15000});
+            await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await semantic('seat-'+((seat+4)%12));await page.waitForTimeout(150);}
+          const committed=events.filter(e=>e.event_name==='answer_committed').length;await tap(0,654);await page.waitForTimeout(400);
+          check(events.filter(e=>e.event_name==='answer_committed').length===committed+1,'the review\'s Seal answers a canvas tap; nothing covers it at '+viewport.width);
+        } else await semantic('seal');
+      }
       else{if(n===1)await page.screenshot({path:path.join(out,viewport.width+'-review-tap.png')});await semantic('element-'+(seat%4));}
     }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().reviewMode==='done'&&window.ascendantDial.snapshot().canLeaveReview,{},{timeout:20000});

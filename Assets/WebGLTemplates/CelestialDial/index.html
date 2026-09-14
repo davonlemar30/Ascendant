@@ -96,7 +96,6 @@
       pois.forEach(id=>{byId('poi-'+id).disabled=!state.canWalk;});byId('room').hidden=pois.length===0;
       byId('enter-dial').disabled=!state.canEnterDial;byId('enter-shelf').disabled=!state.canEnterShelf;byId('close-book').disabled=!state.canCloseBook;byId('walk-speed').disabled=!(state.screen==='hub'&&!state.busy);
       byId('walk-speed').setAttribute('aria-label','Walk speed: '+(state.walkSpeed||'normal')+', test only');
-      byId('enter-seals').textContent=state.dueCount>0?'Check the Seals, '+state.dueCount+' due':'Check the Seals';
       const tap=state.screen==='review'&&state.reviewMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
       const glyph=!!state.glyphMode&&!state.busy;for(let i=0;i<4;i++){const gb=byId('glyph-name-'+i);gb.disabled=!glyph;gb.textContent=state.glyphOptions&&state.glyphOptions[i]?state.glyphOptions[i]:'';}byId('glyph-names').hidden=!glyph;
       byId('glyph-names').setAttribute('aria-label',glyph?'Which sign carries the symbol '+state.glyphChar+'?':'Which sign carries this symbol?');

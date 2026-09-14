@@ -7,9 +7,9 @@ namespace Ascendant.CelestialDial
     public enum ItemState { Introduced, Practicing }
 
     // One atomic item per sign-element pair (Curriculum canon, Stage 0: all twelve enter the deck as Introduced).
-    [Serializable]
     public enum ItemKind { Element, Glyph } // v0.3 adds twelve glyph items (sign ↔ glyph), Curriculum canon Stage 1.
 
+    [Serializable] // JsonUtility skips a nested class without this: the deck had not been saving since v0.3 (owner playtest, Sept 14).
     public sealed class ReviewItem
     {
         public int seat;
