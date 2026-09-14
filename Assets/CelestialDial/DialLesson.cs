@@ -70,7 +70,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
             return result;
         }
-        public const string GlyphIntro = "Every sign carries a mark of its own. Twelve marks, older than the names.\nTell me which sign each one belongs to."; // placeholder (owner writes)
+        public const string GlyphIntro = "Every sign carries a symbol of its own. Twelve symbols, older than the names.\nTell me which sign each one belongs to."; // placeholder (owner writes)
         public string GlyphNameResult { get; private set; } = ""; // the last Part A result line, kept while the wheel takes over
         public bool AnswerGlyphName(int seat)
         {
@@ -84,9 +84,9 @@ namespace Ascendant.CelestialDial
                 NextGlyphName(); return true;
             }
             GlyphMisses++;
-            if (GlyphMisses == 1) { Message = GlyphNameResult = "Not that one. This mark belongs to a " + Element(target) + " sign."; Dial.Log("hint_requested"); return false; }
+            if (GlyphMisses == 1) { Message = GlyphNameResult = "Not that one. This symbol belongs to a " + Element(target) + " sign."; Dial.Log("hint_requested"); return false; }
             // Second miss: Level 2 reveals the name; no evidence; move on.
-            GlyphNamed[target] = true; Message = GlyphNameResult = "This is the mark of " + SignName(target) + ". Remember it.";
+            GlyphNamed[target] = true; Message = GlyphNameResult = "This is the symbol of " + SignName(target) + ". Remember it.";
             GlyphNamedEvent?.Invoke(target, false, false); Dial.Log("hint_escalated"); Dial.Log("glyph_named", false, false, "DirectSeat");
             NextGlyphName(); return false;
         }
@@ -100,19 +100,19 @@ namespace Ascendant.CelestialDial
             Phase = LessonPhase.GlyphWheel; GlyphIndex = 0; RecoveryEncounters = 0; exposedProblems.Clear(); recoveryStarts.Clear();
             for (int i = 0; i < 12; i++) if (GlyphPlaced[i]) GlyphIndex = i + 1;
             if (GlyphIndex >= 12) { FinishGlyphs(); return; }
-            Message = "Now the wheel hides its names. Only the marks remain.\nI will name a sign; you turn until its mark sits under the bracket, then press Seal."; // placeholder (owner writes)
+            Message = "Now the wheel hides its names. Only the symbols remain.\nI will name a sign; you turn until its symbol sits under the bracket, then press Seal."; // placeholder (owner writes)
             BeginGlyphProblem(GlyphIndex);
         }
         void BeginGlyphProblem(int seat)
         {
             Dial.Begin(0, 0, seat); CountBeatPending = false;
-            Message = "Find the mark of " + SignName(seat) + ".\nTurn until it sits under the bracket, then press Seal.";
+            Message = "Find the symbol of " + SignName(seat) + ".\nTurn until it sits under the bracket, then press Seal.";
         }
         void FinishGlyphs()
         {
             Dial.Home();
-            if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve marks, twelve names, in their order. You read the wheel now.\nKeeper Key 2 is yours."; Dial.Log("key2_earned", true, true); } // placeholder (owner writes)
-            else { Phase = LessonPhase.Paused; Message = "We reached the end of the marks, but I did most of the finding.\nRest, and we will try the marks again another day."; }
+            if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve symbols, twelve names, in their order. You read the wheel now.\nKeeper Key 2 is yours."; Dial.Log("key2_earned", true, true); } // placeholder (owner writes)
+            else { Phase = LessonPhase.Paused; Message = "We reached the end of the symbols, but I did most of the finding.\nRest, and we will try the symbols again when you return."; }
         }
         // v0.2 (Q05): Unit 1.1 continuation on the same Dial, and compressed review problems.
         public int FamiliesComplete => Enumerable.Range(0, 4).Count(f => Kin[f]);
@@ -224,7 +224,7 @@ namespace Ascendant.CelestialDial
                 }
                 else if (Dial.Attempts == 1) Message = "Not that one. Aries is here at the start; count forward from it.";
                 else if (Dial.Attempts == 2) { NameRevealed[target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(target) + ", then press Seal."; }
-                else Message = "Watch me find it.\nThen the next mark.";
+                else Message = "Watch me find it.\nThen the next symbol.";
                 return result;
             }
             if (Phase == LessonPhase.Review)
@@ -354,14 +354,14 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 12; i++) { GlyphNamed[i] = stage >= 2 || (stage == 1 && i < index) || (stage == 0 && false); GlyphPlaced[i] = stage >= 2; }
             if (stage == 0) for (int i = 0; i < 12; i++) GlyphNamed[i] = i < index;
             Key2Earned = key2; GlyphEvidence = key2;
-            if (key2) { Phase = LessonPhase.Key2; Message = "Twelve marks, twelve names. You read the wheel."; }
+            if (key2) { Phase = LessonPhase.Key2; Message = "Twelve symbols, twelve names. You read the wheel."; }
         }
         public void Say(string text) { Message = text; } // Slice beats speak through the same panel.
         public string SeatLabel(int seat)
         {
             var sign = Zodiac.Seats[seat];
-            if (NamesHidden && !NameRevealed[seat]) return "Mark " + sign.Glyph + ", position " + (seat + 1) + " of 12, " + (Dial.Selected == seat ? "selected" : "not selected");
-            return sign.Name + (GlyphsShown ? ", mark " + sign.Glyph : "") + ", position " + (seat + 1) + " of 12, " +
+            if (NamesHidden && !NameRevealed[seat]) return "Symbol " + sign.Glyph + ", position " + (seat + 1) + " of 12, " + (Dial.Selected == seat ? "selected" : "not selected");
+            return sign.Name + (GlyphsShown ? ", symbol " + sign.Glyph : "") + ", position " + (seat + 1) + " of 12, " +
                 (Dial.Selected == seat ? "selected" : "not selected") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }

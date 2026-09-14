@@ -64,8 +64,8 @@ namespace Ascendant.CelestialDial
             public string[] glyphOptions;
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
-            public int atriumStage, dueCount, reviewIndex, reviewTotal, day;
-            public bool canEnterWing, canEnterSeals, canAdvanceDay, canLeaveWing, canLeaveReview, v02Complete, resumed;
+            public int atriumStage, dueCount, reviewIndex, reviewTotal;
+            public bool canEnterWing, canEnterSeals, canLeaveWing, canLeaveReview, v02Complete, resumed;
             public string reviewMode = "", reviewSign = "", reviewSummary = "", hubNote = "";
             public string sunSign = "";
             public int locksFilled;
@@ -287,7 +287,7 @@ namespace Ascendant.CelestialDial
         {
             busy=true; int beginning=Lesson.Dial.Start; int steps=Lesson.Phase==LessonPhase.GlyphWheel ? Zodiac.Wrap(Lesson.Dial.Target-beginning) : 4;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing();
-            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch. From "+Zodiac.Seats[beginning].Name+", I count forward to the mark of "+Zodiac.Seats[Lesson.Dial.Target].Name+"." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
+            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch. From "+Zodiac.Seats[beginning].Name+", I count forward to the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+"." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=steps;n++)
             {
@@ -325,9 +325,9 @@ namespace Ascendant.CelestialDial
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
                 Lesson.Phase==LessonPhase.AllLit ? "Four families complete. The whole wheel is lit." :
-                Lesson.Phase==LessonPhase.GlyphNames ? "The marks · " + Lesson.GlyphIndex + " of 12 named" :
-                Lesson.Phase==LessonPhase.GlyphWheel ? "Help level "+Lesson.Dial.HintLevel+" · The marks, in order · " + Lesson.GlyphIndex + " of 12" :
-                Lesson.Phase==LessonPhase.Key2 ? "Twelve marks read. Keeper Key 2 earned." :
+                Lesson.Phase==LessonPhase.GlyphNames ? "The symbols · " + Lesson.GlyphIndex + " of 12 named" :
+                Lesson.Phase==LessonPhase.GlyphWheel ? "Help level "+Lesson.Dial.HintLevel+" · The symbols, in order · " + Lesson.GlyphIndex + " of 12" :
+                Lesson.Phase==LessonPhase.Key2 ? "Twelve symbols read. Keeper Key 2 earned." :
                 Lesson.Phase==LessonPhase.Review ? "Checking the seals" :
                 Lesson.IsProblem ? "Help level "+Lesson.Dial.HintLevel+" · "+(Lesson.Phase==LessonPhase.Guided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example";
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
@@ -371,7 +371,7 @@ namespace Ascendant.CelestialDial
         {
             var labels=new string[12];for(int i=0;i<12;i++) labels[i]=Lesson.SeatLabel(i);
             var glyphs=new string[12];for(int i=0;i<12;i++) glyphs[i]=Zodiac.Seats[i].Glyph;
-            var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "mark "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=start.text,phase=phase.text,count=count.text,seats=labels,
+            var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete,
                 glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : ""};

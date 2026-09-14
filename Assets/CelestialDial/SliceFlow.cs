@@ -36,8 +36,6 @@ namespace Ascendant.CelestialDial
         public int GlyphIndex { get; private set; }
         public bool GlyphsStarted { get; private set; }
         public bool V03Complete => Keys >= 2 && AtriumStage >= 4;
-        public int DayOffset { get; private set; }          // test-only "advance one day"
-        public int FirstDay { get; private set; } = -1;
         public int ReviewsChecked { get; private set; }
         // v0.4: the marker that walks the Atrium and the Wing room (Q06 phase 2).
         public readonly Walker Walk = new Walker();
@@ -47,17 +45,15 @@ namespace Ascendant.CelestialDial
         public string ReviewSummary { get; private set; } = "";
         public event Action<string> Logged;
         readonly Func<int> random;
-        readonly Func<int> realDay;
-        public SliceFlow() : this(null, null) { }
-        public SliceFlow(Func<int> randomSeat) : this(randomSeat, null) { }
-        public SliceFlow(Func<int> randomSeat, Func<int> realDayNumber)
+        public SliceFlow() : this(null) { }
+        public SliceFlow(Func<int> randomSeat)
         {
             random = randomSeat ?? (() => new Random().Next(12));
-            realDay = realDayNumber ?? (() => (int)(DateTime.UtcNow - new DateTime(2026, 1, 1)).TotalDays);
             Deck.Logged += n => Logged?.Invoke(n);
             Walk.Logged += n => Logged?.Invoke(n);
         }
-        public int Day { get { if (FirstDay < 0) FirstDay = realDay(); return realDay() - FirstDay + DayOffset; } }
+        // No in-game time (owner, Sept 13): the deck counts sittings, one per completed Check the Seals batch.
+        public int Sitting => ReviewsChecked;
         public string DisplayName => string.IsNullOrEmpty(PlayerName) ? "Keeper" : PlayerName;
         public void SetName(string name) { PlayerName = (name ?? "").Trim(); }
         public void ChooseBirth(string choice)
@@ -91,7 +87,7 @@ namespace Ascendant.CelestialDial
                 Screen == SliceScreen.Atrium ? SliceScreen.Wing :
                 Screen == SliceScreen.Wing ? SliceScreen.AtriumReturn :
                 Screen == SliceScreen.AtriumReturn ? SliceScreen.Chamber : SliceScreen.Hub;
-            if (Screen == SliceScreen.Hub) { Note = ""; if (AtriumStage < 2) { AtriumStage = 2; Deck.IntroduceAll(Day); } Walk.Enter(Room.Atrium, "entry"); }
+            if (Screen == SliceScreen.Hub) { Note = ""; if (AtriumStage < 2) { AtriumStage = 2; Deck.IntroduceAll(Sitting); } Walk.Enter(Room.Atrium, "entry"); }
             Logged?.Invoke("screen_entered:" + Screen);
             return true;
         }
@@ -151,18 +147,18 @@ namespace Ascendant.CelestialDial
         }
         public void MarkWheelComplete() { if (!WheelComplete) { WheelComplete = true; Logged?.Invoke("wheel_completed"); } }
         public void MarkKeyEarned() { if (Keys < 1) { Keys = 1; } }
-        public void StartGlyphs() { if (!GlyphsStarted) { GlyphsStarted = true; Deck.IntroduceAll(Day, ItemKind.Glyph); Logged?.Invoke("glyph_unit_started"); } }
+        public void StartGlyphs() { if (!GlyphsStarted) { GlyphsStarted = true; Deck.IntroduceAll(Sitting, ItemKind.Glyph); Logged?.Invoke("glyph_unit_started"); } }
         public void SetGlyphProgress(int stage, int index) { GlyphStage = stage; GlyphIndex = index; }
         public void MarkKey2() { if (Keys < 2) { Keys = 2; GlyphStage = 2; } } // the lesson logs key2_earned once
-        public void RecordGlyphAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Day, ItemKind.Glyph); }
-        public void RecordLessonAnswer(int seat, bool eligible) { if (AtriumStage >= 2 || Deck.Items[seat].entered) Deck.RecordLesson(seat, eligible, Day); else Deck.RecordLesson(seat, eligible, Day); }
-        public int DueCount => Deck.Due(Day).Count;
+        public void RecordGlyphAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Sitting, ItemKind.Glyph); }
+        public void RecordLessonAnswer(int seat, bool eligible) { if (AtriumStage >= 2 || Deck.Items[seat].entered) Deck.RecordLesson(seat, eligible, Sitting); else Deck.RecordLesson(seat, eligible, Sitting); }
+        public int DueCount => Deck.Due(Sitting).Count;
         public bool CanCheckSeals => AtHub && DueCount > 0;
         public bool EnterSeals()
         {
             if (!AtHub) return false;
-            var due = Deck.Due(Day);
-            if (due.Count == 0) { Note = "Nothing is due today. Come back tomorrow."; Logged?.Invoke("seals_nothing_due"); return false; }
+            var due = Deck.Due(Sitting);
+            if (due.Count == 0) { Note = "The seals hold for now. Come back after the Wing."; Logged?.Invoke("seals_nothing_due"); return false; } // placeholder (owner writes)
             ReviewQueue.Clear(); ReviewIndex = 0; ReviewSummary = ""; Note = "";
             // Form is a test variable (Q05 decision 2): alternate compressed Dial and direct tap.
             for (int i = 0; i < due.Count && i < ReviewDeck.BatchSize; i++)
@@ -201,10 +197,10 @@ namespace Ascendant.CelestialDial
             var task = CurrentReview; if (task == null || task.done) return;
             task.done = true; task.correct = correct;
             var kind = task.Mode == ReviewMode.Glyph ? ItemKind.Glyph : ItemKind.Element;
-            Deck.RecordReview(task.seat, correct, eligible, Day, kind);
+            Deck.RecordReview(task.seat, correct, eligible, Sitting, kind);
             string name = Zodiac.Seats[task.seat].Name, element = Zodiac.Seats[task.seat].Element;
             Note = kind == ItemKind.Glyph
-                ? (correct ? "Yes. That is the mark of " + name + "." : "That is the mark of " + name + ". We will come back to it.")
+                ? (correct ? "Yes. That is the symbol of " + name + "." : "That is the symbol of " + name + ". We will come back to it.")
                 : (correct ? "Yes. " + name + " is " + element + "." : name + " is " + element + ". We will come back to it.");
             ReviewIndex++;
             if (ReviewIndex >= ReviewQueue.Count)
@@ -220,13 +216,12 @@ namespace Ascendant.CelestialDial
             if (Screen != SliceScreen.Review || !ReviewDone) return false;
             Screen = SliceScreen.Hub; Note = ""; Walk.Enter(Room.Atrium, "desk"); Logged?.Invoke("screen_entered:hub"); return true;
         }
-        public void AdvanceDay() { DayOffset++; Logged?.Invoke("test_day_advanced"); }
         public bool V02Complete => WheelComplete && AtriumStage >= 3;
         // ---- save / restore ----
         public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned)
         {
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, dayOffset = DayOffset, firstDay = FirstDay, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
         public bool Restore(SaveData save)
@@ -234,7 +229,7 @@ namespace Ascendant.CelestialDial
             if (save == null || save.atriumStage < 2 || save.sunSign < 0) return false;
             PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = save.keyEarned ? 1 : 0; Ended = save.keyEarned;
-            WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; DayOffset = save.dayOffset; FirstDay = save.firstDay; ReviewsChecked = save.reviewsChecked;
+            WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; ReviewsChecked = save.reviewsChecked;
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
             if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < 2) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
             Screen = SliceScreen.Hub; Walk.Enter(Room.Atrium, "entry"); Logged?.Invoke("session_resumed"); return true;
