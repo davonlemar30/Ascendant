@@ -36,7 +36,7 @@ namespace Ascendant.CelestialDial
         readonly Text[] seatGlyphs = new Text[12];
         public Font GlyphFont { get; private set; } // Placeholder glyph rendering: Noto Sans Symbols (OFL), the Unicode zodiac symbols.
         Text message, destination, start, count, phase, sealText, motionText;
-        Button seal, back, forward, countButton, next, optional;
+        Button seal, back, forward, countButton, next, optional, askButton;
         RectTransform root, ring, bracket;
         Canvas canvas;
         DialGeometry geometry;
@@ -56,7 +56,8 @@ namespace Ascendant.CelestialDial
         {
             public string message, destination, start, phase, count;
             public string[] seats;
-            public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy, review, wheelComplete;
+            public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy, review, wheelComplete, canAsk;
+            public int hintLevel; // for test evidence; never shown to the player
             public int familiesComplete, keys;
             public string[] glyphs;
             public bool namesHidden, glyphWheel, key2, v03Complete;
@@ -127,7 +128,8 @@ namespace Ascendant.CelestialDial
             seal = MakeButton(root,"SEAL",0,654,146,56,Commit); // Amended canon (Sept 11): "Keeper's Seal" renamed to "Seal".
             seal.GetComponent<Image>().color=Crimson; sealText=seal.GetComponentInChildren<Text>();
             forward = MakeButton(root,"Next",122,654,64,56,()=>Step(1,ClickMethod(DialInput.ForwardStep)));
-            countButton=MakeButton(root,"Count",0,714,80,48,()=> { Lesson.Dial.Count(); Refresh(); });
+            countButton=MakeButton(root,"Count",-60,714,100,48,()=> { Lesson.Dial.Count(); Refresh(); });
+            askButton=MakeButton(root,"Ask Caspar for help",78,714,164,48,AskCaspar); askButton.GetComponentInChildren<Text>().fontSize=13; askButton.gameObject.SetActive(false);
             next=MakeButton(root,"Continue",0,654,190,56,ContinueLesson);
             optional=MakeButton(root,"Try one more (optional)",0,714,244,48,()=> { Lesson.BeginOptional(); AlignStart(); });
             var motion = MakeButton(root,"Reduced motion: off",0,768,216,48,ToggleMotion);
@@ -227,6 +229,7 @@ namespace Ascendant.CelestialDial
             if(inertia!=0) Lesson.Dial.Step(inertia,DialInput.Drag);
             targetTurns+=dragDetent+inertia; Lesson.Dial.Frame(); Refresh();
         }
+        void AskCaspar() { if(busy || dragging || !Lesson.AskCaspar()) return; Refresh(); Publish(); }
         public void Commit()
         {
             if(busy || dragging) return;
@@ -236,7 +239,7 @@ namespace Ascendant.CelestialDial
             Refresh();
             if(Lesson.Phase==LessonPhase.Review) { AlignStart(); return; } // The lesson settles review outcomes itself; the slice paces the next item.
             if(result.correctness) StartCoroutine(Correct(result));
-            else if(Lesson.Dial.Attempts>=3) StartCoroutine(Demonstrate());
+            else if(Lesson.Dial.HintLevel>=3) StartCoroutine(Demonstrate());
         }
         IEnumerator Correct(DialEvent result)
         {
@@ -326,17 +329,18 @@ namespace Ascendant.CelestialDial
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
                 Lesson.Phase==LessonPhase.AllLit ? "Four families complete. The whole wheel is lit." :
                 Lesson.Phase==LessonPhase.GlyphNames ? "The symbols · " + Lesson.GlyphIndex + " of 12 named" :
-                Lesson.Phase==LessonPhase.GlyphWheel ? "Help level "+Lesson.Dial.HintLevel+" · The symbols, in order · " + Lesson.GlyphIndex + " of 12" :
+                Lesson.Phase==LessonPhase.GlyphWheel ? "The symbols, in order · " + Lesson.GlyphIndex + " of 12" :
                 Lesson.Phase==LessonPhase.Key2 ? "Twelve symbols read. Keeper Key 2 earned." :
                 Lesson.Phase==LessonPhase.Review ? "Checking the seals" :
-                Lesson.IsProblem ? "Help level "+Lesson.Dial.HintLevel+" · "+(Lesson.Phase==LessonPhase.Guided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example";
+                Lesson.IsProblem ? (Lesson.Phase==LessonPhase.Guided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example"; // no level numbers on screen (owner, Sept 13)
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;
             countButton.gameObject.SetActive(Lesson.IsProblem); countButton.interactable=active;
             next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer) && !busy);
             optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned && Lesson.FamiliesComplete<=2 && (Slice==null || !SliceHidesOptional));
-            countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review && Lesson.Phase!=LessonPhase.GlyphWheel); // no count in the marks: the target is a symbol, not a distance (owner playtest v0.3)
+            countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review && Lesson.Phase!=LessonPhase.GlyphWheel);
+            askButton.gameObject.SetActive(Lesson.CanAsk && !busy); askButton.interactable=active; // no count in the marks: the target is a symbol, not a distance (owner playtest v0.3)
             motionText.text="Reduced motion: "+(Lesson.Dial.ReducedMotion ? "on" : "off");
             RefreshSeats(); LayoutRing(); Publish();
         }
@@ -374,7 +378,7 @@ namespace Ascendant.CelestialDial
             var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete,
-                glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : ""};
+                glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : ""};
             Slice?.Fill(state); return state;
         }
         public void Publish()
@@ -401,6 +405,7 @@ namespace Ascendant.CelestialDial
             else if(command=="optional") { if(!busy) { Lesson.BeginOptional(); AlignStart(); } }
             else if(command=="motion")ToggleMotion();
             else if(command=="motion-on") { Lesson.Dial.ReducedMotion=true; Refresh(); }
+            else if(command=="ask-caspar") AskCaspar();
             else if(command.StartsWith("seat:") && int.TryParse(command.Substring(5),out int seat) && seat>=0 && seat<12)SelectSeat(seat,DialInput.Accessible);
             else ExtraActions?.Invoke(command);
         }
