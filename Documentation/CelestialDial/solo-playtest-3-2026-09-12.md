@@ -36,3 +36,10 @@ Owner's paper notes and one screenshot (iPhone, Chrome, at work), converted by t
 - **Design requests (owner).** Clearer objective wording on the Elemental Pattern ("Find the next elemental sign after [sign] on the wheel" instead of "Start at Pisces. Count each sign after it: one, two, three, four"); "Find the mark" may read better as "Find the symbol"; the marks unit should either transform the wheel or unlock a separate instrument in the same room (owner prefers the separate instrument); a visible "ask Caspar for a hint" option for beginners; difficulty that rises after the first successful run.
 - **Not reached.** Key 2, glyph review items, reload with two Keys.
 - **Decision.** REVISE proposed (the owner said the same); awaiting confirmation on task 86bbznawx.
+
+## Marks, test 2 after the fix (September 13, production 8b842f3)
+
+- **Confirmed.** Part B shows the marks on the seats.
+- **Defect 3.** During "Find the mark of [sign]" the center readout still named the sign under the bracket as the wheel turned, which gave the answer away; the "Your sign / Start" line was unnecessary in that challenge. Fixed: in Part B the center shows the mark under the bracket, no start line, no count; the screen-reader readout says "Selected: mark [glyph]"; the browser suite asserts no sign name in any Part B readout.
+- **Owner question.** The purpose of the day system ("Next day (test)", "N due"): it is the locked Q05 review ladder (items come due 1, 3, 7, 14, 30 days after they are learned); "Next day" is a test-only shortcut so the ladder can be exercised in one sitting. Decision on how it is presented pending with the owner.
+- **Decision.** Stays REVISE.
