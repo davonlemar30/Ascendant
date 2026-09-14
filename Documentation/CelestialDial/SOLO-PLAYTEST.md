@@ -92,27 +92,26 @@ This checks the screens before and after the wheel, and the two reward moments.
 This checks the loop: coming back to the Library, checking the seals, and finishing the wheel.
 
 - [ ] After "Let us continue, shall we?", press Continue. You should see the Grand Atrium again, changed: one lamp lit, the desk uncovered, the Zodiac Wing door open with light in it, the other doors sealed with locks. Caspar points at the dark seats and mentions the seals. Write down if the room felt changed: ___
-- [ ] Look at the bottom of the Atrium. You should see two big buttons, "The Zodiac Wing" and "Check the Seals," and three small test buttons: "Next day (test)," "Walk: normal (test)," and "Start over (test)."
-- [ ] Press "Check the Seals" right away. You should see the Keeper walk to the desk, then a note that nothing is due today. Nothing else happens.
-- [ ] Press "Next day (test)" once. You should see the Seals button say "12 due." Press it. You should see the wheel with your sign already framed and Caspar asking for the next sign in its family. Move and press Seal. You should see "Yes." or the right answer, then the next item.
+- [ ] Look at the bottom of the Atrium. You should see two big buttons, "The Zodiac Wing" and "Check the Seals," and two small test buttons: "Walk: normal (test)" and "Start over (test)."
+- [ ] Press "Check the Seals." You should see the Keeper walk to the desk, then the wheel with your sign already framed and Caspar asking for the next sign in its family. Move and press Seal. You should see "Yes." or the right answer, then the next item.
 - [ ] Keep going. You should see the items alternate: some on the wheel, some as a question with four family buttons (Fire, Earth, Air, Water). Get one wrong on purpose. You should see one "Try once more," and if you miss again, the answer and a move on. After six items, you should see "N of 6 seals held." and a button back to the Atrium.
 - [ ] Press "The Zodiac Wing." You should see the Keeper walk to the open door, the room go dark for a moment, then the Wing as a room. Tap the Dial. You should see the Keeper walk to it, then the wheel with six seats lit and Caspar starting the third family from its first sign, with almost no help. Finish it. You should see him hand you the last family with even less. Finish that.
 - [ ] When the twelfth seat lights, you should see four family lines, the floor marks fully bright, Caspar say the whole wheel is lit, and no new Key. Press "Back to the Atrium." You should see a second lamp lit and a line that this is the end of prototype v0.2.
 - [ ] Close the game and open it again. You should see the Atrium, not the dark opening, with everything as you left it. Press "Start over (test)." You should see the dark opening again.
-- [ ] Turn "Reduced motion" on and check the seals again after advancing a day. You should see everything still work with no sliding.
+- [ ] Turn "Reduced motion" on and check the seals again. You should see everything still work with no sliding.
 
-## The marks (v0.3)
+## The symbols (v0.3)
 
-This checks the glyph unit: naming the twelve marks, finding them on the wheel, and earning Key 2.
+This checks the symbol unit: naming the twelve symbols, finding them on the wheel, and earning Key 2.
 
-- [ ] With all twelve seats lit, press "The Zodiac Wing" and then tap the Dial in the room. You should see a big mark on a card and four sign names below it, with Caspar's line about the twelve marks.
-- [ ] Tap the right name. You should see "Yes. [sign]." and the next mark. Tap a wrong name on purpose. You should see one hint that only names the element, and a second chance. Miss again. You should see the name revealed and the next mark.
-- [ ] After twelve marks, you should see the wheel with the names hidden and only the marks showing. Caspar names a sign. Turn until that sign's mark is under the bracket and press Seal. You should see "Yes. [sign], in its place." and the next name.
+- [ ] With all twelve seats lit, press "The Zodiac Wing" and then tap the Dial in the room. You should see a big symbol on a card and four sign names below it, with Caspar's line about the twelve symbols.
+- [ ] Tap the right name. You should see "Yes. [sign]." and the next symbol. Tap a wrong name on purpose. You should see one hint that only names the element, and a second chance. Miss again. You should see the name revealed and the next symbol.
+- [ ] After twelve symbols, you should see the wheel with the names hidden and only the symbols showing. The middle of the wheel shows the symbol under the bracket, never a name. Caspar names a sign. Turn until that sign's symbol is under the bracket and press Seal. You should see "Yes. [sign], in its place." and the next name.
 - [ ] Get one wrong on purpose. You should see "Aries is here at the start; count forward from it." Miss again. You should see that sign's name appear on its seat. Miss a third time. You should see Caspar count forward to it himself, then the next mark.
-- [ ] After all twelve, you should see "Keeper Key 2 is yours," the names back on the wheel beside their marks, and "Keeper Keys: 2" at the top. Press "Back to the Atrium." You should see the end card say v0.4.
-- [ ] Advance a day and check the seals. You should see some items show a mark with four names instead of a family question. They work the same way: one hint, then the answer.
+- [ ] After all twelve, you should see "Keeper Key 2 is yours," the names back on the wheel beside their symbols, and "Keeper Keys: 2" at the top. Press "Back to the Atrium." You should see the end card say v0.4.
+- [ ] Check the seals again. You should see some items show a symbol with four names instead of a family question. They work the same way: one hint, then the answer.
 - [ ] Close and reopen the game. You should see the Atrium with two Keys. Press "Start over (test)" to reset.
-- [ ] Turn "Reduced motion" on and do the marks again after starting over. You should see everything still work.
+- [ ] Turn "Reduced motion" on and do the symbols again after starting over. You should see everything still work.
 
 ## Walking (v0.4)
 
@@ -123,7 +122,7 @@ This checks tap-to-move: the Keeper walks the Atrium and the Wing, and the butto
 - [ ] In the Wing room, tap the big ring in the middle. You should see the Keeper walk to it, then the wheel open as before.
 - [ ] Press "Back to the Atrium" on the wheel. You should see the room again, the Keeper walk to the doorway, a dark moment, then the Atrium with the Keeper by the Wing door.
 - [ ] Tap a sealed door. You should see a note that it is sealed. The Keeper does not move.
-- [ ] Tap the desk. You should see the Keeper walk to it, then Check the Seals open, or the note that nothing is due. Tap Caspar. You should see the Keeper walk to him and a short note.
+- [ ] Tap the desk. You should see the Keeper walk to it, then Check the Seals open, or a note that the seals hold for now. Tap Caspar. You should see the Keeper walk to him and a short note.
 - [ ] Press the "The Zodiac Wing" button instead of tapping the door. You should see the same walk and the same dark moment. The buttons and the taps do the same thing.
 - [ ] Press "Walk: normal (test)" to change the walking speed to fast, then slow. Walk somewhere each time. Write down which speed felt right: ___
 - [ ] Turn "Reduced motion" on. Tap a door. You should see the Keeper jump straight there and the rooms cut with no fade.
@@ -151,7 +150,7 @@ Answer in your own words. Short is fine.
 8. Did the ending in the Chamber land? Too slow, too fast, or about right? ___
 9. When you came back to the Atrium, did you want to go back into the Wing, or check the seals, or neither? ___
 10. Did checking the seals (the desk in the Atrium) feel like care for the Library, or like a quiz? Skip if you did not check the seals. ___
-11. Did the marks (the twelve symbols, after all twelve seats are lit) feel learnable, or like memorizing squiggles? Which part helped more, naming them or finding them on the wheel? Skip if you did not get to the marks. ___
+11. Did the symbols (after all twelve seats are lit) feel learnable, or like memorizing squiggles? Which part helped more, naming them or finding them on the wheel? Skip if you did not get to the symbols. ___
 12. Did walking make the Library feel like a place you were in, or like waiting? ___
 13. Did the walk slow you down on the way back to the wheel? Too slow, too fast, or about right? ___
 
@@ -164,7 +163,7 @@ Answer in your own words. Short is fine.
 - First-drag resistance is off by default; `DialView.firstDragResistance` re-enables it for comparison. Inertia is `DialView.inertiaEnabled`.
 - Known and not a defect: automated pointer input in the very first frame after a phase transition is ignored; not reachable by a human.
 - Walking: `Walker.NormalSpeed` (170 px/s on the 360-wide layout; slow 110, fast 260), the floor band `SliceView.BandY` (436), and the fade `SliceView.FadeSeconds` (0.35 s) are the test variables. The console log carries `walk_started_*`, `walk_arrived_*`, and `room_entered_*` with `response_time` for timing the loop.
-- Progress is saved on this device only (browser storage). "Next day (test)" shifts the review clock; real reviews come due on the 1, 3, 7, 14, 30 day ladder.
+- Progress is saved on this device only (browser storage). There is no in-game clock: the review ladder (1, 3, 7, 14, 30) counts sittings, one per completed Check the Seals batch.
 - Scripted checks (mechanical, Play Mode, browser) are described in `VALIDATION.md`. They are not this playtest.
 
 ## Solo decision (provisional)
