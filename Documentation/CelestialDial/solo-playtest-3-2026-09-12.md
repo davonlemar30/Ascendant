@@ -43,3 +43,15 @@ Owner's paper notes and one screenshot (iPhone, Chrome, at work), converted by t
 - **Defect 3.** During "Find the mark of [sign]" the center readout still named the sign under the bracket as the wheel turned, which gave the answer away; the "Your sign / Start" line was unnecessary in that challenge. Fixed: in Part B the center shows the mark under the bracket, no start line, no count; the screen-reader readout says "Selected: mark [glyph]"; the browser suite asserts no sign name in any Part B readout.
 - **Owner question.** The purpose of the day system ("Next day (test)", "N due"): it is the locked Q05 review ladder (items come due 1, 3, 7, 14, 30 days after they are learned); "Next day" is a test-only shortcut so the ladder can be exercised in one sitting. Decision on how it is presented pending with the owner.
 - **Decision.** Stays REVISE.
+
+## Symbols replay, test 2 (September 14, production c17b094): the owner's paper notes
+
+- **Defect 4, stuck in Check the Seals.** On the first return, Check the Seals opened the compressed Dial item with the Wing's "Back to the Atrium" button drawn on top of Seal (screenshot). The button did nothing there and Seal could not be pressed; only a refresh got out. Cause: the button was switched on at the Key reveal and only managed while on the Wing screen. Fixed: managed wherever the Dial shows; the suite now taps the review's Seal on the canvas.
+- **Defect 5, "The seals hold for now" after a refresh.** Cause: since v0.3 the `[Serializable]` marker sat on the `ItemKind` enum instead of `ReviewItem`, so the JSON save skipped the deck and every reload restored an empty one. Fixed; a mechanical check round-trips the deck through JSON; the fixture and the suite reload mid-review.
+- **Part B started on or beside the answer** ("the wheel should randomize the starting point"). Fixed: each problem starts three to nine seats away; the first hint reads "Find Aries first, then count forward to it."; the worked example turns to the symbol without naming a start seat.
+- **Wing room caption** showed the Dial's prompt ("Find the symbol of Aries...") while still in the room. Replaced with a room line.
+- **"A weird number 10 next to it."** The Seals button no longer shows a count; the review screen shows n of m.
+- **Copy (owner writes):** "Six seats?" (Hub first line); "Now the Fire family. You have done this twice" (continuation intro); "The names you know. Their symbols wait on the shelf." Better intros to each challenge. All flagged on the worksheet.
+- **Design request:** the Dial should unlock a book the player can study before the symbol challenge (a study guide or journal that unlocks new concepts), since the game should not assume the player already knows the symbols. Recorded for a brief; it matches the canon's Introduced-before-retrieval rule.
+- **Known, planned:** no way back to the Key Room (the Chamber) from the Atrium; Build D makes the Chamber walkable.
+- **Decision:** stays REVISE.
