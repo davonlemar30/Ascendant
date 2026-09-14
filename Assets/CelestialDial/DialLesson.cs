@@ -45,6 +45,37 @@ namespace Ascendant.CelestialDial
         public int GlyphMisses { get; private set; }         // Part A misses on the current glyph
         public bool GlyphEvidence { get; private set; }      // any Level 0/1 answer in Part B (the central skill)
         public bool Key2Earned { get; private set; }
+        // v0.3 revision, build 3: the difficulty ramp. After Key 2 the book and the wheel can be replayed; each clean replay
+        // (at least one unassisted placement) counts, and from the first clean run on the symbols come shuffled, with harder
+        // wrong names and no Aries anchor. Four choices always (owner, Sept 13).
+        public bool Practice { get; private set; }
+        public int CleanRuns { get; private set; }
+        public bool Hard => CleanRuns > 0;
+        readonly int[] order = Enumerable.Range(0, 12).ToArray();
+        public int SeatAt(int index) => order[index];
+        public event Action<bool> PracticeFinished; // clean
+        public void SetCleanRuns(int runs) { CleanRuns = Math.Max(0, runs); }
+        static readonly int[] LookAlike = { 1, 0, 11, 4, 3, 7, 0, 5, 9, 3, 4, 2 }; // a symbol that reads like this seat's, by shape
+        public static int[] OptionsFor(int seat, bool hard, int salt)
+        {
+            int[] o = hard
+                ? new[] { seat, LookAlike[seat], Zodiac.Wrap(seat + 4), Zodiac.Wrap(seat + 8) }   // look-alike plus the same element
+                : new[] { seat, Zodiac.Wrap(seat + 3), Zodiac.Wrap(seat + 6), Zodiac.Wrap(seat + 9) };
+            int r = (seat + salt) % 4; var result = new int[4];
+            for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
+            return result;
+        }
+        public bool CanPractice => Key2Earned && (Phase == LessonPhase.Key2 || Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused);
+        public bool BeginPractice()
+        {
+            if (!CanPractice) return false;
+            Practice = true; GlyphEvidence = false; GlyphMisses = 0; GlyphIndex = 0; Dial.Home();
+            for (int i = 0; i < 12; i++) { GlyphNamed[i] = false; GlyphPlaced[i] = false; NameRevealed[i] = false; order[i] = Hard ? Zodiac.Wrap(i * 5 + 1 + CleanRuns) : i; } // stride 5 visits every seat
+            Phase = LessonPhase.GlyphNames;
+            Message = Hard ? "Again, and harder this time. The order is mine now, and the wrong names will look right.\nTell me which sign each one belongs to." : "Once more, from the start.\nTell me which sign each one belongs to."; // placeholder (owner writes)
+            Dial.Log("symbol_practice_started");
+            return true;
+        }
         public int Keys => (KeyEarned ? 1 : 0) + (Key2Earned ? 1 : 0);
         public bool GlyphsShown => Phase == LessonPhase.GlyphNames || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.Key2 || (WheelComplete && Key2Earned);
         public bool NamesHidden => Phase == LessonPhase.GlyphWheel;
@@ -55,31 +86,26 @@ namespace Ascendant.CelestialDial
             if (!CanBeginGlyphs) return false;
             if (Phase == LessonPhase.GlyphNames || Phase == LessonPhase.GlyphWheel) return true;
             Phase = LessonPhase.GlyphNames; GlyphIndex = 0; GlyphMisses = 0; Dial.Home();
+            for (int i = 0; i < 12; i++) order[i] = i;
             for (int i = 0; i < 12; i++) if (GlyphNamed[i]) GlyphIndex = i + 1;
             if (GlyphIndex >= 12) { StartGlyphWheel(); return true; }
             Message = GlyphIntro;
             Dial.Log("glyph_unit_started");
             return true;
         }
-        public int CurrentGlyph => Phase == LessonPhase.GlyphNames ? GlyphIndex : Phase == LessonPhase.GlyphWheel ? Dial.Target : -1;
+        public int CurrentGlyph => Phase == LessonPhase.GlyphNames ? (GlyphIndex < 12 ? SeatAt(GlyphIndex) : -1) : Phase == LessonPhase.GlyphWheel ? Dial.Target : -1;
         public bool AllNamed { get { for (int i = 0; i < 12; i++) if (!GlyphNamed[i]) return false; return true; } } // Part A complete
         public const string ShelfFirst = "The names you know. Their symbols wait on the shelf.\nRead them there first; then the wheel will hide its names."; // placeholder (owner writes)
         public const string ShelfDark = "The shelf is dark. Light the wheel first."; // placeholder (owner writes)
         public const string ShelfRead = "Twelve symbols, read. The book has nothing more for now."; // placeholder (owner writes)
         // Four names: the answer plus three others, in a stable order per seat so tests and the page agree.
-        public int[] GlyphOptions(int seat)
-        {
-            int[] o = { seat, Zodiac.Wrap(seat + 3), Zodiac.Wrap(seat + 6), Zodiac.Wrap(seat + 9) };
-            int r = seat % 4; var result = new int[4];
-            for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
-            return result;
-        }
+        public int[] GlyphOptions(int seat) => OptionsFor(seat, Hard, Hard ? CleanRuns : 0);
         public const string GlyphIntro = "Every sign carries a symbol of its own. Twelve symbols, older than the names.\nTell me which sign each one belongs to."; // placeholder (owner writes)
         public string GlyphNameResult { get; private set; } = ""; // the last Part A result line, kept while the wheel takes over
         public bool AnswerGlyphName(int seat)
         {
             if (Phase != LessonPhase.GlyphNames || GlyphIndex >= 12) return false;
-            int target = GlyphIndex; bool correct = Zodiac.Wrap(seat) == target;
+            int target = SeatAt(GlyphIndex); bool correct = Zodiac.Wrap(seat) == target;
             if (correct)
             {
                 bool eligible = GlyphMisses <= 1; // Level 0 or a Level 1 nudge
@@ -102,10 +128,10 @@ namespace Ascendant.CelestialDial
         void StartGlyphWheel()
         {
             Phase = LessonPhase.GlyphWheel; GlyphIndex = 0; RecoveryEncounters = 0; exposedProblems.Clear(); recoveryStarts.Clear();
-            for (int i = 0; i < 12; i++) if (GlyphPlaced[i]) GlyphIndex = i + 1;
+            for (int i = 0; i < 12; i++) if (GlyphPlaced[SeatAt(i)]) GlyphIndex = i + 1;
             if (GlyphIndex >= 12) { FinishGlyphs(); return; }
             Message = "Now the wheel hides its names. Only the symbols remain.\nI will name a sign; you turn until its symbol sits under the bracket, then press Seal."; // placeholder (owner writes)
-            BeginGlyphProblem(GlyphIndex);
+            BeginGlyphProblem(SeatAt(GlyphIndex));
         }
         void BeginGlyphProblem(int seat)
         {
@@ -115,6 +141,14 @@ namespace Ascendant.CelestialDial
         void FinishGlyphs()
         {
             Dial.Home();
+            if (Practice)
+            {
+                Practice = false; Phase = LessonPhase.Key2; bool clean = GlyphEvidence;
+                if (clean) { CleanRuns++; Message = "Twelve symbols again, and sharper.\nThe book will ask harder next time."; Dial.Log("symbol_practice_clean", true, true); } // placeholder (owner writes)
+                else Message = "Twelve symbols again, but I did most of the finding.\nThe book will wait for you."; // placeholder (owner writes)
+                PracticeFinished?.Invoke(clean);
+                return;
+            }
             if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve symbols, twelve names, in their order. You read the wheel now.\nKeeper Key 2 is yours."; Dial.Log("key2_earned", true, true); } // placeholder (owner writes)
             else { Phase = LessonPhase.Paused; Message = "We reached the end of the symbols, but I did most of the finding.\nRest, and we will try the symbols again when you return."; }
         }
@@ -237,7 +271,7 @@ namespace Ascendant.CelestialDial
                     GlyphPlaced[target] = true; if (result.evidence_eligible) GlyphEvidence = true;
                     Message = "Yes. " + SignName(target) + ", in its place."; Dial.Log("glyph_placed", true, result.evidence_eligible);
                 }
-                else if (step == 1) Message = "Not that one. Aries is here at the start; count forward from it.";
+                else if (step == 1) Message = Hard ? "Not that one. Look at the shape again, then find it on the wheel." : "Not that one. Aries is here at the start; count forward from it."; // no Aries anchor after a clean run
                 else if (step == 2) { NameRevealed[target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(target) + ", then press Seal."; }
                 else Message = "Watch me find it.\nThen the next symbol.";
                 return result;
@@ -282,7 +316,7 @@ namespace Ascendant.CelestialDial
         void NextGlyphProblem()
         {
             GlyphIndex++;
-            if (GlyphIndex >= 12) FinishGlyphs(); else BeginGlyphProblem(GlyphIndex);
+            if (GlyphIndex >= 12) FinishGlyphs(); else BeginGlyphProblem(SeatAt(GlyphIndex));
         }
         public int DemonstrationTarget => Phase == LessonPhase.GlyphWheel ? Dial.Target : Zodiac.Destination(Dial.Start);
         public void RevealDemonstration()

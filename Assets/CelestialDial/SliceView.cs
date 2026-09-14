@@ -75,6 +75,7 @@ namespace Ascendant.CelestialDial
             Dial.Lesson.ReviewFinished += (seat, correct, eligible) => StartCoroutine(AfterDialReview(correct, eligible));
             Dial.Lesson.GlyphNamedEvent += (seat, correct, eligible) => { Flow.RecordGlyphAnswer(seat, eligible); Flow.SetGlyphProgress(Dial.Lesson.Phase == LessonPhase.GlyphWheel ? 1 : 0, Dial.Lesson.GlyphIndex); Save(); };
             Dial.Lesson.Dial.Logged += e => { if (e.event_name == "glyph_placed") { Flow.RecordGlyphAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
+            Dial.Lesson.PracticeFinished += clean => { if (clean) Flow.RecordCleanRun(); Save(); Publish(); };
             var canvasObject = new GameObject("Slice Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
             canvasObject.transform.SetParent(transform, false);
             canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 1;
@@ -390,6 +391,7 @@ namespace Ascendant.CelestialDial
         {
             if (!Flow.EnterBook()) return;
             if (Dial.Lesson.CanBeginGlyphs && !Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) { Flow.StartGlyphs(); Save(); } }
+            else if (Dial.Lesson.CanPractice) Dial.Lesson.BeginPractice(); // after Key 2 the book tests again, harder after a clean run
             else Dial.Lesson.Say(DialLesson.ShelfRead); // Part A done or Key 2 earned: the book only shows its pages closed
             Show(); Publish();
         }
@@ -526,6 +528,7 @@ namespace Ascendant.CelestialDial
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
                 wingRoomCaption.text = Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? Dial.Lesson.Message
+                    : Dial.Lesson.CanPractice ? (Dial.Lesson.Hard ? "The symbols are yours. The book will test you again, harder." : "The symbols are yours. The book will test you again.") // placeholder (owner writes)
                     : Flow.WheelComplete && !Dial.Lesson.AllNamed ? "The wheel is lit. Something on the shelf has woken with it." // placeholder (owner writes)
                     : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
             }
@@ -675,7 +678,7 @@ namespace Ascendant.CelestialDial
             try { save = JsonUtility.FromJson<SaveData>(json); } catch (Exception e) { Debug.LogWarning("[CelestialDial] save unreadable: " + e.Message); }
             if (save == null || !Flow.Restore(save)) return;
             Dial.Lesson.RestoreProgress(save.sunSign, save.lit, save.kin, save.keyEarned);
-            Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2);
+            Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2); Dial.Lesson.SetCleanRuns(save.cleanRuns);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: 2";
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f); candle.color = Bone; }

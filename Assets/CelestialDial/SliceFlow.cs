@@ -35,6 +35,8 @@ namespace Ascendant.CelestialDial
         public int GlyphStage { get; private set; }   // 0 none, 1 Part A done, 2 Key 2 earned
         public int GlyphIndex { get; private set; }
         public bool GlyphsStarted { get; private set; }
+        public int CleanRuns { get; private set; }     // v0.3 revision, build 3: clean symbol replays after Key 2
+        public void RecordCleanRun() { CleanRuns++; Logged?.Invoke("clean_run_recorded"); }
         public bool V03Complete => Keys >= 2 && AtriumStage >= 4;
         public int ReviewsChecked { get; private set; }
         // v0.4: the marker that walks the Atrium and the Wing room (Q06 phase 2).
@@ -184,13 +186,7 @@ namespace Ascendant.CelestialDial
         }
         // Direct-tap item: which element does this sign belong to? One nudge, then reveal and move on.
         // Glyph review item: which sign is this mark? Four names, stable per seat (same options as the lesson).
-        public int[] GlyphReviewOptions(int seat)
-        {
-            int[] o = { seat, Zodiac.Wrap(seat + 3), Zodiac.Wrap(seat + 6), Zodiac.Wrap(seat + 9) };
-            int r = seat % 4; var result = new int[4];
-            for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
-            return result;
-        }
+        public int[] GlyphReviewOptions(int seat) => DialLesson.OptionsFor(seat, CleanRuns > 0, CleanRuns); // harder names once a clean run is on record
         public bool AnswerGlyph(int seat)
         {
             var task = CurrentReview; if (task == null || task.Mode != ReviewMode.Glyph || task.done) return false;
@@ -238,7 +234,7 @@ namespace Ascendant.CelestialDial
         public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned)
         {
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
         public bool Restore(SaveData save)
@@ -247,7 +243,7 @@ namespace Ascendant.CelestialDial
             PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = save.keyEarned ? 1 : 0; Ended = save.keyEarned;
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; ReviewsChecked = save.reviewsChecked;
-            Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
+            Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
             if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < 2) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
             Screen = SliceScreen.Hub; Walk.Enter(Room.Atrium, "entry"); Logged?.Invoke("session_resumed"); return true;
         }
