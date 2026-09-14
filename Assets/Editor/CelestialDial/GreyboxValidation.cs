@@ -165,7 +165,7 @@ namespace Ascendant.Build
             Check(g.AnswerGlyphName(1) && g.CurrentGlyph==2 && g.Dial.Events.Last(e=>e.event_name=="glyph_named").evidence_eligible,"a correct tap after one nudge is Level 1 evidence");
             Check(!g.AnswerGlyphName(6) && !g.AnswerGlyphName(7) && g.GlyphNamed[2] && g.CurrentGlyph==3 && g.Message.Contains("symbol of Gemini") && !g.Dial.Events.Last(e=>e.event_name=="glyph_named").evidence_eligible,"second miss reveals the name, no evidence, and moves on");
             for(int seat=3;seat<12;seat++) g.AnswerGlyphName(seat);
-            Check(g.Phase==LessonPhase.GlyphWheel && g.Dial.Active && g.Dial.Start==0 && g.Dial.Target==0 && g.NamesHidden && g.SeatLabel(5).StartsWith("Symbol") && !g.SeatLabel(5).Contains("Virgo") && g.Dial.Relationship=="seat_of_sign","Part B starts with names hidden, Aries first, labels that do not leak names, and the seat-of-sign relationship");
+            Check(g.Phase==LessonPhase.GlyphWheel && g.Dial.Active && g.Dial.Start!=0 && Math.Abs(g.Dial.Start-g.Dial.Target)>=2 && g.Dial.Target==0 && g.NamesHidden && g.SeatLabel(5).StartsWith("Symbol") && !g.SeatLabel(5).Contains("Virgo") && g.Dial.Relationship=="seat_of_sign","Part B starts with names hidden, Aries asked first with the wheel away from it, labels that do not leak names, and the seat-of-sign relationship");
             void Place(DialLesson l,int seat){l.Dial.Select(seat,DialInput.DirectSeat);var r=l.Seal();l.AfterCorrect(r);}
             Place(g,0);Check(g.GlyphPlaced[0] && g.GlyphEvidence && g.Dial.Target==1,"sealing on the target places the glyph and counts as evidence");
             g.Dial.Select(5,DialInput.DirectSeat);g.Seal();Check(g.Dial.Active && g.Dial.HintLevel==1 && g.Message.Contains("count forward"),"first wrong Seal in Part B nudges");
@@ -240,7 +240,7 @@ namespace Ascendant.Build
             var ramp=new DialLesson(()=>0);ramp.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);ramp.RestoreGlyphs(2,12,true);
             Check(!ramp.Hard && ramp.CanPractice && ramp.BeginPractice() && ramp.Practice && ramp.Phase==LessonPhase.GlyphNames && ramp.SeatAt(0)==0 && ramp.Dial.Events.Last().event_name=="symbol_practice_started","after Key 2 the book replays, in order the first time");
             for(int i=0;i<12;i++)ramp.AnswerGlyphName(ramp.CurrentGlyph);Check(ramp.Phase==LessonPhase.GlyphWheel && ramp.Dial.Target==0,"the replayed Part A hands to the wheel");
-            ramp.Dial.Select(3,DialInput.DirectSeat);ramp.Seal();Check(ramp.Message.Contains("Aries is here at the start"),"the first replay keeps the Aries anchor");
+            ramp.Dial.Select(3,DialInput.DirectSeat);ramp.Seal();Check(ramp.Message.Contains("Find Aries first"),"the first replay keeps the Aries anchor");
             ramp.Dial.Select(0,DialInput.DirectSeat);var p0=ramp.Seal();ramp.AfterCorrect(p0);
             for(int i=1;i<12;i++){ramp.Dial.Select(ramp.Dial.Target,DialInput.DirectSeat);var pe=ramp.Seal();ramp.AfterCorrect(pe);}
             Check(!ramp.Practice && ramp.CleanRuns==1 && ramp.Hard && ramp.Phase==LessonPhase.Key2 && ramp.Dial.Events.Count(e=>e.event_name=="key2_earned")==0 && ramp.Dial.Events.Count(e=>e.event_name=="symbol_practice_clean")==1,"a clean replay counts once, hardens the next, and never re-earns Key 2");
@@ -250,6 +250,13 @@ namespace Ascendant.Build
             var rampFlow=new SliceFlow(()=>1);Check(rampFlow.GlyphReviewOptions(5).Contains(Zodiac.Wrap(5+3)),"review names are the usual set before a clean run");rampFlow.RecordCleanRun();
             Check(rampFlow.CleanRuns==1 && rampFlow.GlyphReviewOptions(5).Contains(Zodiac.Wrap(5+4)) && rampFlow.GlyphReviewOptions(5).Contains(5),"after a clean run the review names harden and still include the answer");
             var rampSave=rampFlow.ToSave(new bool[12],new bool[12],true);var rampBack=new SliceFlow(()=>1);rampSave.atriumStage=4;rampSave.sunSign=1;Check(rampBack.Restore(rampSave) && rampBack.CleanRuns==1,"the clean-run count survives a save");
+            // ---- Sept 14 hotfix: the deck must survive the JSON save; Part B never starts on or beside the answer ----
+            var jflow=new SliceFlow(()=>1);jflow.Continue();jflow.ChooseBirth("known");jflow.SetKnownSign(1);jflow.Continue();jflow.Continue();jflow.RevealKey();jflow.Continue();jflow.Continue();jflow.InsertKey();jflow.End();jflow.Continue();
+            jflow.RecordLessonAnswer(5,true);var jsave=UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(jflow.ToSave(new bool[12],new bool[12],true)));var jback=new SliceFlow(()=>1);
+            Check(jsave.deck!=null && jsave.deck.Length==24 && jback.Restore(jsave) && jback.DueCount==jflow.DueCount && jback.Deck.Practicing==1,"the review deck survives the JSON save and reload with its due count and practicing items");
+            var starts=new DialLesson(()=>0);starts.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);starts.BeginGlyphs();for(int i=0;i<12;i++)starts.AnswerGlyphName(starts.CurrentGlyph);
+            bool startsOk=true;for(int i=0;i<12;i++){int d=Math.Abs(starts.Dial.Start-starts.Dial.Target);if(d<2 || d>10)startsOk=false;starts.Dial.Select(starts.Dial.Target,DialInput.DirectSeat);var se=starts.Seal();starts.AfterCorrect(se);}
+            Check(startsOk,"every Part B problem starts the wheel at least two seats from the answer");
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }
