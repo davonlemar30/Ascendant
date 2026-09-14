@@ -18,12 +18,13 @@ namespace Ascendant.CelestialDial
         public int state;      // ItemState
         public int streak;     // running evidence score (Mastery & Mistakes: +1 per eligible success, -1 per miss, floor 0)
         public int interval;   // index into ReviewDeck.Ladder
-        public int dueDay;
+        public int dueDay;     // the sitting (completed Check the Seals count) at which the item is ready again
         public bool entered;   // has entered the deck
         public ItemState State => (ItemState)state;
     }
 
-    // Locked Mastery & Mistakes scheduler, v0.x: 1 → 3 → 7 → 14 → 30 days. Never called a test in copy.
+    // Mastery & Mistakes scheduler with the Q05 ladder 1 → 3 → 7 → 14 → 30, counted in sittings (completed Check the Seals
+    // batches) rather than days: the owner removed in-game time on September 13 (Q05 amendment). Never called a test in copy.
     public sealed class ReviewDeck
     {
         public static readonly int[] Ladder = { 1, 3, 7, 14, 30 };
@@ -35,7 +36,7 @@ namespace Ascendant.CelestialDial
         public void IntroduceAll(int day) { IntroduceAll(day, ItemKind.Element); }
         public void IntroduceAll(int day, ItemKind kind)
         {
-            foreach (var item in Items) if (item.Kind == kind && !item.entered) { item.entered = true; item.interval = 0; item.dueDay = day + Ladder[0]; }
+            foreach (var item in Items) if (item.Kind == kind && !item.entered) { item.entered = true; item.interval = 0; item.dueDay = day; } // ready at the next check
             Logged?.Invoke(kind == ItemKind.Element ? "deck_introduced" : "deck_glyphs_introduced");
         }
         // A correct Level 0/1 answer in a lesson makes the item Practicing and starts its streak.
@@ -43,7 +44,7 @@ namespace Ascendant.CelestialDial
         public void RecordLesson(int seat, bool eligible, int day, ItemKind kind)
         {
             var item = Item(seat, kind);
-            if (!item.entered) { item.entered = true; item.interval = 0; item.dueDay = day + Ladder[0]; }
+            if (!item.entered) { item.entered = true; item.interval = 0; item.dueDay = day; }
             if (!eligible) return;
             if (item.State == ItemState.Introduced) { item.state = (int)ItemState.Practicing; item.streak = 1; item.dueDay = day + Ladder[item.interval]; }
         }
@@ -61,7 +62,7 @@ namespace Ascendant.CelestialDial
             else if (!correct)
             {
                 item.streak = Math.Max(0, item.streak - 1);
-                item.interval = Math.Max(0, item.interval - 1); // at the first interval a miss stays at one day
+                item.interval = Math.Max(0, item.interval - 1); // at the first interval a miss stays at one sitting
             }
             // Assisted (ineligible) correct answers neither advance nor set back; they schedule a fresh look at the same interval.
             item.dueDay = day + Ladder[item.interval];
@@ -74,7 +75,7 @@ namespace Ascendant.CelestialDial
     [Serializable]
     public sealed class SaveData
     {
-        public int version = 2;
+        public int version = 3;
         public string playerName = "";
         public int sunSign = -1;
         public bool[] lit = new bool[12];
@@ -82,8 +83,6 @@ namespace Ascendant.CelestialDial
         public bool keyEarned;
         public bool wheelComplete;
         public int atriumStage;
-        public int dayOffset;
-        public int firstDay;
         public ReviewItem[] deck;
         public int keys;
         public int glyphStage;      // 0 not started, 1 Part A done, 2 Part B done (Key 2)
