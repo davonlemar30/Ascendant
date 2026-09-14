@@ -224,6 +224,16 @@ namespace Ascendant.Build
             while(!wflow.ReviewDone){var t=wflow.CurrentReview;if(t.Mode==ReviewMode.Tap)wflow.AnswerTap(Zodiac.Seats[t.seat].Element);else if(t.Mode==ReviewMode.Glyph)wflow.AnswerGlyph(t.seat);else wflow.FinishReview(true,true);}
             Check(wflow.LeaveReview() && wflow.Walk.At=="desk","leaving the review places the marker at the desk");
             var wsave=wflow.ToSave(new bool[12],new bool[12],true);var wback=new SliceFlow(()=>4);Check(wback.Restore(wsave) && wback.Walk.Room==Room.Atrium && wback.Walk.At=="entry","a resumed session starts at the Atrium entry");
+            // ---- v0.3 revision, build 2: Ask Caspar ----
+            var ask=Transfer();Check(!ask.CanAsk,"Ask Caspar is not offered before a first miss");
+            Wrong(ask,1);Check(ask.CanAsk && ask.Dial.HintLevel==1,"after a first miss the player may ask Caspar");
+            Check(ask.AskCaspar() && ask.Dial.HintLevel==2 && ask.Dial.Asked && ask.Message.Contains("Find the next elemental sign after") && ask.CountBeatPending && !ask.CanAsk && ask.Dial.Events.Last().event_name=="hint_asked","asking gives the Level 2 rule reminder once, with the count, and is not a miss");
+            var askedAnswer=Answer(ask);Check(askedAnswer.correctness && !askedAnswer.evidence_eligible && askedAnswer.hint_level==2,"a correct answer after asking is assisted: no evidence");
+            var ask3=Transfer();Wrong(ask3,1);ask3.AskCaspar();Wrong(ask3,1);Check(ask3.Dial.HintLevel==3 && !ask3.Dial.Active && ask3.Message.StartsWith("Watch me do one"),"a miss after the asked reminder goes to the worked example, not a second reminder");
+            var guided=new DialLesson(()=>0);EnterGuided(guided);guided.Dial.Select(guided.Dial.Start,DialInput.DirectSeat);guided.Seal();Check(!guided.CanAsk,"no Ask Caspar in the guided problem, which already carries the rule");
+            var askGlyph=new DialLesson(()=>0);askGlyph.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);askGlyph.BeginGlyphs();for(int i=0;i<12;i++)askGlyph.AnswerGlyphName(i);
+            askGlyph.Dial.Select(5,DialInput.DirectSeat);askGlyph.Seal();Check(askGlyph.CanAsk && askGlyph.AskCaspar() && askGlyph.NameRevealed[0] && askGlyph.Dial.HintLevel==2,"in the symbols, asking reveals the name on its seat");
+            askGlyph.Dial.Select(0,DialInput.DirectSeat);var askedPlace=askGlyph.Seal();Check(askedPlace.correctness && !askedPlace.evidence_eligible,"a placement after asking earns no evidence toward Key 2");
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }

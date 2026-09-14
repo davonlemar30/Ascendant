@@ -214,10 +214,21 @@ namespace Ascendant.CelestialDial
                 "Your turn. Find the next sign in this family from " + sign + ".\nMove the wheel, inspect the framed sign, then press Seal.";
         }
         public void CountBeatShown() { CountBeatPending = false; }
+        public const string RuleLine = "Find the next elemental sign after {0} on the wheel.\nCount each sign after it: one, two, three, four."; // Level 2 (owner wording, Sept 13)
+        public bool CanAsk => Dial.CanAsk && (Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel);
+        // Ask Caspar: the Level 2 reminder on request, wherever a rule exists. An answer after it earns no evidence.
+        public bool AskCaspar()
+        {
+            if (!CanAsk || !Dial.Ask()) return false;
+            if (Phase == LessonPhase.GlyphWheel) { NameRevealed[Dial.Target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(Dial.Target) + ", then press Seal."; }
+            else { Message = string.Format(RuleLine, SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal."; if (Phase != LessonPhase.Review) { CountBeatPending = true; exposedProblems.Add(Dial.Start); } }
+            return true;
+        }
         public DialEvent Seal()
         {
             var result = Dial.Commit();
             if (result == null) return null;
+            int step = Dial.Attempts + (Dial.Asked ? 1 : 0); // the asked reminder counts as the second step of the ladder
             if (Phase == LessonPhase.GlyphWheel)
             {
                 int target = Dial.Target;
@@ -226,8 +237,8 @@ namespace Ascendant.CelestialDial
                     GlyphPlaced[target] = true; if (result.evidence_eligible) GlyphEvidence = true;
                     Message = "Yes. " + SignName(target) + ", in its place."; Dial.Log("glyph_placed", true, result.evidence_eligible);
                 }
-                else if (Dial.Attempts == 1) Message = "Not that one. Aries is here at the start; count forward from it.";
-                else if (Dial.Attempts == 2) { NameRevealed[target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(target) + ", then press Seal."; }
+                else if (step == 1) Message = "Not that one. Aries is here at the start; count forward from it.";
+                else if (step == 2) { NameRevealed[target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(target) + ", then press Seal."; }
                 else Message = "Watch me find it.\nThen the next symbol.";
                 return result;
             }
@@ -242,9 +253,9 @@ namespace Ascendant.CelestialDial
             {
                 if (RecoveryEncounters == 0) RecoveryEncounters = 1;
                 if (Dial.HintLevel >= 2) exposedProblems.Add(Dial.Start);
-                if (Dial.Attempts == 2) CountBeatPending = true;
-                Message = Dial.Attempts == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
-                    Dial.Attempts == 2 ? "Start at " + SignName(Dial.Start) + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
+                if (step == 2) CountBeatPending = true;
+                Message = step == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
+                    step == 2 ? string.Format(RuleLine, SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal." :
                     "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;

@@ -68,6 +68,7 @@ namespace Ascendant.CelestialDial
         public int Start { get; private set; }
         public int Selected { get; private set; }
         public int HintLevel { get; private set; }
+        public bool Asked { get; private set; }      // the player asked Caspar for the rule (Level 2 on request); the next miss goes to Level 3
         public int Attempts { get; private set; }
         public int MovementCount { get; private set; }
         public bool Counting { get; private set; }
@@ -86,7 +87,7 @@ namespace Ascendant.CelestialDial
         {
             Start = Zodiac.Wrap(start); Target = targetSeat < 0 ? -1 : Zodiac.Wrap(targetSeat);
             Selected = Start; // Automatic positioning does not emit a movement tick.
-            HintLevel = hintLevel;
+            HintLevel = hintLevel; Asked = false;
             Attempts = MovementCount = 0;
             Counting = Rejected = false;
             Active = true;
@@ -134,6 +135,13 @@ namespace Ascendant.CelestialDial
             Counting = true;
             HintLevel = Math.Max(1, HintLevel); // A counter never lowers rule-revealing assistance.
         }
+        // Ask Caspar (v0.3 revision, build 2): after a first miss the player may request the Level 2 rule reminder.
+        public bool CanAsk => Active && Attempts >= 1 && HintLevel < 2;
+        public bool Ask()
+        {
+            if (!CanAsk) return false;
+            Asked = true; Escalate(2); Log("hint_asked"); return true;
+        }
         public void Escalate(int level)
         {
             HintLevel = Math.Max(HintLevel, level);
@@ -150,8 +158,8 @@ namespace Ascendant.CelestialDial
             Rejected = !correct;
             if (correct) { FirstSuccessfulSeal = true; Active = false; }
             else if (Attempts == 1) Escalate(1);
-            else if (Attempts == 2) Escalate(2);
-            else { Escalate(3); Active = false; }
+            else if (Attempts == 2 && !Asked) Escalate(2);
+            else { Escalate(3); Active = false; } // a miss after the asked reminder is the third step
             return result;
         }
         public DialEvent Log(string name, bool correct = false, bool evidence = false, string method = null)

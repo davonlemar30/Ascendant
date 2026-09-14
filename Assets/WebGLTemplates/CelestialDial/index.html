@@ -16,7 +16,7 @@
 <p id="instructions" class="sr"></p>
 <div id="seats" role="group" aria-label="Zodiac seats in order"></div>
 <button id="back">Previous</button><button id="seal">Seal</button><button id="forward">Next</button>
-<button id="count">Count</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
+<button id="count">Count</button><button id="ask-caspar">Ask Caspar for help</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
 <label id="name-label" for="name" class="sr">Your name</label><input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Your name" hidden>
 <label id="birthdate-label" for="birthdate" class="sr">Your birth date</label><input id="birthdate" type="date" hidden>
 <button id="use-date">Use this date</button><button id="change-birth">Change my answer</button>
@@ -42,7 +42,7 @@
     const b=document.createElement('button');b.id='seat-'+i;b.textContent='Zodiac position '+(i+1);b.onclick=()=>send('seat:'+i);byId('seats').appendChild(b);
     const sb=document.createElement('button');sb.id='sign-'+i;sb.textContent=SIGNS[i];sb.onclick=()=>send('sign:'+i);byId('signs').appendChild(sb);
   }
-  for(const id of ['back','seal','forward','count','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed'])byId(id).onclick=()=>send(id);
+  for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed'])byId(id).onclick=()=>send(id);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);}
   byId('next-screen').onclick=()=>send('next-screen');
   for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
@@ -59,7 +59,7 @@
     const selected=state?state.seats.findIndex(s=>s.includes(', selected')):0;
     for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;box('seat-'+i,Math.cos(angle)*136,270-Math.sin(angle)*136,52,52);}
     box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
-    box('count',0,714,80,48);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',0,768,216,48);
+    box('count',-60,714,100,48);box('ask-caspar',78,714,164,48);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',0,768,216,48);
     box('name',0,300,260,48);for(let i=0;i<3;i++)box(['birth-chart','birth-known','birth-unknown'][i],0,300+i*64,300,52);
     box('next-screen',0,654,190,56);box('insert',0,654,190,56);box('restart',0,768,216,48);
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
@@ -81,7 +81,7 @@
       const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial');
       byId('instructions').textContent=wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
-      for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('count').disabled=!(wing&&state.active&&!state.glyphWheel);
+      for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('count').disabled=!(wing&&state.active&&!state.glyphWheel);byId('ask-caspar').disabled=!(wing&&state.canAsk);
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
       byId('motion').disabled=false;
       byId('next-screen').disabled=!state.canSliceContinue;byId('insert').disabled=!state.canInsert;byId('restart').disabled=!(state.ended||state.screen==='hub');
