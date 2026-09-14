@@ -152,6 +152,8 @@ const path=require('path');
     }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
     check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Mark')),'Part B hides every name, labels included, at '+viewport.width);
+    await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Part A hold ends, then the wheel's labels refresh
+    { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: mark ') && b.start==='' && b.count==='','Part B readouts do not name the sign under the bracket at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
