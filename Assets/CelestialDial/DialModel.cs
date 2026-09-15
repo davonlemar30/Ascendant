@@ -10,6 +10,7 @@ namespace Ascendant.CelestialDial
     {
         public readonly string Name;
         public readonly string Element;
+        public string Modality => Zodiac.ModalityOf(this);
         public readonly string Glyph; // Placeholder: the Unicode zodiac symbol. Not final glyph art.
         public ZodiacSeat(string name, string element, string glyph) { Name = name; Element = element; Glyph = glyph; }
     }
@@ -25,6 +26,9 @@ namespace Ascendant.CelestialDial
             new ZodiacSeat("Sagittarius", "Fire", "\u2650"), new ZodiacSeat("Capricorn", "Earth", "\u2651"),
             new ZodiacSeat("Aquarius", "Air", "\u2652"), new ZodiacSeat("Pisces", "Water", "\u2653") });
         public static int Wrap(int position) => (position % 12 + 12) % 12;
+        public static readonly string[] Modalities = { "Cardinal", "Fixed", "Mutable" }; // every third sign shares a modality (Curriculum Rev 2, Stage 1)
+        public static string ModalityOf(ZodiacSeat seat) { for (int i = 0; i < Seats.Count; i++) if (ReferenceEquals(Seats[i], seat)) return Modalities[i % 3]; return Modalities[0]; }
+        public static string ModalityAt(int seat) => Modalities[Wrap(seat) % 3];
         public static int Destination(int start, int forward = 4) => Wrap(start + forward);
         public static bool Evaluate(int start, int offset, int destination) => Destination(start, offset) == destination;
         // Tropical sun-sign date ranges (common almanac boundaries; cusp days can vary by year). Returns -1 for an invalid date.
@@ -81,11 +85,13 @@ namespace Ascendant.CelestialDial
         public DialModel(Func<double> clock) { now = clock; }
 
         public int Target { get; private set; } = -1;   // -1: the default forward-offset-4 relationship
-        public string Relationship => Target >= 0 ? "seat_of_sign" : "forward_offset_4";
-        public void Begin(int start, int hintLevel) { Begin(start, hintLevel, -1); }
-        public void Begin(int start, int hintLevel, int targetSeat)
+        public int Forward { get; private set; } = 4;   // seats forward per problem: 4 for the elemental families, 3 for the modalities
+        public string Relationship => Target >= 0 ? "seat_of_sign" : "forward_offset_" + Forward;
+        public void Begin(int start, int hintLevel) { Begin(start, hintLevel, -1, 4); }
+        public void Begin(int start, int hintLevel, int targetSeat) { Begin(start, hintLevel, targetSeat, 4); }
+        public void Begin(int start, int hintLevel, int targetSeat, int step)
         {
-            Start = Zodiac.Wrap(start); Target = targetSeat < 0 ? -1 : Zodiac.Wrap(targetSeat);
+            Start = Zodiac.Wrap(start); Target = targetSeat < 0 ? -1 : Zodiac.Wrap(targetSeat); Forward = step;
             Selected = Start; // Automatic positioning does not emit a movement tick.
             HintLevel = hintLevel; Asked = false;
             Attempts = MovementCount = 0;
@@ -151,7 +157,7 @@ namespace Ascendant.CelestialDial
         {
             if (!Active) return null;
             Attempts++;
-            bool correct = Target >= 0 ? Selected == Target : Zodiac.Evaluate(Start, 4, Selected);
+            bool correct = Target >= 0 ? Selected == Target : Zodiac.Evaluate(Start, Forward, Selected);
             bool evidence = correct && HintLevel <= 1;
             Log("answer_committed", correct, evidence);
             var result = Log(correct ? "answer_correct" : "answer_rejected", correct, evidence);

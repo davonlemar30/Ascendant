@@ -116,6 +116,16 @@ This checks the symbol unit: naming the twelve symbols, finding them on the whee
 - [ ] Close and reopen the game. You should see the Atrium with two Keys. Press "Start over (test)" to reset.
 - [ ] Turn "Reduced motion" on and do the symbols again after starting over. You should see everything still work.
 
+## The second pattern (Build A)
+
+This checks the modality unit: three kinds of sign, three steps apart, on the same wheel.
+
+- [ ] With Key 2 in hand, tap the Dial. You should see the subtitle change to "The Second Pattern" and Caspar say every third sign shares a kind, name your sign's kind, and list its four family members. The wheel shows you a count of three, then hands you the problem.
+- [ ] Turn three signs forward and press Seal. You should see the seat light up with its kind under the name ("Fixed," "Cardinal," or "Mutable"). Finish the four seats. You should see Caspar hand you the next kind with less help.
+- [ ] Get one wrong on purpose. You should see the "Ask Caspar for help" button. Press it. You should see "Find the next sign of the same kind after [sign] on the wheel. Count each sign after it: one, two, three." and the count shown once.
+- [ ] Finish all three kinds. You should see "Three kinds complete" and no new Key. Press "Back to the Atrium." You should see the same two Keys.
+- [ ] Check the seals once or twice. You should see some items ask "[Sign]. Which kind?" with three buttons, and some wheel items say "Find the next sign of the same kind." Close and reopen the game. You should see the kinds still lit on the wheel.
+
 ## Walking (v0.4)
 
 This checks tap-to-move: the Keeper walks the Atrium and the Wing, and the buttons still work.

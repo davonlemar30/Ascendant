@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review, GlyphNames, GlyphWheel, Key2 }
+    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review, GlyphNames, GlyphWheel, Key2, ModalityGuided, ModalityOwn, ModalityPaused, ModalityComplete }
 
     public sealed class DialLesson
     {
@@ -36,7 +36,8 @@ namespace Ascendant.CelestialDial
         // A Level 2 problem shows the count once, one click per beat, before the player takes over.
         public bool CountBeatPending { get; private set; }
         public string Message { get; private set; }
-        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel;
+        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn;
+        public bool InModalities => Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || Phase == LessonPhase.ModalityPaused || Phase == LessonPhase.ModalityComplete;
         // ---- v0.3: glyphs and Key 2 (owner's form, Sept 12: Part A name the glyph by tap, Part B find the glyph on the wheel) ----
         public readonly bool[] GlyphNamed = new bool[12];    // Part A done for this seat
         public readonly bool[] GlyphPlaced = new bool[12];   // Part B done for this seat
@@ -65,7 +66,88 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
             return result;
         }
-        public bool CanPractice => Key2Earned && (Phase == LessonPhase.Key2 || Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused);
+        public bool CanPractice => Key2Earned && (Phase == LessonPhase.Key2 || Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || Phase == LessonPhase.ModalityComplete || Phase == LessonPhase.ModalityPaused);
+        // ---- Build A (Unit 1.2, part 1): the modalities on the same Dial, three seats forward, three families of four. No Key here. ----
+        public readonly bool[] LitMod = new bool[12];
+        public readonly bool[] KinMod = new bool[3];
+        public bool ModalitiesComplete => LitMod.All(v => v);
+        public int ModalityFamiliesComplete => KinMod.Count(v => v);
+        public bool ModalityUnitStarted { get; private set; }
+        int modalityFamily, modalityAssisted;
+        public bool CanBeginModalities => Key2Earned && !ModalitiesComplete && (Phase == LessonPhase.Key2 || Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || Phase == LessonPhase.ModalityPaused || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn);
+        public static string ModalityName(int seat) => Zodiac.ModalityAt(seat);
+        static string ModalityMembers(int f) => SignName(f) + ", " + SignName(f + 3) + ", " + SignName(f + 6) + ", and " + SignName(f + 9);
+        public bool BeginModalities()
+        {
+            if (!CanBeginModalities) return false;
+            if ((Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) && Dial.Active) return true;
+            bool first = !ModalityUnitStarted; ModalityUnitStarted = true; modalityAssisted = 0;
+            int f = NextUnlitModalityFamily(); if (f < 0) return false;
+            bool guided = f == Sun % 3 && !KinMod[f] && first;
+            modalityFamily = f; Phase = guided ? LessonPhase.ModalityGuided : LessonPhase.ModalityOwn;
+            int start = guided ? Sun : FirstUnlitInModalityFamily(f, out _);
+            if (!LitMod[start]) LitMod[start] = true;
+            StartModalityProblem(start, guided ? 2 : 0);
+            Message = guided
+                ? "The wheel keeps a second pattern. Every third sign shares a kind: cardinal, fixed, or mutable.\n" + SignName(Sun) + " is " + ModalityName(Sun) + ". So are " + ModalityMembers(f) + ".\n" + Message // placeholder (owner writes)
+                : "Now the " + ModalityName(f).ToLowerInvariant() + " signs: " + ModalityMembers(f) + ".\nStart at " + SignName(start) + ". Three forward each time. I will only watch."; // placeholder (owner writes)
+            Dial.Log(first ? "modality_unit_started" : "modality_family_started");
+            return true;
+        }
+        int NextUnlitModalityFamily() { int s = Sun % 3; for (int k = 0; k < 3; k++) { int f = (s + k) % 3; if (!KinMod[f]) return f; } return -1; }
+        int FirstUnlitInModalityFamily(int f, out int prev)
+        {
+            // The chain runs f → f+3 → f+6 → f+9; the first unlit seat is the next target, the seat before it the start.
+            for (int i = 0; i < 4; i++) { int seat = Zodiac.Wrap(f + 3 * i); if (!LitMod[seat]) { prev = Zodiac.Wrap(seat - 3); return i == 0 ? seat : prev; } }
+            prev = -1; return f;
+        }
+        void StartModalityProblem(int start, int hint)
+        {
+            lastStart = Zodiac.Wrap(start);
+            Dial.Begin(lastStart, hint, -1, 3);
+            CountBeatPending = hint >= 2;
+            Message = hint >= 2 ? string.Format(RuleFor(3), SignName(lastStart)) + "\nInspect the framed sign, then press Seal."
+                : "Your turn. Find the next " + ModalityName(lastStart).ToLowerInvariant() + " sign from " + SignName(lastStart) + ".\nMove the wheel, inspect the framed sign, then press Seal.";
+        }
+        void AfterModalityCorrect(DialEvent result)
+        {
+            LitMod[result.selected_destination] = true;
+            int f = modalityFamily;
+            bool complete = Enumerable.Range(0, 4).All(i => LitMod[Zodiac.Wrap(f + 3 * i)]);
+            if (!complete)
+            {
+                int target = Enumerable.Range(0, 4).Select(i => Zodiac.Wrap(f + 3 * i)).First(sd => !LitMod[sd]);
+                StartModalityProblem(Zodiac.Wrap(target - 3), Phase == LessonPhase.ModalityGuided ? 2 : 0);
+                return;
+            }
+            KinMod[f] = true; Dial.Log("modality_family_completed"); Dial.Home();
+            int next = NextUnlitModalityFamily();
+            if (next < 0) { Phase = LessonPhase.ModalityComplete; Message = "Twelve seats, three kinds. Cardinal begins, fixed holds, mutable turns.\nThe wheel has one more pattern to give you, and a table to fill."; Dial.Log("modalities_completed"); return; } // placeholder (owner writes)
+            Phase = LessonPhase.ModalityOwn; modalityFamily = next;
+            int start = FirstUnlitInModalityFamily(next, out _); LitMod[start] = true;
+            StartModalityProblem(start, 0);
+            Message = (ModalityFamiliesComplete == 1 ? "One kind done. " : "Last kind. ") + "Now the " + ModalityName(next).ToLowerInvariant() + " signs: " + ModalityMembers(next) + ".\nStart at " + SignName(start) + ". Three forward each time."; // placeholder (owner writes)
+            Dial.Log("modality_family_started");
+        }
+        void AfterModalityDemonstration()
+        {
+            // A worked example lights the seat without evidence; three of them in one sitting pause the unit (reappearance cap).
+            LitMod[Zodiac.Destination(lastStart, 3)] = true; modalityAssisted++;
+            if (modalityAssisted >= 3) { Dial.Home(); Phase = LessonPhase.ModalityPaused; Message = "Let us stop the second pattern here for now.\nWe will pick it up when you return."; return; } // placeholder (owner writes)
+            AfterModalityCorrect(Dial.Events.Last());
+        }
+        public string RuleFor(int step) => step == 3
+            ? "Find the next sign of the same kind after {0} on the wheel.\nCount each sign after it: one, two, three."
+            : RuleLine;
+
+        // Closing the book mid-practice abandons that pass: the unit is already earned, so nothing is lost.
+        public void AbandonPractice()
+        {
+            if (!Practice || Phase != LessonPhase.GlyphNames) return;
+            Practice = false; Phase = LessonPhase.Key2; GlyphMisses = 0; GlyphIndex = 0;
+            for (int i = 0; i < 12; i++) { GlyphNamed[i] = true; GlyphPlaced[i] = true; order[i] = i; }
+            Dial.Log("symbol_practice_abandoned");
+        }
         public bool BeginPractice()
         {
             if (!CanPractice) return false;
@@ -174,12 +256,13 @@ namespace Ascendant.CelestialDial
             Dial.Log("unit11_family_started");
             return true;
         }
-        public bool BeginReview(int seat)
+        public bool BeginReview(int seat) { return BeginReview(seat, 4); }
+        public bool BeginReview(int seat, int step)
         {
             if (Phase == LessonPhase.Review || IsProblem) return false;
             phaseBeforeReview = Phase; Phase = LessonPhase.Review;
-            Dial.Begin(seat, 0); CountBeatPending = false;
-            Message = "Find the next sign in this family."; // Compressed form: start already framed, one line, Seal.
+            Dial.Begin(seat, 0, -1, step); CountBeatPending = false;
+            Message = step == 3 ? "Find the next sign of the same kind." : "Find the next sign in this family."; // Compressed form: start already framed, one line, Seal.
             return true;
         }
         public void EndReview() { if (Phase != LessonPhase.Review) return; Dial.Home(); Phase = phaseBeforeReview; }
@@ -249,13 +332,13 @@ namespace Ascendant.CelestialDial
         }
         public void CountBeatShown() { CountBeatPending = false; }
         public const string RuleLine = "Find the next elemental sign after {0} on the wheel.\nCount each sign after it: one, two, three, four."; // Level 2 (owner wording, Sept 13)
-        public bool CanAsk => Dial.CanAsk && (Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel);
+        public bool CanAsk => Dial.CanAsk && (Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityOwn);
         // Ask Caspar: the Level 2 reminder on request, wherever a rule exists. An answer after it earns no evidence.
         public bool AskCaspar()
         {
             if (!CanAsk || !Dial.Ask()) return false;
             if (Phase == LessonPhase.GlyphWheel) { NameRevealed[Dial.Target] = true; Message = "Look: the name shows on its seat now. Turn to " + SignName(Dial.Target) + ", then press Seal."; }
-            else { Message = string.Format(RuleLine, SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal."; if (Phase != LessonPhase.Review) { CountBeatPending = true; exposedProblems.Add(Dial.Start); } }
+            else { Message = string.Format(RuleFor(Dial.Forward), SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal."; if (Phase != LessonPhase.Review) { CountBeatPending = true; exposedProblems.Add(Dial.Start); } }
             return true;
         }
         public DialEvent Seal()
@@ -278,8 +361,8 @@ namespace Ascendant.CelestialDial
             }
             if (Phase == LessonPhase.Review)
             {
-                if (result.correctness) { Message = "Yes. " + SignName(result.selected_destination) + " is " + Element(result.selected_destination) + "."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, true, result.hint_level <= 1); }
-                else if (Dial.Attempts >= 2) { Message = "It is " + SignName(Zodiac.Destination(Dial.Start)) + ". We will come back to it."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, false, false); }
+                if (result.correctness) { Message = "Yes. " + SignName(result.selected_destination) + " is " + (Dial.Forward == 3 ? ModalityName(result.selected_destination).ToLowerInvariant() : Element(result.selected_destination)) + "."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, true, result.hint_level <= 1); }
+                else if (Dial.Attempts >= 2) { Message = "It is " + SignName(Zodiac.Destination(Dial.Start, Dial.Forward)) + ". We will come back to it."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, false, false); }
                 else { Message = "Not that one. Try once more."; }
                 return result;
             }
@@ -289,19 +372,20 @@ namespace Ascendant.CelestialDial
                 if (Dial.HintLevel >= 2) exposedProblems.Add(Dial.Start);
                 if (step == 2) CountBeatPending = true;
                 Message = step == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
-                    step == 2 ? string.Format(RuleLine, SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal." :
+                    step == 2 ? string.Format(RuleFor(Dial.Forward), SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal." :
                     "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;
         }
         public string CorrectLine(DialEvent result) =>
-            "Yes. " + SignName(result.selected_destination) + " is a " + Element(result.selected_destination) + " sign, like your sun sign.\n" +
+            "Yes. " + SignName(result.selected_destination) + (InModalities ? " is " + ModalityName(result.selected_destination).ToLowerInvariant() + ", like " + SignName(Dial.Start) + "." : " is a " + Element(result.selected_destination) + " sign, like your sun sign.") + "\n" +
             (result.evidence_eligible ? "You found that one on your own." : "We found that one together.");
         public void AfterCorrect(DialEvent result)
         {
             if (result == null || !result.correctness) return;
             if (Phase == LessonPhase.Review) return;
             if (Phase == LessonPhase.GlyphWheel) { NextGlyphProblem(); return; }
+            if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) { AfterModalityCorrect(result); return; }
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -318,16 +402,18 @@ namespace Ascendant.CelestialDial
             GlyphIndex++;
             if (GlyphIndex >= 12) FinishGlyphs(); else BeginGlyphProblem(SeatAt(GlyphIndex));
         }
-        public int DemonstrationTarget => Phase == LessonPhase.GlyphWheel ? Dial.Target : Zodiac.Destination(Dial.Start);
+        public int DemonstrationTarget => Phase == LessonPhase.GlyphWheel ? Dial.Target : Zodiac.Destination(Dial.Start, Dial.Forward);
         public void RevealDemonstration()
         {
             if (Phase == LessonPhase.GlyphWheel) { GlyphPlaced[Dial.Target] = true; NameRevealed[Dial.Target] = true; return; } // Worked exposure: no evidence, no fresh equivalent for a fixed set.
+            if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) return; // lit in AfterModalityDemonstration
             if (Phase != LessonPhase.Optional) Lit[Zodiac.Destination(lastStart)] = true;
             // Worked exposure illuminates but never writes eligible answer evidence.
         }
         public void AfterDemonstration()
         {
             if (Phase == LessonPhase.GlyphWheel) { Dial.Home(); NextGlyphProblem(); return; }
+            if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) { AfterModalityDemonstration(); return; }
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -397,6 +483,13 @@ namespace Ascendant.CelestialDial
             StartProblem(OptionalFamily, 0);
             Message = "One more, if you like. Start from " + SignName(OptionalFamily) + ", in the " + Element(OptionalFamily) + " family.\nIt'll be good practice.";
         }
+        public void RestoreModalities(bool[] litMod, bool[] kinMod, bool started)
+        {
+            for (int i = 0; i < 12; i++) LitMod[i] = litMod != null && i < litMod.Length && litMod[i];
+            for (int f = 0; f < 3; f++) KinMod[f] = kinMod != null && f < kinMod.Length && kinMod[f];
+            ModalityUnitStarted = started;
+            if (ModalitiesComplete) { Phase = LessonPhase.ModalityComplete; Message = "Three kinds, twelve seats. The wheel remembers."; } // placeholder (owner writes)
+        }
         public void RestoreGlyphs(int stage, int index, bool key2)
         {
             // stage 0: none; 1: Part A done through index (or all); 2: Key 2 earned.
@@ -410,7 +503,7 @@ namespace Ascendant.CelestialDial
         {
             var sign = Zodiac.Seats[seat];
             if (NamesHidden && !NameRevealed[seat]) return "Symbol " + sign.Glyph + ", position " + (seat + 1) + " of 12, " + (Dial.Selected == seat ? "selected" : "not selected");
-            return sign.Name + (GlyphsShown ? ", symbol " + sign.Glyph : "") + ", position " + (seat + 1) + " of 12, " +
+            return sign.Name + (GlyphsShown ? ", symbol " + sign.Glyph : "") + (LitMod[seat] ? ", " + ModalityName(seat).ToLowerInvariant() : "") + ", position " + (seat + 1) + " of 12, " +
                 (Dial.Selected == seat ? "selected" : "not selected") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }

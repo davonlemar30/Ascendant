@@ -5,7 +5,7 @@ using System.Linq;
 namespace Ascendant.CelestialDial
 {
     public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book }
-    public enum ReviewMode { Dial, Tap, Glyph }
+    public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
 
     [Serializable]
     public sealed class ReviewTask { public int seat; public int mode; public int misses; public bool done; public bool correct; public ReviewMode Mode => (ReviewMode)mode; }
@@ -36,6 +36,9 @@ namespace Ascendant.CelestialDial
         public int GlyphIndex { get; private set; }
         public bool GlyphsStarted { get; private set; }
         public int CleanRuns { get; private set; }     // v0.3 revision, build 3: clean symbol replays after Key 2
+        public bool ModalitiesStarted { get; private set; } // Build A
+        public void StartModalities() { if (!ModalitiesStarted) { ModalitiesStarted = true; Deck.IntroduceAll(Sitting, ItemKind.Modality); Logged?.Invoke("modality_unit_started"); } }
+        public void RecordModalityAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Sitting, ItemKind.Modality); }
         public void RecordCleanRun() { CleanRuns++; Logged?.Invoke("clean_run_recorded"); }
         public bool V03Complete => Keys >= 2 && AtriumStage >= 4;
         public int ReviewsChecked { get; private set; }
@@ -181,7 +184,7 @@ namespace Ascendant.CelestialDial
             ReviewQueue.Clear(); ReviewIndex = 0; ReviewSummary = ""; Note = "";
             // Form is a test variable (Q05 decision 2): alternate compressed Dial and direct tap.
             for (int i = 0; i < due.Count && i < ReviewDeck.BatchSize; i++)
-                ReviewQueue.Add(new ReviewTask { seat = due[i].seat, mode = (int)(due[i].Kind == ItemKind.Glyph ? ReviewMode.Glyph : i % 2 == 0 ? ReviewMode.Dial : ReviewMode.Tap) });
+                ReviewQueue.Add(new ReviewTask { seat = due[i].seat, mode = (int)(due[i].Kind == ItemKind.Glyph ? ReviewMode.Glyph : due[i].Kind == ItemKind.Modality ? (i % 2 == 0 ? ReviewMode.DialModality : ReviewMode.TapModality) : i % 2 == 0 ? ReviewMode.Dial : ReviewMode.Tap) });
             Screen = SliceScreen.Review; Logged?.Invoke("review_started"); return true;
         }
         // Direct-tap item: which element does this sign belong to? One nudge, then reveal and move on.
@@ -191,6 +194,15 @@ namespace Ascendant.CelestialDial
         {
             var task = CurrentReview; if (task == null || task.Mode != ReviewMode.Glyph || task.done) return false;
             bool correct = Zodiac.Wrap(seat) == task.seat;
+            if (correct) { FinishReview(true, task.misses == 0); return true; }
+            task.misses++;
+            if (task.misses >= 2) { FinishReview(false, false); return false; }
+            Note = "Not that one. Try once more."; return false;
+        }
+        public bool AnswerModalityTap(string modality)
+        {
+            var task = CurrentReview; if (task == null || task.Mode != ReviewMode.TapModality || task.done) return false;
+            bool correct = Zodiac.ModalityAt(task.seat) == modality;
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++;
             if (task.misses >= 2) { FinishReview(false, false); return false; }
@@ -209,11 +221,13 @@ namespace Ascendant.CelestialDial
         {
             var task = CurrentReview; if (task == null || task.done) return;
             task.done = true; task.correct = correct;
-            var kind = task.Mode == ReviewMode.Glyph ? ItemKind.Glyph : ItemKind.Element;
+            var kind = task.Mode == ReviewMode.Glyph ? ItemKind.Glyph : (task.Mode == ReviewMode.TapModality || task.Mode == ReviewMode.DialModality) ? ItemKind.Modality : ItemKind.Element;
             Deck.RecordReview(task.seat, correct, eligible, Sitting, kind);
-            string name = Zodiac.Seats[task.seat].Name, element = Zodiac.Seats[task.seat].Element;
+            string name = Zodiac.Seats[task.seat].Name, element = Zodiac.Seats[task.seat].Element, modality = Zodiac.ModalityAt(task.seat).ToLowerInvariant();
             Note = kind == ItemKind.Glyph
                 ? (correct ? "Yes. That is the symbol of " + name + "." : "That is the symbol of " + name + ". We will come back to it.")
+                : kind == ItemKind.Modality
+                ? (correct ? "Yes. " + name + " is " + modality + "." : name + " is " + modality + ". We will come back to it.")
                 : (correct ? "Yes. " + name + " is " + element + "." : name + " is " + element + ". We will come back to it.");
             ReviewIndex++;
             if (ReviewIndex >= ReviewQueue.Count)
@@ -231,9 +245,10 @@ namespace Ascendant.CelestialDial
         }
         public bool V02Complete => WheelComplete && AtriumStage >= 3;
         // ---- save / restore ----
-        public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned)
+        public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned) { return ToSave(lit, kin, keyEarned, null, null); }
+        public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned, bool[] litMod, bool[] kinMod)
         {
-            return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned,
+            return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
@@ -243,8 +258,8 @@ namespace Ascendant.CelestialDial
             PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = save.keyEarned ? 1 : 0; Ended = save.keyEarned;
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; ReviewsChecked = save.reviewsChecked;
-            Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
-            if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < 2) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
+            Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; ModalitiesStarted = save.modalitiesStarted; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
+            if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < 3) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
             Screen = SliceScreen.Hub; Walk.Enter(Room.Atrium, "entry"); Logged?.Invoke("session_resumed"); return true;
         }
     }

@@ -24,6 +24,7 @@
 <button id="birth-chart">Enter birth date, time, place</button><button id="birth-known">Enter what I already know</button><button id="birth-unknown">I don't know</button>
 <button id="next-screen">Continue</button><button id="insert">Insert the Key</button><button id="restart">Start over, test only</button>
 <button id="enter-wing">The Zodiac Wing</button><button id="enter-seals">Check the Seals</button><button id="leave-wing">Back to the Atrium</button><button id="leave-review">Back to the Atrium</button>
+<div id="modalities" role="group" aria-label="Which kind?"><button id="modality-0">Cardinal</button><button id="modality-1">Fixed</button><button id="modality-2">Mutable</button></div>
 <div id="elements" role="group" aria-label="Which family?"><button id="element-0">Fire</button><button id="element-1">Earth</button><button id="element-2">Air</button><button id="element-3">Water</button></div>
 <div id="room" role="group" aria-label="Points of interest, tap to walk there"></div>
 <button id="enter-dial">The Dial</button><button id="enter-shelf">The bookshelf</button><button id="close-book">Close the book</button><button id="walk-speed">Walk speed, test only</button>
@@ -43,6 +44,7 @@
     const sb=document.createElement('button');sb.id='sign-'+i;sb.textContent=SIGNS[i];sb.onclick=()=>send('sign:'+i);byId('signs').appendChild(sb);
   }
   for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed'])byId(id).onclick=()=>send(id);
+  for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);}
   byId('next-screen').onclick=()=>send('next-screen');
   for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
@@ -71,6 +73,7 @@
     const POI={desk:[-125,426,70,40],'wing-door':[0,325,70,100],caspar:[100,420,44,76],'sealed-left':[-120,325,70,100],'sealed-right':[120,325,70,100],'atrium-door':[-130,325,70,100],dial:[30,250,200,200],shelf:[120,140,50,36]};
     for(const id in POI)if(byId('poi-'+id))box('poi-'+id,POI[id][0],POI[id][1],POI[id][2],POI[id][3]);
     for(let i=0;i<4;i++)box('element-'+i,-78+(i%2)*156,300+Math.floor(i/2)*64,150,56);
+    for(let i=0;i<3;i++)box('modality-'+i,0,300+i*64,300,56);
     const gy=state&&state.glyphMode==='name'?340:300;for(let i=0;i<4;i++)box('glyph-name-'+i,-78+(i%2)*156,gy+Math.floor(i/2)*64,150,56);
     for(let i=0;i<12;i++)box('sign-'+i,-110+(i%3)*110,316+Math.floor(i/3)*58,100,52);
   }
@@ -97,6 +100,7 @@
       byId('enter-dial').disabled=!state.canEnterDial;byId('enter-shelf').disabled=!state.canEnterShelf;byId('close-book').disabled=!state.canCloseBook;byId('walk-speed').disabled=!(state.screen==='hub'&&!state.busy);
       byId('walk-speed').setAttribute('aria-label','Walk speed: '+(state.walkSpeed||'normal')+', test only');
       const tap=state.screen==='review'&&state.reviewMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
+      const modTap=state.screen==='review'&&state.reviewMode==='modality';for(let i=0;i<3;i++)byId('modality-'+i).disabled=!modTap;byId('modalities').hidden=!modTap;
       const glyph=!!state.glyphMode&&!state.busy;for(let i=0;i<4;i++){const gb=byId('glyph-name-'+i);gb.disabled=!glyph;gb.textContent=state.glyphOptions&&state.glyphOptions[i]?state.glyphOptions[i]:'';}byId('glyph-names').hidden=!glyph;
       byId('glyph-names').setAttribute('aria-label',glyph?'Which sign carries the symbol '+state.glyphChar+'?':'Which sign carries this symbol?');
       byId('name').hidden=!state.canName;if(state.canName&&document.activeElement!==byId('name')&&byId('name').value===''&&state.playerName!=='Keeper')byId('name').value=state.playerName;
@@ -108,7 +112,7 @@
       layout();
       // Refocus when nothing useful is focused, or when the last focus was ours (not the player's own Tab).
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
-        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canEnterDial?byId('enter-dial'):tap?byId('element-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
+        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canEnterDial?byId('enter-dial'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});autoFocused=focus;
       }
     },

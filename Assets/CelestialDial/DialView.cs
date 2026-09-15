@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -35,7 +36,7 @@ namespace Ascendant.CelestialDial
         readonly Text[] seatTexts = new Text[12];
         readonly Text[] seatGlyphs = new Text[12];
         public Font GlyphFont { get; private set; } // Placeholder glyph rendering: Noto Sans Symbols (OFL), the Unicode zodiac symbols.
-        Text message, destination, start, count, phase, sealText, motionText;
+        Text message, destination, start, count, phase, sealText, motionText, subtitle;
         Button seal, back, forward, countButton, next, optional, askButton;
         RectTransform root, ring, bracket;
         Canvas canvas;
@@ -59,6 +60,7 @@ namespace Ascendant.CelestialDial
             public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy, review, wheelComplete, canAsk;
             public int hintLevel; // for test evidence; never shown to the player
             public int cleanRuns; public bool practice, hard;
+            public string unit = ""; public bool modalitiesComplete; public int litModCount, step;
             public int familiesComplete, keys;
             public string[] glyphs;
             public bool namesHidden, glyphWheel, key2, v03Complete;
@@ -92,7 +94,7 @@ namespace Ascendant.CelestialDial
             var bg = canvasObject.AddComponent<Image>(); bg.color = Charcoal;
             root = Rect("Portrait", canvasObject.transform, 0, 0, 360, 800);
             Label(root, "THE ZODIAC WING", 0, 32, 340, 24, 18);
-            Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14);
+            subtitle = Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14);
             ring = Rect("Twelve-seat Dial", root, 0, 270, 332, 332);
             var hit = ring.gameObject.AddComponent<Image>(); hit.color = new Color(0,0,0,.001f);
             ring.gameObject.AddComponent<DialDrag>().View = this;
@@ -245,7 +247,7 @@ namespace Ascendant.CelestialDial
         IEnumerator Correct(DialEvent result)
         {
             busy=true;
-            Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional && Lesson.Phase != LessonPhase.Review; // Reviews never light seats.
+            Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional && Lesson.Phase != LessonPhase.Review && !Lesson.InModalities; // Reviews never light seats; the modality unit lights its own array.
             message.text=Lesson.Phase==LessonPhase.Review ? Lesson.Message : Lesson.CorrectLine(result);
             RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .6f : 1.1f);
@@ -277,7 +279,7 @@ namespace Ascendant.CelestialDial
             busy=true; int beginning=Lesson.Dial.Start, before=Lesson.Dial.Selected; string rule=Lesson.Message;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing(); RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Beat);
-            for(int n=1;n<=4;n++)
+            for(int n=1;n<=Lesson.Dial.Forward;n++)
             {
                 Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
                 count.text=Number(n);
@@ -289,7 +291,7 @@ namespace Ascendant.CelestialDial
         }
         IEnumerator Demonstrate()
         {
-            busy=true; int beginning=Lesson.Dial.Start; int steps=Lesson.Phase==LessonPhase.GlyphWheel ? Zodiac.Wrap(Lesson.Dial.Target-beginning) : 4;
+            busy=true; int beginning=Lesson.Dial.Start; int steps=Lesson.Phase==LessonPhase.GlyphWheel ? Zodiac.Wrap(Lesson.Dial.Target-beginning) : Lesson.Dial.Forward;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing();
             message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch. I turn until the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+" sits under the bracket." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Beat);
@@ -332,8 +334,11 @@ namespace Ascendant.CelestialDial
                 Lesson.Phase==LessonPhase.GlyphNames ? "The symbols · " + Lesson.GlyphIndex + " of 12 named" :
                 Lesson.Phase==LessonPhase.GlyphWheel ? "The symbols, in order · " + Lesson.GlyphIndex + " of 12" :
                 Lesson.Phase==LessonPhase.Key2 ? "Twelve symbols read. Keeper Key 2 earned." :
+                Lesson.Phase==LessonPhase.ModalityComplete ? "Three kinds complete. The wheel keeps both patterns." :
+                Lesson.Phase==LessonPhase.ModalityPaused ? "Paused for now" :
                 Lesson.Phase==LessonPhase.Review ? "Checking the seals" :
-                Lesson.IsProblem ? (Lesson.Phase==LessonPhase.Guided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example"; // no level numbers on screen (owner, Sept 13)
+                Lesson.IsProblem ? (Lesson.Phase==LessonPhase.Guided || Lesson.Phase==LessonPhase.ModalityGuided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example"; // no level numbers on screen (owner, Sept 13)
+            subtitle.text=Lesson.InModalities ? "The Second Pattern" : "The Elemental Pattern"; // placeholder unit name (owner writes)
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;
@@ -355,7 +360,9 @@ namespace Ascendant.CelestialDial
                 seatGlyphs[i].gameObject.SetActive(showGlyph); seatGlyphs[i].text=Zodiac.Seats[i].Glyph; seatGlyphs[i].color=Bone;
                 var seatRectTransform=(RectTransform)seatTexts[i].transform; seatRectTransform.anchoredPosition=new Vector2(0,showGlyph ? -36 : -26); // top-anchored rect: -26 is the tile center; below the mark when one shows (owner playtest 3: names sat on the tile's top edge)
                 seatTexts[i].fontSize=showGlyph ? 9 : 11;
-                seatTexts[i].text=(selected && Lesson.Dial.Rejected ? "× " : "")+(hideName ? "" : Zodiac.Seats[i].Name+(Lesson.Lit[i] && !showGlyph ? "\n"+Zodiac.Seats[i].Element : ""));
+                bool showMod=Lesson.LitMod[i] && !hideName; // Build A: the modality joins the element once the seat is lit in that unit
+                seatTexts[i].text=(selected && Lesson.Dial.Rejected ? "× " : "")+(hideName ? "" : Zodiac.Seats[i].Name+(Lesson.Lit[i] && !showGlyph ? "\n"+Zodiac.Seats[i].Element : "")+(showMod ? (Lesson.Lit[i] && !showGlyph ? " · " : "\n")+Zodiac.ModalityAt(i) : ""));
+                seatTexts[i].fontSize=showGlyph ? 9 : showMod ? 9 : 11;
                 bool dormant=Lesson.DialDormant && !waking;
                 seatTexts[i].color=dormant ? new Color(Bone.r,Bone.g,Bone.b,.3f) : Bone;
                 seats[i].GetComponent<Image>().color=dormant ? new Color(.1f,.1f,.12f) : Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f);
@@ -379,7 +386,7 @@ namespace Ascendant.CelestialDial
             var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete,
-                glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,cleanRuns=Lesson.CleanRuns,practice=Lesson.Practice,hard=Lesson.Hard,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : ""};
+                glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,cleanRuns=Lesson.CleanRuns,practice=Lesson.Practice,hard=Lesson.Hard,unit=Lesson.InModalities ? "modalities" : Lesson.GlyphsShown && !(Lesson.WheelComplete && Lesson.Key2Earned && Lesson.Phase==LessonPhase.Key2) ? "symbols" : "elements",modalitiesComplete=Lesson.ModalitiesComplete,litModCount=Lesson.LitMod.Count(v=>v),step=Lesson.Dial.Forward,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : ""};
             Slice?.Fill(state); return state;
         }
         public void Publish()
