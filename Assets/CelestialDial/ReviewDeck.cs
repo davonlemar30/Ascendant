@@ -7,7 +7,7 @@ namespace Ascendant.CelestialDial
     public enum ItemState { Introduced, Practicing }
 
     // One atomic item per sign-element pair (Curriculum canon, Stage 0: all twelve enter the deck as Introduced).
-    public enum ItemKind { Element, Glyph } // v0.3 adds twelve glyph items (sign ↔ glyph), Curriculum canon Stage 1.
+    public enum ItemKind { Element, Glyph, Modality } // v0.3 adds twelve glyph items; Build A adds twelve sign ↔ modality items (Curriculum canon Stage 1).
 
     [Serializable] // JsonUtility skips a nested class without this: the deck had not been saving since v0.3 (owner playtest, Sept 14).
     public sealed class ReviewItem
@@ -29,7 +29,7 @@ namespace Ascendant.CelestialDial
     {
         public static readonly int[] Ladder = { 1, 3, 7, 14, 30 };
         public const int BatchSize = 6; // "two minutes on entering the Library"; tuning variable
-        public readonly ReviewItem[] Items = Enumerable.Range(0, 24).Select(i => new ReviewItem { seat = i % 12, kind = i / 12 }).ToArray();
+        public readonly ReviewItem[] Items = Enumerable.Range(0, 36).Select(i => new ReviewItem { seat = i % 12, kind = i / 12 }).ToArray();
         public ReviewItem Item(int seat, ItemKind kind) => Items[(int)kind * 12 + Zodiac.Wrap(seat)];
         public event Action<string> Logged;
 
@@ -37,7 +37,7 @@ namespace Ascendant.CelestialDial
         public void IntroduceAll(int day, ItemKind kind)
         {
             foreach (var item in Items) if (item.Kind == kind && !item.entered) { item.entered = true; item.interval = 0; item.dueDay = day; } // ready at the next check
-            Logged?.Invoke(kind == ItemKind.Element ? "deck_introduced" : "deck_glyphs_introduced");
+            Logged?.Invoke(kind == ItemKind.Element ? "deck_introduced" : kind == ItemKind.Glyph ? "deck_glyphs_introduced" : "deck_modalities_introduced");
         }
         // A correct Level 0/1 answer in a lesson makes the item Practicing and starts its streak.
         public void RecordLesson(int seat, bool eligible, int day) { RecordLesson(seat, eligible, day, ItemKind.Element); }
@@ -89,5 +89,8 @@ namespace Ascendant.CelestialDial
         public int glyphIndex;      // next glyph in zodiac order within the current part
         public int reviewsChecked;
         public int cleanRuns;       // v0.3 revision, build 3
+        public bool[] litMod = new bool[12]; // Build A: modality unit
+        public bool[] kinMod = new bool[3];
+        public bool modalitiesStarted;
     }
 }

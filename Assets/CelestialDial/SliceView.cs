@@ -34,6 +34,7 @@ namespace Ascendant.CelestialDial
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
         Button enterWing, enterSeals, hubRestart, leaveReview;
         readonly Button[] elementButtons = new Button[4];
+        readonly Button[] modalityButtons = new Button[3]; // Build A: which kind?
         Image flash, seam, keyGlow, candle, insertGlow, lampOne, lampTwo, deskCloth, doorOpenLight;
         Text enterSealsLabel;
         readonly Image[] floorLines = new Image[24];
@@ -71,11 +72,12 @@ namespace Ascendant.CelestialDial
             Dial = dialObject.AddComponent<DialView>();
             Dial.Slice = this; Dial.ExtraActions = WebAction; font = Dial.UiFont;
             Flow.Logged += name => Dial.Lesson.Dial.Log(name.ToLowerInvariant().Replace(':', '_'), false, false, "slice");
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.Phase != LessonPhase.Review) { Flow.RecordLessonAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.Phase != LessonPhase.Review && !Dial.Lesson.InModalities) { Flow.RecordLessonAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             Dial.Lesson.ReviewFinished += (seat, correct, eligible) => StartCoroutine(AfterDialReview(correct, eligible));
             Dial.Lesson.GlyphNamedEvent += (seat, correct, eligible) => { Flow.RecordGlyphAnswer(seat, eligible); Flow.SetGlyphProgress(Dial.Lesson.Phase == LessonPhase.GlyphWheel ? 1 : 0, Dial.Lesson.GlyphIndex); Save(); };
             Dial.Lesson.Dial.Logged += e => { if (e.event_name == "glyph_placed") { Flow.RecordGlyphAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             Dial.Lesson.PracticeFinished += clean => { if (clean) Flow.RecordCleanRun(); Save(); Publish(); };
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.InModalities) { Flow.RecordModalityAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             var canvasObject = new GameObject("Slice Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
             canvasObject.transform.SetParent(transform, false);
             canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 1;
@@ -224,6 +226,7 @@ namespace Ascendant.CelestialDial
             reviewProgress = Label(review, "", 0, 62, 300, 20, 12); reviewProgress.color = Muted;
             reviewQuestion = Label(review, "", 0, 200, 330, 44, 18);
             for (int i = 0; i < 4; i++) { string element = Elements[i]; elementButtons[i] = MakeButton(review, element, -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerTap(element)); }
+            for (int i = 0; i < 3; i++) { string modality = Zodiac.Modalities[i]; modalityButtons[i] = MakeButton(review, modality, 0, 300 + i * 64, 300, 56, () => AnswerModalityTap(modality)); modalityButtons[i].gameObject.SetActive(false); }
             var glyphBox = Rect("Review glyph", review, 0, 150, 90, 90); reviewGlyph = Label(glyphBox, "", 0, 45, 90, 90, 60); reviewGlyph.font = Dial.GlyphFont; reviewGlyph.horizontalOverflow = HorizontalWrapMode.Overflow; reviewGlyph.verticalOverflow = VerticalWrapMode.Overflow; reviewGlyph.gameObject.SetActive(false);
             for (int i = 0; i < 4; i++) { int slot = i; reviewGlyphButtons[i] = MakeButton(review, "", -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerGlyphReview(slot)); reviewGlyphButtons[i].gameObject.SetActive(false); }
             reviewNote = Label(review, "", 0, 440, 330, 50, 14);
@@ -338,6 +341,7 @@ namespace Ascendant.CelestialDial
             else if (command == "leave-wing") LeaveWing();
             else if (command == "leave-review") LeaveReview();
             else if (command.StartsWith("element:") && int.TryParse(command.Substring(8), out int element) && element >= 0 && element < 4) AnswerTap(Elements[element]);
+            else if (command.StartsWith("modality:") && int.TryParse(command.Substring(9), out int modality) && modality >= 0 && modality < 3) AnswerModalityTap(Zodiac.Modalities[modality]);
             else if (command.StartsWith("glyph-name:") && int.TryParse(command.Substring(11), out int slot) && slot >= 0 && slot < 4) { if (Flow.Screen == SliceScreen.Review) AnswerGlyphReview(slot); else AnswerGlyphName(slot); }
         }
         void ChooseBirth(string choice) { if (busy) return; Flow.ChooseBirth(choice); AfterBirthEntry(); }
@@ -386,6 +390,7 @@ namespace Ascendant.CelestialDial
             if (Dial.Lesson.CanContinueUnit) Dial.Lesson.BeginContinuation();
             else if (Dial.Lesson.CanBeginGlyphs && Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) Save(); } // Part B: the wheel hides its names
             else if (Dial.Lesson.CanBeginGlyphs) Dial.Lesson.Say(DialLesson.ShelfFirst); // the lit wheel, read only, until the book is read
+            else if (Dial.Lesson.Phase != LessonPhase.GlyphWheel && Dial.Lesson.CanBeginModalities) { if (Dial.Lesson.BeginModalities()) { Flow.StartModalities(); Save(); } } // Build A: the second pattern, after Key 2
             Show(); Dial.Realign(); Publish();
         }
         void OpenBook()
@@ -396,7 +401,7 @@ namespace Ascendant.CelestialDial
             else Dial.Lesson.Say(DialLesson.ShelfRead); // Part A done or Key 2 earned: the book only shows its pages closed
             Show(); Publish();
         }
-        void CloseBook() { if (busy || !Flow.LeaveBook()) return; Save(); Show(); Publish(); }
+        void CloseBook() { if (busy || !Flow.LeaveBook()) return; Dial.Lesson.AbandonPractice(); Save(); Show(); Publish(); }
         void Walk(string id)
         {
             if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom)) return;
@@ -480,10 +485,10 @@ namespace Ascendant.CelestialDial
             var task = Flow.CurrentReview;
             reviewNote.text = "";
             if (task == null) { Show(); Publish(); return; }
-            if (task.Mode == ReviewMode.Dial)
+            if (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality)
             {
                 Dial.SliceHidesOptional = true;
-                Dial.Lesson.BeginReview(task.seat); Show(); Dial.Realign(); Publish();
+                Dial.Lesson.BeginReview(task.seat, task.Mode == ReviewMode.DialModality ? 3 : 4); Show(); Dial.Realign(); Publish();
             }
             else { Show(); Publish(); }
         }
@@ -492,6 +497,14 @@ namespace Ascendant.CelestialDial
             busy = true; Flow.FinishReview(correct, eligible); Save(); Dial.ForceRefresh(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? .8f : 1.4f);
             Dial.Lesson.EndReview(); Dial.Realign(); busy = false; StartReviewItem();
+        }
+        void AnswerModalityTap(string modality)
+        {
+            if (busy) return;
+            var task = Flow.CurrentReview; if (task == null || task.Mode != ReviewMode.TapModality) return;
+            Flow.AnswerModalityTap(modality); Dial.Lesson.Dial.Log("tap_answered");
+            reviewNote.text = Flow.Note; Save(); Publish();
+            if (task.done) StartCoroutine(AfterTap());
         }
         void AnswerTap(string element)
         {
@@ -513,7 +526,7 @@ namespace Ascendant.CelestialDial
         {
             var s = Flow.Screen;
             var task = Flow.CurrentReview;
-            bool reviewOnDial = s == SliceScreen.Review && task != null && task.Mode == ReviewMode.Dial && !task.done;
+            bool reviewOnDial = s == SliceScreen.Review && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth);
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber); hub.gameObject.SetActive(s == SliceScreen.Hub);
@@ -529,6 +542,7 @@ namespace Ascendant.CelestialDial
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
                 wingRoomCaption.text = Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "The wheel has hidden its names. Go to the Dial and find each symbol in turn." // placeholder (owner writes)
+                    : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The wheel keeps a second pattern. Go to the Dial." // placeholder (owner writes)
                     : Dial.Lesson.CanPractice ? (Dial.Lesson.Hard ? "The symbols are yours. The book will test you again, harder." : "The symbols are yours. The book will test you again.") // placeholder (owner writes)
                     : Flow.WheelComplete && !Dial.Lesson.AllNamed ? "The wheel is lit. Something on the shelf has woken with it." // placeholder (owner writes)
                     : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
@@ -585,8 +599,10 @@ namespace Ascendant.CelestialDial
             bool done = Flow.ReviewDone;
             reviewProgress.text = done ? "" : (Flow.ReviewIndex + 1) + " of " + Flow.ReviewQueue.Count;
             bool glyphItem = !done && task != null && task.Mode == ReviewMode.Glyph;
-            reviewQuestion.text = done ? "" : task != null && task.Mode == ReviewMode.Tap ? Zodiac.Seats[task.seat].Name + ". Which family?" : glyphItem ? "Which sign carries this symbol?" : "";
+            bool modItem = !done && task != null && task.Mode == ReviewMode.TapModality;
+            reviewQuestion.text = done ? "" : task != null && task.Mode == ReviewMode.Tap ? Zodiac.Seats[task.seat].Name + ". Which family?" : modItem ? Zodiac.Seats[task.seat].Name + ". Which kind?" : glyphItem ? "Which sign carries this symbol?" : "";
             foreach (var b in elementButtons) { b.gameObject.SetActive(!done && task != null && task.Mode == ReviewMode.Tap); b.interactable = !busy && task != null && !task.done; }
+            foreach (var b in modalityButtons) { b.gameObject.SetActive(modItem); b.interactable = !busy && task != null && !task.done; }
             reviewGlyph.gameObject.SetActive(glyphItem); reviewGlyph.text = glyphItem ? Zodiac.Seats[task.seat].Glyph : "";
             var opts = glyphItem ? Flow.GlyphReviewOptions(task.seat) : new int[4];
             for (int i = 0; i < 4; i++) { reviewGlyphButtons[i].gameObject.SetActive(glyphItem); reviewGlyphButtons[i].GetComponentInChildren<Text>().text = glyphItem ? Zodiac.Seats[opts[i]].Name : ""; reviewGlyphButtons[i].interactable = !busy && glyphItem && !task.done; }
@@ -612,7 +628,7 @@ namespace Ascendant.CelestialDial
         public void Fill(DialView.WebState state)
         {
             var s = Flow.Screen; var task = Flow.CurrentReview;
-            bool reviewOnDial = s == SliceScreen.Review && task != null && task.Mode == ReviewMode.Dial && !task.done;
+            bool reviewOnDial = s == SliceScreen.Review && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             state.screen = s.ToString().ToLowerInvariant(); state.playerName = Flow.DisplayName; state.note = Flow.Note;
             state.busy = state.busy || busy; // The semantic layer must see the slice's own beats as busy too.
             state.caspar = s == SliceScreen.Identity ? "Who are you? Enter a name, then continue." :
@@ -635,7 +651,7 @@ namespace Ascendant.CelestialDial
             state.canEnterWing = s == SliceScreen.Hub && !busy; state.canEnterSeals = s == SliceScreen.Hub && !busy;
             state.canLeaveWing = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy && Dial.Lesson.Phase != LessonPhase.GlyphNames;
             state.canLeaveReview = s == SliceScreen.Review && Flow.ReviewDone && !busy;
-            state.reviewMode = s != SliceScreen.Review ? "" : Flow.ReviewDone ? "done" : task != null && task.Mode == ReviewMode.Dial ? "dial" : "tap";
+            state.reviewMode = s != SliceScreen.Review ? "" : Flow.ReviewDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
             state.reviewIndex = Flow.ReviewIndex; state.reviewTotal = Flow.ReviewQueue.Count; state.reviewSign = task != null && !Flow.ReviewDone ? Zodiac.Seats[task.seat].Name : "";
             state.reviewSummary = Flow.ReviewSummary; state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
             bool partA = s == SliceScreen.Book && Dial.Lesson.Phase == LessonPhase.GlyphNames;
@@ -668,7 +684,7 @@ namespace Ascendant.CelestialDial
         void Save()
         {
             if (Flow.AtriumStage < 2) return;
-            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned))); PlayerPrefs.Save(); }
+            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned, Dial.Lesson.LitMod, Dial.Lesson.KinMod))); PlayerPrefs.Save(); }
             catch (Exception e) { Debug.LogWarning("[CelestialDial] save failed: " + e.Message); }
         }
         void TryRestore()
@@ -680,6 +696,7 @@ namespace Ascendant.CelestialDial
             if (save == null || !Flow.Restore(save)) return;
             Dial.Lesson.RestoreProgress(save.sunSign, save.lit, save.kin, save.keyEarned);
             Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2); Dial.Lesson.SetCleanRuns(save.cleanRuns);
+            Dial.Lesson.RestoreModalities(save.litMod, save.kinMod, save.modalitiesStarted);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: 2";
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f); candle.color = Bone; }
