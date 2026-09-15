@@ -39,6 +39,15 @@ namespace Ascendant.Build
         }
         static void Check(bool value,string text) { if(!value)throw new Exception(text);Report.Add("PASS: "+text); }
         static void Act(string command) => View.Dial.WebAction(command);
+        static void AnswerReview(bool captureGlyph)
+        {
+            var task=View.Flow.CurrentReview;if(task==null||task.done)return;
+            if(task.Mode==ReviewMode.Dial){Act("seat:"+Zodiac.Destination(task.seat));Act("seal");}
+            else if(task.Mode==ReviewMode.DialModality){Act("seat:"+Zodiac.Destination(task.seat,3));Act("seal");}
+            else if(task.Mode==ReviewMode.Tap){Act("element:"+System.Array.IndexOf(new[]{"Fire","Earth","Air","Water"},Zodiac.Seats[task.seat].Element));}
+            else if(task.Mode==ReviewMode.TapModality){if(View.Flow.ReviewIndex==1)Capture("slice-390-review-modality.png");Act("modality:"+(task.seat%3));}
+            else{int slot=System.Array.IndexOf(View.Flow.GlyphReviewOptions(task.seat),task.seat);if(captureGlyph && View.Flow.ReviewIndex==0)Capture("slice-390-review-glyph.png");Act("glyph-name:"+slot);}
+        }
         static void QueueChecks()
         {
             Report.Clear();Steps.Clear();RuntimeErrors.Clear();Application.logMessageReceived+=CaptureLog;
@@ -93,7 +102,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Key2Earned && View.Flow.Keys==2 && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key2_earned")==1,"twelve marks placed earns Key 2 once");Capture("slice-390-key2.png");});
             Steps.Enqueue(()=>Act("leave-wing"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==4 && View.Flow.V03Complete,"one more return completes v0.3");Capture("slice-390-hub-v03.png");Act("enter-seals");});
-            for(int i=0;i<6;i++) Steps.Enqueue(()=>{var task=View.Flow.CurrentReview;if(task==null||task.done)return;if(task.Mode==ReviewMode.Dial){Act("seat:"+Zodiac.Destination(task.seat));Act("seal");}else if(task.Mode==ReviewMode.Tap){Act("element:"+System.Array.IndexOf(new[]{"Fire","Earth","Air","Water"},Zodiac.Seats[task.seat].Element));}else{int slot=System.Array.IndexOf(View.Flow.GlyphReviewOptions(task.seat),task.seat);if(View.Flow.ReviewIndex==0)Capture("slice-390-review-glyph.png");Act("glyph-name:"+slot);}});
+            for(int i=0;i<6;i++) Steps.Enqueue(()=>AnswerReview(true));
             Steps.Enqueue(()=>{Check(View.Flow.ReviewDone,"a review batch with the deck open completes");Act("leave-review");});
             // ---- v0.3 revision, build 3: the book tests again after Key 2; a clean replay hardens the next one ----
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub with two Keys");Act("enter-wing");});
@@ -108,7 +117,25 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub");Act("enter-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"in the Wing room again");Act("walk:shelf");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(View.Flow.Screen==SliceScreen.Book && l.Practice && l.Hard && l.SeatAt(0)!=0 && l.GlyphOptions(l.CurrentGlyph).Length==4 && l.GlyphOptions(l.CurrentGlyph).Distinct().Count()==4 && l.GlyphOptions(l.CurrentGlyph).Contains(l.CurrentGlyph),"the hard replay shuffles the order and keeps four distinct names including the answer");Capture("slice-390-practice-hard.png");Act("close-book");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"the book can be closed mid-practice");Act("walk:atrium-door");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"the book can be closed mid-practice");Act("walk:dial");});
+            // ---- Build A: the modalities on the Dial ----
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(View.Flow.Screen==SliceScreen.Wing && l.Phase==LessonPhase.ModalityGuided && l.Dial.Forward==3 && l.Dial.Start==l.Sun && l.LitMod[l.Sun] && View.Flow.ModalitiesStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Modality && i.entered)==12,"after Key 2 the Dial opens the modality unit at the sun sign, three forward, and introduces twelve modality items");Capture("slice-390-modalities.png");});
+            for(int i=0;i<9;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(!(l.Phase==LessonPhase.ModalityGuided||l.Phase==LessonPhase.ModalityOwn)||!l.Dial.Active)return;if(l.LitMod.Count(v=>v)==6 && l.Phase==LessonPhase.ModalityOwn && l.Dial.Attempts==0){Act("seat:"+Zodiac.Wrap(l.Dial.Start+2));Act("seal");return;}Act("seat:"+Zodiac.Destination(l.Dial.Start,3));Act("seal");});
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;if((l.Phase==LessonPhase.ModalityGuided||l.Phase==LessonPhase.ModalityOwn) && l.Dial.Active){Act("seat:"+Zodiac.Destination(l.Dial.Start,3));Act("seal");}});
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.ModalityComplete && l.ModalitiesComplete && View.Flow.Keys==2 && l.Dial.Events.Count(e=>e.event_name=="modality_family_completed")==3,"three modality families of four complete with no new Key");Capture("slice-390-modalities-complete.png");});
+            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.Deck.Due(View.Flow.Sitting).Any(i=>i.Kind==ItemKind.Modality),"back at the Hub with modality items ready");});
+            bool sawModality=false; // older items come first, so the modality items may wait a batch or two
+            for(int round=0;round<3;round++)
+            {
+                Steps.Enqueue(()=>{if(sawModality||View.Flow.Screen!=SliceScreen.Hub)return;Act("enter-seals");});
+                for(int i=0;i<6;i++) Steps.Enqueue(()=>{if(View.Flow.Screen==SliceScreen.Review)AnswerReview(false);});
+                Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Review)return;if(View.Flow.ReviewQueue.Any(t=>t.Mode==ReviewMode.TapModality||t.Mode==ReviewMode.DialModality))sawModality=true;Act("leave-review");});
+            }
+            Steps.Enqueue(()=>{Check(sawModality && View.Flow.Screen==SliceScreen.Hub,"a review batch carries modality items within three checks");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub");Act("reload");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Dial.Lesson.ModalitiesComplete && View.Flow.ModalitiesStarted,"a reload keeps the modality unit complete");Act("enter-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"in the Wing room after the reload");Act("walk:atrium-door");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub before the reload");Act("reload");});
             Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.WheelComplete && View.Flow.AtriumStage==4 && View.Flow.Keys==2 && View.Dial.Lesson.Key2Earned && View.Flow.CleanRuns==1 && View.Dial.Lesson.Hard && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with Key 2");Act("restart");});
             Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});
