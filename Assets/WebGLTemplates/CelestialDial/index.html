@@ -32,6 +32,8 @@
 <div id="grid-signs" role="group" aria-label="Signs to seat: tap one, then its cell"></div>
 <div id="grid-cells" role="group" aria-label="The table: four element rows by three kinds"></div>
 <button id="grid-seal">Seal</button><button id="grid-ask">Ask Caspar for help</button><button id="leave-grid">Leave the table</button><button id="enter-grid">The table</button>
+<div id="builder-names" role="group" aria-label="Which sign is that?"><button id="builder-name-0"></button><button id="builder-name-1"></button><button id="builder-name-2"></button><button id="builder-name-3"></button></div>
+<div id="builder-share" role="group" aria-label="Tap what the two share"><button id="builder-share-0">Kind</button><button id="builder-share-1">Side</button><button id="builder-share-2">Element</button></div>
 </section>
 <div id="announcement" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
 </main>
@@ -50,7 +52,8 @@
   }
   for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid'])byId(id).onclick=()=>send(id);
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
-  for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);}
+  for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
+  for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
   byId('next-screen').onclick=()=>send('next-screen');
   for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
   byId('name').addEventListener('change',e=>send('name:'+e.target.value));
@@ -84,13 +87,17 @@
     // Build B: the table's cells and tiles sit where the canvas draws them.
     for(let i=0;i<12;i++){box('grid-cell-'+i,-72+(i%3)*92,128+Math.floor(i/3)*52,86,48);box('grid-sign-'+i,-129+(i%4)*86,344+Math.floor(i/4)*44,82,40);}
     box('grid-seal',0,654,146,56);box('grid-ask',78,714,164,48);box('leave-grid',-72,714,128,48);box('enter-grid',0,512,300,52);
+    // Build C: the builder's name and share steps sit where the wheel's controls sit.
+    for(let i=0;i<4;i++)box('builder-name-'+i,-78+(i%2)*156,654+Math.floor(i/2)*60,150,56);
+    for(let i=0;i<3;i++)box('builder-share-'+i,-110+i*110,654,104,56);
   }
   let lastAnnouncement='',autoFocused=null,lastPois='';
   window.ascendantDial={
     receive(next){
       state=next;
       const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial'),grid=state.screen==='grid';
-      byId('instructions').textContent=wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):grid?[state.caspar,state.gridReadout,state.gridStatus,'Tap a sign, then the cell where it belongs, then Seal. Tab moves between controls. Only Seal submits.'].filter(Boolean).join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
+      const naming=wing&&state.builderStep==='name',sharing=wing&&state.builderStep==='share';
+      byId('instructions').textContent=naming?[state.message,'Four names: choose the sign Caspar described. Tab moves between controls.'].join(' '):sharing?[state.message,(state.shared&&state.shared.length?'Shared so far: '+state.shared.join(', ')+'.':''),'Tap each thing the two signs share. Tab moves between controls.'].filter(Boolean).join(' '):wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):grid?[state.caspar,state.gridReadout,state.gridStatus,'Tap a sign, then the cell where it belongs, then Seal. Tab moves between controls. Only Seal submits.'].filter(Boolean).join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
       for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('count').disabled=!(wing&&state.active&&!state.glyphWheel);byId('ask-caspar').disabled=!(wing&&state.canAsk);
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
@@ -110,6 +117,10 @@
       for(let i=0;i<12;i++){const t=byId('grid-sign-'+i),c=byId('grid-cell-'+i);const tl=grid&&state.gridTiles?state.gridTiles[i]:SIGNS[i],cl=grid&&state.gridCells?state.gridCells[i]:'Cell '+(i+1);
         t.setAttribute('aria-label',tl);t.disabled=!(grid&&state.canGridPick&&!tl.endsWith(', seated')&&(!state.gridLocked||tl.startsWith(state.gridSign+',')));c.setAttribute('aria-label',cl);c.textContent=cl.split(':')[0];c.disabled=!(grid&&state.canGridPick&&!!state.gridSign&&cl.includes(': empty'));}
       byId('grid-signs').hidden=!grid;byId('grid-cells').hidden=!grid;
+      for(let i=0;i<4;i++){const nb=byId('builder-name-'+i);nb.disabled=!(naming&&state.canBuilderName);nb.textContent=naming&&state.builderOptions&&state.builderOptions[i]?state.builderOptions[i]:'';}
+      byId('builder-names').hidden=!naming;byId('builder-names').setAttribute('aria-label',naming?'Which sign is '+state.builderAsk+'?':'Which sign is that?');
+      for(let i=0;i<3;i++){const sb=byId('builder-share-'+i);const done=!!(state.shared&&state.shared.includes(['Kind','Side','Element'][i]));sb.disabled=!(sharing&&state.canBuilderShare&&!done);sb.textContent=['Kind','Side','Element'][i]+(done?': shared':'');}
+      byId('builder-share').hidden=!sharing;
       byId('walk-speed').setAttribute('aria-label','Walk speed: '+(state.walkSpeed||'normal')+', test only');
       const tap=state.screen==='review'&&state.reviewMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
       const modTap=state.screen==='review'&&state.reviewMode==='modality';for(let i=0;i<3;i++)byId('modality-'+i).disabled=!modTap;byId('modalities').hidden=!modTap;
@@ -125,7 +136,8 @@
       // Refocus when nothing useful is focused, or when the last focus was ours (not the player's own Tab).
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
         const firstTile=grid&&state.gridTiles?state.gridTiles.findIndex(t=>!t.endsWith(', seated')):-1;
-        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
+        const firstShare=sharing&&state.shared?['Kind','Side','Element'].findIndex(l=>!state.shared.includes(l)):-1;
+        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):naming&&state.canBuilderName?byId('builder-name-0'):sharing&&state.canBuilderShare&&firstShare>=0?byId('builder-share-'+firstShare):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});if(document.activeElement===focus)autoFocused=focus; // a target still disabled (a beat in progress) keeps the last auto-focus, so the next state can try again
       }
     },

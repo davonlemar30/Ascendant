@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review, GlyphNames, GlyphWheel, Key2, ModalityGuided, ModalityOwn, ModalityPaused, ModalityComplete }
+    public enum LessonPhase { Encounter, Rule, Guided, Transfer, Independent, Complete, Paused, Optional, Continuation, AllLit, Review, GlyphNames, GlyphWheel, Key2, ModalityGuided, ModalityOwn, ModalityPaused, ModalityComplete, Polarity, OppositeGuided, OppositeOwn, OppositePaused, OppositesComplete, BuilderName, BuilderOpposite, BuilderShare, BuilderPaused, Key4 }
 
     public sealed class DialLesson
     {
@@ -36,8 +36,161 @@ namespace Ascendant.CelestialDial
         // A Level 2 problem shows the count once, one click per beat, before the player takes over.
         public bool CountBeatPending { get; private set; }
         public string Message { get; private set; }
-        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn;
+        public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || InOppositeProblem;
         public bool InModalities => Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || Phase == LessonPhase.ModalityPaused || Phase == LessonPhase.ModalityComplete;
+        // ---- Build C (Unit 1.3): polarity, the six opposite pairs, and the builder on the same Dial. Key 4 for three signs built. ----
+        public bool InOppositeProblem => Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.BuilderOpposite;
+        public bool InOpposites => Phase == LessonPhase.Polarity || Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.OppositePaused || Phase == LessonPhase.OppositesComplete;
+        public bool InBuilder => Phase == LessonPhase.BuilderName || Phase == LessonPhase.BuilderOpposite || Phase == LessonPhase.BuilderShare || Phase == LessonPhase.BuilderPaused || Phase == LessonPhase.Key4;
+        public bool Key3Held { get; private set; }                 // the table's Key, held by the slice; the last pattern waits for it
+        public void SetKey3(bool held) { Key3Held = held; }
+        public bool PolarityShown { get; private set; }            // after the beat every lit seat shows its side (day / night)
+        public int PolarityStep { get; private set; }
+        public readonly bool[] OppKnown = new bool[Zodiac.OppositePairs];
+        public bool OppositesStarted { get; private set; }
+        public bool OppositesComplete => OppKnown.All(v => v);
+        public int PairsKnown => OppKnown.Count(v => v);
+        int oppAssisted;                                           // worked examples this sitting: the reappearance cap, as in the modality unit
+        public int Built { get; private set; }                     // signs built so far (0..3)
+        public bool BuilderEvidence { get; private set; }          // any sign built with every step at Level 0/1: the Key 4 rule
+        public bool Key4Earned { get; private set; }
+        public int BuilderStep { get; private set; }               // 1 name the sign, 2 turn to its opposite, 3 tap what they share; 0 between signs
+        public int BuilderTarget { get; private set; } = -1;
+        int builderMisses; bool builderAssisted;
+        public readonly bool[] Shared = new bool[3];               // kind, side, element marked in step 3
+        public static readonly string[] ShareLabels = { "Kind", "Side", "Element" }; // player words for modality, polarity, element
+        public int[] BuilderTargets => new[] { Sun, Zodiac.Wrap(Sun + 5), Zodiac.Wrap(Sun + 7) }; // three signs in different rows and columns of the table, opposites distinct from them
+        public bool CanBeginOpposites => Key3Held && !Key4Earned && ModalitiesComplete && (Phase == LessonPhase.ModalityComplete || Phase == LessonPhase.Key2 || Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || InOpposites || InBuilder);
+        public const string PolarityLine0 = "One more thing the wheel keeps. Every seat has a side.\nFire and Air are day signs. Earth and Water are night signs."; // placeholder (owner writes)
+        public const string PolarityLine1 = "Older books say " + Zodiac.OlderPolarityTerms + ". We will say day and night.\nLook: each seat shows its side now."; // placeholder (owner writes)
+        public const string OppositesDoneLine = "Six pairs. Every sign has its partner straight across the wheel, and none of them are enemies.\nNow build one for me."; // placeholder (owner writes)
+        public const string OppositesPausedLine = "Let us stop the last pattern here for now.\nWe will pick it up when you return."; // placeholder (owner writes)
+        public const string BuilderNoEvidenceLine = "Three built, but I did most of the building.\nRest, and we will build again when you return."; // placeholder (owner writes)
+        public const string Key4Line = "Three signs built from their parts, and their partners named. Every pattern the wheel keeps is yours now.\nKeeper Key 4 is yours."; // placeholder (owner writes)
+        static string Side(int seat) => Zodiac.PolarityAt(seat);
+        static string Kind(int seat) => Zodiac.ModalityAt(seat).ToLowerInvariant();
+        public bool BeginOpposites()
+        {
+            if (!CanBeginOpposites) return false;
+            if (InOppositeProblem && Dial.Active) return true;
+            if (Phase == LessonPhase.BuilderName || Phase == LessonPhase.BuilderShare || Phase == LessonPhase.Polarity || Phase == LessonPhase.OppositesComplete) return true;
+            bool first = !OppositesStarted; OppositesStarted = true; oppAssisted = 0;
+            if (!PolarityShown) { Phase = LessonPhase.Polarity; PolarityStep = 0; Dial.Home(); Message = PolarityLine0; Dial.Log(first ? "opposites_unit_started" : "polarity_beat_resumed"); return true; }
+            if (!OppositesComplete) { StartNextOpposite(); Dial.Log("opposites_resumed"); return true; }
+            if (Built >= 3 && !Key4Earned) { Built = 0; BuilderEvidence = false; Dial.Log("builder_cleared"); } // three built with help: build again
+            StartBuilderSign(); return true;
+        }
+        void StartNextOpposite()
+        {
+            for (int k = 0; k < Zodiac.OppositePairs; k++) { int start = Zodiac.Wrap(Sun + k); if (!OppKnown[Zodiac.PairOf(start)]) { StartOppositeProblem(start, 0); return; } }
+        }
+        void StartOppositeProblem(int start, int hint)
+        {
+            lastStart = Zodiac.Wrap(start); Phase = hint >= 2 ? LessonPhase.OppositeGuided : LessonPhase.OppositeOwn;
+            Dial.Begin(lastStart, hint, -1, 6); CountBeatPending = hint >= 2;
+            Message = hint >= 2 ? "Now the last pattern: the sign straight across the wheel.\n" + string.Format(RuleFor(6), SignName(lastStart)) + "\nInspect the framed sign, then press Seal." // placeholder (owner writes)
+                : "Your turn. Find the sign across from " + SignName(lastStart) + ".\nMove the wheel, inspect the framed sign, then press Seal."; // placeholder (owner writes)
+        }
+        void AfterOppositeCorrect(DialEvent result)
+        {
+            OppKnown[Zodiac.PairOf(Dial.Start)] = true;
+            if (OppositesComplete) { Dial.Home(); Phase = LessonPhase.OppositesComplete; Message = OppositesDoneLine; Dial.Log("opposites_completed"); return; }
+            StartNextOpposite();
+        }
+        void AfterOppositeDemonstration()
+        {
+            OppKnown[Zodiac.PairOf(Dial.Start)] = true; oppAssisted++;
+            if (oppAssisted >= 3 && !OppositesComplete) { Dial.Home(); Phase = LessonPhase.OppositePaused; Message = OppositesPausedLine; Dial.Log("opposites_paused"); return; }
+            AfterOppositeCorrect(Dial.Events.Last());
+        }
+        // The builder: element and kind given, name the sign, turn to its opposite, tap what the two share.
+        public int[] BuilderOptions
+        {
+            get
+            {
+                int t = BuilderTarget < 0 ? Sun : BuilderTarget;
+                int[] o = { t, Zodiac.Wrap(t + 4), Zodiac.Wrap(t + 8), Zodiac.Wrap(t + 3) }; // the two same-element signs and one same-kind sign
+                int r = (t + Built) % 4; var result = new int[4];
+                for (int i = 0; i < 4; i++) result[(i + r) % 4] = o[i];
+                return result;
+            }
+        }
+        void StartBuilderSign()
+        {
+            if (Built >= 3) { FinishBuilder(); return; }
+            BuilderTarget = BuilderTargets[Built]; BuilderStep = 1; builderMisses = 0; builderAssisted = false; for (int i = 0; i < 3; i++) Shared[i] = false;
+            Phase = LessonPhase.BuilderName; Dial.Home();
+            Message = (Built == 0 ? "Build me a sign from its parts. " : Built == 1 ? "Again. " : "One more. ") + Element(BuilderTarget) + ", " + Kind(BuilderTarget) + ". Which sign is that?"; // placeholder (owner writes)
+            Dial.Log("builder_sign_started");
+        }
+        public bool AnswerBuilderName(int seat)
+        {
+            if (Phase != LessonPhase.BuilderName) return false;
+            int t = BuilderTarget; seat = Zodiac.Wrap(seat);
+            if (seat == t)
+            {
+                Dial.Log("builder_named", true, builderMisses <= 1, "DirectSeat");
+                Message = "Yes. " + SignName(t) + ": " + Element(t) + ", " + Kind(t) + ".\nNow turn to the sign across from it, then press Seal."; StartBuilderOpposite(); return true;
+            }
+            builderMisses++;
+            if (builderMisses == 1)
+            {
+                // Level 1 names the property the wrong sign misses.
+                Message = "Not that one. " + SignName(seat) + " is " + (Element(seat) != Element(t) ? Element(seat) : Kind(seat)) + ". Find the " + Element(t) + " sign that is " + Kind(t) + "."; // placeholder (owner writes)
+                Dial.Log("hint_requested"); return false;
+            }
+            builderAssisted = true; Dial.Log("hint_escalated"); Dial.Log("builder_named", false, false, "DirectSeat");
+            Message = "It is " + SignName(t) + ": " + Element(t) + ", " + Kind(t) + ".\nNow turn to the sign across from it, then press Seal."; StartBuilderOpposite(); return false; // Level 2 reveals the name; no evidence
+        }
+        void StartBuilderOpposite()
+        {
+            Phase = LessonPhase.BuilderOpposite; BuilderStep = 2; lastStart = BuilderTarget;
+            Dial.Begin(BuilderTarget, 0, -1, 6); CountBeatPending = false;
+        }
+        void StartBuilderShare()
+        {
+            Phase = LessonPhase.BuilderShare; BuilderStep = 3; builderMisses = 0; Dial.Home();
+            Message = SignName(BuilderTarget) + " and " + SignName(Zodiac.Opposite(BuilderTarget)) + ", straight across the wheel from each other.\nTap what the two share."; // placeholder (owner writes)
+        }
+        public bool AnswerBuilderShare(int property)
+        {
+            if (Phase != LessonPhase.BuilderShare || property < 0 || property > 2) return false;
+            int t = BuilderTarget, o = Zodiac.Opposite(t);
+            if (property < 2)
+            {
+                Shared[property] = true; Dial.Log("builder_share_marked");
+                if (Shared[0] && Shared[1]) { Message = "Yes. Same kind, same side. Only the element differs: " + Element(t) + " against " + Element(o) + "."; Dial.Log("builder_shared", true, builderMisses <= 1); FinishBuilderSign(); return true; } // placeholder (owner writes)
+                Message = "Yes, the " + (property == 0 ? "kind" : "side") + ". What else do they share?"; return true; // placeholder (owner writes)
+            }
+            builderMisses++;
+            if (builderMisses == 1) { Message = "Not the element. " + SignName(t) + " is " + Element(t) + "; " + SignName(o) + " is " + Element(o) + ". Tap what they do share."; Dial.Log("hint_requested"); return false; } // placeholder (owner writes)
+            builderAssisted = true; Shared[0] = Shared[1] = true; Dial.Log("hint_escalated"); Dial.Log("builder_shared", false, false);
+            Message = "Opposites share the kind and the side. Only their elements differ: " + Element(t) + " against " + Element(o) + "."; FinishBuilderSign(); return false; // placeholder (owner writes)
+        }
+        void FinishBuilderSign()
+        {
+            Built++; if (!builderAssisted) BuilderEvidence = true; BuilderStep = 0;
+            Dial.Log("builder_sign_built", true, !builderAssisted);
+        }
+        // The view holds on the last line, then asks for the next sign (or the Key).
+        public void NextBuilderSign()
+        {
+            if (Phase != LessonPhase.BuilderShare || BuilderStep != 0) return;
+            if (Built >= 3) FinishBuilder(); else StartBuilderSign();
+        }
+        void FinishBuilder()
+        {
+            Dial.Home();
+            if (BuilderEvidence) { Key4Earned = true; Phase = LessonPhase.Key4; Message = Key4Line; Dial.Log("key4_earned", true, true); }
+            else { Phase = LessonPhase.BuilderPaused; Message = BuilderNoEvidenceLine; Dial.Log("builder_no_evidence"); }
+        }
+        public void RestoreOpposites(bool polarityShown, bool[] oppKnown, bool started, int built, bool builderEvidence, bool key4)
+        {
+            PolarityShown = polarityShown; PolarityStep = polarityShown ? 1 : 0; OppositesStarted = started || polarityShown;
+            for (int p = 0; p < Zodiac.OppositePairs; p++) OppKnown[p] = oppKnown != null && p < oppKnown.Length && oppKnown[p];
+            Built = Math.Max(0, Math.Min(3, built)); BuilderEvidence = builderEvidence || key4; Key4Earned = key4; BuilderStep = 0; BuilderTarget = -1;
+            if (key4) { Phase = LessonPhase.Key4; Message = "Four patterns, four Keys. The wheel is yours."; } // placeholder (owner writes)
+        }
         // ---- v0.3: glyphs and Key 2 (owner's form, Sept 12: Part A name the glyph by tap, Part B find the glyph on the wheel) ----
         public readonly bool[] GlyphNamed = new bool[12];    // Part A done for this seat
         public readonly bool[] GlyphPlaced = new bool[12];   // Part B done for this seat
@@ -138,6 +291,7 @@ namespace Ascendant.CelestialDial
         }
         public string RuleFor(int step) => step == 3
             ? "Find the next sign of the same kind after {0} on the wheel.\nCount each sign after it: one, two, three."
+            : step == 6 ? "The opposite sits six seats on from {0}.\nCount each sign after it: one, two, three, four, five, six." // Build C (the brief's rule)
             : RuleLine;
 
         // Closing the book mid-practice abandons that pass: the unit is already earned, so nothing is lost.
@@ -319,6 +473,12 @@ namespace Ascendant.CelestialDial
                 family = SecondFamily; Phase = LessonPhase.Independent; Lit[family] = true;
                 StartProblem(family, 0);
             }
+            else if (Phase == LessonPhase.Polarity)
+            {
+                if (PolarityStep == 0) { PolarityStep = 1; PolarityShown = true; Message = PolarityLine1; Dial.Log("polarity_shown"); return; }
+                StartOppositeProblem(Sun, 2); // the first pair from the sun sign, guided with the six-count
+            }
+            else if (Phase == LessonPhase.OppositesComplete) StartBuilderSign();
         }
         void StartProblem(int start, int hint)
         {
@@ -332,7 +492,7 @@ namespace Ascendant.CelestialDial
         }
         public void CountBeatShown() { CountBeatPending = false; }
         public const string RuleLine = "Find the next elemental sign after {0} on the wheel.\nCount each sign after it: one, two, three, four."; // Level 2 (owner wording, Sept 13)
-        public bool CanAsk => Dial.CanAsk && (Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityOwn);
+        public bool CanAsk => Dial.CanAsk && (Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityOwn || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.BuilderOpposite);
         // Ask Caspar: the Level 2 reminder on request, wherever a rule exists. An answer after it earns no evidence.
         public bool AskCaspar()
         {
@@ -373,12 +533,14 @@ namespace Ascendant.CelestialDial
                 if (step == 2) CountBeatPending = true;
                 Message = step == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
                     step == 2 ? string.Format(RuleFor(Dial.Forward), SignName(Dial.Start)) + "\nInspect the framed sign, then press Seal." :
+                    InOppositeProblem ? "Watch me find it.\n" + (Phase == LessonPhase.BuilderOpposite ? "Then tell me what the two share." : "Then the next pair.") : // placeholder (owner writes)
                     "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;
         }
         public string CorrectLine(DialEvent result) =>
-            "Yes. " + SignName(result.selected_destination) + (InModalities ? " is " + ModalityName(result.selected_destination).ToLowerInvariant() + ", like " + SignName(Dial.Start) + "." : " is a " + Element(result.selected_destination) + " sign, like your sun sign.") + "\n" +
+            "Yes. " + SignName(result.selected_destination) + (InOppositeProblem ? " sits across from " + SignName(Dial.Start) + ". Both " + Kind(Dial.Start) + ", both " + Side(Dial.Start) + "; only the element differs: " + Element(Dial.Start) + " against " + Element(result.selected_destination) + "." // placeholder (owner writes)
+                : InModalities ? " is " + ModalityName(result.selected_destination).ToLowerInvariant() + ", like " + SignName(Dial.Start) + "." : " is a " + Element(result.selected_destination) + " sign, like your sun sign.") + "\n" +
             (result.evidence_eligible ? "You found that one on your own." : "We found that one together.");
         public void AfterCorrect(DialEvent result)
         {
@@ -386,6 +548,8 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Review) return;
             if (Phase == LessonPhase.GlyphWheel) { NextGlyphProblem(); return; }
             if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) { AfterModalityCorrect(result); return; }
+            if (Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn) { AfterOppositeCorrect(result); return; }
+            if (Phase == LessonPhase.BuilderOpposite) { if (result.hint_level >= 2) builderAssisted = true; StartBuilderShare(); return; }
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -407,6 +571,7 @@ namespace Ascendant.CelestialDial
         {
             if (Phase == LessonPhase.GlyphWheel) { GlyphPlaced[Dial.Target] = true; NameRevealed[Dial.Target] = true; return; } // Worked exposure: no evidence, no fresh equivalent for a fixed set.
             if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) return; // lit in AfterModalityDemonstration
+            if (InOppositeProblem) return; // the wheel is already lit; opposites mark pairs, not seats
             if (Phase != LessonPhase.Optional) Lit[Zodiac.Destination(lastStart)] = true;
             // Worked exposure illuminates but never writes eligible answer evidence.
         }
@@ -414,6 +579,13 @@ namespace Ascendant.CelestialDial
         {
             if (Phase == LessonPhase.GlyphWheel) { Dial.Home(); NextGlyphProblem(); return; }
             if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) { AfterModalityDemonstration(); return; }
+            if (Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn) { AfterOppositeDemonstration(); return; }
+            if (Phase == LessonPhase.BuilderOpposite)
+            {
+                builderAssisted = true; oppAssisted++;
+                if (oppAssisted >= 3) { Dial.Home(); Phase = LessonPhase.BuilderPaused; Message = OppositesPausedLine; Dial.Log("builder_paused"); return; }
+                StartBuilderShare(); return;
+            }
             if (Phase == LessonPhase.Optional)
             {
                 Dial.Home(); Phase = LessonPhase.Complete;
@@ -503,7 +675,7 @@ namespace Ascendant.CelestialDial
         {
             var sign = Zodiac.Seats[seat];
             if (NamesHidden && !NameRevealed[seat]) return "Symbol " + sign.Glyph + ", position " + (seat + 1) + " of 12, " + (Dial.Selected == seat ? "selected" : "not selected");
-            return sign.Name + (GlyphsShown ? ", symbol " + sign.Glyph : "") + (LitMod[seat] ? ", " + ModalityName(seat).ToLowerInvariant() : "") + ", position " + (seat + 1) + " of 12, " +
+            return sign.Name + (GlyphsShown ? ", symbol " + sign.Glyph : "") + (LitMod[seat] ? ", " + ModalityName(seat).ToLowerInvariant() : "") + (PolarityShown ? ", " + Zodiac.PolarityAt(seat) : "") + ", position " + (seat + 1) + " of 12, " +
                 (Dial.Selected == seat ? "selected" : "not selected") +
                 (Lit[seat] ? ", " + sign.Element + (Kin[seat] ? ", family complete" : ", lit") : ", dormant");
         }
