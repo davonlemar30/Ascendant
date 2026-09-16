@@ -29,6 +29,14 @@ namespace Ascendant.CelestialDial
         public static readonly string[] Modalities = { "Cardinal", "Fixed", "Mutable" }; // every third sign shares a modality (Curriculum Rev 2, Stage 1)
         public static string ModalityOf(ZodiacSeat seat) { for (int i = 0; i < Seats.Count; i++) if (ReferenceEquals(Seats[i], seat)) return Modalities[i % 3]; return Modalities[0]; }
         public static string ModalityAt(int seat) => Modalities[Wrap(seat) % 3];
+        // Build C: polarity is a property of the element. Fire and Air are day signs, Earth and Water night signs (Curriculum Rev 2, Stage 1:
+        // "the game picks one label pair and notes the older terms"). The pair is the brief's recommendation, one constant, the owner's to swap.
+        public static readonly string[] Polarities = { "day", "night" };
+        public const string OlderPolarityTerms = "masculine and feminine, or yang and yin";
+        public static string PolarityAt(int seat) => Polarities[Wrap(seat) % 2];   // the elements alternate Fire, Earth, Air, Water, so even seats are day
+        public static int Opposite(int seat) => Wrap(seat + 6);                     // six seats on: the sign straight across the wheel
+        public const int OppositePairs = 6;
+        public static int PairOf(int seat) => Wrap(seat) % OppositePairs;          // a pair is named by its lower seat
         public static int Destination(int start, int forward = 4) => Wrap(start + forward);
         public static bool Evaluate(int start, int offset, int destination) => Destination(start, offset) == destination;
         // Tropical sun-sign date ranges (common almanac boundaries; cusp days can vary by year). Returns -1 for an invalid date.

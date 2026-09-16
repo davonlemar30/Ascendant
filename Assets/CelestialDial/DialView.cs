@@ -24,6 +24,7 @@ namespace Ascendant.CelestialDial
         public Canvas UiCanvas => canvas;
         public Font UiFont => font;
         public bool Busy => busy;
+        public bool ControlsShown => next!=null && (next.gameObject.activeSelf || builderNames[0].gameObject.activeSelf || builderShares[0].gameObject.activeSelf); // the slice keeps its Back button off these rows
         public void RegisterNavigation(Selectable s) { navigation.Add(s); }
         public void ForceRefresh() { Refresh(); }
         public void Realign() { AlignStart(); }
@@ -38,6 +39,7 @@ namespace Ascendant.CelestialDial
         public Font GlyphFont { get; private set; } // Placeholder glyph rendering: Noto Sans Symbols (OFL), the Unicode zodiac symbols.
         Text message, destination, start, count, phase, sealText, motionText, subtitle;
         Button seal, back, forward, countButton, next, optional, askButton;
+        readonly Button[] builderNames = new Button[4], builderShares = new Button[3]; // Build C: the builder's name and share steps
         RectTransform root, ring, bracket;
         Canvas canvas;
         DialGeometry geometry;
@@ -61,6 +63,10 @@ namespace Ascendant.CelestialDial
             public int hintLevel; // for test evidence; never shown to the player
             public int cleanRuns; public bool practice, hard;
             public string unit = ""; public bool modalitiesComplete; public int litModCount, step;
+            // Build C
+            public bool polarityShown, oppositesComplete, key4, canBuilderName, canBuilderShare;
+            public int pairsKnown, built, builderIndex; public string builderStep = "", builderAsk = "";
+            public string[] builderOptions, shared;
             public int familiesComplete, keys;
             public string[] glyphs;
             public bool namesHidden, glyphWheel, key2, v03Complete;
@@ -139,6 +145,8 @@ namespace Ascendant.CelestialDial
             countButton=MakeButton(root,"Count",-60,714,100,48,()=> { Lesson.Dial.Count(); Refresh(); });
             askButton=MakeButton(root,"Ask Caspar for help",78,714,164,48,AskCaspar); askButton.GetComponentInChildren<Text>().fontSize=13; askButton.gameObject.SetActive(false);
             next=MakeButton(root,"Continue",0,654,190,56,ContinueLesson);
+            for(int i=0;i<4;i++){ int slot=i; builderNames[i]=MakeButton(root,"",-78+(i%2)*156,654+(i/2)*60,150,56,()=>BuilderName(slot)); builderNames[i].gameObject.SetActive(false); }
+            for(int i=0;i<3;i++){ int property=i; builderShares[i]=MakeButton(root,DialLesson.ShareLabels[i],-110+i*110,654,104,56,()=>BuilderShare(property)); builderShares[i].GetComponentInChildren<Text>().fontSize=13; builderShares[i].gameObject.SetActive(false); }
             optional=MakeButton(root,"Try one more (optional)",0,714,244,48,()=> { Lesson.BeginOptional(); AlignStart(); });
             var motion = MakeButton(root,"Reduced motion: off",0,768,216,48,ToggleMotion);
             motionText=motion.GetComponentInChildren<Text>(); motionText.fontSize=13;
@@ -252,7 +260,7 @@ namespace Ascendant.CelestialDial
         IEnumerator Correct(DialEvent result)
         {
             busy=true;
-            Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional && Lesson.Phase != LessonPhase.Review && !Lesson.InModalities; // Reviews never light seats; the modality unit lights its own array.
+            Lesson.Lit[result.selected_destination] |= Lesson.Phase != LessonPhase.Optional && Lesson.Phase != LessonPhase.Review && !Lesson.InModalities && !Lesson.InOppositeProblem; // Reviews never light seats; the modality unit lights its own array; opposites mark pairs.
             message.text=Lesson.Phase==LessonPhase.Review ? Lesson.Message : Lesson.CorrectLine(result);
             RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .6f : 1.1f);
@@ -263,7 +271,7 @@ namespace Ascendant.CelestialDial
         public const float BeatSeconds=.9f, ReducedBeatSeconds=.5f;
         float Beat => Lesson.Dial.ReducedMotion ? ReducedBeatSeconds : BeatSeconds;
         bool waking;
-        static string Number(int n) => n==1 ? "one" : n==2 ? "two" : n==3 ? "three" : "four";
+        static string Number(int n) => n==1 ? "one" : n==2 ? "two" : n==3 ? "three" : n==4 ? "four" : n==5 ? "five" : "six"; // the opposite sits six seats on
         IEnumerator IntroBeat()
         {
             busy=true; Refresh();
@@ -304,7 +312,7 @@ namespace Ascendant.CelestialDial
             {
                 Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
                 if(Lesson.Phase!=LessonPhase.GlyphWheel) message.text="Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it.\n"+n+": "+Zodiac.Seats[Zodiac.Wrap(beginning+n)].Name;
-                count.text=n<=4 ? Number(n) : n.ToString();
+                count.text=n<=6 ? Number(n) : n.ToString();
                 LayoutRing(); RefreshSeats(); Publish();
                 yield return new WaitForSecondsRealtime(Beat);
             }
@@ -321,6 +329,26 @@ namespace Ascendant.CelestialDial
             turns=0; LayoutRing();
         }
         void ContinueLesson() { if(busy || Lesson.IntroAuto)return; Lesson.Continue(); AlignStart(); }
+        // Build C: the builder's name and share steps answer by tap; a short hold lets the line land before the next step.
+        void BuilderName(int slot)
+        {
+            if(busy || dragging || Lesson.Phase!=LessonPhase.BuilderName || slot<0 || slot>3) return;
+            Lesson.AnswerBuilderName(Lesson.BuilderOptions[slot]);
+            if(Lesson.Phase==LessonPhase.BuilderOpposite) StartCoroutine(BuilderHold(false)); else Refresh();
+        }
+        void BuilderShare(int property)
+        {
+            if(busy || dragging || Lesson.Phase!=LessonPhase.BuilderShare) return;
+            Lesson.AnswerBuilderShare(property);
+            if(Lesson.BuilderStep==0) StartCoroutine(BuilderHold(true)); else Refresh();
+        }
+        IEnumerator BuilderHold(bool nextSign)
+        {
+            busy=true; Refresh();
+            yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .7f : 1.3f);
+            if(nextSign) Lesson.NextBuilderSign();
+            busy=false; AlignStart();
+        }
         void AlignStart() { targetTurns=Lesson.Dial.Selected; turns=targetTurns; LayoutRing(); Refresh(); }
         void ToggleMotion() { Lesson.Dial.ReducedMotion=!Lesson.Dial.ReducedMotion; if(Lesson.Dial.ReducedMotion) turns=targetTurns; Refresh(); }
         void Refresh()
@@ -341,14 +369,23 @@ namespace Ascendant.CelestialDial
                 Lesson.Phase==LessonPhase.Key2 ? "Twelve symbols read. Keeper Key 2 earned." :
                 Lesson.Phase==LessonPhase.ModalityComplete ? "Three kinds complete. The wheel keeps both patterns." :
                 Lesson.Phase==LessonPhase.ModalityPaused ? "Paused for now" :
+                Lesson.Phase==LessonPhase.Polarity ? "The last pattern" :
+                Lesson.Phase==LessonPhase.OppositePaused || Lesson.Phase==LessonPhase.BuilderPaused ? "Paused for now" :
+                Lesson.Phase==LessonPhase.OppositesComplete ? "Six pairs. The wheel's last pattern is yours." :
+                Lesson.Phase==LessonPhase.Key4 ? "Three signs built. Keeper Key 4 earned." :
+                Lesson.InBuilder ? "The builder · sign " + Mathf.Clamp(Lesson.BuilderStep == 0 ? Lesson.Built : Lesson.Built + 1, 1, 3) + " of 3" :
                 Lesson.Phase==LessonPhase.Review ? "Checking the seals" :
                 Lesson.IsProblem ? (Lesson.Phase==LessonPhase.Guided || Lesson.Phase==LessonPhase.ModalityGuided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example"; // no level numbers on screen (owner, Sept 13)
-            subtitle.text=Lesson.InModalities ? "The Second Pattern" : "The Elemental Pattern"; // placeholder unit name (owner writes)
+            subtitle.text=Lesson.InBuilder ? "The Builder" : Lesson.InOpposites ? "The Last Pattern" : Lesson.InModalities ? "The Second Pattern" : "The Elemental Pattern"; // placeholder unit names (owner writes)
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;
             countButton.gameObject.SetActive(Lesson.IsProblem); countButton.interactable=active;
-            next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer) && !busy);
+            next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer || Lesson.Phase==LessonPhase.Polarity || Lesson.Phase==LessonPhase.OppositesComplete) && !busy);
+            bool naming=Lesson.Phase==LessonPhase.BuilderName, sharing=Lesson.Phase==LessonPhase.BuilderShare;
+            var options=naming ? Lesson.BuilderOptions : null;
+            for(int i=0;i<4;i++){ builderNames[i].gameObject.SetActive(naming); builderNames[i].interactable=naming && !busy; builderNames[i].GetComponentInChildren<Text>().text=naming ? Zodiac.Seats[options[i]].Name : ""; }
+            for(int i=0;i<3;i++){ builderShares[i].gameObject.SetActive(sharing); builderShares[i].interactable=sharing && !busy && !Lesson.Shared[i]; builderShares[i].GetComponentInChildren<Text>().text=DialLesson.ShareLabels[i]+(sharing && Lesson.Shared[i] ? ": shared" : ""); builderShares[i].GetComponent<Image>().color=sharing && Lesson.Shared[i] ? new Color(.29f,.27f,.28f) : new Color(.21f,.21f,.24f); }
             optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned && Lesson.FamiliesComplete<=2 && (Slice==null || !SliceHidesOptional));
             countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review && Lesson.Phase!=LessonPhase.GlyphWheel);
             askButton.gameObject.SetActive(Lesson.CanAsk && !busy); askButton.interactable=active; // no count in the marks: the target is a symbol, not a distance (owner playtest v0.3)
@@ -366,7 +403,7 @@ namespace Ascendant.CelestialDial
                 var seatRectTransform=(RectTransform)seatTexts[i].transform; seatRectTransform.anchoredPosition=new Vector2(0,showGlyph ? -36 : -26); // top-anchored rect: -26 is the tile center; below the mark when one shows (owner playtest 3: names sat on the tile's top edge)
                 seatTexts[i].fontSize=showGlyph ? 9 : 11;
                 bool showMod=Lesson.LitMod[i] && !hideName; // Build A: the modality joins the element once the seat is lit in that unit
-                seatTexts[i].text=(selected && Lesson.Dial.Rejected ? "× " : "")+(hideName ? "" : Zodiac.Seats[i].Name+(Lesson.Lit[i] && !showGlyph ? "\n"+Zodiac.Seats[i].Element : "")+(showMod ? (Lesson.Lit[i] && !showGlyph ? " · " : "\n")+Zodiac.ModalityAt(i) : ""));
+                seatTexts[i].text=(selected && Lesson.Dial.Rejected ? "× " : "")+(hideName ? "" : Zodiac.Seats[i].Name+(Lesson.Lit[i] && !showGlyph ? "\n"+Zodiac.Seats[i].Element : "")+(showMod ? (Lesson.Lit[i] && !showGlyph ? " · " : "\n")+Zodiac.ModalityAt(i) : "")+(showMod && Lesson.PolarityShown ? " · "+Zodiac.PolarityAt(i) : "")); // Build C: the side joins the kind, as a word, never color alone
                 seatTexts[i].fontSize=showGlyph ? 9 : showMod ? 9 : 11;
                 bool dormant=Lesson.DialDormant && !waking;
                 seatTexts[i].color=dormant ? new Color(Bone.r,Bone.g,Bone.b,.3f) : Bone;
@@ -391,7 +428,13 @@ namespace Ascendant.CelestialDial
             var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=start.text,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete,
-                glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,cleanRuns=Lesson.CleanRuns,practice=Lesson.Practice,hard=Lesson.Hard,unit=Lesson.InModalities ? "modalities" : Lesson.GlyphsShown && !(Lesson.WheelComplete && Lesson.Key2Earned && Lesson.Phase==LessonPhase.Key2) ? "symbols" : "elements",modalitiesComplete=Lesson.ModalitiesComplete,litModCount=Lesson.LitMod.Count(v=>v),step=Lesson.Dial.Forward,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : ""};
+                glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,cleanRuns=Lesson.CleanRuns,practice=Lesson.Practice,hard=Lesson.Hard,unit=Lesson.InBuilder ? "builder" : Lesson.InOpposites ? "opposites" : Lesson.InModalities ? "modalities" : Lesson.GlyphsShown && !(Lesson.WheelComplete && Lesson.Key2Earned && Lesson.Phase==LessonPhase.Key2) ? "symbols" : "elements",modalitiesComplete=Lesson.ModalitiesComplete,litModCount=Lesson.LitMod.Count(v=>v),step=Lesson.Dial.Forward,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : "",
+                polarityShown=Lesson.PolarityShown,oppositesComplete=Lesson.OppositesComplete,pairsKnown=Lesson.PairsKnown,key4=Lesson.Key4Earned,built=Lesson.Built,builderIndex=Lesson.Built,
+                builderStep=Lesson.Phase==LessonPhase.BuilderName ? "name" : Lesson.Phase==LessonPhase.BuilderOpposite ? "opposite" : Lesson.Phase==LessonPhase.BuilderShare ? "share" : "",
+                builderAsk=Lesson.InBuilder && Lesson.BuilderTarget>=0 ? Zodiac.Seats[Lesson.BuilderTarget].Element+", "+Zodiac.ModalityAt(Lesson.BuilderTarget).ToLowerInvariant() : "",
+                builderOptions=Lesson.Phase==LessonPhase.BuilderName ? Lesson.BuilderOptions.Select(o=>Zodiac.Seats[o].Name).ToArray() : new string[0],
+                shared=Lesson.Phase==LessonPhase.BuilderShare ? Enumerable.Range(0,3).Where(i=>Lesson.Shared[i]).Select(i=>DialLesson.ShareLabels[i]).ToArray() : new string[0],
+                canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy};
             Slice?.Fill(state); return state;
         }
         public void Publish()
@@ -419,6 +462,8 @@ namespace Ascendant.CelestialDial
             else if(command=="motion")ToggleMotion();
             else if(command=="motion-on") { Lesson.Dial.ReducedMotion=true; Refresh(); }
             else if(command=="ask-caspar") AskCaspar();
+            else if(command.StartsWith("builder-name:") && int.TryParse(command.Substring(13),out int nameSlot)) BuilderName(nameSlot);
+            else if(command.StartsWith("builder-share:") && int.TryParse(command.Substring(14),out int shareProperty)) BuilderShare(shareProperty);
             else if(command.StartsWith("seat:") && int.TryParse(command.Substring(5),out int seat) && seat>=0 && seat<12)SelectSeat(seat,DialInput.Accessible);
             else ExtraActions?.Invoke(command);
         }

@@ -29,7 +29,7 @@ namespace Ascendant.CelestialDial
         RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
         Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
         // Build B: the table in the Wing room and its screen.
-        RectTransform gridScreen; Text gridCaspar, gridReadout, gridStatus, gridKeys; Button gridSeal, gridAsk, leaveGrid, enterGrid; Image gridGlow, lampThree;
+        RectTransform gridScreen; Text gridCaspar, gridReadout, gridStatus, gridKeys; Button gridSeal, gridAsk, leaveGrid, enterGrid; Image gridGlow, lampThree, lampFour;
         readonly Button[] gridTiles = new Button[12], gridCells = new Button[12];
         readonly Text[] gridTileNames = new Text[12], gridTileGlyphs = new Text[12], gridCellNames = new Text[12], gridCellGlyphs = new Text[12];
         int demoCell = -1;
@@ -71,6 +71,7 @@ namespace Ascendant.CelestialDial
         const string HubCompleteLine = "The whole wheel. I have not seen it lit since he left.\nRest now. The seals will want checking when you return, and there is more to wake.";
         const string HubKey2Line = "Two Keys. He left twenty-one locks, and you have opened the way to two of them.\nThat is enough for tonight. The seals will keep."; // placeholder (owner writes)
         const string HubKey3Line = "Three Keys. The table is full, and the Wing has one more thing to teach you.\nRest now. The seals will keep."; // placeholder (owner writes; Build B)
+        const string HubKey4Line = "Four Keys. Every pattern the wheel keeps, you keep now.\nRest. The Chamber will want to see them."; // placeholder (owner writes; Build C)
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
 
         void Awake()
@@ -80,7 +81,9 @@ namespace Ascendant.CelestialDial
             Dial = dialObject.AddComponent<DialView>();
             Dial.Slice = this; Dial.ExtraActions = WebAction; font = Dial.UiFont;
             Flow.Logged += name => Dial.Lesson.Dial.Log(name.ToLowerInvariant().Replace(':', '_'), false, false, "slice");
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.Phase != LessonPhase.Review && !Dial.Lesson.InModalities) { Flow.RecordLessonAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.Phase != LessonPhase.Review && !Dial.Lesson.InModalities && !Dial.Lesson.InOppositeProblem) { Flow.RecordLessonAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.InOppositeProblem) { Flow.RecordOppositeAnswer(e.start_seat, e.evidence_eligible); Save(); } }; // Build C: a pair learned, on the wheel or in the builder
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "polarity_shown" || e.event_name == "builder_sign_built" || e.event_name == "opposites_completed") Save(); };
             Dial.Lesson.ReviewFinished += (seat, correct, eligible) => StartCoroutine(AfterDialReview(correct, eligible));
             Dial.Lesson.GlyphNamedEvent += (seat, correct, eligible) => { Flow.RecordGlyphAnswer(seat, eligible); Flow.SetGlyphProgress(Dial.Lesson.Phase == LessonPhase.GlyphWheel ? 1 : 0, Dial.Lesson.GlyphIndex); Save(); };
             Dial.Lesson.Dial.Logged += e => { if (e.event_name == "glyph_placed") { Flow.RecordGlyphAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
@@ -113,6 +116,7 @@ namespace Ascendant.CelestialDial
             if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Review) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.ModalitiesComplete && !Flow.ModalitiesComplete) { Flow.MarkModalitiesComplete(); Save(); Publish(); } // Build B: the table wakes
             if (Flow.Screen == SliceScreen.Grid && Grid.Key3Earned && Flow.Keys < 3) { Flow.MarkKey3(); keyIndicator.text = "Keeper Keys: 3"; Save(); Show(); Publish(); }
+            if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Key4Earned && Flow.Keys < 4) { Flow.MarkKey4(); keyIndicator.text = "Keeper Keys: 4"; Save(); Show(); Publish(); } // Build C
             if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && !Flow.KeyInserted)
             {
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
@@ -121,7 +125,7 @@ namespace Ascendant.CelestialDial
             if (wingContinue != null && Flow.AtriumStage >= 2)
             {
                 // The Wing's Back button belongs to the Wing screen only; left on, it sat over the review's Seal (owner playtest, Sept 14).
-                bool idle = Flow.Screen == SliceScreen.Wing && !Dial.Lesson.Dial.Active && !Dial.Busy && !busy && Dial.Lesson.Phase != LessonPhase.Review;
+                bool idle = Flow.Screen == SliceScreen.Wing && !Dial.Lesson.Dial.Active && !Dial.Busy && !busy && Dial.Lesson.Phase != LessonPhase.Review && !Dial.ControlsShown; // Build C: nor over the beat's Continue or the builder's buttons
                 if (wingContinue.gameObject.activeSelf != idle) { wingContinue.gameObject.SetActive(idle); Publish(); }
             }
         }
@@ -214,6 +218,7 @@ namespace Ascendant.CelestialDial
             var lamp1 = Rect("Lamp", hub, -40, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false;
             var lamp2 = Rect("Lamp", hub, 60, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false;
             var lamp3 = Rect("Lamp", hub, 140, 150, 8, 22); lampThree = lamp3.gameObject.AddComponent<Image>(); lampThree.color = LampDark; lampThree.raycastTarget = false; // Build B: Stage 5
+            var lamp4 = Rect("Lamp", hub, -90, 150, 8, 22); lampFour = lamp4.gameObject.AddComponent<Image>(); lampFour.color = LampDark; lampFour.raycastTarget = false; // Build C: Stage 6
             string[] doors = { "Sealed", "Zodiac Wing, open", "Sealed" };
             for (int i = 0; i < 3; i++)
             {
@@ -446,11 +451,12 @@ namespace Ascendant.CelestialDial
         void EnterDialNow()
         {
             if (!Flow.EnterDial()) return;
-            Dial.SliceHidesOptional = true;
+            Dial.SliceHidesOptional = true; Dial.Lesson.SetKey3(Flow.Keys >= 3);
             if (Dial.Lesson.CanContinueUnit) Dial.Lesson.BeginContinuation();
             else if (Dial.Lesson.CanBeginGlyphs && Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) Save(); } // Part B: the wheel hides its names
             else if (Dial.Lesson.CanBeginGlyphs) Dial.Lesson.Say(DialLesson.ShelfFirst); // the lit wheel, read only, until the book is read
             else if (Dial.Lesson.Phase != LessonPhase.GlyphWheel && Dial.Lesson.CanBeginModalities) { if (Dial.Lesson.BeginModalities()) { Flow.StartModalities(); Save(); } } // Build A: the second pattern, after Key 2
+            else if (Dial.Lesson.CanBeginOpposites) { if (Dial.Lesson.BeginOpposites()) { Flow.StartOpposites(); Save(); } } // Build C: the last pattern and the builder, after Key 3
             Show(); Dial.Realign(); Publish();
         }
         void OpenBook()
@@ -647,6 +653,7 @@ namespace Ascendant.CelestialDial
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "The wheel has hidden its names. Go to the Dial and find each symbol in turn." // placeholder (owner writes)
                     : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The wheel keeps a second pattern. Go to the Dial." // placeholder (owner writes)
                     : Flow.ModalitiesComplete && !Grid.Key3Earned ? (Grid.PlacedCount > 0 ? "The table waits, part seated. Go to it." : "A table has woken beside the wheel. Go to it.") // placeholder (owner writes; Build B)
+                    : Flow.Keys >= 3 && !Dial.Lesson.Key4Earned ? (Dial.Lesson.OppositesStarted ? "The wheel's last pattern waits. Go to the Dial." : "The wheel keeps one last pattern for you. Go to the Dial.") // placeholder (owner writes; Build C)
                     : Dial.Lesson.CanPractice ? (Dial.Lesson.Hard ? "The symbols are yours. The book will test you again, harder." : "The symbols are yours. The book will test you again.") // placeholder (owner writes)
                     : Flow.WheelComplete && !Dial.Lesson.AllNamed ? "The wheel is lit. Something on the shelf has woken with it." // placeholder (owner writes)
                     : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
@@ -709,13 +716,13 @@ namespace Ascendant.CelestialDial
         void ShowHub()
         {
             int stage = Flow.AtriumStage;
-            lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark; lampThree.color = stage >= 5 ? LampLit : LampDark;
-            hubCaption.text = stage >= 5 ? "Stirring: three lamps, a clear desk, the Wing open." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
-            hubText.text = Flow.Keys >= 3 ? HubKey3Line : Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
+            lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark; lampThree.color = stage >= 5 ? LampLit : LampDark; lampFour.color = stage >= 6 ? LampLit : LampDark;
+            hubCaption.text = stage >= 6 ? "Stirring: four lamps, a clear desk, the Wing open." : stage >= 5 ? "Stirring: three lamps, a clear desk, the Wing open." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
+            hubText.text = Flow.Keys >= 4 ? HubKey4Line : Flow.Keys >= 3 ? HubKey3Line : Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
             int due = Flow.DueCount;
             enterSealsLabel.text = "Check the Seals"; // no count on the button (owner, Sept 14); the review screen shows n of m
             enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
-            endCard.text = Flow.Keys >= 3 ? "Build B: the table is full and Key 3 is earned." : Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
+            endCard.text = Flow.Keys >= 4 ? "Build C: four Keys. The Chamber waits for Build D." : Flow.Keys >= 3 ? "Build B: the table is full and Key 3 is earned." : Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.V03Complete);
         }
@@ -822,7 +829,7 @@ namespace Ascendant.CelestialDial
         void Save()
         {
             if (Flow.AtriumStage < 2) return;
-            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned, Dial.Lesson.LitMod, Dial.Lesson.KinMod, Grid.Placed, Grid.Evidence))); PlayerPrefs.Save(); }
+            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned, Dial.Lesson.LitMod, Dial.Lesson.KinMod, Grid.Placed, Grid.Evidence, Dial.Lesson.PolarityShown, Dial.Lesson.OppKnown, Dial.Lesson.Built, Dial.Lesson.BuilderEvidence))); PlayerPrefs.Save(); }
             catch (Exception e) { Debug.LogWarning("[CelestialDial] save failed: " + e.Message); }
         }
         void TryRestore()
@@ -836,6 +843,7 @@ namespace Ascendant.CelestialDial
             Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2); Dial.Lesson.SetCleanRuns(save.cleanRuns);
             Dial.Lesson.RestoreModalities(save.litMod, save.kinMod, save.modalitiesStarted);
             Grid.Restore(save.gridPlaced, save.gridEvidence, save.gridStarted, save.keys >= 3);
+            Dial.Lesson.SetKey3(save.keys >= 3); Dial.Lesson.RestoreOpposites(save.polarityShown, save.oppKnown, save.oppositesStarted, save.built, save.builderEvidence, save.keys >= 4);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: " + Math.Max(2, save.keys);
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f); candle.color = Bone; }
