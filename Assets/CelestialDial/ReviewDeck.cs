@@ -7,7 +7,7 @@ namespace Ascendant.CelestialDial
     public enum ItemState { Introduced, Practicing }
 
     // One atomic item per sign-element pair (Curriculum canon, Stage 0: all twelve enter the deck as Introduced).
-    public enum ItemKind { Element, Glyph, Modality } // v0.3 adds twelve glyph items; Build A adds twelve sign ↔ modality items (Curriculum canon Stage 1).
+    public enum ItemKind { Element, Glyph, Modality, Grid } // v0.3 adds twelve glyph items; Build A twelve sign ↔ modality items; Build B twelve sign → cell items (Curriculum canon Stage 1).
 
     [Serializable] // JsonUtility skips a nested class without this: the deck had not been saving since v0.3 (owner playtest, Sept 14).
     public sealed class ReviewItem
@@ -29,15 +29,19 @@ namespace Ascendant.CelestialDial
     {
         public static readonly int[] Ladder = { 1, 3, 7, 14, 30 };
         public const int BatchSize = 6; // "two minutes on entering the Library"; tuning variable
-        public readonly ReviewItem[] Items = Enumerable.Range(0, 36).Select(i => new ReviewItem { seat = i % 12, kind = i / 12 }).ToArray();
+        public const int Kinds = 4;
+        public readonly ReviewItem[] Items = Enumerable.Range(0, 12 * Kinds).Select(i => new ReviewItem { seat = i % 12, kind = i / 12 }).ToArray();
         public ReviewItem Item(int seat, ItemKind kind) => Items[(int)kind * 12 + Zodiac.Wrap(seat)];
+        // Deck as data (owner, Sept 15): the grid items are scheduled like the rest but have no review form until the
+        // lesson/review fork on the instrument ships; Check the Seals never asks them.
+        public static bool Reviewable(ItemKind kind) => kind != ItemKind.Grid;
         public event Action<string> Logged;
 
         public void IntroduceAll(int day) { IntroduceAll(day, ItemKind.Element); }
         public void IntroduceAll(int day, ItemKind kind)
         {
             foreach (var item in Items) if (item.Kind == kind && !item.entered) { item.entered = true; item.interval = 0; item.dueDay = day; } // ready at the next check
-            Logged?.Invoke(kind == ItemKind.Element ? "deck_introduced" : kind == ItemKind.Glyph ? "deck_glyphs_introduced" : "deck_modalities_introduced");
+            Logged?.Invoke(kind == ItemKind.Element ? "deck_introduced" : kind == ItemKind.Glyph ? "deck_glyphs_introduced" : kind == ItemKind.Modality ? "deck_modalities_introduced" : "deck_grid_introduced");
         }
         // A correct Level 0/1 answer in a lesson makes the item Practicing and starts its streak.
         public void RecordLesson(int seat, bool eligible, int day) { RecordLesson(seat, eligible, day, ItemKind.Element); }
@@ -49,6 +53,7 @@ namespace Ascendant.CelestialDial
             if (item.State == ItemState.Introduced) { item.state = (int)ItemState.Practicing; item.streak = 1; item.dueDay = day + Ladder[item.interval]; }
         }
         public List<ReviewItem> Due(int day) => Items.Where(i => i.entered && i.dueDay <= day).OrderBy(i => i.dueDay).ThenBy(i => i.kind).ThenBy(i => i.seat).ToList();
+        public List<ReviewItem> DueForReview(int day) => Due(day).Where(i => Reviewable(i.Kind)).ToList();
         public void RecordReview(int seat, bool correct, bool eligible, int day) { RecordReview(seat, correct, eligible, day, ItemKind.Element); }
         public void RecordReview(int seat, bool correct, bool eligible, int day, ItemKind kind)
         {
@@ -92,5 +97,8 @@ namespace Ascendant.CelestialDial
         public bool[] litMod = new bool[12]; // Build A: modality unit
         public bool[] kinMod = new bool[3];
         public bool modalitiesStarted;
+        public bool[] gridPlaced = new bool[12]; // Build B: the table; keys carries Key 3
+        public bool gridEvidence;
+        public bool gridStarted;
     }
 }

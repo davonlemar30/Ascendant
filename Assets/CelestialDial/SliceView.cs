@@ -14,6 +14,7 @@ namespace Ascendant.CelestialDial
     {
         public SliceFlow Flow { get; private set; } = new SliceFlow();
         public DialView Dial { get; private set; }
+        public GridModel Grid { get; private set; } // Build B: the table (pure C#, beside the deck)
         public bool Busy => busy;
         public int Page { get; private set; }
         public bool Resumed { get; private set; }
@@ -27,6 +28,11 @@ namespace Ascendant.CelestialDial
         // v0.4 tap-to-move (Q06 phase 2): two walkable rooms, a placeholder marker, fades at doorways.
         RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
         Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
+        // Build B: the table in the Wing room and its screen.
+        RectTransform gridScreen; Text gridCaspar, gridReadout, gridStatus, gridKeys; Button gridSeal, gridAsk, leaveGrid, enterGrid; Image gridGlow, lampThree;
+        readonly Button[] gridTiles = new Button[12], gridCells = new Button[12];
+        readonly Text[] gridTileNames = new Text[12], gridTileGlyphs = new Text[12], gridCellNames = new Text[12], gridCellGlyphs = new Text[12];
+        int demoCell = -1;
         const float BandY = 436f, FadeSeconds = .35f; // floor band and fade length are test variables (Q06 phase 2, decision 7)
         readonly Button[] glyphNameButtons = new Button[4];
         readonly Button[] reviewGlyphButtons = new Button[4];
@@ -45,6 +51,7 @@ namespace Ascendant.CelestialDial
         static readonly Color Bone = new Color(.94f,.91f,.86f), Charcoal = new Color(.075f,.075f,.09f), Crimson = new Color(.46f,.09f,.15f);
         static readonly Color PanelColor = new Color(.13f,.13f,.15f), Dim = new Color(.21f,.21f,.24f), Muted = new Color(.62f,.57f,.53f);
         static readonly Color LampDark = new Color(.3f,.27f,.24f), LampLit = new Color(.95f,.8f,.5f);
+        static readonly Color Held = new Color(.45f,.36f,.28f), Seated = new Color(.29f,.27f,.28f), TileGone = new Color(.1f,.1f,.12f);
         static readonly string[] Elements = { "Fire", "Earth", "Air", "Water" };
         public static readonly string[] AtriumPages = {
             "You are awake. Good. I hope the trip was not too rough. You were... let us say 'unavailable' for most of it.",
@@ -63,6 +70,7 @@ namespace Ascendant.CelestialDial
         const string HubLaterLine = "Welcome back. The Wing waits, and the seals are yours to check.";
         const string HubCompleteLine = "The whole wheel. I have not seen it lit since he left.\nRest now. The seals will want checking when you return, and there is more to wake.";
         const string HubKey2Line = "Two Keys. He left twenty-one locks, and you have opened the way to two of them.\nThat is enough for tonight. The seals will keep."; // placeholder (owner writes)
+        const string HubKey3Line = "Three Keys. The table is full, and the Wing has one more thing to teach you.\nRest now. The seals will keep."; // placeholder (owner writes; Build B)
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
 
         void Awake()
@@ -78,6 +86,9 @@ namespace Ascendant.CelestialDial
             Dial.Lesson.Dial.Logged += e => { if (e.event_name == "glyph_placed") { Flow.RecordGlyphAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             Dial.Lesson.PracticeFinished += clean => { if (clean) Flow.RecordCleanRun(); Save(); Publish(); };
             Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.InModalities) { Flow.RecordModalityAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
+            Grid = new GridModel(() => Time.realtimeSinceStartupAsDouble);
+            Grid.Logged += e => Debug.Log("[CelestialDial] " + JsonUtility.ToJson(e));
+            Grid.Logged += e => { if (e.event_name == "grid_placed") { Flow.RecordGridAnswer(e.start_seat, e.evidence_eligible); Save(); } };
             var canvasObject = new GameObject("Slice Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
             canvasObject.transform.SetParent(transform, false);
             canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 1;
@@ -85,7 +96,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth();
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue);
-            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildWingExtras(); BuildWingRoom(); BuildAvatar(); BuildFade();
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildAvatar(); BuildFade();
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -100,6 +111,8 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
             if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Review) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
+            if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.ModalitiesComplete && !Flow.ModalitiesComplete) { Flow.MarkModalitiesComplete(); Save(); Publish(); } // Build B: the table wakes
+            if (Flow.Screen == SliceScreen.Grid && Grid.Key3Earned && Flow.Keys < 3) { Flow.MarkKey3(); keyIndicator.text = "Keeper Keys: 3"; Save(); Show(); Publish(); }
             if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && !Flow.KeyInserted)
             {
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
@@ -200,6 +213,7 @@ namespace Ascendant.CelestialDial
             var casparTap = Rect("Caspar, tap to walk", hub, 100, 420, 44, 76); var casparTapImage = casparTap.gameObject.AddComponent<Image>(); casparTapImage.color = new Color(0, 0, 0, 0); Tappable(casparTap, () => Walk("caspar"));
             var lamp1 = Rect("Lamp", hub, -40, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false;
             var lamp2 = Rect("Lamp", hub, 60, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false;
+            var lamp3 = Rect("Lamp", hub, 140, 150, 8, 22); lampThree = lamp3.gameObject.AddComponent<Image>(); lampThree.color = LampDark; lampThree.raycastTarget = false; // Build B: Stage 5
             string[] doors = { "Sealed", "Zodiac Wing, open", "Sealed" };
             for (int i = 0; i < 3; i++)
             {
@@ -249,6 +263,40 @@ namespace Ascendant.CelestialDial
             glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14);
             closeBook = MakeButton(glyphs, "Close the book", 0, 680, 300, 52, CloseBook); // between the name buttons (to 432) and the Caspar panel (from 460)
         }
+        void BuildGrid()
+        {
+            // Build B: the table. Four element rows by three kind columns, twelve sign tiles below. Tap a sign, tap a cell, Seal.
+            gridScreen = ScreenPanel("Grid");
+            Label(gridScreen, "THE ZODIAC WING", 0, 32, 340, 24, 18);
+            Label(gridScreen, "The Table", 0, 62, 200, 22, 14); // placeholder unit name (owner writes)
+            gridKeys = Label(gridScreen, "Keeper Keys: 2", 110, 62, 140, 20, 12); gridKeys.alignment = TextAnchor.MiddleRight;
+            for (int c = 0; c < GridModel.Columns; c++) Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, 96, 86, 18, 11).color = Muted;
+            for (int r = 0; r < GridModel.Rows; r++) Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12).color = Muted;
+            for (int cell = 0; cell < 12; cell++)
+            {
+                int index = cell;
+                gridCells[cell] = MakeButton(gridScreen, "Cell " + (cell + 1), -72 + (cell % 3) * 92, 128 + (cell / 3) * 52, 86, 48, () => ChooseCell(index));
+                var name = gridCells[cell].GetComponentInChildren<Text>(); name.text = ""; name.fontSize = 11; name.horizontalOverflow = HorizontalWrapMode.Overflow; // the cell shows the seated sign, not a number
+                var nameRect = (RectTransform)name.transform; nameRect.anchoredPosition = new Vector2(10, -24); nameRect.sizeDelta = new Vector2(58, 44); gridCellNames[cell] = name;
+                gridCellGlyphs[cell] = Label(gridCells[cell].transform, "", -30, 24, 24, 40, 16); gridCellGlyphs[cell].font = Dial.GlyphFont; gridCellGlyphs[cell].horizontalOverflow = HorizontalWrapMode.Overflow; gridCellGlyphs[cell].verticalOverflow = VerticalWrapMode.Overflow;
+            }
+            for (int seat = 0; seat < 12; seat++)
+            {
+                int index = seat;
+                gridTiles[seat] = MakeButton(gridScreen, Zodiac.Seats[seat].Name, -129 + (seat % 4) * 86, 344 + (seat / 4) * 44, 82, 40, () => PickSign(index));
+                var name = gridTiles[seat].GetComponentInChildren<Text>(); name.fontSize = 11; name.horizontalOverflow = HorizontalWrapMode.Overflow;
+                var nameRect = (RectTransform)name.transform; nameRect.anchoredPosition = new Vector2(10, -20); nameRect.sizeDelta = new Vector2(58, 36); gridTileNames[seat] = name;
+                gridTileGlyphs[seat] = Label(gridTiles[seat].transform, Zodiac.Seats[seat].Glyph, -28, 20, 24, 36, 16); gridTileGlyphs[seat].font = Dial.GlyphFont; gridTileGlyphs[seat].horizontalOverflow = HorizontalWrapMode.Overflow; gridTileGlyphs[seat].verticalOverflow = VerticalWrapMode.Overflow;
+            }
+            gridReadout = Label(gridScreen, "", 0, 470, 340, 20, 12);
+            var panel = Rect("Caspar panel", gridScreen, 0, 540, 324, 112); panel.gameObject.AddComponent<Image>().color = PanelColor;
+            Label(panel, "CASPAR", 0, 14, 290, 20, 13);
+            gridCaspar = Label(panel, "", 0, 66, 306, 84, 12);
+            gridStatus = Label(gridScreen, "", 0, 614, 330, 24, 12); gridStatus.color = Muted;
+            gridSeal = MakeButton(gridScreen, "SEAL", 0, 654, 146, 56, GridSeal); gridSeal.GetComponent<Image>().color = Crimson;
+            leaveGrid = MakeButton(gridScreen, "Leave the table", -72, 714, 128, 48, LeaveGrid); leaveGrid.GetComponentInChildren<Text>().fontSize = 13;
+            gridAsk = MakeButton(gridScreen, "Ask Caspar for help", 78, 714, 164, 48, GridAsk); gridAsk.GetComponentInChildren<Text>().fontSize = 13; gridAsk.gameObject.SetActive(false);
+        }
         void BuildWingExtras()
         {
             var r = Dial.Root;
@@ -281,10 +329,16 @@ namespace Ascendant.CelestialDial
             RingLines(dial, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(dial, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
             var dialLabel = Label(wingRoom, "The Dial", 30, 352, 120, 16, 10); dialLabel.color = Muted;
             Tappable(dial, () => Walk("dial"));
+            // Build B (07 Room Scope amendment): a second interactive object, the table with its board of twelve, dark until the modality unit is complete.
+            var table = Block(wingRoom, "The table", -60, 372, 60, 30);
+            for (int i = 0; i < 12; i++) { var square = Rect("Square", table, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
+            var tableGlow = Rect("Table glow", table, 0, 15, 72, 44); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
+            Tappable(table, () => Walk("grid"));
             var door = Block(wingRoom, "Doorway back", -130, 325, 70, 100); Tappable(door, () => Walk("atrium-door"));
             var light = Rect("Doorway light", door, 0, 50, 50, 82); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, .25f); lightImage.raycastTarget = false;
             var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
-            wingRoomCaption = Label(wingRoom, "The Dial waits at the center of the room. The doorway leads back.", 0, 478, 340, 36, 12); // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
+            wingRoomCaption = Label(wingRoom, "The Dial waits at the center of the room. The doorway leads back.", 0, 466, 340, 36, 12); // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
+            enterGrid = MakeButton(wingRoom, "The table", 0, 512, 300, 52, () => Walk("grid")); enterGrid.gameObject.SetActive(false); // Build B: shown once the table has woken
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
             enterShelf = MakeButton(wingRoom, "The bookshelf", 0, 568, 300, 52, () => Walk("shelf")); enterShelf.gameObject.SetActive(false);
             wingRoomBack = MakeButton(wingRoom, "Back to the Atrium", 0, 680, 300, 52, LeaveWing);
@@ -335,6 +389,12 @@ namespace Ascendant.CelestialDial
             else if (command == "enter-dial") Walk("dial");
             else if (command == "enter-shelf") Walk("shelf");
             else if (command == "close-book") CloseBook();
+            else if (command == "enter-grid") Walk("grid");
+            else if (command == "leave-grid") LeaveGrid();
+            else if (command == "grid-seal") GridSeal();
+            else if (command == "grid-ask") GridAsk();
+            else if (command.StartsWith("grid-sign:") && int.TryParse(command.Substring(10), out int gridSign) && gridSign >= 0 && gridSign < 12) PickSign(gridSign);
+            else if (command.StartsWith("grid-cell:") && int.TryParse(command.Substring(10), out int gridCell) && gridCell >= 0 && gridCell < 12) ChooseCell(gridCell);
             else if (command.StartsWith("walk:")) Walk(command.Substring(5));
             else if (command == "walk-speed") CycleWalkSpeed();
             else if (command == "enter-seals") EnterSeals();
@@ -402,12 +462,50 @@ namespace Ascendant.CelestialDial
             Show(); Publish();
         }
         void CloseBook() { if (busy || !Flow.LeaveBook()) return; Dial.Lesson.AbandonPractice(); Save(); Show(); Publish(); }
+        // ---- Build B: the table ----
+        void EnterGridNow()
+        {
+            if (!Flow.EnterGrid()) return;
+            if (Grid.Begin()) { Flow.StartGrid(); Save(); } // the first opening introduces the twelve sign → cell items (deck as data)
+            demoCell = -1; Show(); Publish();
+        }
+        void LeaveGrid() { if (busy || !Flow.LeaveGrid()) return; Save(); Show(); Publish(); }
+        void PickSign(int seat) { if (busy || Flow.Screen != SliceScreen.Grid || !Grid.Pick(seat)) return; ShowGrid(); Publish(); }
+        void ChooseCell(int cell) { if (busy || Flow.Screen != SliceScreen.Grid || !Grid.Choose(cell)) return; ShowGrid(); Publish(); }
+        void GridAsk() { if (busy || Flow.Screen != SliceScreen.Grid || !Grid.Ask()) return; ShowGrid(); Publish(); }
+        void GridSeal()
+        {
+            if (busy || Flow.Screen != SliceScreen.Grid) return;
+            var result = Grid.Seal(); if (result == null) return;
+            if (result.correctness) StartCoroutine(GridSeated());
+            else if (Grid.Demonstrating) StartCoroutine(GridDemonstrate());
+            else { ShowGrid(); Publish(); }
+        }
+        IEnumerator GridSeated()
+        {
+            busy = true; ShowGrid(); Publish();
+            yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.1f);
+            busy = false; ShowGrid(); Publish();
+        }
+        // Level 3: Caspar names the rule, the cell lights, the sign lands. Exposure only, never evidence.
+        IEnumerator GridDemonstrate()
+        {
+            busy = true; ShowGrid(); Publish();
+            float beat = ReducedMotion ? DialView.ReducedBeatSeconds : DialView.BeatSeconds;
+            yield return new WaitForSecondsRealtime(beat);
+            demoCell = Grid.DemonstrationCell; ShowGrid(); Publish();
+            yield return new WaitForSecondsRealtime(beat);
+            demoCell = -1; Grid.AfterDemonstration(); Save(); ShowGrid(); Publish();
+            yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.2f);
+            busy = false; ShowGrid(); Publish();
+        }
         void Walk(string id)
         {
             if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom)) return;
             var poi = Flow.Walk.Find(id); if (poi == null) return;
             if (!poi.Walkable) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; }
             if (id == "shelf" && !Flow.WheelComplete) { if (Flow.TouchDarkShelf()) { wingRoomCaption.text = DialLesson.ShelfDark; Publish(); } return; }
+            if (id == "grid" && !Flow.CanOpenGrid) { if (Flow.TouchDarkGrid()) { wingRoomCaption.text = GridModel.DarkLine; Publish(); } return; } // Build B: dark and tappable with a note before the unit
             if (!Flow.Walk.GoTo(id)) return;
             StartCoroutine(Travel(id));
         }
@@ -435,6 +533,7 @@ namespace Ascendant.CelestialDial
             else if (id == "caspar") { Flow.ApproachCaspar(); hubNote.text = Flow.Note; }
             else if (id == "dial") EnterDialNow();
             else if (id == "shelf") OpenBook();
+            else if (id == "grid") EnterGridNow();
         }
         IEnumerator FadeTo(float alpha)
         {
@@ -531,6 +630,7 @@ namespace Ascendant.CelestialDial
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber); hub.gameObject.SetActive(s == SliceScreen.Hub);
             wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
+            gridScreen.gameObject.SetActive(s == SliceScreen.Grid); if (s == SliceScreen.Grid) ShowGrid();
             bool book = s == SliceScreen.Book;
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom;
             if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : wingRoom, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
@@ -540,9 +640,13 @@ namespace Ascendant.CelestialDial
                 enterDial.interactable = !busy; wingRoomBack.interactable = !busy;
                 enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
+                enterGrid.gameObject.SetActive(Flow.CanOpenGrid); enterGrid.interactable = !busy;
+                gridGlow.color = new Color(.95f, .8f, .5f, Flow.ModalitiesComplete && !Grid.Key3Earned ? .35f : Flow.ModalitiesComplete ? .12f : 0); // an instrument with a unit waiting glows, like the shelf
                 wingRoomCaption.text = Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
+                    : Flow.Note == "grid-dark" ? GridModel.DarkLine
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "The wheel has hidden its names. Go to the Dial and find each symbol in turn." // placeholder (owner writes)
                     : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The wheel keeps a second pattern. Go to the Dial." // placeholder (owner writes)
+                    : Flow.ModalitiesComplete && !Grid.Key3Earned ? (Grid.PlacedCount > 0 ? "The table waits, part seated. Go to it." : "A table has woken beside the wheel. Go to it.") // placeholder (owner writes; Build B)
                     : Dial.Lesson.CanPractice ? (Dial.Lesson.Hard ? "The symbols are yours. The book will test you again, harder." : "The symbols are yours. The book will test you again.") // placeholder (owner writes)
                     : Flow.WheelComplete && !Dial.Lesson.AllNamed ? "The wheel is lit. Something on the shelf has woken with it." // placeholder (owner writes)
                     : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
@@ -580,16 +684,38 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = naming && !busy && target >= 0;
             glyphCaspar.text = DialLesson.GlyphIntro; glyphNote.text = busy ? glyphNote.text : "";
         }
+        void ShowGrid()
+        {
+            var g = Grid; bool active = g.Active && !busy;
+            gridCaspar.text = g.Message; gridReadout.text = g.Readout;
+            gridStatus.text = g.Phase == GridPhase.Complete ? "Twelve seated. Keeper Key 3 earned." : g.Phase == GridPhase.Paused ? "Paused for now" : "The table · " + g.PlacedCount + " of 12 seated"; // no level numbers on screen (owner, Sept 13)
+            gridKeys.text = "Keeper Keys: " + Flow.Keys; gridKeys.gameObject.SetActive(Flow.Keys > 0);
+            for (int i = 0; i < 12; i++)
+            {
+                bool seated = g.Placed[i], inHand = g.Sign == i;
+                gridTiles[i].interactable = active && g.CanPick(i);
+                gridTiles[i].GetComponent<Image>().color = seated ? TileGone : inHand ? Held : Dim;
+                gridTileNames[i].color = gridTileGlyphs[i].color = seated ? new Color(Bone.r, Bone.g, Bone.b, .3f) : Bone;
+                int seat = GridModel.SeatOf(i); bool filled = g.Placed[seat];
+                gridCells[i].interactable = active && g.CanChoose(i);
+                gridCells[i].GetComponent<Image>().color = filled ? Seated : i == g.Cell || i == demoCell ? Held : Dim;
+                gridCellNames[i].text = filled ? Zodiac.Seats[seat].Name : i == g.Rejected ? "×" : "";
+                gridCellGlyphs[i].text = filled ? Zodiac.Seats[seat].Glyph : "";
+            }
+            gridSeal.interactable = active && g.CanSeal;
+            gridAsk.gameObject.SetActive(g.CanAsk && !busy); gridAsk.interactable = active && g.CanAsk;
+            leaveGrid.interactable = !busy;
+        }
         void ShowHub()
         {
             int stage = Flow.AtriumStage;
-            lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark;
-            hubCaption.text = stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
-            hubText.text = Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
+            lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark; lampThree.color = stage >= 5 ? LampLit : LampDark;
+            hubCaption.text = stage >= 5 ? "Stirring: three lamps, a clear desk, the Wing open." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
+            hubText.text = Flow.Keys >= 3 ? HubKey3Line : Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
             int due = Flow.DueCount;
             enterSealsLabel.text = "Check the Seals"; // no count on the button (owner, Sept 14); the review screen shows n of m
             enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
-            endCard.text = Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
+            endCard.text = Flow.Keys >= 3 ? "Build B: the table is full and Key 3 is earned. The Chamber waits for Build D." : Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.V03Complete);
         }
@@ -678,13 +804,25 @@ namespace Ascendant.CelestialDial
             state.canCloseBook = s == SliceScreen.Book && !busy;
             if (s == SliceScreen.Book && !partA) state.caspar = Dial.Lesson.Message;
             if (roomScreen && !busy) state.note = hubNote.text;
+            // Build B: the table
+            state.gridOpen = Flow.ModalitiesComplete; state.gridStarted = Flow.GridStarted; state.key3 = Grid.Key3Earned; state.gridPlaced = Grid.PlacedCount;
+            state.gridComplete = Grid.Complete; state.gridPaused = Grid.Phase == GridPhase.Paused; state.gridHintLevel = Grid.HintLevel;
+            state.canEnterGrid = s == SliceScreen.WingRoom && Flow.CanOpenGrid && !busy;
+            state.keys = Math.Max(state.keys, Flow.Keys); // the lesson counts two Keys; the table adds the third
+            if (s == SliceScreen.Grid)
+            {
+                state.caspar = Grid.Message; state.gridReadout = Grid.Readout; state.gridStatus = gridStatus.text;
+                state.gridSign = Grid.Sign >= 0 ? Zodiac.Seats[Grid.Sign].Name : ""; state.gridCell = Grid.Cell; state.gridLocked = Grid.Locked;
+                state.gridTiles = Enumerable.Range(0, 12).Select(i => Grid.TileLabel(i)).ToArray(); state.gridCells = Enumerable.Range(0, 12).Select(i => Grid.CellLabel(i)).ToArray();
+                state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
+            }
         }
 
         // ---- save / restore (Q05 decision 5) ----
         void Save()
         {
             if (Flow.AtriumStage < 2) return;
-            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned, Dial.Lesson.LitMod, Dial.Lesson.KinMod))); PlayerPrefs.Save(); }
+            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned, Dial.Lesson.LitMod, Dial.Lesson.KinMod, Grid.Placed, Grid.Evidence))); PlayerPrefs.Save(); }
             catch (Exception e) { Debug.LogWarning("[CelestialDial] save failed: " + e.Message); }
         }
         void TryRestore()
@@ -697,7 +835,8 @@ namespace Ascendant.CelestialDial
             Dial.Lesson.RestoreProgress(save.sunSign, save.lit, save.kin, save.keyEarned);
             Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2); Dial.Lesson.SetCleanRuns(save.cleanRuns);
             Dial.Lesson.RestoreModalities(save.litMod, save.kinMod, save.modalitiesStarted);
-            if (save.keys >= 2) keyIndicator.text = "Keeper Keys: 2";
+            Grid.Restore(save.gridPlaced, save.gridEvidence, save.gridStarted, save.keys >= 3);
+            if (save.keys >= 2) keyIndicator.text = "Keeper Keys: " + Math.Max(2, save.keys);
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f); candle.color = Bone; }
         }
