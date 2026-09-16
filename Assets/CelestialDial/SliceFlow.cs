@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book }
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book, Grid }
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
 
     [Serializable]
@@ -39,6 +39,29 @@ namespace Ascendant.CelestialDial
         public bool ModalitiesStarted { get; private set; } // Build A
         public void StartModalities() { if (!ModalitiesStarted) { ModalitiesStarted = true; Deck.IntroduceAll(Sitting, ItemKind.Modality); Logged?.Invoke("modality_unit_started"); } }
         public void RecordModalityAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Sitting, ItemKind.Modality); }
+        // Build B: the table wakes once the modality unit is complete; its twelve sign → cell items enter the deck as data (owner, Sept 15).
+        public bool ModalitiesComplete { get; private set; }
+        public void MarkModalitiesComplete() { if (!ModalitiesComplete) { ModalitiesComplete = true; Logged?.Invoke("modalities_complete"); } }
+        public bool GridStarted { get; private set; }
+        public void StartGrid() { if (!GridStarted) { GridStarted = true; Deck.IntroduceAll(Sitting, ItemKind.Grid); Logged?.Invoke("grid_unit_started"); } }
+        public void RecordGridAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Sitting, ItemKind.Grid); }
+        public void MarkKey3() { if (Keys < 3) Keys = 3; } // the table logs key3_earned once
+        public bool CanOpenGrid => AtWingRoom && ModalitiesComplete;
+        public bool EnterGrid()
+        {
+            if (!CanOpenGrid) return false;
+            Screen = SliceScreen.Grid; Note = ""; Logged?.Invoke("screen_entered:grid"); return true;
+        }
+        public bool LeaveGrid()
+        {
+            if (Screen != SliceScreen.Grid) return false;
+            Screen = SliceScreen.WingRoom; Note = ""; Logged?.Invoke("screen_entered:wingroom"); return true;
+        }
+        public bool TouchDarkGrid()
+        {
+            if (!AtWingRoom || ModalitiesComplete) return false;
+            Note = "grid-dark"; Logged?.Invoke("grid_dark_touched"); return true;
+        }
         public void RecordCleanRun() { CleanRuns++; Logged?.Invoke("clean_run_recorded"); }
         public bool V03Complete => Keys >= 2 && AtriumStage >= 4;
         public int ReviewsChecked { get; private set; }
@@ -124,7 +147,7 @@ namespace Ascendant.CelestialDial
         public bool EnterDial()
         {
             if (!AtWingRoom) return false;
-            Screen = SliceScreen.Wing; Logged?.Invoke("screen_entered:wing"); return true;
+            Screen = SliceScreen.Wing; Note = ""; Logged?.Invoke("screen_entered:wing"); return true; // a dark-object note does not outlive the visit
         }
         // v0.3 revision (Sept 13 lock): Part A, the symbol-naming cards, lives in a book on the Wing's bookshelf.
         public bool CanOpenBook => AtWingRoom && WheelComplete;
@@ -154,6 +177,7 @@ namespace Ascendant.CelestialDial
             Screen = SliceScreen.Hub; Note = "";
             if (WheelComplete && AtriumStage < 3) { AtriumStage = 3; Logged?.Invoke("atrium_stage_3"); }
             if (Keys >= 2 && AtriumStage < 4) { AtriumStage = 4; Logged?.Invoke("atrium_stage_4"); }
+            if (Keys >= 3 && AtriumStage < 5) { AtriumStage = 5; Logged?.Invoke("atrium_stage_5"); } // Build B: one more step after Key 3
             Walk.Enter(Room.Atrium, "wing-door"); Logged?.Invoke("screen_entered:hub"); return true;
         }
         // Sealed doors only say they are sealed (Q06 phase 2, decision 2).
@@ -174,12 +198,12 @@ namespace Ascendant.CelestialDial
         public void MarkKey2() { if (Keys < 2) { Keys = 2; GlyphStage = 2; } } // the lesson logs key2_earned once
         public void RecordGlyphAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Sitting, ItemKind.Glyph); }
         public void RecordLessonAnswer(int seat, bool eligible) { if (AtriumStage >= 2 || Deck.Items[seat].entered) Deck.RecordLesson(seat, eligible, Sitting); else Deck.RecordLesson(seat, eligible, Sitting); }
-        public int DueCount => Deck.Due(Sitting).Count;
+        public int DueCount => Deck.DueForReview(Sitting).Count; // grid items are data only until the review fork ships
         public bool CanCheckSeals => AtHub && DueCount > 0;
         public bool EnterSeals()
         {
             if (!AtHub) return false;
-            var due = Deck.Due(Sitting);
+            var due = Deck.DueForReview(Sitting);
             if (due.Count == 0) { Note = "The seals hold for now. Come back after the Wing."; Logged?.Invoke("seals_nothing_due"); return false; } // placeholder (owner writes)
             ReviewQueue.Clear(); ReviewIndex = 0; ReviewSummary = ""; Note = "";
             // Form is a test variable (Q05 decision 2): alternate compressed Dial and direct tap.
@@ -246,9 +270,11 @@ namespace Ascendant.CelestialDial
         public bool V02Complete => WheelComplete && AtriumStage >= 3;
         // ---- save / restore ----
         public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned) { return ToSave(lit, kin, keyEarned, null, null); }
-        public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned, bool[] litMod, bool[] kinMod)
+        public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned, bool[] litMod, bool[] kinMod) { return ToSave(lit, kin, keyEarned, litMod, kinMod, null, false); }
+        public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned, bool[] litMod, bool[] kinMod, bool[] gridPlaced, bool gridEvidence)
         {
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
+                gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
                 wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
@@ -259,7 +285,8 @@ namespace Ascendant.CelestialDial
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = save.keyEarned ? 1 : 0; Ended = save.keyEarned;
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; ReviewsChecked = save.reviewsChecked;
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; ModalitiesStarted = save.modalitiesStarted; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
-            if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < 3) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
+            ModalitiesComplete = save.litMod != null && save.litMod.Length == 12 && save.litMod.All(v => v); GridStarted = save.gridStarted || save.keys >= 3;
+            if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < ReviewDeck.Kinds) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
             Screen = SliceScreen.Hub; Walk.Enter(Room.Atrium, "entry"); Logged?.Invoke("session_resumed"); return true;
         }
     }

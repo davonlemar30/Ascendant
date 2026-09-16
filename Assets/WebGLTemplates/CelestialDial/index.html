@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Ascendant — Celestial Dial greybox</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#131317;color:#f0e8dc;font:16px system-ui}main{position:relative;width:100%;height:100dvh;overflow:hidden}canvas{width:100%;height:100%;display:block;touch-action:none}#loading{position:absolute;top:45%;width:100%;text-align:center}#semantic{position:absolute;inset:0;pointer-events:none}#semantic button{position:absolute;border:0;background:transparent;color:transparent;pointer-events:none;padding:0;font:13px system-ui;border-radius:0}#semantic.kb button:focus-visible{outline:3px solid #f0e8dc;background:#222;color:#fff;z-index:10}#semantic.kb input:focus-visible{outline:3px solid #f0e8dc}#semantic button:disabled{display:none}#semantic input{position:absolute;pointer-events:auto;background:#36363d;color:#f0e8dc;border:0;font:16px system-ui;padding:0 8px;border-radius:0}#semantic input:focus-visible{outline:3px solid #f0e8dc}#semantic input[hidden]{display:none}#seats button:disabled{display:block}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#fallback{display:none}#failure{position:absolute;inset:30% 10%;text-align:center}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#131317;color:#f0e8dc;font:16px system-ui}main{position:relative;width:100%;height:100dvh;overflow:hidden}canvas{width:100%;height:100%;display:block;touch-action:none}#loading{position:absolute;top:45%;width:100%;text-align:center}#semantic{position:absolute;inset:0;pointer-events:none}#semantic button{position:absolute;border:0;background:transparent;color:transparent;pointer-events:none;padding:0;font:13px system-ui;border-radius:0}#semantic.kb button:focus-visible{outline:3px solid #f0e8dc;background:#222;color:#fff;z-index:10}#semantic.kb input:focus-visible{outline:3px solid #f0e8dc}#semantic button:disabled{display:none}#semantic input{position:absolute;pointer-events:auto;background:#36363d;color:#f0e8dc;border:0;font:16px system-ui;padding:0 8px;border-radius:0}#semantic input:focus-visible{outline:3px solid #f0e8dc}#semantic input[hidden]{display:none}#seats button:disabled{display:block}#grid-cells button:disabled{display:block}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#fallback{display:none}#failure{position:absolute;inset:30% 10%;text-align:center}
 </style>
 </head>
 <body>
@@ -29,6 +29,9 @@
 <div id="room" role="group" aria-label="Points of interest, tap to walk there"></div>
 <button id="enter-dial">The Dial</button><button id="enter-shelf">The bookshelf</button><button id="close-book">Close the book</button><button id="walk-speed">Walk speed, test only</button>
 <div id="glyph-names" role="group" aria-label="Which sign carries this symbol?"><button id="glyph-name-0"></button><button id="glyph-name-1"></button><button id="glyph-name-2"></button><button id="glyph-name-3"></button></div>
+<div id="grid-signs" role="group" aria-label="Signs to seat: tap one, then its cell"></div>
+<div id="grid-cells" role="group" aria-label="The table: four element rows by three kinds"></div>
+<button id="grid-seal">Seal</button><button id="grid-ask">Ask Caspar for help</button><button id="leave-grid">Leave the table</button><button id="enter-grid">The table</button>
 </section>
 <div id="announcement" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
 </main>
@@ -42,8 +45,10 @@
   for(let i=0;i<12;i++){
     const b=document.createElement('button');b.id='seat-'+i;b.textContent='Zodiac position '+(i+1);b.onclick=()=>send('seat:'+i);byId('seats').appendChild(b);
     const sb=document.createElement('button');sb.id='sign-'+i;sb.textContent=SIGNS[i];sb.onclick=()=>send('sign:'+i);byId('signs').appendChild(sb);
+    const gs=document.createElement('button');gs.id='grid-sign-'+i;gs.textContent=SIGNS[i];gs.onclick=()=>send('grid-sign:'+i);byId('grid-signs').appendChild(gs);
+    const gc=document.createElement('button');gc.id='grid-cell-'+i;gc.textContent='Cell '+(i+1);gc.onclick=()=>send('grid-cell:'+i);byId('grid-cells').appendChild(gc);
   }
-  for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed'])byId(id).onclick=()=>send(id);
+  for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid'])byId(id).onclick=()=>send(id);
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);}
   byId('next-screen').onclick=()=>send('next-screen');
@@ -70,19 +75,22 @@
     box('leave-wing',0,room?680:654,room?300:190,room?52:56);box('leave-review',0,654,190,56);
     if(hub)box('restart',60,774,112,40);
     // Points of interest sit where their placeholder geometry is drawn (v0.4 tap-to-move).
-    const POI={desk:[-125,426,70,40],'wing-door':[0,325,70,100],caspar:[100,420,44,76],'sealed-left':[-120,325,70,100],'sealed-right':[120,325,70,100],'atrium-door':[-130,325,70,100],dial:[30,250,200,200],shelf:[120,140,50,36]};
+    const POI={desk:[-125,426,70,40],'wing-door':[0,325,70,100],caspar:[100,420,44,76],'sealed-left':[-120,325,70,100],'sealed-right':[120,325,70,100],'atrium-door':[-130,325,70,100],dial:[30,250,200,200],shelf:[120,140,50,36],grid:[-60,372,60,30]};
     for(const id in POI)if(byId('poi-'+id))box('poi-'+id,POI[id][0],POI[id][1],POI[id][2],POI[id][3]);
     for(let i=0;i<4;i++)box('element-'+i,-78+(i%2)*156,300+Math.floor(i/2)*64,150,56);
     for(let i=0;i<3;i++)box('modality-'+i,0,300+i*64,300,56);
     const gy=state&&state.glyphMode==='name'?340:300;for(let i=0;i<4;i++)box('glyph-name-'+i,-78+(i%2)*156,gy+Math.floor(i/2)*64,150,56);
     for(let i=0;i<12;i++)box('sign-'+i,-110+(i%3)*110,316+Math.floor(i/3)*58,100,52);
+    // Build B: the table's cells and tiles sit where the canvas draws them.
+    for(let i=0;i<12;i++){box('grid-cell-'+i,-72+(i%3)*92,128+Math.floor(i/3)*52,86,48);box('grid-sign-'+i,-129+(i%4)*86,344+Math.floor(i/4)*44,82,40);}
+    box('grid-seal',0,654,146,56);box('grid-ask',78,714,164,48);box('leave-grid',-72,714,128,48);box('enter-grid',0,512,300,52);
   }
   let lastAnnouncement='',autoFocused=null,lastPois='';
   window.ascendantDial={
     receive(next){
       state=next;
-      const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial');
-      byId('instructions').textContent=wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
+      const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial'),grid=state.screen==='grid';
+      byId('instructions').textContent=wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):grid?[state.caspar,state.gridReadout,state.gridStatus,'Tap a sign, then the cell where it belongs, then Seal. Tab moves between controls. Only Seal submits.'].filter(Boolean).join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
       for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('count').disabled=!(wing&&state.active&&!state.glyphWheel);byId('ask-caspar').disabled=!(wing&&state.canAsk);
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
@@ -98,6 +106,10 @@
       if(poiKey!==lastPois){lastPois=poiKey;const roomGroup=byId('room');roomGroup.innerHTML='';pois.forEach((id,i)=>{const b=document.createElement('button');b.id='poi-'+id;b.textContent=state.poiLabels[i];b.onclick=()=>send('walk:'+id);roomGroup.appendChild(b);});}
       pois.forEach(id=>{byId('poi-'+id).disabled=!state.canWalk;});byId('room').hidden=pois.length===0;
       byId('enter-dial').disabled=!state.canEnterDial;byId('enter-shelf').disabled=!state.canEnterShelf;byId('close-book').disabled=!state.canCloseBook;byId('walk-speed').disabled=!(state.screen==='hub'&&!state.busy);
+      byId('enter-grid').disabled=!state.canEnterGrid;byId('grid-seal').disabled=!(grid&&state.canGridSeal);byId('grid-ask').disabled=!(grid&&state.canGridAsk);byId('leave-grid').disabled=!(grid&&state.canLeaveGrid);
+      for(let i=0;i<12;i++){const t=byId('grid-sign-'+i),c=byId('grid-cell-'+i);const tl=grid&&state.gridTiles?state.gridTiles[i]:SIGNS[i],cl=grid&&state.gridCells?state.gridCells[i]:'Cell '+(i+1);
+        t.setAttribute('aria-label',tl);t.disabled=!(grid&&state.canGridPick&&!tl.endsWith(', seated')&&(!state.gridLocked||tl.startsWith(state.gridSign+',')));c.setAttribute('aria-label',cl);c.textContent=cl.split(':')[0];c.disabled=!(grid&&state.canGridPick&&!!state.gridSign&&cl.includes(': empty'));}
+      byId('grid-signs').hidden=!grid;byId('grid-cells').hidden=!grid;
       byId('walk-speed').setAttribute('aria-label','Walk speed: '+(state.walkSpeed||'normal')+', test only');
       const tap=state.screen==='review'&&state.reviewMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
       const modTap=state.screen==='review'&&state.reviewMode==='modality';for(let i=0;i<3;i++)byId('modality-'+i).disabled=!modTap;byId('modalities').hidden=!modTap;
@@ -107,13 +119,14 @@
       byId('seats').hidden=!wing;
       byId('motion').setAttribute('aria-pressed',String(state.reducedMotion));
       byId('motion').setAttribute('aria-label','Reduced motion: '+(state.reducedMotion?'on':'off'));
-      const announcement=wing?[state.destination,state.count,state.message].filter(Boolean).join('. '):[state.caspar,state.note].filter(Boolean).join('. ');
+      const announcement=wing?[state.destination,state.count,state.message].filter(Boolean).join('. '):grid?[state.gridReadout,state.caspar].filter(Boolean).join('. '):[state.caspar,state.note].filter(Boolean).join('. ');
       if(announcement!==lastAnnouncement){byId('announcement').textContent=announcement;lastAnnouncement=announcement;}
       layout();
       // Refocus when nothing useful is focused, or when the last focus was ours (not the player's own Tab).
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
-        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canEnterDial?byId('enter-dial'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
-        focus.focus({preventScroll:true});autoFocused=focus;
+        const firstTile=grid&&state.gridTiles?state.gridTiles.findIndex(t=>!t.endsWith(', seated')):-1;
+        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
+        focus.focus({preventScroll:true});if(document.activeElement===focus)autoFocused=focus; // a target still disabled (a beat in progress) keeps the last auto-focus, so the next state can try again
       }
     },
     ready(unity){instance=unity;if(pendingMotion)send('motion-on');},
