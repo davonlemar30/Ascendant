@@ -98,7 +98,7 @@ const path=require('path');
     check((await state()).atriumStage===2 && (await state()).dueCount>=6,'the Chamber leads to the Hub in Stage 2 with a batch of seals ready at once, no in-game time, at '+viewport.width);
     // ---- v0.4: tap-to-move ----
     const atriumState=await state();
-    check(atriumState.room==='atrium' && atriumState.avatarAt==='entry' && ['desk','wing-door','caspar','sealed-left','sealed-right'].every(id=>atriumState.pois.includes(id)),'the Atrium lists its points of interest with the marker where you came in at '+viewport.width);
+    check(atriumState.room==='atrium' && atriumState.avatarAt==='entry' && ['desk','wing-door','caspar','sealed-left','chamber-door'].every(id=>atriumState.pois.includes(id)) && atriumState.canEnterChamber && atriumState.keysInHand===0,'the Atrium lists its points of interest, the Chamber doorway among them, with the marker where you came in at '+viewport.width);
     await semantic('poi-sealed-left');await page.waitForFunction(()=>window.ascendantDial.snapshot().note.startsWith('Sealed'));
     check(!(await state()).walking,'a sealed door only says it is sealed at '+viewport.width);
     await semantic('poi-caspar');await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='caspar'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -185,8 +185,23 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key2&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve symbols placed earns Key 2 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-key2.png')});
-    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).v03Complete,'one more return completes v0.3 at '+viewport.width);
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    // ---- Build D: the finished loop. Keys earned are spent in the Chamber; the Atrium restores on the return. ----
+    const spendAtBooks=async(tag)=>{
+      await semantic('poi-chamber-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamberroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+      check((await state()).room==='chamber' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,books' && !(await state()).canInsert,'the Chamber doorway fades into the Chamber as a room ('+tag+') at '+viewport.width);
+      await semantic('poi-books');await page.waitForFunction(()=>window.ascendantDial.snapshot().atBooks&&window.ascendantDial.snapshot().canInsert,{},{timeout:15000});
+      const before=(await state()).keysSpent;await page.waitForTimeout(300);await tap(0,654); // the Insert button on the canvas, where a thumb lands
+      await page.waitForFunction(k=>window.ascendantDial.snapshot().keysSpent===k+1,before,{},{timeout:5000});
+      await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+    };
+    check((await state()).atriumStage===3 && (await state()).keysInHand===1 && (await state()).caspar.includes('carry a Key'),'one more return: Key 2 in hand, the Atrium waits for it to be spent at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-hub-key-in-hand.png')});
+    await spendAtBooks('Key 2');
+    check((await state()).keysSpent===2 && (await state()).keysInHand===0 && (await state()).booksOpen===0 && !(await state()).canInsert && events.filter(e=>e.event_name==='key_spent').length===1,'Key 2 fills the second lock; the Book stays shut; nothing more to spend at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-chamber-lock2.png')});
+    await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).v03Complete && (await state()).avatarAt==='chamber-door' && (await state()).caspar.includes('Two locks filled'),'the return after spending takes the Atrium to Stage 4 at '+viewport.width);
     // ---- v0.3 revision, build 3: a clean replay hardens the symbols ----
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
@@ -297,13 +312,18 @@ const path=require('path');
     check((await state()).keys===3 && (await state()).gridPlaced===12 && (await state()).gridComplete && !(await state()).canGridPick && events.filter(e=>e.event_name==='key3_earned').length===1 && (await state()).caspar.includes('Keeper Key 3 is yours'),'twelve seated earns Key 3 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-key3.png')});
     await semantic('leave-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===5&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).caspar.includes('Three Keys') && (await state()).caspar.includes('three lamps'),'one more return takes the Atrium to Stage 5 with three Keys at '+viewport.width);
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).atriumStage===4 && (await state()).keysInHand===1,'back in the Atrium with Key 3 in hand at '+viewport.width);
+    await spendAtBooks('Key 3');
+    check((await state()).keysSpent===3 && (await state()).booksOpen===1 && !(await state()).wingWhole && events.some(e=>e.event_name==='book_opened_1') && (await state()).caspar.includes('Book opens'),'Key 3 fills the third lock and Book 1 opens at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-book-opens.png')});
+    await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===5&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).caspar.includes('Three locks') && (await state()).caspar.includes('three lamps'),'the return takes the Atrium to Stage 5 with three Keys spent at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key3.png')});
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-    check((await state()).atriumStage===5 && (await state()).keys===3 && (await state()).key3 && (await state()).gridComplete && (await state()).cleanRuns===1 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with three Keys, the full table, and the clean run at '+viewport.width);
+    check((await state()).atriumStage===5 && (await state()).keys===3 && (await state()).keysSpent===3 && (await state()).booksOpen===1 && (await state()).key3 && (await state()).gridComplete && (await state()).cleanRuns===1 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with three Keys spent, Book 1 open, the full table, and the clean run at '+viewport.width);
     // ---- Build C: polarity, the six opposite pairs, the builder, and Key 4 ----
     const OPP=seat=>(seat+6)%12;
     const unitActive=async()=>{await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await page.waitForTimeout(400);await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await page.waitForTimeout(150);}; // a guided problem shows its count a frame after it starts
@@ -358,11 +378,16 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key4&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).keys===4 && (await state()).built===3 && events.filter(e=>e.event_name==='key4_earned').length===1 && (await state()).message.includes('Keeper Key 4 is yours'),'three signs built with one unassisted earns Key 4 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-key4.png')});
-    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===6&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).caspar.includes('Four Keys') && (await state()).caspar.includes('four lamps'),'one more return takes the Atrium to Stage 6 with four Keys at '+viewport.width);
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).atriumStage===5 && (await state()).keysInHand===1,'back in the Atrium with Key 4 in hand at '+viewport.width);
+    await spendAtBooks('Key 4');
+    check((await state()).keysSpent===4 && (await state()).booksOpen===1 && (await state()).wingWhole && !(await state()).canInsert && events.some(e=>e.event_name==='wing_whole') && (await state()).caspar.includes('The Wing is whole') && (await state()).caspar.includes('End of the Zodiac Wing'),'Key 4 fills Book 2\'s first lock: the Wing is whole, with the closing line and the end card at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-wing-whole.png')});
+    await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===6&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).caspar.includes('Four Keys spent') && (await state()).caspar.includes('four lamps'),'the return takes the Atrium to Stage 6 with four Keys spent at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-    check((await state()).atriumStage===6 && (await state()).keys===4 && (await state()).key4 && (await state()).polarityShown && (await state()).oppositesComplete && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with four Keys, the sides, and the six pairs at '+viewport.width);
+    check((await state()).atriumStage===6 && (await state()).keys===4 && (await state()).keysSpent===4 && (await state()).wingWhole && (await state()).key4 && (await state()).polarityShown && (await state()).oppositesComplete && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with four Keys spent, the Wing whole, the sides, and the six pairs at '+viewport.width);
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);

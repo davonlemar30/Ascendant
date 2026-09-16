@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book, Grid }
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book, Grid, ChamberRoom }
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
 
     [Serializable]
@@ -51,6 +51,37 @@ namespace Ascendant.CelestialDial
         public void StartOpposites() { if (!OppositesStarted) { OppositesStarted = true; Deck.IntroduceAll(Sitting, ItemKind.Opposite, Zodiac.OppositePairs); Logged?.Invoke("opposites_unit_started"); } }
         public void RecordOppositeAnswer(int seat, bool eligible) { Deck.RecordLesson(Zodiac.PairOf(seat), eligible, Sitting, ItemKind.Opposite); }
         public void MarkKey4() { if (Keys < 4) Keys = 4; } // the lesson logs key4_earned once
+        // Build D: the finished loop. Every Key earned is spent in the Chamber; Book 1 has three locks, the fourth Key starts Book 2.
+        // The Atrium restores one step per Key spent (stages 4–6), on the return from the Chamber (04 First Reward: spending is the beat).
+        public int KeysSpent => LocksFilled;
+        public int KeysInHand => Math.Max(0, Keys - LocksFilled);
+        public int BooksOpen => LocksFilled / LocksPerBook;
+        public bool WingWhole => LocksFilled >= 4;                 // the Wing milestone: four Keys spent
+        public bool AtChamberRoom => Screen == SliceScreen.ChamberRoom;
+        public bool CanEnterChamber => AtHub && KeyInserted;       // the first visit is the Continue bookend; after it the doorway is a room
+        public bool EnterChamber()
+        {
+            if (!CanEnterChamber) return false;
+            Screen = SliceScreen.ChamberRoom; Note = ""; Walk.Enter(Room.Chamber, "atrium-door"); Logged?.Invoke("screen_entered:chamberroom"); return true;
+        }
+        public bool CanSpend => AtChamberRoom && KeysInHand > 0;
+        public bool SpendKey()
+        {
+            if (!CanSpend) return false;                            // nothing accepts a Key the player does not have
+            LocksFilled++; Logged?.Invoke("key_spent");
+            if (LocksFilled % LocksPerBook == 0) Logged?.Invoke("book_opened:" + BooksOpen);
+            if (WingWhole) Logged?.Invoke("wing_whole");
+            return true;
+        }
+        public bool LeaveChamber()
+        {
+            if (!AtChamberRoom) return false;
+            Screen = SliceScreen.Hub; Note = "";
+            if (LocksFilled >= 2 && AtriumStage < 4) { AtriumStage = 4; Logged?.Invoke("atrium_stage_4"); }
+            if (LocksFilled >= 3 && AtriumStage < 5) { AtriumStage = 5; Logged?.Invoke("atrium_stage_5"); }
+            if (LocksFilled >= 4 && AtriumStage < 6) { AtriumStage = 6; Logged?.Invoke("atrium_stage_6"); }
+            Walk.Enter(Room.Atrium, "chamber-door"); Logged?.Invoke("screen_entered:hub"); return true;
+        }
         public bool CanOpenGrid => AtWingRoom && ModalitiesComplete;
         public bool EnterGrid()
         {
@@ -181,9 +212,7 @@ namespace Ascendant.CelestialDial
             if (Screen != SliceScreen.WingRoom || AtriumStage < 2) return false;
             Screen = SliceScreen.Hub; Note = "";
             if (WheelComplete && AtriumStage < 3) { AtriumStage = 3; Logged?.Invoke("atrium_stage_3"); }
-            if (Keys >= 2 && AtriumStage < 4) { AtriumStage = 4; Logged?.Invoke("atrium_stage_4"); }
-            if (Keys >= 3 && AtriumStage < 5) { AtriumStage = 5; Logged?.Invoke("atrium_stage_5"); } // Build B: one more step after Key 3
-            if (Keys >= 4 && AtriumStage < 6) { AtriumStage = 6; Logged?.Invoke("atrium_stage_6"); } // Build C: and one more after Key 4
+            // Stages 4–6 follow Keys spent, on the return from the Chamber (Build D); Keys earned show in hand until then.
             Walk.Enter(Room.Atrium, "wing-door"); Logged?.Invoke("screen_entered:hub"); return true;
         }
         // Sealed doors only say they are sealed (Q06 phase 2, decision 2).
@@ -282,7 +311,7 @@ namespace Ascendant.CelestialDial
         {
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
-                polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence,
+                polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
                 wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
@@ -290,7 +319,7 @@ namespace Ascendant.CelestialDial
         {
             if (save == null || save.atriumStage < 2 || save.sunSign < 0) return false;
             PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
-            KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = save.keyEarned ? 1 : 0; Ended = save.keyEarned;
+            KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = Math.Max(save.locksFilled, save.keyEarned ? 1 : 0); Ended = save.keyEarned;
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; ReviewsChecked = save.reviewsChecked;
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; ModalitiesStarted = save.modalitiesStarted; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
             ModalitiesComplete = save.litMod != null && save.litMod.Length == 12 && save.litMod.All(v => v); GridStarted = save.gridStarted || save.keys >= 3;
