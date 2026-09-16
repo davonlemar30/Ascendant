@@ -516,7 +516,7 @@ namespace Ascendant.CelestialDial
             bool canSpend = Flow.CanSpend && atBooks && !busy;
             insert.gameObject.SetActive(Flow.CanSpend && atBooks); insert.interactable = canSpend; insert.GetComponentInChildren<Text>().text = Flow.KeysInHand > 1 ? "Insert a Key (" + Flow.KeysInHand + " in hand)" : "Insert the Key";
             if (!canSpend) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
-            chamberEnd.gameObject.SetActive(Flow.WingWhole && !busy); chamberEnd.text = ChamberEndCard; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -376); // the Books' caption row; the first visit's card sits lower
+            chamberEnd.gameObject.SetActive(Flow.WingWhole && !busy); chamberEnd.text = ChamberEndCard; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -250); // between the mechanism and the Books, clear of the Keeper; the first visit's card sits lower
             if (string.IsNullOrEmpty(chamberLine)) chamberLine = DefaultChamberLine();
             chamberText.text = chamberLine;
         }
