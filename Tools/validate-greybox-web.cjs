@@ -38,6 +38,7 @@ const path=require('path');
     for(let n=0;n<8&&(await state()).screen==='atrium';n++){await semantic('next-screen');await page.waitForTimeout(150);}
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing');await ready();
     check((await state()).dormant,'the Dial is dormant on arrival at '+viewport.width);
+    check((await state()).artSet===''&&!(await state()).style&&(await state()).lastCue==='page','no query: the game plays on the Art folder, no style page; the page hook fired on Caspar\'s pages, file or not, at '+viewport.width); // Build E
     await page.screenshot({path:path.join(out,viewport.width+'-encounter.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at '+viewport.width);
     // Seven intro beats, two of them automatic, then the teaching page and the guided problem.
@@ -105,6 +106,8 @@ const path=require('path');
     check((await state()).note.includes('Caspar') && events.some(e=>e.event_name==='walk_started_caspar') && events.some(e=>e.event_name==='walk_arrived_caspar'),'tapping Caspar walks the marker to him at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
+    await semantic('mute');await page.waitForFunction(()=>window.ascendantDial.snapshot().muted);check((await page.locator('#mute').getAttribute('aria-pressed'))==='true','the test sound toggle mutes from the Atrium and says so at '+viewport.width); // Build E
+    await semantic('mute');await page.waitForFunction(()=>!window.ascendantDial.snapshot().muted);
     await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial');
     let reloadedMidReview=false;
     for(let n=0;n<6;n++){
@@ -428,5 +431,45 @@ const path=require('path');
   await recovery.waitForFunction(()=>window.ascendantDial.snapshot().phase.includes('Paused for now'),{},{timeout:30000});
   check(await recovery.evaluate(()=>!window.ascendantDial.snapshot().active && !window.ascendantDial.snapshot().keyEarned),'browser recovery cap pauses without awarding Key');
   await recovery.screenshot({path:path.join(out,'390-recovery-cap.png')});await recoveryContext.close();
+  // ---- Build E: the test set from the URL at both viewports (the opening and the Dial), the cues, the style page on both sets ----
+  const base=process.env.GREYBOX_URL || 'http://127.0.0.1:8000';const withQuery=q=>base+(base.includes('?')?'&':'?')+q;
+  for(const viewport of [{width:390,height:844},{width:360,height:800}]){
+    const artContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
+    const art=await artContext.newPage();
+    await art.goto(withQuery('art=test'));
+    await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
+    const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===28&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
+    await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
+    await act('birth-known');await art.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await art.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');
+    await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
+    await art.screenshot({path:path.join(out,viewport.width+'-art-atrium.png')});
+    check(await art.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll with the test set at '+viewport.width);
+    await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='page'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a page turn plays the page cue from the test set at '+viewport.width);
+    for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await art.waitForTimeout(150);}
+    await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().canContinue,{},{timeout:120000});
+    await art.screenshot({path:path.join(out,viewport.width+'-art-dial.png')});
+    for(let n=0;n<16&&(await snap()).start!=='Start: Taurus';n++){if((await snap()).canContinue)await act('continue');await art.waitForTimeout(500);}
+    const okStart=s=>window.ascendantDial.snapshot()?.active && window.ascendantDial.snapshot().start===('Start: '+s);await art.waitForFunction(okStart,'Taurus',{timeout:15000});await art.waitForTimeout(400);await art.waitForFunction(okStart,'Taurus',{timeout:20000});await art.waitForTimeout(150);
+    const before=(await snap()).cuesPlayed;await act('forward');await art.waitForFunction(b=>window.ascendantDial.snapshot().lastCue==='step'&&window.ascendantDial.snapshot().cuesPlayed>b,before);check(true,'a wheel step plays the step cue from the test set at '+viewport.width);
+    await art.screenshot({path:path.join(out,viewport.width+'-art-dial-guided.png')});
+    await artContext.close();
+  }
+  for(const [query,set] of [['style=test','test'],['style','']]){
+    const styleContext=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
+    const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
+    await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
+    const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
+    check(s.style&&s.artSet===set&&s.styleSlots.length===28&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 28 art and 7 sound slots and no game controls');
+    check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===28&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
+    await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
+    if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');
+      await stylePage.locator('#mute').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().muted);check((await stylePage.locator('#mute').getAttribute('aria-pressed'))==='true','the test mute toggle works from the style page');
+      await stylePage.locator('#mute').evaluate(b=>b.click());await stylePage.waitForFunction(()=>!window.ascendantDial.snapshot().muted);}
+    await styleContext.close();
+  }
   fs.writeFileSync(path.join(out,'validation.txt'),report.join('\n'));console.log(report.join('\n'));await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});

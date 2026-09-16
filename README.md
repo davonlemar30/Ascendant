@@ -45,12 +45,22 @@ Your progress saves on the device you're playing on, in the browser, the moment 
 
 ## What's placeholder, what's coming
 
-- **Art:** placeholder blocks and lines. One illustrated look for the two rooms, Caspar, the Keeper, the Dial, and the book is on the plan.
-- **Sound:** none yet. One ambient loop and a few interface sounds are planned.
+- **Art:** placeholder blocks and lines. One illustrated look for the two rooms, Caspar, the Keeper, the Dial, and the book is on the plan. Every grey box is now a named slot that takes an image, so the art can arrive one file at a time (see below).
+- **Sound:** none yet. One ambient loop and a few interface sounds are planned; the hooks are in, and each is a named slot that takes a sound file.
 - **Caspar's voice:** most lines are stand-ins written in his tone. The real ones are being written.
 - **Next up:** a way to practice what you've learned from the instruments themselves (Caspar's practice offer and a study journal), then art and sound for the Wing, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
 
 The full game teaches the whole of beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
+
+## How to drop art in
+
+For the owner, and anyone helping with the look. Every placeholder has a named slot: a file named after the slot, dropped into the project, replaces the grey box with no code change; a sound file does the same for an action. The full list of slots, their sizes, and where each is drawn is in [`Documentation/CelestialDial/ART-SLOTS.md`](Documentation/CelestialDial/ART-SLOTS.md).
+
+1. Name the file after the slot: `atrium.png`, `keeper-idle.png`, `door-open.png`; for sounds `step.wav`, `seal.wav`, `ambient.wav`.
+2. Put it in `Assets/CelestialDial/Resources/Art/` (images) or `Assets/CelestialDial/Resources/Audio/` (sounds). Unity imports it with the right settings on its own.
+3. Play. To see every slot at once with what is in it, open the **style page**: add `?style` to the game's address, or use the Editor menu *Ascendant › Greybox › Play the style page*. Add `?art=test` to the address to see the game with a test image in every slot, so you know where each one lands.
+
+Until real files arrive nothing changes: with no files the game looks and sounds exactly as it does today.
 
 ## Feedback
 

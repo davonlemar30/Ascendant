@@ -34,6 +34,8 @@
 <button id="grid-seal">Seal</button><button id="grid-ask">Ask Caspar for help</button><button id="leave-grid">Leave the table</button><button id="enter-grid">The table</button>
 <div id="builder-names" role="group" aria-label="Which sign is that?"><button id="builder-name-0"></button><button id="builder-name-1"></button><button id="builder-name-2"></button><button id="builder-name-3"></button></div>
 <div id="builder-share" role="group" aria-label="Tap what the two share"><button id="builder-share-0">Kind</button><button id="builder-share-1">Side</button><button id="builder-share-2">Element</button></div>
+<button id="mute">Sound, test only</button>
+<div id="style" role="region" aria-label="Style page: every art and sound slot with its source" hidden><ol id="style-list" class="sr"></ol><div id="style-sounds" role="group" aria-label="Sound slots, tap to play"></div></div>
 </section>
 <div id="announcement" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
 </main>
@@ -54,7 +56,7 @@
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
   for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
-  byId('next-screen').onclick=()=>send('next-screen');
+  byId('next-screen').onclick=()=>send('next-screen');byId('mute').onclick=()=>send('mute');
   for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
   byId('name').addEventListener('change',e=>send('name:'+e.target.value));
   byId('birthdate').addEventListener('change',e=>send('birthdate:'+e.target.value));
@@ -74,9 +76,11 @@
     box('next-screen',0,654,190,56);box('insert',0,654,190,56);box('restart',0,768,216,48);
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
-    box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('enter-seals',0,680,300,52);box('walk-speed',-60,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
+    box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('enter-seals',0,680,300,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
     box('leave-wing',0,room?680:654,room?300:190,room?52:56);box('leave-review',0,654,190,56);
-    if(hub)box('restart',60,774,112,40);
+    if(hub)box('restart',118,774,112,40);
+    // Build E: the style page's sound slots sit where the canvas draws them.
+    for(let i=0;i<7;i++)if(byId('sound-'+i))box('sound-'+i,-129+(i%4)*86,686+Math.floor(i/4)*42,82,38);
     // Points of interest sit where their placeholder geometry is drawn (v0.4 tap-to-move).
     const chamberRoom=state&&state.room==='chamber';
     const POI={desk:[-125,426,70,40],'wing-door':[0,325,70,100],caspar:[100,420,44,76],'sealed-left':[-120,325,70,100],'chamber-door':[120,325,70,100],'atrium-door':chamberRoom?[-140,384,40,60]:[-130,325,70,100],dial:[30,250,200,200],shelf:[120,140,50,36],grid:[-60,372,60,30],books:[0,300,330,90]};
@@ -98,8 +102,11 @@
       state=next;
       const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial'),grid=state.screen==='grid';
       const naming=wing&&state.builderStep==='name',sharing=wing&&state.builderStep==='share';
-      const chamber=state.screen==='chamberroom';
-      byId('instructions').textContent=chamber?[state.caspar,state.canWalk?'Tap the Books or the doorway to walk there, or use the buttons below.':'','Tab moves between controls.'].filter(Boolean).join(' '):naming?[state.message,'Four names: choose the sign Caspar described. Tab moves between controls.'].join(' '):sharing?[state.message,(state.shared&&state.shared.length?'Shared so far: '+state.shared.join(', ')+'.':''),'Tap each thing the two signs share. Tab moves between controls.'].filter(Boolean).join(' '):wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):grid?[state.caspar,state.gridReadout,state.gridStatus,'Tap a sign, then the cell where it belongs, then Seal. Tab moves between controls. Only Seal submits.'].filter(Boolean).join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
+      const chamber=state.screen==='chamberroom',style=state.screen==='style';
+      byId('style').hidden=!style;
+      if(style){const list=byId('style-list'),key=(state.styleSlots||[]).join('|')+'#'+(state.styleSounds||[]).join('|');if(list.dataset.key!==key){list.dataset.key=key;list.innerHTML='';(state.styleSlots||[]).forEach(s=>{const li=document.createElement('li');li.textContent=s;list.appendChild(li);});const sounds=byId('style-sounds');sounds.innerHTML='';(state.styleSounds||[]).forEach((s,i)=>{const b=document.createElement('button');b.id='sound-'+i;b.textContent='Play '+s;b.onclick=()=>send('sound:'+s.split(':')[0]);sounds.appendChild(b);});}}
+      byId('mute').disabled=!((state.screen==='hub'&&!state.busy)||style);byId('mute').setAttribute('aria-pressed',String(!!state.muted));byId('mute').setAttribute('aria-label','Sound: '+(state.muted?'off':'on')+', test only');
+      byId('instructions').textContent=style?[state.caspar,'Tab moves between the sound slots and the sound toggle.'].join(' '):chamber?[state.caspar,state.canWalk?'Tap the Books or the doorway to walk there, or use the buttons below.':'','Tab moves between controls.'].filter(Boolean).join(' '):naming?[state.message,'Four names: choose the sign Caspar described. Tab moves between controls.'].join(' '):sharing?[state.message,(state.shared&&state.shared.length?'Shared so far: '+state.shared.join(', ')+'.':''),'Tap each thing the two signs share. Tab moves between controls.'].filter(Boolean).join(' '):wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):grid?[state.caspar,state.gridReadout,state.gridStatus,'Tap a sign, then the cell where it belongs, then Seal. Tab moves between controls. Only Seal submits.'].filter(Boolean).join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
       for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('count').disabled=!(wing&&state.active&&!state.glyphWheel);byId('ask-caspar').disabled=!(wing&&state.canAsk);
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
@@ -139,7 +146,7 @@
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
         const firstTile=grid&&state.gridTiles?state.gridTiles.findIndex(t=>!t.endsWith(', seated')):-1;
         const firstShare=sharing&&state.shared?['Kind','Side','Element'].findIndex(l=>!state.shared.includes(l)):-1;
-        const focus=state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canInsert&&chamber?byId('insert'):chamber&&state.canWalk&&!state.atBooks&&state.keysInHand>0?byId('poi-books'):chamber&&state.canLeaveChamber?byId('leave-chamber'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):naming&&state.canBuilderName?byId('builder-name-0'):sharing&&state.canBuilderShare&&firstShare>=0?byId('builder-share-'+firstShare):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
+        const focus=style?byId('mute'):state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canInsert&&chamber?byId('insert'):chamber&&state.canWalk&&!state.atBooks&&state.keysInHand>0?byId('poi-books'):chamber&&state.canLeaveChamber?byId('leave-chamber'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):naming&&state.canBuilderName?byId('builder-name-0'):sharing&&state.canBuilderShare&&firstShare>=0?byId('builder-share-'+firstShare):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});if(document.activeElement===focus)autoFocused=focus; // a target still disabled (a beat in progress) keeps the last auto-focus, so the next state can try again
       }
     },

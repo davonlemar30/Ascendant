@@ -25,6 +25,7 @@ namespace Ascendant.CelestialDial
         public Font UiFont => font;
         public bool Busy => busy;
         public bool ControlsShown => next!=null && (next.gameObject.activeSelf || builderNames[0].gameObject.activeSelf || builderShares[0].gameObject.activeSelf); // the slice keeps its Back button off these rows
+        public bool Inert;                        // Build E: the style page shows no game; every action goes to the slice
         public void RegisterNavigation(Selectable s) { navigation.Add(s); }
         public void ForceRefresh() { Refresh(); }
         public void Realign() { AlignStart(); }
@@ -41,6 +42,7 @@ namespace Ascendant.CelestialDial
         Button seal, back, forward, countButton, next, optional, askButton;
         readonly Button[] builderNames = new Button[4], builderShares = new Button[3]; // Build C: the builder's name and share steps
         RectTransform root, ring, bracket;
+        Image faceImage; // Build E: the dial-face slot under the seats
         Canvas canvas;
         DialGeometry geometry;
         Font font;
@@ -91,6 +93,9 @@ namespace Ascendant.CelestialDial
             public bool gridOpen, gridStarted, gridComplete, gridPaused, gridLocked, key3, canEnterGrid, canGridPick, canGridSeal, canGridAsk, canLeaveGrid;
             // Build D: the finished loop
             public int keysInHand, keysSpent, booksOpen; public bool wingWhole, canEnterChamber, canLeaveChamber, atBooks;
+            // Build E: art slots and sound hooks
+            public string artSet = "", lastCue = ""; public int artFiles, soundFiles, cuesPlayed; public bool muted, style;
+            public string[] styleSlots, styleSounds;
         }
         void Awake()
         {
@@ -98,6 +103,7 @@ namespace Ascendant.CelestialDial
             gameObject.name = "CelestialDial";
             Lesson = new DialLesson(() => Time.realtimeSinceStartupAsDouble);
             Lesson.Dial.Logged += e => Debug.Log("[CelestialDial] " + JsonUtility.ToJson(e));
+            Sound.Ensure(); Lesson.Dial.Logged += e => Sound.Play(Sound.Cue(e.event_name, e.correctness, TapPhase)); // Build E: the model's events name the cues
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             GlyphFont = Resources.Load<Font>("Fonts/NotoSansSymbols") ?? font;
             var canvasObject = new GameObject("Greybox Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
@@ -111,13 +117,14 @@ namespace Ascendant.CelestialDial
             ring = Rect("Twelve-seat Dial", root, 0, 270, 332, 332);
             var hit = ring.gameObject.AddComponent<Image>(); hit.color = new Color(0,0,0,.001f);
             ring.gameObject.AddComponent<DialDrag>().View = this;
+            var face = Rect("Dial face", ring, 0,166,332,332); faceImage = face.gameObject.AddComponent<Image>(); faceImage.raycastTarget = false; face.gameObject.SetActive(Slots.Dress(faceImage, "dial-face")); // Build E: the face under the seats; the ring's lines stay without it
             var drawing = Rect("Ring and family connections", ring, 0,166,332,332);
-            geometry = drawing.gameObject.AddComponent<DialGeometry>(); geometry.View = this; 
+            geometry = drawing.gameObject.AddComponent<DialGeometry>(); geometry.View = this; geometry.RingHidden = face.gameObject.activeSelf;
             for (int i=0;i<12;i++)
             {
                 int seat = i;
                 seats[i] = MakeButton(ring, Zodiac.Seats[i].Name, 0,166,52,52, () => SelectSeat(seat, ClickMethod(DialInput.DirectSeat)));
-                seats[i].gameObject.AddComponent<DialDrag>().View = this;
+                seats[i].gameObject.AddComponent<DialDrag>().View = this; Slots.Dress(seats[i].GetComponent<Image>(), "seat");
                 seatTexts[i] = seats[i].GetComponentInChildren<Text>(); seatTexts[i].fontSize = 11;
                 seatTexts[i].horizontalOverflow = HorizontalWrapMode.Overflow; // Long names spill past the tile instead of breaking mid-word.
                 // The symbol font sits low in its box, so the box sits high in the tile. (A v0.4 edit turned the rest of this line into a comment,
@@ -127,10 +134,10 @@ namespace Ascendant.CelestialDial
             }
             bracket = Rect("Fixed focus bracket", root, -136,270,58,58);
             var outline = bracket.gameObject.AddComponent<Image>(); outline.color = Color.clear; outline.raycastTarget = false;
-            var edge = bracket.gameObject.AddComponent<Outline>(); edge.effectColor = Bone; edge.effectDistance = new Vector2(2,2);
+            bool bracketArt = Slots.Dress(outline, "bracket"); // Build E: the file frames the seat; the bars and the edge stay without it
+            var edge = bracket.gameObject.AddComponent<Outline>(); edge.effectColor = Bone; edge.effectDistance = new Vector2(2,2); edge.enabled = !bracketArt;
             // Four short bars visibly frame exactly one seat, without relying on color.
-            Bar(bracket,-27,29,3,58); Bar(bracket,27,29,3,58);
-            Bar(bracket,0,1,56,3); Bar(bracket,0,57,56,3);
+            if(!bracketArt) { Bar(bracket,-27,29,3,58); Bar(bracket,27,29,3,58); Bar(bracket,0,1,56,3); Bar(bracket,0,57,56,3); }
             start = Label(root,"",0,223,188,30,13);
             destination = Label(root,"",0,271,188,50,20); // Names the sign under the bracket, live while dragging (owner request, Sept 12; reverses the Sept 11 "no label" row).
             count = Label(root,"",0,319,178,36,15);
@@ -296,7 +303,7 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=Lesson.Dial.Forward;n++)
             {
-                Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
+                Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n; Sound.Play("step");
                 count.text=Number(n);
                 LayoutRing(); RefreshSeats(); Publish();
                 yield return new WaitForSecondsRealtime(Beat);
@@ -312,7 +319,7 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=steps;n++)
             {
-                Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n;
+                Lesson.Dial.PositionSilently(beginning+n); targetTurns=turns=beginning+n; Sound.Play("step");
                 if(Lesson.Phase!=LessonPhase.GlyphWheel) message.text="Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it.\n"+n+": "+Zodiac.Seats[Zodiac.Wrap(beginning+n)].Name;
                 count.text=n<=6 ? Number(n) : n.ToString();
                 LayoutRing(); RefreshSeats(); Publish();
@@ -352,6 +359,7 @@ namespace Ascendant.CelestialDial
             busy=false; AlignStart();
         }
         void AlignStart() { targetTurns=Lesson.Dial.Selected; turns=targetTurns; LayoutRing(); Refresh(); }
+        bool TapPhase => Lesson.Phase==LessonPhase.GlyphNames || Lesson.Phase==LessonPhase.BuilderName || Lesson.Phase==LessonPhase.BuilderShare; // where a first miss logs only hint_requested
         void ToggleMotion() { Lesson.Dial.ReducedMotion=!Lesson.Dial.ReducedMotion; if(Lesson.Dial.ReducedMotion) turns=targetTurns; Refresh(); }
         void Refresh()
         {
@@ -409,8 +417,8 @@ namespace Ascendant.CelestialDial
                 seatTexts[i].fontSize=showGlyph ? 9 : showMod ? 9 : 11;
                 bool dormant=Lesson.DialDormant && !waking;
                 seatTexts[i].color=dormant ? new Color(Bone.r,Bone.g,Bone.b,.3f) : Bone;
-                seats[i].GetComponent<Image>().color=dormant ? new Color(.1f,.1f,.12f) : Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f);
-                geometry.Dormant=dormant;
+                Slots.Paint(seats[i].GetComponent<Image>(),dormant ? new Color(.1f,.1f,.12f) : Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f),dormant ? .35f : Lesson.Lit[i] ? 1f : .6f); // Build E: a seat file dims the same way
+                geometry.Dormant=dormant; if(faceImage.gameObject.activeSelf) faceImage.color=dormant ? new Color(.4f,.4f,.4f) : Color.white;
                 seats[i].interactable=Lesson.Dial.Active && !busy;
             }
         }
@@ -436,7 +444,8 @@ namespace Ascendant.CelestialDial
                 builderAsk=Lesson.InBuilder && Lesson.BuilderTarget>=0 ? Zodiac.Seats[Lesson.BuilderTarget].Element+", "+Zodiac.ModalityAt(Lesson.BuilderTarget).ToLowerInvariant() : "",
                 builderOptions=Lesson.Phase==LessonPhase.BuilderName ? Lesson.BuilderOptions.Select(o=>Zodiac.Seats[o].Name).ToArray() : new string[0],
                 shared=Lesson.Phase==LessonPhase.BuilderShare ? Enumerable.Range(0,3).Where(i=>Lesson.Shared[i]).Select(i=>DialLesson.ShareLabels[i]).ToArray() : new string[0],
-                canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy};
+                canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy,
+                artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
             Slice?.Fill(state); return state;
         }
         public void Publish()
@@ -453,6 +462,7 @@ namespace Ascendant.CelestialDial
         }
         [Preserve] public void WebAction(string command)
         {
+            if(Inert) { ExtraActions?.Invoke(command); return; }
             if(command=="forward")Step(1,DialInput.Accessible);
             else if(command=="back")Step(-1,DialInput.Accessible);
             else if(command=="keyboard-forward")Step(1,DialInput.Keyboard);

@@ -18,7 +18,7 @@ namespace Ascendant.Build
         static readonly Queue<Action> Steps=new Queue<Action>();
         static readonly List<string> Report=new List<string>();
         static readonly List<string> RuntimeErrors=new List<string>();
-        static double nextAt;
+        static double nextAt; static string stashedSave=""; static int playedBefore;
         const string ReportPath="Logs/slice-play-validation.txt";
         static SliceView View => UnityEngine.Object.FindFirstObjectByType<SliceView>();
         static SlicePlayValidation()
@@ -33,6 +33,7 @@ namespace Ascendant.Build
         {
             EditorSceneManager.OpenScene("Assets/Scenes/VerticalSlice.unity");
             PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save(); // a stale local save from an earlier run would resume at the Hub
+            SlotMenus.ClearForFixture();Slots.Request(null,null); // Build E: the run plays on the Art folder; the test set comes in at the end
             int scale=Environment.GetCommandLineArgs().Contains("-sliceScale2") ? 2 : 1; // phone pixel density: the same layout at twice the pixels
             GreyboxPlayValidation.SetSize(390*scale,844*scale);SessionState.SetBool("AscendantSlicePlayValidation",true);
             EditorApplication.EnterPlaymode();
@@ -199,10 +200,32 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.LocksFilled==4 && View.Flow.BooksOpen==1 && View.Flow.WingWhole && !View.Flow.CanSpend && View.Flow.KeysInHand==0,"Key 4 fills Book 2's first lock: the Wing is whole");Capture("slice-390-wing-whole.png");Act("leave-chamber");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.AtriumStage==6 && View.Flow.Keys==4,"the return takes the Atrium to Stage 6 with four Keys spent; the Wing's end card shows");Capture("slice-390-hub-key4.png");});
             Steps.Enqueue(()=>Act("reload"));
-            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==6 && View.Flow.Keys==4 && View.Flow.LocksFilled==4 && View.Flow.WingWhole && View.Dial.Lesson.Key4Earned && View.Dial.Lesson.PolarityShown && View.Dial.Lesson.OppositesComplete && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && View.Grid.Key3Earned && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with four Keys spent, the Books, the sides, the six pairs, and the pair items as data");Act("restart");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==6 && View.Flow.Keys==4 && View.Flow.LocksFilled==4 && View.Flow.WingWhole && View.Dial.Lesson.Key4Earned && View.Dial.Lesson.PolarityShown && View.Dial.Lesson.OppositesComplete && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && View.Grid.Key3Earned && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with four Keys spent, the Books, the sides, the six pairs, and the pair items as data");stashedSave=PlayerPrefs.GetString(SliceView.SaveKey);Act("restart");});
             Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});
+            Steps.Enqueue(()=>{Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");});
+            // Build E: the same save with the test set in every slot, at both viewports; the cues; then the style page on both sets.
+            Steps.Enqueue(()=>{Check(Slots.Set=="" && !View.StyleShown && Sound.LastCue!="","the run so far played on the Art folder and the sound hooks fired, files or not (last cue: "+Sound.LastCue+")");PlayerPrefs.SetString(SliceView.SaveKey,stashedSave);PlayerPrefs.Save();Slots.Request(Slots.TestSet,false);Act("reload");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && Slots.Set==Slots.TestSet && Slots.ArtFiles==28 && Slots.SoundFiles==7,"?art=test: the save resumes at the Hub with the test set, every slot with a file");
+                Check(new[]{"atrium","caspar","lamp","door-sealed","door-open","desk","shelves","shelf-book","keeper-idle"}.All(Slots.IsDressed),"the Atrium takes its files: background, Caspar, lamps, doors, desk, shelves and their books, the Keeper");Capture("slice-360-art-hub.png");Debug.Log("[SlicePlayValidation] ambient loop playing: "+Sound.AmbientPlaying);});
+            Steps.Enqueue(()=>{playedBefore=Sound.Played;Act("walk:wing-door");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && Sound.LastCue=="door" && Sound.Played>playedBefore,"the doorway plays the door cue from the test set (cues played: "+Sound.Played+")");
+                Check(new[]{"wing","shelf","table","dial-face"}.All(Slots.IsDressed) && (Slots.IsDressed("keeper-idle") || Slots.IsDressed("keeper-walk")),"the Wing room takes its files: background, shelf, table, the Dial's face, the Keeper");Capture("slice-360-art-wing-room.png");Act("walk:dial");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && new[]{"dial-face","seat","bracket","floor-markings","shelf","chair","candle"}.All(Slots.IsDressed),"the Dial takes its files: face, seats, bracket, floor markings, and the props beside it");Capture("slice-360-art-dial.png");});
+            Steps.Enqueue(()=>Act("leave-wing")); // captures land at the end of the frame: the next action waits its own step
+            Steps.Enqueue(()=>Act("walk:atrium-door"));
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back in the Atrium with the test set");Act("walk:chamber-door");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.ChamberRoom && new[]{"chamber","crystal-book","crystal-page","lock","mechanism","candle","door-open"}.All(Slots.IsDressed),"the Chamber takes its files: background, Books, pages, locks, mechanism, candles, doorway");Capture("slice-360-art-chamber.png");});
+            Steps.Enqueue(()=>GreyboxPlayValidation.SetSize(390,844));
+            Steps.Enqueue(()=>{Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(390,844),"the larger viewport again");Capture("slice-390-art-chamber.png");});
+            Steps.Enqueue(()=>Act("leave-chamber"));
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"the same files at 390 wide");Capture("slice-390-art-hub.png");});
+            Steps.Enqueue(()=>{Slots.Request(Slots.TestSet,true);Act("reload");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.screen=="style" && s.style && s.styleSlots.Length==28 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": test set")) && s.styleSounds.All(t=>t.EndsWith(": test set")) && s.artSet==Slots.TestSet,"?style=test: the style page lists every slot on the test set, each with its source");Capture("slice-390-style-test.png");});
+            Steps.Enqueue(()=>{int played=Sound.Played;Act("sound:seal");Check(Sound.LastCue=="seal" && Sound.Played==played+1,"a sound slot plays from the style page");Act("mute");Check(Sound.Muted && View.Dial.Snapshot().muted,"the test mute toggle silences the game");Act("mute");Check(!Sound.Muted,"and back");Slots.Request("",true);Act("reload");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.styleSlots.Length==28 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": file") || t.EndsWith(": placeholder")) && s.styleSounds.All(t=>t.EndsWith(": file") || t.EndsWith(": silent")) && s.artSet=="" && (Slots.DressedCount==0 || Slots.ArtFiles>0),"?style: the style page on the Art folder lists every slot as file or placeholder; nothing is dressed without a file");Capture("slice-390-style.png");});
+            Steps.Enqueue(()=>{Slots.Request(null,null);PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save();});
             Steps.Enqueue(()=>{
-                Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");
+                Check(!PlayerPrefs.HasKey(SliceView.SaveKey) && Slots.Set=="" && !Slots.StyleRequested,"the fixture leaves no save and no set request behind");
                 Check(RuntimeErrors.Count==0,"no runtime errors: "+string.Join("; ",RuntimeErrors));
                 Application.logMessageReceived-=CaptureLog;
                 Directory.CreateDirectory("Logs");File.WriteAllLines(ReportPath,Report);
