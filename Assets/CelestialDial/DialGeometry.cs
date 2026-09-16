@@ -8,6 +8,7 @@ namespace Ascendant.CelestialDial
     {
         public DialView View;
         public bool Dormant;
+        public bool RingHidden; // Build E: a dial-face file draws the ring
         readonly RectTransform[] lines = new RectTransform[60];
         public void Redraw()
         {
@@ -22,6 +23,7 @@ namespace Ascendant.CelestialDial
                 }
             for(int i=0;i<48;i++)
             {
+                lines[i].gameObject.SetActive(!RingHidden); if(RingHidden) continue;
                 float a=i*Mathf.PI*2/48, b=(i+1)*Mathf.PI*2/48;
                 Line(i,new Vector2(Mathf.Cos(a),Mathf.Sin(a))*136,
                     new Vector2(Mathf.Cos(b),Mathf.Sin(b))*136,Dormant ? new Color(.2f,.2f,.22f) : new Color(.38f,.38f,.4f));

@@ -10,6 +10,8 @@ namespace Ascendant.CelestialDial
     // Vertical slice v0.2 "the return": the locked opening and Chamber bookends (Q01, Q04, Q06, Q07), the September 11
     // copy session, and the locked loop (Q05): two-entrance Atrium, Check the Seals, Unit 1.1 continuation, local save.
     // Placeholder art. Copy is the v0.1 Copy Deck; v0.2 lines marked "placeholder (owner writes)" are not final.
+    // Build E: every placeholder is a named art slot and every action a sound slot (Slots, Sound); a file in a slot replaces
+    // the grey box or the silence, nothing else changes. ?style shows every slot at once.
     public sealed class SliceView : MonoBehaviour, DialView.ISliceState
     {
         public SliceFlow Flow { get; private set; } = new SliceFlow();
@@ -19,6 +21,7 @@ namespace Ascendant.CelestialDial
         public int Page { get; private set; }
         public bool Resumed { get; private set; }
         public bool ChamberPaging => chamberContinue.gameObject.activeSelf && !insert.gameObject.activeSelf; // fixture evidence
+        public bool StyleShown => styleShown; // Build E: the style page instead of the game (fixture evidence)
         public const string SaveKey = "ascendant.v02.save";
         Canvas canvas, flashCanvas; RectTransform root; Font font;
         RectTransform identity, birth, atrium, atriumReturn, chamber, hub, review, birthChoices, birthDate, birthSigns, glyphs;
@@ -35,6 +38,10 @@ namespace Ascendant.CelestialDial
         readonly Image[] bookImages = new Image[SliceFlow.Books], bookPages = new Image[SliceFlow.Books], shelfBooks = new Image[3];
         const float ChamberBandY = 408f; // the Chamber's floor band sits under the Books, above Caspar's panel
         string chamberLine = "";
+        // Build E: art slots that carry state or a frame, the sound toggle, and the style page.
+        Image avatarArt, floorArt, bookCard; Sprite keeperIdle, keeperWalk; Button mute, styleMute; RectTransform style; bool styleShown; string styleSet; string[] styleSlots, styleSounds; // the page as built
+        static readonly Color LockDark = new Color(.3f, .3f, .33f), BookOpen = new Color(.42f, .38f, .32f);
+        const float DarkArt = .35f, ShutArt = .55f, LockDarkArt = .45f; // a file's brightness where the placeholder used a dark color
         readonly Button[] gridTiles = new Button[12], gridCells = new Button[12];
         readonly Text[] gridTileNames = new Text[12], gridTileGlyphs = new Text[12], gridCellNames = new Text[12], gridCellGlyphs = new Text[12];
         int demoCell = -1;
@@ -108,6 +115,8 @@ namespace Ascendant.CelestialDial
             Grid = new GridModel(() => Time.realtimeSinceStartupAsDouble);
             Grid.Logged += e => Debug.Log("[CelestialDial] " + JsonUtility.ToJson(e));
             Grid.Logged += e => { if (e.event_name == "grid_placed") { Flow.RecordGridAnswer(e.start_seat, e.evidence_eligible); Save(); } };
+            Grid.Logged += e => Sound.Play(Sound.Cue(e.event_name, e.correctness, false)); // Build E: a pick is a step, a seating a seal, a miss a miss, Key 3 a key
+            Flow.Logged += n => { if (n == "key_spent" || n == "key_inserted") Sound.Play("key"); };
             var canvasObject = new GameObject("Slice Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
             canvasObject.transform.SetParent(transform, false);
             canvas = canvasObject.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 1;
@@ -120,12 +129,14 @@ namespace Ascendant.CelestialDial
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
             flash = flashObject.AddComponent<Image>(); flash.color = new Color(1, 1, 1, 0); flash.raycastTarget = false;
+            if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
             TryRestore();
             Show(); Publish();
         }
         void Update()
         {
             if (canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f);
+            if (styleShown) return;
             if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
@@ -178,13 +189,13 @@ namespace Ascendant.CelestialDial
         }
         RectTransform BuildAtrium(string name, out Text caspar, out Button next)
         {
-            var screen = ScreenPanel(name);
+            var screen = ScreenPanel(name, "atrium");
             Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
-            Block(screen, "Shelves, mostly empty", -130, 240, 60, 180);
-            Block(screen, "Covered furniture", 20, 300, 120, 70);
-            var cloth = Rect("Dust cloth", screen, 20, 288, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f);
-            Block(screen, "Sealed door", 135, 230, 50, 150);
-            var candle = Rect("Candle", screen, -60, 200, 6, 18); candle.gameObject.AddComponent<Image>().color = new Color(.5f, .42f, .3f);
+            Block(screen, "Shelves, mostly empty", -130, 240, 60, 180, "shelves");
+            var furniture = Block(screen, "Covered furniture", 20, 300, 120, 70, "furniture-covered");
+            var cloth = Rect("Dust cloth", screen, 20, 288, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(furniture));
+            Block(screen, "Sealed door", 135, 230, 50, 150, "door-sealed");
+            var candle = Rect("Candle", screen, -60, 200, 6, 18); var candleImage = candle.gameObject.AddComponent<Image>(); Slots.Dress(candleImage, "candle"); Slots.Paint(candleImage, new Color(.5f, .42f, .3f), .7f);
             Label(screen, "Dust. Covered furniture. Sealed doors. One weak candle.", 0, 405, 330, 20, 12).color = Muted;
             var panel = Rect("Caspar panel", screen, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
@@ -194,27 +205,29 @@ namespace Ascendant.CelestialDial
         }
         void BuildChamber()
         {
-            chamber = ScreenPanel("Chamber");
+            chamber = ScreenPanel("Chamber", "chamber");
             Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18);
             for (int i = 0; i < candles.Length; i++)
-            { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].color = LampDark; candles[i].raycastTarget = false; }
+            { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].raycastTarget = false; Slots.Dress(candles[i], "candle"); Slots.Paint(candles[i], LampDark, DarkArt); }
             chandelierLabel = Label(chamber, "The chandelier, dark", 0, 116, 300, 18, 11); chandelierLabel.color = Muted;
             mechanism = Rect("Mechanism", chamber, 0, 180, 110, 110);
-            RingLines(mechanism, 46, new Color(.62f, .57f, .53f, .5f), null);
-            var tick = Rect("Mechanism tick", mechanism, 0, 55 - 46, 3, 14); tick.gameObject.AddComponent<Image>().color = Bone;
+            var mechanismImage = mechanism.gameObject.AddComponent<Image>(); mechanismImage.raycastTarget = false; bool mechanismArt = Slots.Dress(mechanismImage, "mechanism"); mechanismImage.enabled = mechanismArt;
+            var mechanismLines = Rect("Mechanism lines", mechanism, 0, 55, 110, 110); mechanismLines.gameObject.SetActive(!mechanismArt);
+            RingLines(mechanismLines, 46, new Color(.62f, .57f, .53f, .5f), null);
+            var tick = Rect("Mechanism tick", mechanismLines, 0, 55 - 46, 3, 14); tick.gameObject.AddComponent<Image>().color = Bone;
             for (int b = 0; b < SliceFlow.Books; b++)
             {
                 float x = -138 + b * 46;
-                var book = Rect("Book " + (b + 1), chamber, x, 300, 34, 70); bookImages[b] = book.gameObject.AddComponent<Image>(); bookImages[b].color = Dim;
-                book.gameObject.AddComponent<Outline>().effectColor = new Color(.35f, .35f, .38f);
-                var page = Rect("Page", book, 0, 35, 26, 58); bookPages[b] = page.gameObject.AddComponent<Image>(); bookPages[b].color = new Color(Bone.r, Bone.g, Bone.b, 0); bookPages[b].raycastTarget = false; // Build D: a page turns when the Book opens
+                var book = Rect("Book " + (b + 1), chamber, x, 300, 34, 70); bookImages[b] = book.gameObject.AddComponent<Image>();
+                var bookOutline = book.gameObject.AddComponent<Outline>(); bookOutline.effectColor = new Color(.35f, .35f, .38f); bookOutline.enabled = !Slots.Dress(bookImages[b], "crystal-book"); Slots.Paint(bookImages[b], Dim, ShutArt);
+                var page = Rect("Page", book, 0, 35, 26, 58); bookPages[b] = page.gameObject.AddComponent<Image>(); bookPages[b].raycastTarget = false; Slots.Dress(bookPages[b], "crystal-page"); Slots.Paint(bookPages[b], new Color(Bone.r, Bone.g, Bone.b, 0), 1f); // Build D: a page turns when the Book opens
                 for (int l = 0; l < SliceFlow.LocksPerBook; l++)
-                { var dot = Rect("Lock", chamber, x - 10 + l * 10, 348, 7, 7); locks[b * 3 + l] = dot.gameObject.AddComponent<Image>(); locks[b * 3 + l].color = new Color(.3f, .3f, .33f); }
+                { var dot = Rect("Lock", chamber, x - 10 + l * 10, 348, 7, 7); locks[b * 3 + l] = dot.gameObject.AddComponent<Image>(); Slots.Dress(locks[b * 3 + l], "lock"); Slots.Paint(locks[b * 3 + l], LockDark, LockDarkArt); }
             }
             chamberBooksLabel = Label(chamber, "Seven sealed Books, three locks each", 0, 376, 330, 20, 12); chamberBooksLabel.color = Muted;
             // Build D: the Chamber as a room. A doorway back, the Books as a point of interest, a floor band; all hidden on the first (Continue) visit.
             chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f); chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band
-            chamberDoor = Block(chamber, "Doorway back", -140, 384, 40, 60); Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
+            chamberDoor = Block(chamber, "Doorway back", -140, 384, 40, 60, "door-open"); Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
             chamberBooksTap = Rect("The Books, tap to walk", chamber, 0, 300, 330, 90); var booksTapImage = chamberBooksTap.gameObject.AddComponent<Image>(); booksTapImage.color = new Color(0, 0, 0, 0); Tappable(chamberBooksTap, () => Walk("books")); chamberBooksTap.gameObject.SetActive(false);
             var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
@@ -228,27 +241,28 @@ namespace Ascendant.CelestialDial
         void BuildHub()
         {
             // Q05 decisions 1, 6: the Atrium in Stage 2 "Stirring" with two entrances.
-            hub = ScreenPanel("Hub");
+            hub = ScreenPanel("Hub", "atrium");
             Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
-            var shelves = Block(hub, "Shelves, mostly empty", -130, 200, 60, 120); shelvesLabel = shelves.GetComponentInChildren<Text>();
-            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
+            var shelves = Block(hub, "Shelves, mostly empty", -130, 200, 60, 120, "shelves"); shelvesLabel = shelves.GetComponentInChildren<Text>();
+            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; Slots.Dress(shelfBooks[i], "shelf-book"); book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
             var floor = Rect("Floor band", hub, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
-            var desk = Block(hub, "Desk, uncovered", -125, 426, 70, 30); Tappable(desk, () => Walk("desk"));
+            var desk = Block(hub, "Desk, uncovered", -125, 426, 70, 30, "desk"); Tappable(desk, () => Walk("desk"));
             var casparMark = Rect("Caspar", hub, 100, 418, 14, 40); var casparBody = casparMark.gameObject.AddComponent<Image>(); casparBody.color = Muted; casparBody.raycastTarget = false;
             var casparHead = Rect("Caspar head", hub, 100, 392, 12, 12); var casparHeadImage = casparHead.gameObject.AddComponent<Image>(); casparHeadImage.color = Muted; casparHeadImage.raycastTarget = false;
             Label(hub, "Caspar", 100, 452, 60, 14, 10).color = Muted;
             var casparTap = Rect("Caspar, tap to walk", hub, 100, 420, 44, 76); var casparTapImage = casparTap.gameObject.AddComponent<Image>(); casparTapImage.color = new Color(0, 0, 0, 0); Tappable(casparTap, () => Walk("caspar"));
-            var lamp1 = Rect("Lamp", hub, -40, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false;
-            var lamp2 = Rect("Lamp", hub, 60, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false;
-            var lamp3 = Rect("Lamp", hub, 140, 150, 8, 22); lampThree = lamp3.gameObject.AddComponent<Image>(); lampThree.color = LampDark; lampThree.raycastTarget = false; // Build B: Stage 5
-            var lamp4 = Rect("Lamp", hub, -90, 150, 8, 22); lampFour = lamp4.gameObject.AddComponent<Image>(); lampFour.color = LampDark; lampFour.raycastTarget = false; // Build C: Stage 6
+            if (Slots.Dress(casparTapImage, "caspar")) { casparMark.gameObject.SetActive(false); casparHead.gameObject.SetActive(false); } // Build E: his figure takes the file; the tap rect is his slot
+            var lamp1 = Rect("Lamp", hub, -40, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false; Slots.Dress(lampOne, "lamp");
+            var lamp2 = Rect("Lamp", hub, 60, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false; Slots.Dress(lampTwo, "lamp");
+            var lamp3 = Rect("Lamp", hub, 140, 150, 8, 22); lampThree = lamp3.gameObject.AddComponent<Image>(); lampThree.color = LampDark; lampThree.raycastTarget = false; Slots.Dress(lampThree, "lamp"); // Build B: Stage 5
+            var lamp4 = Rect("Lamp", hub, -90, 150, 8, 22); lampFour = lamp4.gameObject.AddComponent<Image>(); lampFour.color = LampDark; lampFour.raycastTarget = false; Slots.Dress(lampFour, "lamp"); // Build C: Stage 6
             string[] doors = { "Sealed", "Zodiac Wing, open", "Crystal Book Chamber" }; // Build D: the third doorway leads back to the Chamber
             for (int i = 0; i < 3; i++)
             {
-                var door = Block(hub, doors[i], -120 + i * 120, 325, 70, 100); string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "chamber-door"; Tappable(door, () => Walk(poi));
+                var door = Block(hub, doors[i], -120 + i * 120, 325, 70, 100, i == 0 ? "door-sealed" : "door-open"); string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "chamber-door"; Tappable(door, () => Walk(poi));
                 if (i == 1) { var light = Rect("Doorway light", door, 0, 50, 50, 82); doorOpenLight = light.gameObject.AddComponent<Image>(); doorOpenLight.color = new Color(.95f, .8f, .5f, .35f); doorOpenLight.raycastTarget = false; }
                 else if (i == 2) { var light = Rect("Doorway light", door, 0, 50, 50, 82); var li = light.gameObject.AddComponent<Image>(); li.color = new Color(.7f, .8f, .95f, .3f); li.raycastTarget = false; }
-                else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; var glow = Rect("Light behind the door", door, 0, 50, 50, 82); sealedLeftLight = glow.gameObject.AddComponent<Image>(); sealedLeftLight.color = new Color(.95f, .8f, .5f, 0); sealedLeftLight.raycastTarget = false; glow.SetAsFirstSibling(); }
+                else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; lockRect.gameObject.SetActive(!HasArt(door)); var glow = Rect("Light behind the door", door, 0, 50, 50, 82); sealedLeftLight = glow.gameObject.AddComponent<Image>(); sealedLeftLight.color = new Color(.95f, .8f, .5f, 0); sealedLeftLight.raycastTarget = false; glow.SetAsFirstSibling(); }
             }
             hubCaption = Label(hub, "", 0, 470, 340, 20, 12); hubCaption.color = Muted;
             var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
@@ -259,8 +273,9 @@ namespace Ascendant.CelestialDial
             enterSeals = MakeButton(hub, "Check the Seals", 0, 680, 300, 52, EnterSeals); enterSealsLabel = enterSeals.GetComponentInChildren<Text>();
             hubNote = Label(hub, "", 0, 718, 330, 20, 12); hubNote.color = Muted;
             endCard = Label(hub, "End of prototype v0.2. Glyphs and Key 2 come next.", 0, 738, 330, 20, 12); endCard.gameObject.SetActive(false);
-            walkSpeed = TestButton(hub, "Walk: normal (test)", -60, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
-            hubRestart = TestButton(hub, "Start over (test)", 60, 774, Restart);
+            walkSpeed = TestButton(hub, "Walk: normal (test)", -118, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
+            mute = TestButton(hub, MuteLabel, 0, 774, ToggleMute); // Build E: sound on or off, apart from reduced motion
+            hubRestart = TestButton(hub, "Start over (test)", 118, 774, Restart);
         }
         void BuildReview()
         {
@@ -283,7 +298,7 @@ namespace Ascendant.CelestialDial
             glyphs = ScreenPanel("Glyphs");
             Label(glyphs, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             glyphProgress = Label(glyphs, "", 0, 62, 300, 20, 12); glyphProgress.color = Muted;
-            var card = Rect("Glyph card", glyphs, 0, 200, 140, 140); card.gameObject.AddComponent<Image>().color = PanelColor;
+            var card = Rect("Glyph card", glyphs, 0, 200, 140, 140); bookCard = card.gameObject.AddComponent<Image>(); bookCard.color = PanelColor; // Build E: book-cover shut, book-page open
             glyphCard = Label(card, "", 0, 70, 130, 130, 84); glyphCard.font = Dial.GlyphFont; glyphCard.horizontalOverflow = HorizontalWrapMode.Overflow; glyphCard.verticalOverflow = VerticalWrapMode.Overflow;
             Label(glyphs, "Which sign carries this symbol?", 0, 290, 330, 24, 15);
             for (int i = 0; i < 4; i++) { int slot = i; glyphNameButtons[i] = MakeButton(glyphs, "", -78 + (i % 2) * 156, 340 + (i / 2) * 64, 150, 56, () => AnswerGlyphName(slot)); }
@@ -331,16 +346,18 @@ namespace Ascendant.CelestialDial
         {
             var r = Dial.Root;
             var floor = Rect("Floor markings", r, 0, 270, 320, 320); floor.SetAsFirstSibling();
-            RingLines(floor, 150, new Color(.62f, .57f, .53f, .2f), floorLines);
-            var shelf = Block(r, "Collapsed bookshelf", -125, 90, 50, 36); shelf.SetAsFirstSibling();
-            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); book.gameObject.AddComponent<Image>().color = new Color(.3f, .28f, .3f); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
-            var chair = Block(r, "Covered chair", 125, 90, 44, 36); chair.SetAsFirstSibling();
-            var cloth = Rect("Dust cloth", chair, 0, 10, 48, 14); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f);
-            var c = Rect("Candle", r, -160, 445, 6, 18); c.SetAsFirstSibling(); candle = c.gameObject.AddComponent<Image>(); candle.color = LampDark; candle.raycastTarget = false;
+            floorArt = floor.gameObject.AddComponent<Image>(); floorArt.raycastTarget = false; floorArt.enabled = Slots.Dress(floorArt, "floor-markings");
+            RingLines(floor, 150, new Color(.62f, .57f, .53f, .2f), floorLines); if (floorArt.enabled) foreach (var line in floorLines) line.gameObject.SetActive(false);
+            FloorLight(.2f);
+            var shelf = Block(r, "Collapsed bookshelf", -125, 90, 50, 36, "shelf"); shelf.SetAsFirstSibling();
+            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
+            var chair = Block(r, "Covered chair", 125, 90, 44, 36, "chair"); chair.SetAsFirstSibling();
+            var cloth = Rect("Dust cloth", chair, 0, 10, 48, 14); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(chair));
+            var c = Rect("Candle", r, -160, 445, 6, 18); c.SetAsFirstSibling(); candle = c.gameObject.AddComponent<Image>(); candle.raycastTarget = false; Slots.Dress(candle, "candle"); Slots.Paint(candle, LampDark, DarkArt);
             var s = Rect("Seam", r, 0, 270, 332, 2); seam = s.gameObject.AddComponent<Image>(); seam.color = new Color(Bone.r, Bone.g, Bone.b, 0); seam.raycastTarget = false;
             var glow = Rect("Key glow", r, 0, 270, 140, 140); keyGlow = glow.gameObject.AddComponent<Image>(); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); keyGlow.raycastTarget = false;
-            keyRect = Rect("Keeper Key", r, 0, 270, 84, 40); var keyImage = keyRect.gameObject.AddComponent<Image>(); keyImage.color = new Color(Bone.r, Bone.g, Bone.b, 0); keyImage.raycastTarget = false;
-            keyLabel = Label(keyRect, "KEEPER KEY", 0, 20, 80, 36, 12); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0);
+            keyRect = Rect("Keeper Key", r, 0, 270, 84, 40); var keyImage = keyRect.gameObject.AddComponent<Image>(); keyImage.raycastTarget = false; bool keyArt = Slots.Dress(keyImage, "keeper-key"); Slots.Paint(keyImage, new Color(Bone.r, Bone.g, Bone.b, 0), 1f);
+            keyLabel = Label(keyRect, "KEEPER KEY", 0, 20, 80, 36, 12); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0); keyLabel.gameObject.SetActive(!keyArt); // the file draws its own Key
             keyIndicator = Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
             wingContinue = MakeButton(r, "Continue", 0, 654, 190, 56, WingContinue); wingContinue.name = "Slice Continue"; wingContinue.gameObject.SetActive(false);
         }
@@ -348,23 +365,25 @@ namespace Ascendant.CelestialDial
         void BuildWingRoom()
         {
             // Q06 phase 2, decision 2: the Wing as a room with two points of interest, the Dial and the doorway back.
-            wingRoom = ScreenPanel("Wing room");
+            wingRoom = ScreenPanel("Wing room", "wing");
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
-            var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36);
-            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); book.gameObject.AddComponent<Image>().color = new Color(.3f, .28f, .3f); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
+            var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36, "shelf");
+            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
             var glow = Rect("Shelf glow", shelf, 0, 18, 60, 46); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
             var dial = Rect("The Dial", wingRoom, 30, 250, 200, 200); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
-            RingLines(dial, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(dial, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
+            var rings = Rect("Rings", dial, 0, 100, 200, 200); rings.gameObject.SetActive(!Slots.Dress(dialImage, "dial-face")); // the face seen from the room
+            RingLines(rings, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(rings, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
             var dialLabel = Label(wingRoom, "The Dial", 30, 352, 120, 16, 10); dialLabel.color = Muted;
             Tappable(dial, () => Walk("dial"));
             // Build B (07 Room Scope amendment): a second interactive object, the table with its board of twelve, dark until the modality unit is complete.
-            var table = Block(wingRoom, "The table", -60, 372, 60, 30);
-            for (int i = 0; i < 12; i++) { var square = Rect("Square", table, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
+            var table = Block(wingRoom, "The table", -60, 372, 60, 30, "table");
+            var board = Rect("Board", table, 0, 15, 60, 30); board.gameObject.SetActive(!HasArt(table));
+            for (int i = 0; i < 12; i++) { var square = Rect("Square", board, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
             var tableGlow = Rect("Table glow", table, 0, 15, 72, 44); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
             Tappable(table, () => Walk("grid"));
-            var door = Block(wingRoom, "Doorway back", -130, 325, 70, 100); Tappable(door, () => Walk("atrium-door"));
+            var door = Block(wingRoom, "Doorway back", -130, 325, 70, 100, "door-open"); Tappable(door, () => Walk("atrium-door"));
             var light = Rect("Doorway light", door, 0, 50, 50, 82); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, .25f); lightImage.raycastTarget = false;
             var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
             wingRoomCaption = Label(wingRoom, "The Dial waits at the center of the room. The doorway leads back.", 0, 466, 340, 36, 12); // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
@@ -379,6 +398,12 @@ namespace Ascendant.CelestialDial
             avatar = Rect("Keeper", root, 0, BandY - 16, 20, 44);
             var body = Rect("Body", avatar, 0, 26, 16, 30); var bodyImage = body.gameObject.AddComponent<Image>(); bodyImage.color = new Color(.85f, .8f, .72f); bodyImage.raycastTarget = false;
             avatarHead = Rect("Head", avatar, 0, 7, 12, 12); var headImage = avatarHead.gameObject.AddComponent<Image>(); headImage.color = new Color(.85f, .8f, .72f); headImage.raycastTarget = false;
+            // Build E: two frames take the marker's place, idle and walk, flipped to face the way it walks.
+            var art = Rect("Keeper art", avatar, 0, 22, 20, 44); avatarArt = art.gameObject.AddComponent<Image>(); avatarArt.raycastTarget = false;
+            bool keeperArt = Slots.Dress(avatarArt, "keeper-idle"); keeperWalk = Slots.Image("keeper-walk");
+            if (!keeperArt && keeperWalk != null) { keeperArt = Slots.Dress(avatarArt, "keeper-walk"); } // a walk frame alone stands in for both
+            keeperIdle = avatarArt.sprite; if (keeperWalk == null) keeperWalk = keeperIdle;
+            art.gameObject.SetActive(keeperArt); body.gameObject.SetActive(!keeperArt); avatarHead.gameObject.SetActive(!keeperArt);
             avatar.gameObject.SetActive(false);
         }
         void BuildFade()
@@ -390,6 +415,7 @@ namespace Ascendant.CelestialDial
             var walk = Flow.Walk; float band = walk.Room == Room.Chamber ? ChamberBandY : BandY;
             avatar.anchoredPosition = new Vector2(walk.X, -(band - 16) + walk.Bob);
             avatarHead.anchoredPosition = new Vector2(walk.Facing * 2, -7);
+            if (avatarArt.gameObject.activeSelf) { avatarArt.sprite = walk.Walking && ((int)(walk.Traveled / 14f)) % 2 == 1 ? keeperWalk : keeperIdle; avatarArt.rectTransform.localScale = new Vector3(walk.Facing, 1, 1); } // one frame per step, the walk bob's own rhythm
         }
         void Tappable(RectTransform r, Action action)
         {
@@ -407,6 +433,9 @@ namespace Ascendant.CelestialDial
         // ---- actions (all input paths, including the Web bridge, arrive here) ----
         public void WebAction(string command)
         {
+            if (command == "mute") { ToggleMute(); return; }
+            if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
+            if (styleShown && command != "reload") return; // the style page is not the game (a reload, test-only, still gets out of it)
             if (command == "next-screen") Continue();
             else if (command.StartsWith("birth:")) ChooseBirth(command.Substring(6));
             else if (command.StartsWith("birthdate:")) UseDate(command.Substring(10));
@@ -461,9 +490,9 @@ namespace Ascendant.CelestialDial
         {
             if (busy) return;
             var s = Flow.Screen;
-            if (s == SliceScreen.Atrium && Page < AtriumPages.Length - 1) { Page++; ShowPage(); Publish(); return; }
-            if (s == SliceScreen.AtriumReturn && Page < ReturnPages.Length - 1) { Page++; ShowPage(); Publish(); return; }
-            if (s == SliceScreen.Chamber && !Flow.Ended) { if (Page < ChamberPages.Length - 1) { Page++; ShowPage(); Publish(); } return; }
+            if (s == SliceScreen.Atrium && Page < AtriumPages.Length - 1) { Page++; Sound.Play("page"); ShowPage(); Publish(); return; }
+            if (s == SliceScreen.AtriumReturn && Page < ReturnPages.Length - 1) { Page++; Sound.Play("page"); ShowPage(); Publish(); return; }
+            if (s == SliceScreen.Chamber && !Flow.Ended) { if (Page < ChamberPages.Length - 1) { Page++; Sound.Play("page"); ShowPage(); Publish(); } return; }
             var from = Flow.Screen;
             if (!Flow.Continue()) return;
             Page = 0;
@@ -484,14 +513,15 @@ namespace Ascendant.CelestialDial
         IEnumerator Spend()
         {
             busy = true; int spent = Flow.LocksFilled; insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
-            locks[spent - 1].color = Bone;
+            Slots.Paint(locks[spent - 1], Bone, 1f);
             bool opened = spent % SliceFlow.LocksPerBook == 0; int book = (spent - 1) / SliceFlow.LocksPerBook;
             chamberLine = opened ? "The last lock turns. Something inside the crystal moves." : spent == 4 ? "The second Book takes its first Key." : "Lock " + (spent % SliceFlow.LocksPerBook) + " of three. The Book holds it."; // placeholder (owner writes)
             ShowChamberRoom(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? 1f : 1.4f);
             if (opened)
             {
-                yield return Tween(ReducedMotion ? 0 : .8f, k => { bookImages[book].color = Color.Lerp(Dim, new Color(.42f, .38f, .32f), k); bookPages[book].color = new Color(Bone.r, Bone.g, Bone.b, .9f * k); bookPages[book].rectTransform.anchoredPosition = new Vector2(0, -35 + 18 * k); });
+                Sound.Play("page");
+                yield return Tween(ReducedMotion ? 0 : .8f, k => { Slots.Paint(bookImages[book], Color.Lerp(Dim, BookOpen, k), Mathf.Lerp(ShutArt, 1f, k)); Slots.Paint(bookPages[book], new Color(Bone.r, Bone.g, Bone.b, .9f * k), 1f); bookPages[book].rectTransform.anchoredPosition = new Vector2(0, -35 + 18 * k); });
                 Candles(true);
                 chamberLine = "The first Book opens. Light spills from its pages, and the room takes a breath.\nEvery lock it had is turned."; // placeholder (owner writes)
                 ShowChamberRoom(); Publish();
@@ -510,8 +540,8 @@ namespace Ascendant.CelestialDial
             chamberDoor.gameObject.SetActive(room); chamberBooksTap.gameObject.SetActive(room); chamberBand.gameObject.SetActive(room); chamberBooksLabel.gameObject.SetActive(!room);
             chamberBack.gameObject.SetActive(room); chamberBack.interactable = !busy; chamberContinue.gameObject.SetActive(!room && chamberContinue.gameObject.activeSelf);
             if (!room) return;
-            for (int l = 0; l < locks.Length; l++) locks[l].color = l < Flow.LocksFilled ? Bone : new Color(.3f, .3f, .33f);
-            for (int b = 0; b < SliceFlow.Books; b++) { bool open = b < Flow.BooksOpen; if (!busy) { bookImages[b].color = open ? new Color(.42f, .38f, .32f) : Dim; bookPages[b].color = new Color(Bone.r, Bone.g, Bone.b, open ? .9f : 0); bookPages[b].rectTransform.anchoredPosition = new Vector2(0, open ? -17 : -35); } }
+            for (int l = 0; l < locks.Length; l++) Slots.Paint(locks[l], l < Flow.LocksFilled ? Bone : LockDark, l < Flow.LocksFilled ? 1f : LockDarkArt);
+            for (int b = 0; b < SliceFlow.Books; b++) { bool open = b < Flow.BooksOpen; if (!busy) { Slots.Paint(bookImages[b], open ? BookOpen : Dim, open ? 1f : ShutArt); Slots.Paint(bookPages[b], new Color(Bone.r, Bone.g, Bone.b, open ? .9f : 0), 1f); bookPages[b].rectTransform.anchoredPosition = new Vector2(0, open ? -17 : -35); } }
             if (Flow.BooksOpen > 0) Candles(true);
             bool canSpend = Flow.CanSpend && atBooks && !busy;
             insert.gameObject.SetActive(Flow.CanSpend && atBooks); insert.interactable = canSpend; insert.GetComponentInChildren<Text>().text = Flow.KeysInHand > 1 ? "Insert a Key (" + Flow.KeysInHand + " in hand)" : "Insert the Key";
@@ -539,12 +569,13 @@ namespace Ascendant.CelestialDial
         void OpenBook()
         {
             if (!Flow.EnterBook()) return;
+            Sound.Play("page");
             if (Dial.Lesson.CanBeginGlyphs && !Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) { Flow.StartGlyphs(); Save(); } }
             else if (Dial.Lesson.CanPractice) Dial.Lesson.BeginPractice(); // after Key 2 the book tests again, harder after a clean run
             else Dial.Lesson.Say(DialLesson.ShelfRead); // Part A done or Key 2 earned: the book only shows its pages closed
             Show(); Publish();
         }
-        void CloseBook() { if (busy || !Flow.LeaveBook()) return; Dial.Lesson.AbandonPractice(); Save(); Show(); Publish(); }
+        void CloseBook() { if (busy || !Flow.LeaveBook()) return; Sound.Play("page"); Dial.Lesson.AbandonPractice(); Save(); Show(); Publish(); }
         // ---- Build B: the table ----
         void EnterGridNow()
         {
@@ -606,6 +637,7 @@ namespace Ascendant.CelestialDial
         {
             if (id == "wing-door" || id == "atrium-door" || id == "chamber-door")
             {
+                Sound.Play("door");
                 yield return FadeTo(1);
                 if (id == "wing-door") Flow.EnterWing(); else if (id == "chamber-door") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); } else if (Flow.Walk.Room == Room.Chamber) { Flow.LeaveChamber(); Save(); } else { Flow.LeaveWing(); Save(); }
                 Show(); PlaceAvatar(); Publish();
@@ -652,7 +684,7 @@ namespace Ascendant.CelestialDial
             if (busy) return;
             var task = Flow.CurrentReview; if (task == null || task.Mode != ReviewMode.Glyph) return;
             int seat = Flow.GlyphReviewOptions(task.seat)[slot];
-            Flow.AnswerGlyph(seat);
+            Sound.Play(Flow.AnswerGlyph(seat) ? "seal" : "miss");
             reviewNote.text = Flow.Note; Save(); Publish();
             if (task.done) StartCoroutine(AfterTap());
         }
@@ -685,7 +717,7 @@ namespace Ascendant.CelestialDial
         {
             if (busy) return;
             var task = Flow.CurrentReview; if (task == null || task.Mode != ReviewMode.TapModality) return;
-            Flow.AnswerModalityTap(modality); Dial.Lesson.Dial.Log("tap_answered");
+            Sound.Play(Flow.AnswerModalityTap(modality) ? "seal" : "miss"); Dial.Lesson.Dial.Log("tap_answered");
             reviewNote.text = Flow.Note; Save(); Publish();
             if (task.done) StartCoroutine(AfterTap());
         }
@@ -693,7 +725,7 @@ namespace Ascendant.CelestialDial
         {
             if (busy) { Dial.Lesson.Dial.Log("tap_ignored_busy"); return; }
             var task = Flow.CurrentReview; if (task == null || task.Mode != ReviewMode.Tap) { Dial.Lesson.Dial.Log("tap_ignored_task"); return; }
-            Flow.AnswerTap(element); Dial.Lesson.Dial.Log("tap_answered");
+            Sound.Play(Flow.AnswerTap(element) ? "seal" : "miss"); Dial.Lesson.Dial.Log("tap_answered");
             reviewNote.text = Flow.Note; Save(); Publish();
             if (task.done) StartCoroutine(AfterTap());
         }
@@ -759,6 +791,7 @@ namespace Ascendant.CelestialDial
             var lesson = Dial.Lesson; int target = lesson.CurrentGlyph;
             bool naming = lesson.Phase == LessonPhase.GlyphNames;
             closeBook.interactable = !busy;
+            var page = Slots.Image(naming ? "book-page" : "book-cover"); bookCard.sprite = page; bookCard.color = page != null ? Color.white : PanelColor; // Build E
             if (!naming) { glyphProgress.text = ""; glyphCard.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].GetComponentInChildren<Text>().text = ""; glyphCaspar.text = lesson.Message; glyphNote.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = false; return; } // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
             if (naming)
             {
@@ -796,7 +829,7 @@ namespace Ascendant.CelestialDial
         {
             int stage = Flow.AtriumStage;
             // Build D: one step of dressing per Key spent (placeholder): lamps, the shelves take their books back, light behind a sealed door.
-            lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark; lampThree.color = stage >= 5 ? LampLit : LampDark; lampFour.color = stage >= 6 ? LampLit : LampDark;
+            Lamp(lampOne, stage >= 2); Lamp(lampTwo, stage >= 3); Lamp(lampThree, stage >= 5); Lamp(lampFour, stage >= 6);
             foreach (var book in shelfBooks) book.gameObject.SetActive(stage >= 4); shelvesLabel.text = stage >= 4 ? "Shelves, filling" : "Shelves, mostly empty";
             sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? .3f : 0);
             hubCaption.text = stage >= 6 ? "Awake: four lamps, shelves filling. The Wing is whole." : stage >= 5 ? "Waking: three lamps, and light behind a sealed door." : stage >= 4 ? "Waking: the shelves take their books back." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open."; // placeholder (owner writes)
@@ -840,10 +873,22 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Chamber) { chamberEnd.text = "The first Key is spent. The Library has taken her first breath."; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -720); }
             if (!chamberReady && insertGlow != null) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
         }
-        void LightWing() { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .8f); candle.color = LampLit; }
+        void LightWing() { FloorLight(.8f); Slots.Paint(candle, LampLit, 1f); }
+        // Build E: the floor's lines at an alpha, or the floor's file at a brightness that follows it.
+        void FloorLight(float alpha) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, alpha); if (floorArt != null && floorArt.enabled) floorArt.color = Color.white * (.45f + .55f * alpha / .8f); }
+        static void Lamp(Image lamp, bool lit) => Slots.Paint(lamp, lit ? LampLit : LampDark, lit ? 1f : DarkArt);
+        static bool HasArt(RectTransform r) { var image = r.GetComponent<Image>(); return image != null && image.sprite != null; }
+        static string MuteLabel => "Sound: " + (Sound.Muted ? "off" : "on") + " (test)";
+        void ToggleMute()
+        {
+            Sound.ToggleMute();
+            if (mute != null) mute.GetComponentInChildren<Text>().text = MuteLabel; if (styleMute != null) styleMute.GetComponentInChildren<Text>().text = MuteLabel;
+            Publish();
+        }
         public void Publish() => Dial.Publish();
         public void Fill(DialView.WebState state)
         {
+            if (styleShown) { FillStyle(state); return; }
             var s = Flow.Screen; var task = Flow.CurrentReview;
             bool reviewOnDial = s == SliceScreen.Review && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             state.screen = s.ToString().ToLowerInvariant(); state.playerName = Flow.DisplayName; state.note = Flow.Note;
@@ -934,7 +979,7 @@ namespace Ascendant.CelestialDial
             Dial.Lesson.SetKey3(save.keys >= 3); Dial.Lesson.RestoreOpposites(save.polarityShown, save.oppKnown, save.oppositesStarted, save.built, save.builderEvidence, save.keys >= 4);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: " + Math.Max(2, save.keys);
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
-            keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f); candle.color = Bone; }
+            keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { FloorLight(.55f); Slots.Paint(candle, Bone, 1f); }
         }
 
         // ---- beats ----
@@ -955,18 +1000,18 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(ReducedMotion ? .8f : 2.2f);
             float t = ReducedMotion ? 0 : .25f;
             yield return Tween(t, k => { seam.color = new Color(Bone.r, Bone.g, Bone.b, k); Dial.Ring.localScale = Vector3.one * (1 + .03f * k); });
-            var keyImage = keyRect.GetComponent<Image>();
+            var keyImage = keyRect.GetComponent<Image>(); Sound.Play("key");
             yield return Tween(ReducedMotion ? 0 : .9f, k => {
                 keyRect.anchoredPosition = new Vector2(0, -270 + 100 * k);
-                keyImage.color = new Color(Bone.r, Bone.g, Bone.b, k); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, k);
+                Slots.Paint(keyImage, new Color(Bone.r, Bone.g, Bone.b, k), 1f); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, k);
                 keyGlow.rectTransform.anchoredPosition = keyRect.anchoredPosition; keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, .35f * k);
             });
             yield return new WaitForSecondsRealtime(ReducedMotion ? .3f : .6f);
             yield return Tween(ReducedMotion ? 0 : .5f, k => keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, .35f - .23f * k));
             Dial.Lesson.Say("Aah... the Library stirs."); // Q04 locked line.
             Dial.ForceRefresh();
-            foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .55f);
-            candle.color = Bone; keyIndicator.gameObject.SetActive(true);
+            FloorLight(.55f);
+            Slots.Paint(candle, Bone, 1f); keyIndicator.gameObject.SetActive(true);
             Flow.RevealKey(); wingContinue.gameObject.SetActive(true);
             busy = false; Publish();
         }
@@ -974,13 +1019,13 @@ namespace Ascendant.CelestialDial
         {
             busy = true; ShowPage(); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); Publish();
             float hold = ReducedMotion ? 1.2f : 1f;
-            locks[0].color = Bone; chamberText.text = "Something inside the crystal moves.";
+            Slots.Paint(locks[0], Bone, 1f); chamberText.text = "Something inside the crystal moves.";
             yield return new WaitForSecondsRealtime(hold * 1.6f);
             if (!ReducedMotion)
             {
                 Candles(true); yield return new WaitForSecondsRealtime(.1f); Candles(false); yield return new WaitForSecondsRealtime(.18f);
                 Candles(true); yield return new WaitForSecondsRealtime(.1f); Candles(false); yield return new WaitForSecondsRealtime(.25f);
-                for (int i = 0; i < candles.Length; i++) { candles[i].color = Bone; yield return new WaitForSecondsRealtime(.09f); }
+                for (int i = 0; i < candles.Length; i++) { Slots.Paint(candles[i], Bone, 1f); yield return new WaitForSecondsRealtime(.09f); }
                 chandelierLabel.text = "The chandelier, lit";
             }
             else Candles(true);
@@ -996,7 +1041,7 @@ namespace Ascendant.CelestialDial
             Flow.End(); chamberEnd.gameObject.SetActive(true); insert.gameObject.SetActive(false); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
             busy = false; ShowPage(); Publish();
         }
-        void Candles(bool on) { foreach (var c in candles) c.color = on ? Bone : LampDark; chandelierLabel.text = on ? "The chandelier, lit" : "The chandelier, dark"; }
+        void Candles(bool on) { foreach (var c in candles) Slots.Paint(c, on ? Bone : LampDark, on ? 1f : DarkArt); chandelierLabel.text = on ? "The chandelier, lit" : "The chandelier, dark"; }
         IEnumerator Tween(float seconds, Action<float> apply)
         {
             if (seconds <= 0) { apply(1); yield break; }
@@ -1006,11 +1051,47 @@ namespace Ascendant.CelestialDial
         }
         IEnumerator Fade(Image image, float from, float to, float seconds) => Tween(seconds, k => image.color = new Color(1, 1, 1, Mathf.Lerp(from, to, k)));
 
-        // ---- placeholder geometry helpers (same reference layout as the Dial: 360 x 800, top-anchored) ----
-        RectTransform ScreenPanel(string name) { var s = Rect(name, root, 0, 400, 360, 800); s.gameObject.AddComponent<Image>().color = Charcoal; return s; }
-        RectTransform Block(Transform parent, string name, float x, float top, float width, float height)
+        // ---- Build E: the style page (?style). Every slot at once, with its source, so a set can be judged before it goes in. ----
+        void BuildStyle()
         {
-            var r = Rect(name, parent, x, top, width, height); var image = r.gameObject.AddComponent<Image>(); image.color = PanelColor; image.raycastTarget = false;
+            style = ScreenPanel("Style"); styleSet = Slots.Set;
+            styleSlots = Slots.Art.Select(a => a.Name + ": " + Slots.Source(a.Name)).ToArray(); styleSounds = Slots.Sounds.Select(s => s.Name + ": " + Slots.SoundSource(s.Name)).ToArray();
+            Label(style, "STYLE PAGE", 0, 22, 340, 24, 16);
+            var note = Label(style, "Every art and sound slot with its source. Set: " + (Slots.Set == "" ? "the Art and Audio folders" : Slots.Set), 0, 44, 344, 18, 10); note.color = Muted;
+            for (int i = 0; i < Slots.Art.Length; i++)
+            {
+                var slot = Slots.Art[i]; float x = -129 + (i % 4) * 86, top = 62 + (i / 4) * 88;
+                var cell = Rect("Slot " + slot.Name, style, x, top + 26, 80, 52); var thumb = cell.gameObject.AddComponent<Image>(); thumb.color = PanelColor; thumb.raycastTarget = false;
+                if (Slots.Dress(thumb, slot.Name)) thumb.preserveAspect = true; // the sheet keeps the file's shape; in the game the placeholder's rect wins
+                Label(style, slot.Name, x, top + 60, 86, 12, 9);
+                var source = Label(style, slot.Width + " × " + slot.Height + " · " + Slots.Source(slot.Name), x, top + 72, 86, 12, 8); source.color = Muted;
+            }
+            for (int i = 0; i < Slots.Sounds.Length; i++)
+            {
+                string name = Slots.Sounds[i].Name; float x = -129 + (i % 4) * 86, top = 686 + (i / 4) * 42;
+                var button = MakeButton(style, name, x, top, 82, 38, () => { Sound.Play(name); Publish(); }); var text = button.GetComponentInChildren<Text>(); text.fontSize = 10; text.text = name + "\n" + Slots.SoundSource(name);
+            }
+            styleMute = TestButton(style, MuteLabel, 0, 774, ToggleMute);
+        }
+        void ShowStyle()
+        {
+            styleShown = true; Dial.Inert = true;
+            foreach (var screen in new[] { identity, birth, atrium, atriumReturn, chamber, hub, review, glyphs, gridScreen, wingRoom, avatar }) screen.gameObject.SetActive(false);
+            Dial.UiCanvas.gameObject.SetActive(false); style.gameObject.SetActive(true);
+        }
+        void FillStyle(DialView.WebState state)
+        {
+            state.screen = "style"; state.style = true; state.busy = false;
+            state.active = false; state.canContinue = false; state.canOptional = false; state.canAsk = false; state.canBuilderName = false; state.canBuilderShare = false;
+            state.styleSlots = styleSlots; state.styleSounds = styleSounds; state.artSet = styleSet; // the page as built, not a live lookup
+            state.caspar = "Style page, " + (styleSet == "" ? "the Art and Audio folders" : "the " + styleSet + " set") + ": " + styleSlots.Count(t => !t.EndsWith(": placeholder")) + " of " + Slots.Art.Length + " art slots and " + styleSounds.Count(t => !t.EndsWith(": silent")) + " of " + Slots.Sounds.Length + " sound slots have files.";
+        }
+
+        // ---- placeholder geometry helpers (same reference layout as the Dial: 360 x 800, top-anchored) ----
+        RectTransform ScreenPanel(string name, string slot = null) { var s = Rect(name, root, 0, 400, 360, 800); var image = s.gameObject.AddComponent<Image>(); image.color = Charcoal; if (slot != null) Slots.Dress(image, slot); return s; } // Build E: a room's background is a slot
+        RectTransform Block(Transform parent, string name, float x, float top, float width, float height, string slot = null)
+        {
+            var r = Rect(name, parent, x, top, width, height); var image = r.gameObject.AddComponent<Image>(); image.color = PanelColor; image.raycastTarget = false; if (slot != null) Slots.Dress(image, slot);
             var label = Label(r, name, 0, height + 10, Mathf.Max(width, 110), 16, 10); label.color = Muted; label.horizontalOverflow = HorizontalWrapMode.Overflow; return r;
         }
         InputField TextBox(Transform parent, string name, float x, float top, float width, float height, string placeholderText, Action<string> onEndEdit)
