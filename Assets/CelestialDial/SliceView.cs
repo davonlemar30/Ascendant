@@ -30,6 +30,11 @@ namespace Ascendant.CelestialDial
         Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
         // Build B: the table in the Wing room and its screen.
         RectTransform gridScreen; Text gridCaspar, gridReadout, gridStatus, gridKeys; Button gridSeal, gridAsk, leaveGrid, enterGrid; Image gridGlow, lampThree, lampFour;
+        // Build D: the Chamber as a room, the Books, and the Atrium's dressing per stage.
+        Button enterChamber, chamberBack; Image sealedLeftLight; Text shelvesLabel, chamberBooksLabel, chandelierLabel; RectTransform chamberDoor, chamberBooksTap, chamberBand;
+        readonly Image[] bookImages = new Image[SliceFlow.Books], bookPages = new Image[SliceFlow.Books], shelfBooks = new Image[3];
+        const float ChamberBandY = 408f; // the Chamber's floor band sits under the Books, above Caspar's panel
+        string chamberLine = "";
         readonly Button[] gridTiles = new Button[12], gridCells = new Button[12];
         readonly Text[] gridTileNames = new Text[12], gridTileGlyphs = new Text[12], gridCellNames = new Text[12], gridCellGlyphs = new Text[12];
         int demoCell = -1;
@@ -72,6 +77,17 @@ namespace Ascendant.CelestialDial
         const string HubKey2Line = "Two Keys. He left twenty-one locks, and you have opened the way to two of them.\nThat is enough for tonight. The seals will keep."; // placeholder (owner writes)
         const string HubKey3Line = "Three Keys. The table is full, and the Wing has one more thing to teach you.\nRest now. The seals will keep."; // placeholder (owner writes; Build B)
         const string HubKey4Line = "Four Keys. Every pattern the wheel keeps, you keep now.\nRest. The Chamber will want to see them."; // placeholder (owner writes; Build C)
+        // Build D placeholder lines (owner writes; worksheet section 13).
+        const string HubKeyInHandLine = "You carry a Key the Chamber has not seen. Its door is open when you are ready.";
+        const string HubKeysInHandLine = "You carry {0} Keys the Chamber has not seen. Its door is open when you are ready.";
+        const string HubSpent2Line = "Two locks filled. The first Book is one Key from opening.\nThe shelves are taking their books back.";
+        const string HubSpent3Line = "Three locks. The first Book breathes. He would not have believed it.\nThere is light behind a sealed door now.";
+        const string HubWholeLine = "Four Keys spent. The Wing is whole, and the second Book has begun.\nWhat remains is sealed, for now. Rest.";
+        const string ChamberQuietLine = "The Books are quiet. They will want the next Key.";
+        const string ChamberWholeLine = "The first Book open, the second begun. The Wing is whole.\nWhat remains is sealed, for now.";
+        const string ChamberBringLine = "Bring it to the Books.";
+        const string ChamberChooseLine = "Choose a lock. Feed it your Key.";
+        const string ChamberEndCard = "End of the Zodiac Wing. The rest is sealed for now."; // one line at 330 wide
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
 
         void Awake()
@@ -117,7 +133,7 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.ModalitiesComplete && !Flow.ModalitiesComplete) { Flow.MarkModalitiesComplete(); Save(); Publish(); } // Build B: the table wakes
             if (Flow.Screen == SliceScreen.Grid && Grid.Key3Earned && Flow.Keys < 3) { Flow.MarkKey3(); keyIndicator.text = "Keeper Keys: 3"; Save(); Show(); Publish(); }
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Key4Earned && Flow.Keys < 4) { Flow.MarkKey4(); keyIndicator.text = "Keeper Keys: 4"; Save(); Show(); Publish(); } // Build C
-            if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && !Flow.KeyInserted)
+            if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && (!Flow.KeyInserted || Flow.CanSpend))
             {
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
                 insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, a);
@@ -182,19 +198,24 @@ namespace Ascendant.CelestialDial
             Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18);
             for (int i = 0; i < candles.Length; i++)
             { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].color = LampDark; candles[i].raycastTarget = false; }
-            Label(chamber, "The chandelier, dark", 0, 116, 300, 18, 11).color = Muted;
+            chandelierLabel = Label(chamber, "The chandelier, dark", 0, 116, 300, 18, 11); chandelierLabel.color = Muted;
             mechanism = Rect("Mechanism", chamber, 0, 180, 110, 110);
             RingLines(mechanism, 46, new Color(.62f, .57f, .53f, .5f), null);
             var tick = Rect("Mechanism tick", mechanism, 0, 55 - 46, 3, 14); tick.gameObject.AddComponent<Image>().color = Bone;
             for (int b = 0; b < SliceFlow.Books; b++)
             {
                 float x = -138 + b * 46;
-                var book = Rect("Book " + (b + 1), chamber, x, 300, 34, 70); book.gameObject.AddComponent<Image>().color = Dim;
+                var book = Rect("Book " + (b + 1), chamber, x, 300, 34, 70); bookImages[b] = book.gameObject.AddComponent<Image>(); bookImages[b].color = Dim;
                 book.gameObject.AddComponent<Outline>().effectColor = new Color(.35f, .35f, .38f);
+                var page = Rect("Page", book, 0, 35, 26, 58); bookPages[b] = page.gameObject.AddComponent<Image>(); bookPages[b].color = new Color(Bone.r, Bone.g, Bone.b, 0); bookPages[b].raycastTarget = false; // Build D: a page turns when the Book opens
                 for (int l = 0; l < SliceFlow.LocksPerBook; l++)
                 { var dot = Rect("Lock", chamber, x - 10 + l * 10, 348, 7, 7); locks[b * 3 + l] = dot.gameObject.AddComponent<Image>(); locks[b * 3 + l].color = new Color(.3f, .3f, .33f); }
             }
-            Label(chamber, "Seven sealed Books, three locks each", 0, 376, 330, 20, 12).color = Muted;
+            chamberBooksLabel = Label(chamber, "Seven sealed Books, three locks each", 0, 376, 330, 20, 12); chamberBooksLabel.color = Muted;
+            // Build D: the Chamber as a room. A doorway back, the Books as a point of interest, a floor band; all hidden on the first (Continue) visit.
+            chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f); chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band
+            chamberDoor = Block(chamber, "Doorway back", -140, 384, 40, 60); Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
+            chamberBooksTap = Rect("The Books, tap to walk", chamber, 0, 300, 330, 90); var booksTapImage = chamberBooksTap.gameObject.AddComponent<Image>(); booksTapImage.color = new Color(0, 0, 0, 0); Tappable(chamberBooksTap, () => Walk("books")); chamberBooksTap.gameObject.SetActive(false);
             var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
             chamberText = Label(panel, "", 0, 96, 306, 136, 13);
@@ -202,13 +223,15 @@ namespace Ascendant.CelestialDial
             var glow = Rect("Insert glow", chamber, 0, 654, 214, 80); insertGlow = glow.gameObject.AddComponent<Image>(); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); insertGlow.raycastTarget = false;
             insert = MakeButton(chamber, "Insert the Key", 0, 654, 190, 56, Insert); insert.GetComponent<Image>().color = Crimson;
             chamberContinue = MakeButton(chamber, "Continue", 0, 654, 190, 56, () => Continue()); chamberContinue.gameObject.SetActive(false);
+            chamberBack = MakeButton(chamber, "Back to the Atrium", 0, 714, 300, 48, LeaveChamber); chamberBack.gameObject.SetActive(false); // Build D
         }
         void BuildHub()
         {
             // Q05 decisions 1, 6: the Atrium in Stage 2 "Stirring" with two entrances.
             hub = ScreenPanel("Hub");
             Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
-            Block(hub, "Shelves, mostly empty", -130, 200, 60, 120);
+            var shelves = Block(hub, "Shelves, mostly empty", -130, 200, 60, 120); shelvesLabel = shelves.GetComponentInChildren<Text>();
+            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
             var floor = Rect("Floor band", hub, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
             var desk = Block(hub, "Desk, uncovered", -125, 426, 70, 30); Tappable(desk, () => Walk("desk"));
             var casparMark = Rect("Caspar", hub, 100, 418, 14, 40); var casparBody = casparMark.gameObject.AddComponent<Image>(); casparBody.color = Muted; casparBody.raycastTarget = false;
@@ -219,18 +242,20 @@ namespace Ascendant.CelestialDial
             var lamp2 = Rect("Lamp", hub, 60, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false;
             var lamp3 = Rect("Lamp", hub, 140, 150, 8, 22); lampThree = lamp3.gameObject.AddComponent<Image>(); lampThree.color = LampDark; lampThree.raycastTarget = false; // Build B: Stage 5
             var lamp4 = Rect("Lamp", hub, -90, 150, 8, 22); lampFour = lamp4.gameObject.AddComponent<Image>(); lampFour.color = LampDark; lampFour.raycastTarget = false; // Build C: Stage 6
-            string[] doors = { "Sealed", "Zodiac Wing, open", "Sealed" };
+            string[] doors = { "Sealed", "Zodiac Wing, open", "Crystal Book Chamber" }; // Build D: the third doorway leads back to the Chamber
             for (int i = 0; i < 3; i++)
             {
-                var door = Block(hub, doors[i], -120 + i * 120, 325, 70, 100); string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "sealed-right"; Tappable(door, () => Walk(poi));
+                var door = Block(hub, doors[i], -120 + i * 120, 325, 70, 100); string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "chamber-door"; Tappable(door, () => Walk(poi));
                 if (i == 1) { var light = Rect("Doorway light", door, 0, 50, 50, 82); doorOpenLight = light.gameObject.AddComponent<Image>(); doorOpenLight.color = new Color(.95f, .8f, .5f, .35f); doorOpenLight.raycastTarget = false; }
-                else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; }
+                else if (i == 2) { var light = Rect("Doorway light", door, 0, 50, 50, 82); var li = light.gameObject.AddComponent<Image>(); li.color = new Color(.7f, .8f, .95f, .3f); li.raycastTarget = false; }
+                else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; var glow = Rect("Light behind the door", door, 0, 50, 50, 82); sealedLeftLight = glow.gameObject.AddComponent<Image>(); sealedLeftLight.color = new Color(.95f, .8f, .5f, 0); sealedLeftLight.raycastTarget = false; glow.SetAsFirstSibling(); }
             }
             hubCaption = Label(hub, "", 0, 470, 340, 20, 12); hubCaption.color = Muted;
             var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
-            enterWing = MakeButton(hub, "The Zodiac Wing", 0, 624, 300, 52, EnterWing);
+            enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing);
+            enterChamber = MakeButton(hub, "The Chamber", 78, 624, 150, 52, EnterChamber); // Build D
             enterSeals = MakeButton(hub, "Check the Seals", 0, 680, 300, 52, EnterSeals); enterSealsLabel = enterSeals.GetComponentInChildren<Text>();
             hubNote = Label(hub, "", 0, 718, 330, 20, 12); hubNote.color = Muted;
             endCard = Label(hub, "End of prototype v0.2. Glyphs and Key 2 come next.", 0, 738, 330, 20, 12); endCard.gameObject.SetActive(false);
@@ -362,8 +387,8 @@ namespace Ascendant.CelestialDial
         }
         void PlaceAvatar()
         {
-            var walk = Flow.Walk;
-            avatar.anchoredPosition = new Vector2(walk.X, -(BandY - 16) + walk.Bob);
+            var walk = Flow.Walk; float band = walk.Room == Room.Chamber ? ChamberBandY : BandY;
+            avatar.anchoredPosition = new Vector2(walk.X, -(band - 16) + walk.Bob);
             avatarHead.anchoredPosition = new Vector2(walk.Facing * 2, -7);
         }
         void Tappable(RectTransform r, Action action)
@@ -388,6 +413,8 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("sign:") && int.TryParse(command.Substring(5), out int seat)) { if (Flow.SetKnownSign(seat)) AfterBirthEntry(); }
             else if (command.StartsWith("name:")) { Flow.SetName(command.Substring(5)); if (nameField != null) nameField.text = Flow.PlayerName; Publish(); }
             else if (command == "insert") Insert();
+            else if (command == "enter-chamber") EnterChamber();
+            else if (command == "leave-chamber") LeaveChamber();
             else if (command == "restart") Restart();
             else if (command == "reload") { if (!busy) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); } // test-only: resume from the local save
             else if (command == "enter-wing") EnterWing();
@@ -444,7 +471,57 @@ namespace Ascendant.CelestialDial
             if (from == SliceScreen.Birth) StartCoroutine(WhiteLight()); else { Show(); Publish(); }
         }
         void WingContinue() { if (Flow.AtriumStage >= 2) LeaveWing(); else Continue(); }
-        void Insert() { if (busy || Page < ChamberPages.Length - 1 || !Flow.InsertKey()) return; StartCoroutine(Chandelier()); }
+        void Insert()
+        {
+            if (busy) return;
+            if (Flow.AtChamberRoom) { if (Flow.Walk.At != "books" || !Flow.SpendKey()) return; Save(); StartCoroutine(Spend()); return; } // Build D
+            if (Page < ChamberPages.Length - 1 || !Flow.InsertKey()) return; StartCoroutine(Chandelier());
+        }
+        // ---- Build D: the Chamber as a room ----
+        void EnterChamber() { Walk("chamber-door"); }
+        void LeaveChamber() { if (busy || !Flow.AtChamberRoom) return; Walk("atrium-door"); }
+        // A Key spent: its lock lights; the third lock opens the Book (light, a page turning); the fourth Key starts the second Book and ends the Wing.
+        IEnumerator Spend()
+        {
+            busy = true; int spent = Flow.LocksFilled; insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
+            locks[spent - 1].color = Bone;
+            bool opened = spent % SliceFlow.LocksPerBook == 0; int book = (spent - 1) / SliceFlow.LocksPerBook;
+            chamberLine = opened ? "The last lock turns. Something inside the crystal moves." : spent == 4 ? "The second Book takes its first Key." : "Lock " + (spent % SliceFlow.LocksPerBook) + " of three. The Book holds it."; // placeholder (owner writes)
+            ShowChamberRoom(); Publish();
+            yield return new WaitForSecondsRealtime(ReducedMotion ? 1f : 1.4f);
+            if (opened)
+            {
+                yield return Tween(ReducedMotion ? 0 : .8f, k => { bookImages[book].color = Color.Lerp(Dim, new Color(.42f, .38f, .32f), k); bookPages[book].color = new Color(Bone.r, Bone.g, Bone.b, .9f * k); bookPages[book].rectTransform.anchoredPosition = new Vector2(0, -35 + 18 * k); });
+                Candles(true);
+                chamberLine = "The first Book opens. Light spills from its pages, and the room takes a breath.\nEvery lock it had is turned."; // placeholder (owner writes)
+                ShowChamberRoom(); Publish();
+                yield return new WaitForSecondsRealtime(ReducedMotion ? 1.2f : 2.2f);
+            }
+            if (Flow.WingWhole)
+            {
+                chamberLine = ChamberWholeLine; ShowChamberRoom(); Publish();
+                yield return new WaitForSecondsRealtime(ReducedMotion ? 1f : 1.8f);
+            }
+            busy = false; Show(); Publish();
+        }
+        void ShowChamberRoom()
+        {
+            bool room = Flow.AtChamberRoom; bool atBooks = Flow.Walk.At == "books";
+            chamberDoor.gameObject.SetActive(room); chamberBooksTap.gameObject.SetActive(room); chamberBand.gameObject.SetActive(room); chamberBooksLabel.gameObject.SetActive(!room);
+            chamberBack.gameObject.SetActive(room); chamberBack.interactable = !busy; chamberContinue.gameObject.SetActive(!room && chamberContinue.gameObject.activeSelf);
+            if (!room) return;
+            for (int l = 0; l < locks.Length; l++) locks[l].color = l < Flow.LocksFilled ? Bone : new Color(.3f, .3f, .33f);
+            for (int b = 0; b < SliceFlow.Books; b++) { bool open = b < Flow.BooksOpen; if (!busy) { bookImages[b].color = open ? new Color(.42f, .38f, .32f) : Dim; bookPages[b].color = new Color(Bone.r, Bone.g, Bone.b, open ? .9f : 0); bookPages[b].rectTransform.anchoredPosition = new Vector2(0, open ? -17 : -35); } }
+            if (Flow.BooksOpen > 0) Candles(true);
+            bool canSpend = Flow.CanSpend && atBooks && !busy;
+            insert.gameObject.SetActive(Flow.CanSpend && atBooks); insert.interactable = canSpend; insert.GetComponentInChildren<Text>().text = Flow.KeysInHand > 1 ? "Insert a Key (" + Flow.KeysInHand + " in hand)" : "Insert the Key";
+            if (!canSpend) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
+            chamberEnd.gameObject.SetActive(Flow.WingWhole && !busy); chamberEnd.text = ChamberEndCard; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -376); // the Books' caption row; the first visit's card sits lower
+            if (string.IsNullOrEmpty(chamberLine)) chamberLine = DefaultChamberLine();
+            chamberText.text = chamberLine;
+        }
+        // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
+        string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? Flow.KeysInHand + " Keys in your hand. " : "A Key in your hand. ") + ChamberBringLine; // placeholder (owner writes)
         void Restart() { if (busy) return; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
         void EnterWing() { Walk("wing-door"); }
@@ -507,7 +584,7 @@ namespace Ascendant.CelestialDial
         }
         void Walk(string id)
         {
-            if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom)) return;
+            if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom && Flow.Screen != SliceScreen.ChamberRoom)) return;
             var poi = Flow.Walk.Find(id); if (poi == null) return;
             if (!poi.Walkable) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; }
             if (id == "shelf" && !Flow.WheelComplete) { if (Flow.TouchDarkShelf()) { wingRoomCaption.text = DialLesson.ShelfDark; Publish(); } return; }
@@ -527,10 +604,10 @@ namespace Ascendant.CelestialDial
         }
         IEnumerator Arrive(string id)
         {
-            if (id == "wing-door" || id == "atrium-door")
+            if (id == "wing-door" || id == "atrium-door" || id == "chamber-door")
             {
                 yield return FadeTo(1);
-                if (id == "wing-door") Flow.EnterWing(); else { Flow.LeaveWing(); Save(); }
+                if (id == "wing-door") Flow.EnterWing(); else if (id == "chamber-door") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); } else if (Flow.Walk.Room == Room.Chamber) { Flow.LeaveChamber(); Save(); } else { Flow.LeaveWing(); Save(); }
                 Show(); PlaceAvatar(); Publish();
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
                 yield return FadeTo(0);
@@ -540,6 +617,7 @@ namespace Ascendant.CelestialDial
             else if (id == "dial") EnterDialNow();
             else if (id == "shelf") OpenBook();
             else if (id == "grid") EnterGridNow();
+            else if (id == "books") { chamberLine = DefaultChamberLine(); ShowChamberRoom(); } // the Insert button waits at the Books
         }
         IEnumerator FadeTo(float alpha)
         {
@@ -634,12 +712,12 @@ namespace Ascendant.CelestialDial
             bool reviewOnDial = s == SliceScreen.Review && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth);
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
-            chamber.gameObject.SetActive(s == SliceScreen.Chamber); hub.gameObject.SetActive(s == SliceScreen.Hub);
+            chamber.gameObject.SetActive(s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom); hub.gameObject.SetActive(s == SliceScreen.Hub);
             wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
             gridScreen.gameObject.SetActive(s == SliceScreen.Grid); if (s == SliceScreen.Grid) ShowGrid();
             bool book = s == SliceScreen.Book;
-            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom;
-            if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : wingRoom, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
+            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
+            if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : s == SliceScreen.WingRoom ? wingRoom : chamber, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
             avatar.gameObject.SetActive(roomScreen);
             if (s == SliceScreen.WingRoom)
             {
@@ -674,6 +752,7 @@ namespace Ascendant.CelestialDial
             if (s == SliceScreen.Hub) ShowHub();
             if (s == SliceScreen.Review) ShowReview();
             ShowPage();
+            if (s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom) ShowChamberRoom(); // after ShowPage: the room owns the Chamber's controls
         }
         void ShowGlyphs()
         {
@@ -716,15 +795,19 @@ namespace Ascendant.CelestialDial
         void ShowHub()
         {
             int stage = Flow.AtriumStage;
+            // Build D: one step of dressing per Key spent (placeholder): lamps, the shelves take their books back, light behind a sealed door.
             lampOne.color = stage >= 2 ? LampLit : LampDark; lampTwo.color = stage >= 3 ? LampLit : LampDark; lampThree.color = stage >= 5 ? LampLit : LampDark; lampFour.color = stage >= 6 ? LampLit : LampDark;
-            hubCaption.text = stage >= 6 ? "Stirring: four lamps, a clear desk, the Wing open." : stage >= 5 ? "Stirring: three lamps, a clear desk, the Wing open." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open.";
-            hubText.text = Flow.Keys >= 4 ? HubKey4Line : Flow.Keys >= 3 ? HubKey3Line : Flow.Keys >= 2 ? HubKey2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
+            foreach (var book in shelfBooks) book.gameObject.SetActive(stage >= 4); shelvesLabel.text = stage >= 4 ? "Shelves, filling" : "Shelves, mostly empty";
+            sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? .3f : 0);
+            hubCaption.text = stage >= 6 ? "Awake: four lamps, shelves filling. The Wing is whole." : stage >= 5 ? "Waking: three lamps, and light behind a sealed door." : stage >= 4 ? "Waking: the shelves take their books back." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open."; // placeholder (owner writes)
+            hubText.text = Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
+            enterChamber.interactable = !busy && Flow.CanEnterChamber;
             int due = Flow.DueCount;
             enterSealsLabel.text = "Check the Seals"; // no count on the button (owner, Sept 14); the review screen shows n of m
-            enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
-            endCard.text = Flow.Keys >= 4 ? "Build C: four Keys. The Chamber waits for Build D." : Flow.Keys >= 3 ? "Build B: the table is full and Key 3 is earned." : Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
+            enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
+            endCard.text = Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber will take them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber will take them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber will take them." : "End of prototype v0.2. Glyphs and Key 2 come next."; // the prototype end cards give way to the Wing's (Build D)
             hubNote.text = Flow.Note;
-            endCard.gameObject.SetActive(Flow.V02Complete || Flow.V03Complete);
+            endCard.gameObject.SetActive(Flow.V02Complete || Flow.Keys >= 2);
         }
         void ShowReview()
         {
@@ -754,6 +837,7 @@ namespace Ascendant.CelestialDial
             insert.gameObject.SetActive(Flow.Screen == SliceScreen.Chamber && !Flow.KeyInserted && chamberReady);
             insert.interactable = chamberReady && !busy;
             chamberContinue.gameObject.SetActive(Flow.Screen == SliceScreen.Chamber && !busy && (Flow.Ended || (!Flow.KeyInserted && !chamberReady)));
+            if (Flow.Screen == SliceScreen.Chamber) { chamberEnd.text = "The first Key is spent. The Library has taken her first breath."; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -720); }
             if (!chamberReady && insertGlow != null) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
         }
         void LightWing() { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, .8f); candle.color = LampLit; }
@@ -772,7 +856,7 @@ namespace Ascendant.CelestialDial
                 s == SliceScreen.Review && !reviewOnDial ? (Flow.ReviewDone ? Flow.ReviewSummary + " " + reviewNote.text : reviewQuestion.text + " " + reviewNote.text) : "";
             state.keyRevealed = Flow.KeyRevealed; state.keyInserted = Flow.KeyInserted; state.ended = Flow.Ended; state.locksFilled = Flow.LocksFilled;
             state.sunSign = Flow.HasSunSign ? Zodiac.Seats[Flow.SunSign].Name : "";
-            state.canInsert = s == SliceScreen.Chamber && !Flow.KeyInserted && Page >= ChamberPages.Length - 1 && !busy;
+            state.canInsert = (s == SliceScreen.Chamber && !Flow.KeyInserted && Page >= ChamberPages.Length - 1 && !busy) || (s == SliceScreen.ChamberRoom && Flow.CanSpend && Flow.Walk.At == "books" && !busy);
             state.canSliceContinue = !busy && ((s == SliceScreen.Atrium && Page < AtriumPages.Length - 1) || (s == SliceScreen.AtriumReturn && Page < ReturnPages.Length - 1) || (s == SliceScreen.Chamber && !Flow.Ended && Page < ChamberPages.Length - 1) || ((s != SliceScreen.Chamber || Flow.Ended) && s != SliceScreen.Wing && Flow.CanContinue) || (s == SliceScreen.Wing && Flow.AtriumStage == 1 && Flow.CanContinue));
             state.canName = s == SliceScreen.Identity;
             state.canBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice == "";
@@ -800,14 +884,18 @@ namespace Ascendant.CelestialDial
             if (glyphItem) state.reviewMode = "glyph";
             state.v03Complete = Flow.V03Complete;
             // v0.4
-            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom;
+            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
             var walk = Flow.Walk;
-            state.room = !roomScreen ? "" : walk.Room == Room.Atrium ? "atrium" : "wing";
+            state.room = !roomScreen ? "" : walk.Room == Room.Atrium ? "atrium" : walk.Room == Room.Wing ? "wing" : "chamber";
             state.avatarX = walk.X; state.walking = walk.Walking; state.walkTarget = walk.TargetId; state.avatarAt = walk.At; state.walkSpeed = walk.SpeedName;
             var pois = roomScreen ? Rooms.Visible(walk.Room).ToArray() : new PointOfInterest[0];
             state.pois = pois.Select(p => p.Id).ToArray(); state.poiLabels = pois.Select(p => (p.Walkable ? "Walk to " : "") + p.Label).ToArray();
             state.canWalk = roomScreen && !busy; state.canEnterDial = s == SliceScreen.WingRoom && !busy; state.canEnterShelf = s == SliceScreen.WingRoom && Flow.WheelComplete && !busy;
             if (s == SliceScreen.WingRoom) { state.caspar = wingRoomCaption.text; state.canLeaveWing = !busy; }
+            // Build D
+            state.keysInHand = Flow.KeysInHand; state.keysSpent = Flow.KeysSpent; state.booksOpen = Flow.BooksOpen; state.wingWhole = Flow.WingWhole;
+            state.canEnterChamber = s == SliceScreen.Hub && Flow.CanEnterChamber && !busy; state.canLeaveChamber = s == SliceScreen.ChamberRoom && !busy; state.atBooks = s == SliceScreen.ChamberRoom && walk.At == "books";
+            if (s == SliceScreen.ChamberRoom) state.caspar = chamberText.text + (Flow.WingWhole && !busy ? " " + ChamberEndCard : "");
             state.canCloseBook = s == SliceScreen.Book && !busy;
             if (s == SliceScreen.Book && !partA) state.caspar = Dial.Lesson.Message;
             if (roomScreen && !busy) state.note = hubNote.text;
@@ -893,6 +981,7 @@ namespace Ascendant.CelestialDial
                 Candles(true); yield return new WaitForSecondsRealtime(.1f); Candles(false); yield return new WaitForSecondsRealtime(.18f);
                 Candles(true); yield return new WaitForSecondsRealtime(.1f); Candles(false); yield return new WaitForSecondsRealtime(.25f);
                 for (int i = 0; i < candles.Length; i++) { candles[i].color = Bone; yield return new WaitForSecondsRealtime(.09f); }
+                chandelierLabel.text = "The chandelier, lit";
             }
             else Candles(true);
             chamberText.text = "The chandelier flickers, then every candle lights.\nDust shakes from the ceiling. The old mechanism turns one degree.";
@@ -907,7 +996,7 @@ namespace Ascendant.CelestialDial
             Flow.End(); chamberEnd.gameObject.SetActive(true); insert.gameObject.SetActive(false); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
             busy = false; ShowPage(); Publish();
         }
-        void Candles(bool on) { foreach (var c in candles) c.color = on ? Bone : LampDark; }
+        void Candles(bool on) { foreach (var c in candles) c.color = on ? Bone : LampDark; chandelierLabel.text = on ? "The chandelier, lit" : "The chandelier, dark"; }
         IEnumerator Tween(float seconds, Action<float> apply)
         {
             if (seconds <= 0) { apply(1); yield break; }

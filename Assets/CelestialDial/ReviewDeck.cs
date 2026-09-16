@@ -106,5 +106,6 @@ namespace Ascendant.CelestialDial
         public bool oppositesStarted;
         public int built;
         public bool builderEvidence;
+        public int locksFilled;                  // Build D: Keys spent in the Chamber (Book 1 has three locks; the fourth Key starts Book 2)
     }
 }

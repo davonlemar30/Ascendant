@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     // v0.4 tap-to-move greybox (Q06 phase 2 lock, September 12): two walkable rooms, a placeholder marker,
     // straight-line walking at a fixed speed along a floor band, no pathfinding. Pure state, no Unity types.
-    public enum Room { None, Atrium, Wing }
+    public enum Room { None, Atrium, Wing, Chamber }
 
     public sealed class PointOfInterest
     {
@@ -23,8 +23,14 @@ namespace Ascendant.CelestialDial
             new PointOfInterest("wing-door", "the Zodiac Wing doorway", 0),
             new PointOfInterest("caspar", "Caspar", 76),   // stops beside him, not on him
             new PointOfInterest("sealed-left", "a sealed door", -120, false),
-            new PointOfInterest("sealed-right", "a sealed door", 120, false),
+            new PointOfInterest("chamber-door", "the Crystal Book Chamber doorway", 120), // Build D: the third doorway; the Chamber is a room once the first visit is behind the player
             new PointOfInterest("entry", "where you came in", 40),   // arrival spot from the Chamber; not shown as a point of interest
+        };
+        // Build D: the Chamber as a room. The Keeper walks between the doorway and the Books.
+        public static readonly PointOfInterest[] Chamber =
+        {
+            new PointOfInterest("atrium-door", "the doorway back to the Atrium", -140),
+            new PointOfInterest("books", "the Crystal Books", 0),
         };
         public static readonly PointOfInterest[] Wing =
         {
@@ -33,7 +39,7 @@ namespace Ascendant.CelestialDial
             new PointOfInterest("dial", "the Dial", 30),
             new PointOfInterest("shelf", "the bookshelf", 120),   // v0.3 revision: Part A lives here once the wheel is lit
         };
-        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : Array.Empty<PointOfInterest>();
+        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : Array.Empty<PointOfInterest>();
         public static PointOfInterest Find(Room room, string id) => Of(room).FirstOrDefault(p => p.Id == id);
         public static IEnumerable<PointOfInterest> Visible(Room room) => Of(room).Where(p => p.Id != "entry");
     }

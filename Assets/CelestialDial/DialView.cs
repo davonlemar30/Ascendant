@@ -89,6 +89,8 @@ namespace Ascendant.CelestialDial
             public string[] gridTiles, gridCells;
             public int gridPlaced, gridCell = -1, gridHintLevel; // the level is test evidence only, never shown
             public bool gridOpen, gridStarted, gridComplete, gridPaused, gridLocked, key3, canEnterGrid, canGridPick, canGridSeal, canGridAsk, canLeaveGrid;
+            // Build D: the finished loop
+            public int keysInHand, keysSpent, booksOpen; public bool wingWhole, canEnterChamber, canLeaveChamber, atBooks;
         }
         void Awake()
         {
