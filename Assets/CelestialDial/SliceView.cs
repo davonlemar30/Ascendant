@@ -269,7 +269,7 @@ namespace Ascendant.CelestialDial
             gridScreen = ScreenPanel("Grid");
             Label(gridScreen, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(gridScreen, "The Table", 0, 62, 200, 22, 14); // placeholder unit name (owner writes)
-            gridKeys = Label(gridScreen, "Keeper Keys: 2", 110, 62, 140, 20, 12); gridKeys.alignment = TextAnchor.MiddleRight;
+            gridKeys = Label(gridScreen, "Keeper Keys: 2", 100, 62, 140, 20, 12); gridKeys.alignment = TextAnchor.MiddleRight; // ten px in from the edge: at 360 wide the Dial's indicator touches it
             for (int c = 0; c < GridModel.Columns; c++) Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, 96, 86, 18, 11).color = Muted;
             for (int r = 0; r < GridModel.Rows; r++) Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12).color = Muted;
             for (int cell = 0; cell < 12; cell++)
@@ -715,7 +715,7 @@ namespace Ascendant.CelestialDial
             int due = Flow.DueCount;
             enterSealsLabel.text = "Check the Seals"; // no count on the button (owner, Sept 14); the review screen shows n of m
             enterWing.GetComponentInChildren<Text>().text = Flow.Keys >= 2 ? "The Zodiac Wing (read)" : Flow.WheelComplete ? "The Zodiac Wing (lit)" : "The Zodiac Wing";
-            endCard.text = Flow.Keys >= 3 ? "Build B: the table is full and Key 3 is earned. The Chamber waits for Build D." : Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
+            endCard.text = Flow.Keys >= 3 ? "Build B: the table is full and Key 3 is earned." : Flow.Keys >= 2 ? "End of prototype v0.4. The Library can be walked." : "End of prototype v0.2. Glyphs and Key 2 come next.";
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.V03Complete);
         }
