@@ -304,6 +304,65 @@ const path=require('path');
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check((await state()).atriumStage===5 && (await state()).keys===3 && (await state()).key3 && (await state()).gridComplete && (await state()).cleanRuns===1 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with three Keys, the full table, and the clean run at '+viewport.width);
+    // ---- Build C: polarity, the six opposite pairs, the builder, and Key 4 ----
+    const OPP=seat=>(seat+6)%12;
+    const unitActive=async()=>{await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await page.waitForTimeout(400);await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await page.waitForTimeout(150);}; // a guided problem shows its count a frame after it starts
+    const startSeat=async()=>SIGNS.indexOf((await state()).start.replace('Start: ',''));
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).caspar.includes('last pattern'),'with three Keys the room points at the wheel\'s last pattern at '+viewport.width);
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='opposites'&&window.ascendantDial.snapshot().canContinue,{},{timeout:15000});
+    check(!(await state()).polarityShown && (await state()).message.startsWith('One more thing the wheel keeps') && !(await state()).active && !(await state()).canLeaveWing,'after Key 3 the Dial opens the polarity beat; the Back button stays off its Continue at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-polarity.png')});
+    await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().polarityShown,{},{timeout:5000});
+    check((await state()).seats[0].includes(', day') && (await state()).seats[1].includes(', night') && (await state()).message.includes('day and night'),'the second line shows every seat\'s side, in words, at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-polarity-shown.png')});
+    await semantic('continue');await unitActive();
+    check((await state()).step===6 && (await state()).start==='Start: Taurus' && (await state()).hintLevel===2 && (await state()).unit==='opposites','the first pair is guided from the sun sign with the six-count at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-opposites.png')});
+    await semantic('seat-'+OPP(1));await semantic('seal');await unitActive();
+    check((await state()).pairsKnown===1 && (await state()).hintLevel===0 && (await state()).start==='Start: Gemini','the guided pair is known; the next is on the player\'s own at '+viewport.width);
+    await semantic('seat-'+((2+3)%12));await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().hintLevel===1&&window.ascendantDial.snapshot().canAsk,{},{timeout:5000});
+    await semantic('ask-caspar');await page.waitForFunction(()=>window.ascendantDial.snapshot().hintLevel===2&&window.ascendantDial.snapshot().message.includes('six seats on'),{},{timeout:5000});
+    check(true,'a wrong turn nudges; Ask Caspar gives the six-seat rule at '+viewport.width);
+    await unitActive();await semantic('seat-'+OPP(2));await semantic('seal');await unitActive();
+    check((await state()).pairsKnown===2 && !events.filter(e=>e.event_name==='answer_correct'&&e.requested_relationship==='forward_offset_6').pop().evidence_eligible,'a pair found after asking counts, not as evidence, at '+viewport.width);
+    for(let n=0;n<4;n++){const from=await startSeat();await semantic('seat-'+OPP(from));await semantic('seal');if(n<3)await unitActive();}
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().oppositesComplete&&window.ascendantDial.snapshot().canContinue,{},{timeout:20000});
+    check((await state()).pairsKnown===6 && events.filter(e=>e.event_name==='opposites_completed').length===1,'six pairs complete the last pattern at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-opposites-complete.png')});
+    await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='name'&&window.ascendantDial.snapshot().canBuilderName,{},{timeout:5000});
+    { const b=await state(); check(b.unit==='builder' && b.builderAsk==='Earth, fixed' && b.builderOptions.length===4 && b.builderOptions.includes('Taurus') && b.built===0 && !b.canLeaveWing,'Continue opens the builder on the sun sign\'s parts: four names, the Back button off them, at '+viewport.width); }
+    const nameBoxes=await page.locator('#builder-names button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height})));
+    check(nameBoxes.length===4 && nameBoxes.every(b=>b.width>=48 && b.height>=48),'four semantic names at the target floor at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-builder-name.png')});
+    await page.waitForTimeout(300);await tap(-78+156*((await state()).builderOptions.indexOf('Taurus')%2),654+60*Math.floor((await state()).builderOptions.indexOf('Taurus')/2)); // the thumb path: the right name on the canvas
+    await unitActive();check((await state()).builderStep==='opposite' && (await state()).step===6 && (await state()).start==='Start: Taurus','the right name hands to the wheel at '+viewport.width);
+    await semantic('seat-'+OPP(1));await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='share'&&window.ascendantDial.snapshot().canBuilderShare,{},{timeout:20000});
+    check((await state()).message.includes('Taurus and Scorpio'),'the opposite found, the share step asks what the two share at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-builder-share.png')});
+    await semantic('builder-share-2');await page.waitForFunction(()=>window.ascendantDial.snapshot().message.includes('Not the element'),{},{timeout:5000});
+    await semantic('builder-share-0');await page.waitForFunction(()=>window.ascendantDial.snapshot().shared.includes('Kind'),{},{timeout:5000});
+    await semantic('builder-share-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().built===1&&window.ascendantDial.snapshot().builderStep==='name',{},{timeout:20000});
+    check(events.filter(e=>e.event_name==='builder_sign_built').pop().evidence_eligible && (await state()).builderAsk==='Air, cardinal','the first sign is built unassisted; the second begins at '+viewport.width);
+    { const o=(await state()).builderOptions;const right=o.indexOf('Libra');await semantic('builder-name-'+((right+1)%4));await page.waitForFunction(()=>window.ascendantDial.snapshot().message.startsWith('Not that one.'),{},{timeout:5000});await semantic('builder-name-'+right); }
+    await unitActive();check((await state()).builderStep==='opposite' && (await state()).start==='Start: Libra','a wrong name is nudged; the right one hands to the wheel at '+viewport.width);
+    await semantic('seat-'+((6+3)%12));await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().hintLevel===1&&window.ascendantDial.snapshot().canAsk,{},{timeout:5000});
+    await semantic('ask-caspar');await page.waitForFunction(()=>window.ascendantDial.snapshot().hintLevel===2,{},{timeout:5000});await unitActive();
+    await semantic('seat-'+OPP(6));await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='share'&&window.ascendantDial.snapshot().canBuilderShare,{},{timeout:20000});
+    await semantic('builder-share-0');await page.waitForTimeout(150);await semantic('builder-share-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().built===2&&window.ascendantDial.snapshot().builderStep==='name',{},{timeout:20000});
+    check(!events.filter(e=>e.event_name==='builder_sign_built').pop().evidence_eligible && (await state()).builderAsk==='Fire, mutable','the second sign is built with help; the third begins at '+viewport.width);
+    { const o=(await state()).builderOptions;const right=o.indexOf('Sagittarius');await semantic('builder-name-'+((right+1)%4));await page.waitForTimeout(150);await semantic('builder-name-'+((right+2)%4)); }
+    await unitActive();check((await state()).message.startsWith('It is Sagittarius') && (await state()).builderStep==='opposite','two wrong names reveal the sign at '+viewport.width);
+    await semantic('seat-'+OPP(8));await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='share'&&window.ascendantDial.snapshot().canBuilderShare,{},{timeout:20000});
+    await semantic('builder-share-1');await page.waitForTimeout(150);await semantic('builder-share-0');
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().key4&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
+    check((await state()).keys===4 && (await state()).built===3 && events.filter(e=>e.event_name==='key4_earned').length===1 && (await state()).message.includes('Keeper Key 4 is yours'),'three signs built with one unassisted earns Key 4 once at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-key4.png')});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===6&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).caspar.includes('Four Keys') && (await state()).caspar.includes('four lamps'),'one more return takes the Atrium to Stage 6 with four Keys at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
+    await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    check((await state()).atriumStage===6 && (await state()).keys===4 && (await state()).key4 && (await state()).polarityShown && (await state()).oppositesComplete && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with four Keys, the sides, and the six pairs at '+viewport.width);
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);
