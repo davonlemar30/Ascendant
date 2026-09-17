@@ -2,6 +2,14 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Evidence routing
+
+[ClickUp task: Fix symbol answers bleeding into element mastery](https://app.clickup.com/t/86bc2338n).
+
+Every answer records exactly one review-deck item kind, chosen by the lesson's phase, and the table is written out above the subscriptions in `SliceFlow.ObserveProgress`: element-family problems (`DialLesson.InElementProblem`: Guided, Independent, Optional, Continuation) record `ItemKind.Element` by the destination seat; symbol Part A records `ItemKind.Glyph` through `GlyphNamedEvent` and Part B through the `glyph_placed` event, so a wheel placement's `answer_correct` is never element evidence; modality problems record `ItemKind.Modality`; opposite and builder problems record `ItemKind.Opposite` by pair; the table records `ItemKind.Grid`; a review answer records nothing through the lesson subscription (the batch records its own item). The element filter is a positive list: a phase added later records nothing until it is routed on purpose.
+
+Checks (`ValidateEvidenceRouting`, through the production subscriptions): the symbol unit end to end, Part A and twelve Level 0 placements, leaves every element, modality, grid, and opposite item byte-identical and advances all twelve symbol items; the element unit (guided, transfer, continuation) leaves every other kind untouched; the modality, opposite-and-builder, and table units each move only their own kind; a compressed Dial review answer records no lesson evidence of any kind.
+
 ## Post-Wing save checkpoints
 
 [ClickUp task: Fix save capture ordering and partial symbol restoration](https://app.clickup.com/t/86bc2338p).

@@ -39,6 +39,8 @@ namespace Ascendant.CelestialDial
         public bool CountBeatPending { get; private set; }
         public string Message { get; private set; }
         public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || InOppositeProblem;
+        // The element-family problems, the only phases whose answer_correct is sign → element evidence (evidence routing audit, Sept 17).
+        public bool InElementProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation;
         public bool InModalities => Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || Phase == LessonPhase.ModalityPaused || Phase == LessonPhase.ModalityComplete;
         // ---- Build C (Unit 1.3): polarity, the six opposite pairs, and the builder on the same Dial. Key 4 for three signs built. ----
         public bool InOppositeProblem => Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.BuilderOpposite;
