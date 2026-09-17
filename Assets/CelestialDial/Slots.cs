@@ -42,6 +42,8 @@ namespace Ascendant.CelestialDial
             new ArtSlot("shelf-book", 10, 26, 64, "a book on a shelf: three on the Wing's, three that return to the Atrium's at Stage 4"),
             new ArtSlot("book-cover", 140, 140, 512, "the book on the shelf, closed"),
             new ArtSlot("book-page", 140, 140, 512, "the book's open page behind each symbol"),
+            new ArtSlot("journal-page", 360, 800, 2048, "the journal's open page, behind its entries (Build F)"),
+            new ArtSlot("journal-cover", 60, 60, 256, "the journal's cover, at the head of its page (Build F)"),
             new ArtSlot("shelves", 60, 180, 512, "the Atrium's shelves, mostly empty (60 x 120 in the room)"),
             new ArtSlot("furniture-covered", 120, 70, 512, "the covered furniture of the opening"),
             new ArtSlot("desk", 70, 30, 256, "the desk, uncovered, in the Atrium room"),

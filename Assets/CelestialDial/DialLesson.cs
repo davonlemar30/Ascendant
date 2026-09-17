@@ -41,6 +41,8 @@ namespace Ascendant.CelestialDial
         public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || InOppositeProblem;
         // The element-family problems, the only phases whose answer_correct is sign → element evidence (evidence routing audit, Sept 17).
         public bool InElementProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation;
+        // Build F: a unit begun and neither complete nor paused resumes on the next visit without the fork (a reload restores no phase, so this reads the unit's own state).
+        public bool UnitInProgress => (AllNamed && !Key2Earned) || (ModalityUnitStarted && !ModalitiesComplete && Phase != LessonPhase.ModalityPaused) || (OppositesStarted && !Key4Earned && Phase != LessonPhase.OppositePaused && Phase != LessonPhase.BuilderPaused);
         public bool InModalities => Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || Phase == LessonPhase.ModalityPaused || Phase == LessonPhase.ModalityComplete;
         // ---- Build C (Unit 1.3): polarity, the six opposite pairs, and the builder on the same Dial. Key 4 for three signs built. ----
         public bool InOppositeProblem => Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.BuilderOpposite;
@@ -68,8 +70,10 @@ namespace Ascendant.CelestialDial
         public const string PolarityLine0 = "One more thing the wheel keeps. Every seat has a side.\nFire and Air are day signs. Earth and Water are night signs."; // placeholder (owner writes)
         public const string PolarityLine1 = "Older books say " + Zodiac.OlderPolarityTerms + ". We will say day and night.\nLook: each seat shows its side now."; // placeholder (owner writes)
         public const string OppositesDoneLine = "Six pairs. Every sign has its partner straight across the wheel, and none of them are enemies.\nNow build one for me."; // placeholder (owner writes)
-        public const string OppositesPausedLine = "Let us stop the last pattern here for now.\nWe will pick it up when you return."; // placeholder (owner writes)
-        public const string BuilderNoEvidenceLine = "Three built, but I did most of the building.\nRest, and we will build again when you return."; // placeholder (owner writes)
+        // Build F: every pause points somewhere now: the journal (the Sept 15 brief's missing destination). Placeholder (owner writes).
+        public const string JournalNudge = "Your journal holds what we have covered, if you want to read before we go on.";
+        public const string OppositesPausedLine = "Let us stop the last pattern here for now.\nWe will pick it up when you return. " + JournalNudge; // placeholder (owner writes)
+        public const string BuilderNoEvidenceLine = "Three built, but I did most of the building.\nRest, and we will build again when you return. " + JournalNudge; // placeholder (owner writes)
         public const string Key4Line = "Three signs built from their parts, and their partners named. Every pattern the wheel keeps is yours now.\nKeeper Key 4 is yours."; // placeholder (owner writes)
         static string Side(int seat) => Zodiac.PolarityAt(seat);
         static string Kind(int seat) => Zodiac.ModalityAt(seat).ToLowerInvariant();
@@ -297,7 +301,7 @@ namespace Ascendant.CelestialDial
         {
             // A worked example lights the seat without evidence; three of them in one sitting pause the unit (reappearance cap).
             LitMod[Zodiac.Destination(lastStart, 3)] = true; modalityAssisted++;
-            if (modalityAssisted >= 3) { Dial.Home(); Phase = LessonPhase.ModalityPaused; Message = "Let us stop the second pattern here for now.\nWe will pick it up when you return."; return; } // placeholder (owner writes)
+            if (modalityAssisted >= 3) { Dial.Home(); Phase = LessonPhase.ModalityPaused; Message = "Let us stop the second pattern here for now.\nWe will pick it up when you return. " + JournalNudge; return; } // placeholder (owner writes)
             AfterModalityCorrect(Dial.Events.Last());
         }
         public string RuleFor(int step) => step == 3
@@ -397,12 +401,13 @@ namespace Ascendant.CelestialDial
                 return;
             }
             if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve symbols, twelve names, in their order. You read the wheel now.\nKeeper Key 2 is yours."; Dial.Log("key2_earned", true, true); } // placeholder (owner writes)
-            else { Phase = LessonPhase.Paused; Message = "We reached the end of the symbols, but I did most of the finding.\nRest, and we will try the symbols again when you return."; }
+            else { Phase = LessonPhase.Paused; Message = "We reached the end of the symbols, but I did most of the finding.\nRest, and we will try the symbols again when you return. " + JournalNudge; }
         }
         // v0.2 (Q05): Unit 1.1 continuation on the same Dial, and compressed review problems.
         public int FamiliesComplete => Enumerable.Range(0, 4).Count(f => Kin[f]);
         public bool WheelComplete => Lit.All(v => v);
         LessonPhase phaseBeforeReview;
+        public string ReviewHeader { get; set; } = "Practice"; // Build F: the slice names the item ("Practice · 2 of 6") so a practice never looks like the lesson
         public event Action<int, bool, bool> ReviewFinished; // seat, correct, eligible
         public bool CanContinueUnit => KeyEarned && !WheelComplete && (Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || Phase == LessonPhase.Continuation);
         int NextUnlitFamily() { for (int f = 0; f < 4; f++) if (!Kin[f]) return f; return -1; }

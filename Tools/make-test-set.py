@@ -22,6 +22,7 @@ IMAGES = [
     ("shelves", 60, 180), ("furniture-covered", 120, 72), ("desk", 72, 32), ("lamp", 8, 24), ("candle", 8, 20),
     ("door-open", 72, 100), ("door-sealed", 72, 100),
     ("mechanism", 112, 112), ("crystal-book", 36, 72), ("crystal-page", 28, 60), ("lock", 8, 8), ("keeper-key", 84, 40),
+    ("journal-page", 180, 400), ("journal-cover", 60, 60),  # Build F
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row

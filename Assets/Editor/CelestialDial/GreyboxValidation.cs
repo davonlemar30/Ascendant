@@ -190,6 +190,60 @@ namespace Ascendant.Build
             review.BeginReview(2, 4); review.Dial.Select(Zodiac.Destination(2), DialInput.DirectSeat); var reviewAnswer = review.Seal(); review.AfterCorrect(reviewAnswer);
             Check(reviewAnswer.correctness && review.Phase == LessonPhase.Review && Others(reviewFlow.Deck, ItemKind.Grid) + Kind(reviewFlow.Deck, ItemKind.Grid) == allBefore, "a compressed Dial review answer records no lesson evidence of any kind");
         }
+        static void ValidateBuildF()
+        {
+            // ---- Build F: the practice fork on the Dial (Sept 15 ruling), the sitting rule (Sept 17), the three-strikes gate, the journal in the inventory ----
+            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.Continue(); f.Continue(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; } // at the Hub, Stage 2, twelve element items entered
+            string DeckKey(SliceFlow f) => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
+            void AnswerAll(SliceFlow f) { int guard = 0; while (!f.PracticeDone && guard++ < 12) { var t = f.CurrentReview; if (t.Mode == ReviewMode.Tap) f.AnswerTap(Zodiac.Seats[t.seat].Element); else if (t.Mode == ReviewMode.TapModality) f.AnswerModalityTap(Zodiac.ModalityAt(t.seat)); else if (t.Mode == ReviewMode.Glyph) f.AnswerGlyph(t.seat); else f.FinishReview(true, true); } }
+            var first = new SliceFlow(() => 1); first.Continue(); first.ChooseBirth("known"); first.SetKnownSign(1); first.Continue(); first.Continue();
+            Check(first.Screen == SliceScreen.Wing && !first.PracticeAvailable && !first.CanEnterPractice && !first.CanOpenJournal, "on the first visit nothing has entered the deck: no fork, no journal");
+            var lit = new DialLesson(() => 0); lit.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
+            var midB = new DialLesson(() => 0); midB.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true); midB.RestoreGlyphs(1, 3, false);
+            var midMod = new DialLesson(() => 0); midMod.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true); midMod.RestoreGlyphs(2, 12, true); midMod.RestoreModalities(Enumerable.Range(0, 12).Select(i => i % 3 == 1).ToArray(), new[] { false, true, false }, true);
+            var doneMod = new DialLesson(() => 0); doneMod.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true); doneMod.RestoreGlyphs(2, 12, true); doneMod.RestoreModalities(Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 3).ToArray(), true);
+            Check(!lit.UnitInProgress && midB.UnitInProgress && midMod.UnitInProgress && !doneMod.UnitInProgress, "a unit begun and not complete is in progress after a reload (Part B mid-way, a modality family mid-way); a lit wheel or a finished unit is not, so the fork can show");
+            var f = Fresh();
+            Check(f.AtHub && f.PracticeAvailable && f.CanOpenJournal && !f.CanEnterPractice && f.Sittings == 0, "at the Hub the journal is in hand; practice waits for the Dial");
+            Check(f.EnterWing() && !f.CanEnterPractice && f.EnterDial() && f.CanEnterPractice, "practice is offered on the Dial, not in the room");
+            Check(f.EnterPractice() && f.Sittings == 1 && f.Sitting == 1 && f.AtPractice && f.ReviewQueue.Count == 6 && f.Strikes == 0, "entering practice counts one sitting and asks up to six due items");
+            Check(f.LeavePractice() && f.Screen == SliceScreen.Wing && f.ReviewQueue.Count == 0 && f.Deck.DueForReview(f.Sitting).Count == 12, "leaving at once keeps every item due at the same sitting");
+            Check(f.EnterPractice() && f.Sittings == 2, "re-entering counts another sitting");
+            var one = f.CurrentReview; f.FinishReview(true, true); var two = f.CurrentReview; if (two.Mode == ReviewMode.Tap) f.AnswerTap(Zodiac.Seats[two.seat].Element); else f.FinishReview(true, true);
+            Check(f.ReviewIndex == 2 && f.LeavePractice() && f.Deck.Item(one.seat, ItemKind.Element).dueDay == 2 + ReviewDeck.Ladder[1] && f.Deck.DueForReview(f.Sitting).Count == 10, "two answered move up the ladder; leaving early leaves the other ten due now");
+            foreach (var it in f.Deck.Items) it.dueDay = 99;
+            Check(f.CanEnterPractice && !f.EnterPractice() && f.Sittings == 3 && f.Note == SliceFlow.NothingDueLine && f.Screen == SliceScreen.Wing, "with nothing due the entry still counts a sitting and Caspar says so");
+            foreach (var it in f.Deck.Items) if (it.Kind == ItemKind.Element) it.dueDay = 0;
+            Check(f.EnterPractice() && f.Sittings == 4 && f.Strikes == 0, "fresh strikes on every entry");
+            int guard = 0;
+            while (!f.Gated && guard++ < 12) { var t = f.CurrentReview; if (t == null) break; if (t.Mode == ReviewMode.Tap) f.AnswerTap(Zodiac.Seats[t.seat].Element == "Fire" ? "Water" : "Fire"); else { f.RecordStrike(); f.FinishReview(false, false); } }
+            Check(f.Gated && f.Strikes == SliceFlow.StrikeLimit && f.AtPractice, "the third wrong answer across the practice, on any form, gates the instrument");
+            Check(f.CloseInstrument() && f.Screen == SliceScreen.WingRoom && f.Note == "gated" && !f.Gated && f.ReviewQueue.Count == 0 && f.CanOpenJournal, "the gate closes the instrument into the room, journal offered, nobody locked out");
+            Check(f.EnterDial() && f.CanEnterPractice && f.EnterPractice() && f.Strikes == 0 && f.Sittings == 5, "re-entry is immediate with three fresh strikes and a new sitting");
+            f.LeavePractice(); f.LeaveDial();
+            Check(f.JournalSections.SequenceEqual(new[] { ItemKind.Element }), "before the symbols the journal has one section");
+            f.StartGlyphs(); f.Deck.RecordLesson(3, true, f.Sitting, ItemKind.Glyph);
+            string deckBefore = DeckKey(f);
+            Check(f.OpenJournal() && f.AtJournal && f.JournalFrom == SliceScreen.WingRoom && f.JournalKind == ItemKind.Element && f.JournalEntries(ItemKind.Element).Count == 12 && f.JournalEntries(ItemKind.Element)[0] == "Aries — Fire · " + SliceFlow.StateWord(f.Deck.Item(0, ItemKind.Element)) && !f.CanJournalPrev && f.CanJournalNext, "the journal opens from the room on the elements, twelve entries in wheel order");
+            Check(f.JournalNext() && f.JournalKind == ItemKind.Glyph && f.JournalEntries(ItemKind.Glyph).Count == 12 && f.JournalEntries(ItemKind.Glyph)[3].EndsWith("practicing") && f.JournalEntries(ItemKind.Glyph)[4].EndsWith("introduced") && !f.CanJournalNext && !f.JournalNext() && f.JournalPrev() && f.JournalKind == ItemKind.Element && !f.JournalPrev(), "the symbols are a second section; pages turn both ways and stop at the ends; the state word follows the deck");
+            Check(DeckKey(f) == deckBefore && f.CloseJournal() && f.Screen == SliceScreen.WingRoom && f.Note == "" && DeckKey(f) == deckBefore, "reading the journal changes no deck field; closing returns to the room and clears the gate note");
+            Check(f.LeaveWing() && f.CanOpenJournal && f.OpenJournal() && f.JournalFrom == SliceScreen.Hub && f.CloseJournal() && f.AtHub && f.EnterChamber() && f.CanOpenJournal && f.OpenJournal() && f.CloseJournal() && f.AtChamberRoom, "the journal opens from the Atrium and the Chamber too");
+            f.StartGrid(); f.StartOpposites();
+            Check(f.JournalSections.SequenceEqual(new[] { ItemKind.Element, ItemKind.Glyph, ItemKind.Grid, ItemKind.Opposite }) && f.JournalEntries(ItemKind.Grid)[0] == "Aries — Fire · Cardinal · introduced" && f.JournalEntries(ItemKind.Opposite).Count == 6 && f.JournalEntries(ItemKind.Opposite)[0].StartsWith("Aries and Libra"), "the table and the opposites show in the journal as data, in curriculum order");
+            Check(f.LeaveChamber() && f.ApproachDesk() && f.Note == SliceFlow.DeskLine && f.Screen == SliceScreen.Hub, "the desk is dressing: it only speaks");
+            var save = UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true))); var back = new SliceFlow(() => 1);
+            Check(save.version == 4 && save.sittings == 5 && save.reviewsChecked == 5 && back.Restore(save) && back.Sittings == 5, "the save carries the sitting count both ways");
+            var older = new SliceFlow(() => 1);
+            Check(older.Restore(new SaveData { atriumStage = 3, sunSign = 1, keyEarned = true, reviewsChecked = 2 }) && older.Sittings == 2, "an older save's completed batches count as sittings");
+            // Liveness (folded from the audit's deadlock task 86bc2338q): twelve items answered correctly every time; every item reaches the last interval; no entry ever stalls the clock.
+            var live = Fresh(); live.EnterWing(); live.EnterDial(); int stalled = 0;
+            for (int entry = 0; entry < 30; entry++) { if (live.EnterPractice()) { AnswerAll(live); live.LeavePractice(); } else stalled++; }
+            Check(live.Sittings == 30 && live.Deck.Items.Where(i => i.Kind == ItemKind.Element).All(i => i.interval == ReviewDeck.Ladder.Length - 1) && stalled > 0 && stalled < 30, "liveness: thirty entries, twelve items answered correctly every time; every item reaches the last interval, the clock ticks on every entry, and the empty entries never stall it");
+            // Regression: the audit's stall (every item scheduled ahead, nothing due). Under the sitting rule the empty entry still moves the clock and the next entry finds items due.
+            var stall = Fresh(); stall.EnterWing(); stall.EnterDial();
+            for (int k = 0; k < 2; k++) { stall.EnterPractice(); AnswerAll(stall); stall.LeavePractice(); }
+            Check(stall.Sittings == 2 && stall.Deck.DueForReview(stall.Sitting).Count == 0 && !stall.EnterPractice() && stall.Sittings == 3 && stall.Deck.DueForReview(stall.Sitting).Count == 0 && stall.EnterPractice() && stall.Sittings == 4 && stall.ReviewQueue.Count == 6, "the audit's stall: with every item scheduled ahead, the empty entry still moves the clock and the next entry finds the first six due again");
+        }
         [MenuItem("Ascendant/Greybox/Run mechanical validation")]
         public static void Run()
         {
@@ -286,7 +340,7 @@ namespace Ascendant.Build
             deck.RecordReview(3,true,false,1);Check(deck.Items[3].State==ItemState.Introduced && deck.Items[3].interval==0,"an assisted correct review neither advances nor sets back");
             var loop=new SliceFlow(()=>1);loop.Continue();loop.ChooseBirth("known");loop.SetKnownSign(1);loop.Continue();loop.Continue();loop.RevealKey();loop.Continue();loop.Continue();loop.InsertKey();loop.End();
             Check(loop.Screen==SliceScreen.Chamber && loop.CanContinue && loop.Continue() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2 && loop.Deck.Items.Where(i=>i.Kind==ItemKind.Element).All(i=>i.entered),"after the ending, Continue reaches the Hub in Stage 2 and the deck opens");
-            Check(loop.Sitting==0 && loop.DueCount==12 && loop.EnterSeals() && loop.Screen==SliceScreen.Review && loop.ReviewQueue.Count==ReviewDeck.BatchSize,"no in-game time: the first sitting already has items ready; a batch of six begins");
+            Check(loop.Sitting==0 && loop.DueCount==12 && loop.EnterWing() && loop.EnterDial() && loop.CanEnterPractice && loop.EnterPractice() && loop.Sitting==1 && loop.Screen==SliceScreen.Practice && loop.ReviewQueue.Count==ReviewDeck.BatchSize,"no in-game time: the first practice already has items ready; the entry is the first sitting and a batch of six begins");
             Check(loop.ReviewQueue[0].Mode==ReviewMode.Dial && loop.ReviewQueue[1].Mode==ReviewMode.Tap,"review alternates compressed Dial and direct tap");
             loop.FinishReview(true,true);Check(loop.ReviewIndex==1 && loop.Deck.Items[loop.ReviewQueue[0].seat].State==ItemState.Practicing,"a compressed Dial review success advances its item");
             var tapTask=loop.CurrentReview;string wrong=Zodiac.Seats[tapTask.seat].Element=="Fire" ? "Water" : "Fire";
@@ -296,11 +350,11 @@ namespace Ascendant.Build
             loop.AnswerTap(Zodiac.Seats[tap3.seat].Element=="Air" ? "Water" : "Air");loop.AnswerTap(Zodiac.Seats[tap3.seat].Element=="Air" ? "Water" : "Air");
             Check(tap3.done && !tap3.correct && loop.Note.Contains("We will come back"),"two tap misses reveal the element and move on");
             loop.FinishReview(true,true);var last=loop.CurrentReview;loop.AnswerTap(Zodiac.Seats[last.seat].Element);
-            Check(loop.ReviewDone && loop.ReviewSummary.EndsWith("of 6 seals held.") && loop.ReviewsChecked==1 && loop.LeaveReview() && loop.Screen==SliceScreen.Hub,"six items finish the batch with a summary; back to the Hub");
+            Check(loop.PracticeDone && loop.PracticeSummary.EndsWith("of 6 remembered.") && loop.Sittings==1 && loop.LeavePractice() && loop.Screen==SliceScreen.Wing && loop.LeaveDial() && loop.LeaveWing() && loop.Screen==SliceScreen.Hub,"six items finish the practice with a summary; back to the Dial, the room, the Hub");
             Check(loop.EnterWing() && loop.Screen==SliceScreen.WingRoom && loop.EnterDial() && loop.Screen==SliceScreen.Wing && loop.LeaveDial() && loop.Screen==SliceScreen.WingRoom && loop.LeaveWing() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2,"the Wing can be entered from the Hub through its room and left back to it");
             loop.MarkWheelComplete();loop.EnterWing();loop.EnterDial();loop.LeaveDial();loop.LeaveWing();Check(loop.AtriumStage==3 && loop.V02Complete,"twelve lit seats and one more return complete v0.2");
             var save=loop.ToSave(new bool[12],new bool[12],true);var resumed=new SliceFlow(()=>1);
-            Check(resumed.Restore(save) && resumed.Screen==SliceScreen.Hub && resumed.SunSign==1 && resumed.AtriumStage==3 && resumed.WheelComplete && resumed.Sitting==1 && resumed.Deck.Items[5].State==loop.Deck.Items[5].State && resumed.ReviewsChecked==1,"a saved session resumes at the Hub with deck, sittings, and stage");
+            Check(resumed.Restore(save) && resumed.Screen==SliceScreen.Hub && resumed.SunSign==1 && resumed.AtriumStage==3 && resumed.WheelComplete && resumed.Sitting==1 && resumed.Deck.Items[5].State==loop.Deck.Items[5].State && resumed.Sittings==1,"a saved session resumes at the Hub with deck, sittings, and stage");
             Check(!new SliceFlow().Restore(new SaveData{atriumStage=1,sunSign=1}),"a save from before the Hub does not resume");
             var unit=new DialLesson(()=>0);unit.SetSunSign(1);EnterGuided(unit);Answer(unit);Answer(unit);unit.Continue();Answer(unit);Answer(unit);
             Check(unit.KeyEarned && unit.FamiliesComplete==2 && unit.CanContinueUnit && unit.BeginContinuation() && unit.Phase==LessonPhase.Continuation && unit.Dial.Start==2 && unit.Lit[2] && unit.Message.Contains("done this twice"),"Unit 1.1 continues with the third family at Level 0");
@@ -345,11 +399,11 @@ namespace Ascendant.Build
             gflow.MarkWheelComplete();gflow.EnterWing();gflow.LeaveWing();gflow.StartGlyphs();Check(gflow.GlyphsStarted && gflow.Deck.Due(gflow.Sitting).Count(i=>i.Kind==ItemKind.Glyph)==12,"starting the glyph unit introduces twelve glyph items");
             gflow.MarkKey2();gflow.EnterWing();gflow.LeaveWing();Check(gflow.Keys==2 && gflow.AtriumStage==3 && gflow.KeysInHand==1,"Key 2 earned: in hand, the Atrium waits for it to be spent (Build D)");
             Check(gflow.EnterChamber() && gflow.SpendKey() && gflow.LocksFilled==2 && gflow.LeaveChamber() && gflow.AtriumStage==4 && gflow.V03Complete,"spent in the Chamber, the return completes v0.3 at Stage 4");
-            Check(gflow.EnterSeals() && gflow.ReviewQueue.Count==6 && gflow.ReviewQueue.All(t=>t.Mode!=ReviewMode.Glyph),"element items are due before glyph items in the batch order");
+            Check(gflow.EnterWing() && gflow.EnterDial() && gflow.EnterPractice() && gflow.ReviewQueue.Count==6 && gflow.ReviewQueue.All(t=>t.Mode!=ReviewMode.Glyph),"element items are due before glyph items in the practice order");
             var gsave=gflow.ToSave(new bool[12],new bool[12],true);var gres=new SliceFlow(()=>1);Check(gres.Restore(gsave) && gres.Keys==2 && gres.GlyphStage==2 && gres.V03Complete && gres.Deck.Item(0,ItemKind.Glyph).entered,"a save carries Keys, glyph stage, and glyph items");
             var greview=new SliceFlow(()=>1);greview.Continue();greview.ChooseBirth("known");greview.SetKnownSign(1);greview.Continue();greview.Continue();greview.RevealKey();greview.Continue();greview.Continue();greview.InsertKey();greview.End();greview.Continue();
             foreach(var it in greview.Deck.Items) if(it.Kind==ItemKind.Element){it.dueDay=99;} greview.StartGlyphs();
-            Check(greview.EnterSeals() && greview.ReviewQueue.All(t=>t.Mode==ReviewMode.Glyph),"glyph items review in the glyph form");
+            Check(greview.EnterWing() && greview.EnterDial() && greview.EnterPractice() && greview.ReviewQueue.All(t=>t.Mode==ReviewMode.Glyph),"glyph items practice in the glyph form");
             var gt=greview.CurrentReview;var gopts=greview.GlyphReviewOptions(gt.seat);int wrongSeat=gopts.First(o=>o!=gt.seat);
             Check(!greview.AnswerGlyph(wrongSeat) && greview.Note.Contains("Try once more") && greview.AnswerGlyph(gt.seat) && gt.done && gt.correct && greview.Note.Contains("symbol of"),"a glyph review nudges once then accepts the name");
             var grl=new DialLesson(()=>0);grl.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,12).ToArray(),true);grl.RestoreGlyphs(2,12,true);Check(grl.Key2Earned && grl.Keys==2 && grl.Phase==LessonPhase.Key2 && !grl.CanBeginGlyphs,"restored Key 2 does not reopen the glyph unit");
@@ -381,9 +435,9 @@ namespace Ascendant.Build
             shelfLesson.BeginGlyphs();for(int i=0;i<12;i++)shelfLesson.AnswerGlyphName(i);
             Check(shelfLesson.AllNamed && shelfLesson.Phase==LessonPhase.GlyphWheel,"naming all twelve in the book hands the unit to the wheel");
             Check(wflow.LeaveWing() && wflow.Screen==SliceScreen.Hub && wflow.Walk.Room==Room.Atrium && wflow.Walk.At=="wing-door","leaving the Wing room places the marker at the Atrium's Wing doorway");
-            Check(wflow.EnterSeals() && wflow.Screen==SliceScreen.Review,"the desk opens Check the Seals");
-            while(!wflow.ReviewDone){var t=wflow.CurrentReview;if(t.Mode==ReviewMode.Tap)wflow.AnswerTap(Zodiac.Seats[t.seat].Element);else if(t.Mode==ReviewMode.Glyph)wflow.AnswerGlyph(t.seat);else wflow.FinishReview(true,true);}
-            Check(wflow.LeaveReview() && wflow.Walk.At=="desk","leaving the review places the marker at the desk");
+            Check(wflow.ApproachDesk() && wflow.Note==SliceFlow.DeskLine && wflow.EnterWing() && wflow.EnterDial() && wflow.EnterPractice() && wflow.Screen==SliceScreen.Practice,"the desk only speaks (Build F); practice opens on the Dial");
+            while(!wflow.PracticeDone){var t=wflow.CurrentReview;if(t.Mode==ReviewMode.Tap)wflow.AnswerTap(Zodiac.Seats[t.seat].Element);else if(t.Mode==ReviewMode.Glyph)wflow.AnswerGlyph(t.seat);else wflow.FinishReview(true,true);}
+            Check(wflow.LeavePractice() && wflow.Screen==SliceScreen.Wing && wflow.LeaveDial() && wflow.LeaveWing() && wflow.Walk.At=="wing-door","leaving practice returns to the Dial; the room and the Atrium follow");
             var wsave=wflow.ToSave(new bool[12],new bool[12],true);var wback=new SliceFlow(()=>4);Check(wback.Restore(wsave) && wback.Walk.Room==Room.Atrium && wback.Walk.At=="entry","a resumed session starts at the Atrium entry");
             // ---- v0.3 revision, build 2: Ask Caspar ----
             var ask=Transfer();Check(!ask.CanAsk,"Ask Caspar is not offered before a first miss");
@@ -433,7 +487,7 @@ namespace Ascendant.Build
             var mflow=new SliceFlow(()=>1);mflow.Continue();mflow.ChooseBirth("known");mflow.SetKnownSign(1);mflow.Continue();mflow.Continue();mflow.RevealKey();mflow.Continue();mflow.Continue();mflow.InsertKey();mflow.End();mflow.Continue();
             mflow.StartModalities();Check(mflow.ModalitiesStarted && mflow.Deck.Items.Count(i=>i.Kind==ItemKind.Modality && i.entered)==12 && mflow.DueCount>=12,"starting the unit introduces twelve modality items, ready at the next check");
             foreach(var it in mflow.Deck.Items) if(it.Kind!=ItemKind.Modality) it.dueDay=99;
-            Check(mflow.EnterSeals() && mflow.ReviewQueue.All(t=>t.Mode==ReviewMode.DialModality||t.Mode==ReviewMode.TapModality),"modality items review as a three-step Dial item or a which-kind tap");
+            Check(mflow.EnterWing() && mflow.EnterDial() && mflow.EnterPractice() && mflow.ReviewQueue.All(t=>t.Mode==ReviewMode.DialModality||t.Mode==ReviewMode.TapModality),"modality items practice as a three-step Dial item or a which-kind tap");
             var mt=mflow.ReviewQueue.First(t=>t.Mode==ReviewMode.TapModality);while(mflow.CurrentReview!=mt)mflow.FinishReview(true,true);
             Check(!mflow.AnswerModalityTap(Zodiac.ModalityAt(mt.seat)=="Fixed" ? "Cardinal" : "Fixed") && mflow.AnswerModalityTap(Zodiac.ModalityAt(mt.seat)) && mt.done && mt.correct && mflow.Note.Contains(Zodiac.ModalityAt(mt.seat).ToLowerInvariant()),"a which-kind tap nudges once then accepts the kind");
             var msave=UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(mflow.ToSave(new bool[12],new bool[12],true,mod.LitMod,mod.KinMod)));var mback=new SliceFlow(()=>1);var mlesson=new DialLesson(()=>0);
@@ -485,7 +539,7 @@ namespace Ascendant.Build
             tflow.RecordGridAnswer(4,true);tflow.RecordGridAnswer(1,false);Check(tflow.Deck.Item(4,ItemKind.Grid).State==ItemState.Practicing && tflow.Deck.Item(1,ItemKind.Grid).State==ItemState.Introduced && tflow.Deck.Item(4,ItemKind.Element).State==ItemState.Introduced,"grid evidence advances only the grid item");
             Check(tflow.LeaveWing() && tflow.AtriumStage==3 && tflow.KeysInHand==1,"two Keys, one in hand: the Atrium stays at Stage 3 until it is spent");
             foreach(var it in tflow.Deck.Items) if(it.Kind!=ItemKind.Grid) it.dueDay=99;
-            Check(tflow.DueCount==0 && !tflow.CanCheckSeals && !tflow.EnterSeals() && tflow.Note.Contains("seals hold"),"with only grid items ready, Check the Seals has nothing to ask");
+            Check(tflow.DueCount==0 && tflow.EnterWing() && tflow.EnterDial() && tflow.CanEnterPractice && !tflow.EnterPractice() && tflow.Sittings==1 && tflow.Note==SliceFlow.NothingDueLine && tflow.LeaveDial() && tflow.LeaveWing(),"with only grid items ready, practice has nothing to ask, says so, and still counts the sitting");
             tflow.MarkKey3();Check(tflow.Keys==3 && tflow.EnterChamber() && tflow.SpendKey() && tflow.SpendKey() && !tflow.SpendKey() && tflow.BooksOpen==1 && tflow.LeaveChamber() && tflow.AtriumStage==5,"Keys 2 and 3 spent fill Book 1 and take the Atrium to Stage 5");
             var tsave=UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(tflow.ToSave(new bool[12],new bool[12],true,Enumerable.Repeat(true,12).ToArray(),Enumerable.Repeat(true,3).ToArray(),grid.Placed,true)));var tback=new SliceFlow(()=>1);
             Check(tsave.deck.Length==60 && tsave.gridPlaced.All(v=>v) && tsave.gridEvidence && tsave.gridStarted && tback.Restore(tsave) && tback.Keys==3 && tback.AtriumStage==5 && tback.ModalitiesComplete && tback.GridStarted && tback.Deck.Item(4,ItemKind.Grid).State==ItemState.Practicing && tback.DueCount==0 && tback.EnterWing() && tback.CanOpenGrid,"the save carries the table, Key 3, Stage 5, and the grid items as data");
@@ -564,7 +618,7 @@ namespace Ascendant.Build
             Check(dsave.locksFilled==4 && dback.Restore(dsave) && dback.LocksFilled==4 && dback.KeysSpent==4 && dback.KeysInHand==0 && dback.BooksOpen==1 && dback.WingWhole && dback.AtriumStage==6 && dback.CanEnterChamber,"the save carries the Keys spent and the Books");
             var oldSave=new SaveData{atriumStage=6,sunSign=1,keyEarned=true,keys=4};var oldBack=new SliceFlow(()=>1);Check(oldBack.Restore(oldSave) && oldBack.LocksFilled==1 && oldBack.KeysInHand==3 && oldBack.AtriumStage==6,"a save from before Build D keeps its stage and holds its Keys in hand");
             // Build E: art slots and sound hooks. The manifest, the URL, the loader on the shipped test set, the import settings, the cues, the size budget.
-            Check(Slots.Art.Length==28 && Slots.Art.Select(a=>a.Name).Distinct().Count()==28 && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),"28 art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
+            Check(Slots.Art.Length==30 && Slots.Art.Select(a=>a.Name).Distinct().Count()==30 && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),"28 art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
             Check(Slots.Sounds.Select(s=>s.Name).SequenceEqual(new[]{"step","seal","miss","key","page","door","ambient"}) && Slots.Sounds.All(s=>s.When.Length>0),"seven sound slots: step, seal, miss, key, page, door, ambient");
             Slots.ParseQuery("https://davonlemar30.github.io/Ascendant/?style",out var qSet,out var qStyle);Check(qSet=="" && qStyle,"?style asks for the style page on the Art folder");
             Slots.ParseQuery("http://127.0.0.1:8765/?art=test",out qSet,out qStyle);Check(qSet=="test" && !qStyle,"?art=test plays with the test set");
@@ -572,7 +626,7 @@ namespace Ascendant.Build
             Slots.ParseQuery("http://127.0.0.1:8765/?art=../Evil_Set!",out qSet,out qStyle);Check(qSet=="evilset","a set name keeps letters, digits, and hyphens only");
             Slots.ParseQuery("",out qSet,out qStyle);Check(qSet=="" && !qStyle,"no URL: the Art folder, no style page");
             Slots.Request(Slots.TestSet,null);
-            Check(Slots.Set=="test" && Slots.Art.All(a=>Slots.Image(a.Name)!=null) && Slots.Sounds.All(s=>Slots.Clip(s.Name)!=null) && Slots.ArtFiles==28 && Slots.SoundFiles==7,"the shipped test set has a file for every slot and the loader finds each one");
+            Check(Slots.Set=="test" && Slots.Art.All(a=>Slots.Image(a.Name)!=null) && Slots.Sounds.All(s=>Slots.Clip(s.Name)!=null) && Slots.ArtFiles==30 && Slots.SoundFiles==7,"the shipped test set has a file for every slot and the loader finds each one");
             Check(Slots.Art.All(a=>Slots.Source(a.Name)=="test set") && Slots.Sounds.All(s=>Slots.SoundSource(s.Name)=="test set"),"sources on the test set read 'test set'");
             Check(Slots.Image("no-such-slot")==null && Slots.Clip("no-such-slot")==null && Slots.Source("no-such-slot")=="placeholder" && Slots.SoundSource("no-such-slot")=="silent","an unknown slot loads nothing and reads placeholder or silent");
             var atriumImporter=AssetImporter.GetAtPath(SlotImport.ArtRoot+"test/atrium.png") as TextureImporter;var lockImporter=AssetImporter.GetAtPath(SlotImport.ArtRoot+"test/lock.png") as TextureImporter;
@@ -588,6 +642,7 @@ namespace Ascendant.Build
             bool wasMuted=Sound.Muted;Sound.ToggleMute();Check(Sound.Muted!=wasMuted && AudioListener.volume==(Sound.Muted ? 0 : 1),"the mute toggle silences the listener and back");if(Sound.Muted)Sound.ToggleMute();
             ValidateCommittedSaves();
             ValidateEvidenceRouting();
+            ValidateBuildF();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }
