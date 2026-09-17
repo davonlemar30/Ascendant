@@ -131,6 +131,65 @@ namespace Ascendant.Build
             var keyFlow = new SliceFlow(() => 1); keyFlow.Continue(); keyFlow.ChooseBirth("known"); keyFlow.SetKnownSign(1); keyFlow.Continue(); keyFlow.Continue();
             Check(keyFlow.RevealKey() && keyFlow.Keys == 1 && keyFlow.KeysInHand == 1, "the first Key reveal immediately records one earned Key");
         }
+        static void ValidateEvidenceRouting()
+        {
+            // Each unit, played through the production subscriptions, moves only its own item kind (task 86bc2338n).
+            string Kind(ReviewDeck deck, ItemKind kind) => string.Join("|", deck.Items.Where(i => i.Kind == kind).Select(i => i.seat + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
+            string Others(ReviewDeck deck, ItemKind except) => string.Join("/", Enum.GetValues(typeof(ItemKind)).Cast<ItemKind>().Where(k => k != except).Select(k => Kind(deck, k)));
+            SliceFlow Observe(DialLesson lesson, GridModel grid)
+            {
+                var flow = new SliceFlow(() => 1);
+                flow.Restore(new SaveData { sunSign = 1, atriumStage = 3, keyEarned = true, keys = 1 });
+                flow.ObserveProgress(lesson, grid, () => { });
+                return flow;
+            }
+            DialLesson Lit(bool symbols = false, bool modalities = false)
+            {
+                var lesson = new DialLesson(() => 0);
+                lesson.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
+                if (symbols) lesson.RestoreGlyphs(2, 12, true);
+                if (modalities) lesson.RestoreModalities(Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 3).ToArray(), true);
+                return lesson;
+            }
+            var grid = new GridModel(() => 0);
+            // Symbols: Part A then Part B on the wheel, every answer at Level 0.
+            var symbols = Lit(); var symbolFlow = Observe(symbols, grid); symbolFlow.StartGlyphs();
+            string elementsBefore = Kind(symbolFlow.Deck, ItemKind.Element), othersBefore = Others(symbolFlow.Deck, ItemKind.Glyph);
+            symbols.BeginGlyphs();
+            for (int i = 0; i < 12; i++) symbols.AnswerGlyphName(symbols.CurrentGlyph);
+            Check(symbols.Phase == LessonPhase.GlyphWheel && Kind(symbolFlow.Deck, ItemKind.Element) == elementsBefore, "symbol Part A leaves every element item untouched");
+            for (int i = 0; i < 12; i++) { symbols.Dial.Select(symbols.Dial.Target, DialInput.DirectSeat); var answer = symbols.Seal(); Check(answer.correctness && answer.event_name == "answer_correct", "symbol placement " + (i + 1) + " is a correct wheel answer"); symbols.AfterCorrect(answer); }
+            Check(symbols.Key2Earned && Kind(symbolFlow.Deck, ItemKind.Element) == elementsBefore && Others(symbolFlow.Deck, ItemKind.Glyph) == othersBefore, "symbol Part B (twelve answer_correct events on the wheel) leaves every element, modality, grid, and opposite item untouched");
+            Check(symbolFlow.Deck.Items.Where(i => i.Kind == ItemKind.Glyph).All(i => i.entered && i.State == ItemState.Practicing && i.streak >= 1), "symbol answers advance all twelve symbol items");
+            // Elements: the guided family, the transfer family, and the continuation, through the same subscription.
+            var elements = new DialLesson(() => 0); elements.SetSunSign(1); var elementFlow = Observe(elements, grid);
+            string glyphsBefore = Kind(elementFlow.Deck, ItemKind.Glyph); othersBefore = Others(elementFlow.Deck, ItemKind.Element);
+            EnterGuided(elements); Answer(elements); Answer(elements); elements.Continue(); Answer(elements); Answer(elements); elements.BeginContinuation(); Answer(elements); Answer(elements); Answer(elements); Answer(elements);
+            Check(elements.WheelComplete && Others(elementFlow.Deck, ItemKind.Element) == othersBefore && Kind(elementFlow.Deck, ItemKind.Glyph) == glyphsBefore, "element-family answers leave every symbol, modality, grid, and opposite item untouched");
+            Check(elementFlow.Deck.Items.Where(i => i.Kind == ItemKind.Element).Count(i => i.State == ItemState.Practicing) >= 6, "independent element answers advance element items");
+            // Modalities.
+            var mod = Lit(true); var modFlow = Observe(mod, grid); modFlow.StartModalities();
+            othersBefore = Others(modFlow.Deck, ItemKind.Modality); mod.BeginModalities();
+            while (!mod.ModalitiesComplete) { mod.Dial.Select(Zodiac.Destination(mod.Dial.Start, 3), DialInput.DirectSeat); var answer = mod.Seal(); mod.AfterCorrect(answer); }
+            Check(Others(modFlow.Deck, ItemKind.Modality) == othersBefore && modFlow.Deck.Items.Where(i => i.Kind == ItemKind.Modality).All(i => i.entered), "modality answers move only modality items");
+            // Opposites and the builder.
+            var opp = Lit(true, true); opp.SetKey3(true); var oppFlow = Observe(opp, grid); oppFlow.MarkKey3(); oppFlow.StartOpposites();
+            othersBefore = Others(oppFlow.Deck, ItemKind.Opposite); opp.BeginOpposites(); opp.Continue(); opp.Continue();
+            for (int i = 0; i < 6; i++) { opp.Dial.Select(Zodiac.Opposite(opp.Dial.Start), DialInput.DirectSeat); var answer = opp.Seal(); opp.AfterCorrect(answer); }
+            opp.Continue();
+            for (int i = 0; i < 3; i++) { opp.AnswerBuilderName(opp.BuilderTarget); opp.Dial.Select(Zodiac.Opposite(opp.BuilderTarget), DialInput.DirectSeat); var answer = opp.Seal(); opp.AfterCorrect(answer); opp.AnswerBuilderShare(0); opp.AnswerBuilderShare(1); opp.NextBuilderSign(); }
+            Check(opp.Key4Earned && Others(oppFlow.Deck, ItemKind.Opposite) == othersBefore && oppFlow.Deck.Items.Where(i => i.Kind == ItemKind.Opposite && i.seat < 6).All(i => i.entered), "opposite and builder answers move only the six pair items");
+            // The table.
+            var tableLesson = Lit(true, true); var table = new GridModel(() => 0); var tableFlow = Observe(tableLesson, table); tableFlow.StartGrid();
+            othersBefore = Others(tableFlow.Deck, ItemKind.Grid); table.Begin();
+            for (int i = 0; i < 12; i++) { table.Pick(i); table.Choose(GridModel.CellOf(i)); table.Seal(); }
+            Check(table.Key3Earned && Others(tableFlow.Deck, ItemKind.Grid) == othersBefore && tableFlow.Deck.Items.Where(i => i.Kind == ItemKind.Grid).All(i => i.State == ItemState.Practicing), "table seatings move only grid items");
+            // A review answer on the wheel records nothing through the lesson subscription; the batch records its own item.
+            var review = Lit(true, true); var reviewFlow = Observe(review, grid);
+            string allBefore = Others(reviewFlow.Deck, ItemKind.Grid) + Kind(reviewFlow.Deck, ItemKind.Grid);
+            review.BeginReview(2, 4); review.Dial.Select(Zodiac.Destination(2), DialInput.DirectSeat); var reviewAnswer = review.Seal(); review.AfterCorrect(reviewAnswer);
+            Check(reviewAnswer.correctness && review.Phase == LessonPhase.Review && Others(reviewFlow.Deck, ItemKind.Grid) + Kind(reviewFlow.Deck, ItemKind.Grid) == allBefore, "a compressed Dial review answer records no lesson evidence of any kind");
+        }
         [MenuItem("Ascendant/Greybox/Run mechanical validation")]
         public static void Run()
         {
@@ -528,6 +587,7 @@ namespace Ascendant.Build
             Check(Sound.Cue("hint_requested",false,true)=="miss" && Sound.Cue("hint_requested",false,false)==null && Sound.Cue("key2_earned",true,false)=="key" && Sound.Cue("key3_earned",true,false)=="key" && Sound.Cue("key4_earned",true,false)=="key" && Sound.Cue("key1_earned",true,false)==null && Sound.Cue("seat_framed",false,false)==null && Sound.Cue("hint_escalated",false,false)==null,"a first miss in the book or the builder is a miss, the Count button is not; Keys 2 to 4 sound when earned, Key 1 when it rises; nothing else sounds");
             bool wasMuted=Sound.Muted;Sound.ToggleMute();Check(Sound.Muted!=wasMuted && AudioListener.volume==(Sound.Muted ? 0 : 1),"the mute toggle silences the listener and back");if(Sound.Muted)Sound.ToggleMute();
             ValidateCommittedSaves();
+            ValidateEvidenceRouting();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }

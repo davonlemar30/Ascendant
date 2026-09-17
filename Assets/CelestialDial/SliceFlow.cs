@@ -308,9 +308,18 @@ namespace Ascendant.CelestialDial
         // Shared by the live slice and the reload regression checks so they exercise the same subscriptions.
         public void ObserveProgress(DialLesson lesson, GridModel grid, Action checkpoint)
         {
+            // Evidence routing (audit of Sept 16, task 86bc2338n): every answer records exactly one item kind, chosen by the lesson's phase.
+            //   element-family problems (Guided, Independent, Optional, Continuation) → ItemKind.Element, by the destination seat
+            //   symbol Part A (GlyphNames), by GlyphNamedEvent                        → ItemKind.Glyph, by the named seat
+            //   symbol Part B (GlyphWheel), by the glyph_placed event                  → ItemKind.Glyph, by the placed seat (its answer_correct is not element evidence)
+            //   modality problems (ModalityGuided, ModalityOwn)                        → ItemKind.Modality, by the destination seat
+            //   opposite problems (OppositeGuided, OppositeOwn, BuilderOpposite)       → ItemKind.Opposite, by the pair of the start seat
+            //   the table (GridModel grid_placed)                                      → ItemKind.Grid, by the seated sign
+            //   Review answers record nothing here: FinishReview records the reviewed item by its own kind.
+            // The element filter is a positive list so a new phase records nothing until it is routed on purpose.
             lesson.Dial.Logged += e =>
             {
-                if (e.event_name == "answer_correct" && lesson.Phase != LessonPhase.Review && lesson.Phase != LessonPhase.GlyphWheel && !lesson.InModalities && !lesson.InOppositeProblem)
+                if (e.event_name == "answer_correct" && lesson.InElementProblem)
                     RecordLessonAnswer(e.selected_destination, e.evidence_eligible);
                 if (e.event_name == "answer_correct" && lesson.InOppositeProblem)
                     RecordOppositeAnswer(e.start_seat, e.evidence_eligible);
