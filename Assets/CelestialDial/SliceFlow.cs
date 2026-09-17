@@ -158,7 +158,7 @@ namespace Ascendant.CelestialDial
         public bool RevealKey()
         {
             if (Screen != SliceScreen.Wing || KeyRevealed) return false;
-            KeyRevealed = true; Logged?.Invoke("key_revealed"); return true;
+            KeyRevealed = true; MarkKeyEarned(); Logged?.Invoke("key_revealed"); return true;
         }
         public bool InsertKey()
         {
@@ -304,6 +304,38 @@ namespace Ascendant.CelestialDial
         }
         public bool V02Complete => WheelComplete && AtriumStage >= 3;
         // ---- save / restore ----
+        // Record answer evidence as before, but persist only after the owning model commits its progress.
+        // Shared by the live slice and the reload regression checks so they exercise the same subscriptions.
+        public void ObserveProgress(DialLesson lesson, GridModel grid, Action checkpoint)
+        {
+            lesson.Dial.Logged += e =>
+            {
+                if (e.event_name == "answer_correct" && lesson.Phase != LessonPhase.Review && lesson.Phase != LessonPhase.GlyphWheel && !lesson.InModalities && !lesson.InOppositeProblem)
+                    RecordLessonAnswer(e.selected_destination, e.evidence_eligible);
+                if (e.event_name == "answer_correct" && lesson.InOppositeProblem)
+                    RecordOppositeAnswer(e.start_seat, e.evidence_eligible);
+                if (e.event_name == "answer_correct" && lesson.InModalities)
+                    RecordModalityAnswer(e.selected_destination, e.evidence_eligible);
+                if (e.event_name == "glyph_placed") RecordGlyphAnswer(e.selected_destination, e.evidence_eligible);
+            };
+            lesson.GlyphNamedEvent += (seat, correct, eligible) => RecordGlyphAnswer(seat, eligible);
+            lesson.ProgressCommitted += checkpoint;
+            lesson.PracticeFinished += clean => { if (clean) RecordCleanRun(); checkpoint(); };
+            grid.Logged += e => { if (e.event_name == "grid_placed") RecordGridAnswer(e.start_seat, e.evidence_eligible); };
+            grid.ProgressCommitted += checkpoint;
+        }
+        // One snapshot after a committed transition; presentation polling is not a persistence boundary.
+        public SaveData CaptureProgress(DialLesson lesson, GridModel grid)
+        {
+            // Replays are disposable; never replace the earned unit's saved progress with a practice index.
+            SetGlyphProgress(lesson.Key2Earned ? 2 : lesson.AllNamed ? 1 : 0,
+                lesson.Key2Earned ? 12 : lesson.AllNamed ? lesson.GlyphPlaced.Count(v => v) : lesson.GlyphNamed.Count(v => v));
+            var save = ToSave(lesson.Lit, lesson.Kin, lesson.KeyEarned, lesson.LitMod, lesson.KinMod,
+                grid.Placed, grid.Evidence, lesson.PolarityShown, lesson.OppKnown, lesson.Built, lesson.BuilderEvidence);
+            save.wheelComplete = lesson.WheelComplete;
+            save.keys = Math.Max(Keys, lesson.Key4Earned ? 4 : grid.Key3Earned ? 3 : lesson.Key2Earned ? 2 : lesson.KeyEarned ? 1 : 0);
+            return save;
+        }
         public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned) { return ToSave(lit, kin, keyEarned, null, null); }
         public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned, bool[] litMod, bool[] kinMod) { return ToSave(lit, kin, keyEarned, litMod, kinMod, null, false); }
         public SaveData ToSave(bool[] lit, bool[] kin, bool keyEarned, bool[] litMod, bool[] kinMod, bool[] gridPlaced, bool gridEvidence) { return ToSave(lit, kin, keyEarned, litMod, kinMod, gridPlaced, gridEvidence, false, null, 0, false); }

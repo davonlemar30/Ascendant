@@ -66,7 +66,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Transfer,"guided family completes inside the slice");Act("continue");for(int i=0;i<4;i++)Act("keyboard-forward");Act("seal");});
             Steps.Enqueue(()=>{Act("seat:8");Act("seal");});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.KeyEarned,"six-seat lesson earns Key 1 inside the slice");Check(View.Dial.Lesson.Message.StartsWith("Two of four") || View.Flow.KeyRevealed,"locked completion line precedes the reveal");});
-            Steps.Enqueue(()=>{Check(View.Flow.KeyRevealed && !View.Busy,"the Dial reveals the Key after completion");Check(View.Dial.Lesson.Message.StartsWith("Aah"),"Caspar's reveal line follows the locked line");Capture("slice-390-wing-reveal.png");});
+            Steps.Enqueue(()=>{Check(View.Flow.KeyRevealed && View.Flow.Keys==1 && !View.Busy,"the Dial reveals the Key after completion");Check(View.Dial.Lesson.Message.StartsWith("Aah"),"Caspar's reveal line follows the locked line");Capture("slice-390-wing-reveal.png");});
             Steps.Enqueue(()=>{Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.AtriumReturn,"wing continues to the atrium return");Capture("slice-390-atrium-return.png");});
             Steps.Enqueue(()=>{for(int i=0;i<SliceView.ReturnPages.Length;i++)Act("next-screen");});
@@ -94,9 +94,19 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back out to the Atrium");Act("enter-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"and in again");Act("walk:shelf");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Book && View.Dial.Lesson.Phase==LessonPhase.GlyphNames && View.Flow.GlyphsStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Glyph && i.entered)==12,"the shelf opens the book: Part A, and introduces the symbol items");Capture("slice-390-glyphs-a.png");});
-            for(int i=0;i<14;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphNames)return;int target=l.CurrentGlyph;int slot=System.Array.IndexOf(l.GlyphOptions(target),target);if(l.GlyphIndex==2)Act("glyph-name:"+((slot+1)%4));Act("glyph-name:"+slot);});
+            for(int i=0;i<3;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
+            Steps.Enqueue(()=>{var saved=JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(SliceView.SaveKey));Check(saved.glyphStage==0 && saved.glyphIndex==3,"the live naming checkpoint stores the next card after three answers");Act("reload");});
+            Steps.Enqueue(()=>{Check(View.Resumed && View.Dial.Lesson.GlyphNamed.Count(v=>v)==3,"reload retains the first three named symbols");Act("enter-wing");});
+            Steps.Enqueue(()=>Act("walk:shelf"));
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.CurrentGlyph==3,"mid-naming reload resumes on Cancer, not Aries");Capture("slice-390-symbol-naming-restored.png");});
+            for(int i=0;i<14;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphNames)return;int target=l.CurrentGlyph;int slot=System.Array.IndexOf(l.GlyphOptions(target),target);if(l.GlyphIndex==5)Act("glyph-name:"+((slot+1)%4));Act("glyph-name:"+slot);});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && View.Dial.Lesson.Phase==LessonPhase.GlyphWheel && !View.Busy,"the twelfth name closes the book and returns to the room");Act("walk:dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase==LessonPhase.GlyphWheel && View.Dial.Lesson.NamesHidden && View.Dial.Lesson.Dial.Target==0,"the Dial runs Part B: names hidden, Aries first");Capture("slice-390-glyphs-b.png");});
+            for(int i=0;i<3;i++) Steps.Enqueue(()=>{Act("seat:"+View.Dial.Lesson.Dial.Target);Act("seal");});
+            Steps.Enqueue(()=>{var saved=JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(SliceView.SaveKey));Check(saved.glyphStage==1 && saved.glyphIndex==3,"the live placement checkpoint stores three placed symbols");Act("reload");});
+            Steps.Enqueue(()=>{Check(View.Resumed && View.Dial.Lesson.GlyphPlaced.Count(v=>v)==3,"reload retains three placed symbols");Act("enter-wing");});
+            Steps.Enqueue(()=>Act("walk:dial"));
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.GlyphIndex==3 && View.Dial.Lesson.Dial.Target==3,"mid-placement reload resumes at Cancer with Aries, Taurus, and Gemini placed");Capture("slice-390-symbol-placement-restored.png");});
             bool missedOnce=false; // one deliberate miss on the fourth mark; a second would climb the ladder and skip the placement
             for(int i=0;i<12;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphWheel)return;int target=l.Dial.Target;if(l.GlyphIndex==3 && !missedOnce){missedOnce=true;Act("seat:"+Zodiac.Wrap(target+2));Act("seal");return;}Act("seat:"+target);Act("seal");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase==LessonPhase.GlyphWheel){Act("seat:"+l.Dial.Target);Act("seal");}});

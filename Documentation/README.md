@@ -15,6 +15,10 @@ Approved ClickUp documentation is the design authority. This directory provides 
 
 Read the complete records and their appended clarifications. If requirements conflict without an explicit reconciliation, stop and surface the conflict before changing either source. Do not infer decisions for areas marked open.
 
+## Post-Wing save-ordering correction
+
+[Save-ordering task](https://app.clickup.com/t/86bc2338p): saves follow committed lesson transitions, partial symbol naming and placement use the existing stage/index fields, and the first Key reveal immediately updates the earned-Key count. The change preserves the Atrium resume point and leaves review scheduling and the broader migration work out of scope. See [checkpoint semantics and regression coverage](CelestialDial/VALIDATION.md#post-wing-save-checkpoints).
+
 ## Engineering checkpoint — September 11, 2026
 
 The completed deployment proof supersedes the older ClickUp text describing WebGL and deployment prerequisites as unfinished. [PR #1](https://github.com/davonlemar30/Ascendant/pull/1) introduced the shared build and deployment pipeline. Local WebGL, GitHub Actions, and production deployment were validated in that milestone, as confirmed by the milestone owner's engineering handoff.

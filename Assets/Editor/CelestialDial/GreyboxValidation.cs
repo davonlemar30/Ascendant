@@ -30,6 +30,107 @@ namespace Ascendant.Build
         {
             for(int i=0;i<times;i++){lesson.Dial.Select(lesson.Dial.Start,DialInput.DirectSeat);lesson.Seal();}
         }
+        static void ValidateCommittedSaves()
+        {
+            // The same subscriptions and snapshot builder as SliceView, followed by a real JSON round-trip.
+            SaveData saved = null;
+            SliceFlow Observe(DialLesson lesson, GridModel grid)
+            {
+                saved = null;
+                var flow = new SliceFlow(() => 1);
+                flow.Restore(new SaveData { sunSign = 1, atriumStage = 3, keyEarned = true, keys = 1 });
+                flow.ObserveProgress(lesson, grid, () => saved = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(flow.CaptureProgress(lesson, grid))));
+                return flow;
+            }
+            DialLesson RestoreLesson(SaveData save)
+            {
+                var flow = new SliceFlow(() => 1);
+                Check(flow.Restore(save), "committed checkpoint restores its flow");
+                var lesson = new DialLesson(() => 0);
+                lesson.RestoreProgress(save.sunSign, save.lit, save.kin, save.keyEarned);
+                lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2);
+                lesson.RestoreModalities(save.litMod, save.kinMod, save.modalitiesStarted);
+                lesson.SetKey3(save.keys >= 3);
+                lesson.RestoreOpposites(save.polarityShown, save.oppKnown, save.oppositesStarted, save.built, save.builderEvidence, save.keys >= 4);
+                return lesson;
+            }
+            DialLesson LitLesson(bool symbols = false, bool modalities = false)
+            {
+                var lesson = new DialLesson(() => 0);
+                lesson.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
+                if (symbols) lesson.RestoreGlyphs(2, 12, true);
+                if (modalities) lesson.RestoreModalities(Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 3).ToArray(), true);
+                return lesson;
+            }
+            var grid = new GridModel(() => 0);
+            var naming = LitLesson(); var namingFlow = Observe(naming, grid); naming.BeginGlyphs();
+            for (int i = 0; i < 5; i++)
+            {
+                naming.AnswerGlyphName(naming.CurrentGlyph);
+                var restored = RestoreLesson(saved);
+                Check(saved.glyphStage == 0 && saved.glyphIndex == i + 1 && restored.BeginGlyphs() && restored.CurrentGlyph == i + 1 && saved.deck[i + 12].State == ItemState.Practicing,
+                    "Part A answer " + (i + 1) + " checkpoints the next card and deck evidence");
+            }
+            for (int i = 5; i < 12; i++) naming.AnswerGlyphName(naming.CurrentGlyph);
+            var partB = RestoreLesson(saved);
+            Check(saved.glyphStage == 1 && saved.glyphIndex == 0 && partB.AllNamed && partB.BeginGlyphs() && partB.Phase == LessonPhase.GlyphWheel && partB.Dial.Target == 0,
+                "the last naming answer restores directly into Part B without repeating cards");
+            Observe(partB, grid);
+            for (int i = 0; i < 5; i++)
+            {
+                partB.Dial.Select(partB.Dial.Target, DialInput.DirectSeat); var answer = partB.Seal(); partB.AfterCorrect(answer);
+                var restored = RestoreLesson(saved);
+                Check(saved.glyphStage == 1 && saved.glyphIndex == i + 1 && restored.GlyphPlaced.SequenceEqual(partB.GlyphPlaced) && restored.BeginGlyphs() && restored.Dial.Target == i + 1 && saved.deck[i + 12].State == ItemState.Practicing,
+                    "Part B answer " + (i + 1) + " restores placed symbols, next target, and deck evidence");
+            }
+            var elements = new DialLesson(() => 0);
+            elements.RestoreProgress(1, Enumerable.Range(0, 12).Select(i => i % 4 < 2).ToArray(), Enumerable.Range(0, 12).Select(i => i % 4 < 2).ToArray(), true);
+            Observe(elements, grid); elements.BeginContinuation();
+            for (int i = 0; i < 4; i++)
+            {
+                int target = Zodiac.Destination(elements.Dial.Start); Answer(elements); var restored = RestoreLesson(saved);
+                Check(restored.Lit.SequenceEqual(elements.Lit) && restored.Kin.SequenceEqual(elements.Kin) && saved.deck[target].State == ItemState.Practicing,
+                    "element answer " + (i + 1) + " restores lit seats, family completion, and deck evidence");
+            }
+            var mod = LitLesson(true); var modFlow = Observe(mod, grid); modFlow.StartModalities(); mod.BeginModalities();
+            int modAnswers = 0;
+            while (!mod.ModalitiesComplete)
+            {
+                int target = Zodiac.Destination(mod.Dial.Start, 3); mod.Dial.Select(target, DialInput.DirectSeat); var answer = mod.Seal(); mod.AfterCorrect(answer);
+                var restored = RestoreLesson(saved);
+                Check(restored.LitMod.SequenceEqual(mod.LitMod) && restored.KinMod.SequenceEqual(mod.KinMod) && saved.deck[24 + target].entered && (!answer.evidence_eligible || saved.deck[24 + target].State == ItemState.Practicing),
+                    "modality answer " + (++modAnswers) + " restores seats, families, and eligible evidence");
+            }
+            var opposite = LitLesson(true, true); opposite.SetKey3(true); var oppFlow = Observe(opposite, grid); oppFlow.MarkKey3(); oppFlow.StartOpposites(); opposite.BeginOpposites(); opposite.Continue(); opposite.Continue();
+            for (int i = 0; i < 6; i++)
+            {
+                int pair = Zodiac.PairOf(opposite.Dial.Start); opposite.Dial.Select(Zodiac.Opposite(opposite.Dial.Start), DialInput.DirectSeat); var answer = opposite.Seal(); opposite.AfterCorrect(answer);
+                var restored = RestoreLesson(saved);
+                Check(restored.OppKnown.SequenceEqual(opposite.OppKnown) && saved.deck[48 + pair].entered && (!answer.evidence_eligible || saved.deck[48 + pair].State == ItemState.Practicing),
+                    "opposite answer " + (i + 1) + " restores the known pair and eligible evidence");
+            }
+            opposite.Continue();
+            for (int i = 0; i < 3; i++)
+            {
+                opposite.AnswerBuilderName(opposite.BuilderTarget); opposite.Dial.Select(Zodiac.Opposite(opposite.BuilderTarget), DialInput.DirectSeat); var answer = opposite.Seal(); opposite.AfterCorrect(answer);
+                opposite.AnswerBuilderShare(0); opposite.AnswerBuilderShare(1);
+                var restored = RestoreLesson(saved);
+                Check(restored.Built == i + 1 && restored.BuilderEvidence, "builder sign " + (i + 1) + " restores its committed count and evidence");
+                opposite.NextBuilderSign();
+            }
+            Check(saved.keys == 4 && RestoreLesson(saved).Key4Earned, "the final builder transition checkpoints Key 4 before presentation polling");
+            var tableLesson = LitLesson(true, true); var table = new GridModel(() => 0); var tableFlow = Observe(tableLesson, table); tableFlow.StartGrid(); table.Begin();
+            for (int i = 0; i < 12; i++)
+            {
+                table.Pick(i); table.Choose(GridModel.CellOf(i)); table.Seal();
+                var restored = new GridModel(() => 0); restored.Restore(saved.gridPlaced, saved.gridEvidence, saved.gridStarted, saved.keys >= 3);
+                Check(restored.Placed.SequenceEqual(table.Placed) && restored.Evidence && saved.deck[36 + i].State == ItemState.Practicing,
+                    "table seating " + (i + 1) + " restores placement and deck evidence");
+            }
+            Check(saved.keys == 3, "the final seating checkpoints Key 3 before presentation polling");
+            var keyFlow = new SliceFlow(() => 1); keyFlow.Continue(); keyFlow.ChooseBirth("known"); keyFlow.SetKnownSign(1); keyFlow.Continue(); keyFlow.Continue();
+            Check(keyFlow.RevealKey() && keyFlow.Keys == 1 && keyFlow.KeysInHand == 1, "the first Key reveal immediately records one earned Key");
+        }
         [MenuItem("Ascendant/Greybox/Run mechanical validation")]
         public static void Run()
         {
@@ -426,6 +527,7 @@ namespace Ascendant.Build
             Check(Sound.Cue("dial_rotated",false,false)=="step" && Sound.Cue("sign_picked",false,false)=="step" && Sound.Cue("cell_chosen",false,false)=="step" && Sound.Cue("answer_correct",true,false)=="seal" && Sound.Cue("answer_rejected",false,false)=="miss" && Sound.Cue("glyph_named",true,true)=="seal" && Sound.Cue("glyph_named",false,true)=="miss" && Sound.Cue("builder_named",false,true)=="miss" && Sound.Cue("builder_share_marked",false,true)=="seal" && Sound.Cue("builder_shared",true,true)==null && Sound.Cue("builder_shared",false,true)=="miss","cues follow the model: a detent or a pick is a step, a right answer a seal, a wrong one a miss");
             Check(Sound.Cue("hint_requested",false,true)=="miss" && Sound.Cue("hint_requested",false,false)==null && Sound.Cue("key2_earned",true,false)=="key" && Sound.Cue("key3_earned",true,false)=="key" && Sound.Cue("key4_earned",true,false)=="key" && Sound.Cue("key1_earned",true,false)==null && Sound.Cue("seat_framed",false,false)==null && Sound.Cue("hint_escalated",false,false)==null,"a first miss in the book or the builder is a miss, the Count button is not; Keys 2 to 4 sound when earned, Key 1 when it rises; nothing else sounds");
             bool wasMuted=Sound.Muted;Sound.ToggleMute();Check(Sound.Muted!=wasMuted && AudioListener.volume==(Sound.Muted ? 0 : 1),"the mute toggle silences the listener and back");if(Sound.Muted)Sound.ToggleMute();
+            ValidateCommittedSaves();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }

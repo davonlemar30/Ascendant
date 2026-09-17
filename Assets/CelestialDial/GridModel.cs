@@ -26,6 +26,7 @@ namespace Ascendant.CelestialDial
         readonly List<DialEvent> events = new List<DialEvent>();
         public IReadOnlyList<DialEvent> Events => events;
         public event Action<DialEvent> Logged;
+        public event Action ProgressCommitted;
         public readonly bool[] Placed = new bool[12];
         public readonly bool[] Assisted = new bool[12];     // seated at Level 2 or 3; never evidence
         public GridPhase Phase { get; private set; } = GridPhase.Closed;
@@ -112,7 +113,7 @@ namespace Ascendant.CelestialDial
             bool correct = Cell == CellOf(Sign), evidence = correct && HintLevel <= 1;
             Log("answer_committed", correct, evidence);
             var result = Log(correct ? "answer_correct" : "answer_rejected", correct, evidence);
-            if (correct) { Seat(Sign, evidence); return result; }
+            if (correct) { Seat(Sign, evidence); ProgressCommitted?.Invoke(); return result; }
             int wrong = Cell; Rejected = wrong; Cell = -1;
             if (Attempts == 1) { HintLevel = 1; Message = Nudge(Sign, wrong); }
             else if (Attempts == 2 && !Asked) { HintLevel = 2; Message = Rule(Sign) + "\nFind that cell, then press Seal."; }
@@ -128,6 +129,11 @@ namespace Ascendant.CelestialDial
         }
         // Level 3: Caspar seats the sign. No evidence; three in one sitting pause the table (the reappearance cap).
         public void AfterDemonstration()
+        {
+            AfterDemonstrationCore();
+            ProgressCommitted?.Invoke();
+        }
+        void AfterDemonstrationCore()
         {
             if (!Demonstrating) return;
             Demonstrating = false; AssistedThisSitting++;
