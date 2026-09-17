@@ -2,6 +2,22 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Post-Wing save checkpoints
+
+[ClickUp task: Fix save capture ordering and partial symbol restoration](https://app.clickup.com/t/86bc2338p).
+
+Lesson answer events record deck evidence but do not write a save. `DialLesson.ProgressCommitted` writes the checkpoint after naming advances, a Dial answer finishes `AfterCorrect`, a demonstration completes, or a builder sign commits. `GridModel.ProgressCommitted` follows the completed seating transition, including the final Key 3 award. `SliceFlow.ObserveProgress` provides the same subscriptions to the live slice and mechanical regression tests; `CaptureProgress` snapshots model progress and rewards without waiting for the view's next frame.
+
+The existing `glyphStage` / `glyphIndex` fields now consistently mean:
+
+- Stage 0: the index of the next naming card; lower indices have been read.
+- Stage 1: all twelve names have been read; the index is the next wheel placement, and lower indices have been placed.
+- Stage 2: Key 2 is earned; both parts are complete, even during a disposable practice replay.
+
+The initial unit remains in zodiac order, so stage and index reconstruct its completed prefix without a new placement array. Resuming still starts at the Atrium; the player walks back to the book or Dial. In-flight answers and animation frames are not resumable checkpoints. Saves still begin after the first arrival at the Hub. Review scheduling and evidence routing are unchanged in this task.
+
+Regression checks use the production subscriptions and actual JSON serialization after committed naming, placement, element-family, modality, opposite-pair, builder-sign, and table transitions. The Editor and browser suites additionally reload during Part A and Part B; their evidence includes `symbol-naming-restored` and `symbol-placement-restored` captures. First-Key reveal checks require `Flow.Keys == 1` immediately.
+
 ## Provisional implementation decisions
 
 The milestone owner approved this recovery variation on September 11, 2026: use a different starting sign in the same elemental family as a fresh equivalent; use one shared three-encounter recovery budget for the move-four procedure, so changing signs cannot reset the budget. The first failed encounter occupies slot one. Fresh recovery problems occupy slots two and three across the activity. Ordinary local corrections remain within their encounter. If no unrevealed equivalent remains or the budget is exhausted, pause for conceptual transfer to later Review Deck work. There is no persistent Review Deck implementation.

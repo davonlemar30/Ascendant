@@ -172,6 +172,14 @@ const path=require('path');
       const target=SIGNS.findIndex(name=>s.glyphChar===['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'][SIGNS.indexOf(name)]);
       const slot=s.glyphOptions.indexOf(SIGNS[target]);
       await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
+      if(n===4){
+        await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
+        await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+        await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+        await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+        check((await state()).glyphChar==='\u264D','mid-naming reload resumes at Virgo after five committed cards at '+viewport.width);
+        await page.screenshot({path:path.join(out,viewport.width+'-symbol-naming-restored.png')});
+      }
     }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
     check((await state()).glyphWheel,'the twelfth name closes the book and returns to the room at '+viewport.width);
@@ -184,6 +192,14 @@ const path=require('path');
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
       const target=SIGNS.indexOf((await state()).glyphTarget);
       await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
+      if(n===4){
+        await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
+        await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+        await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+        await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+        check((await state()).glyphTarget==='Virgo','mid-placement reload resumes at Virgo after five committed placements at '+viewport.width);
+        await page.screenshot({path:path.join(out,viewport.width+'-symbol-placement-restored.png')});
+      }
     }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key2&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve symbols placed earns Key 2 once at '+viewport.width);

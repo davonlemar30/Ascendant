@@ -9,6 +9,8 @@ namespace Ascendant.CelestialDial
     public sealed class DialLesson
     {
         public readonly DialModel Dial;
+        // Persistence observes completed transitions, never the evaluator's intermediate answer events.
+        public event Action ProgressCommitted;
         public readonly bool[] Lit = new bool[12];
         public readonly bool[] Kin = new bool[12];
         readonly HashSet<int> exposedProblems = new HashSet<int>();
@@ -77,6 +79,7 @@ namespace Ascendant.CelestialDial
             bool first = !OppositesStarted; OppositesStarted = true; oppAssisted = 0;
             if (!PolarityShown) { Phase = LessonPhase.Polarity; PolarityStep = 0; Dial.Home(); Message = PolarityLine0; Dial.Log(first ? "opposites_unit_started" : "polarity_beat_resumed"); return true; }
             if (!OppositesComplete) { StartNextOpposite(); Dial.Log("opposites_resumed"); return true; }
+            if (Built >= 3 && BuilderEvidence) { FinishBuilder(); ProgressCommitted?.Invoke(); return true; } // reload during the final sign's presentation hold
             if (Built >= 3 && !Key4Earned) { Built = 0; BuilderEvidence = false; Dial.Log("builder_cleared"); } // three built with help: build again
             StartBuilderSign(); return true;
         }
@@ -171,9 +174,15 @@ namespace Ascendant.CelestialDial
         {
             Built++; if (!builderAssisted) BuilderEvidence = true; BuilderStep = 0;
             Dial.Log("builder_sign_built", true, !builderAssisted);
+            ProgressCommitted?.Invoke();
         }
         // The view holds on the last line, then asks for the next sign (or the Key).
         public void NextBuilderSign()
+        {
+            NextBuilderSignCore();
+            ProgressCommitted?.Invoke();
+        }
+        void NextBuilderSignCore()
         {
             if (Phase != LessonPhase.BuilderShare || BuilderStep != 0) return;
             if (Built >= 3) FinishBuilder(); else StartBuilderSign();
@@ -347,14 +356,14 @@ namespace Ascendant.CelestialDial
                 bool eligible = GlyphMisses <= 1; // Level 0 or a Level 1 nudge
                 GlyphNamed[target] = true; Message = GlyphNameResult = "Yes. " + SignName(target) + ".";
                 GlyphNamedEvent?.Invoke(target, true, eligible); Dial.Log("glyph_named", true, eligible, "DirectSeat");
-                NextGlyphName(); return true;
+                NextGlyphName(); ProgressCommitted?.Invoke(); return true;
             }
             GlyphMisses++;
             if (GlyphMisses == 1) { Message = GlyphNameResult = "Not that one. This symbol belongs to a " + Element(target) + " sign."; Dial.Log("hint_requested"); return false; }
             // Second miss: Level 2 reveals the name; no evidence; move on.
             GlyphNamed[target] = true; Message = GlyphNameResult = "This is the symbol of " + SignName(target) + ". Remember it.";
             GlyphNamedEvent?.Invoke(target, false, false); Dial.Log("hint_escalated"); Dial.Log("glyph_named", false, false, "DirectSeat");
-            NextGlyphName(); return false;
+            NextGlyphName(); ProgressCommitted?.Invoke(); return false;
         }
         void NextGlyphName()
         {
@@ -475,7 +484,7 @@ namespace Ascendant.CelestialDial
             }
             else if (Phase == LessonPhase.Polarity)
             {
-                if (PolarityStep == 0) { PolarityStep = 1; PolarityShown = true; Message = PolarityLine1; Dial.Log("polarity_shown"); return; }
+                if (PolarityStep == 0) { PolarityStep = 1; PolarityShown = true; Message = PolarityLine1; Dial.Log("polarity_shown"); ProgressCommitted?.Invoke(); return; }
                 StartOppositeProblem(Sun, 2); // the first pair from the sun sign, guided with the six-count
             }
             else if (Phase == LessonPhase.OppositesComplete) StartBuilderSign();
@@ -544,6 +553,11 @@ namespace Ascendant.CelestialDial
             (result.evidence_eligible ? "You found that one on your own." : "We found that one together.");
         public void AfterCorrect(DialEvent result)
         {
+            AfterCorrectCore(result);
+            ProgressCommitted?.Invoke();
+        }
+        void AfterCorrectCore(DialEvent result)
+        {
             if (result == null || !result.correctness) return;
             if (Phase == LessonPhase.Review) return;
             if (Phase == LessonPhase.GlyphWheel) { NextGlyphProblem(); return; }
@@ -576,6 +590,11 @@ namespace Ascendant.CelestialDial
             // Worked exposure illuminates but never writes eligible answer evidence.
         }
         public void AfterDemonstration()
+        {
+            AfterDemonstrationCore();
+            ProgressCommitted?.Invoke();
+        }
+        void AfterDemonstrationCore()
         {
             if (Phase == LessonPhase.GlyphWheel) { Dial.Home(); NextGlyphProblem(); return; }
             if (Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn) { AfterModalityDemonstration(); return; }
@@ -664,9 +683,16 @@ namespace Ascendant.CelestialDial
         }
         public void RestoreGlyphs(int stage, int index, bool key2)
         {
-            // stage 0: none; 1: Part A done through index (or all); 2: Key 2 earned.
-            for (int i = 0; i < 12; i++) { GlyphNamed[i] = stage >= 2 || (stage == 1 && i < index) || (stage == 0 && false); GlyphPlaced[i] = stage >= 2; }
-            if (stage == 0) for (int i = 0; i < 12; i++) GlyphNamed[i] = i < index;
+            // Stage 0: next naming card. Stage 1: all names read, next placement. Stage 2: Key 2 earned.
+            index = Math.Max(0, Math.Min(12, index));
+            for (int i = 0; i < 12; i++)
+            {
+                order[i] = i;
+                GlyphNamed[i] = key2 || stage >= 1 || i < index;
+                GlyphPlaced[i] = key2 || stage >= 2 || (stage == 1 && i < index);
+                NameRevealed[i] = false;
+            }
+            GlyphIndex = index; GlyphMisses = 0; Practice = false;
             Key2Earned = key2; GlyphEvidence = key2;
             if (key2) { Phase = LessonPhase.Key2; Message = "Twelve symbols, twelve names. You read the wheel."; }
         }

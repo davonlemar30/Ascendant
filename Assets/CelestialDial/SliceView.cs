@@ -104,17 +104,11 @@ namespace Ascendant.CelestialDial
             Dial = dialObject.AddComponent<DialView>();
             Dial.Slice = this; Dial.ExtraActions = WebAction; font = Dial.UiFont;
             Flow.Logged += name => Dial.Lesson.Dial.Log(name.ToLowerInvariant().Replace(':', '_'), false, false, "slice");
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.Phase != LessonPhase.Review && !Dial.Lesson.InModalities && !Dial.Lesson.InOppositeProblem) { Flow.RecordLessonAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.InOppositeProblem) { Flow.RecordOppositeAnswer(e.start_seat, e.evidence_eligible); Save(); } }; // Build C: a pair learned, on the wheel or in the builder
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "polarity_shown" || e.event_name == "builder_sign_built" || e.event_name == "opposites_completed") Save(); };
             Dial.Lesson.ReviewFinished += (seat, correct, eligible) => StartCoroutine(AfterDialReview(correct, eligible));
-            Dial.Lesson.GlyphNamedEvent += (seat, correct, eligible) => { Flow.RecordGlyphAnswer(seat, eligible); Flow.SetGlyphProgress(Dial.Lesson.Phase == LessonPhase.GlyphWheel ? 1 : 0, Dial.Lesson.GlyphIndex); Save(); };
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "glyph_placed") { Flow.RecordGlyphAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
-            Dial.Lesson.PracticeFinished += clean => { if (clean) Flow.RecordCleanRun(); Save(); Publish(); };
-            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_correct" && Dial.Lesson.InModalities) { Flow.RecordModalityAnswer(e.selected_destination, e.evidence_eligible); Save(); } };
             Grid = new GridModel(() => Time.realtimeSinceStartupAsDouble);
             Grid.Logged += e => Debug.Log("[CelestialDial] " + JsonUtility.ToJson(e));
-            Grid.Logged += e => { if (e.event_name == "grid_placed") { Flow.RecordGridAnswer(e.start_seat, e.evidence_eligible); Save(); } };
+            Flow.ObserveProgress(Dial.Lesson, Grid, Save);
+            Dial.Lesson.PracticeFinished += clean => Publish();
             Grid.Logged += e => Sound.Play(Sound.Cue(e.event_name, e.correctness, false)); // Build E: a pick is a step, a seating a seal, a miss a miss, Key 3 a key
             Flow.Logged += n => { if (n == "key_spent" || n == "key_inserted") Sound.Play("key"); };
             var canvasObject = new GameObject("Slice Canvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
@@ -962,7 +956,7 @@ namespace Ascendant.CelestialDial
         void Save()
         {
             if (Flow.AtriumStage < 2) return;
-            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.ToSave(Dial.Lesson.Lit, Dial.Lesson.Kin, Dial.Lesson.KeyEarned, Dial.Lesson.LitMod, Dial.Lesson.KinMod, Grid.Placed, Grid.Evidence, Dial.Lesson.PolarityShown, Dial.Lesson.OppKnown, Dial.Lesson.Built, Dial.Lesson.BuilderEvidence))); PlayerPrefs.Save(); }
+            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.CaptureProgress(Dial.Lesson, Grid))); PlayerPrefs.Save(); }
             catch (Exception e) { Debug.LogWarning("[CelestialDial] save failed: " + e.Message); }
         }
         void TryRestore()
