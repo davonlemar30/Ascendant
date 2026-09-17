@@ -23,7 +23,9 @@
 <div id="signs" role="group" aria-label="Choose your sign"></div>
 <button id="birth-chart">Enter birth date, time, place</button><button id="birth-known">Enter what I already know</button><button id="birth-unknown">I don't know</button>
 <button id="next-screen">Continue</button><button id="insert">Insert the Key</button><button id="restart">Start over, test only</button>
-<button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="enter-seals">Check the Seals</button><button id="leave-wing">Back to the Atrium</button><button id="leave-review">Back to the Atrium</button><button id="leave-chamber">Back to the Atrium</button>
+<button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="leave-wing">Back to the Atrium</button><button id="leave-chamber">Back to the Atrium</button>
+<button id="continue-lesson">Continue the lesson</button><button id="enter-practice">Practice what you know</button><button id="leave-practice">Leave the instrument</button>
+<button id="open-journal">Your journal</button><button id="close-journal">Close the journal</button><button id="journal-prev">Previous page</button><button id="journal-next">Next page</button>
 <div id="modalities" role="group" aria-label="Which kind?"><button id="modality-0">Cardinal</button><button id="modality-1">Fixed</button><button id="modality-2">Mutable</button></div>
 <div id="elements" role="group" aria-label="Which family?"><button id="element-0">Fire</button><button id="element-1">Earth</button><button id="element-2">Air</button><button id="element-3">Water</button></div>
 <div id="room" role="group" aria-label="Points of interest, tap to walk there"></div>
@@ -52,7 +54,7 @@
     const gs=document.createElement('button');gs.id='grid-sign-'+i;gs.textContent=SIGNS[i];gs.onclick=()=>send('grid-sign:'+i);byId('grid-signs').appendChild(gs);
     const gc=document.createElement('button');gc.id='grid-cell-'+i;gc.textContent='Cell '+(i+1);gc.onclick=()=>send('grid-cell:'+i);byId('grid-cells').appendChild(gc);
   }
-  for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','enter-seals','leave-wing','leave-review','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
+  for(const id of ['back','seal','forward','count','ask-caspar','continue','optional','motion','insert','restart','enter-wing','leave-wing','continue-lesson','enter-practice','leave-practice','open-journal','close-journal','journal-prev','journal-next','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
   for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
@@ -76,8 +78,12 @@
     box('next-screen',0,654,190,56);box('insert',0,654,190,56);box('restart',0,768,216,48);
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
-    box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('enter-seals',0,680,300,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
-    box('leave-wing',0,room?680:654,room?300:190,room?52:56);box('leave-review',0,654,190,56);
+    box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
+    box('leave-wing',0,room?680:654,room?300:190,room?52:56);
+    // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
+    const practiceDial=state&&state.screen==='practice'&&state.practiceMode==='dial';
+    box('continue-lesson',-78,714,150,48);box('enter-practice',78,714,150,48);if(practiceDial)box('leave-practice',-72,714,128,48);else box('leave-practice',0,654,190,56);
+    if(hub)box('open-journal',0,680,300,52);else box('open-journal',0,774,216,40);box('close-journal',0,714,190,48);box('journal-prev',-78,654,150,56);box('journal-next',78,654,150,56);
     if(hub)box('restart',118,774,112,40);
     // Build E: the style page's sound slots sit where the canvas draws them.
     for(let i=0;i<7;i++)if(byId('sound-'+i))box('sound-'+i,-129+(i%4)*86,686+Math.floor(i/4)*42,82,38);
@@ -100,7 +106,7 @@
   window.ascendantDial={
     receive(next){
       state=next;
-      const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='review'&&state.reviewMode==='dial'),grid=state.screen==='grid';
+      const wing=((state.screen||'wing')==='wing'&&state.glyphMode!=='name')||(state.screen==='practice'&&state.practiceMode==='dial'),grid=state.screen==='grid',journal=state.screen==='journal';
       const naming=wing&&state.builderStep==='name',sharing=wing&&state.builderStep==='share';
       const chamber=state.screen==='chamberroom',style=state.screen==='style';
       byId('style').hidden=!style;
@@ -116,8 +122,10 @@
       byId('birthdate').hidden=!state.canBirthDate;byId('use-date').disabled=!state.canBirthDate;byId('change-birth').disabled=!state.canChangeBirth;
       for(let i=0;i<12;i++)byId('sign-'+i).disabled=!state.canSignPick;
       byId('signs').hidden=!state.canSignPick;
-      byId('enter-wing').disabled=!state.canEnterWing;byId('enter-seals').disabled=!state.canEnterSeals;byId('enter-chamber').disabled=!state.canEnterChamber;byId('leave-chamber').disabled=!state.canLeaveChamber;
-      byId('leave-wing').disabled=!state.canLeaveWing;byId('leave-review').disabled=!state.canLeaveReview;
+      byId('enter-wing').disabled=!state.canEnterWing;byId('enter-chamber').disabled=!state.canEnterChamber;byId('leave-chamber').disabled=!state.canLeaveChamber;
+      byId('leave-wing').disabled=!state.canLeaveWing;
+      byId('continue-lesson').disabled=!state.canContinueLesson;byId('enter-practice').disabled=!state.canEnterPractice;byId('leave-practice').disabled=!state.canLeavePractice;
+      byId('open-journal').disabled=!state.canOpenJournal;byId('close-journal').disabled=!state.canCloseJournal;byId('journal-prev').disabled=!state.canJournalPrev;byId('journal-next').disabled=!state.canJournalNext;
       const pois=state.pois||[],poiKey=pois.join('|');
       if(poiKey!==lastPois){lastPois=poiKey;const roomGroup=byId('room');roomGroup.innerHTML='';pois.forEach((id,i)=>{const b=document.createElement('button');b.id='poi-'+id;b.textContent=state.poiLabels[i];b.onclick=()=>send('walk:'+id);roomGroup.appendChild(b);});}
       pois.forEach(id=>{byId('poi-'+id).disabled=!state.canWalk;});byId('room').hidden=pois.length===0;
@@ -131,15 +139,15 @@
       for(let i=0;i<3;i++){const sb=byId('builder-share-'+i);const done=!!(state.shared&&state.shared.includes(['Kind','Side','Element'][i]));sb.disabled=!(sharing&&state.canBuilderShare&&!done);sb.textContent=['Kind','Side','Element'][i]+(done?': shared':'');}
       byId('builder-share').hidden=!sharing;
       byId('walk-speed').setAttribute('aria-label','Walk speed: '+(state.walkSpeed||'normal')+', test only');
-      const tap=state.screen==='review'&&state.reviewMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
-      const modTap=state.screen==='review'&&state.reviewMode==='modality';for(let i=0;i<3;i++)byId('modality-'+i).disabled=!modTap;byId('modalities').hidden=!modTap;
+      const tap=state.screen==='practice'&&state.practiceMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
+      const modTap=state.screen==='practice'&&state.practiceMode==='modality';for(let i=0;i<3;i++)byId('modality-'+i).disabled=!modTap;byId('modalities').hidden=!modTap;
       const glyph=!!state.glyphMode&&!state.busy;for(let i=0;i<4;i++){const gb=byId('glyph-name-'+i);gb.disabled=!glyph;gb.textContent=state.glyphOptions&&state.glyphOptions[i]?state.glyphOptions[i]:'';}byId('glyph-names').hidden=!glyph;
       byId('glyph-names').setAttribute('aria-label',glyph?'Which sign carries the symbol '+state.glyphChar+'?':'Which sign carries this symbol?');
       byId('name').hidden=!state.canName;if(state.canName&&document.activeElement!==byId('name')&&byId('name').value===''&&state.playerName!=='Keeper')byId('name').value=state.playerName;
       byId('seats').hidden=!wing;
       byId('motion').setAttribute('aria-pressed',String(state.reducedMotion));
       byId('motion').setAttribute('aria-label','Reduced motion: '+(state.reducedMotion?'on':'off'));
-      const announcement=wing?[state.destination,state.count,state.message].filter(Boolean).join('. '):grid?[state.gridReadout,state.caspar].filter(Boolean).join('. '):[state.caspar,state.note].filter(Boolean).join('. ');
+      const announcement=wing?[state.destination,state.count,state.message].filter(Boolean).join('. '):journal?[state.caspar].concat(state.journalEntries||[]).join('. '):grid?[state.gridReadout,state.caspar].filter(Boolean).join('. '):[state.caspar,state.note].filter(Boolean).join('. ');
       if(announcement!==lastAnnouncement){byId('announcement').textContent=announcement;lastAnnouncement=announcement;}
       layout();
       // Refocus when nothing useful is focused, or when the last focus was ours (not the player's own Tab).

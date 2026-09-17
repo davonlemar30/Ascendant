@@ -37,6 +37,8 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `shelf-book` | 10 × 26 | 64 | a book on a shelf: three on the Wing's, three that return to the Atrium's at Stage 4 |
 | `book-cover` | 140 × 140 | 512 | the book on the shelf, closed |
 | `book-page` | 140 × 140 | 512 | the book's open page behind each symbol |
+| `journal-page` | 360 × 800 | 2048 | the journal's open page, behind its entries (Build F) |
+| `journal-cover` | 60 × 60 | 256 | the journal's cover, at the head of its page (Build F) |
 | `shelves` | 60 × 180 | 512 | the Atrium's shelves, mostly empty (60 × 120 in the room) |
 | `furniture-covered` | 120 × 70 | 512 | the covered furniture of the opening (its dust cloth goes) |
 | `desk` | 70 × 30 | 256 | the desk, uncovered, in the Atrium room |
@@ -73,7 +75,7 @@ Applied by [`Assets/Editor/CelestialDial/SlotImport.cs`](../../Assets/Editor/Cel
 - **Images:** Sprite (2D and UI), single, full-rect mesh, no mipmaps, alpha is transparency, sRGB, not readable, clamp, bilinear, no power-of-two scaling; **max size per slot** (the cap above); **compressed with crunch at quality 50** (the download shrinks several times over; the on-device format follows the WebGL texture setting, DXT by default). A side that is not a multiple of 4 is warned about.
 - **Sounds:** Vorbis at quality 0.5, optimized sample rate, preloaded; cues forced to mono and decompressed on load (no latency), the ambient loop stereo and compressed in memory.
 
-Budget: the shipped test set (28 images, 7 sounds, 166 KB on disk) adds well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
+Budget: the shipped test set (30 images, 7 sounds, 269 KB on disk) adds well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
 
 ## The test set and the style page
 

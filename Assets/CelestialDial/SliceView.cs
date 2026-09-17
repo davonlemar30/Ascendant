@@ -8,7 +8,8 @@ using UnityEngine.UI;
 namespace Ascendant.CelestialDial
 {
     // Vertical slice v0.2 "the return": the locked opening and Chamber bookends (Q01, Q04, Q06, Q07), the September 11
-    // copy session, and the locked loop (Q05): two-entrance Atrium, Check the Seals, Unit 1.1 continuation, local save.
+    // copy session, and the locked loop (Q05) as amended Sept 15/17: one-entrance Atrium, the practice fork on the Dial, the three-strikes
+    // gate, the journal in the inventory (Build F), Unit 1.1 continuation, local save.
     // Placeholder art. Copy is the v0.1 Copy Deck; v0.2 lines marked "placeholder (owner writes)" are not final.
     // Build E: every placeholder is a named art slot and every action a sound slot (Slots, Sound); a file in a slot replaces
     // the grey box or the silence, nothing else changes. ?style shows every slot at once.
@@ -50,11 +51,17 @@ namespace Ascendant.CelestialDial
         readonly Button[] reviewGlyphButtons = new Button[4];
         InputField nameField, dateField;
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
-        Button enterWing, enterSeals, hubRestart, leaveReview;
+        Button enterWing, hubRestart, leavePractice;
+        // Build F: the fork and the practice exit on the Dial, the journal's buttons and screen.
+        Button forkLesson, forkPractice, leavePracticeDial, journalHub, journalWing, journalChamber, journalPrev, journalNext, journalClose;
+        RectTransform journal; Text journalSectionText, journalNote; Image journalCover; readonly Text[] journalGlyphs = new Text[12], journalLines = new Text[12];
+        bool forkShown, gating;
+        const string ForkLine = "The wheel is yours. We can go on with the lesson, or you can practice what you already know."; // placeholder (owner writes)
+        const string ForkPracticeOnlyLine = "Nothing new waits on the wheel today. Practice what you know, or rest."; // placeholder (owner writes)
+        const string ForkReturnLine = "Back at the wheel. The lesson, or more practice: your choice."; // placeholder (owner writes)
         readonly Button[] elementButtons = new Button[4];
         readonly Button[] modalityButtons = new Button[3]; // Build A: which kind?
         Image flash, seam, keyGlow, candle, insertGlow, lampOne, lampTwo, deskCloth, doorOpenLight;
-        Text enterSealsLabel;
         readonly Image[] floorLines = new Image[24];
         readonly Image[] candles = new Image[9];
         readonly Image[] locks = new Image[SliceFlow.Books * SliceFlow.LocksPerBook];
@@ -78,11 +85,11 @@ namespace Ascendant.CelestialDial
             "Before your ancestor left, he sealed them. All seven. He knew that the power inside these Books, paired with the knowledge this Library holds, could unbalance the world in the wrong hands.",
             "So he made sure the next Keeper would have to learn the language of the stars before they could open even one. That is why the wheel tested you first.\nChoose a Book. Feed it your Key." };
         // v0.2 placeholder lines (owner writes; Q05 decision 7).
-        const string HubFirstLine = "Look at it. One lamp, and the dust already knows it.\nSix seats still dark in the Wing, when you are ready. And the seals: a Keeper checks them on every return. For now they hold.";
-        const string HubLaterLine = "Welcome back. The Wing waits, and the seals are yours to check.";
-        const string HubCompleteLine = "The whole wheel. I have not seen it lit since he left.\nRest now. The seals will want checking when you return, and there is more to wake.";
-        const string HubKey2Line = "Two Keys. He left twenty-one locks, and you have opened the way to two of them.\nThat is enough for tonight. The seals will keep."; // placeholder (owner writes)
-        const string HubKey3Line = "Three Keys. The table is full, and the Wing has one more thing to teach you.\nRest now. The seals will keep."; // placeholder (owner writes; Build B)
+        const string HubFirstLine = "Look at it. One lamp, and the dust already knows it.\nSix seats still dark in the Wing, when you are ready. And take the journal from the desk: what the wheel teaches you, it will keep."; // placeholder (owner writes; Build F)
+        const string HubLaterLine = "Welcome back. The Wing waits, and your journal is in your hands."; // placeholder (owner writes; Build F)
+        const string HubCompleteLine = "The whole wheel. I have not seen it lit since he left.\nRest now. The wheel will want practice when you return, and there is more to wake."; // placeholder (owner writes; Build F)
+        const string HubKey2Line = "Two Keys. He left twenty-one locks, and you have opened the way to two of them.\nThat is enough for tonight. Your journal will keep."; // placeholder (owner writes)
+        const string HubKey3Line = "Three Keys. The table is full, and the Wing has one more thing to teach you.\nRest now. Your journal will keep."; // placeholder (owner writes; Build B)
         const string HubKey4Line = "Four Keys. Every pattern the wheel keeps, you keep now.\nRest. The Chamber will want to see them."; // placeholder (owner writes; Build C)
         // Build D placeholder lines (owner writes; worksheet section 13).
         const string HubKeyInHandLine = "You carry a Key the Chamber has not seen. Its door is open when you are ready.";
@@ -105,6 +112,7 @@ namespace Ascendant.CelestialDial
             Dial.Slice = this; Dial.ExtraActions = WebAction; font = Dial.UiFont;
             Flow.Logged += name => Dial.Lesson.Dial.Log(name.ToLowerInvariant().Replace(':', '_'), false, false, "slice");
             Dial.Lesson.ReviewFinished += (seat, correct, eligible) => StartCoroutine(AfterDialReview(correct, eligible));
+            Dial.Lesson.Dial.Logged += e => { if (e.event_name == "answer_rejected" && Flow.AtPractice && Dial.Lesson.Phase == LessonPhase.Review) Flow.RecordStrike(); }; // Build F: a wheel miss in practice is a strike; the tap forms count their own
             Grid = new GridModel(() => Time.realtimeSinceStartupAsDouble);
             Grid.Logged += e => Debug.Log("[CelestialDial] " + JsonUtility.ToJson(e));
             Flow.ObserveProgress(Dial.Lesson, Grid, Save);
@@ -118,7 +126,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth();
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue);
-            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildAvatar(); BuildFade();
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildAvatar(); BuildFade();
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -134,7 +142,7 @@ namespace Ascendant.CelestialDial
             if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
-            if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Review) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
+            if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Practice) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); keyIndicator.text = "Keeper Keys: 2"; Save(); Show(); Publish(); }
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.ModalitiesComplete && !Flow.ModalitiesComplete) { Flow.MarkModalitiesComplete(); Save(); Publish(); } // Build B: the table wakes
             if (Flow.Screen == SliceScreen.Grid && Grid.Key3Earned && Flow.Keys < 3) { Flow.MarkKey3(); keyIndicator.text = "Keeper Keys: 3"; Save(); Show(); Publish(); }
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Key4Earned && Flow.Keys < 4) { Flow.MarkKey4(); keyIndicator.text = "Keeper Keys: 4"; Save(); Show(); Publish(); } // Build C
@@ -143,11 +151,15 @@ namespace Ascendant.CelestialDial
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
                 insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, a);
             }
+            if (Flow.Gated && !busy && !Dial.Busy && !gating) StartCoroutine(Gate()); // Build F: the third strike closes the instrument once the answer's beat has settled
             if (wingContinue != null && Flow.AtriumStage >= 2)
             {
                 // The Wing's Back button belongs to the Wing screen only; left on, it sat over the review's Seal (owner playtest, Sept 14).
                 bool idle = Flow.Screen == SliceScreen.Wing && !Dial.Lesson.Dial.Active && !Dial.Busy && !busy && Dial.Lesson.Phase != LessonPhase.Review && !Dial.ControlsShown; // Build C: nor over the beat's Continue or the builder's buttons
                 if (wingContinue.gameObject.activeSelf != idle) { wingContinue.gameObject.SetActive(idle); Publish(); }
+                // Build F: the fork sits on the row below Back, under the same idle rule, only while the fork is open.
+                bool fork = idle && forkShown && Flow.CanEnterPractice, lesson = fork && LessonAvailable;
+                if (forkPractice.gameObject.activeSelf != fork || forkLesson.gameObject.activeSelf != lesson) { forkPractice.gameObject.SetActive(fork); forkLesson.gameObject.SetActive(lesson); Publish(); }
             }
         }
 
@@ -231,6 +243,7 @@ namespace Ascendant.CelestialDial
             insert = MakeButton(chamber, "Insert the Key", 0, 654, 190, 56, Insert); insert.GetComponent<Image>().color = Crimson;
             chamberContinue = MakeButton(chamber, "Continue", 0, 654, 190, 56, () => Continue()); chamberContinue.gameObject.SetActive(false);
             chamberBack = MakeButton(chamber, "Back to the Atrium", 0, 714, 300, 48, LeaveChamber); chamberBack.gameObject.SetActive(false); // Build D
+            journalChamber = MakeButton(chamber, "Your journal", 0, 774, 216, 40, OpenJournal); journalChamber.GetComponentInChildren<Text>().fontSize = 13; journalChamber.gameObject.SetActive(false); // Build F
         }
         void BuildHub()
         {
@@ -264,7 +277,7 @@ namespace Ascendant.CelestialDial
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
             enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing);
             enterChamber = MakeButton(hub, "The Chamber", 78, 624, 150, 52, EnterChamber); // Build D
-            enterSeals = MakeButton(hub, "Check the Seals", 0, 680, 300, 52, EnterSeals); enterSealsLabel = enterSeals.GetComponentInChildren<Text>();
+            journalHub = MakeButton(hub, "Your journal", 0, 680, 300, 52, OpenJournal); journalHub.gameObject.SetActive(false); // Build F: the journal takes the row Check the Seals held (retired Sept 15)
             hubNote = Label(hub, "", 0, 718, 330, 20, 12); hubNote.color = Muted;
             endCard = Label(hub, "End of prototype v0.2. Glyphs and Key 2 come next.", 0, 738, 330, 20, 12); endCard.gameObject.SetActive(false);
             walkSpeed = TestButton(hub, "Walk: normal (test)", -118, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
@@ -274,8 +287,8 @@ namespace Ascendant.CelestialDial
         void BuildReview()
         {
             // Q05 decision 2: direct-tap items live here; compressed Dial items use the Wing canvas.
-            review = ScreenPanel("Review");
-            Label(review, "CHECK THE SEALS", 0, 32, 340, 24, 18);
+            review = ScreenPanel("Practice");
+            Label(review, "PRACTICE", 0, 32, 340, 24, 18); // Build F: the tap forms of practice; the wheel forms use the Dial canvas with a "Practice · n of N" header
             reviewProgress = Label(review, "", 0, 62, 300, 20, 12); reviewProgress.color = Muted;
             reviewQuestion = Label(review, "", 0, 200, 330, 44, 18);
             for (int i = 0; i < 4; i++) { string element = Elements[i]; elementButtons[i] = MakeButton(review, element, -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerTap(element)); }
@@ -284,7 +297,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 4; i++) { int slot = i; reviewGlyphButtons[i] = MakeButton(review, "", -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerGlyphReview(slot)); reviewGlyphButtons[i].gameObject.SetActive(false); }
             reviewNote = Label(review, "", 0, 440, 330, 50, 14);
             reviewSummary = Label(review, "", 0, 520, 330, 30, 16);
-            leaveReview = MakeButton(review, "Back to the Atrium", 0, 654, 190, 56, LeaveReview);
+            leavePractice = MakeButton(review, "Leave the instrument", 0, 654, 190, 56, LeavePractice); // Build F: an exit at any point (the Sept 15 defect)
         }
         void BuildGlyphs()
         {
@@ -354,6 +367,10 @@ namespace Ascendant.CelestialDial
             keyLabel = Label(keyRect, "KEEPER KEY", 0, 20, 80, 36, 12); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0); keyLabel.gameObject.SetActive(!keyArt); // the file draws its own Key
             keyIndicator = Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
             wingContinue = MakeButton(r, "Continue", 0, 654, 190, 56, WingContinue); wingContinue.name = "Slice Continue"; wingContinue.gameObject.SetActive(false);
+            // Build F: the fork (Sept 15 ruling) on the row below Back; the practice exit where the table's exit sits, clear of Ask Caspar.
+            forkLesson = MakeButton(r, "Continue the lesson", -78, 714, 150, 48, ContinueLesson); forkLesson.GetComponentInChildren<Text>().fontSize = 12; forkLesson.gameObject.SetActive(false);
+            forkPractice = MakeButton(r, "Practice what you know", 78, 714, 150, 48, EnterPractice); forkPractice.GetComponentInChildren<Text>().fontSize = 12; forkPractice.gameObject.SetActive(false);
+            leavePracticeDial = MakeButton(r, "Leave the instrument", -72, 714, 128, 48, LeavePractice); leavePracticeDial.GetComponentInChildren<Text>().fontSize = 12; leavePracticeDial.gameObject.SetActive(false);
         }
 
         void BuildWingRoom()
@@ -385,6 +402,7 @@ namespace Ascendant.CelestialDial
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
             enterShelf = MakeButton(wingRoom, "The bookshelf", 0, 568, 300, 52, () => Walk("shelf")); enterShelf.gameObject.SetActive(false);
             wingRoomBack = MakeButton(wingRoom, "Back to the Atrium", 0, 680, 300, 52, LeaveWing);
+            journalWing = MakeButton(wingRoom, "Your journal", 0, 774, 216, 40, OpenJournal); journalWing.GetComponentInChildren<Text>().fontSize = 13; journalWing.gameObject.SetActive(false); // Build F
         }
         void BuildAvatar()
         {
@@ -452,12 +470,17 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("grid-cell:") && int.TryParse(command.Substring(10), out int gridCell) && gridCell >= 0 && gridCell < 12) ChooseCell(gridCell);
             else if (command.StartsWith("walk:")) Walk(command.Substring(5));
             else if (command == "walk-speed") CycleWalkSpeed();
-            else if (command == "enter-seals") EnterSeals();
             else if (command == "leave-wing") LeaveWing();
-            else if (command == "leave-review") LeaveReview();
+            else if (command == "continue-lesson") ContinueLesson(); // Build F
+            else if (command == "enter-practice") EnterPractice();
+            else if (command == "leave-practice") LeavePractice();
+            else if (command == "open-journal") OpenJournal();
+            else if (command == "close-journal") CloseJournal();
+            else if (command == "journal-next") JournalTurn(1);
+            else if (command == "journal-prev") JournalTurn(-1);
             else if (command.StartsWith("element:") && int.TryParse(command.Substring(8), out int element) && element >= 0 && element < 4) AnswerTap(Elements[element]);
             else if (command.StartsWith("modality:") && int.TryParse(command.Substring(9), out int modality) && modality >= 0 && modality < 3) AnswerModalityTap(Zodiac.Modalities[modality]);
-            else if (command.StartsWith("glyph-name:") && int.TryParse(command.Substring(11), out int slot) && slot >= 0 && slot < 4) { if (Flow.Screen == SliceScreen.Review) AnswerGlyphReview(slot); else AnswerGlyphName(slot); }
+            else if (command.StartsWith("glyph-name:") && int.TryParse(command.Substring(11), out int slot) && slot >= 0 && slot < 4) { if (Flow.AtPractice) AnswerGlyphReview(slot); else AnswerGlyphName(slot); }
         }
         void ChooseBirth(string choice) { if (busy) return; Flow.ChooseBirth(choice); AfterBirthEntry(); }
         void UseDate(string text)
@@ -533,6 +556,7 @@ namespace Ascendant.CelestialDial
             bool room = Flow.AtChamberRoom; bool atBooks = Flow.Walk.At == "books";
             chamberDoor.gameObject.SetActive(room); chamberBooksTap.gameObject.SetActive(room); chamberBand.gameObject.SetActive(room); chamberBooksLabel.gameObject.SetActive(!room);
             chamberBack.gameObject.SetActive(room); chamberBack.interactable = !busy; chamberContinue.gameObject.SetActive(!room && chamberContinue.gameObject.activeSelf);
+            journalChamber.gameObject.SetActive(room && Flow.CanOpenJournal); journalChamber.interactable = !busy; // Build F
             if (!room) return;
             for (int l = 0; l < locks.Length; l++) Slots.Paint(locks[l], l < Flow.LocksFilled ? Bone : LockDark, l < Flow.LocksFilled ? 1f : LockDarkArt);
             for (int b = 0; b < SliceFlow.Books; b++) { bool open = b < Flow.BooksOpen; if (!busy) { Slots.Paint(bookImages[b], open ? BookOpen : Dim, open ? 1f : ShutArt); Slots.Paint(bookPages[b], new Color(Bone.r, Bone.g, Bone.b, open ? .9f : 0), 1f); bookPages[b].rectTransform.anchoredPosition = new Vector2(0, open ? -17 : -35); } }
@@ -549,16 +573,25 @@ namespace Ascendant.CelestialDial
         void Restart() { if (busy) return; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
         void EnterWing() { Walk("wing-door"); }
+        // Build F: whether the wheel has a lesson to offer at the fork (Part A stays on the shelf; the book's replay is the shelf's too).
+        bool LessonAvailable => Dial.Lesson.CanContinueUnit || (Dial.Lesson.CanBeginGlyphs && Dial.Lesson.AllNamed) || (Dial.Lesson.Phase != LessonPhase.GlyphWheel && Dial.Lesson.CanBeginModalities) || Dial.Lesson.CanBeginOpposites;
         void EnterDialNow()
         {
             if (!Flow.EnterDial()) return;
             Dial.SliceHidesOptional = true; Dial.Lesson.SetKey3(Flow.Keys >= 3);
+            Dial.ForceRefresh(); // the Dial's own buttons follow the restored lesson only after a refresh (a reload leaves Continue active by construction)
+            bool forkMoment = Flow.CanEnterPractice && !Dial.Lesson.Dial.Active && !Dial.ControlsShown && Dial.Lesson.Phase != LessonPhase.GlyphWheel && !Dial.Lesson.UnitInProgress; // a wheel mid-unit resumes as before; the fork is for an idle wheel
+            if (forkMoment) { forkShown = true; Dial.Lesson.Say(LessonAvailable ? ForkLine : Dial.Lesson.CanBeginGlyphs && !Dial.Lesson.AllNamed ? DialLesson.ShelfFirst : ForkPracticeOnlyLine); Show(); Dial.Realign(); Publish(); return; } // the fork (Sept 15 ruling): nothing starts until the player chooses
+            StartLesson(); Show(); Dial.Realign(); Publish();
+        }
+        void ContinueLesson() { if (busy || Dial.Busy || !forkShown || Flow.Screen != SliceScreen.Wing) return; forkShown = false; StartLesson(); Show(); Dial.Realign(); Publish(); }
+        void StartLesson()
+        {
             if (Dial.Lesson.CanContinueUnit) Dial.Lesson.BeginContinuation();
             else if (Dial.Lesson.CanBeginGlyphs && Dial.Lesson.AllNamed) { if (Dial.Lesson.BeginGlyphs()) Save(); } // Part B: the wheel hides its names
             else if (Dial.Lesson.CanBeginGlyphs) Dial.Lesson.Say(DialLesson.ShelfFirst); // the lit wheel, read only, until the book is read
             else if (Dial.Lesson.Phase != LessonPhase.GlyphWheel && Dial.Lesson.CanBeginModalities) { if (Dial.Lesson.BeginModalities()) { Flow.StartModalities(); Save(); } } // Build A: the second pattern, after Key 2
             else if (Dial.Lesson.CanBeginOpposites) { if (Dial.Lesson.BeginOpposites()) { Flow.StartOpposites(); Save(); } } // Build C: the last pattern and the builder, after Key 3
-            Show(); Dial.Realign(); Publish();
         }
         void OpenBook()
         {
@@ -638,7 +671,7 @@ namespace Ascendant.CelestialDial
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
                 yield return FadeTo(0);
             }
-            else if (id == "desk") { if (!Flow.EnterSeals()) hubNote.text = Flow.Note; else { Show(); StartReviewItem(); } }
+            else if (id == "desk") { Flow.ApproachDesk(); hubNote.text = Flow.Note; } // Build F: the desk is dressing; the journal is in the inventory
             else if (id == "caspar") { Flow.ApproachCaspar(); hubNote.text = Flow.Note; }
             else if (id == "dial") EnterDialNow();
             else if (id == "shelf") OpenBook();
@@ -685,10 +718,18 @@ namespace Ascendant.CelestialDial
         void LeaveWing()
         {
             if (busy) return;
-            if (Flow.Screen == SliceScreen.Wing) { if (Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveDial()) return; Save(); Show(); Publish(); }
+            if (Flow.Screen == SliceScreen.Wing) { if (Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveDial()) return; forkShown = false; Save(); Show(); Publish(); }
             if (Flow.Screen == SliceScreen.WingRoom) Walk("atrium-door"); // one press from the Dial walks back out through the room
         }
-        void EnterSeals() { Walk("desk"); }
+        // ---- Build F: practice on the Dial. One entry is one sitting; the same forms as before; an exit on every item; three strikes close the instrument. ----
+        void EnterPractice()
+        {
+            if (busy || Dial.Busy || Flow.Screen != SliceScreen.Wing || !forkShown) return;
+            forkShown = false;
+            bool started = Flow.EnterPractice(); Save();
+            if (!started) { forkShown = true; Dial.Lesson.Say(Flow.Note); Show(); Dial.Realign(); Publish(); return; } // nothing due: the sitting counted, Caspar says so, the fork stays
+            Show(); StartReviewItem();
+        }
         void StartReviewItem()
         {
             var task = Flow.CurrentReview;
@@ -697,6 +738,7 @@ namespace Ascendant.CelestialDial
             if (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality)
             {
                 Dial.SliceHidesOptional = true;
+                Dial.Lesson.ReviewHeader = "Practice · " + (Flow.ReviewIndex + 1) + " of " + Flow.ReviewQueue.Count; // a check never looks like the lesson (Sept 15 defect)
                 Dial.Lesson.BeginReview(task.seat, task.Mode == ReviewMode.DialModality ? 3 : 4); Show(); Dial.Realign(); Publish();
             }
             else { Show(); Publish(); }
@@ -705,7 +747,25 @@ namespace Ascendant.CelestialDial
         {
             busy = true; Flow.FinishReview(correct, eligible); Save(); Dial.ForceRefresh(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? .8f : 1.4f);
-            Dial.Lesson.EndReview(); Dial.Realign(); busy = false; StartReviewItem();
+            Dial.Lesson.EndReview(); Dial.Realign(); busy = false;
+            if (Flow.Gated) { Publish(); yield break; } // the gate closes the instrument from Update once the beat has settled
+            StartReviewItem();
+        }
+        // The gate (owner, Sept 15): the instrument closes, the Keeper is back in the room with the journal offered; re-entry is immediate with fresh strikes.
+        IEnumerator Gate()
+        {
+            gating = true; busy = true; Publish();
+            yield return new WaitForSecondsRealtime(ReducedMotion ? .8f : 1.4f);
+            if (Dial.Lesson.Phase == LessonPhase.Review) { Dial.Lesson.EndReview(); Dial.Realign(); }
+            Flow.CloseInstrument(); Save(); Sound.Play("door");
+            busy = false; gating = false; Show(); Publish();
+        }
+        void LeavePractice()
+        {
+            if (busy || Dial.Busy || !Flow.AtPractice) return;
+            if (Dial.Lesson.Phase == LessonPhase.Review) { Dial.Lesson.EndReview(); Dial.Realign(); }
+            Flow.LeavePractice(); Save();
+            forkShown = true; Dial.Lesson.Say(ForkReturnLine); Show(); Dial.Realign(); Publish(); // back to the fork on the Dial; unanswered items stay due
         }
         void AnswerModalityTap(string modality)
         {
@@ -725,18 +785,20 @@ namespace Ascendant.CelestialDial
         }
         IEnumerator AfterTap()
         {
-            busy = true; ShowReview(); Publish();
+            busy = true; ShowPractice(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? .8f : 1.2f);
-            busy = false; StartReviewItem();
+            busy = false;
+            if (Flow.Gated) { Publish(); yield break; }
+            StartReviewItem();
         }
-        void LeaveReview() { if (busy || !Flow.LeaveReview()) return; Save(); Show(); Publish(); }
 
         void Show()
         {
             var s = Flow.Screen;
             var task = Flow.CurrentReview;
-            bool reviewOnDial = s == SliceScreen.Review && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
+            bool practiceOnDial = s == SliceScreen.Practice && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth);
+            journal.gameObject.SetActive(s == SliceScreen.Journal); if (s == SliceScreen.Journal) ShowJournal();
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom); hub.gameObject.SetActive(s == SliceScreen.Hub);
             wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
@@ -751,8 +813,10 @@ namespace Ascendant.CelestialDial
                 enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
                 enterGrid.gameObject.SetActive(Flow.CanOpenGrid); enterGrid.interactable = !busy;
+                journalWing.gameObject.SetActive(Flow.CanOpenJournal); journalWing.interactable = !busy; // Build F
                 gridGlow.color = new Color(.95f, .8f, .5f, Flow.ModalitiesComplete && !Grid.Key3Earned ? .35f : Flow.ModalitiesComplete ? .12f : 0); // an instrument with a unit waiting glows, like the shelf
-                wingRoomCaption.text = Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
+                wingRoomCaption.text = Flow.Note == "gated" ? SliceFlow.GateLine // Build F: the instrument closed on the third strike; the journal is below
+                    : Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Flow.Note == "grid-dark" ? GridModel.DarkLine
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "The wheel has hidden its names. Go to the Dial and find each symbol in turn." // placeholder (owner writes)
                     : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The wheel keeps a second pattern. Go to the Dial." // placeholder (owner writes)
@@ -763,12 +827,14 @@ namespace Ascendant.CelestialDial
                     : "The Dial waits at the center of the room. The doorway leads back."; // placeholder (owner writes)
             }
             bool partA = book;
-            review.gameObject.SetActive(s == SliceScreen.Review && !reviewOnDial);
+            review.gameObject.SetActive(s == SliceScreen.Practice && !practiceOnDial);
             glyphs.gameObject.SetActive(partA);
-            Dial.UiCanvas.gameObject.SetActive(s == SliceScreen.Wing || reviewOnDial);
+            Dial.UiCanvas.gameObject.SetActive(s == SliceScreen.Wing || practiceOnDial);
+            leavePracticeDial.gameObject.SetActive(practiceOnDial); leavePracticeDial.interactable = !busy; // Build F: an exit on the wheel form too
+            if (s != SliceScreen.Wing) { forkLesson.gameObject.SetActive(false); forkPractice.gameObject.SetActive(false); }
             if (partA) ShowGlyphs();
             if (birthContinue != null) birthContinue.interactable = Flow.CanContinue;
-            if (s == SliceScreen.Wing || reviewOnDial)
+            if (s == SliceScreen.Wing || practiceOnDial)
             {
                 if (!sunSent && Flow.HasSunSign) { Dial.Lesson.SetSunSign(Flow.SunSign); sunSent = true; }
                 if (Flow.AtriumStage >= 2) { keyRect.gameObject.SetActive(false); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); seam.color = new Color(Bone.r, Bone.g, Bone.b, 0); Dial.Ring.localScale = Vector3.one; }
@@ -776,7 +842,7 @@ namespace Ascendant.CelestialDial
                 Dial.ForceRefresh();
             }
             if (s == SliceScreen.Hub) ShowHub();
-            if (s == SliceScreen.Review) ShowReview();
+            if (s == SliceScreen.Practice) ShowPractice();
             ShowPage();
             if (s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom) ShowChamberRoom(); // after ShowPage: the room owns the Chamber's controls
         }
@@ -827,20 +893,19 @@ namespace Ascendant.CelestialDial
             foreach (var book in shelfBooks) book.gameObject.SetActive(stage >= 4); shelvesLabel.text = stage >= 4 ? "Shelves, filling" : "Shelves, mostly empty";
             sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? .3f : 0);
             hubCaption.text = stage >= 6 ? "Awake: four lamps, shelves filling. The Wing is whole." : stage >= 5 ? "Waking: three lamps, and light behind a sealed door." : stage >= 4 ? "Waking: the shelves take their books back." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Wing open." : "Stirring: one lamp lit, one desk uncovered, the Wing open."; // placeholder (owner writes)
-            hubText.text = Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.ReviewsChecked > 0 ? HubLaterLine : HubFirstLine;
+            hubText.text = Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
             enterChamber.interactable = !busy && Flow.CanEnterChamber;
-            int due = Flow.DueCount;
-            enterSealsLabel.text = "Check the Seals"; // no count on the button (owner, Sept 14); the review screen shows n of m
+            journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
             endCard.text = Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber will take them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber will take them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber will take them." : "End of prototype v0.2. Glyphs and Key 2 come next."; // the prototype end cards give way to the Wing's (Build D)
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.Keys >= 2);
         }
-        void ShowReview()
+        void ShowPractice()
         {
             var task = Flow.CurrentReview;
-            bool done = Flow.ReviewDone;
-            reviewProgress.text = done ? "" : (Flow.ReviewIndex + 1) + " of " + Flow.ReviewQueue.Count;
+            bool done = Flow.PracticeDone;
+            reviewProgress.text = done ? "Practice finished" : "Practice · " + (Flow.ReviewIndex + 1) + " of " + Flow.ReviewQueue.Count;
             bool glyphItem = !done && task != null && task.Mode == ReviewMode.Glyph;
             bool modItem = !done && task != null && task.Mode == ReviewMode.TapModality;
             reviewQuestion.text = done ? "" : task != null && task.Mode == ReviewMode.Tap ? Zodiac.Seats[task.seat].Name + ". Which family?" : modItem ? Zodiac.Seats[task.seat].Name + ". Which kind?" : glyphItem ? "Which sign carries this symbol?" : "";
@@ -849,9 +914,9 @@ namespace Ascendant.CelestialDial
             reviewGlyph.gameObject.SetActive(glyphItem); reviewGlyph.text = glyphItem ? Zodiac.Seats[task.seat].Glyph : "";
             var opts = glyphItem ? Flow.GlyphReviewOptions(task.seat) : new int[4];
             for (int i = 0; i < 4; i++) { reviewGlyphButtons[i].gameObject.SetActive(glyphItem); reviewGlyphButtons[i].GetComponentInChildren<Text>().text = glyphItem ? Zodiac.Seats[opts[i]].Name : ""; reviewGlyphButtons[i].interactable = !busy && glyphItem && !task.done; }
-            reviewSummary.text = done ? Flow.ReviewSummary : "";
-            leaveReview.gameObject.SetActive(done);
-            if (done) reviewNote.text = "The seals are checked. Placeholder line: the owner writes Caspar's close."; // owner writes
+            reviewSummary.text = done ? Flow.PracticeSummary : "";
+            leavePractice.gameObject.SetActive(true); leavePractice.interactable = !busy; leavePractice.GetComponentInChildren<Text>().text = done ? "Back to the Dial" : "Leave the instrument";
+            if (done) reviewNote.text = "That is enough practice for now. The wheel will ask again when you return."; // placeholder (owner writes)
         }
         void ShowPage()
         {
@@ -884,7 +949,7 @@ namespace Ascendant.CelestialDial
         {
             if (styleShown) { FillStyle(state); return; }
             var s = Flow.Screen; var task = Flow.CurrentReview;
-            bool reviewOnDial = s == SliceScreen.Review && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
+            bool practiceOnDial = s == SliceScreen.Practice && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             state.screen = s.ToString().ToLowerInvariant(); state.playerName = Flow.DisplayName; state.note = Flow.Note;
             state.busy = state.busy || busy; // The semantic layer must see the slice's own beats as busy too.
             state.caspar = s == SliceScreen.Identity ? "Who are you? Enter a name, then continue." :
@@ -892,7 +957,8 @@ namespace Ascendant.CelestialDial
                 s == SliceScreen.Atrium ? atriumText.text : s == SliceScreen.AtriumReturn ? returnText.text :
                 s == SliceScreen.Chamber ? chamberText.text + (Flow.Ended ? " " + chamberEnd.text : "") :
                 s == SliceScreen.Hub ? hubText.text + " " + hubCaption.text :
-                s == SliceScreen.Review && !reviewOnDial ? (Flow.ReviewDone ? Flow.ReviewSummary + " " + reviewNote.text : reviewQuestion.text + " " + reviewNote.text) : "";
+                s == SliceScreen.Practice && !practiceOnDial ? (Flow.PracticeDone ? Flow.PracticeSummary + " " + reviewNote.text : reviewProgress.text + ". " + reviewQuestion.text + " " + reviewNote.text) :
+                s == SliceScreen.Journal ? "Your journal. " + journalSectionText.text + " " + journalNote.text : "";
             state.keyRevealed = Flow.KeyRevealed; state.keyInserted = Flow.KeyInserted; state.ended = Flow.Ended; state.locksFilled = Flow.LocksFilled;
             state.sunSign = Flow.HasSunSign ? Zodiac.Seats[Flow.SunSign].Name : "";
             state.canInsert = (s == SliceScreen.Chamber && !Flow.KeyInserted && Page >= ChamberPages.Length - 1 && !busy) || (s == SliceScreen.ChamberRoom && Flow.CanSpend && Flow.Walk.At == "books" && !busy);
@@ -904,14 +970,23 @@ namespace Ascendant.CelestialDial
             state.canChangeBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice != "";
             // v0.2
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.resumed = Resumed;
-            state.canEnterWing = s == SliceScreen.Hub && !busy; state.canEnterSeals = s == SliceScreen.Hub && !busy;
+            state.canEnterWing = s == SliceScreen.Hub && !busy;
             state.canLeaveWing = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy && Dial.Lesson.Phase != LessonPhase.GlyphNames;
-            state.canLeaveReview = s == SliceScreen.Review && Flow.ReviewDone && !busy;
-            state.reviewMode = s != SliceScreen.Review ? "" : Flow.ReviewDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
-            state.reviewIndex = Flow.ReviewIndex; state.reviewTotal = Flow.ReviewQueue.Count; state.reviewSign = task != null && !Flow.ReviewDone ? Zodiac.Seats[task.seat].Name : "";
-            state.reviewSummary = Flow.ReviewSummary; state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
+            // Build F: the fork, practice, the gate, the journal
+            state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
+            state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
+            state.practiceIndex = Flow.ReviewIndex; state.practiceCount = Flow.ReviewQueue.Count; state.practiceSign = task != null && !Flow.PracticeDone ? Zodiac.Seats[task.seat].Name : "";
+            state.practiceSummary = Flow.PracticeSummary; state.strikes = Flow.Strikes; state.sitting = Flow.Sittings; state.gated = Flow.Note == "gated";
+            bool forkOpen = s == SliceScreen.Wing && forkShown && Flow.CanEnterPractice && !busy && !Dial.Busy;
+            state.canEnterPractice = forkOpen; state.canContinueLesson = forkOpen && LessonAvailable;
+            state.fork = !forkOpen ? "none" : LessonAvailable ? "both" : "practice";
+            state.journal = s == SliceScreen.Journal; state.canOpenJournal = Flow.CanOpenJournal && !busy; state.canCloseJournal = state.journal && !busy;
+            state.canJournalNext = Flow.CanJournalNext && !busy; state.canJournalPrev = Flow.CanJournalPrev && !busy;
+            state.journalPage = Flow.JournalSection; state.journalCount = Flow.JournalSections.Count;
+            state.journalSection = state.journal ? SliceFlow.SectionTitle(Flow.JournalKind) : ""; state.journalEntries = state.journal ? Flow.JournalEntries(Flow.JournalKind).ToArray() : new string[0];
+            state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
             bool partA = s == SliceScreen.Book && Dial.Lesson.Phase == LessonPhase.GlyphNames;
-            bool glyphItem = s == SliceScreen.Review && task != null && !Flow.ReviewDone && task.Mode == ReviewMode.Glyph;
+            bool glyphItem = s == SliceScreen.Practice && task != null && !Flow.PracticeDone && task.Mode == ReviewMode.Glyph;
             state.glyphMode = partA ? "name" : glyphItem ? "review" : "";
             if (partA || glyphItem)
             {
@@ -920,7 +995,7 @@ namespace Ascendant.CelestialDial
                 state.glyphChar = Zodiac.Seats[target].Glyph; state.glyphOptions = new[] { Zodiac.Seats[opts[0]].Name, Zodiac.Seats[opts[1]].Name, Zodiac.Seats[opts[2]].Name, Zodiac.Seats[opts[3]].Name };
                 if (partA) state.caspar = "Which sign carries this symbol? " + (glyphNote.text ?? "") + " " + DialLesson.GlyphIntro;
             }
-            if (glyphItem) state.reviewMode = "glyph";
+            if (glyphItem) state.practiceMode = "glyph";
             state.v03Complete = Flow.V03Complete;
             // v0.4
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
@@ -951,6 +1026,44 @@ namespace Ascendant.CelestialDial
                 state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
             }
         }
+
+        // ---- Build F: the journal. In the inventory (owner, Sept 15): a button in every room, never a room object. It renders straight from the
+        // deck, one section per kind the wheel has taught, only the items that have entered, in wheel order, with 08's state word. Reading changes nothing. ----
+        void BuildJournal()
+        {
+            journal = ScreenPanel("Journal", "journal-page");
+            Label(journal, "YOUR JOURNAL", 0, 32, 340, 24, 18);
+            var cover = Rect("Journal cover", journal, 0, 74, 60, 60); journalCover = cover.gameObject.AddComponent<Image>(); journalCover.color = PanelColor; journalCover.raycastTarget = false; cover.gameObject.SetActive(Slots.Dress(journalCover, "journal-cover"));
+            journalSectionText = Label(journal, "", 0, 116, 330, 26, 16);
+            for (int i = 0; i < 12; i++)
+            {
+                journalGlyphs[i] = Label(journal, "", -140, 150 + i * 36, 40, 36, 22); journalGlyphs[i].font = Dial.GlyphFont; journalGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow; journalGlyphs[i].verticalOverflow = VerticalWrapMode.Overflow;
+                journalLines[i] = Label(journal, "", 24, 150 + i * 36, 280, 36, 12); journalLines[i].alignment = TextAnchor.MiddleLeft;
+            }
+            journalNote = Label(journal, "", 0, 596, 330, 40, 12); journalNote.color = Muted;
+            journalPrev = MakeButton(journal, "Previous", -78, 654, 150, 56, () => JournalTurn(-1));
+            journalNext = MakeButton(journal, "Next", 78, 654, 150, 56, () => JournalTurn(1));
+            journalClose = MakeButton(journal, "Close the journal", 0, 714, 190, 48, CloseJournal);
+        }
+        void ShowJournal()
+        {
+            var kind = Flow.JournalKind; var items = Flow.JournalItems(kind);
+            journalSectionText.text = SliceFlow.SectionTitle(kind) + " · " + (Flow.JournalSection + 1) + " of " + Flow.JournalSections.Count;
+            for (int i = 0; i < 12; i++)
+            {
+                bool show = i < items.Count;
+                journalGlyphs[i].gameObject.SetActive(show && kind != ItemKind.Opposite); journalLines[i].gameObject.SetActive(show);
+                if (!show) continue;
+                journalGlyphs[i].text = Zodiac.Seats[items[i].seat].Glyph;
+                journalLines[i].text = SliceFlow.JournalName(items[i]) + " — " + SliceFlow.JournalFact(items[i]) + "\n" + SliceFlow.StateWord(items[i]);
+                journalLines[i].color = items[i].State == ItemState.Practicing ? Bone : Muted;
+            }
+            journalNote.text = "What the wheel has shown you, as it stands. Reading here proves nothing; the wheel does that."; // placeholder (owner writes)
+            journalPrev.interactable = Flow.CanJournalPrev && !busy; journalNext.interactable = Flow.CanJournalNext && !busy; journalClose.interactable = !busy;
+        }
+        void OpenJournal() { if (busy || !Flow.OpenJournal()) return; Sound.Play("page"); Show(); Publish(); }
+        void CloseJournal() { if (busy || !Flow.CloseJournal()) return; Sound.Play("page"); Save(); Show(); Publish(); }
+        void JournalTurn(int direction) { if (busy || !(direction > 0 ? Flow.JournalNext() : Flow.JournalPrev())) return; Sound.Play("page"); ShowJournal(); Publish(); }
 
         // ---- save / restore (Q05 decision 5) ----
         void Save()

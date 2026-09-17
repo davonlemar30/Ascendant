@@ -76,9 +76,14 @@ namespace Ascendant.CelestialDial
             public string[] glyphOptions;
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
-            public int atriumStage, dueCount, reviewIndex, reviewTotal;
-            public bool canEnterWing, canEnterSeals, canLeaveWing, canLeaveReview, v02Complete, resumed;
-            public string reviewMode = "", reviewSign = "", reviewSummary = "", hubNote = "";
+            public int atriumStage, dueCount;
+            public bool canEnterWing, canLeaveWing, v02Complete, resumed;
+            public string hubNote = "";
+            // Build F: the practice fork, the sitting, the gate, the journal
+            public string fork = "", practiceMode = "", practiceSign = "", practiceSummary = "", journalSection = "";
+            public bool practicing, gated, journal, canContinueLesson, canEnterPractice, canLeavePractice, canOpenJournal, canCloseJournal, canJournalNext, canJournalPrev;
+            public int practiceIndex, practiceCount, strikes, sitting, journalPage, journalCount;
+            public string[] journalEntries;
             public string sunSign = "";
             public int locksFilled;
             // v0.4 tap-to-move
@@ -384,7 +389,7 @@ namespace Ascendant.CelestialDial
                 Lesson.Phase==LessonPhase.OppositesComplete ? "Six pairs. The wheel's last pattern is yours." :
                 Lesson.Phase==LessonPhase.Key4 ? "Three signs built. Keeper Key 4 earned." :
                 Lesson.InBuilder ? "The builder · sign " + Mathf.Clamp(Lesson.BuilderStep == 0 ? Lesson.Built : Lesson.Built + 1, 1, 3) + " of 3" :
-                Lesson.Phase==LessonPhase.Review ? "Checking the seals" :
+                Lesson.Phase==LessonPhase.Review ? Lesson.ReviewHeader :
                 Lesson.IsProblem ? (Lesson.Phase==LessonPhase.Guided || Lesson.Phase==LessonPhase.ModalityGuided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example"; // no level numbers on screen (owner, Sept 13)
             subtitle.text=Lesson.InBuilder ? "The Builder" : Lesson.InOpposites ? "The Last Pattern" : Lesson.InModalities ? "The Second Pattern" : "The Elemental Pattern"; // placeholder unit names (owner writes)
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
@@ -418,7 +423,7 @@ namespace Ascendant.CelestialDial
                 bool dormant=Lesson.DialDormant && !waking;
                 seatTexts[i].color=dormant ? new Color(Bone.r,Bone.g,Bone.b,.3f) : Bone;
                 Slots.Paint(seats[i].GetComponent<Image>(),dormant ? new Color(.1f,.1f,.12f) : Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f),dormant ? .35f : Lesson.Lit[i] ? 1f : .6f); // Build E: a seat file dims the same way
-                geometry.Dormant=dormant; if(faceImage.gameObject.activeSelf) faceImage.color=dormant ? new Color(.4f,.4f,.4f) : Color.white;
+                geometry.Dormant=dormant; geometry.Dim=Lesson.Phase==LessonPhase.Review; if(faceImage.gameObject.activeSelf) faceImage.color=dormant ? new Color(.4f,.4f,.4f) : Color.white;
                 seats[i].interactable=Lesson.Dial.Active && !busy;
             }
         }

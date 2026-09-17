@@ -18,13 +18,14 @@ namespace Ascendant.CelestialDial
         public int state;      // ItemState
         public int streak;     // running evidence score (Mastery & Mistakes: +1 per eligible success, -1 per miss, floor 0)
         public int interval;   // index into ReviewDeck.Ladder
-        public int dueDay;     // the sitting (completed Check the Seals count) at which the item is ready again
+        public int dueDay;     // the sitting (practice entries on the Dial; Build F) at which the item is ready again
         public bool entered;   // has entered the deck
         public ItemState State => (ItemState)state;
     }
 
-    // Mastery & Mistakes scheduler with the Q05 ladder 1 → 3 → 7 → 14 → 30, counted in sittings (completed Check the Seals
-    // batches) rather than days: the owner removed in-game time on September 13 (Q05 amendment). Never called a test in copy.
+    // Mastery & Mistakes scheduler with the Q05 ladder 1 → 3 → 7 → 14 → 30, counted in sittings rather than days: the owner removed
+    // in-game time on September 13 (Q05 amendment). A sitting is one entry to the practice fork on the Dial (the sitting rule, Sept 17;
+    // Build F), so the clock always moves. Never called a test in copy.
     public sealed class ReviewDeck
     {
         public static readonly int[] Ladder = { 1, 3, 7, 14, 30 };
@@ -32,8 +33,8 @@ namespace Ascendant.CelestialDial
         public const int Kinds = 5;
         public readonly ReviewItem[] Items = Enumerable.Range(0, 12 * Kinds).Select(i => new ReviewItem { seat = i % 12, kind = i / 12 }).ToArray();
         public ReviewItem Item(int seat, ItemKind kind) => Items[(int)kind * 12 + Zodiac.Wrap(seat)];
-        // Deck as data (owner, Sept 15): the grid and opposite items are scheduled like the rest but have no review form until the
-        // lesson/review fork on the instrument ships; Check the Seals never asks them.
+        // Deck as data (owner, Sept 15): the grid and opposite items are scheduled like the rest but have no practice form yet;
+        // practice never asks them. The journal shows them (Build F).
         public static bool Reviewable(ItemKind kind) => kind != ItemKind.Grid && kind != ItemKind.Opposite;
         public event Action<string> Logged;
 
@@ -81,7 +82,7 @@ namespace Ascendant.CelestialDial
     [Serializable]
     public sealed class SaveData
     {
-        public int version = 3;
+        public int version = 4;      // 4: Build F writes sittings (reviewsChecked is read from older saves)
         public string playerName = "";
         public int sunSign = -1;
         public bool[] lit = new bool[12];
@@ -93,7 +94,8 @@ namespace Ascendant.CelestialDial
         public int keys;
         public int glyphStage;      // 0 not started, 1 Part A done, 2 Part B done (Key 2)
         public int glyphIndex;      // next glyph in zodiac order within the current part
-        public int reviewsChecked;
+        public int reviewsChecked;  // through Build E: completed Check the Seals batches; read as the sitting count by Build F
+        public int sittings;        // Build F: entries to the practice fork (the sitting rule, Sept 17)
         public int cleanRuns;       // v0.3 revision, build 3
         public bool[] litMod = new bool[12]; // Build A: modality unit
         public bool[] kinMod = new bool[3];

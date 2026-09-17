@@ -9,6 +9,7 @@ namespace Ascendant.CelestialDial
         public DialView View;
         public bool Dormant;
         public bool RingHidden; // Build E: a dial-face file draws the ring
+        public bool Dim;        // Build F: the family lines fade during practice so a check never looks like the lesson
         readonly RectTransform[] lines = new RectTransform[60];
         public void Redraw()
         {
@@ -34,7 +35,7 @@ namespace Ascendant.CelestialDial
                     int index=48+family*3+i;
                     bool show=View!=null && View.Lesson!=null && View.Lesson.Kin[family];
                     lines[index].gameObject.SetActive(show);
-                    if(show)Line(index,View.SeatPosition(family+4*i)*.77f,View.SeatPosition(family+4*((i+1)%3))*.77f,new Color(.62f,.57f,.53f));
+                    if(show)Line(index,View.SeatPosition(family+4*i)*.77f,View.SeatPosition(family+4*((i+1)%3))*.77f,Dim ? new Color(.62f,.57f,.53f,.28f) : new Color(.62f,.57f,.53f));
                 }
         }
         void Line(int index,Vector2 a,Vector2 b,Color color)

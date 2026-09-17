@@ -96,7 +96,7 @@ const path=require('path');
     // ---- v0.2: the return ----
     const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'],ELEMENTS=['Fire','Earth','Air','Water'],ELEMENT_OF=i=>ELEMENTS[i%4];
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
-    check((await state()).atriumStage===2 && (await state()).dueCount>=6,'the Chamber leads to the Hub in Stage 2 with a batch of seals ready at once, no in-game time, at '+viewport.width);
+    check((await state()).atriumStage===2 && (await state()).dueCount>=6,'the Chamber leads to the Hub in Stage 2 with twelve items ready for practice at once, no in-game time, at '+viewport.width);
     // ---- v0.4: tap-to-move ----
     const atriumState=await state();
     check(atriumState.room==='atrium' && atriumState.avatarAt==='entry' && ['desk','wing-door','caspar','sealed-left','chamber-door'].every(id=>atriumState.pois.includes(id)) && atriumState.canEnterChamber && atriumState.keysInHand===0,'the Atrium lists its points of interest, the Chamber doorway among them, with the marker where you came in at '+viewport.width);
@@ -108,31 +108,17 @@ const path=require('path');
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
     await semantic('mute');await page.waitForFunction(()=>window.ascendantDial.snapshot().muted);check((await page.locator('#mute').getAttribute('aria-pressed'))==='true','the test sound toggle mutes from the Atrium and says so at '+viewport.width); // Build E
     await semantic('mute');await page.waitForFunction(()=>!window.ascendantDial.snapshot().muted);
-    await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial');
-    let reloadedMidReview=false;
-    for(let n=0;n<6;n++){
-      try{await page.waitForFunction(i=>window.ascendantDial.snapshot().reviewIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().reviewMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});}
-      catch(e){console.error('review loop stalled at item '+n+': '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-12).map(x=>x.event_name+'@'+x.input_method)));throw e;}
-      const s=await state();const seat=SIGNS.indexOf(s.reviewSign);
-      if(s.reviewMode==='dial'){
-        await semantic('seat-'+((seat+(s.step||4))%12));
-        if(n===0){ // the owner's thumb path: the Seal on the canvas must not be covered by the Wing's Back button
-          if(!reloadedMidReview){reloadedMidReview=true;const before=(await state()).dueCount;await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-            check((await state()).dueCount===before,'a reload during the review keeps the deck and its ready count at '+viewport.width);
-            await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review'&&window.ascendantDial.snapshot().reviewMode==='dial',{},{timeout:15000});
-            await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await semantic('seat-'+((seat+(s.step||4))%12));await page.waitForTimeout(150);}
-          const committed=events.filter(e=>e.event_name==='answer_committed').length;await tap(0,654);await page.waitForTimeout(400);
-          check(events.filter(e=>e.event_name==='answer_committed').length===committed+1,'the review\'s Seal answers a canvas tap; nothing covers it at '+viewport.width);
-        } else await semantic('seal');
-      }
-      else if(s.reviewMode==='modality'){await semantic('modality-'+(seat%3));}
-      else{if(n===1)await page.screenshot({path:path.join(out,viewport.width+'-review-tap.png')});await semantic('element-'+(seat%4));}
-    }
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().reviewMode==='done'&&window.ascendantDial.snapshot().canLeaveReview,{},{timeout:20000});
-    check((await state()).reviewSummary.startsWith('6 of 6'),'six seals held through compressed Dial and direct tap at '+viewport.width);
-    check(events.some(e=>e.event_name==='review_started') && events.some(e=>e.event_name==='review_finished'),'review events at '+viewport.width);
-    await semantic('leave-review');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
-    check((await state()).avatarAt==='desk','the review leaves the marker at the desk at '+viewport.width);
+    // ---- Build F: the desk is dressing, the journal is in the inventory, the fork is on the Dial, practice is the sitting ----
+    check((await page.locator('#enter-seals').count())===0 && (await page.locator('#open-journal').count())===1,'Check the Seals is gone from the page; the journal has a control at '+viewport.width);
+    await semantic('poi-desk');await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='desk'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).note.includes('journal') && (await state()).canOpenJournal,'the desk only speaks; the journal is in hand at the Atrium at '+viewport.width);
+    await semantic('open-journal');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='journal',{},{timeout:5000});
+    { const j=await state(); check(j.journal && j.journalEntries.length===12 && j.journalEntries[0].startsWith('Aries — Fire') && !j.canJournalNext && !j.canJournalPrev && j.journalSection==='The elements' && j.caspar.includes('journal'),'the journal opens from the Atrium on twelve element entries, one section so far, at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-journal.png')});
+    check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll in the journal at '+viewport.width);
+    await tap(0,714); // Close the journal, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});
+    check((await state()).avatarAt==='desk','the journal closes back to the Atrium, the marker where it stood, on a canvas tap at '+viewport.width);
     await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().walking&&window.ascendantDial.snapshot().walkTarget==='wing-door',{},{timeout:5000});
     await page.screenshot({path:path.join(out,viewport.width+'-walk.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -143,8 +129,83 @@ const path=require('path');
     check(!(await state()).walking,'before the wheel is lit the shelf only says it is dark at '+viewport.width);
     await semantic('poi-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('table is bare'),{},{timeout:5000});
     check(!(await state()).walking && !(await state()).gridOpen,'before the modality unit the table only says it is bare at '+viewport.width);
-    await semantic('enter-dial');await waitActive('Gemini');
-    check((await state()).avatarAt==='dial','the Dial opens once the marker reaches it at '+viewport.width);
+    await semantic('enter-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveWing,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
+    check((await state()).avatarAt==='dial' && (await state()).canEnterPractice && (await state()).canContinueLesson && !(await state()).active && (await state()).canLeaveWing,'the Dial opens once the marker reaches it, on the fork: the lesson or practice, nothing started, Back still offered, at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-fork.png')});
+    await tap(78,714); // Practice what you know, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice'&&window.ascendantDial.snapshot().practiceMode==='dial',{},{timeout:10000});
+    check((await state()).sitting===1 && (await state()).practiceCount===6 && (await state()).phase==='Practice · 1 of 6' && (await state()).canLeavePractice && !(await state()).canLeaveWing,'a canvas tap on the fork opens practice as the first sitting: six items, headed as practice, an exit on the item, no Back over the Seal at '+viewport.width);
+    let reloadedMidPractice=false;
+    const practiceItem=async(n,wrong)=>{
+      try{await page.waitForFunction(i=>window.ascendantDial.snapshot().practiceIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().practiceMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});}
+      catch(e){console.error('practice loop stalled at item '+n+': '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-12).map(x=>x.event_name+'@'+x.input_method)));throw e;}
+      const s=await state();const seat=SIGNS.indexOf(s.practiceSign);
+      if(s.practiceMode==='dial'){await semantic('seat-'+((seat+(s.step||4)+(wrong?1:0))%12));await semantic('seal');}
+      else if(s.practiceMode==='modality'){await semantic('modality-'+((seat+(wrong?1:0))%3));}
+      else if(s.practiceMode==='glyph'){const opts=s.glyphOptions;await semantic('glyph-name-'+(wrong?(opts.indexOf(SIGNS[seat])+1)%4:opts.indexOf(SIGNS[seat])));}
+      else{await semantic('element-'+((seat+(wrong?1:0))%4));}
+      await page.waitForTimeout(250);
+    };
+    for(let n=0;n<6;n++){
+      await page.waitForFunction(i=>window.ascendantDial.snapshot().practiceIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().practiceMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});
+      const s=await state();const seat=SIGNS.indexOf(s.practiceSign);
+      if(s.practiceMode==='dial'){
+        await semantic('seat-'+((seat+(s.step||4))%12));
+        if(n===0){ // the owner's thumb path: the Seal on the canvas must not be covered by the Wing's Back button
+          if(!reloadedMidPractice){reloadedMidPractice=true;const before=(await state()).dueCount;await page.screenshot({path:path.join(out,viewport.width+'-practice-dial.png')});await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+            check((await state()).dueCount===before && (await state()).sitting===1,'a reload during practice keeps the deck, its ready count, and the sitting at '+viewport.width);
+            await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+            await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+            await semantic('enter-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice'&&window.ascendantDial.snapshot().practiceMode==='dial',{},{timeout:15000});
+            check((await state()).sitting===2,'practice after the reload is the second sitting at '+viewport.width);
+            await page.waitForFunction(()=>window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});await semantic('seat-'+((seat+(s.step||4))%12));await page.waitForTimeout(150);}
+          const committed=events.filter(e=>e.event_name==='answer_committed').length;await tap(0,654);await page.waitForTimeout(400);
+          check(events.filter(e=>e.event_name==='answer_committed').length===committed+1,'the practice\'s Seal answers a canvas tap; nothing covers it at '+viewport.width);
+        } else await semantic('seal');
+      }
+      else if(s.practiceMode==='modality'){await semantic('modality-'+(seat%3));}
+      else{if(n===1)await page.screenshot({path:path.join(out,viewport.width+'-practice-tap.png')});await semantic('element-'+(seat%4));}
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().practiceMode==='done'&&window.ascendantDial.snapshot().canLeavePractice,{},{timeout:20000});
+    check((await state()).practiceSummary.startsWith('6 of 6'),'six remembered through compressed Dial and direct tap at '+viewport.width);
+    check(events.some(e=>e.event_name==='practice_started') && events.some(e=>e.event_name==='practice_finished') && events.some(e=>e.event_name==='sitting_2'),'practice and sitting events at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-practice-done.png')});
+    await semantic('leave-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:10000});
+    // the other six at the third sitting; nothing due at the fourth still counts; three wrong answers at the fifth close the instrument; the journal from the room; re-entry with fresh strikes
+    await semantic('enter-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice',{},{timeout:10000});
+    check((await state()).sitting===3 && (await state()).practiceCount===6,'the other six are due at the third sitting at '+viewport.width);
+    for(let n=0;n<6;n++)await practiceItem(n,false);
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().practiceMode==='done'&&window.ascendantDial.snapshot().canLeavePractice,{},{timeout:20000}); // the last answer's beat must settle before the exit is taken
+    await semantic('leave-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:10000});
+    await semantic('enter-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().sitting===4&&!window.ascendantDial.snapshot().busy,{},{timeout:10000});
+    check((await state()).screen==='wing' && (await state()).message.startsWith('Nothing is ready') && (await state()).fork==='both','with every item scheduled ahead the entry still counts a sitting; Caspar says nothing is due; the fork stays at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-nothing-due.png')});
+    await semantic('enter-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice'&&window.ascendantDial.snapshot().sitting===5,{},{timeout:10000});
+    check((await state()).strikes===0 && (await state()).practiceCount===6,'one sitting on, six items are due again, fresh strikes at '+viewport.width);
+    for(let n=0;n<3;n++){
+      await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy&&!window.ascendantDial.snapshot().gated&&window.ascendantDial.snapshot().screen==='practice'&&(window.ascendantDial.snapshot().practiceMode!=='dial'||window.ascendantDial.snapshot().active),{},{timeout:20000});
+      const s=await state();const seat=SIGNS.indexOf(s.practiceSign);
+      if(s.practiceMode==='dial'){await semantic('seat-'+((seat+(s.step||4)+1)%12));await semantic('seal');}
+      else if(s.practiceMode==='modality')await semantic('modality-'+((seat+1)%3));
+      else await semantic('element-'+((seat+1)%4));
+      await page.waitForTimeout(300);
+    }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&window.ascendantDial.snapshot().gated&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+    check((await state()).strikes===3 && (await state()).caspar.startsWith('Three misses') && (await state()).canOpenJournal && events.some(e=>e.event_name==='practice_gated'),'the third wrong answer closes the instrument into the room, the journal offered, nobody locked out, at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-gate.png')});
+    await tap(0,774); // Your journal, on the canvas, from the Wing room
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='journal',{},{timeout:5000});
+    await semantic('close-journal');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().gated&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('enter-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice',{},{timeout:10000});
+    check((await state()).strikes===0 && (await state()).sitting===6,'re-entry is immediate with fresh strikes and a new sitting at '+viewport.width);
+    await semantic('leave-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().canLeaveWing&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // one press from the Dial walks out through the room
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('enter-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('continue-lesson');await waitActive('Gemini');
+    check((await state()).avatarAt==='dial' && (await state()).fork==='none','the lesson continues from the fork at '+viewport.width);
     check((await state()).hintLevel===0 && !(await state()).phase.includes('Help level'),'Unit 1.1 continues on the player\'s own, no level numbers on screen, at '+viewport.width);
     for(const [from,to] of [[2,6],[6,10],[3,7],[7,11]]){await waitActive(SIGNS[from]);await semantic('seat-'+to);await semantic('seal');}
     await page.waitForFunction(()=>window.ascendantDial.snapshot().wheelComplete&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
@@ -247,7 +308,8 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-practice-hard.png')});
     await semantic('close-book');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     // ---- Build A: the modalities on the Dial ----
-    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='modalities'&&window.ascendantDial.snapshot().active,{},{timeout:15000});
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('continue-lesson');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='modalities'&&window.ascendantDial.snapshot().active,{},{timeout:15000});
     check((await state()).step===3 && (await state()).start==='Start: Taurus' && (await state()).message.includes('second pattern'),'after Key 2 the Dial opens the modality unit at the sun sign, three forward, at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-modalities.png')});
     for(let n=0;n<12;n++){
@@ -266,21 +328,27 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-modalities-complete.png')});
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     let sawModality=false;
-    for(let round=0;round<3&&!sawModality;round++){
-    await semantic('enter-seals');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='review',{},{timeout:15000});
+    for(let round=0;round<6&&!sawModality;round++){ // three kinds, thirty-six items: older items come first
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().canEnterPractice&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('enter-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice'||window.ascendantDial.snapshot().message.startsWith('Nothing is ready'),{},{timeout:15000});
+    if((await state()).screen==='practice'){
     for(let n=0;n<6;n++){
-      await page.waitForFunction(i=>window.ascendantDial.snapshot().reviewIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().reviewMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});
-      const r=await state();if(r.reviewMode==='done')break;const seat=SIGNS.indexOf(r.reviewSign);
-      if(r.reviewMode==='dial'){if(r.step===3)sawModality=true;await semantic('seat-'+((seat+(r.step||4))%12));await semantic('seal');}
-      else if(r.reviewMode==='modality'){sawModality=true;if(n===1)await page.screenshot({path:path.join(out,viewport.width+'-review-modality.png')});await semantic('modality-'+(seat%3));}
-      else if(r.reviewMode==='tap')await semantic('element-'+(seat%4));
+      await page.waitForFunction(i=>window.ascendantDial.snapshot().practiceIndex===i&&!window.ascendantDial.snapshot().busy&&(window.ascendantDial.snapshot().practiceMode!=='dial'||window.ascendantDial.snapshot().active),n,{timeout:20000});
+      const r=await state();if(r.practiceMode==='done')break;const seat=SIGNS.indexOf(r.practiceSign);
+      if(r.practiceMode==='dial'){if(r.step===3)sawModality=true;await semantic('seat-'+((seat+(r.step||4))%12));await semantic('seal');}
+      else if(r.practiceMode==='modality'){sawModality=true;if(n===1)await page.screenshot({path:path.join(out,viewport.width+'-practice-modality.png')});await semantic('modality-'+(seat%3));}
+      else if(r.practiceMode==='tap')await semantic('element-'+(seat%4));
       else{const opts=r.glyphOptions;await semantic('glyph-name-'+opts.indexOf(SIGNS[seat]));}
       await page.waitForTimeout(250);
     }
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().reviewMode==='done'&&window.ascendantDial.snapshot().canLeaveReview,{},{timeout:20000});
-    await semantic('leave-review');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().practiceMode==='done'&&window.ascendantDial.snapshot().canLeavePractice,{},{timeout:20000});
+    await semantic('leave-practice');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     }
-    check(sawModality,'a review batch carries modality items within three checks at '+viewport.width);
+    if((await state()).screen==='wing'){await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveWing,{},{timeout:15000});}
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // one press from the Dial walks out through the room
+    }
+    check(sawModality,'a practice carries modality items within six sittings at '+viewport.width);
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check((await state()).modalitiesComplete && (await state()).gridOpen && !(await state()).gridStarted,'a reload keeps the modality unit complete, and the table has woken at '+viewport.width);
     // ---- Build B: the table and Key 3 ----
@@ -349,7 +417,8 @@ const path=require('path');
     const startSeat=async()=>SIGNS.indexOf((await state()).start.replace('Start: ',''));
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).caspar.includes('last pattern'),'with three Keys the room points at the wheel\'s last pattern at '+viewport.width);
-    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='opposites'&&window.ascendantDial.snapshot().canContinue,{},{timeout:15000});
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await semantic('continue-lesson');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='opposites'&&window.ascendantDial.snapshot().canContinue,{},{timeout:15000});
     check(!(await state()).polarityShown && (await state()).message.startsWith('One more thing the wheel keeps') && !(await state()).active && !(await state()).canLeaveWing,'after Key 3 the Dial opens the polarity beat; the Back button stays off its Continue at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-polarity.png')});
     await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().polarityShown,{},{timeout:5000});
@@ -455,7 +524,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===28&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===30&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
     await act('birth-known');await art.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await art.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');
@@ -477,9 +546,9 @@ const path=require('path');
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===28&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 28 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===30&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 28 art and 7 sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===28&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===30&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');

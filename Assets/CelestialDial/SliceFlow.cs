@@ -4,14 +4,15 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Review, WingRoom, Book, Grid, ChamberRoom }
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal }
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
 
     [Serializable]
     public sealed class ReviewTask { public int seat; public int mode; public int misses; public bool done; public bool correct; public ReviewMode Mode => (ReviewMode)mode; }
 
-    // The locked v0.1 flow (Q06) plus the locked v0.2 loop (Q05): Hub with two entrances, Check the Seals,
-    // Unit 1.1 continuation, session day, local save. Pure state, no Unity types.
+    // The locked v0.1 flow (Q06) plus the locked v0.2 loop (Q05) as amended Sept 15 and 17 (Build F): the Atrium's one entrance,
+    // the practice fork on the Dial (one entry = one sitting), the three-strikes gate, the journal in the inventory,
+    // Unit 1.1 continuation, local save. Pure state, no Unity types.
     public sealed class SliceFlow
     {
         public SliceScreen Screen { get; private set; } = SliceScreen.Identity;
@@ -100,13 +101,12 @@ namespace Ascendant.CelestialDial
         }
         public void RecordCleanRun() { CleanRuns++; Logged?.Invoke("clean_run_recorded"); }
         public bool V03Complete => Keys >= 2 && AtriumStage >= 4;
-        public int ReviewsChecked { get; private set; }
         // v0.4: the marker that walks the Atrium and the Wing room (Q06 phase 2).
         public readonly Walker Walk = new Walker();
         public readonly List<ReviewTask> ReviewQueue = new List<ReviewTask>();
         public int ReviewIndex { get; private set; }
         public ReviewTask CurrentReview => ReviewIndex < ReviewQueue.Count ? ReviewQueue[ReviewIndex] : null;
-        public string ReviewSummary { get; private set; } = "";
+        public string PracticeSummary { get; private set; } = "";
         public event Action<string> Logged;
         readonly Func<int> random;
         public SliceFlow() : this(null) { }
@@ -116,8 +116,10 @@ namespace Ascendant.CelestialDial
             Deck.Logged += n => Logged?.Invoke(n);
             Walk.Logged += n => Logged?.Invoke(n);
         }
-        // No in-game time (owner, Sept 13): the deck counts sittings, one per completed Check the Seals batch.
-        public int Sitting => ReviewsChecked;
+        // No in-game time (owner, Sept 13): the deck counts sittings. The sitting rule (owner, Sept 17): one entry to the practice
+        // fork on the Dial is one sitting, due items or not, so the ladder can never stall (the Sept 16 audit's deadlock).
+        public int Sittings { get; private set; }
+        public int Sitting => Sittings;
         public string DisplayName => string.IsNullOrEmpty(PlayerName) ? "Keeper" : PlayerName;
         public void SetName(string name) { PlayerName = (name ?? "").Trim(); }
         public void ChooseBirth(string choice)
@@ -233,19 +235,87 @@ namespace Ascendant.CelestialDial
         public void MarkKey2() { if (Keys < 2) { Keys = 2; GlyphStage = 2; } } // the lesson logs key2_earned once
         public void RecordGlyphAnswer(int seat, bool eligible) { Deck.RecordLesson(seat, eligible, Sitting, ItemKind.Glyph); }
         public void RecordLessonAnswer(int seat, bool eligible) { if (AtriumStage >= 2 || Deck.Items[seat].entered) Deck.RecordLesson(seat, eligible, Sitting); else Deck.RecordLesson(seat, eligible, Sitting); }
-        public int DueCount => Deck.DueForReview(Sitting).Count; // grid items are data only until the review fork ships
-        public bool CanCheckSeals => AtHub && DueCount > 0;
-        public bool EnterSeals()
+        public int DueCount => Deck.DueForReview(Sitting).Count; // grid and opposite items are data only (no practice form yet)
+        // ---- Build F: the practice fork on the Dial (Sept 15 ruling), the sitting rule (Sept 17), the three-strikes gate, the journal ----
+        public const int StrikeLimit = 3;                          // three wrong answers across one practice close the instrument (owner, Sept 15)
+        public int Strikes { get; private set; }                  // session only, never saved; fresh on every entry
+        public bool PracticeAvailable => Deck.Items.Any(i => i.entered && ReviewDeck.Reviewable(i.Kind));
+        public bool AtDial => Screen == SliceScreen.Wing;
+        public bool AtPractice => Screen == SliceScreen.Practice;
+        public bool CanEnterPractice => AtDial && AtriumStage >= 2 && PracticeAvailable;
+        public const string NothingDueLine = "Nothing is ready to practice yet. The wheel will have more for you after the next lesson."; // placeholder (owner writes)
+        public const string GateLine = "Three misses. Let the instrument rest a moment.\nYour journal is below, if you want it; the wheel is ready when you are."; // placeholder (owner writes); two lines: the room caption holds two
+        public const string DeskLine = "The desk is clear. What Caspar used to keep here, you carry now: your journal."; // placeholder (owner writes)
+        // One entry is one sitting, whether or not anything is due; nothing due says so and the fork stays.
+        public bool EnterPractice()
         {
-            if (!AtHub) return false;
+            if (!CanEnterPractice) return false;
+            Sittings++; Logged?.Invoke("sitting:" + Sittings);
+            Strikes = 0; ReviewQueue.Clear(); ReviewIndex = 0; PracticeSummary = "";
             var due = Deck.DueForReview(Sitting);
-            if (due.Count == 0) { Note = "The seals hold for now. Come back after the Wing."; Logged?.Invoke("seals_nothing_due"); return false; } // placeholder (owner writes)
-            ReviewQueue.Clear(); ReviewIndex = 0; ReviewSummary = ""; Note = "";
+            if (due.Count == 0) { Note = NothingDueLine; Logged?.Invoke("practice_nothing_due"); return false; }
+            Note = "";
             // Form is a test variable (Q05 decision 2): alternate compressed Dial and direct tap.
             for (int i = 0; i < due.Count && i < ReviewDeck.BatchSize; i++)
                 ReviewQueue.Add(new ReviewTask { seat = due[i].seat, mode = (int)(due[i].Kind == ItemKind.Glyph ? ReviewMode.Glyph : due[i].Kind == ItemKind.Modality ? (i % 2 == 0 ? ReviewMode.DialModality : ReviewMode.TapModality) : i % 2 == 0 ? ReviewMode.Dial : ReviewMode.Tap) });
-            Screen = SliceScreen.Review; Logged?.Invoke("review_started"); return true;
+            Screen = SliceScreen.Practice; Logged?.Invoke("practice_started"); return true;
         }
+        public bool PracticeDone => AtPractice && ReviewIndex >= ReviewQueue.Count;
+        // An exit at any point: the unanswered items simply stay due at this sitting.
+        public bool LeavePractice()
+        {
+            if (!AtPractice) return false;
+            bool early = !PracticeDone;
+            ReviewQueue.Clear(); ReviewIndex = 0; Note = "";
+            Screen = SliceScreen.Wing; Logged?.Invoke(early ? "practice_left" : "practice_closed"); return true;
+        }
+        public void RecordStrike() { if (!AtPractice) return; Strikes++; Logged?.Invoke("strike:" + Strikes); }
+        public bool Gated => AtPractice && Strikes >= StrikeLimit;
+        // The gate: the instrument closes and the player is in the room, journal in hand, never locked out; re-entry is immediate.
+        public bool CloseInstrument()
+        {
+            if (!Gated) return false;
+            ReviewQueue.Clear(); ReviewIndex = 0;
+            Screen = SliceScreen.WingRoom; Note = "gated"; Logged?.Invoke("practice_gated"); return true;
+        }
+        public bool ApproachDesk()
+        {
+            if (!AtHub) return false;
+            Note = DeskLine; Logged?.Invoke("desk_approached"); return true;
+        }
+        // The journal: in the inventory, opened from any room; renders straight from the deck; reading changes nothing (08: exposure only).
+        public static readonly ItemKind[] JournalOrder = { ItemKind.Element, ItemKind.Glyph, ItemKind.Modality, ItemKind.Grid, ItemKind.Opposite };
+        public static string SectionTitle(ItemKind kind) => kind == ItemKind.Element ? "The elements" : kind == ItemKind.Glyph ? "The symbols" : kind == ItemKind.Modality ? "The kinds" : kind == ItemKind.Grid ? "The table" : "The opposites"; // placeholder (owner writes)
+        public List<ItemKind> JournalSections => JournalOrder.Where(k => Deck.Items.Any(i => i.Kind == k && i.entered)).ToList();
+        public int JournalSection { get; private set; }
+        public SliceScreen JournalFrom { get; private set; } = SliceScreen.Hub;
+        public bool AtJournal => Screen == SliceScreen.Journal;
+        public bool CanOpenJournal => (AtHub || AtWingRoom || AtChamberRoom) && JournalSections.Count > 0;
+        public bool OpenJournal()
+        {
+            if (!CanOpenJournal) return false;
+            JournalFrom = Screen; JournalSection = 0; Screen = SliceScreen.Journal; Logged?.Invoke("journal_opened"); return true;
+        }
+        public bool CloseJournal()
+        {
+            if (!AtJournal) return false;
+            Screen = JournalFrom; if (Note == "gated") Note = ""; Logged?.Invoke("journal_closed"); return true;
+        }
+        public bool CanJournalNext => AtJournal && JournalSection < JournalSections.Count - 1;
+        public bool CanJournalPrev => AtJournal && JournalSection > 0;
+        public bool JournalNext() { if (!CanJournalNext) return false; JournalSection++; Logged?.Invoke("journal_page:" + JournalSection); return true; }
+        public bool JournalPrev() { if (!CanJournalPrev) return false; JournalSection--; Logged?.Invoke("journal_page:" + JournalSection); return true; }
+        public ItemKind JournalKind => JournalSections.Count == 0 ? ItemKind.Element : JournalSections[Math.Min(JournalSection, JournalSections.Count - 1)];
+        public List<ReviewItem> JournalItems(ItemKind kind) => Deck.Items.Where(i => i.Kind == kind && i.entered).OrderBy(i => i.seat).ToList();
+        public static string JournalName(ReviewItem item) => item.Kind == ItemKind.Opposite ? Zodiac.Seats[item.seat].Name + " and " + Zodiac.Seats[Zodiac.Opposite(item.seat)].Name : Zodiac.Seats[item.seat].Name;
+        public static string JournalFact(ReviewItem item) =>
+            item.Kind == ItemKind.Element ? Zodiac.Seats[item.seat].Element :
+            item.Kind == ItemKind.Glyph ? "its symbol" :
+            item.Kind == ItemKind.Modality ? Zodiac.ModalityAt(item.seat) :
+            item.Kind == ItemKind.Grid ? Zodiac.Seats[item.seat].Element + " · " + Zodiac.ModalityAt(item.seat) :
+            "opposites: six seats apart";
+        public static string StateWord(ReviewItem item) => item.State == ItemState.Practicing ? "practicing" : "introduced"; // 08's names for the two states a prototype can show
+        public List<string> JournalEntries(ItemKind kind) => JournalItems(kind).Select(i => JournalName(i) + " — " + JournalFact(i) + " · " + StateWord(i)).ToList();
         // Direct-tap item: which element does this sign belong to? One nudge, then reveal and move on.
         // Glyph review item: which sign is this mark? Four names, stable per seat (same options as the lesson).
         public int[] GlyphReviewOptions(int seat) => DialLesson.OptionsFor(seat, CleanRuns > 0, CleanRuns); // harder names once a clean run is on record
@@ -254,7 +324,7 @@ namespace Ascendant.CelestialDial
             var task = CurrentReview; if (task == null || task.Mode != ReviewMode.Glyph || task.done) return false;
             bool correct = Zodiac.Wrap(seat) == task.seat;
             if (correct) { FinishReview(true, task.misses == 0); return true; }
-            task.misses++;
+            task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
             Note = "Not that one. Try once more."; return false;
         }
@@ -263,7 +333,7 @@ namespace Ascendant.CelestialDial
             var task = CurrentReview; if (task == null || task.Mode != ReviewMode.TapModality || task.done) return false;
             bool correct = Zodiac.ModalityAt(task.seat) == modality;
             if (correct) { FinishReview(true, task.misses == 0); return true; }
-            task.misses++;
+            task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
             Note = "Not that one. Try once more."; return false;
         }
@@ -272,7 +342,7 @@ namespace Ascendant.CelestialDial
             var task = CurrentReview; if (task == null || task.Mode != ReviewMode.Tap || task.done) return false;
             bool correct = Zodiac.Seats[task.seat].Element == element;
             if (correct) { FinishReview(true, task.misses == 0); return true; }
-            task.misses++;
+            task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
             Note = "Not that one. Try once more."; return false;
         }
@@ -292,15 +362,9 @@ namespace Ascendant.CelestialDial
             if (ReviewIndex >= ReviewQueue.Count)
             {
                 int right = ReviewQueue.Count(t => t.correct);
-                ReviewSummary = right + " of " + ReviewQueue.Count + " seals held."; ReviewsChecked++;
-                Logged?.Invoke("review_finished");
+                PracticeSummary = right + " of " + ReviewQueue.Count + " remembered."; // placeholder (owner writes); the sitting was counted on entry
+                Logged?.Invoke("practice_finished");
             }
-        }
-        public bool ReviewDone => Screen == SliceScreen.Review && ReviewIndex >= ReviewQueue.Count;
-        public bool LeaveReview()
-        {
-            if (Screen != SliceScreen.Review || !ReviewDone) return false;
-            Screen = SliceScreen.Hub; Note = ""; Walk.Enter(Room.Atrium, "desk"); Logged?.Invoke("screen_entered:hub"); return true;
         }
         public bool V02Complete => WheelComplete && AtriumStage >= 3;
         // ---- save / restore ----
@@ -353,7 +417,7 @@ namespace Ascendant.CelestialDial
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
                 polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), reviewsChecked = ReviewsChecked };
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
         public bool Restore(SaveData save)
@@ -361,7 +425,7 @@ namespace Ascendant.CelestialDial
             if (save == null || save.atriumStage < 2 || save.sunSign < 0) return false;
             PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = Math.Max(save.locksFilled, save.keyEarned ? 1 : 0); Ended = save.keyEarned;
-            WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; ReviewsChecked = save.reviewsChecked;
+            WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; Sittings = Math.Max(save.sittings, save.reviewsChecked); // an older save's batches count as sittings
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; ModalitiesStarted = save.modalitiesStarted; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));
             ModalitiesComplete = save.litMod != null && save.litMod.Length == 12 && save.litMod.All(v => v); GridStarted = save.gridStarted || save.keys >= 3;
             OppositesStarted = save.oppositesStarted || save.polarityShown || save.keys >= 4;
