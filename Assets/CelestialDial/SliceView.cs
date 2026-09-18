@@ -197,11 +197,11 @@ namespace Ascendant.CelestialDial
         {
             var screen = ScreenPanel(name, "atrium");
             Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
-            Block(screen, "Shelves, mostly empty", -130, 240, 60, 180, "shelves");
-            var furniture = Block(screen, "Covered furniture", 20, 300, 120, 70, "furniture-covered");
-            var cloth = Rect("Dust cloth", screen, 20, 288, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(furniture));
-            Block(screen, "Sealed door", 135, 230, 50, 150, "door-sealed");
-            var candle = Rect("Candle", screen, -60, 200, 6, 18); var candleImage = candle.gameObject.AddComponent<Image>(); Slots.Dress(candleImage, "candle"); Slots.Paint(candleImage, new Color(.5f, .42f, .3f), .7f);
+            Block(screen, "Sealed door", -135, 230, 50, 150, "door-sealed");
+            Block(screen, "Shelves, mostly empty", -55, 240, 60, 180, "shelves");
+            var furniture = Block(screen, "Covered furniture", 50, 300, 120, 70, "furniture-covered");
+            var cloth = Rect("Dust cloth", screen, 50, 288, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(furniture));
+            var candle = Rect("Candle", screen, 70, 200, 6, 18); var candleImage = candle.gameObject.AddComponent<Image>(); Slots.Dress(candleImage, "candle"); Slots.Paint(candleImage, new Color(.5f, .42f, .3f), .7f);
             Label(screen, "Dust. Covered furniture. Sealed doors. One weak candle.", 0, 405, 330, 20, 12).color = Muted;
             var panel = Rect("Caspar panel", screen, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
