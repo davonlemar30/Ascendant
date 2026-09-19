@@ -2,6 +2,12 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build H: the light overlays
+
+[ClickUp task: Build H — Light overlay slots](https://app.clickup.com/t/86bc3jd1j). The Sept 17 lighting decision (Option C): one transparent golden-hour overlay per room.
+
+`Slots.Art` gains `atrium-light`, `wing-light`, `chamber-light` (360 × 800, cap 2048; 33 slots). `SliceView.LightOverlay` puts one Image per room panel (the opening and the return share the Atrium's file with the hub) as the panel's first child, so it draws over the background and under every prop, character, caption, and control; with no file the object is inactive and nothing changes. `LightAlphaFor(stage)` is the fade: 0 at Stage 1, .25, .5, .75, then 1 at Stages 5 and 6 (the steps are a tuning variable; every room follows the Atrium stage). `ApplyLight` runs from `Show`: on a room screen a stage change fades over 0.8 s (reduced motion: at once); a reload sets the alpha before the first frame. Web state `lightAlpha`, `lightFiles`. The style page lays its slots five per row so 33 sit above the sound rows. The test set carries three translucent amber overlays. Checks: mechanical (the three slots, the alpha table, the test set at 33), the slice fixture (the three overlays dressed and the alpha matching the stage on the test set), the browser suite (the overlays resolve and stay dark in the opening; a quarter at the first Hub; full once the Wing is whole; the style page at 33).
+
 ## Build G: Caspar's lines
 
 [ClickUp task: Build G — Caspar's lines](https://app.clickup.com/t/86bc2ck78).

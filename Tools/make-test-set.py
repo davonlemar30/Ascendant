@@ -23,6 +23,7 @@ IMAGES = [
     ("door-open", 72, 100), ("door-sealed", 72, 100),
     ("mechanism", 112, 112), ("crystal-book", 36, 72), ("crystal-page", 28, 60), ("lock", 8, 8), ("keeper-key", 84, 40),
     ("journal-page", 180, 400), ("journal-cover", 60, 60),  # Build F
+    ("atrium-light", 180, 400), ("wing-light", 180, 400), ("chamber-light", 180, 400),  # Build H: translucent overlays
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
@@ -79,7 +80,13 @@ def image(index, name, width, height):
     label, scale = text_pixels(name, width, height)
     corner = 3 if min(width, height) >= 16 else 0
     walk_band = name == "keeper-walk"
+    light = name.endswith("-light")  # Build H: a translucent amber wash, brighter at the top, with diagonal shafts; the name stays readable
     def pixel(x, y):
+        if light:
+            if (x, y) in label:
+                return (255, 255, 255, 255)
+            shaft = (x + y) % 40 < 8
+            return (255, 196, 110, min(200, int(30 + 90 * (1 - y / height)) + (60 if shaft else 0)))
         if corner and (x + y < corner or (width - 1 - x) + y < corner or x + (height - 1 - y) < corner or (width - 1 - x) + (height - 1 - y) < corner):
             return (0, 0, 0, 0)  # transparent corners: alpha reaches the screen
         if (x, y) in label:

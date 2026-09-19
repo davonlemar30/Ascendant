@@ -59,7 +59,8 @@ For the owner, and anyone helping with the look. Every placeholder has a named s
 
 1. Name the file after the slot: `atrium.png`, `keeper-idle.png`, `door-open.png`; for sounds `step.wav`, `seal.wav`, `ambient.wav`.
 2. Put it in `Assets/CelestialDial/Resources/Art/` (images) or `Assets/CelestialDial/Resources/Audio/` (sounds). Unity imports it with the right settings on its own.
-3. Play. To see every slot at once with what is in it, open the **style page**: add `?style` to the game's address, or use the Editor menu *Ascendant › Greybox › Play the style page*. Add `?art=test` to the address to see the game with a test image in every slot, so you know where each one lands.
+3. The light: each room also takes a transparent **golden-hour overlay** (`atrium-light.png`, `wing-light.png`, `chamber-light.png`), drawn over the room and faded in as the Library wakes. Draw the room dormant; draw its light separately.
+4. Play. To see every slot at once with what is in it, open the **style page**: add `?style` to the game's address, or use the Editor menu *Ascendant › Greybox › Play the style page*. Add `?art=test` to the address to see the game with a test image in every slot, so you know where each one lands.
 
 Until real files arrive nothing changes: with no files the game looks and sounds exactly as it does today.
 

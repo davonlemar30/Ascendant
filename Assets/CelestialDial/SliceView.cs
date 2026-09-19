@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -56,6 +57,11 @@ namespace Ascendant.CelestialDial
         Button forkLesson, forkPractice, leavePracticeDial, journalHub, journalWing, journalChamber, journalPrev, journalNext, journalClose;
         RectTransform journal; Text journalSectionText, journalNote; Image journalCover; readonly Text[] journalGlyphs = new Text[12], journalLines = new Text[12];
         bool forkShown, gating;
+        // Build H (the Sept 17 lighting decision, Option C): one golden-hour overlay per room, over the background and under everything else, faded by the Atrium stage.
+        readonly List<Image> lightOverlays = new List<Image>(); float lightAlpha; Coroutine lightFade;
+        public float LightAlpha => lightAlpha; // fixture evidence
+        public static readonly string[] LightSlots = { "atrium-light", "wing-light", "chamber-light" };
+        public static float LightAlphaFor(int stage) => stage <= 1 ? 0f : stage == 2 ? .25f : stage == 3 ? .5f : stage == 4 ? .75f : 1f; // nothing at Stage 1, full at Stages 5–6; the steps between are a tuning variable
         const string ForkLine = "The wheel is yours. We can go on with the lesson, or you can practice what you already know."; // placeholder (owner writes)
         const string ForkPracticeOnlyLine = "Nothing new waits on the wheel today. Practice what you know, or rest."; // placeholder (owner writes)
         const string ForkReturnLine = "Back at the wheel. The lesson, or more practice: your choice."; // placeholder (owner writes)
@@ -195,7 +201,7 @@ namespace Ascendant.CelestialDial
         }
         RectTransform BuildAtrium(string name, out Text caspar, out Button next)
         {
-            var screen = ScreenPanel(name, "atrium");
+            var screen = ScreenPanel(name, "atrium"); LightOverlay(screen, "atrium-light");
             Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
             Block(screen, "Sealed door", -108, 325, 70, 100, "door-sealed");
             Block(screen, "Shelves, mostly bare", -130, 200, 60, 120, "shelves");
@@ -211,7 +217,7 @@ namespace Ascendant.CelestialDial
         }
         void BuildChamber()
         {
-            chamber = ScreenPanel("Chamber", "chamber");
+            chamber = ScreenPanel("Chamber", "chamber"); LightOverlay(chamber, "chamber-light");
             Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18);
             for (int i = 0; i < candles.Length; i++)
             { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].raycastTarget = false; Slots.Dress(candles[i], "candle"); Slots.Paint(candles[i], LampDark, DarkArt); }
@@ -248,7 +254,7 @@ namespace Ascendant.CelestialDial
         void BuildHub()
         {
             // Q05 decisions 1, 6: the Atrium in Stage 2 "Stirring" with two entrances.
-            hub = ScreenPanel("Hub", "atrium");
+            hub = ScreenPanel("Hub", "atrium"); LightOverlay(hub, "atrium-light");
             Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
             var shelves = Block(hub, "Shelves, mostly bare", -130, 200, 60, 120, "shelves"); shelvesLabel = shelves.GetComponentInChildren<Text>(); // owner (worksheet section 13)
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; Slots.Dress(shelfBooks[i], "shelf-book"); book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
@@ -376,7 +382,7 @@ namespace Ascendant.CelestialDial
         void BuildWingRoom()
         {
             // Q06 phase 2, decision 2: the Wing as a room with two points of interest, the Dial and the doorway back.
-            wingRoom = ScreenPanel("Wing room", "wing");
+            wingRoom = ScreenPanel("Wing room", "wing"); LightOverlay(wingRoom, "wing-light");
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
             var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36, "shelf");
@@ -810,6 +816,7 @@ namespace Ascendant.CelestialDial
             gridScreen.gameObject.SetActive(s == SliceScreen.Grid); if (s == SliceScreen.Grid) ShowGrid();
             bool book = s == SliceScreen.Book;
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
+            ApplyLight(roomScreen); // Build H
             if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : s == SliceScreen.WingRoom ? wingRoom : chamber, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
             avatar.gameObject.SetActive(roomScreen);
             if (s == SliceScreen.WingRoom)
@@ -1018,6 +1025,8 @@ namespace Ascendant.CelestialDial
             state.canCloseBook = s == SliceScreen.Book && !busy;
             if (s == SliceScreen.Book && !partA) state.caspar = Dial.Lesson.Message;
             if (roomScreen && !busy) state.note = hubNote.text;
+            // Build H: the light overlays
+            state.lightAlpha = lightAlpha; state.lightFiles = LightSlots.Count(slot => Slots.Image(slot) != null);
             // Build B: the table
             state.gridOpen = Flow.ModalitiesComplete; state.gridStarted = Flow.GridStarted; state.key3 = Grid.Key3Earned; state.gridPlaced = Grid.PlacedCount;
             state.gridComplete = Grid.Complete; state.gridPaused = Grid.Phase == GridPhase.Paused; state.gridHintLevel = Grid.HintLevel;
@@ -1031,6 +1040,24 @@ namespace Ascendant.CelestialDial
                 state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
             }
         }
+
+        // ---- Build H: the light overlays. A file in a room's light slot is drawn over the background and under everything else; without one nothing exists. ----
+        Image LightOverlay(RectTransform panel, string slot)
+        {
+            var r = Rect("Light overlay", panel, 0, 400, 360, 800); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false;
+            bool file = Slots.Dress(image, slot); image.gameObject.SetActive(file); image.color = new Color(1, 1, 1, 0); r.SetAsFirstSibling();
+            lightOverlays.Add(image); return image;
+        }
+        void ApplyLight(bool animate)
+        {
+            float target = LightAlphaFor(Flow.AtriumStage);
+            if (Mathf.Approximately(target, lightAlpha)) return;
+            if (lightFade != null) { StopCoroutine(lightFade); lightFade = null; }
+            if (!animate || ReducedMotion) { SetLight(target); return; }
+            lightFade = StartCoroutine(FadeLight(target));
+        }
+        void SetLight(float alpha) { lightAlpha = alpha; foreach (var overlay in lightOverlays) overlay.color = new Color(1, 1, 1, alpha); }
+        IEnumerator FadeLight(float target) { float from = lightAlpha; yield return Tween(.8f, k => SetLight(Mathf.Lerp(from, target, k))); lightFade = null; Publish(); } // the settled alpha reaches the web state
 
         // ---- Build F: the journal. In the inventory (owner, Sept 15): a button in every room, never a room object. It renders straight from the
         // deck, one section per kind the wheel has taught, only the items that have entered, in wheel order, with 08's state word. Reading changes nothing. ----
@@ -1090,7 +1117,7 @@ namespace Ascendant.CelestialDial
             Grid.Restore(save.gridPlaced, save.gridEvidence, save.gridStarted, save.keys >= 3);
             Dial.Lesson.SetKey3(save.keys >= 3); Dial.Lesson.RestoreOpposites(save.polarityShown, save.oppKnown, save.oppositesStarted, save.built, save.builderEvidence, save.keys >= 4);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: " + Math.Max(2, save.keys);
-            sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true;
+            sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true; SetLight(LightAlphaFor(save.atriumStage)); // Build H: no fade on a reload
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { FloorLight(.55f); Slots.Paint(candle, Bone, 1f); }
         }
 
@@ -1172,11 +1199,11 @@ namespace Ascendant.CelestialDial
             var note = Label(style, "Every art and sound slot with its source. Set: " + (Slots.Set == "" ? "the Art and Audio folders" : Slots.Set), 0, 44, 344, 18, 10); note.color = Muted;
             for (int i = 0; i < Slots.Art.Length; i++)
             {
-                var slot = Slots.Art[i]; float x = -129 + (i % 4) * 86, top = 62 + (i / 4) * 88;
-                var cell = Rect("Slot " + slot.Name, style, x, top + 26, 80, 52); var thumb = cell.gameObject.AddComponent<Image>(); thumb.color = PanelColor; thumb.raycastTarget = false;
+                var slot = Slots.Art[i]; float x = -136 + (i % 5) * 68, top = 62 + (i / 5) * 78; // five per row: 33 slots (Build H) sit above the sound rows
+                var cell = Rect("Slot " + slot.Name, style, x, top + 24, 62, 44); var thumb = cell.gameObject.AddComponent<Image>(); thumb.color = PanelColor; thumb.raycastTarget = false;
                 if (Slots.Dress(thumb, slot.Name)) thumb.preserveAspect = true; // the sheet keeps the file's shape; in the game the placeholder's rect wins
-                Label(style, slot.Name, x, top + 60, 86, 12, 9);
-                var source = Label(style, slot.Width + " × " + slot.Height + " · " + Slots.Source(slot.Name), x, top + 72, 86, 12, 8); source.color = Muted;
+                Label(style, slot.Name, x, top + 52, 68, 12, 8);
+                var source = Label(style, slot.Width + " × " + slot.Height + " · " + Slots.Source(slot.Name), x, top + 63, 68, 12, 7); source.color = Muted;
             }
             for (int i = 0; i < Slots.Sounds.Length; i++)
             {
