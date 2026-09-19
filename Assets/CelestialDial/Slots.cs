@@ -56,6 +56,11 @@ namespace Ascendant.CelestialDial
             new ArtSlot("crystal-page", 26, 58, 256, "the page that rises from an open Book"),
             new ArtSlot("lock", 7, 7, 32, "one lock, three per Book; lights when filled"),
             new ArtSlot("keeper-key", 84, 40, 256, "the Keeper Key rising from the Dial"),
+            // Build H (the Sept 17 lighting decision, Option C): one transparent golden-hour overlay per room, over the dormant background and
+            // under everything else, faded by the Atrium stage from nothing at Stage 1 to full at Stages 5–6.
+            new ArtSlot("atrium-light", 360, 800, 2048, "the Atrium's golden-hour light: shafts through the arches, glowing dust, warmth on the stone; over the background, faded by stage"),
+            new ArtSlot("wing-light", 360, 800, 2048, "the Zodiac Wing room's golden-hour light, over the background, faded by stage"),
+            new ArtSlot("chamber-light", 360, 800, 2048, "the Crystal Book Chamber's golden-hour light, over the background, faded by stage"),
         };
         public static readonly SoundSlot[] Sounds =
         {

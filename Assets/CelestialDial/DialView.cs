@@ -100,6 +100,7 @@ namespace Ascendant.CelestialDial
             public int keysInHand, keysSpent, booksOpen; public bool wingWhole, canEnterChamber, canLeaveChamber, atBooks;
             // Build E: art slots and sound hooks
             public string artSet = "", lastCue = ""; public int artFiles, soundFiles, cuesPlayed; public bool muted, style;
+            public float lightAlpha; public int lightFiles; // Build H: the light overlays
             public string[] styleSlots, styleSounds;
         }
         void Awake()
