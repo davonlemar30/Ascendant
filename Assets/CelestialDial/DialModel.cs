@@ -31,9 +31,10 @@ namespace Ascendant.CelestialDial
         public static string ModalityAt(int seat) => Modalities[Wrap(seat) % 3];
         // Build C: polarity is a property of the element. Fire and Air are day signs, Earth and Water night signs (Curriculum Rev 2, Stage 1:
         // "the game picks one label pair and notes the older terms"). The pair is the brief's recommendation, one constant, the owner's to swap.
-        public static readonly string[] Polarities = { "day", "night" };
+        public static readonly string[] Polarities = { "Yang", "Yin" }; // owner, Sept 17 (worksheet section 12): Fire and Air are Yang, Earth and Water Yin
         public const string OlderPolarityTerms = "masculine and feminine, or yang and yin";
-        public static string PolarityAt(int seat) => Polarities[Wrap(seat) % 2];   // the elements alternate Fire, Earth, Air, Water, so even seats are day
+        public static string Article(string element) => element == "Earth" || element == "Air" ? "an" : "a"; // "an Earth sign", "a Fire sign": the bracket substitution keeps its article
+        public static string PolarityAt(int seat) => Polarities[Wrap(seat) % 2];   // the elements alternate Fire, Earth, Air, Water, so even seats are Yang
         public static int Opposite(int seat) => Wrap(seat + 6);                     // six seats on: the sign straight across the wheel
         public const int OppositePairs = 6;
         public static int PairOf(int seat) => Wrap(seat) % OppositePairs;          // a pair is named by its lower seat

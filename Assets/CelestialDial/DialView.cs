@@ -157,7 +157,7 @@ namespace Ascendant.CelestialDial
             seal.GetComponent<Image>().color=Crimson; sealText=seal.GetComponentInChildren<Text>();
             forward = MakeButton(root,"Next",122,654,64,56,()=>Step(1,ClickMethod(DialInput.ForwardStep)));
             countButton=MakeButton(root,"Count",-60,714,100,48,()=> { Lesson.Dial.Count(); Refresh(); });
-            askButton=MakeButton(root,"Ask Caspar for help",78,714,164,48,AskCaspar); askButton.GetComponentInChildren<Text>().fontSize=13; askButton.gameObject.SetActive(false);
+            askButton=MakeButton(root,"Ask Caspar",78,714,164,48,AskCaspar); askButton.GetComponentInChildren<Text>().fontSize=13; askButton.gameObject.SetActive(false); // owner (worksheet section 8)
             next=MakeButton(root,"Continue",0,654,190,56,ContinueLesson);
             for(int i=0;i<4;i++){ int slot=i; builderNames[i]=MakeButton(root,"",-78+(i%2)*156,654+(i/2)*60,150,56,()=>BuilderName(slot)); builderNames[i].gameObject.SetActive(false); }
             for(int i=0;i<3;i++){ int property=i; builderShares[i]=MakeButton(root,DialLesson.ShareLabels[i],-110+i*110,654,104,56,()=>BuilderShare(property)); builderShares[i].GetComponentInChildren<Text>().fontSize=13; builderShares[i].gameObject.SetActive(false); }
@@ -320,7 +320,7 @@ namespace Ascendant.CelestialDial
         {
             busy=true; int beginning=Lesson.Dial.Start; int steps=Lesson.Phase==LessonPhase.GlyphWheel ? Zodiac.Wrap(Lesson.Dial.Target-beginning) : Lesson.Dial.Forward;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing();
-            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch. I turn until the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+" sits under the bracket." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
+            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch me, acolyte. I search the wheel until the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+" is selected. There, you see how it is done." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=steps;n++)
             {
@@ -378,20 +378,20 @@ namespace Ascendant.CelestialDial
             count.text=Lesson.Dial.Counting && !marks ? "Count: "+Lesson.Dial.MovementCount : "";
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
-                Lesson.Phase==LessonPhase.AllLit ? "Four families complete. The whole wheel is lit." :
-                Lesson.Phase==LessonPhase.GlyphNames ? "The symbols · " + Lesson.GlyphIndex + " of 12 named" :
-                Lesson.Phase==LessonPhase.GlyphWheel ? "The symbols, in order · " + Lesson.GlyphIndex + " of 12" :
-                Lesson.Phase==LessonPhase.Key2 ? "Twelve symbols read. Keeper Key 2 earned." :
-                Lesson.Phase==LessonPhase.ModalityComplete ? "Three kinds complete. The wheel keeps both patterns." :
+                Lesson.Phase==LessonPhase.AllLit ? "All twelve signs alight. The whole wheel burns." : // owner (worksheet section 3)
+                Lesson.Phase==LessonPhase.GlyphNames ? "Name the symbols · " + Lesson.GlyphIndex + " of 12 named" : // owner (worksheet section 5)
+                Lesson.Phase==LessonPhase.GlyphWheel ? "Find the symbols on the wheel · " + Lesson.GlyphIndex + " of 12 found" :
+                Lesson.Phase==LessonPhase.Key2 ? "All twelve symbols mastered. Keeper Key 2 earned." :
+                Lesson.Phase==LessonPhase.ModalityComplete ? "Three modalities complete. The wheel keeps both patterns." : // owner (worksheet section 10)
                 Lesson.Phase==LessonPhase.ModalityPaused ? "Paused for now" :
-                Lesson.Phase==LessonPhase.Polarity ? "The last pattern" :
+                Lesson.Phase==LessonPhase.Polarity ? "The final pattern" : // owner (worksheet section 12)
                 Lesson.Phase==LessonPhase.OppositePaused || Lesson.Phase==LessonPhase.BuilderPaused ? "Paused for now" :
-                Lesson.Phase==LessonPhase.OppositesComplete ? "Six pairs. The wheel's last pattern is yours." :
+                Lesson.Phase==LessonPhase.OppositesComplete ? "Six pairs found. The wheel's last pattern is yours." :
                 Lesson.Phase==LessonPhase.Key4 ? "Three signs built. Keeper Key 4 earned." :
                 Lesson.InBuilder ? "The builder · sign " + Mathf.Clamp(Lesson.BuilderStep == 0 ? Lesson.Built : Lesson.Built + 1, 1, 3) + " of 3" :
                 Lesson.Phase==LessonPhase.Review ? Lesson.ReviewHeader :
                 Lesson.IsProblem ? (Lesson.Phase==LessonPhase.Guided || Lesson.Phase==LessonPhase.ModalityGuided ? "Together" : Lesson.Phase==LessonPhase.Optional ? "Just for fun" : "On your own") : "Practice example"; // no level numbers on screen (owner, Sept 13)
-            subtitle.text=Lesson.InBuilder ? "The Builder" : Lesson.InOpposites ? "The Last Pattern" : Lesson.InModalities ? "The Second Pattern" : "The Elemental Pattern"; // placeholder unit names (owner writes)
+            subtitle.text=Lesson.InBuilder ? "The Builder" : Lesson.InOpposites ? "Polarity and Opposites" : Lesson.InModalities ? "The Modalities" : "The Elemental Pattern"; // owner unit names (worksheet sections 10 and 12)
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;

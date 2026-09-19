@@ -2,6 +2,12 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build G: Caspar's lines
+
+[ClickUp task: Build G — Caspar's lines](https://app.clickup.com/t/86bc2ck78).
+
+Copy only: the owner's worksheet rewrites (sections 1–13) applied verbatim across `SliceView`, `SliceFlow`, `DialLesson`, `DialView`, `GridModel`, and the web template's labels, with the game's bracket substitutions kept (`[sign]`, `[element]`, `[modality]`, `[n]`). `Zodiac.Polarities` is `Yang` / `Yin` (even seats, Fire and Air, are Yang); `DialLesson.ShareLabels` is Modality / Polarity / Element; `GridModel.Rule` and the table's misses say "square"; the tile labels say "placed". No mechanic, rule, or layout changed; two labels grew a line (the identity note, the end cards) and the Chamber button's text is smaller. The checks quote the new fragments: "try once more", ", Yang" / ", Yin", "six signs forward", "Not that square, acolyte. …", "Yes, Taurus belongs to Earth, fixed.", "Watch me place it, acolyte.", "Opposites share the modality and the polarity", "Before you turn the wheel", "what the two signs share", "placed", "proven at the wheel"; the browser suite matches "book upon the shelf", "Dark and quiet", "dark and bare", "already placed", "Three lamps", "Four lamps", "Wing is whole", "shares the same element after", "The Zodiac Wing is complete", "The wheel holds one last secret", "Four elements and three modalities", and "Modality" among the shared labels.
+
 ## Build F: the practice fork, the sitting rule, the gate, the journal
 
 [ClickUp task: Build F — The practice fork on the Dial and the study journal](https://app.clickup.com/t/86bc291fn).
