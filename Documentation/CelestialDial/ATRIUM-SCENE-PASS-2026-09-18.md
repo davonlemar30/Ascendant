@@ -43,3 +43,5 @@ All eight final images were created or revised with the built-in ImageGen tool. 
 ![Atrium hub at 360 × 800](Evidence/atrium-pass-2026-09-18/360-hub.png)
 
 ![Shared open doorway in the Wing](Evidence/atrium-pass-2026-09-18/390-wing-room.png)
+
+See also: [the cohesion assessment that followed](ATRIUM-COHESION-2026-09-19.md) (the door-frame fix, PR #32).

@@ -1,4 +1,4 @@
-# Art slots and sound hooks (Build E)
+# Art slots and sound hooks
 
 Every placeholder in the greybox is a **named slot**. A slot takes one file, named after it, dropped into a folder; the file is drawn in the placeholder's rect (or played on its action) and nothing else changes. No file, no change: the grey box and the silence stay. This is the door the art pass walks through: a folder of files, not a code change per piece, so the cost of each room can be measured.
 
@@ -9,7 +9,8 @@ The manifest lives in code, in [`Assets/CelestialDial/Slots.cs`](../../Assets/Ce
 1. Name the file after the slot, exactly: `atrium.png`, `keeper-idle.png`, `door-open.png`.
 2. Put it in `Assets/CelestialDial/Resources/Art/` (images, PNG) or `Assets/CelestialDial/Resources/Audio/` (sounds, WAV).
 3. Open the project once so Unity imports it (the import settings below are applied automatically, and a name that is not a slot is flagged in the Console).
-4. Play. The file is in place. Open the style page (Editor menu **Ascendant › Greybox › Play the style page**, or `?style` on the web build) to see every slot at once with its source.
+4. The light: each room also takes a transparent golden-hour overlay (`atrium-light.png`, `wing-light.png`, `chamber-light.png`, 360 × 800), drawn over the room and faded in by the Atrium's stage as the Library wakes. Draw the room dormant; draw its light separately.
+5. Play. The file is in place. Open the style page (Editor menu **Ascendant › Greybox › Play the style page**, or `?style` on the web build) to see every slot at once with its source.
 
 A file fills its placeholder's rect exactly (no letterboxing), so draw at the slot's proportions: a 360 × 800 room background, a 20 × 44 Keeper. Draw at twice the listed size for phone density (720 × 1600 for a room), never more than the slot's cap. Make both sides multiples of 4 so the texture compresses; anything else imports uncompressed and larger, and the Console says so. Transparent pixels are honoured (the Keeper and Caspar should be cut-outs).
 
@@ -62,7 +63,7 @@ Not slots, on purpose: the Caspar panels, buttons, and text (interface, not plac
 | Slot | Plays when |
 | --- | --- |
 | `step` | the wheel crosses one detent: a button, a drag, an arrow key, a count beat, or a worked example; a tile or cell picked on the table |
-| `seal` | a Seal or a tap answer is accepted (on the wheel, the table, the book, the builder, and in Check the Seals) |
+| `seal` | a Seal or a tap answer is accepted (on the wheel, the table, the book, the builder, and in practice) |
 | `miss` | a Seal or a tap answer is rejected (same places) |
 | `key` | a Key is earned (Key 1 when it rises from the Dial; Keys 2–4 on the last answer) and a Key is spent on a lock |
 | `page` | Caspar's page turns in the opening, the return, and the Chamber; the book opens or closes; a Book's page rises |

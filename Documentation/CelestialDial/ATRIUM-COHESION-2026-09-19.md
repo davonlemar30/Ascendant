@@ -22,3 +22,5 @@ The updated scene was reviewed in the local WebGL build at 390×844 and 360×800
 - Unity `6000.3.24f1`, clean detached checkout at `aeda8fa`, with only the two updated door PNGs copied in: WebGL build succeeded, BuildReport 0 errors / 0 warnings, output size 17,608,253 bytes. Required loader, framework, wasm, data, and `index.html` files were present.
 - Local browser review completed at 390×844 and 360×800. Browser console returned no warnings or errors.
 - The shared production site was not changed. Pull request CI remains required before merge.
+
+See also: [the scene pass this assessment reviews](ATRIUM-SCENE-PASS-2026-09-18.md) (PR #30). The light overlay slots this document defers to were added in Build H ([ART-SLOTS.md](ART-SLOTS.md)).

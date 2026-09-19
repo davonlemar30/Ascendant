@@ -1,5 +1,7 @@
 # Celestial Dial solo playtest checklist
 
+> **History (Sept 19, 2026).** This checklist was written for the Sept 14 build (through Build A) and names surfaces since retired or renamed: the Atrium's "Check the Seals" button and the desk that opened it (gone in Build F; practice lives on the Dial and the journal is a button in every room), "Ask Caspar for help" (now "Ask Caspar"), and the "Second Pattern" subtitle (now "The Modalities"). It is kept as a record. The live checklists are the owner session pages under Solo Playtest Checklist in ClickUp (page 2kyd583p-24454).
+
 This is for you to play the game once, start to finish, and write down what happened. You are the only tester. What you decide at the end is the decision.
 
 Play here: https://davonlemar30.github.io/Ascendant/  ·  Write your decision here: https://app.clickup.com/t/86bbzm11t (walking: https://app.clickup.com/t/86bbznax8)
