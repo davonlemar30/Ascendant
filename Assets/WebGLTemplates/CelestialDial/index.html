@@ -16,26 +16,26 @@
 <p id="instructions" class="sr"></p>
 <div id="seats" role="group" aria-label="Zodiac seats in order"></div>
 <button id="back">Previous</button><button id="seal">Seal</button><button id="forward">Next</button>
-<button id="count">Count</button><button id="ask-caspar">Ask Caspar for help</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
+<button id="count">Count</button><button id="ask-caspar">Ask Caspar</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
 <label id="name-label" for="name" class="sr">Your name</label><input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Your name" hidden>
 <label id="birthdate-label" for="birthdate" class="sr">Your birth date</label><input id="birthdate" type="date" hidden>
 <button id="use-date">Use this date</button><button id="change-birth">Change my answer</button>
 <div id="signs" role="group" aria-label="Choose your sign"></div>
 <button id="birth-chart">Enter birth date, time, place</button><button id="birth-known">Enter what I already know</button><button id="birth-unknown">I don't know</button>
-<button id="next-screen">Continue</button><button id="insert">Insert the Key</button><button id="restart">Start over, test only</button>
-<button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="leave-wing">Back to the Atrium</button><button id="leave-chamber">Back to the Atrium</button>
+<button id="next-screen">Continue</button><button id="insert">Insert Key</button><button id="restart">Start over, test only</button>
+<button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="leave-wing">Return to the Atrium</button><button id="leave-chamber">Return to the Atrium</button>
 <button id="continue-lesson">Continue the lesson</button><button id="enter-practice">Practice what you know</button><button id="leave-practice">Leave the instrument</button>
 <button id="open-journal">Your journal</button><button id="close-journal">Close the journal</button><button id="journal-prev">Previous page</button><button id="journal-next">Next page</button>
-<div id="modalities" role="group" aria-label="Which kind?"><button id="modality-0">Cardinal</button><button id="modality-1">Fixed</button><button id="modality-2">Mutable</button></div>
-<div id="elements" role="group" aria-label="Which family?"><button id="element-0">Fire</button><button id="element-1">Earth</button><button id="element-2">Air</button><button id="element-3">Water</button></div>
+<div id="modalities" role="group" aria-label="Which modality?"><button id="modality-0">Cardinal</button><button id="modality-1">Fixed</button><button id="modality-2">Mutable</button></div>
+<div id="elements" role="group" aria-label="To which element does this sign owe its nature?"><button id="element-0">Fire</button><button id="element-1">Earth</button><button id="element-2">Air</button><button id="element-3">Water</button></div>
 <div id="room" role="group" aria-label="Points of interest, tap to walk there"></div>
-<button id="enter-dial">The Dial</button><button id="enter-shelf">The bookshelf</button><button id="close-book">Close the book</button><button id="walk-speed">Walk speed, test only</button>
-<div id="glyph-names" role="group" aria-label="Which sign carries this symbol?"><button id="glyph-name-0"></button><button id="glyph-name-1"></button><button id="glyph-name-2"></button><button id="glyph-name-3"></button></div>
+<button id="enter-dial">The Dial</button><button id="enter-shelf">The Bookshelf</button><button id="close-book">Close the Book</button><button id="walk-speed">Walk speed, test only</button>
+<div id="glyph-names" role="group" aria-label="This symbol belongs to which sign?"><button id="glyph-name-0"></button><button id="glyph-name-1"></button><button id="glyph-name-2"></button><button id="glyph-name-3"></button></div>
 <div id="grid-signs" role="group" aria-label="Signs to seat: tap one, then its cell"></div>
 <div id="grid-cells" role="group" aria-label="The table: four element rows by three kinds"></div>
-<button id="grid-seal">Seal</button><button id="grid-ask">Ask Caspar for help</button><button id="leave-grid">Leave the table</button><button id="enter-grid">The table</button>
+<button id="grid-seal">Seal</button><button id="grid-ask">Ask Caspar</button><button id="leave-grid">Leave the Table</button><button id="enter-grid">The Table</button>
 <div id="builder-names" role="group" aria-label="Which sign is that?"><button id="builder-name-0"></button><button id="builder-name-1"></button><button id="builder-name-2"></button><button id="builder-name-3"></button></div>
-<div id="builder-share" role="group" aria-label="Tap what the two share"><button id="builder-share-0">Kind</button><button id="builder-share-1">Side</button><button id="builder-share-2">Element</button></div>
+<div id="builder-share" role="group" aria-label="Tap what the two share"><button id="builder-share-0">Modality</button><button id="builder-share-1">Polarity</button><button id="builder-share-2">Element</button></div>
 <button id="mute">Sound, test only</button>
 <div id="style" role="region" aria-label="Style page: every art and sound slot with its source" hidden><ol id="style-list" class="sr"></ol><div id="style-sounds" role="group" aria-label="Sound slots, tap to play"></div></div>
 </section>
@@ -132,17 +132,17 @@
       byId('enter-dial').disabled=!state.canEnterDial;byId('enter-shelf').disabled=!state.canEnterShelf;byId('close-book').disabled=!state.canCloseBook;byId('walk-speed').disabled=!(state.screen==='hub'&&!state.busy);
       byId('enter-grid').disabled=!state.canEnterGrid;byId('grid-seal').disabled=!(grid&&state.canGridSeal);byId('grid-ask').disabled=!(grid&&state.canGridAsk);byId('leave-grid').disabled=!(grid&&state.canLeaveGrid);
       for(let i=0;i<12;i++){const t=byId('grid-sign-'+i),c=byId('grid-cell-'+i);const tl=grid&&state.gridTiles?state.gridTiles[i]:SIGNS[i],cl=grid&&state.gridCells?state.gridCells[i]:'Cell '+(i+1);
-        t.setAttribute('aria-label',tl);t.disabled=!(grid&&state.canGridPick&&!tl.endsWith(', seated')&&(!state.gridLocked||tl.startsWith(state.gridSign+',')));c.setAttribute('aria-label',cl);c.textContent=cl.split(':')[0];c.disabled=!(grid&&state.canGridPick&&!!state.gridSign&&cl.includes(': empty'));}
+        t.setAttribute('aria-label',tl);t.disabled=!(grid&&state.canGridPick&&!tl.endsWith(', placed')&&(!state.gridLocked||tl.startsWith(state.gridSign+',')));c.setAttribute('aria-label',cl);c.textContent=cl.split(':')[0];c.disabled=!(grid&&state.canGridPick&&!!state.gridSign&&cl.includes(': empty'));}
       byId('grid-signs').hidden=!grid;byId('grid-cells').hidden=!grid;
       for(let i=0;i<4;i++){const nb=byId('builder-name-'+i);nb.disabled=!(naming&&state.canBuilderName);nb.textContent=naming&&state.builderOptions&&state.builderOptions[i]?state.builderOptions[i]:'';}
       byId('builder-names').hidden=!naming;byId('builder-names').setAttribute('aria-label',naming?'Which sign is '+state.builderAsk+'?':'Which sign is that?');
-      for(let i=0;i<3;i++){const sb=byId('builder-share-'+i);const done=!!(state.shared&&state.shared.includes(['Kind','Side','Element'][i]));sb.disabled=!(sharing&&state.canBuilderShare&&!done);sb.textContent=['Kind','Side','Element'][i]+(done?': shared':'');}
+      for(let i=0;i<3;i++){const sb=byId('builder-share-'+i);const done=!!(state.shared&&state.shared.includes(['Modality','Polarity','Element'][i]));sb.disabled=!(sharing&&state.canBuilderShare&&!done);sb.textContent=['Modality','Polarity','Element'][i]+(done?': shared':'');}
       byId('builder-share').hidden=!sharing;
       byId('walk-speed').setAttribute('aria-label','Walk speed: '+(state.walkSpeed||'normal')+', test only');
       const tap=state.screen==='practice'&&state.practiceMode==='tap';for(let i=0;i<4;i++)byId('element-'+i).disabled=!tap;byId('elements').hidden=!tap;
       const modTap=state.screen==='practice'&&state.practiceMode==='modality';for(let i=0;i<3;i++)byId('modality-'+i).disabled=!modTap;byId('modalities').hidden=!modTap;
       const glyph=!!state.glyphMode&&!state.busy;for(let i=0;i<4;i++){const gb=byId('glyph-name-'+i);gb.disabled=!glyph;gb.textContent=state.glyphOptions&&state.glyphOptions[i]?state.glyphOptions[i]:'';}byId('glyph-names').hidden=!glyph;
-      byId('glyph-names').setAttribute('aria-label',glyph?'Which sign carries the symbol '+state.glyphChar+'?':'Which sign carries this symbol?');
+      byId('glyph-names').setAttribute('aria-label',glyph?'The symbol '+state.glyphChar+' belongs to which sign?':'This symbol belongs to which sign?');
       byId('name').hidden=!state.canName;if(state.canName&&document.activeElement!==byId('name')&&byId('name').value===''&&state.playerName!=='Keeper')byId('name').value=state.playerName;
       byId('seats').hidden=!wing;
       byId('motion').setAttribute('aria-pressed',String(state.reducedMotion));
@@ -152,8 +152,8 @@
       layout();
       // Refocus when nothing useful is focused, or when the last focus was ours (not the player's own Tab).
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
-        const firstTile=grid&&state.gridTiles?state.gridTiles.findIndex(t=>!t.endsWith(', seated')):-1;
-        const firstShare=sharing&&state.shared?['Kind','Side','Element'].findIndex(l=>!state.shared.includes(l)):-1;
+        const firstTile=grid&&state.gridTiles?state.gridTiles.findIndex(t=>!t.endsWith(', placed')):-1;
+        const firstShare=sharing&&state.shared?['Modality','Polarity','Element'].findIndex(l=>!state.shared.includes(l)):-1;
         const focus=style?byId('mute'):state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canInsert&&chamber?byId('insert'):chamber&&state.canWalk&&!state.atBooks&&state.keysInHand>0?byId('poi-books'):chamber&&state.canLeaveChamber?byId('leave-chamber'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):naming&&state.canBuilderName?byId('builder-name-0'):sharing&&state.canBuilderShare&&firstShare>=0?byId('builder-share-'+firstShare):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});if(document.activeElement===focus)autoFocused=focus; // a target still disabled (a beat in progress) keeps the last auto-focus, so the next state can try again
       }

@@ -221,12 +221,12 @@ namespace Ascendant.CelestialDial
         public bool TouchSealedDoor()
         {
             if (!AtHub) return false;
-            Note = "Sealed. It does not answer to you yet."; Logged?.Invoke("sealed_door_touched"); return true; // placeholder (owner writes)
+            Note = "Sealed. Gather more Keys, acolyte, and perhaps the door shall stir and reveal what lies beyond."; Logged?.Invoke("sealed_door_touched"); return true; // owner (worksheet section 6)
         }
         public bool ApproachCaspar()
         {
             if (!AtHub) return false;
-            Note = "Caspar looks up from the desk and waits."; Logged?.Invoke("caspar_approached"); return true; // placeholder (owner writes)
+            Note = "Caspar raises his gaze from the desk and watches you approach, saying nothing."; Logged?.Invoke("caspar_approached"); return true; // owner (worksheet section 6)
         }
         public void MarkWheelComplete() { if (!WheelComplete) { WheelComplete = true; Logged?.Invoke("wheel_completed"); } }
         public void MarkKeyEarned() { if (Keys < 1) { Keys = 1; } }
@@ -326,7 +326,7 @@ namespace Ascendant.CelestialDial
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
-            Note = "Not that one. Try once more."; return false;
+            Note = "Not that one, acolyte. Look again and try once more."; return false; // owner (worksheet section 2)
         }
         public bool AnswerModalityTap(string modality)
         {
@@ -335,7 +335,7 @@ namespace Ascendant.CelestialDial
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
-            Note = "Not that one. Try once more."; return false;
+            Note = "Not that one, acolyte. Look again and try once more."; return false; // owner (worksheet section 2)
         }
         public bool AnswerTap(string element)
         {
@@ -344,7 +344,7 @@ namespace Ascendant.CelestialDial
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
-            Note = "Not that one. Try once more."; return false;
+            Note = "Not that one, acolyte. Look again and try once more."; return false; // owner (worksheet section 2)
         }
         public void FinishReview(bool correct, bool eligible)
         {
@@ -354,15 +354,15 @@ namespace Ascendant.CelestialDial
             Deck.RecordReview(task.seat, correct, eligible, Sitting, kind);
             string name = Zodiac.Seats[task.seat].Name, element = Zodiac.Seats[task.seat].Element, modality = Zodiac.ModalityAt(task.seat).ToLowerInvariant();
             Note = kind == ItemKind.Glyph
-                ? (correct ? "Yes. That is the symbol of " + name + "." : "That is the symbol of " + name + ". We will come back to it.")
+                ? (correct ? "Yes, this is the symbol of " + name + "." : "This symbol belongs to " + name + ". The wheel shall test you on it again.") // owner (worksheet section 5)
                 : kind == ItemKind.Modality
-                ? (correct ? "Yes. " + name + " is " + modality + "." : name + " is " + modality + ". We will come back to it.")
-                : (correct ? "Yes. " + name + " is " + element + "." : name + " is " + element + ". We will come back to it.");
+                ? (correct ? "Yes, " + name + " is " + modality + "." : name + " is " + modality + ". The wheel shall test you on it again.") // owner (worksheet section 10)
+                : (correct ? "Yes. " + name + " is " + Zodiac.Article(element) + " " + element + " sign." : name + " is " + Zodiac.Article(element) + " " + element + " sign. We will come back to it."); // owner (worksheet section 2)
             ReviewIndex++;
             if (ReviewIndex >= ReviewQueue.Count)
             {
                 int right = ReviewQueue.Count(t => t.correct);
-                PracticeSummary = right + " of " + ReviewQueue.Count + " remembered."; // placeholder (owner writes); the sitting was counted on entry
+                PracticeSummary = right + " of " + ReviewQueue.Count + " proven at the wheel."; // owner (worksheet section 2); the sitting was counted on entry
                 Logged?.Invoke("practice_finished");
             }
         }

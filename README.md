@@ -8,7 +8,7 @@ Ascendant teaches Western astrology the way a patient tutor would: one pattern a
 
 ## What you are playing right now
 
-This is an early, playable build — a **greybox**. That means the shapes, rooms, and instruments are real and the learning is real, but the art is placeholder blocks, the sounds are not in yet, and most of what Caspar says is a stand-in until the writer's lines land. Expect a museum at night rendered in charcoal and bone, not a finished painting.
+This is an early, playable build — a **greybox** with its first art landing. The shapes, rooms, and instruments are real and the learning is real; the Atrium and the characters now have illustrated art, the other rooms and instruments are still placeholder blocks, the sounds are not in yet, and Caspar speaks in the writer's own lines. Expect a museum at night rendered in charcoal and bone, not a finished painting.
 
 The current build is **the Zodiac Wing**, the first wing of the Library. It holds one curriculum: the twelve signs, and how to *derive* what a sign is instead of memorizing twelve personalities.
 
@@ -48,7 +48,7 @@ Your progress saves on the device you're playing on, in the browser, the moment 
 
 - **Art:** placeholder blocks and lines. One illustrated look for the two rooms, Caspar, the Keeper, the Dial, and the book is on the plan. Every grey box is now a named slot that takes an image, so the art can arrive one file at a time (see below).
 - **Sound:** none yet. One ambient loop and a few interface sounds are planned; the hooks are in, and each is a named slot that takes a sound file.
-- **Caspar's voice:** most lines are stand-ins written in his tone. The real ones are being written.
+- **Caspar's voice:** the Wing's lines are now the writer's own, from the first return to the Chamber's end. The few stand-ins left are around practice and the journal (the fork, the gate, the journal's pages); they follow.
 - **Next up:** Caspar's real lines, then art and sound for the Wing, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
 
 The full game teaches the whole of beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
