@@ -1,0 +1,1805 @@
+fileFormatVersion: 2
+guid: d97301576a8fc4520a7c37acff990cb2
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1081953716390959872
+    second: atrium-light_0
+  - first:
+      213: 5755659644416082606
+    second: atrium-light_1
+  - first:
+      213: 4107908346438040684
+    second: atrium-light_2
+  - first:
+      213: -6420839771611046317
+    second: atrium-light_3
+  - first:
+      213: -3627666096974491595
+    second: atrium-light_4
+  - first:
+      213: -7305401566576843751
+    second: atrium-light_5
+  - first:
+      213: 6174829975225431943
+    second: atrium-light_6
+  - first:
+      213: -6886147823622223764
+    second: atrium-light_7
+  - first:
+      213: 1608483786484248776
+    second: atrium-light_8
+  - first:
+      213: 4741392108512281303
+    second: atrium-light_9
+  - first:
+      213: 4751241948085540691
+    second: atrium-light_10
+  - first:
+      213: -2160557218509573136
+    second: atrium-light_11
+  - first:
+      213: -4853300776934311934
+    second: atrium-light_12
+  - first:
+      213: 1853573291217938962
+    second: atrium-light_13
+  - first:
+      213: 92906720937666382
+    second: atrium-light_14
+  - first:
+      213: 1733788524885769809
+    second: atrium-light_15
+  - first:
+      213: 4700204256738085924
+    second: atrium-light_16
+  - first:
+      213: -2840852458740189248
+    second: atrium-light_17
+  - first:
+      213: 8593818501804947712
+    second: atrium-light_18
+  - first:
+      213: -3213427673897873792
+    second: atrium-light_19
+  - first:
+      213: 216554005059152355
+    second: atrium-light_20
+  - first:
+      213: -9001136375464367646
+    second: atrium-light_21
+  - first:
+      213: 5252021802137685838
+    second: atrium-light_22
+  - first:
+      213: 6493290273235538017
+    second: atrium-light_23
+  - first:
+      213: 2677148590897214619
+    second: atrium-light_24
+  - first:
+      213: -5051535688517402531
+    second: atrium-light_25
+  - first:
+      213: 664592325218506898
+    second: atrium-light_26
+  - first:
+      213: -1476633908338069017
+    second: atrium-light_27
+  - first:
+      213: 9115974930413343371
+    second: atrium-light_28
+  - first:
+      213: 2592531719323849754
+    second: atrium-light_29
+  - first:
+      213: 466244435038492492
+    second: atrium-light_30
+  - first:
+      213: -4857754086852615378
+    second: atrium-light_31
+  - first:
+      213: 7651288493115998298
+    second: atrium-light_32
+  - first:
+      213: 9120440863267814610
+    second: atrium-light_33
+  - first:
+      213: 5164982812623667691
+    second: atrium-light_34
+  - first:
+      213: 2739139145715707200
+    second: atrium-light_35
+  - first:
+      213: 7127051192564323234
+    second: atrium-light_36
+  - first:
+      213: 1154299840156304709
+    second: atrium-light_37
+  - first:
+      213: -8998898882193077830
+    second: atrium-light_38
+  - first:
+      213: -1220335037014810208
+    second: atrium-light_39
+  - first:
+      213: 7579249483826417612
+    second: atrium-light_40
+  - first:
+      213: -2133532551917285265
+    second: atrium-light_41
+  - first:
+      213: 6767454177484345449
+    second: atrium-light_42
+  - first:
+      213: -1980409220621822578
+    second: atrium-light_43
+  - first:
+      213: 2473048356170505849
+    second: atrium-light_44
+  - first:
+      213: -5447136020046947371
+    second: atrium-light_45
+  - first:
+      213: -7171702511720461080
+    second: atrium-light_46
+  - first:
+      213: 167644006461165597
+    second: atrium-light_47
+  - first:
+      213: 9203459953701273547
+    second: atrium-light_48
+  - first:
+      213: 9167288587613071911
+    second: atrium-light_49
+  - first:
+      213: 2944461439833838859
+    second: atrium-light_50
+  - first:
+      213: 7930022162806281080
+    second: atrium-light_51
+  - first:
+      213: 656421694834726982
+    second: atrium-light_52
+  - first:
+      213: 6354110591391487670
+    second: atrium-light_53
+  - first:
+      213: -6351654827606196811
+    second: atrium-light_54
+  - first:
+      213: 2563379378299802226
+    second: atrium-light_55
+  - first:
+      213: 4659912577212464511
+    second: atrium-light_56
+  - first:
+      213: -4906473059271747504
+    second: atrium-light_57
+  - first:
+      213: -5896611257124583839
+    second: atrium-light_58
+  - first:
+      213: 9034910908146462970
+    second: atrium-light_59
+  - first:
+      213: -8127069213852539898
+    second: atrium-light_60
+  - first:
+      213: 6460445695963781060
+    second: atrium-light_61
+  - first:
+      213: 3641914668379531335
+    second: atrium-light_62
+  - first:
+      213: 406501820400993552
+    second: atrium-light_63
+  - first:
+      213: 8938802766725899433
+    second: atrium-light_64
+  - first:
+      213: 4388365004881335850
+    second: atrium-light_65
+  - first:
+      213: -1871717951735607966
+    second: atrium-light_66
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 1
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: atrium-light_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 720
+        height: 1600
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00b95e03c2fd30f00800000000000000
+      internalID: 1081953716390959872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_1
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 86
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea2c879a3f530ef40800000000000000
+      internalID: 5755659644416082606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_2
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 116
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6c3d4f50e8320930800000000000000
+      internalID: 4107908346438040684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_3
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 116
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35e5c6d2f3894e6a0800000000000000
+      internalID: -6420839771611046317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_4
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 171
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5309b1ea7e0f7adc0800000000000000
+      internalID: -3627666096974491595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_5
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 33
+        width: 6
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 914ea9a1bfffd9a90800000000000000
+      internalID: -7305401566576843751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_6
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 43
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 787feb5952761b550800000000000000
+      internalID: 6174829975225431943
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_7
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 70
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c680b2ee90d7f60a0800000000000000
+      internalID: -6886147823622223764
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_8
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 102
+        width: 15
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c07e505b7b725610800000000000000
+      internalID: 1608483786484248776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_9
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 164
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d207b0700fccc140800000000000000
+      internalID: 4741392108512281303
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_10
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 89
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 357d29de06dcfe140800000000000000
+      internalID: 4751241948085540691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_11
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 171
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f3b4d928a82402e0800000000000000
+      internalID: -2160557218509573136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_12
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 85
+        width: 15
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 208f3b248ac95acb0800000000000000
+      internalID: -4853300776934311934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_13
+      rect:
+        serializedVersion: 2
+        x: 93
+        y: 56
+        width: 19
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21a6234761739b910800000000000000
+      internalID: 1853573291217938962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_14
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 150
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e476cb2ab221a4100800000000000000
+      internalID: 92906720937666382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_15
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 94
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15ef6753a77af0810800000000000000
+      internalID: 1733788524885769809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_16
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 75
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42c07a66eda7a3140800000000000000
+      internalID: 4700204256738085924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_17
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 242
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c7fe718db34398d0800000000000000
+      internalID: -2840852458740189248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_18
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 235
+        width: 8
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00973483560634770800000000000000
+      internalID: 8593818501804947712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_19
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 238
+        width: 9
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08e48e95e8c9763d0800000000000000
+      internalID: -3213427673897873792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_20
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 251
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e92d3268ba510300800000000000000
+      internalID: 216554005059152355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_21
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 73
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e96995182a851380800000000000000
+      internalID: -9001136375464367646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_22
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 129
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4f060da00ee2e840800000000000000
+      internalID: 5252021802137685838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_23
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 89
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16014bfb91dcc1a50800000000000000
+      internalID: 6493290273235538017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_24
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 256
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b94bd539574272520800000000000000
+      internalID: 2677148590897214619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_25
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 233
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5046b33e0755e9b0800000000000000
+      internalID: -5051535688517402531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_26
+      rect:
+        serializedVersion: 2
+        x: 208
+        y: 143
+        width: 6
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2989919d23b193900800000000000000
+      internalID: 664592325218506898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_27
+      rect:
+        serializedVersion: 2
+        x: 220
+        y: 198
+        width: 8
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e1763ea841f18be0800000000000000
+      internalID: -1476633908338069017
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_28
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 197
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8257a496e2728e70800000000000000
+      internalID: 9115974930413343371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_29
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 81
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a141b37ecd58af320800000000000000
+      internalID: 2592531719323849754
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_30
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 145
+        width: 8
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c47d8f8e7de687600800000000000000
+      internalID: 466244435038492492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_31
+      rect:
+        serializedVersion: 2
+        x: 275
+        y: 277
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e23a2fe356ac59cb0800000000000000
+      internalID: -4857754086852615378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_32
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 154
+        width: 10
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a508632a856de2a60800000000000000
+      internalID: 7651288493115998298
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_33
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 178
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2dcf80a94a0529e70800000000000000
+      internalID: 9120440863267814610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_34
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 6
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be18e69b084bda740800000000000000
+      internalID: 5164982812623667691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_35
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 252
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04d60ca5a80630620800000000000000
+      internalID: 2739139145715707200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_36
+      rect:
+        serializedVersion: 2
+        x: 339
+        y: 240
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a312d48c4f58e260800000000000000
+      internalID: 7127051192564323234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_37
+      rect:
+        serializedVersion: 2
+        x: 339
+        y: 164
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5458ec0c695e40010800000000000000
+      internalID: 1154299840156304709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_38
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 251
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab9c835152d7d1380800000000000000
+      internalID: -8998898882193077830
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_39
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 164
+        width: 8
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a1e4cbdfbf701fe0800000000000000
+      internalID: -1220335037014810208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_40
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 164
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccf498bbf37ee2960800000000000000
+      internalID: 7579249483826417612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_41
+      rect:
+        serializedVersion: 2
+        x: 358
+        y: 143
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f60dc3ea27b2462e0800000000000000
+      internalID: -2133532551917285265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_42
+      rect:
+        serializedVersion: 2
+        x: 359
+        y: 268
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96010ba08b3daed50800000000000000
+      internalID: 6767454177484345449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_43
+      rect:
+        serializedVersion: 2
+        x: 371
+        y: 281
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e859de67e4c2484e0800000000000000
+      internalID: -1980409220621822578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_44
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 249
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97e18ed8068025220800000000000000
+      internalID: 2473048356170505849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_45
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 33
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5dbddd166a2e764b0800000000000000
+      internalID: -5447136020046947371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_46
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 84
+        width: 19
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ec002a109ef87c90800000000000000
+      internalID: -7171702511720461080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_47
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 143
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1057dde557935200800000000000000
+      internalID: 167644006461165597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_48
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 171
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcfb5ecd01249bf70800000000000000
+      internalID: 9203459953701273547
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_49
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 280
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72a6b2a6660c83f70800000000000000
+      internalID: 9167288587613071911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_50
+      rect:
+        serializedVersion: 2
+        x: 462
+        y: 162
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0591204414dcd820800000000000000
+      internalID: 2944461439833838859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_51
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 202
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8731b0b54291d0e60800000000000000
+      internalID: 7930022162806281080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_52
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 206
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 648db77bd041c1900800000000000000
+      internalID: 656421694834726982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_53
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 115
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b6df67dae55e2850800000000000000
+      internalID: 6354110591391487670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_54
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 28
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bd33a836936ad7a0800000000000000
+      internalID: -6351654827606196811
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_55
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 94
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2721f1496f3f29320800000000000000
+      internalID: 2563379378299802226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_56
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 67
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7dbf19bcc55ba040800000000000000
+      internalID: 4659912577212464511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_57
+      rect:
+        serializedVersion: 2
+        x: 533
+        y: 40
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 058551a8fb4b8ebb0800000000000000
+      internalID: -4906473059271747504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_58
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 33
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1660580ad470b2ea0800000000000000
+      internalID: -5896611257124583839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_59
+      rect:
+        serializedVersion: 2
+        x: 590
+        y: 82
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af03f591a93726d70800000000000000
+      internalID: 9034910908146462970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_60
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 164
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6046e4beb99d63f80800000000000000
+      internalID: -8127069213852539898
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_61
+      rect:
+        serializedVersion: 2
+        x: 613
+        y: 233
+        width: 8
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c75f9ea12d18a950800000000000000
+      internalID: 6460445695963781060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_62
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 232
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 748eb0f581eaa8230800000000000000
+      internalID: 3641914668379531335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_63
+      rect:
+        serializedVersion: 2
+        x: 676
+        y: 45
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0150d8d704f24a500800000000000000
+      internalID: 406501820400993552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_64
+      rect:
+        serializedVersion: 2
+        x: 678
+        y: 171
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a4e9fba1c10d0c70800000000000000
+      internalID: 8938802766725899433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_65
+      rect:
+        serializedVersion: 2
+        x: 683
+        y: 199
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2615bca8ba96ec30800000000000000
+      internalID: 4388365004881335850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: atrium-light_66
+      rect:
+        serializedVersion: 2
+        x: 694
+        y: 102
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26dc31f80725606e0800000000000000
+      internalID: -1871717951735607966
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
