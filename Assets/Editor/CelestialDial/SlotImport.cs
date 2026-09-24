@@ -20,7 +20,7 @@ namespace Ascendant.Build
             importer.mipmapEnabled = false; importer.alphaIsTransparency = true; importer.sRGBTexture = true; importer.isReadable = false;
             importer.npotScale = TextureImporterNPOTScale.None; importer.wrapMode = TextureWrapMode.Clamp; importer.filterMode = FilterMode.Bilinear;
             importer.maxTextureSize = entry != null ? entry.MaxSize : 512;
-            importer.textureCompression = TextureImporterCompression.Compressed; importer.crunchedCompression = true; importer.compressionQuality = 50;
+            importer.textureCompression = TextureImporterCompression.Compressed; importer.crunchedCompression = !slot.EndsWith("-light"); importer.compressionQuality = 50; // the light overlays are not crunched: crunch crashes on them in the Linux CI Editor (main's run after PR #36) and bands their soft gradients
             var settings = new TextureImporterSettings(); importer.ReadTextureSettings(settings);
             settings.spriteMeshType = SpriteMeshType.FullRect; settings.spriteGenerateFallbackPhysicsShape = false; importer.SetTextureSettings(settings);
         }
