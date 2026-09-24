@@ -21,5 +21,6 @@ Regenerated the hand-painted phoenix `dial-face` with transparent pixels outside
 ## Validation record
 
 - PNG dimensions and alpha were checked after normalization against the registered slot sizes in `ART-SLOTS.md`.
-- The shared Unity WebGL build and browser captures are recorded on the PR once run from Unity 6000.3.24f1.
+- PR 1 shared WebGL build: passed through `Ascendant.Build.WebBuild.Build` on Unity 6000.3.24f1. The full browser suite passed at desktop density and at `DEVICE_SCALE=2 MOBILE=1`, covering 390 × 844 and 360 × 800, including the style page and all 33 art-slot sources. PR 1 captures are in `Evidence/style-pass-2026-09-24/pr1/`.
+- PR 2 shared WebGL build: passed through the same entry point. The full browser suite passed at desktop density and at `DEVICE_SCALE=2 MOBILE=1` before the final two-file Keeper refresh; the refreshed branch then passed the focused 390 × 844 phone-density style-page check with both Keeper slots resolving as `file`. PR 2 captures are in `Evidence/style-pass-2026-09-24/pr2/`.
 - Generated source images were kept in the local Codex generated-images folder; only selected normalized project PNGs are committed.
