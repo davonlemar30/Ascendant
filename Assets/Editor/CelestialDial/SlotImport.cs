@@ -10,7 +10,7 @@ namespace Ascendant.Build
     // phone build stays small (no mipmaps, crunched compression, a size cap per slot) and a PNG is a sprite without a click.
     public sealed class SlotImport : AssetPostprocessor
     {
-        public override uint GetVersion() => 2; // 2: no crunch on transparent images; bumping it re-imports every slot file, cached Library included
+        public override uint GetVersion() => 3; // 3: no crunch at all (2: none on transparent images); bumping it re-imports every slot file, cached Library included
         public const string ArtRoot = "Assets/CelestialDial/Resources/Art/", AudioRoot = "Assets/CelestialDial/Resources/Audio/";
         void OnPreprocessTexture()
         {
@@ -21,7 +21,7 @@ namespace Ascendant.Build
             importer.mipmapEnabled = false; importer.alphaIsTransparency = true; importer.sRGBTexture = true; importer.isReadable = false;
             importer.npotScale = TextureImporterNPOTScale.None; importer.wrapMode = TextureWrapMode.Clamp; importer.filterMode = FilterMode.Bilinear;
             importer.maxTextureSize = entry != null ? entry.MaxSize : 512;
-            importer.textureCompression = TextureImporterCompression.Compressed; importer.crunchedCompression = !importer.DoesSourceTextureHaveAlpha(); importer.compressionQuality = 50; // no crunch on anything with transparency: crunch crashes on large transparent images in the Linux CI Editor (the light overlays after PR #36, the sign illustrations in PR #39) and bands soft alpha
+            importer.textureCompression = TextureImporterCompression.Compressed; importer.crunchedCompression = false; importer.compressionQuality = 50; // no crunch at all: the crunch compressor crashes the Linux CI Editor at random (transparent overlays and signs, then opaque rooms on main after #43/#44 while the same files passed on the PRs)
             var settings = new TextureImporterSettings(); importer.ReadTextureSettings(settings);
             settings.spriteMeshType = SpriteMeshType.FullRect; settings.spriteGenerateFallbackPhysicsShape = false; importer.SetTextureSettings(settings);
         }
