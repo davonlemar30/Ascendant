@@ -20,7 +20,7 @@ IMAGES = [
     ("shelf", 52, 36), ("chair", 44, 36), ("table", 60, 32), ("shelf-book", 12, 28),
     ("book-cover", 140, 140), ("book-page", 140, 140),
     ("shelves", 60, 180), ("furniture-covered", 120, 72), ("desk", 72, 32), ("lamp", 8, 24), ("candle", 8, 20),
-    ("door-open", 72, 100), ("door-sealed", 72, 100),
+    ("door-open", 64, 128), ("door-sealed", 64, 128),
     ("mechanism", 112, 112), ("crystal-book", 36, 72), ("crystal-page", 28, 60), ("lock", 8, 8), ("keeper-key", 84, 40),
     ("journal-page", 180, 400), ("journal-cover", 60, 60),  # Build F
     ("atrium-light", 180, 400), ("wing-light", 180, 400), ("chamber-light", 180, 400),  # Build H: translucent overlays
