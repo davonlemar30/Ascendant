@@ -55,7 +55,11 @@ namespace Ascendant.CelestialDial
         Button enterWing, hubRestart, leavePractice;
         // Build F: the fork and the practice exit on the Dial, the journal's buttons and screen.
         Button forkLesson, forkPractice, leavePracticeDial, journalHub, journalWing, journalChamber, journalPrev, journalNext, journalClose;
-        RectTransform journal; Text journalSectionText, journalNote; Image journalCover; readonly Text[] journalGlyphs = new Text[12], journalLines = new Text[12];
+        RectTransform journal; Text journalSectionText, journalNote; Image journalCover, journalContentsArt, journalSignArt, journalRibbon;
+        readonly Text[] journalGlyphs = new Text[12], journalLines = new Text[12], journalContentsLabels = new Text[7];
+        readonly Image[] journalPlates = new Image[6];
+        readonly Button[] journalContentsButtons = new Button[7];
+        Button journalContents, journalSigns, journalSignPrev, journalSignNext;
         bool forkShown, gating;
         // Build H (the Sept 17 lighting decision, Option C): one golden-hour overlay per room, over the background and under everything else, faded by the Atrium stage.
         readonly List<Image> lightOverlays = new List<Image>(); float lightAlpha; Coroutine lightFade;
@@ -496,6 +500,9 @@ namespace Ascendant.CelestialDial
             else if (command == "close-journal") CloseJournal();
             else if (command == "journal-next") JournalTurn(1);
             else if (command == "journal-prev") JournalTurn(-1);
+            else if (command == "journal-contents") JournalContentsPage();
+            else if (command == "journal-signs") JournalSignsPage();
+            else if (command.StartsWith("journal-section:") && int.TryParse(command.Substring(16), out int journalSection) && journalSection >= 0 && journalSection < SliceFlow.JournalOrder.Length) JournalSectionPage((ItemKind)journalSection);
             else if (command.StartsWith("element:") && int.TryParse(command.Substring(8), out int element) && element >= 0 && element < 4) AnswerTap(Elements[element]);
             else if (command.StartsWith("modality:") && int.TryParse(command.Substring(9), out int modality) && modality >= 0 && modality < 3) AnswerModalityTap(Zodiac.Modalities[modality]);
             else if (command.StartsWith("glyph-name:") && int.TryParse(command.Substring(11), out int slot) && slot >= 0 && slot < 4) { if (Flow.AtPractice) AnswerGlyphReview(slot); else AnswerGlyphName(slot); }
@@ -1000,10 +1007,11 @@ namespace Ascendant.CelestialDial
             bool forkOpen = s == SliceScreen.Wing && forkShown && Flow.CanEnterPractice && !busy && !Dial.Busy;
             state.canEnterPractice = forkOpen; state.canContinueLesson = forkOpen && LessonAvailable;
             state.fork = !forkOpen ? "none" : LessonAvailable ? "both" : "practice";
-            state.journal = s == SliceScreen.Journal; state.canOpenJournal = Flow.CanOpenJournal && !busy; state.canCloseJournal = state.journal && !busy;
+            state.journal = s == SliceScreen.Journal; state.journalContents = state.journal && Flow.JournalContents; state.journalSigns = state.journal && Flow.JournalSigns; state.canOpenJournal = Flow.CanOpenJournal && !busy; state.canCloseJournal = state.journal && !busy;
             state.canJournalNext = Flow.CanJournalNext && !busy; state.canJournalPrev = Flow.CanJournalPrev && !busy;
             state.journalPage = Flow.JournalSection; state.journalCount = Flow.JournalSections.Count;
-            state.journalSection = state.journal ? SliceFlow.SectionTitle(Flow.JournalKind) : ""; state.journalEntries = state.journal ? Flow.JournalEntries(Flow.JournalKind).ToArray() : new string[0];
+            state.journalSection = state.journal ? (Flow.JournalContents ? "Contents" : Flow.JournalSigns ? "The Signs" : SliceFlow.SectionTitle(Flow.JournalKind)) : ""; state.journalEntries = state.journal && !Flow.JournalContents && !Flow.JournalSigns ? Flow.JournalEntries(Flow.JournalKind).ToArray() : new string[0];
+            state.journalSign = Flow.JournalSign; state.journalFacts = Flow.JournalSigns && Flow.LearnedSignSeats.Count > 0 ? Flow.JournalSignFacts(Flow.LearnedSignSeats[Mathf.Clamp(Flow.JournalSign, 0, Flow.LearnedSignSeats.Count - 1)]).ToArray() : new string[0]; state.journalRibbonLength = Flow.JournalSigns && Flow.LearnedSignSeats.Count > 0 ? Flow.JournalSignRibbonLength(Flow.LearnedSignSeats[Mathf.Clamp(Flow.JournalSign, 0, Flow.LearnedSignSeats.Count - 1)]) : 0; state.journalDue = Flow.JournalSigns && Flow.LearnedSignSeats.Count > 0 && Flow.JournalSignDue(Flow.LearnedSignSeats[Mathf.Clamp(Flow.JournalSign, 0, Flow.LearnedSignSeats.Count - 1)]); state.journalIllumination = Flow.JournalSigns && Flow.LearnedSignSeats.Count > 0 ? SignIllumination(Flow.LearnedSignSeats[Mathf.Clamp(Flow.JournalSign, 0, Flow.LearnedSignSeats.Count - 1)]) : 0f;
             state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
             bool partA = s == SliceScreen.Book && Dial.Lesson.Phase == LessonPhase.GlyphNames;
             bool glyphItem = s == SliceScreen.Practice && task != null && !Flow.PracticeDone && task.Mode == ReviewMode.Glyph;
@@ -1068,40 +1076,84 @@ namespace Ascendant.CelestialDial
         void SetLight(float alpha) { lightAlpha = alpha; foreach (var overlay in lightOverlays) overlay.color = new Color(1, 1, 1, alpha); }
         IEnumerator FadeLight(float target) { float from = lightAlpha; yield return Tween(.8f, k => SetLight(Mathf.Lerp(from, target, k))); lightFade = null; Publish(); } // the settled alpha reaches the web state
 
-        // ---- Build F: the journal. In the inventory (owner, Sept 15): a button in every room, never a room object. It renders straight from the
-        // deck, one section per kind the wheel has taught, only the items that have entered, in wheel order, with 08's state word. Reading changes nothing. ----
+        // ---- Build J: the journal is a book. The deck is the source of truth; missing art leaves the greybox page in place. ----
         void BuildJournal()
         {
             journal = ScreenPanel("Journal", "journal-page");
-            Label(journal, "YOUR JOURNAL", 0, 32, 340, 24, 18);
             var cover = Rect("Journal cover", journal, 0, 74, 60, 60); journalCover = cover.gameObject.AddComponent<Image>(); journalCover.color = PanelColor; journalCover.raycastTarget = false; cover.gameObject.SetActive(Slots.Dress(journalCover, "journal-cover"));
-            journalSectionText = Label(journal, "", 0, 116, 330, 26, 16);
+            var contentsArt = Rect("Contents art", journal, 0, 0, 360, 800); journalContentsArt = contentsArt.gameObject.AddComponent<Image>(); journalContentsArt.raycastTarget = false; contentsArt.SetAsFirstSibling(); Slots.Dress(journalContentsArt, "journal-contents");
+            var sign = Rect("Sign art", journal, 96, 248, 160, 160); journalSignArt = sign.gameObject.AddComponent<Image>(); journalSignArt.raycastTarget = false; journalSignArt.preserveAspect = false;
+            var ribbon = Rect("Journal ribbon", journal, 152, 0, 12, 90); journalRibbon = ribbon.gameObject.AddComponent<Image>(); journalRibbon.raycastTarget = false; journalRibbon.preserveAspect = false; Slots.Dress(journalRibbon, "journal-ribbon");
+            journalSectionText = Label(journal, "", 0, 48, 320, 30, 18);
             for (int i = 0; i < 12; i++)
             {
-                journalGlyphs[i] = Label(journal, "", -140, 150 + i * 36, 40, 36, 22); journalGlyphs[i].font = Dial.GlyphFont; journalGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow; journalGlyphs[i].verticalOverflow = VerticalWrapMode.Overflow;
+                journalGlyphs[i] = Label(journal, "", -112, 150 + i * 36, 40, 36, 22); journalGlyphs[i].font = Dial.GlyphFont; journalGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow; journalGlyphs[i].verticalOverflow = VerticalWrapMode.Overflow;
                 journalLines[i] = Label(journal, "", 24, 150 + i * 36, 280, 36, 12); journalLines[i].alignment = TextAnchor.MiddleLeft;
             }
+            for (int i = 0; i < journalPlates.Length; i++) { var plate = Rect("Fact plate", journal, 24, 186 + i * 42, 192, 28); journalPlates[i] = plate.gameObject.AddComponent<Image>(); journalPlates[i].raycastTarget = false; plate.gameObject.SetActive(false); Slots.Dress(journalPlates[i], "journal-plate"); }
+            for (int i = 0; i < journalContentsButtons.Length; i++) { int index = i; journalContentsButtons[i] = MakeButton(journal, "", 0, 150 + i * 58, 270, 46, () => JournalContentsTap(index)); journalContentsLabels[i] = journalContentsButtons[i].GetComponentInChildren<Text>(); journalContentsLabels[i].alignment = TextAnchor.MiddleLeft; }
+            journalSigns = MakeButton(journal, "The Signs", 0, 566, 270, 46, JournalSignsPage);
             journalNote = Label(journal, "", 0, 596, 330, 40, 12); journalNote.color = Muted;
             journalPrev = MakeButton(journal, "Previous", -78, 654, 150, 56, () => JournalTurn(-1));
             journalNext = MakeButton(journal, "Next", 78, 654, 150, 56, () => JournalTurn(1));
+            journalContents = MakeButton(journal, "Contents", 0, 654, 150, 56, JournalContentsPage);
+            journalSignPrev = MakeButton(journal, "Previous sign", -78, 654, 150, 56, () => JournalTurn(-1));
+            journalSignNext = MakeButton(journal, "Next sign", 78, 654, 150, 56, () => JournalTurn(1));
             journalClose = MakeButton(journal, "Close the journal", 0, 714, 190, 48, CloseJournal);
         }
         void ShowJournal()
         {
-            var kind = Flow.JournalKind; var items = Flow.JournalItems(kind);
-            journalSectionText.text = SliceFlow.SectionTitle(kind) + " · " + (Flow.JournalSection + 1) + " of " + Flow.JournalSections.Count;
-            for (int i = 0; i < 12; i++)
+            bool contents = Flow.JournalContents, signs = Flow.JournalSigns;
+            journalContentsArt.gameObject.SetActive(contents); journalSignArt.gameObject.SetActive(signs && !contents); journalRibbon.gameObject.SetActive(signs && !contents);
+            for (int i = 0; i < journalContentsButtons.Length; i++) journalContentsButtons[i].gameObject.SetActive(false);
+            journalSigns.gameObject.SetActive(false); journalContents.gameObject.SetActive(!contents); journalPrev.gameObject.SetActive(!contents && !signs); journalNext.gameObject.SetActive(!contents && !signs); journalSignPrev.gameObject.SetActive(signs); journalSignNext.gameObject.SetActive(signs);
+            for (int i = 0; i < 12; i++) { journalGlyphs[i].gameObject.SetActive(false); journalLines[i].gameObject.SetActive(false); }
+            for (int i = 0; i < journalPlates.Length; i++) journalPlates[i].gameObject.SetActive(false);
+            if (contents)
             {
-                bool show = i < items.Count;
-                journalGlyphs[i].gameObject.SetActive(show && kind != ItemKind.Opposite); journalLines[i].gameObject.SetActive(show);
-                if (!show) continue;
-                journalGlyphs[i].text = Zodiac.Seats[items[i].seat].Glyph;
-                journalLines[i].text = SliceFlow.JournalName(items[i]) + " — " + SliceFlow.JournalFact(items[i]) + "\n" + SliceFlow.StateWord(items[i]);
-                journalLines[i].color = items[i].State == ItemState.Practicing ? Bone : Muted;
+                journalSectionText.text = "Contents";
+                var sections = Flow.JournalSections;
+                for (int i = 0; i < sections.Count; i++) { journalContentsButtons[i].gameObject.SetActive(true); journalContentsLabels[i].text = SliceFlow.SectionTitle(sections[i]) + (Flow.JournalSectionDue(sections[i]) ? "   ◆" : ""); }
+                journalSigns.gameObject.SetActive(Flow.JournalHasSigns); journalNote.text = "";
             }
-            journalNote.text = "What the wheel has shown you, as it stands. Reading here proves nothing; the wheel does that."; // placeholder (owner writes)
-            journalPrev.interactable = Flow.CanJournalPrev && !busy; journalNext.interactable = Flow.CanJournalNext && !busy; journalClose.interactable = !busy;
+            else if (signs) ShowJournalSign();
+            else
+            {
+                var kind = Flow.JournalKind; var items = Flow.JournalItems(kind); journalSectionText.text = SliceFlow.SectionTitle(kind) + " · " + (Flow.JournalSection + 1) + " of " + Flow.JournalSections.Count;
+                for (int i = 0; i < 12; i++)
+                {
+                    bool show = i < items.Count; journalGlyphs[i].gameObject.SetActive(show && kind != ItemKind.Opposite); journalLines[i].gameObject.SetActive(show); if (!show) continue;
+                    journalGlyphs[i].text = Zodiac.Seats[items[i].seat].Glyph; journalLines[i].text = SliceFlow.JournalName(items[i]) + " — " + SliceFlow.JournalFact(items[i]); journalLines[i].color = IlluminationColor(items[i]);
+                }
+                journalNote.text = "";
+            }
+            journalPrev.interactable = Flow.CanJournalPrev && !busy; journalNext.interactable = Flow.CanJournalNext && !busy; journalSignPrev.interactable = Flow.CanJournalPrev && !busy; journalSignNext.interactable = Flow.CanJournalNext && !busy; journalContents.interactable = !busy; journalClose.interactable = !busy;
         }
+        Color IlluminationColor(ReviewItem item)
+        {
+            float level = item.State == ItemState.Introduced ? .35f : item.streak <= 1 ? .4f : item.streak == 2 ? .7f : 1f;
+            if (item.dueDay <= Flow.Sitting) level *= .78f;
+            return Color.Lerp(Muted, Bone, level);
+        }
+        void ShowJournalSign()
+        {
+            int seat = Flow.LearnedSignSeats[Mathf.Clamp(Flow.JournalSign, 0, Flow.LearnedSignSeats.Count - 1)]; var name = Zodiac.Seats[seat].Name; journalSectionText.text = name;
+            journalSignArt.sprite = Slots.Image("sign-" + name.ToLowerInvariant()); float illumination = SignIllumination(seat); journalSignArt.color = new Color(.35f + .65f * illumination, .35f + .65f * illumination, .35f + .65f * illumination, 1f);
+            int ribbonLevel = Flow.JournalSignRibbonLength(seat); journalRibbon.rectTransform.sizeDelta = new Vector2(12, 18 + ribbonLevel * 18); journalRibbon.rectTransform.anchoredPosition = new Vector2(152, Flow.JournalSignDue(seat) ? -18 : 0);
+            var element = Flow.JournalSignLearned(seat, ItemKind.Element); var glyph = Flow.JournalSignLearned(seat, ItemKind.Glyph); var modality = Flow.JournalSignLearned(seat, ItemKind.Modality); var opposite = Flow.JournalSignOppositeLearned(seat); var grid = Flow.JournalSignLearned(seat, ItemKind.Grid);
+            journalGlyphs[0].gameObject.SetActive(glyph); journalGlyphs[0].text = glyph ? Zodiac.Seats[seat].Glyph : ""; journalGlyphs[0].fontSize = 72;
+            int row = 1; if (element) AddSignFact(row++, "ELEMENT", Zodiac.Seats[seat].Element); if (modality) AddSignFact(row++, "MODALITY", Zodiac.ModalityAt(seat)); if (opposite) { AddSignFact(row++, "POLARITY", Zodiac.PolarityAt(seat)); AddSignFact(row++, "OPPOSITE", Zodiac.Seats[Zodiac.Opposite(seat)].Name); } if (grid) AddSignFact(row++, "TABLE", (seat + 1).ToString());
+            journalNote.text = "";
+        }
+        float SignIllumination(int seat)
+        {
+            var items = Flow.Deck.Items.Where(i => i.entered && i.seat == seat).ToList(); if (items.Count == 0) return .35f; float level = items.Max(i => i.State == ItemState.Introduced ? .35f : i.streak <= 1 ? .4f : i.streak == 2 ? .7f : 1f); return Flow.JournalSignDue(seat) ? level * .78f : level;
+        }
+        void AddSignFact(int row, string label, string value) { if (row >= journalLines.Length) return; journalLines[row].gameObject.SetActive(true); journalLines[row].text = label + "   " + value; journalLines[row].color = Bone; if (row - 1 < journalPlates.Length) journalPlates[row - 1].gameObject.SetActive(true); }
+        void JournalContentsTap(int index) { var sections = Flow.JournalSections; if (index < sections.Count) JournalSectionPage(sections[index]); }
+        void JournalSectionPage(ItemKind kind) { if (busy || !Flow.JournalOpenSection(kind)) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void JournalSignsPage() { if (busy || !Flow.JournalOpenSigns()) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void JournalContentsPage() { if (busy || !Flow.JournalContentsPage()) return; Sound.Play("page"); ShowJournal(); Publish(); }
         void OpenJournal() { if (busy || !Flow.OpenJournal()) return; Sound.Play("page"); Show(); Publish(); }
         void CloseJournal() { if (busy || !Flow.CloseJournal()) return; Sound.Play("page"); Save(); Show(); Publish(); }
         void JournalTurn(int direction) { if (busy || !(direction > 0 ? Flow.JournalNext() : Flow.JournalPrev())) return; Sound.Play("page"); ShowJournal(); Publish(); }

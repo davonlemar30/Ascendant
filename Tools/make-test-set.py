@@ -22,7 +22,9 @@ IMAGES = [
     ("shelves", 60, 180), ("furniture-covered", 120, 72), ("desk", 72, 32), ("lamp", 8, 24), ("candle", 8, 20),
     ("door-open", 72, 100), ("door-sealed", 72, 100),
     ("mechanism", 112, 112), ("crystal-book", 36, 72), ("crystal-page", 28, 60), ("lock", 8, 8), ("keeper-key", 84, 40),
-    ("journal-page", 180, 400), ("journal-cover", 60, 60),  # Build F
+    ("journal-page", 180, 400), ("journal-cover", 60, 60), ("journal-contents", 180, 400), ("journal-ribbon", 24, 180), ("journal-plate", 96, 28),  # Build J
+    ("sign-aries", 200, 200), ("sign-taurus", 200, 200), ("sign-gemini", 200, 200), ("sign-cancer", 200, 200), ("sign-leo", 200, 200), ("sign-virgo", 200, 200),
+    ("sign-libra", 200, 200), ("sign-scorpio", 200, 200), ("sign-sagittarius", 200, 200), ("sign-capricorn", 200, 200), ("sign-aquarius", 200, 200), ("sign-pisces", 200, 200),
     ("atrium-light", 180, 400), ("wing-light", 180, 400), ("chamber-light", 180, 400),  # Build H: translucent overlays
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}

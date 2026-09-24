@@ -285,8 +285,12 @@ namespace Ascendant.CelestialDial
         }
         // The journal: in the inventory, opened from any room; renders straight from the deck; reading changes nothing (08: exposure only).
         public static readonly ItemKind[] JournalOrder = { ItemKind.Element, ItemKind.Glyph, ItemKind.Modality, ItemKind.Grid, ItemKind.Opposite };
-        public static string SectionTitle(ItemKind kind) => kind == ItemKind.Element ? "The elements" : kind == ItemKind.Glyph ? "The symbols" : kind == ItemKind.Modality ? "The kinds" : kind == ItemKind.Grid ? "The table" : "The opposites"; // placeholder (owner writes)
+        public static string SectionTitle(ItemKind kind) => kind == ItemKind.Element ? "The Elements" : kind == ItemKind.Glyph ? "The Symbols" : kind == ItemKind.Modality ? "The Modalities" : kind == ItemKind.Grid ? "The Table" : "The Opposites";
         public List<ItemKind> JournalSections => JournalOrder.Where(k => Deck.Items.Any(i => i.Kind == k && i.entered)).ToList();
+        public bool JournalHasSigns => Deck.Items.Any(i => i.entered);
+        public bool JournalContents { get; private set; }
+        public bool JournalSigns { get; private set; }
+        public int JournalSign { get; private set; }
         public int JournalSection { get; private set; }
         public SliceScreen JournalFrom { get; private set; } = SliceScreen.Hub;
         public bool AtJournal => Screen == SliceScreen.Journal;
@@ -294,19 +298,52 @@ namespace Ascendant.CelestialDial
         public bool OpenJournal()
         {
             if (!CanOpenJournal) return false;
-            JournalFrom = Screen; JournalSection = 0; Screen = SliceScreen.Journal; Logged?.Invoke("journal_opened"); return true;
+            JournalFrom = Screen; JournalSection = 0; JournalSign = 0; JournalContents = true; JournalSigns = false; Screen = SliceScreen.Journal; Logged?.Invoke("journal_opened"); return true;
         }
         public bool CloseJournal()
         {
             if (!AtJournal) return false;
             Screen = JournalFrom; if (Note == "gated") Note = ""; Logged?.Invoke("journal_closed"); return true;
         }
-        public bool CanJournalNext => AtJournal && JournalSection < JournalSections.Count - 1;
-        public bool CanJournalPrev => AtJournal && JournalSection > 0;
-        public bool JournalNext() { if (!CanJournalNext) return false; JournalSection++; Logged?.Invoke("journal_page:" + JournalSection); return true; }
-        public bool JournalPrev() { if (!CanJournalPrev) return false; JournalSection--; Logged?.Invoke("journal_page:" + JournalSection); return true; }
+        public bool CanJournalNext => AtJournal && ((JournalSigns && JournalSign < LearnedSignSeats.Count - 1) || (!JournalContents && !JournalSigns && JournalSection < JournalSections.Count - 1));
+        public bool CanJournalPrev => AtJournal && ((JournalSigns && JournalSign > 0) || (!JournalContents && !JournalSigns && JournalSection > 0));
+        public List<int> LearnedSignSeats => Enumerable.Range(0, 12).Where(SignLearned).ToList();
+        public bool SignLearned(int seat) => Deck.Items.Any(i => i.entered && i.seat == Zodiac.Wrap(seat));
+        public bool JournalSectionDue(ItemKind kind) => Deck.Items.Any(i => i.entered && i.Kind == kind && i.dueDay <= Sitting);
+        public int JournalSignRibbonLength(int seat) => Deck.Items.Where(i => i.entered && i.seat == Zodiac.Wrap(seat)).Select(i => i.interval).DefaultIfEmpty(0).Max();
+        public bool JournalSignDue(int seat) => Deck.Items.Any(i => i.entered && i.seat == Zodiac.Wrap(seat) && i.dueDay <= Sitting);
+        public bool JournalOpenSection(ItemKind kind)
+        {
+            if (!AtJournal || !JournalSections.Contains(kind)) return false;
+            JournalSection = JournalSections.IndexOf(kind); JournalContents = false; JournalSigns = false; Logged?.Invoke("journal_section:" + JournalSection); return true;
+        }
+        public bool JournalOpenSigns()
+        {
+            if (!AtJournal || !JournalHasSigns) return false;
+            JournalContents = false; JournalSigns = true; JournalSign = 0; Logged?.Invoke("journal_signs"); return true;
+        }
+        public bool JournalContentsPage() { if (!AtJournal) return false; JournalContents = true; JournalSigns = false; Logged?.Invoke("journal_contents"); return true; }
+        public bool JournalNext()
+        {
+            if (!CanJournalNext) return false;
+            if (JournalSigns) JournalSign++; else JournalSection++;
+            Logged?.Invoke("journal_page:" + (JournalSigns ? JournalSign : JournalSection)); return true;
+        }
+        public bool JournalPrev()
+        {
+            if (!CanJournalPrev) return false;
+            if (JournalSigns) JournalSign--; else JournalSection--;
+            Logged?.Invoke("journal_page:" + (JournalSigns ? JournalSign : JournalSection)); return true;
+        }
         public ItemKind JournalKind => JournalSections.Count == 0 ? ItemKind.Element : JournalSections[Math.Min(JournalSection, JournalSections.Count - 1)];
         public List<ReviewItem> JournalItems(ItemKind kind) => Deck.Items.Where(i => i.Kind == kind && i.entered).OrderBy(i => i.seat).ToList();
+        public ReviewItem JournalSignItem(int seat, ItemKind kind) => Deck.Item(seat, kind);
+        public bool JournalSignLearned(int seat, ItemKind kind) => JournalSignItem(seat, kind).entered;
+        public bool JournalSignOppositeLearned(int seat) => Deck.Item(Zodiac.PairOf(seat), ItemKind.Opposite).entered;
+        public List<string> JournalSignFacts(int seat)
+        {
+            var facts = new List<string>(); if (JournalSignLearned(seat, ItemKind.Glyph)) facts.Add("symbol " + Zodiac.Seats[seat].Glyph); if (JournalSignLearned(seat, ItemKind.Element)) facts.Add("element " + Zodiac.Seats[seat].Element); if (JournalSignLearned(seat, ItemKind.Modality)) facts.Add("modality " + Zodiac.ModalityAt(seat)); if (JournalSignOppositeLearned(seat)) { facts.Add("polarity " + Zodiac.PolarityAt(seat)); facts.Add("opposite " + Zodiac.Seats[Zodiac.Opposite(seat)].Name); } if (JournalSignLearned(seat, ItemKind.Grid)) facts.Add("table cell " + (seat + 1)); return facts;
+        }
         public static string JournalName(ReviewItem item) => item.Kind == ItemKind.Opposite ? Zodiac.Seats[item.seat].Name + " and " + Zodiac.Seats[Zodiac.Opposite(item.seat)].Name : Zodiac.Seats[item.seat].Name;
         public static string JournalFact(ReviewItem item) =>
             item.Kind == ItemKind.Element ? Zodiac.Seats[item.seat].Element :
@@ -314,8 +351,8 @@ namespace Ascendant.CelestialDial
             item.Kind == ItemKind.Modality ? Zodiac.ModalityAt(item.seat) :
             item.Kind == ItemKind.Grid ? Zodiac.Seats[item.seat].Element + " · " + Zodiac.ModalityAt(item.seat) :
             "opposites: six seats apart";
-        public static string StateWord(ReviewItem item) => item.State == ItemState.Practicing ? "practicing" : "introduced"; // 08's names for the two states a prototype can show
-        public List<string> JournalEntries(ItemKind kind) => JournalItems(kind).Select(i => JournalName(i) + " — " + JournalFact(i) + " · " + StateWord(i)).ToList();
+        public static string StateWord(ReviewItem item) => item.State == ItemState.Practicing ? "practicing" : "introduced"; // retained for web-state compatibility; never rendered
+        public List<string> JournalEntries(ItemKind kind) => JournalItems(kind).Select(i => JournalName(i) + " — " + JournalFact(i)).ToList();
         // Direct-tap item: which element does this sign belong to? One nudge, then reveal and move on.
         // Glyph review item: which sign is this mark? Four names, stable per seat (same options as the lesson).
         public int[] GlyphReviewOptions(int seat) => DialLesson.OptionsFor(seat, CleanRuns > 0, CleanRuns); // harder names once a clean run is on record

@@ -82,9 +82,11 @@ namespace Ascendant.CelestialDial
             public string hubNote = "";
             // Build F: the practice fork, the sitting, the gate, the journal
             public string fork = "", practiceMode = "", practiceSign = "", practiceSummary = "", journalSection = "";
-            public bool practicing, gated, journal, canContinueLesson, canEnterPractice, canLeavePractice, canOpenJournal, canCloseJournal, canJournalNext, canJournalPrev;
-            public int practiceIndex, practiceCount, strikes, sitting, journalPage, journalCount;
-            public string[] journalEntries;
+            public bool practicing, gated, journal, journalContents, journalSigns, canContinueLesson, canEnterPractice, canLeavePractice, canOpenJournal, canCloseJournal, canJournalNext, canJournalPrev;
+            public int practiceIndex, practiceCount, strikes, sitting, journalPage, journalCount, journalSign, journalRibbonLength;
+            public float journalIllumination;
+            public bool journalDue;
+            public string[] journalEntries, journalFacts;
             public string sunSign = "";
             public int locksFilled;
             // v0.4 tap-to-move
