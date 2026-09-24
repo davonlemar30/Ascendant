@@ -2,7 +2,7 @@
 
 ## Authority and scope
 
-This pass follows the canonical `ascendant-style-reference-2026-09-23.png` and the Atrium amendment dated 2026-09-24. The work is art-only: no code, layout, slot sizes, labels, wording, importer settings, or light-overlay crunch settings changed.
+This pass follows the attached Scorpio and Capricorn references as the shared style authority for regenerated raster art: warm amber cinematic lighting, clean dark contours, simplified hand-painted cel-shading, rich graphic shadows, restrained detail, and grounded mature proportions. The work is art-only: no code, layout, slot sizes, labels, wording, importer settings, or light-overlay crunch settings changed.
 
 ## PR 1 — rooms and light overlays
 
@@ -16,7 +16,9 @@ The fixed rects were checked against the 360 × 800 composition before replacing
 
 ## PR 2 — Dial face, props, and character style check
 
-Regenerated the hand-painted phoenix `dial-face` with transparent pixels outside its circle, plus `door-open`, `door-sealed`, `shelves`, `desk`, `furniture-covered`, `shelf`, `shelf-book`, `chair`, `candle`, `lamp`, and `keeper-key`. The existing `table.png` is retained because it already has the required exact 3 × 4 / twelve-cell arrangement; generated candidates were rejected when they produced nine cells. The existing Caspar identity remains compatible with the reference. After the attached Scorpio character references were supplied, `keeper-idle` and `keeper-walk` were regenerated again: African-American teen, semi-curly wet afro, black shirt, dark pants, light sneakers, warm amber rim light, rich charcoal shadows, and the attached clean cinematic linework.
+Regenerated the hand-painted phoenix `dial-face` with transparent pixels outside its circle, plus `door-open`, `door-sealed`, `shelves`, `desk`, `furniture-covered`, `shelf`, `shelf-book`, `chair`, `candle`, `lamp`, and `keeper-key`. `caspar` was also regenerated to match the same warm cinematic linework while preserving his identity. The existing `table.png` is retained because it already has the required exact 3 × 4 / twelve-cell arrangement; generated candidates were rejected when they produced nine cells. After the attached Scorpio character references were supplied, `keeper-idle` and `keeper-walk` were regenerated again: African-American teen, semi-curly wet afro, black shirt, dark pants, light sneakers, warm amber rim light, rich charcoal shadows, and the attached clean cinematic linework.
+
+This is the standing checklist for future raster art: use the attached character references, preserve registered dimensions and transparency, keep backgrounds dormant, put golden-hour energy only in `-light` overlays, and add no text or labels.
 
 ## Validation record
 
