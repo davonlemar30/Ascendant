@@ -45,8 +45,8 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `desk` | 70 × 30 | 256 | the desk, uncovered, in the Atrium room |
 | `lamp` | 8 × 22 | 64 | a wall lamp, four in the Atrium; dark until its stage |
 | `candle` | 8 × 20 | 64 | a candle: the opening's one, the Wing's, the Chamber's nine; dark until lit |
-| `door-open` | 70 × 100 | 512 | an open doorway: the Wing's and the Chamber's in the Atrium, the doorways back (40 × 60 in the Chamber); the doorway glows stay |
-| `door-sealed` | 70 × 100 | 512 | the sealed door on the Atrium's left (its lock mark goes; the light behind it stays) |
+| `door-open` | 64 × 128 | 512 | an open door leaf filling a painted arch: the Wing's (72 × 128) and the Chamber's (62 × 128) in the Atrium, the doorways back (36 × 140 in the Wing, 30 × 124 in the Chamber); no frame of its own, the painted arch is the frame; the doorway glows stay |
+| `door-sealed` | 64 × 128 | 512 | the sealed door leaf filling the Atrium's left arch (62 × 128); no frame of its own; the light behind it stays |
 | `mechanism` | 110 × 110 | 512 | the Chamber's old mechanism; turns one degree at the first Key |
 | `crystal-book` | 34 × 70 | 256 | one Crystal Book, seven times; brightens when it opens |
 | `crystal-page` | 26 × 58 | 256 | the page that rises from an open Book |

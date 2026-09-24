@@ -204,7 +204,7 @@ namespace Ascendant.CelestialDial
         {
             var screen = ScreenPanel(name, "atrium"); LightOverlay(screen, "atrium-light");
             Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
-            Block(screen, "Sealed door", -108, 325, 70, 100, "door-sealed");
+            Block(screen, "Sealed door", -118, 310, 62, 128, "door-sealed"); // Build K: sized to the painted arch (Sept 24 Atrium)
             Block(screen, "Shelves, mostly bare", -130, 200, 60, 120, "shelves");
             var furniture = Block(screen, "Covered furniture", 50, 422, 120, 70, "furniture-covered");
             var cloth = Rect("Dust cloth", screen, 50, 410, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(furniture));
@@ -240,7 +240,7 @@ namespace Ascendant.CelestialDial
             chamberBooksLabel = Label(chamber, "Seven sealed Books, three locks each", 0, 376, 330, 20, 12); chamberBooksLabel.color = Muted;
             // Build D: the Chamber as a room. A doorway back, the Books as a point of interest, a floor band; all hidden on the first (Continue) visit.
             chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f); chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band
-            chamberDoor = Block(chamber, "Doorway back", -140, 384, 40, 60, "door-open"); Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
+            chamberDoor = Block(chamber, "Doorway back", -150, 347, 30, 124, "door-open"); HitArea(chamberDoor, 48); // Build K: the painted doorway Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
             chamberBooksTap = Rect("The Books, tap to walk", chamber, 0, 300, 330, 90); var booksTapImage = chamberBooksTap.gameObject.AddComponent<Image>(); booksTapImage.color = new Color(0, 0, 0, 0); Tappable(chamberBooksTap, () => Walk("books")); chamberBooksTap.gameObject.SetActive(false);
             var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
@@ -273,9 +273,9 @@ namespace Ascendant.CelestialDial
             string[] doors = { "Sealed", "Zodiac Wing, open", "Crystal Book Chamber" }; // Build D: the third doorway leads back to the Chamber
             for (int i = 0; i < 3; i++)
             {
-                var door = Block(hub, doors[i], -108 + i * 108, 325, 70, 100, i == 0 ? "door-sealed" : "door-open"); string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "chamber-door"; Tappable(door, () => Walk(poi));
-                if (i == 1) { var light = Rect("Doorway light", door, 0, 50, 50, 82); doorOpenLight = light.gameObject.AddComponent<Image>(); doorOpenLight.color = new Color(.95f, .8f, .5f, HasArt(door) ? .06f : .35f); doorOpenLight.raycastTarget = false; }
-                else if (i == 2) { var light = Rect("Doorway light", door, 0, 50, 50, 82); var li = light.gameObject.AddComponent<Image>(); li.color = new Color(.7f, .8f, .95f, HasArt(door) ? .05f : .3f); li.raycastTarget = false; }
+                var door = Block(hub, doors[i], i == 0 ? -118 : i == 1 ? 0 : 118, 310, i == 1 ? 72 : 62, 128, i == 0 ? "door-sealed" : "door-open"); // Build K: each door fills its painted arch string poi = i == 0 ? "sealed-left" : i == 1 ? "wing-door" : "chamber-door"; Tappable(door, () => Walk(poi));
+                if (i == 1) { var light = Rect("Doorway light", door, 0, 64, 50, 105); doorOpenLight = light.gameObject.AddComponent<Image>(); doorOpenLight.color = new Color(.95f, .8f, .5f, HasArt(door) ? .06f : .35f); doorOpenLight.raycastTarget = false; }
+                else if (i == 2) { var light = Rect("Doorway light", door, 0, 64, 44, 105); var li = light.gameObject.AddComponent<Image>(); li.color = new Color(.7f, .8f, .95f, HasArt(door) ? .05f : .3f); li.raycastTarget = false; }
                 else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; lockRect.gameObject.SetActive(!HasArt(door)); var glow = Rect("Light behind the door", door, 0, 50, 50, 82); sealedLeftLight = glow.gameObject.AddComponent<Image>(); sealedLeftLight.color = new Color(.95f, .8f, .5f, 0); sealedLeftLight.raycastTarget = false; glow.SetAsFirstSibling(); }
             }
             hubCaption = Label(hub, "", 0, 92, 340, 36, 11); hubCaption.color = Muted;
@@ -407,8 +407,8 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 12; i++) { var square = Rect("Square", board, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
             var tableGlow = Rect("Table glow", table, 0, 15, 72, 44); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
             Tappable(table, () => Walk("grid"));
-            var door = Block(wingRoom, "Doorway back", -130, 325, 70, 100, "door-open"); Tappable(door, () => Walk("atrium-door"));
-            var light = Rect("Doorway light", door, 0, 50, 50, 82); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
+            var door = Block(wingRoom, "Doorway back", -136, 325, 36, 140, "door-open"); Tappable(door, () => Walk("atrium-door")); HitArea(door, 48); // Build K: the painted doorway
+            var light = Rect("Doorway light", door, 0, 70, 26, 115); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
             var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
             wingRoomCaption = Label(wingRoom, "The Dial stands at the center of the room. The doorway behind you leads back to the Atrium.", 0, 466, 340, 36, 12); // owner (worksheet section 6) // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
             enterGrid = MakeButton(wingRoom, "The Table", 0, 512, 300, 52, () => Walk("grid")); enterGrid.gameObject.SetActive(false); // Build B: shown once the table has woken // owner (worksheet section 11)
@@ -1288,6 +1288,8 @@ namespace Ascendant.CelestialDial
 
         // ---- placeholder geometry helpers (same reference layout as the Dial: 360 x 800, top-anchored) ----
         RectTransform ScreenPanel(string name, string slot = null) { var s = Rect(name, root, 0, 400, 360, 800); var image = s.gameObject.AddComponent<Image>(); image.color = Charcoal; if (slot != null) Slots.Dress(image, slot); return s; } // Build E: a room's background is a slot
+        // Build K: a narrow door keeps a finger-sized target; an invisible child catches the tap and it bubbles to the door's Button.
+        void HitArea(RectTransform door, float width) { var hit = Rect("Hit area", door, 0, door.sizeDelta.y / 2, Mathf.Max(width, door.sizeDelta.x), door.sizeDelta.y); var image = hit.gameObject.AddComponent<Image>(); image.color = new Color(0, 0, 0, 0); image.raycastTarget = true; hit.SetAsFirstSibling(); }
         RectTransform Block(Transform parent, string name, float x, float top, float width, float height, string slot = null)
         {
             var r = Rect(name, parent, x, top, width, height); var image = r.gameObject.AddComponent<Image>(); image.color = PanelColor; image.raycastTarget = false; if (slot != null) Slots.Dress(image, slot);
