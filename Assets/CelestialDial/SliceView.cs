@@ -157,7 +157,7 @@ namespace Ascendant.CelestialDial
                 float a = ReducedMotion ? .35f : .15f + .3f * Mathf.PingPong(Time.unscaledTime / 1.2f, 1f);
                 insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, a);
             }
-            if (Flow.Screen == SliceScreen.WingRoom && DialUnitWaiting && !ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .15f + .25f * Mathf.PingPong(Time.unscaledTime / 1.4f, 1f)); // Build I: reduced motion holds it still
+            if (Flow.Screen == SliceScreen.WingRoom && DialUnitWaiting && !ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .35f + .35f * Mathf.PingPong(Time.unscaledTime / 1.4f, 1f)); // Build I: reduced motion holds it still
             if (Flow.Gated && !busy && !Dial.Busy && !gating) StartCoroutine(Gate()); // Build F: the third strike closes the instrument once the answer's beat has settled
             if (wingContinue != null && Flow.AtriumStage >= 2)
             {
@@ -356,7 +356,7 @@ namespace Ascendant.CelestialDial
             leaveGrid = MakeButton(gridScreen, "Leave the Table", -72, 714, 128, 48, LeaveGrid); leaveGrid.GetComponentInChildren<Text>().fontSize = 13; // owner (worksheet section 11)
             gridAsk = MakeButton(gridScreen, "Ask Caspar", 78, 714, 164, 48, GridAsk); gridAsk.GetComponentInChildren<Text>().fontSize = 13; gridAsk.gameObject.SetActive(false); // owner (worksheet section 8)
             // Build I: the table's own Key rise, over the board, drawn like the Dial's
-            var tableKeyGlow = Rect("Table key glow", gridScreen, 0, GridKeyTop, 140, 140); gridKeyGlow = tableKeyGlow.gameObject.AddComponent<Image>(); gridKeyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); gridKeyGlow.raycastTarget = false;
+            var tableKeyGlow = Rect("Table key glow", gridScreen, 0, GridKeyTop, 140, 140); gridKeyGlow = tableKeyGlow.gameObject.AddComponent<Image>(); gridKeyGlow.sprite = SoftGlow(); gridKeyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); gridKeyGlow.raycastTarget = false;
             gridKey = Rect("Table Keeper Key", gridScreen, 0, GridKeyTop, 84, 40); var tableKeyImage = gridKey.gameObject.AddComponent<Image>(); tableKeyImage.raycastTarget = false; bool tableKeyArt = Slots.Dress(tableKeyImage, "keeper-key"); Slots.Paint(tableKeyImage, new Color(Bone.r, Bone.g, Bone.b, 0), 1f);
             gridKeyLabel = Label(gridKey, "KEEPER KEY", 0, 20, 80, 36, 12); gridKeyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0); gridKeyLabel.gameObject.SetActive(!tableKeyArt);
             gridKey.gameObject.SetActive(false);
@@ -374,7 +374,7 @@ namespace Ascendant.CelestialDial
             var cloth = Rect("Dust cloth", chair, 0, 10, 48, 14); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(chair));
             var c = Rect("Candle", r, -160, 445, 6, 18); c.SetAsFirstSibling(); candle = c.gameObject.AddComponent<Image>(); candle.raycastTarget = false; Slots.Dress(candle, "candle"); Slots.Paint(candle, LampDark, DarkArt);
             var s = Rect("Seam", r, 0, 270, 332, 2); seam = s.gameObject.AddComponent<Image>(); seam.color = new Color(Bone.r, Bone.g, Bone.b, 0); seam.raycastTarget = false;
-            var glow = Rect("Key glow", r, 0, 270, 140, 140); keyGlow = glow.gameObject.AddComponent<Image>(); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); keyGlow.raycastTarget = false;
+            var glow = Rect("Key glow", r, 0, 270, 140, 140); keyGlow = glow.gameObject.AddComponent<Image>(); keyGlow.sprite = SoftGlow(); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); keyGlow.raycastTarget = false;
             keyRect = Rect("Keeper Key", r, 0, 270, 84, 40); var keyImage = keyRect.gameObject.AddComponent<Image>(); keyImage.raycastTarget = false; bool keyArt = Slots.Dress(keyImage, "keeper-key"); Slots.Paint(keyImage, new Color(Bone.r, Bone.g, Bone.b, 0), 1f);
             keyLabel = Label(keyRect, "KEEPER KEY", 0, 20, 80, 36, 12); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0); keyLabel.gameObject.SetActive(!keyArt); // the file draws its own Key
             keyIndicator = Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
@@ -393,19 +393,19 @@ namespace Ascendant.CelestialDial
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
             var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36, "shelf");
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
-            var glow = Rect("Shelf glow", shelf, 0, 18, 60, 46); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
+            var glow = Rect("Shelf glow", shelf, 0, 18, 60, 46); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.sprite = SoftGlow(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
             var dial = Rect("The Dial", wingRoom, 30, 250, 200, 200); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
             var rings = Rect("Rings", dial, 0, 100, 200, 200); rings.gameObject.SetActive(!Slots.Dress(dialImage, "dial-face")); // the face seen from the room
             RingLines(rings, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(rings, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
-            var waitingGlow = Rect("Dial glow", wingRoom, 30, 240, 230, 230); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
+            var waitingGlow = Rect("Dial glow", wingRoom, 30, 250, 330, 330); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.sprite = SoftGlow(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
             var dialLabel = Label(wingRoom, "The Dial", 30, 352, 120, 16, 10); dialLabel.color = Muted;
             Tappable(dial, () => Walk("dial"));
             // Build B (07 Room Scope amendment): a second interactive object, the table with its board of twelve, dark until the modality unit is complete.
             var table = Block(wingRoom, "The table", -60, 372, 60, 30, "table");
             var board = Rect("Board", table, 0, 15, 60, 30); board.gameObject.SetActive(!HasArt(table));
             for (int i = 0; i < 12; i++) { var square = Rect("Square", board, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
-            var tableGlow = Rect("Table glow", table, 0, 15, 72, 44); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
+            var tableGlow = Rect("Table glow", table, 0, 15, 72, 44); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
             Tappable(table, () => Walk("grid"));
             var door = Block(wingRoom, "Doorway back", -130, 325, 70, 100, "door-open"); Tappable(door, () => Walk("atrium-door"));
             var light = Rect("Doorway light", door, 0, 50, 50, 82); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
@@ -834,7 +834,7 @@ namespace Ascendant.CelestialDial
                 enterGrid.gameObject.SetActive(Flow.CanOpenGrid); enterGrid.interactable = !busy;
                 journalWing.gameObject.SetActive(Flow.CanOpenJournal); journalWing.interactable = !busy; // Build F
                 gridGlow.color = new Color(.95f, .8f, .5f, Flow.ModalitiesComplete && !Grid.Key3Earned ? .35f : Flow.ModalitiesComplete ? .12f : 0); // an instrument with a unit waiting glows, like the shelf
-                if (!DialUnitWaiting) dialGlow.color = new Color(.95f, .8f, .5f, 0); else if (ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .3f); // Build I: the Dial glows too; Update breathes it
+                if (!DialUnitWaiting) dialGlow.color = new Color(.95f, .8f, .5f, 0); else if (ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .55f); // Build I: the Dial glows too; Update breathes it
                 wingRoomCaption.text = Flow.Note == "gated" ? SliceFlow.GateLine // Build F: the instrument closed on the third strike; the journal is below
                     : Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Flow.Note == "grid-dark" ? GridModel.DarkLine
@@ -1166,6 +1166,19 @@ namespace Ascendant.CelestialDial
         // Build I (task 86bc1brxu): Keys 2 to 4 get the Key 1 ceremony on the screen where they are earned: the seam splits the wheel
         // (on the Dial), the Key rises and glows, the count ticks, the Key settles into the count. Under two seconds; reduced motion cuts.
         const float GridKeyTop = 230;
+        // Build I: glows are soft discs, not flat squares (a radial falloff made once at startup, no file).
+        static Sprite softGlow;
+        static Sprite SoftGlow()
+        {
+            if (softGlow != null) return softGlow;
+            const int size = 64; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+            {
+                float dx = (x + .5f) / size * 2 - 1, dy = (y + .5f) / size * 2 - 1, d = Mathf.Clamp01(Mathf.Sqrt(dx * dx + dy * dy));
+                texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.SmoothStep(1, 0, d)));
+            }
+            texture.Apply(); softGlow = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); return softGlow;
+        }
         // Build I (86bc1brxd): one rule for the Wing room, "an instrument with a unit waiting glows": the symbols' second half,
         // the modalities once Key 2 is in hand, and the last pattern once the table's Key is.
         bool DialUnitWaiting => Flow.WheelComplete && (Dial.Lesson.Phase == LessonPhase.GlyphWheel

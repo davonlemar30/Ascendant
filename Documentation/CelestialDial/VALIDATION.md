@@ -10,7 +10,7 @@ This is an interaction test, not production art or a gameplay-validation result.
 
 `SliceView.KeyCeremony(n)` runs for Keys 2 and 4 on the Dial (seam, ring swell, the Key rises and glows, fades into the count) and for Key 3 over the table (its own Key and glow on the grid screen). About 1.95 s; reduced motion cuts every tween to zero. `LastCeremony` is published as `keyCeremony`. `DialUnitWaiting` (symbols Part B, the modalities with Key 2 in hand, the last pattern with Key 3) drives a glow behind the Dial in the Wing room, breathing in `Update`, static under reduced motion; published as `dialGlow`.
 
-Validation (local, branch `codex/playtest-fixes-keys`): mechanical 458/458 (adds the fixed symbol target, the challenge line, Caspar's silence on a bare challenge); slice fixture 177/177 (the Key 2, 3, and 4 checks now require the ceremony); WebGL build clean (18.4 MB, 0 errors, 0 warnings); browser suite at desktop and phone density with captures of each Key's ceremony and the Dial's glow.
+Validation (local, branch `codex/playtest-fixes-keys`): mechanical 458/458 (adds the fixed symbol target, the challenge line, Caspar's silence on a bare challenge); slice fixture 177/177 (the Key 2, 3, and 4 checks now require the ceremony); WebGL build clean (18.4 MB, 0 errors, 0 warnings); browser suite 273/273 at desktop and 273/273 at phone density (DEVICE_SCALE=2 MOBILE=1), with captures of each Key mid-rise and the Dial's halo in the Wing room. The glows (Key, table Key, Dial, shelf, table) are soft discs from a radial sprite made at startup instead of flat squares.
 
 ## Build H: the light overlays
 
