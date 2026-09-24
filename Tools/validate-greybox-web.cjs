@@ -46,7 +46,7 @@ const path=require('path');
     await waitActive('Taurus');check(!(await state()).dormant,'the Dial has woken and the guided problem began at '+viewport.width);
     const boxes=await page.locator('#seats button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,label:b.getAttribute('aria-label')})));
     check(boxes.length===12 && boxes.every(b=>b.width>=48 && b.height>=48 && b.label.includes('position')),'12 semantic seats and effective target floor at '+viewport.width);
-    await tap(0,714); // Count during guided Level 2 must not downgrade evidence.
+    check((await state()).challenge==='Next Earth after Taurus' && (await page.locator('#count').count())===0,'the wheel shows its own challenge and there is no Count button (Build I) at '+viewport.width);
     const scale=Math.min(viewport.width/360,viewport.height/800),cx=viewport.width/2,cy=(viewport.height-800*scale)/2+270*scale;
     await page.mouse.move(cx-100*scale,cy);await page.mouse.down();
     // Four detents of travel: 4 x 55 logical px along a 100 px radius is a 2.2 rad sweep, so snapping lands on the fourth seat.
@@ -55,7 +55,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-drag.png')});
     fs.writeFileSync(path.join(out,viewport.width+'-drag-state.json'),JSON.stringify({state:await state(),events},null,2));
     check((await state()).destination==='Selected: Virgo','actual pointer drag advances four detents at '+viewport.width);
-    check(events.filter(e=>e.event_name==='answer_committed').length===0,'drag and count do not submit at '+viewport.width);
+    check(events.filter(e=>e.event_name==='answer_committed').length===0,'a drag does not submit at '+viewport.width);
     await tap(0,654);await waitActive('Virgo');
     // Select a destination through the browser semantic path (assistive action simulation).
     await semantic('seat-9');check((await state()).destination==='Selected: Capricorn','semantic direct selection at '+viewport.width);
@@ -249,7 +249,7 @@ const path=require('path');
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
     check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Symbol')),'Part B hides every name, labels included, at '+viewport.width);
     await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Part A hold ends, then the wheel's labels refresh
-    { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: symbol ') && b.start==='' && b.count==='','Part B readouts do not name the sign under the bracket at '+viewport.width); }
+    { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: symbol ') && b.start==='' && b.count==='' && b.challenge===b.glyphTarget,'Part B readouts do not name the sign under the bracket; the center holds the target name (Build I) at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
@@ -264,6 +264,7 @@ const path=require('path');
         await page.screenshot({path:path.join(out,viewport.width+'-symbol-placement-restored.png')});
       }
     }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===2,{},{timeout:20000});await page.screenshot({path:path.join(out,viewport.width+'-key2-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key2&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).keys===2 && events.filter(e=>e.event_name==='key2_earned').length===1,'twelve symbols placed earns Key 2 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-key2.png')});
@@ -310,6 +311,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-practice-hard.png')});
     await semantic('close-book');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     // ---- Build A: the modalities on the Dial ----
+    check((await state()).dialGlow===1,'with Key 2 in hand the Dial glows in the Wing room: a unit waits there (Build I) at '+viewport.width);await page.screenshot({path:path.join(out,viewport.width+'-wing-room-dial-glow.png')});
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('continue-lesson');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='modalities'&&window.ascendantDial.snapshot().active,{},{timeout:15000});
     check((await state()).step===3 && (await state()).start==='Start: Taurus' && (await state()).message.includes('second pattern'),'after Key 2 the Dial opens the modality unit at the sun sign, three forward, at '+viewport.width);
@@ -397,6 +399,7 @@ const path=require('path');
     await settled();
     check((await state()).gridPlaced===6 && (await state()).caspar.includes('Virgo is placed') && !events.filter(e=>e.event_name==='grid_placed')[5].evidence_eligible,'three wrong cells hand the sign to Caspar, who seats it without evidence at '+viewport.width);
     for(let seat=6;seat<12;seat++)await seatSign(seat);
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===3,{},{timeout:20000});await page.screenshot({path:path.join(out,viewport.width+'-key3-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key3&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
     check((await state()).keys===3 && (await state()).gridPlaced===12 && (await state()).gridComplete && !(await state()).canGridPick && events.filter(e=>e.event_name==='key3_earned').length===1 && (await state()).caspar.includes('Keeper Key 3 is yours'),'twelve seated earns Key 3 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-key3.png')});
@@ -465,6 +468,7 @@ const path=require('path');
     await unitActive();check((await state()).message.startsWith('It is Sagittarius') && (await state()).builderStep==='opposite','two wrong names reveal the sign at '+viewport.width);
     await semantic('seat-'+OPP(8));await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='share'&&window.ascendantDial.snapshot().canBuilderShare,{},{timeout:20000});
     await semantic('builder-share-1');await page.waitForTimeout(150);await semantic('builder-share-0');
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===4,{},{timeout:20000});await page.screenshot({path:path.join(out,viewport.width+'-key4-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key4&&window.ascendantDial.snapshot().canLeaveWing,{},{timeout:20000});
     check((await state()).keys===4 && (await state()).built===3 && events.filter(e=>e.event_name==='key4_earned').length===1 && (await state()).message.includes('Keeper Key 4 is yours'),'three signs built with one unassisted earns Key 4 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-key4.png')});
@@ -509,8 +513,8 @@ const path=require('path');
   await action('seal');
   check(await recovery.evaluate(()=>window.ascendantDial.snapshot().destination==='Selected: Aries' && window.ascendantDial.snapshot().hintLevel===1 && window.ascendantDial.snapshot().canAsk),'first browser rejection stays in place at Level 1 and offers Ask Caspar');
   await action('ask-caspar');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().hintLevel===2&&window.ascendantDial.snapshot().message.includes('shares the same element after'));
-  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().active,{},{timeout:20000});await action('count');
-  check(await recovery.evaluate(()=>window.ascendantDial.snapshot().destination==='Selected: Aries' && window.ascendantDial.snapshot().hintLevel===2 && !window.ascendantDial.snapshot().canAsk),'Ask Caspar gives the rule once with the count, ring returns, Count preserves Level 2');
+  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().active,{},{timeout:20000});
+  check(await recovery.evaluate(()=>window.ascendantDial.snapshot().destination==='Selected: Aries' && window.ascendantDial.snapshot().hintLevel===2 && !window.ascendantDial.snapshot().canAsk),'Ask Caspar gives the rule once with the count and the ring returns');
   await recovery.screenshot({path:path.join(out,'390-rejected.png')});
   await recovery.waitForFunction(()=>window.ascendantDial.snapshot().active,{},{timeout:20000});await action('seal');await active('Leo');
   check(await recovery.evaluate(()=>window.ascendantDial.snapshot().hintLevel===0),'a miss after the asked rule goes to the Level 3 demo, which resets to a fresh Level 0 problem');

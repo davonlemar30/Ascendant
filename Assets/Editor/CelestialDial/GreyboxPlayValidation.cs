@@ -46,7 +46,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Lesson.Dial.Start==5,"correct Seal advances after silent home");View.WebAction("seat:9");Check(View.Lesson.Dial.Attempts==0,"accessible direct select does not submit");View.WebAction("seal");});
             Steps.Enqueue(()=>{Check(View.Lesson.Phase==LessonPhase.Transfer,"guided family completes");Capture("editor-390-guided.png");Click("Continue");});
             Steps.Enqueue(()=>{View.WebAction("motion");Check(!View.Lesson.Dial.CanInertia,"reduced motion disables inertia");for(int i=0;i<4;i++)View.WebAction("keyboard-forward");View.WebAction("seal");});
-            Steps.Enqueue(()=>{Check(View.Lesson.Dial.Start==4,"first independent problem completes");View.WebAction("count");View.WebAction("seat:8");View.WebAction("seal");});
+            Steps.Enqueue(()=>{Check(View.Lesson.Dial.Start==4,"first independent problem completes");View.WebAction("seat:8");View.WebAction("seal");});
             Steps.Enqueue(()=>{Check(View.Lesson.KeyEarned && View.Lesson.Lit.Count(v=>v)==6,"full Play Mode flow ends at six lit seats and eligible Key");Capture("editor-390-complete.png");SetSize(360,800);});
             Steps.Enqueue(()=>{Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("editor-360-complete.png");});
             Steps.Enqueue(()=>{

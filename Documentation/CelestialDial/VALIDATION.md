@@ -2,6 +2,16 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build I: playtest fixes, every Key's ceremony, the Dial's waiting glow
+
+[ClickUp task: Build I — Playtest fixes](https://app.clickup.com/t/86bc6kx5v). The owner's combined playtest of Sept 23 (Builds A–H) and two rulings the same day: the symbol challenge's fixed centre shows the target's name; the wheel poses the challenge and Caspar teaches (moving his teaching out of the wheel waits for the journal build).
+
+`DialLesson.Challenge` is the wheel's own line, derived from state: the target's name in the symbols (Part B), otherwise "Next ‹element› after ‹sign›" (four forward), "Next ‹modality› after ‹sign›" (three), "Across from ‹sign›" (six). `DialView` shows it above the centre (the old "Start:" line, best-fit 13 → 10) and, in Part B, puts the name in the centre where the turning symbol was. The web state keeps `start` ("Start: ‹sign›") as a machine field and adds `challenge`. Four Caspar lines that only restated the challenge are empty strings now; his panel hides while `Message` is empty. The Count button, its web action, and its page control are gone; the Level 2 count beat stays. The message box is 326 wide with best-fit 13 → 9.
+
+`SliceView.KeyCeremony(n)` runs for Keys 2 and 4 on the Dial (seam, ring swell, the Key rises and glows, fades into the count) and for Key 3 over the table (its own Key and glow on the grid screen). About 1.95 s; reduced motion cuts every tween to zero. `LastCeremony` is published as `keyCeremony`. `DialUnitWaiting` (symbols Part B, the modalities with Key 2 in hand, the last pattern with Key 3) drives a glow behind the Dial in the Wing room, breathing in `Update`, static under reduced motion; published as `dialGlow`.
+
+Validation (local, branch `codex/playtest-fixes-keys`): mechanical 458/458 (adds the fixed symbol target, the challenge line, Caspar's silence on a bare challenge); slice fixture 177/177 (the Key 2, 3, and 4 checks now require the ceremony); WebGL build clean (18.4 MB, 0 errors, 0 warnings); browser suite at desktop and phone density with captures of each Key's ceremony and the Dial's glow.
+
 ## Build H: the light overlays
 
 [ClickUp task: Build H — Light overlay slots](https://app.clickup.com/t/86bc3jd1j). The Sept 17 lighting decision (Option C): one transparent golden-hour overlay per room.

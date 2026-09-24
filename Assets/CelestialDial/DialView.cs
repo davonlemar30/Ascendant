@@ -40,6 +40,7 @@ namespace Ascendant.CelestialDial
         public Font GlyphFont { get; private set; } // Placeholder glyph rendering: Noto Sans Symbols (OFL), the Unicode zodiac symbols.
         Text message, destination, start, count, phase, sealText, motionText, subtitle;
         Button seal, back, forward, countButton, next, optional, askButton;
+        RectTransform panel;
         readonly Button[] builderNames = new Button[4], builderShares = new Button[3]; // Build C: the builder's name and share steps
         RectTransform root, ring, bracket;
         Image faceImage; // Build E: the dial-face slot under the seats
@@ -59,7 +60,7 @@ namespace Ascendant.CelestialDial
 #endif
         [Serializable] public sealed class WebState
         {
-            public string message, destination, start, phase, count;
+            public string message, destination, start, phase, count, challenge; // Build I: challenge = the line the wheel shows
             public string[] seats;
             public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy, review, wheelComplete, canAsk;
             public int hintLevel; // for test evidence; never shown to the player
@@ -101,6 +102,7 @@ namespace Ascendant.CelestialDial
             // Build E: art slots and sound hooks
             public string artSet = "", lastCue = ""; public int artFiles, soundFiles, cuesPlayed; public bool muted, style;
             public float lightAlpha; public int lightFiles; // Build H: the light overlays
+            public int keyCeremony; public float dialGlow; // Build I: the last Key ceremony shown; the Dial's waiting-unit glow in the Wing room
             public string[] styleSlots, styleSounds;
         }
         void Awake()
@@ -144,14 +146,14 @@ namespace Ascendant.CelestialDial
             var edge = bracket.gameObject.AddComponent<Outline>(); edge.effectColor = Bone; edge.effectDistance = new Vector2(2,2); edge.enabled = !bracketArt;
             // Four short bars visibly frame exactly one seat, without relying on color.
             if(!bracketArt) { Bar(bracket,-27,29,3,58); Bar(bracket,27,29,3,58); Bar(bracket,0,1,56,3); Bar(bracket,0,57,56,3); }
-            start = Label(root,"",0,223,188,30,13);
+            start = Label(root,"",0,223,220,30,13); start.resizeTextForBestFit=true; start.resizeTextMinSize=10; start.resizeTextMaxSize=13; // Build I: the wheel's challenge line
             destination = Label(root,"",0,271,188,50,20); // Names the sign under the bracket, live while dragging (owner request, Sept 12; reverses the Sept 11 "no label" row).
             count = Label(root,"",0,319,178,36,15);
             Label(root,"Move  >  Inspect  >  Seal",0,441,340,24,14);
-            var panel = Rect("Caspar instruction panel",root,0,526,324,128);
+            panel = Rect("Caspar instruction panel",root,0,526,340,128);
             panel.gameObject.AddComponent<Image>().color = new Color(.13f,.13f,.15f);
             Label(panel,"CASPAR",0,18,290,22,13);
-            message = Label(panel,"",0,74,306,96,13);
+            message = Label(panel,"",0,74,326,100,13); message.resizeTextForBestFit=true; message.resizeTextMinSize=9; message.resizeTextMaxSize=13; // Build I: the text shrinks to fit instead of being cut off (owner playtest, Sept 23)
             phase = Label(root,"",0,608,330,28,13);
             back = MakeButton(root,"Previous",-122,654,64,56,()=>Step(-1,ClickMethod(DialInput.BackStep)));
             seal = MakeButton(root,"SEAL",0,654,146,56,Commit); // Amended canon (Sept 11): "Keeper's Seal" renamed to "Seal".
@@ -369,14 +371,17 @@ namespace Ascendant.CelestialDial
         void ToggleMotion() { Lesson.Dial.ReducedMotion=!Lesson.Dial.ReducedMotion; if(Lesson.Dial.ReducedMotion) turns=targetTurns; Refresh(); }
         void Refresh()
         {
-            message.text=Lesson.Message;
+            message.text=Lesson.Message; panel.gameObject.SetActive(Lesson.Message!=""); // Build I: Caspar's panel shows only when he speaks
             // In the marks (Part B) the names are the answer: the center shows the mark under the bracket, no start line, no count
             // (owner playtest v0.3, test 2: the readout gave the sign away).
             bool marks=Lesson.Phase==LessonPhase.GlyphWheel;
-            destination.text=marks ? Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name;
-            destination.font=marks ? GlyphFont : font;
-            start.text=marks ? "" : Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
-            count.text=Lesson.Dial.Counting && !marks ? "Count: "+Lesson.Dial.MovementCount : "";
+            // Build I (owner playtest, Sept 23): in the symbols the center holds the target's name, fixed while the wheel turns;
+            // elsewhere the line above the center is the wheel's own challenge, and the center names the framed sign live.
+            string challenge=Lesson.Challenge;
+            destination.text=marks ? challenge : Zodiac.Seats[Lesson.Dial.Selected].Name;
+            destination.font=font;
+            start.text=marks ? (challenge=="" ? "" : "Find the symbol of") : challenge!="" ? challenge : Lesson.IsProblem ? "" : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
+            count.text=""; // Build I: no Count button, no running count (owner playtest, Sept 23); the worked demonstration still counts aloud
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
                 Lesson.Phase==LessonPhase.AllLit ? "All twelve signs alight. The whole wheel burns." : // owner (worksheet section 3)
@@ -396,14 +401,13 @@ namespace Ascendant.CelestialDial
             bool active=Lesson.IsProblem && Lesson.Dial.Active && !busy;
             back.gameObject.SetActive(Lesson.IsProblem); forward.gameObject.SetActive(Lesson.IsProblem); seal.gameObject.SetActive(Lesson.IsProblem);
             back.interactable=forward.interactable=seal.interactable=active;
-            countButton.gameObject.SetActive(Lesson.IsProblem); countButton.interactable=active;
             next.gameObject.SetActive(((Lesson.Phase==LessonPhase.Encounter && !Lesson.IntroAuto) || Lesson.Phase==LessonPhase.Rule || Lesson.Phase==LessonPhase.Transfer || Lesson.Phase==LessonPhase.Polarity || Lesson.Phase==LessonPhase.OppositesComplete) && !busy);
             bool naming=Lesson.Phase==LessonPhase.BuilderName, sharing=Lesson.Phase==LessonPhase.BuilderShare;
             var options=naming ? Lesson.BuilderOptions : null;
             for(int i=0;i<4;i++){ builderNames[i].gameObject.SetActive(naming); builderNames[i].interactable=naming && !busy; builderNames[i].GetComponentInChildren<Text>().text=naming ? Zodiac.Seats[options[i]].Name : ""; }
             for(int i=0;i<3;i++){ builderShares[i].gameObject.SetActive(sharing); builderShares[i].interactable=sharing && !busy && !Lesson.Shared[i]; builderShares[i].GetComponentInChildren<Text>().text=DialLesson.ShareLabels[i]+(sharing && Lesson.Shared[i] ? ": shared" : ""); builderShares[i].GetComponent<Image>().color=sharing && Lesson.Shared[i] ? new Color(.29f,.27f,.28f) : new Color(.21f,.21f,.24f); }
             optional.gameObject.SetActive(Lesson.Phase==LessonPhase.Complete && Lesson.KeyEarned && Lesson.FamiliesComplete<=2 && (Slice==null || !SliceHidesOptional));
-            countButton.gameObject.SetActive(Lesson.IsProblem && Lesson.Phase!=LessonPhase.Review && Lesson.Phase!=LessonPhase.GlyphWheel);
+            countButton.gameObject.SetActive(false); // Build I: the Count button is off (owner playtest, Sept 23)
             askButton.gameObject.SetActive(Lesson.CanAsk && !busy); askButton.interactable=active; // no count in the marks: the target is a symbol, not a distance (owner playtest v0.3)
             motionText.text="Reduced motion: "+(Lesson.Dial.ReducedMotion ? "on" : "off");
             RefreshSeats(); LayoutRing(); Publish();
@@ -441,7 +445,7 @@ namespace Ascendant.CelestialDial
         {
             var labels=new string[12];for(int i=0;i<12;i++) labels[i]=Lesson.SeatLabel(i);
             var glyphs=new string[12];for(int i=0;i<12;i++) glyphs[i]=Zodiac.Seats[i].Glyph;
-            var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=start.text,phase=phase.text,count=count.text,seats=labels,
+            var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=Lesson.Phase==LessonPhase.GlyphWheel ? "" : Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : start.text,challenge=Lesson.Challenge,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete,
                 glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,cleanRuns=Lesson.CleanRuns,practice=Lesson.Practice,hard=Lesson.Hard,unit=Lesson.InBuilder ? "builder" : Lesson.InOpposites ? "opposites" : Lesson.InModalities ? "modalities" : Lesson.GlyphsShown && !(Lesson.WheelComplete && Lesson.Key2Earned && Lesson.Phase==LessonPhase.Key2) ? "symbols" : "elements",modalitiesComplete=Lesson.ModalitiesComplete,litModCount=Lesson.LitMod.Count(v=>v),step=Lesson.Dial.Forward,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : "",
@@ -474,7 +478,6 @@ namespace Ascendant.CelestialDial
             else if(command=="keyboard-forward")Step(1,DialInput.Keyboard);
             else if(command=="keyboard-back")Step(-1,DialInput.Keyboard);
             else if(command=="seal")Commit();
-            else if(command=="count") { if(!busy)Lesson.Dial.Count(); Refresh(); }
             else if(command=="continue")ContinueLesson();
             else if(command=="optional") { if(!busy) { Lesson.BeginOptional(); AlignStart(); } }
             else if(command=="motion")ToggleMotion();
