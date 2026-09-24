@@ -45,6 +45,20 @@ namespace Ascendant.CelestialDial
         public bool UnitInProgress => (AllNamed && !Key2Earned) || (ModalityUnitStarted && !ModalitiesComplete && Phase != LessonPhase.ModalityPaused) || (OppositesStarted && !Key4Earned && Phase != LessonPhase.OppositePaused && Phase != LessonPhase.BuilderPaused);
         public bool InModalities => Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || Phase == LessonPhase.ModalityPaused || Phase == LessonPhase.ModalityComplete;
         // ---- Build C (Unit 1.3): polarity, the six opposite pairs, and the builder on the same Dial. Key 4 for three signs built. ----
+        // Build I (owner playtest, Sept 23): the wheel poses its own challenge on its face; Caspar teaches and answers.
+        // The symbol challenge names its target, fixed while the wheel turns (owner ruling: the name, so the symbol is still recalled).
+        public string Challenge
+        {
+            get
+            {
+                if (!IsProblem || !Dial.Active) return "";
+                if (Phase == LessonPhase.GlyphWheel) return Dial.Target >= 0 ? SignName(Dial.Target) : "";
+                int s = Dial.Start;
+                return Dial.Forward == 6 ? "Across from " + SignName(s)
+                    : Dial.Forward == 3 ? "Next " + Zodiac.ModalityAt(s) + " after " + SignName(s)
+                    : "Next " + Element(s) + " after " + SignName(s);
+            }
+        }
         public bool InOppositeProblem => Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.BuilderOpposite;
         public bool InOpposites => Phase == LessonPhase.Polarity || Phase == LessonPhase.OppositeGuided || Phase == LessonPhase.OppositeOwn || Phase == LessonPhase.OppositePaused || Phase == LessonPhase.OppositesComplete;
         public bool InBuilder => Phase == LessonPhase.BuilderName || Phase == LessonPhase.BuilderOpposite || Phase == LessonPhase.BuilderShare || Phase == LessonPhase.BuilderPaused || Phase == LessonPhase.Key4;
@@ -275,7 +289,7 @@ namespace Ascendant.CelestialDial
             Dial.Begin(lastStart, hint, -1, 3);
             CountBeatPending = hint >= 2;
             Message = hint >= 2 ? string.Format(RuleFor(3), SignName(lastStart)) + "\nWhen the sign is selected, press Seal."
-                : "Your turn now, acolyte. Find the next " + ModalityName(lastStart).ToLowerInvariant() + " sign after " + SignName(lastStart) + " upon the wheel.\nWhen it is selected, press Seal."; // owner (worksheet section 10)
+                : ""; // Build I: the wheel poses the challenge on its face (was worksheet section 10's "Your turn now, acolyte. Find the next …")
         }
         void AfterModalityCorrect(DialEvent result)
         {
@@ -387,7 +401,7 @@ namespace Ascendant.CelestialDial
         void BeginGlyphProblem(int seat)
         {
             Dial.Begin(Zodiac.Wrap(seat + 3 + (seat * 5) % 7), 0, seat); CountBeatPending = false; // start three to nine seats away, never on or beside the answer (owner playtest, Sept 14)
-            Message = "Find the symbol of " + SignName(seat) + ".\nTurn until it is selected, then press Seal."; // owner (worksheet section 5)
+            Message = ""; // Build I: the wheel names the target on its face; Caspar only teaches and answers (was worksheet section 5's "Find the symbol of …")
         }
         void FinishGlyphs()
         {
@@ -432,7 +446,7 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Review || IsProblem) return false;
             phaseBeforeReview = Phase; Phase = LessonPhase.Review;
             Dial.Begin(seat, 0, -1, step); CountBeatPending = false;
-            Message = step == 3 ? "Find the next sign that shares this modality." : "Before you turn the wheel, know this: the signs are not scattered without purpose. Three signs share an element: Fire, three share Earth, three share Air, and three share Water. These are a sort of elemental family. I shall test whether you can trace them upon the wheel, starting now."; // owner (worksheet sections 2 and 10); the compressed form: start already framed, Seal
+            Message = step == 3 ? "" : "Before you turn the wheel, know this: the signs are not scattered without purpose. Three signs share an element: Fire, three share Earth, three share Air, and three share Water. These are a sort of elemental family. I shall test whether you can trace them upon the wheel, starting now."; // owner (worksheet sections 2 and 10); the compressed form: start already framed, Seal
             return true;
         }
         public void EndReview() { if (Phase != LessonPhase.Review) return; Dial.Home(); Phase = phaseBeforeReview; }
@@ -504,7 +518,7 @@ namespace Ascendant.CelestialDial
             CountBeatPending = hint >= 2;
             string sign = SignName(lastStart);
             Message = hint >= 2 ? "Start at " + sign + ". Count each sign after it: one, two, three, four.\nInspect the framed sign, then press Seal." :
-                "Your turn. Find the next sign in this family from " + sign + ".\nMove the wheel, inspect the framed sign, then press Seal.";
+                ""; // Build I: the wheel poses the challenge on its face (was "Your turn. Find the next sign in this family from …")
         }
         public void CountBeatShown() { CountBeatPending = false; }
         public const string RuleLine = "Find the next sign that shares the same element after {0} upon the wheel.\nCount each sign after it: one, two, three, four."; // Level 2 (owner wording, Sept 17, worksheet section 8)

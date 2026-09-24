@@ -158,6 +158,8 @@ namespace Ascendant.Build
             symbols.BeginGlyphs();
             for (int i = 0; i < 12; i++) symbols.AnswerGlyphName(symbols.CurrentGlyph);
             Check(symbols.Phase == LessonPhase.GlyphWheel && Kind(symbolFlow.Deck, ItemKind.Element) == elementsBefore, "symbol Part A leaves every element item untouched");
+            { int t = symbols.Dial.Target; string before = symbols.Challenge; symbols.Dial.Select(Zodiac.Wrap(t + 2), DialInput.DirectSeat);
+              Check(before == Zodiac.Seats[t].Name && symbols.Challenge == before && symbols.Message == "", "Build I: the symbol challenge names its target on the wheel, fixed while the wheel turns, and Caspar does not pose it"); }
             for (int i = 0; i < 12; i++) { symbols.Dial.Select(symbols.Dial.Target, DialInput.DirectSeat); var answer = symbols.Seal(); Check(answer.correctness && answer.event_name == "answer_correct", "symbol placement " + (i + 1) + " is a correct wheel answer"); symbols.AfterCorrect(answer); }
             Check(symbols.Key2Earned && Kind(symbolFlow.Deck, ItemKind.Element) == elementsBefore && Others(symbolFlow.Deck, ItemKind.Glyph) == othersBefore, "symbol Part B (twelve answer_correct events on the wheel) leaves every element, modality, grid, and opposite item untouched");
             Check(symbolFlow.Deck.Items.Where(i => i.Kind == ItemKind.Glyph).All(i => i.entered && i.State == ItemState.Practicing && i.streak >= 1), "symbol answers advance all twelve symbol items");
@@ -170,6 +172,7 @@ namespace Ascendant.Build
             // Modalities.
             var mod = Lit(true); var modFlow = Observe(mod, grid); modFlow.StartModalities();
             othersBefore = Others(modFlow.Deck, ItemKind.Modality); mod.BeginModalities();
+            Check(mod.Challenge == "Next " + Zodiac.ModalityAt(mod.Dial.Start) + " after " + Zodiac.Seats[mod.Dial.Start].Name, "Build I: the modality challenge is the wheel's own line");
             while (!mod.ModalitiesComplete) { mod.Dial.Select(Zodiac.Destination(mod.Dial.Start, 3), DialInput.DirectSeat); var answer = mod.Seal(); mod.AfterCorrect(answer); }
             Check(Others(modFlow.Deck, ItemKind.Modality) == othersBefore && modFlow.Deck.Items.Where(i => i.Kind == ItemKind.Modality).All(i => i.entered), "modality answers move only modality items");
             // Opposites and the builder.
