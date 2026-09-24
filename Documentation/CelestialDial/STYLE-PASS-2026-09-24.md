@@ -16,7 +16,7 @@ The fixed rects were checked against the 360 × 800 composition before replacing
 
 ## PR 2 — Dial face, props, and character style check
 
-Regenerated the hand-painted phoenix `dial-face` with transparent pixels outside its circle, plus `door-open`, `door-sealed`, `shelves`, `desk`, `furniture-covered`, `shelf`, `shelf-book`, `chair`, `candle`, `lamp`, and `keeper-key`. The existing `table.png` is retained because it already has the required exact 3 × 4 / twelve-cell arrangement; generated candidates were rejected when they produced nine cells. The existing Caspar identity remains compatible with the reference. `keeper-idle` and `keeper-walk` were regenerated in the same style while preserving the dark-skinned youth, black shirt, blue jeans, and white sneaker identity.
+Regenerated the hand-painted phoenix `dial-face` with transparent pixels outside its circle, plus `door-open`, `door-sealed`, `shelves`, `desk`, `furniture-covered`, `shelf`, `shelf-book`, `chair`, `candle`, `lamp`, and `keeper-key`. The existing `table.png` is retained because it already has the required exact 3 × 4 / twelve-cell arrangement; generated candidates were rejected when they produced nine cells. The existing Caspar identity remains compatible with the reference. After the attached Scorpio character references were supplied, `keeper-idle` and `keeper-walk` were regenerated again: African-American teen, semi-curly wet afro, black shirt, dark pants, light sneakers, warm amber rim light, rich charcoal shadows, and the attached clean cinematic linework.
 
 ## Validation record
 
