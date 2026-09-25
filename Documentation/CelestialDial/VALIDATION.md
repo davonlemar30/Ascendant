@@ -88,6 +88,9 @@ Sensitivity (55 logical pixels per detent), 120 ms snap, maximum one-detent iner
 
 ## Reproducible checks
 
+**The whole ladder in one command (Sept 25):** `PLAYWRIGHT_MODULE=<path to an npm-installed playwright> Tools/validate-all.sh` runs the mechanical checks, the shared WebGL build, then the browser suite and the slice fixture **in parallel** (the suite drives a browser against the served build, the fixture drives the Editor). The suite plays both viewports at once (`VIEWPORTS=390` for one), and the fixture's gap between steps is a setting (`-sliceStep`, default 1.5 s; 1.0 s fails the reveal-timing step). `ART_ONLY=1` skips the fixture and plays one viewport, for art-only PRs. Measured: suite ~20 → 7.3 min, fixture ~15 → 10.5 min, and the two now overlap.
+
+
 Use Unity 6000.3.24f1. Run **Ascendant → Greybox → Run mechanical validation** or:
 
 ```sh

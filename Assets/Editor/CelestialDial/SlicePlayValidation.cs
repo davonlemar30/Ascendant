@@ -18,6 +18,9 @@ namespace Ascendant.Build
         static readonly Queue<Action> Steps=new Queue<Action>();
         static readonly List<string> Report=new List<string>();
         static readonly List<string> RuntimeErrors=new List<string>();
+        // Faster checks (Sept 25): the pause between steps was a fixed 4 s; every step already waits for !Busy, so the gap is a
+        // setting (-sliceStep seconds on the command line), 1.5 s by default.
+        static double StepGap { get { var args = System.Environment.GetCommandLineArgs(); int i = System.Array.IndexOf(args, "-sliceStep"); return i >= 0 && i + 1 < args.Length && double.TryParse(args[i + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var v) ? v : 1.5; } }
         static double nextAt; static string stashedSave=""; static int playedBefore;
         const string ReportPath="Logs/slice-play-validation.txt";
         static SliceView View => UnityEngine.Object.FindFirstObjectByType<SliceView>();
@@ -294,7 +297,7 @@ namespace Ascendant.Build
             EditorApplication.QueuePlayerLoopUpdate();
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
             var view=View; if(view!=null && (view.Busy || view.Dial.Busy))return; // Beats own the frame.
-            nextAt=EditorApplication.timeSinceStartup+4;
+            nextAt=EditorApplication.timeSinceStartup+StepGap; // each step also waits until no beat owns the frame
             try{Steps.Dequeue()();}
             catch(Exception e)
             {
