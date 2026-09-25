@@ -102,7 +102,7 @@ namespace Ascendant.CelestialDial
             // Build E: art slots and sound hooks
             public string artSet = "", lastCue = ""; public int artFiles, soundFiles, cuesPlayed; public bool muted, style;
             public float lightAlpha; public int lightFiles; // Build H: the light overlays
-            public int keyCeremony; public float dialGlow; public int kitLevel, kitPieces, kitRestored; public float grime; public string[] kitUp; // Build M: the Wing kit; kitUp = the pieces standing restored // Build I: the last Key ceremony shown; the Dial's waiting-unit glow in the Wing room
+            public int keyCeremony; public float dialGlow; public int kitLevel, kitPieces, kitRestored; public float grime, wingLight; public string[] kitUp; // Build M: the Wing kit; kitUp = the pieces standing restored // Build I: the last Key ceremony shown; the Dial's waiting-unit glow in the Wing room
             public string[] styleSlots, styleSounds;
         }
         void Awake()

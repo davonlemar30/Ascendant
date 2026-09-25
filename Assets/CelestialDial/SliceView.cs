@@ -389,7 +389,7 @@ namespace Ascendant.CelestialDial
         void BuildWingRoom()
         {
             // Q06 phase 2, decision 2: the Wing as a room with two points of interest, the Dial and the doorway back.
-            wingRoom = ScreenPanel("Wing room", "wing"); LightOverlay(wingRoom, "wing-light");
+            wingRoom = ScreenPanel("Wing room", "wing"); wingLight = LightOverlay(wingRoom, "wing-light");
             BuildWingKit(); // Build M: grime under the light, the kit pieces, the veil; everything after draws above the veil
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
@@ -1048,7 +1048,7 @@ namespace Ascendant.CelestialDial
             state.canEnterGrid = s == SliceScreen.WingRoom && Flow.CanOpenGrid && !busy;
             state.keys = Math.Max(state.keys, Flow.Keys); // the lesson counts two Keys; the table adds the third
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
-            state.kitLevel = kitShown; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; // Build M
+            state.kitLevel = kitShown; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
             state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
             if (s == SliceScreen.Grid)
             {
@@ -1204,10 +1204,10 @@ namespace Ascendant.CelestialDial
             new KitPlacement("chair", 144, 475, 3),
             new KitPlacement("plate", -138, 222, 1),
         };
-        public static readonly float[] KitGrime = { 1, .75f, .5f, .25f, 0 }, KitVeil = { .45f, .3f, .18f, .08f, 0 }; // by Keys earned, 0 to 4 (tuning variables)
+        public static readonly float[] KitGrime = { 1, .75f, .5f, .25f, 0 }, KitVeil = { .45f, .3f, .18f, .08f, 0 }, KitLight = { 0, .25f, .5f, .75f, 1 }; // by Keys earned, 0 to 4 (tuning variables)
         const string WingPlateName = "THE GRAND ATRIUM"; // the Wing's doorway leads back to the Atrium
         class KitPiece { public KitPlacement P; public CanvasGroup Worn, Restored; public Image Flash; public bool Shown; }
-        readonly List<KitPiece> wingKit = new List<KitPiece>(); Image wingGrime, wingVeil; int kitShown = -1; Coroutine kitFade;
+        readonly List<KitPiece> wingKit = new List<KitPiece>(); Image wingGrime, wingVeil, wingLight; int kitShown = -1; Coroutine kitFade;
         public int KitLevel => kitShown;
         public int KitRestored => wingKit.Count(p => p.Restored != null && p.Restored.alpha > .99f);
         void BuildWingKit()
@@ -1229,6 +1229,7 @@ namespace Ascendant.CelestialDial
             }
             var veil = Rect("Veil", wingRoom, 0, 400, 360, 800); wingVeil = veil.gameObject.AddComponent<Image>(); wingVeil.color = new Color(0, 0, 0, 0); wingVeil.raycastTarget = false;
             veil.gameObject.SetActive(wingKit.Count > 0);
+            if (wingKit.Count > 0 && wingLight != null) lightOverlays.Remove(wingLight); // owner, Sept 25: with the kit the Wing's light follows its Keys, not the Atrium's stage
         }
         CanvasGroup KitState(RectTransform kit, KitPlacement p, string state)
         {
@@ -1261,6 +1262,7 @@ namespace Ascendant.CelestialDial
             }
             if (wingGrime != null) wingGrime.color = new Color(1, 1, 1, KitGrime[level]);
             if (wingVeil != null) wingVeil.color = new Color(0, 0, 0, KitVeil[level]);
+            if (wingLight != null && !lightOverlays.Contains(wingLight)) wingLight.color = new Color(1, 1, 1, KitLight[level]);
         }
         IEnumerator RestoreKit(int from, int to, List<KitPiece> turning)
         {
@@ -1282,6 +1284,7 @@ namespace Ascendant.CelestialDial
                 }
                 if (wingGrime != null) wingGrime.color = new Color(1, 1, 1, Mathf.Lerp(KitGrime[from], KitGrime[to], k));
                 if (wingVeil != null) wingVeil.color = new Color(0, 0, 0, Mathf.Lerp(KitVeil[from], KitVeil[to], k));
+                if (wingLight != null && !lightOverlays.Contains(wingLight)) wingLight.color = new Color(1, 1, 1, Mathf.Lerp(KitLight[from], KitLight[to], k));
             });
             SetKit(to); kitFade = null; Publish();
         }
