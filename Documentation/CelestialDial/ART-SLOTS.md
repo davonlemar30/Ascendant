@@ -12,7 +12,7 @@ The manifest lives in code, in [`Assets/CelestialDial/Slots.cs`](../../Assets/Ce
 4. The light: each room also takes a transparent golden-hour overlay (`atrium-light.png`, `wing-light.png`, `chamber-light.png`, 360 × 800), drawn over the room and faded in by the Atrium's stage as the Library wakes. Draw the room dormant; draw its light separately.
 5. Play. The file is in place. Open the style page (Editor menu **Ascendant › Greybox › Play the style page**, or `?style` on the web build) to see every slot at once with its source.
 
-A file fills its placeholder's rect exactly (no letterboxing), so draw at the slot's proportions: a 360 × 800 room background, a 20 × 44 Keeper. Draw at twice the listed size for phone density (720 × 1600 for a room), never more than the slot's cap. Make both sides multiples of 4 so the texture compresses; anything else imports uncompressed and larger, and the Console says so. Transparent pixels are honoured (the Keeper and Caspar should be cut-outs).
+A file fills its placeholder's rect exactly (no letterboxing), so draw at the slot's proportions: a 360 × 800 room background, a 44 × 100 Keeper. Draw at twice the listed size for phone density (720 × 1600 for a room), never more than the slot's cap. Make both sides multiples of 4 so the texture compresses; anything else imports uncompressed and larger, and the Console says so. Transparent pixels are honoured (the Keeper and Caspar should be cut-outs).
 
 Where the placeholder used color for state (a lit lamp, an open Book, a lit seat), the file is drawn at full brightness in that state and dimmed in the other; the tints are in `SliceView`/`DialView` next to the placeholder colors. Labels under the props (“Shelves, mostly empty”) stay until the owner says otherwise; whether they go once art arrives is an open owner call.
 
@@ -25,9 +25,9 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `atrium` | 360 × 800 | 2048 | the Grand Atrium, behind the opening, the return, and the room |
 | `wing` | 360 × 800 | 2048 | the Zodiac Wing room, behind its props |
 | `chamber` | 360 × 800 | 2048 | the Crystal Book Chamber, first visit and room |
-| `caspar` | 44 × 76 | 256 | Caspar standing in the Atrium |
-| `keeper-idle` | 20 × 44 | 128 | the Keeper standing; flipped to face the way it last walked |
-| `keeper-walk` | 20 × 44 | 128 | the Keeper mid-step; alternates with idle every step while walking (either frame alone serves for both) |
+| `caspar` | 64 × 112 | 256 | Caspar standing in the Atrium |
+| `keeper-idle` | 44 × 100 | 256 | the Keeper standing; flipped to face the way it last walked |
+| `keeper-walk` | 44 × 100 | 256 | the Keeper mid-step; alternates with idle every step while walking (either frame alone serves for both) |
 | `dial-face` | 332 × 332 | 1024 | the Dial's face under the twelve seats (the ring's lines go); also the Dial seen from the Wing room, at 200 × 200 |
 | `seat` | 52 × 52 | 256 | one seat tile, twelve times; dimmed while dormant or unlit |
 | `bracket` | 58 × 58 | 256 | the fixed focus bracket over the framed seat (the four bars go) |

@@ -15,7 +15,7 @@ AUDIO = "Assets/CelestialDial/Resources/Audio/test"
 # name -> (width, height); sides are multiples of 4 so the texture compresses; backgrounds ship at half size and stretch.
 IMAGES = [
     ("atrium", 180, 400), ("wing", 180, 400), ("chamber", 180, 400),
-    ("caspar", 44, 76), ("keeper-idle", 20, 44), ("keeper-walk", 20, 44),
+    ("caspar", 64, 112), ("keeper-idle", 44, 100), ("keeper-walk", 44, 100),
     ("dial-face", 332, 332), ("seat", 52, 52), ("bracket", 60, 60), ("floor-markings", 320, 320),
     ("shelf", 52, 36), ("chair", 44, 36), ("table", 60, 32), ("shelf-book", 12, 28),
     ("book-cover", 140, 140), ("book-page", 140, 140),
