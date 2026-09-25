@@ -125,7 +125,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-walk.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).room==='wing' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,grid,dial,shelf' && (await state()).canEnterDial && !(await state()).canEnterShelf && !(await state()).canEnterGrid && (await state()).canLeaveWing,'the Wing doorway fades into the Wing room with the Dial, the doorway back, a dark shelf, and a dark table at '+viewport.width);
-    { const k=await state(); check(k.kitPieces===19 && k.kitLevel===k.keys && k.kitRestored<k.kitPieces && k.grime>0,'Build M: the Wing kit shows the Keys earned so far, worn pieces and grime still in place at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-wing-kit-early.png')}); }
+    { const k=await state(); check(k.kitPieces===19 && k.kitLevel===k.keys && k.kitRestored<k.kitPieces && k.grime>0 && Math.abs(k.wingLight-[0,.25,.5,.75,1][k.keys])<.01,'Build M: the Wing kit shows the Keys earned so far, worn pieces and grime still in place, the light by Keys at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-wing-kit-early.png')}); }
     check(events.some(e=>e.event_name==='room_entered_wing'),'room events at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room.png')});
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('Dark and quiet'),{},{timeout:5000});
@@ -492,7 +492,7 @@ const path=require('path');
     // Build L: the Wing at full light (Stage 6), the capture the owner judges the light overlay by
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await page.waitForTimeout(1200);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room-stage6.png')});
-    { const k=await state(); check(k.kitPieces===19 && k.kitLevel===4 && k.kitRestored===k.kitPieces && k.grime===0,'Build M: with four Keys every Wing kit piece is restored and the grime is gone at '+viewport.width); }
+    { const k=await state(); check(k.kitPieces===19 && k.kitLevel===4 && k.kitRestored===k.kitPieces && k.grime===0 && k.wingLight===1,'Build M: with four Keys every Wing kit piece is restored, the grime gone, the light full at '+viewport.width); }
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
