@@ -485,6 +485,10 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check((await state()).atriumStage===6 && (await state()).keys===4 && (await state()).keysSpent===4 && (await state()).wingWhole && (await state()).key4 && (await state()).polarityShown && (await state()).oppositesComplete && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with four Keys spent, the Wing whole, the sides, and the six pairs at '+viewport.width);
+    // Build L: the Wing at full light (Stage 6), the capture the owner judges the light overlay by
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await page.waitForTimeout(1200);
+    await page.screenshot({path:path.join(out,viewport.width+'-wing-room-stage6.png')});
+    await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);

@@ -47,6 +47,7 @@ namespace Ascendant.CelestialDial
         readonly Button[] gridTiles = new Button[12], gridCells = new Button[12];
         readonly Text[] gridTileNames = new Text[12], gridTileGlyphs = new Text[12], gridCellNames = new Text[12], gridCellGlyphs = new Text[12];
         int demoCell = -1;
+        const float KeeperScale = 100f / 44f; // Build L (owner, Sept 24): the Keeper stands 100 px tall, the Wing mockup's scale; his feet stay on the band
         const float BandY = 436f, FadeSeconds = .35f; // floor band and fade length are test variables (Q06 phase 2, decision 7)
         readonly Button[] glyphNameButtons = new Button[4];
         readonly Button[] reviewGlyphButtons = new Button[4];
@@ -261,10 +262,10 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; Slots.Dress(shelfBooks[i], "shelf-book"); book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
             var floor = Rect("Floor band", hub, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f, 0); floorImage.raycastTarget = false;
             var desk = Block(hub, "Desk, uncovered", -125, 426, 70, 30, "desk"); Tappable(desk, () => Walk("desk"));
-            var casparMark = Rect("Caspar", hub, 100, 418, 14, 40); var casparBody = casparMark.gameObject.AddComponent<Image>(); casparBody.color = Muted; casparBody.raycastTarget = false;
-            var casparHead = Rect("Caspar head", hub, 100, 392, 12, 12); var casparHeadImage = casparHead.gameObject.AddComponent<Image>(); casparHeadImage.color = Muted; casparHeadImage.raycastTarget = false;
+            var casparMark = Rect("Caspar", hub, 100, 418, 20, 80); var casparBody = casparMark.gameObject.AddComponent<Image>(); casparBody.color = Muted; casparBody.raycastTarget = false;
+            var casparHead = Rect("Caspar head", hub, 100, 366, 18, 18); var casparHeadImage = casparHead.gameObject.AddComponent<Image>(); casparHeadImage.color = Muted; casparHeadImage.raycastTarget = false;
             Label(hub, "Caspar", 100, 452, 60, 14, 10).color = Muted;
-            var casparTap = Rect("Caspar, tap to walk", hub, 100, 420, 44, 76); var casparTapImage = casparTap.gameObject.AddComponent<Image>(); casparTapImage.color = new Color(0, 0, 0, 0); Tappable(casparTap, () => Walk("caspar"));
+            var casparTap = Rect("Caspar, tap to walk", hub, 100, 402, 64, 112); /* Build L: a head taller than the 100 px Keeper, feet where they were (458) */ var casparTapImage = casparTap.gameObject.AddComponent<Image>(); casparTapImage.color = new Color(0, 0, 0, 0); Tappable(casparTap, () => Walk("caspar"));
             if (Slots.Dress(casparTapImage, "caspar")) { casparMark.gameObject.SetActive(false); casparHead.gameObject.SetActive(false); } // Build E: his figure takes the file; the tap rect is his slot
             var lamp1 = Rect("Lamp", hub, -64, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false; Slots.Dress(lampOne, "lamp");
             var lamp2 = Rect("Lamp", hub, 64, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false; Slots.Dress(lampTwo, "lamp");
@@ -391,25 +392,28 @@ namespace Ascendant.CelestialDial
             wingRoom = ScreenPanel("Wing room", "wing"); LightOverlay(wingRoom, "wing-light");
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
-            var shelf = Block(wingRoom, "Collapsed bookshelf", 120, 140, 50, 36, "shelf");
-            for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
-            var glow = Rect("Shelf glow", shelf, 0, 18, 60, 46); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.sprite = SoftGlow(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
+            // Build L (Wing composition, owner-approved mockup B, Sept 24): the room art carries the Dial, the table, the chair, and the shelf,
+            // painted in place. Each object keeps an invisible tap area and its glow over its painted footprint; without room art the greybox shows.
+            bool wingBaked = HasArt(wingRoom);
+            var shelf = Block(wingRoom, "Collapsed bookshelf", 158, 320, 45, 240, wingBaked ? null : "shelf"); if (wingBaked) shelf.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            if (!wingBaked) for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
+            var glow = Rect("Shelf glow", shelf, 0, 120, 80, 270); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
-            var dial = Rect("The Dial", wingRoom, 30, 250, 200, 200); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
-            var rings = Rect("Rings", dial, 0, 100, 200, 200); rings.gameObject.SetActive(!Slots.Dress(dialImage, "dial-face")); // the face seen from the room
+            var dial = Rect("The Dial", wingRoom, 38, 338, 175, 205); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
+            var rings = Rect("Rings", dial, 0, 102, 175, 175); rings.gameObject.SetActive(!wingBaked && !Slots.Dress(dialImage, "dial-face")); if (wingBaked) dialImage.color = new Color(0, 0, 0, 0); // the face seen from the room
             RingLines(rings, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(rings, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
-            var waitingGlow = Rect("Dial glow", wingRoom, 30, 250, 330, 330); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.sprite = SoftGlow(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
-            var dialLabel = Label(wingRoom, "The Dial", 30, 352, 120, 16, 10); dialLabel.color = Muted;
+            var waitingGlow = Rect("Dial glow", wingRoom, 38, 330, 250, 250); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
+            var dialLabel = Label(wingRoom, "The Dial", 38, 452, 120, 16, 10); dialLabel.color = Muted;
             Tappable(dial, () => Walk("dial"));
             // Build B (07 Room Scope amendment): a second interactive object, the table with its board of twelve, dark until the modality unit is complete.
-            var table = Block(wingRoom, "The table", -60, 372, 60, 30, "table");
-            var board = Rect("Board", table, 0, 15, 60, 30); board.gameObject.SetActive(!HasArt(table));
+            var table = Block(wingRoom, "The table", -67, 407, 79, 75, wingBaked ? null : "table"); if (wingBaked) table.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            var board = Rect("Board", table, 0, 37, 60, 30); board.gameObject.SetActive(!wingBaked && !HasArt(table));
             for (int i = 0; i < 12; i++) { var square = Rect("Square", board, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
-            var tableGlow = Rect("Table glow", table, 0, 15, 72, 44); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
+            var tableGlow = Rect("Table glow", table, 0, 37, 110, 100); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
             Tappable(table, () => Walk("grid"));
-            var door = Block(wingRoom, "Doorway back", -136, 325, 36, 140, "door-open"); Tappable(door, () => Walk("atrium-door")); HitArea(door, 48); // Build K: the painted doorway
-            var light = Rect("Doorway light", door, 0, 70, 26, 115); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
-            var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f); floorImage.raycastTarget = false;
+            var door = Block(wingRoom, "Doorway back", -136, 325, 36, 150, "door-open"); Tappable(door, () => Walk("atrium-door")); HitArea(door, 48); // Build K: the painted doorway
+            var light = Rect("Doorway light", door, 0, 75, 26, 123); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
+            var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f, wingBaked ? 0 : 1); floorImage.raycastTarget = false;
             wingRoomCaption = Label(wingRoom, "The Dial stands at the center of the room. The doorway behind you leads back to the Atrium.", 0, 466, 340, 36, 12); // owner (worksheet section 6) // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
             enterGrid = MakeButton(wingRoom, "The Table", 0, 512, 300, 52, () => Walk("grid")); enterGrid.gameObject.SetActive(false); // Build B: shown once the table has woken // owner (worksheet section 11)
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
@@ -420,7 +424,7 @@ namespace Ascendant.CelestialDial
         void BuildAvatar()
         {
             // Q06 phase 2, decision 3: a placeholder upright marker with a walk bob and one idle pose. No face, no clothing.
-            avatar = Rect("Keeper", root, 0, BandY - 16, 20, 44);
+            avatar = Rect("Keeper", root, 0, BandY - 16, 20, 44); avatar.localScale = Vector3.one * KeeperScale; // the figure is built at 20 x 44 and scaled whole
             var body = Rect("Body", avatar, 0, 26, 16, 30); var bodyImage = body.gameObject.AddComponent<Image>(); bodyImage.color = new Color(.85f, .8f, .72f); bodyImage.raycastTarget = false;
             avatarHead = Rect("Head", avatar, 0, 7, 12, 12); var headImage = avatarHead.gameObject.AddComponent<Image>(); headImage.color = new Color(.85f, .8f, .72f); headImage.raycastTarget = false;
             // Build E: two frames take the marker's place, idle and walk, flipped to face the way it walks.
@@ -438,7 +442,7 @@ namespace Ascendant.CelestialDial
         void PlaceAvatar()
         {
             var walk = Flow.Walk; float band = walk.Room == Room.Chamber ? ChamberBandY : BandY;
-            avatar.anchoredPosition = new Vector2(walk.X, -(band - 16) + walk.Bob);
+            avatar.anchoredPosition = new Vector2(walk.X, -(band + 6 - 22 * KeeperScale) + walk.Bob); // the feet stay at band + 6 whatever the scale
             avatarHead.anchoredPosition = new Vector2(walk.Facing * 2, -7);
             if (avatarArt.gameObject.activeSelf) { avatarArt.sprite = walk.Walking && ((int)(walk.Traveled / 14f)) % 2 == 1 ? keeperWalk : keeperIdle; avatarArt.rectTransform.localScale = new Vector3(walk.Facing, 1, 1); } // one frame per step, the walk bob's own rhythm
         }
@@ -1178,6 +1182,19 @@ namespace Ascendant.CelestialDial
                 texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.SmoothStep(1, 0, d)));
             }
             texture.Apply(); softGlow = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); return softGlow;
+        }
+        // Build L: over an object painted into the room a filled glow would wash it out, so the waiting glow is a halo: bright at the rim, clear inside.
+        static Sprite softRing;
+        static Sprite SoftRing()
+        {
+            if (softRing != null) return softRing;
+            const int size = 128; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+            {
+                float dx = (x + .5f) / size * 2 - 1, dy = (y + .5f) / size * 2 - 1, d = Mathf.Sqrt(dx * dx + dy * dy);
+                texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.Clamp01(1 - Mathf.Abs(d - .78f) / .2f)));
+            }
+            texture.Apply(); softRing = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); return softRing;
         }
         // Build I (86bc1brxd): one rule for the Wing room, "an instrument with a unit waiting glows": the symbols' second half,
         // the modalities once Key 2 is in hand, and the last pattern once the table's Key is.
