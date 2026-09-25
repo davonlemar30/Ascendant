@@ -34,10 +34,10 @@ namespace Ascendant.CelestialDial
         };
         public static readonly PointOfInterest[] Wing =
         {
-            new PointOfInterest("atrium-door", "the doorway back to the Atrium", -130),
-            new PointOfInterest("grid", "the table", -60),        // Build B: the 4 × 3 table wakes once the modality unit is complete (07 Room Scope amendment)
-            new PointOfInterest("dial", "the Dial", 30),
-            new PointOfInterest("shelf", "the bookshelf", 120),   // v0.3 revision: Part A lives here once the wheel is lit
+            new PointOfInterest("atrium-door", "the doorway back to the Atrium", -136),
+            new PointOfInterest("grid", "the table", -67),        // Build B: the 4 × 3 table wakes once the modality unit is complete (07 Room Scope amendment)
+            new PointOfInterest("dial", "the Dial", 38),
+            new PointOfInterest("shelf", "the bookshelf", 150),   // v0.3 revision: Part A lives here once the wheel is lit
         };
         public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : Array.Empty<PointOfInterest>();
         public static PointOfInterest Find(Room room, string id) => Of(room).FirstOrDefault(p => p.Id == id);

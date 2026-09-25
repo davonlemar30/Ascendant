@@ -2,6 +2,16 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build L: the 100 px Keeper and the composed Wing
+
+Owner decisions, Sept 24 (Decisions Log, week of Sept 21–27): the Keeper stands 100 px tall (the Wing mockup's scale), and the Wing is the owner's approved mockup B painted as one scene. A stopgap until the Wing room kit (ClickUp 86bc74f9p).
+
+- **Keeper:** `SliceView.KeeperScale = 100/44` scales the figure whole; `PlaceAvatar` keeps the feet at band + 6 in every room. `keeper-idle`/`keeper-walk` become 44 × 100 (the owner's Sept 17 design, drawn by the art lane; the idle pose mirrored to face right like the walk). Caspar becomes 64 × 112, a head taller than the Keeper (working choice), feet where they were.
+- **Wing:** `wing.png` is mockup B2 with the painted Keeper removed (patched from the art lane's empty room). `BuildWingRoom` reads `HasArt(wingRoom)`: with room art, the shelf, table, and Dial face aren't drawn in the room; their tap areas, walk points (`Walker`: doorway −136, table −67, Dial 38, shelf 150), and glows sit over the painted objects, and the grey floor band hides. Without room art the greybox shows as before. Over painted objects the waiting glows are halos (`SoftRing`), not filled discs. `wing-light` is the art lane's golden-hour layer at half alpha (full strength fogged the room in the game's linear blending).
+- **Suite:** a new capture of the Wing at Stage 6 (`*-wing-room-stage6.png`). **Fixture:** the Wing check expects the composed room, its light, and the Keeper, and no separate table file.
+
+Validation: mechanical 458/458, slice fixture 177/177, WebGL clean (20.3 MB), browser suite 273/273. Capture: [`Evidence/wing-composition-2026-09-24/390-wing-stages.png`](Evidence/wing-composition-2026-09-24/390-wing-stages.png).
+
 ## Build I: playtest fixes, every Key's ceremony, the Dial's waiting glow
 
 [ClickUp task: Build I — Playtest fixes](https://app.clickup.com/t/86bc6kx5v). The owner's combined playtest of Sept 23 (Builds A–H) and two rulings the same day: the symbol challenge's fixed centre shows the target's name; the wheel poses the challenge and Caspar teaches (moving his teaching out of the wheel waits for the journal build).

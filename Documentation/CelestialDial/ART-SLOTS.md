@@ -23,7 +23,7 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | Slot | Size | Cap | Where it is drawn |
 | --- | --- | --- | --- |
 | `atrium` | 360 × 800 | 2048 | the Grand Atrium, behind the opening, the return, and the room |
-| `wing` | 360 × 800 | 2048 | the Zodiac Wing room, behind its props |
+| `wing` | 360 × 800 | 2048 | the Zodiac Wing room **with its objects painted in** (Build L, the owner's mockup B, Sept 24): the Dial on its dais, the table with its board, the covered chair, the shelf and ladder. With this file the `shelf`, `table`, and `dial-face` slots are not drawn in the room; their tap areas and glows sit over the painted objects. A new `wing` must keep the objects where they are or the layout in `SliceView.BuildWingRoom` moves with it |
 | `chamber` | 360 × 800 | 2048 | the Crystal Book Chamber, first visit and room |
 | `caspar` | 64 × 112 | 256 | Caspar standing in the Atrium |
 | `keeper-idle` | 44 × 100 | 256 | the Keeper standing; flipped to face the way it last walked |
