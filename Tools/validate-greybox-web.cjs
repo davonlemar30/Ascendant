@@ -8,7 +8,9 @@ const path=require('path');
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
-  for(const viewport of [{width:390,height:844},{width:360,height:800}]){
+  // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
+  const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()==='360'?{width:360,height:800}:{width:390,height:844});
+  await Promise.all(VIEWPORTS.map(async viewport=>{
     const context=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE}); // DEVICE_SCALE=2 MOBILE=1 approximates a phone
     const page=await context.newPage();const events=[],errors=[];
     page.on('pageerror',e=>errors.push(String(e)));
@@ -499,7 +501,7 @@ const path=require('path');
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);
     fs.writeFileSync(path.join(out,viewport.width+'-events.json'),JSON.stringify(events,null,2));
     await context.close();
-  }
+  }));
   const recoveryContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const recovery=await recoveryContext.newPage();
   await recovery.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
@@ -536,7 +538,7 @@ const path=require('path');
   await recovery.screenshot({path:path.join(out,'390-recovery-cap.png')});await recoveryContext.close();
   // ---- Build E: the test set from the URL at both viewports (the opening and the Dial), the cues, the style page on both sets ----
   const base=process.env.GREYBOX_URL || 'http://127.0.0.1:8000';const withQuery=q=>base+(base.includes('?')?'&':'?')+q;
-  for(const viewport of [{width:390,height:844},{width:360,height:800}]){
+  await Promise.all(VIEWPORTS.map(async viewport=>{
     const artContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
     const art=await artContext.newPage();
     await art.goto(withQuery('art=test'));
@@ -559,7 +561,7 @@ const path=require('path');
     const before=(await snap()).cuesPlayed;await act('forward');await art.waitForFunction(b=>window.ascendantDial.snapshot().lastCue==='step'&&window.ascendantDial.snapshot().cuesPlayed>b,before);check(true,'a wheel step plays the step cue from the test set at '+viewport.width);
     await art.screenshot({path:path.join(out,viewport.width+'-art-dial-guided.png')});
     await artContext.close();
-  }
+  }));
   for(const [query,set] of [['style=test','test'],['style','']]){
     const styleContext=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
