@@ -2,6 +2,16 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build N: the Atrium kit and the doors
+
+Owner decisions, Sept 25 (Decisions Log, week of Sept 21–27): the Atrium restores stage by stage like the Wing, and each unlockable door goes from weathered and chained to clean with its edges glowing, and swings open as the Keeper reaches it.
+
+The Wing's kit code is now a reusable `RoomKit` (`BuildKit`, `FinishKit`, `ApplyKit`, `SetKit`, `RestoreKit`); the Wing runs on it unchanged. `BuildAtriumKit` builds one kit per Atrium panel (the opening, the return, the Hub): the shell (`atrium`), `atrium-grime`, a cold blue veil (`VeilTint`, since the shell carries warm lantern light), and 26 pieces from `AtriumKit` (rug, chandelier, five star charts, four lamps, four banners, shelf, two busts, four plants, two candle stands, bench, desk), restored by the Atrium's stage (2 to 6). **Doors** (`AddDoor`): locked (`akit-door-locked`, chains and padlock), unlocked (`akit-door-closed` split into two leaves, a breathing edge glow, `PulseDoors`), and opening (`OpenDoor`: the leaves swing toward their outer edges and `akit-door-open` comes up, 0.5 s, before the fade; reduced motion cuts). The Zodiac Wing door is unlocked from the start, the Chamber's from the first Key, the sealed door stays locked. **Plates** (`akit-plate-locked` / `akit-plate-clean`) carry engraved names: THE ZODIAC WING, THE CRYSTAL BOOK CHAMBER; the sealed door's stays tarnished and unreadable. With the kit present the greybox props, lamps, and grey labels go; the tap areas stay. The art lane's "lantern" came back as a ring chandelier, so the two pillar lanterns reuse the wall lamp. Slots: 94 (28 new); the test set gains 28 placeholders.
+
+Web state: `atriumKitLevel`, `atriumKitPieces`, `atriumKitRestored`, `atriumGrime`, `doors` (id:locked/unlocked), `lastDoorOpened`. Suite checks: Stage 2 (pieces worn, grime in, sealed door locked, Wing and Chamber unlocked), Stage 6 (all restored, grime gone), the Wing door opening as the Keeper reaches it. The fixture's Atrium check expects the kit files.
+
+Validation: mechanical 458/458, slice fixture 177/177, WebGL clean (23.6 MB), browser suite 289/289. Captures: [`Evidence/atrium-kit-2026-09-25/`](Evidence/atrium-kit-2026-09-25/).
+
 ## Build M: the Wing room kit
 
 Owner decisions, Sept 24–25 (Decisions Log, week of Sept 21–27; ClickUp 86bc74f9p): the Library starts dark and worn and each Key brings it to life; rooms are kits; the grey labels go; name plates on the door arches; instruments restore when they wake.

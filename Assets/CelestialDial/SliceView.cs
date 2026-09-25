@@ -159,6 +159,7 @@ namespace Ascendant.CelestialDial
                 insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, a);
             }
             if (Flow.Screen == SliceScreen.WingRoom && DialUnitWaiting && !ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .35f + .35f * Mathf.PingPong(Time.unscaledTime / 1.4f, 1f)); // Build I: reduced motion holds it still
+            PulseDoors(); // Build N: unlocked doors breathe light at their edges
             if (Flow.Gated && !busy && !Dial.Busy && !gating) StartCoroutine(Gate()); // Build F: the third strike closes the instrument once the answer's beat has settled
             if (wingContinue != null && Flow.AtriumStage >= 2)
             {
@@ -204,12 +205,14 @@ namespace Ascendant.CelestialDial
         RectTransform BuildAtrium(string name, out Text caspar, out Button next)
         {
             var screen = ScreenPanel(name, "atrium"); LightOverlay(screen, "atrium-light");
+            if (AtriumKitted) BuildAtriumKit(screen, name == "Atrium return" ? SliceScreen.AtriumReturn : SliceScreen.Atrium); // Build N
             Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
-            Block(screen, "Sealed door", -118, 310, 62, 128, "door-sealed"); // Build K: sized to the painted arch (Sept 24 Atrium)
-            Block(screen, "Shelves, mostly bare", -130, 200, 60, 120, "shelves");
+            var sealedDoor = Block(screen, "Sealed door", -118, 310, 62, 128, "door-sealed"); // Build K: sized to the painted arch (Sept 24 Atrium)
+            var shelvesBlock = Block(screen, "Shelves, mostly bare", -130, 200, 60, 120, "shelves");
             var furniture = Block(screen, "Covered furniture", 50, 422, 120, 70, "furniture-covered");
             var cloth = Rect("Dust cloth", screen, 50, 410, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(furniture));
             var candle = Rect("Candle", screen, 115, 375, 8, 20); var candleImage = candle.gameObject.AddComponent<Image>(); Slots.Dress(candleImage, "candle"); Slots.Paint(candleImage, new Color(.5f, .42f, .3f), .7f);
+            if (AtriumKitted) { foreach (var b in new[] { sealedDoor, shelvesBlock, furniture }) RetireProps(b, false); cloth.gameObject.SetActive(false); candle.gameObject.SetActive(false); }
             Label(screen, "Dust. Covered furniture. Sealed doors. One weak candle.", 0, 92, 330, 20, 12).color = Muted;
             var panel = Rect("Caspar panel", screen, 0, 560, 324, 150); panel.gameObject.AddComponent<Image>().color = new Color(.045f, .025f, .03f, .92f);
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
@@ -257,6 +260,7 @@ namespace Ascendant.CelestialDial
         {
             // Q05 decisions 1, 6: the Atrium in Stage 2 "Stirring" with two entrances.
             hub = ScreenPanel("Hub", "atrium"); LightOverlay(hub, "atrium-light");
+            if (AtriumKitted) hubKit = BuildAtriumKit(hub, SliceScreen.Hub); // Build N
             Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
             var shelves = Block(hub, "Shelves, mostly bare", -130, 200, 60, 120, "shelves"); shelvesLabel = shelves.GetComponentInChildren<Text>(); // owner (worksheet section 13)
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; Slots.Dress(shelfBooks[i], "shelf-book"); book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
@@ -278,6 +282,14 @@ namespace Ascendant.CelestialDial
                 if (i == 1) { var light = Rect("Doorway light", door, 0, 64, 50, 105); doorOpenLight = light.gameObject.AddComponent<Image>(); doorOpenLight.color = new Color(.95f, .8f, .5f, HasArt(door) ? .06f : .35f); doorOpenLight.raycastTarget = false; }
                 else if (i == 2) { var light = Rect("Doorway light", door, 0, 64, 44, 105); var li = light.gameObject.AddComponent<Image>(); li.color = new Color(.7f, .8f, .95f, HasArt(door) ? .05f : .3f); li.raycastTarget = false; }
                 else { var lockRect = Rect("Lock", door, 0, 50, 12, 16); var li = lockRect.gameObject.AddComponent<Image>(); li.color = new Color(.45f, .45f, .5f); li.raycastTarget = false; lockRect.gameObject.SetActive(!HasArt(door)); var glow = Rect("Light behind the door", door, 0, 50, 50, 82); sealedLeftLight = glow.gameObject.AddComponent<Image>(); sealedLeftLight.color = new Color(.95f, .8f, .5f, 0); sealedLeftLight.raycastTarget = false; glow.SetAsFirstSibling(); }
+            }
+            if (AtriumKitted)
+            {
+                // Build N: the kit carries the shelf, desk, lamps, and doors; the greybox versions and the grey labels go, the tap areas stay.
+                shelves.gameObject.SetActive(false); RetireProps(desk, true);
+                foreach (var lamp in new[] { lampOne, lampTwo, lampThree, lampFour }) lamp.gameObject.SetActive(false);
+                foreach (Transform child in hub) if (child.name == "Sealed" || child.name == "Zodiac Wing, open" || child.name == "Crystal Book Chamber") RetireProps((RectTransform)child, true);
+                foreach (var t in hub.GetComponentsInChildren<Text>(true)) if (t.text == "Caspar" && t.transform.parent == hub) t.gameObject.SetActive(false);
             }
             hubCaption = Label(hub, "", 0, 92, 340, 36, 11); hubCaption.color = Muted;
             var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); panel.gameObject.AddComponent<Image>().color = new Color(.045f, .025f, .03f, .92f);
@@ -390,7 +402,9 @@ namespace Ascendant.CelestialDial
         {
             // Q06 phase 2, decision 2: the Wing as a room with two points of interest, the Dial and the doorway back.
             wingRoom = ScreenPanel("Wing room", "wing"); wingLight = LightOverlay(wingRoom, "wing-light");
-            BuildWingKit(); // Build M: grime under the light, the kit pieces, the veil; everything after draws above the veil
+            wingRoomKit = BuildKit(wingRoom, "kit-", WingKit, "wing-grime", wingLight, KitGrime, KitVeil, KitLight, () => Mathf.Clamp(Flow.Keys, 0, 4), KitRestoredNow); // Build M/N: grime under the light, the pieces, then the veil
+            var wingPlate = wingKit.FirstOrDefault(p => p.P.Name == "plate"); if (wingPlate?.Restored != null) PlateText((RectTransform)wingPlate.Restored.transform, WingPlateName);
+            FinishKit(wingRoom, wingRoomKit); // everything built after this draws above the veil
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
             // Build L (Wing composition, owner-approved mockup B, Sept 24): the room art carries the Dial, the table, the chair, and the shelf,
@@ -688,6 +702,7 @@ namespace Ascendant.CelestialDial
         {
             if (id == "wing-door" || id == "atrium-door" || id == "chamber-door")
             {
+                if (Flow.Screen == SliceScreen.Hub && hubKit != null) yield return OpenDoor(hubKit, id); // Build N: the unlocked door swings open as the Keeper reaches it
                 Sound.Play("door");
                 yield return FadeTo(1);
                 if (id == "wing-door") Flow.EnterWing(); else if (id == "chamber-door") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); } else if (Flow.Walk.Room == Room.Chamber) { Flow.LeaveChamber(); Save(); } else { Flow.LeaveWing(); Save(); }
@@ -830,11 +845,12 @@ namespace Ascendant.CelestialDial
             bool book = s == SliceScreen.Book;
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
             ApplyLight(roomScreen); // Build H
+            foreach (var k in atriumKits) if (k.Container.gameObject.activeInHierarchy) ApplyKit(k, true); // Build N: the Atrium shows its stage, turning what it newly restores
             if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : s == SliceScreen.WingRoom ? wingRoom : chamber, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
             avatar.gameObject.SetActive(roomScreen);
             if (s == SliceScreen.WingRoom)
             {
-                ApplyWingKit(true); // Build M: the room shows the Keys earned, turning what they newly restore
+                ApplyKit(wingRoomKit, true); // Build M: the room shows the Keys earned, turning what they newly restore
                 enterDial.interactable = !busy; wingRoomBack.interactable = !busy;
                 enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
@@ -1048,8 +1064,9 @@ namespace Ascendant.CelestialDial
             state.canEnterGrid = s == SliceScreen.WingRoom && Flow.CanOpenGrid && !busy;
             state.keys = Math.Max(state.keys, Flow.Keys); // the lesson counts two Keys; the table adds the third
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
-            state.kitLevel = kitShown; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
+            state.kitLevel = KitLevel; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
             state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
+            if (hubKit != null) { state.atriumKitLevel = hubKit.Shown; state.atriumKitPieces = hubKit.Pieces.Count; state.atriumKitRestored = hubKit.Pieces.Count(p => p.Shown); state.atriumGrime = hubKit.GrimeImage.gameObject.activeSelf ? hubKit.GrimeImage.color.a : -1; state.doors = hubKit.Doors.Select(d => d.Id + ":" + (d.Shown ? "unlocked" : "locked")).ToArray(); state.lastDoorOpened = LastDoorOpened; } // Build N
             if (s == SliceScreen.Grid)
             {
                 state.caspar = Grid.Message; state.gridReadout = Grid.Readout; state.gridStatus = gridStatus.text;
@@ -1207,86 +1224,220 @@ namespace Ascendant.CelestialDial
         public static readonly float[] KitGrime = { 1, .75f, .5f, .25f, 0 }, KitVeil = { .45f, .3f, .18f, .08f, 0 }, KitLight = { 0, .25f, .5f, .75f, 1 }; // by Keys earned, 0 to 4 (tuning variables)
         const string WingPlateName = "THE GRAND ATRIUM"; // the Wing's doorway leads back to the Atrium
         class KitPiece { public KitPlacement P; public CanvasGroup Worn, Restored; public Image Flash; public bool Shown; }
-        readonly List<KitPiece> wingKit = new List<KitPiece>(); Image wingGrime, wingVeil, wingLight; int kitShown = -1; Coroutine kitFade;
-        public int KitLevel => kitShown;
-        public int KitRestored => wingKit.Count(p => p.Restored != null && p.Restored.alpha > .99f);
-        void BuildWingKit()
+        // Build N (owner, Sept 25): a door is weathered and chained while locked, clean with its edges glowing once unlocked, and swings open as the
+        // Keeper reaches it. The leaves are the two halves of the closed door's file, each swinging toward its outer edge.
+        class DoorPiece
         {
-            var grime = Rect("Grime", wingRoom, 0, 400, 360, 800); wingGrime = grime.gameObject.AddComponent<Image>(); wingGrime.raycastTarget = false;
-            grime.gameObject.SetActive(Slots.Dress(wingGrime, "wing-grime")); grime.SetAsFirstSibling(); // under the light overlay, over the shell
-            var kit = Rect("Wing kit", wingRoom, 0, 400, 360, 800);
-            foreach (var p in WingKit)
-            {
-                if (Slots.Image("kit-" + p.Name + "-restored") == null) continue; // no file, no piece: the greybox stays as it was
-                var piece = new KitPiece { P = p, Worn = KitState(kit, p, "worn"), Restored = KitState(kit, p, "restored") };
-                if (p.Name == "plate" && piece.Restored != null)
-                {
-                    var plate = (RectTransform)piece.Restored.transform;
-                    var name = Label(plate, WingPlateName, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x - 10, plate.sizeDelta.y - 6, 7);
-                    name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 5; name.resizeTextMaxSize = 8;
-                }
-                wingKit.Add(piece);
-            }
-            var veil = Rect("Veil", wingRoom, 0, 400, 360, 800); wingVeil = veil.gameObject.AddComponent<Image>(); wingVeil.color = new Color(0, 0, 0, 0); wingVeil.raycastTarget = false;
-            veil.gameObject.SetActive(wingKit.Count > 0);
-            if (wingKit.Count > 0 && wingLight != null) lightOverlays.Remove(wingLight); // owner, Sept 25: with the kit the Wing's light follows its Keys, not the Atrium's stage
+            public string Id, Name; public CanvasGroup Locked, Closed, Open, PlateLocked, PlateClean; public RectTransform LeafL, LeafR; public Image Glow, Flash; public bool Shown;
         }
-        CanvasGroup KitState(RectTransform kit, KitPlacement p, string state)
+        // Build N: the Wing's kit machinery made reusable per room: grime and a veil over the shell by level, pieces worn or restored, doors.
+        class RoomKit
         {
-            string slot = "kit-" + p.Name + "-" + state; var sprite = Slots.Image(slot); if (sprite == null) return null;
+            public string Prefix; public KitPlacement[] Placements; public float[] Grime, Veil, Light; public System.Func<int> Level; public System.Func<KitPlacement, bool> RestoredNow; public System.Func<string, bool> DoorUnlocked;
+            public Image GrimeImage, VeilImage, LightImage; public bool OwnsLight; public RectTransform Container; public readonly List<KitPiece> Pieces = new List<KitPiece>(); public readonly List<DoorPiece> Doors = new List<DoorPiece>();
+            public int Shown = -1; public Coroutine Fade; public Color VeilTint = Color.black;
+        }
+        RoomKit wingRoomKit; readonly List<RoomKit> atriumKits = new List<RoomKit>(); RoomKit hubKit;
+        List<KitPiece> wingKit => wingRoomKit != null ? wingRoomKit.Pieces : new List<KitPiece>();
+        Image wingGrime => wingRoomKit?.GrimeImage; Image wingLight;
+        public int KitLevel => wingRoomKit != null ? wingRoomKit.Shown : -1;
+        public int KitRestored => wingKit.Count(p => p.Restored != null && p.Restored.alpha > .99f);
+        RoomKit BuildKit(RectTransform panel, string prefix, KitPlacement[] placements, string grimeSlot, Image light, float[] grime, float[] veil, float[] lightLevels, System.Func<int> level, System.Func<KitPlacement, bool> restoredNow)
+        {
+            var k = new RoomKit { Prefix = prefix, Placements = placements, Grime = grime, Veil = veil, Light = lightLevels, Level = level, RestoredNow = restoredNow, LightImage = light };
+            var g = Rect("Grime", panel, 0, 400, 360, 800); k.GrimeImage = g.gameObject.AddComponent<Image>(); k.GrimeImage.raycastTarget = false;
+            g.gameObject.SetActive(Slots.Dress(k.GrimeImage, grimeSlot)); g.SetAsFirstSibling(); // under the light overlay, over the shell
+            k.Container = Rect("Kit", panel, 0, 400, 360, 800);
+            foreach (var p in placements)
+            {
+                if (Slots.Image(prefix + p.Name + "-restored") == null) continue; // no file, no piece: the greybox stays as it was
+                k.Pieces.Add(new KitPiece { P = p, Worn = KitState(k, p, "worn"), Restored = KitState(k, p, "restored") });
+            }
+            return k;
+        }
+        void FinishKit(RectTransform panel, RoomKit k)
+        {
+            var v = Rect("Veil", panel, 0, 400, 360, 800); k.VeilImage = v.gameObject.AddComponent<Image>(); k.VeilImage.color = new Color(0, 0, 0, 0); k.VeilImage.raycastTarget = false;
+            v.gameObject.SetActive(k.Pieces.Count > 0 || k.Doors.Count > 0);
+            if (k.Pieces.Count > 0 && k.LightImage != null && k.Light != null) { lightOverlays.Remove(k.LightImage); k.OwnsLight = true; } // the Wing's light follows its Keys (owner, Sept 25)
+        }
+        CanvasGroup KitState(RoomKit k, KitPlacement p, string state)
+        {
+            string slot = k.Prefix + p.Name + "-" + state; var sprite = Slots.Image(slot); if (sprite == null) return null;
             bool worn = state == "worn"; float scale = worn && p.WornScale > 0 ? p.WornScale : p.Scale; float x = worn && !float.IsNaN(p.WornX) ? p.WornX : p.X;
             float w = sprite.rect.width / 2 * scale, h = sprite.rect.height / 2 * scale; // files are drawn at twice their size on the layout
-            var r = Rect(p.Name + " (" + state + ")", kit, x, p.Bottom - h / 2, w, h); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot);
+            var r = Rect(p.Name + " (" + state + ")", k.Container, x, p.Bottom - h / 2, w, h); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot);
             return r.gameObject.AddComponent<CanvasGroup>();
         }
-        // A piece restores on its Key, or, for an instrument a lesson uses, the moment that instrument wakes (the shelf's book, the table).
-        bool KitRestoredNow(KitPlacement p) => p.Wake == "wheel" ? Flow.WheelComplete : p.Wake == "modalities" ? Flow.ModalitiesComplete : Flow.Keys >= p.Key;
-        void ApplyWingKit(bool animate)
+        Text PlateText(RectTransform plate, string text)
         {
-            if (wingKit.Count == 0) return;
-            int level = Mathf.Clamp(Flow.Keys, 0, 4);
-            if (kitFade != null) { StopCoroutine(kitFade); kitFade = null; SetKit(kitShown); }
-            var turning = kitShown < 0 ? new List<KitPiece>() : wingKit.Where(p => !p.Shown && KitRestoredNow(p.P)).ToList();
-            if (animate && kitShown >= 0 && (turning.Count > 0 || level > kitShown) && !ReducedMotion) kitFade = StartCoroutine(RestoreKit(Mathf.Max(kitShown, 0), level, turning));
-            else SetKit(level);
-            kitShown = level;
+            var name = Label(plate, text, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x - 10, plate.sizeDelta.y - 6, 7);
+            name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 5; name.resizeTextMaxSize = 8; return name;
         }
-        void SetKit(int level)
+        // Doors fill the painted arch openings; the plate sits on the arch's keystone.
+        void AddDoor(RoomKit k, string id, string name, float x, float bottom, float w, float h, float plateBottom, float plateW)
         {
-            foreach (var piece in wingKit)
+            var door = new DoorPiece { Id = id, Name = name };
+            var glow = Rect(id + " glow", k.Container, x, bottom - h / 2, w * 1.55f + 20, h * 1.25f + 20); door.Glow = glow.gameObject.AddComponent<Image>(); door.Glow.sprite = SoftGlow(); door.Glow.raycastTarget = false; door.Glow.color = new Color(1, .82f, .5f, 0);
+            CanvasGroup Face(string slot, string label)
             {
-                bool restored = KitRestoredNow(piece.P); piece.Shown = restored;
+                if (Slots.Image(slot) == null) return null;
+                var r = Rect(id + " (" + label + ")", k.Container, x, bottom - h / 2, w, h); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot); return r.gameObject.AddComponent<CanvasGroup>();
+            }
+            door.Locked = Face(k.Prefix + "door-locked", "locked"); door.Open = Face(k.Prefix + "door-open", "open");
+            var closed = Slots.Image(k.Prefix + "door-closed");
+            if (closed != null)
+            {
+                var c = Rect(id + " (closed)", k.Container, x, bottom - h / 2, w, h); door.Closed = c.gameObject.AddComponent<CanvasGroup>();
+                RectTransform Leaf(bool left)
+                {
+                    var leaf = Rect(left ? "Leaf left" : "Leaf right", c, 0, h / 2, w / 2, h); leaf.pivot = new Vector2(left ? 0 : 1, .5f); leaf.anchoredPosition = new Vector2(left ? -w / 2 : w / 2, -h / 2);
+                    var raw = leaf.gameObject.AddComponent<RawImage>(); raw.texture = closed.texture; raw.raycastTarget = false; var t = closed.textureRect; float tw = closed.texture.width, th = closed.texture.height;
+                    raw.uvRect = new UnityEngine.Rect(t.x / tw + (left ? 0 : t.width / tw / 2), t.y / th, t.width / tw / 2, t.height / th); return leaf;
+                }
+                door.LeafL = Leaf(true); door.LeafR = Leaf(false);
+            }
+            if (Slots.Image(k.Prefix + "plate-clean") != null)
+            {
+                float ph = plateW * .42f;
+                door.PlateLocked = Face2(k.Prefix + "plate-locked"); door.PlateClean = Face2(k.Prefix + "plate-clean");
+                if (door.PlateClean != null && name != null) PlateText((RectTransform)door.PlateClean.transform, name);
+                CanvasGroup Face2(string slot) { if (Slots.Image(slot) == null) return null; var r = Rect(id + " plate", k.Container, x, plateBottom - ph / 2, plateW, ph); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot); return r.gameObject.AddComponent<CanvasGroup>(); }
+            }
+            if (door.Closed != null || door.Locked != null) k.Doors.Add(door);
+        }
+        void ApplyKit(RoomKit k, bool animate)
+        {
+            if (k == null || (k.Pieces.Count == 0 && k.Doors.Count == 0)) return;
+            int level = k.Level();
+            if (k.Fade != null) { StopCoroutine(k.Fade); k.Fade = null; SetKit(k, k.Shown); }
+            var turning = k.Shown < 0 ? new List<KitPiece>() : k.Pieces.Where(p => !p.Shown && k.RestoredNow(p.P)).ToList();
+            var opening = k.Shown < 0 ? new List<DoorPiece>() : k.Doors.Where(d => !d.Shown && k.DoorUnlocked != null && k.DoorUnlocked(d.Id)).ToList();
+            if (animate && k.Shown >= 0 && (turning.Count > 0 || opening.Count > 0 || level > k.Shown) && !ReducedMotion) k.Fade = StartCoroutine(RestoreKit(k, Mathf.Max(k.Shown, 0), level, turning, opening));
+            else SetKit(k, level);
+            k.Shown = level;
+        }
+        void SetKit(RoomKit k, int level)
+        {
+            foreach (var piece in k.Pieces)
+            {
+                bool restored = k.RestoredNow(piece.P); piece.Shown = restored;
                 if (piece.Restored != null) piece.Restored.alpha = restored ? 1 : 0;
                 if (piece.Worn != null) piece.Worn.alpha = restored ? 0 : 1;
                 if (piece.Flash != null) piece.Flash.color = new Color(1, .85f, .55f, 0);
             }
-            if (wingGrime != null) wingGrime.color = new Color(1, 1, 1, KitGrime[level]);
-            if (wingVeil != null) wingVeil.color = new Color(0, 0, 0, KitVeil[level]);
-            if (wingLight != null && !lightOverlays.Contains(wingLight)) wingLight.color = new Color(1, 1, 1, KitLight[level]);
+            foreach (var d in k.Doors)
+            {
+                bool open = k.DoorUnlocked != null && k.DoorUnlocked(d.Id); d.Shown = open;
+                if (d.Locked != null) d.Locked.alpha = open ? 0 : 1;
+                if (d.Closed != null) d.Closed.alpha = open ? 1 : 0;
+                if (d.Open != null) d.Open.alpha = 0;
+                if (d.LeafL != null) { d.LeafL.localScale = Vector3.one; d.LeafR.localScale = Vector3.one; }
+                if (d.PlateLocked != null) d.PlateLocked.alpha = open ? 0 : 1;
+                if (d.PlateClean != null) d.PlateClean.alpha = open ? 1 : 0;
+                if (d.Flash != null) d.Flash.color = new Color(1, .85f, .55f, 0);
+                d.Glow.color = new Color(1, .82f, .5f, open ? .4f : 0);
+            }
+            int i = Mathf.Clamp(level, 0, k.Grime.Length - 1);
+            if (k.GrimeImage != null) k.GrimeImage.color = new Color(1, 1, 1, k.Grime[i]);
+            if (k.VeilImage != null) k.VeilImage.color = new Color(k.VeilTint.r, k.VeilTint.g, k.VeilTint.b, k.Veil[i]);
+            if (k.OwnsLight) k.LightImage.color = new Color(1, 1, 1, k.Light[i]);
         }
-        IEnumerator RestoreKit(int from, int to, List<KitPiece> turning)
+        Image FlashFor(RectTransform target, string name)
+        {
+            var flash = Rect(name + " (light)", target.parent, target.anchoredPosition.x, -target.anchoredPosition.y, target.sizeDelta.x * 1.5f + 30, target.sizeDelta.y * 1.3f + 30);
+            var image = flash.gameObject.AddComponent<Image>(); image.sprite = SoftGlow(); image.raycastTarget = false; image.color = new Color(1, .85f, .55f, 0); return image;
+        }
+        IEnumerator RestoreKit(RoomKit k, int from, int to, List<KitPiece> turning, List<DoorPiece> opening)
         {
             // Light burns across each piece newly earned: a gold flash swells, the worn file gives way to the restored one, the grime thins.
-            foreach (var piece in turning)
-                if (piece.Flash == null && piece.Restored != null)
-                {
-                    var target = (RectTransform)piece.Restored.transform;
-                    var flash = Rect(piece.P.Name + " (light)", target.parent, target.anchoredPosition.x, -target.anchoredPosition.y, target.sizeDelta.x * 1.5f + 30, target.sizeDelta.y * 1.3f + 30);
-                    piece.Flash = flash.gameObject.AddComponent<Image>(); piece.Flash.sprite = SoftGlow(); piece.Flash.raycastTarget = false; piece.Flash.color = new Color(1, .85f, .55f, 0);
-                }
+            // A door newly unlocked turns the same way: the chains and grime give way to the clean door, the plate clears, the edges start to glow.
+            foreach (var piece in turning) if (piece.Flash == null && piece.Restored != null) piece.Flash = FlashFor((RectTransform)piece.Restored.transform, piece.P.Name);
+            foreach (var d in opening) if (d.Flash == null && d.Closed != null) d.Flash = FlashFor((RectTransform)d.Closed.transform, d.Id);
             yield return new WaitForSecondsRealtime(.35f);
-            yield return Tween(1.4f, k => {
+            int a = Mathf.Clamp(from, 0, k.Grime.Length - 1), b = Mathf.Clamp(to, 0, k.Grime.Length - 1);
+            yield return Tween(1.4f, t => {
+                float turn = Mathf.SmoothStep(0, 1, Mathf.Clamp01(t * 1.6f - .3f)), flare = .8f * Mathf.Sin(t * Mathf.PI);
                 foreach (var piece in turning)
                 {
-                    if (piece.Restored != null) piece.Restored.alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01(k * 1.6f - .3f));
-                    if (piece.Worn != null) piece.Worn.alpha = 1 - Mathf.SmoothStep(0, 1, Mathf.Clamp01(k * 1.6f - .3f));
-                    if (piece.Flash != null) piece.Flash.color = new Color(1, .85f, .55f, .8f * Mathf.Sin(k * Mathf.PI));
+                    if (piece.Restored != null) piece.Restored.alpha = turn;
+                    if (piece.Worn != null) piece.Worn.alpha = 1 - turn;
+                    if (piece.Flash != null) piece.Flash.color = new Color(1, .85f, .55f, flare);
                 }
-                if (wingGrime != null) wingGrime.color = new Color(1, 1, 1, Mathf.Lerp(KitGrime[from], KitGrime[to], k));
-                if (wingVeil != null) wingVeil.color = new Color(0, 0, 0, Mathf.Lerp(KitVeil[from], KitVeil[to], k));
-                if (wingLight != null && !lightOverlays.Contains(wingLight)) wingLight.color = new Color(1, 1, 1, Mathf.Lerp(KitLight[from], KitLight[to], k));
+                foreach (var d in opening)
+                {
+                    if (d.Closed != null) d.Closed.alpha = turn; if (d.Locked != null) d.Locked.alpha = 1 - turn;
+                    if (d.PlateClean != null) d.PlateClean.alpha = turn; if (d.PlateLocked != null) d.PlateLocked.alpha = 1 - turn;
+                    if (d.Flash != null) d.Flash.color = new Color(1, .85f, .55f, flare); d.Glow.color = new Color(1, .82f, .5f, .4f * turn);
+                }
+                if (k.GrimeImage != null) k.GrimeImage.color = new Color(1, 1, 1, Mathf.Lerp(k.Grime[a], k.Grime[b], t));
+                if (k.VeilImage != null) k.VeilImage.color = new Color(k.VeilTint.r, k.VeilTint.g, k.VeilTint.b, Mathf.Lerp(k.Veil[a], k.Veil[b], t));
+                if (k.OwnsLight) k.LightImage.color = new Color(1, 1, 1, Mathf.Lerp(k.Light[a], k.Light[b], t));
             });
-            SetKit(to); kitFade = null; Publish();
+            SetKit(k, to); k.Fade = null; Publish();
+        }
+        // The Keeper reaches an unlocked door: the two leaves swing toward their outer edges, the open door and its light come up. About half a second.
+        IEnumerator OpenDoor(RoomKit k, string id)
+        {
+            var d = k?.Doors.FirstOrDefault(x => x.Id == id); if (d == null || d.LeafL == null || !d.Shown) yield break;
+            LastDoorOpened = id;
+            if (ReducedMotion) { d.Closed.alpha = 0; if (d.Open != null) d.Open.alpha = 1; yield break; }
+            yield return Tween(.5f, t => {
+                float s = Mathf.Lerp(1, .12f, Mathf.SmoothStep(0, 1, t));
+                d.LeafL.localScale = new Vector3(s, 1, 1); d.LeafR.localScale = new Vector3(s, 1, 1);
+                if (d.Open != null) d.Open.alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01(t * 1.5f - .4f));
+                d.Glow.color = new Color(1, .82f, .5f, .4f + .5f * t);
+            });
+            d.Closed.alpha = 0;
+        }
+        public string LastDoorOpened { get; private set; } = "";
+        // A Wing piece restores on its Key, or, for an instrument a lesson uses, the moment that instrument wakes (the shelf's book, the table).
+        bool KitRestoredNow(KitPlacement p) => p.Wake == "wheel" ? Flow.WheelComplete : p.Wake == "modalities" ? Flow.ModalitiesComplete : Flow.Keys >= p.Key;
+        // ---- Build N: the Atrium kit. Pieces restore by the Atrium's stage (the Key here is the stage, 2 to 6); the light keeps following the stage too.
+        static readonly KitPlacement[] AtriumKit =
+        {
+            new KitPlacement("rug", 0, 800, 4, 1, 1, 60),
+            new KitPlacement("chandelier", -36, 150, 6),
+            new KitPlacement("chart", -140, 125, 3), new KitPlacement("chart", 138, 122, 3), new KitPlacement("chart", -86, 215, 3, .65f), new KitPlacement("chart", 88, 220, 3, .6f), new KitPlacement("chart", 165, 250, 3, 1.6f),
+            new KitPlacement("lamp", -94, 127, 6), new KitPlacement("lamp", 91, 127, 5),
+            new KitPlacement("banner", -124, 205, 5), new KitPlacement("banner", 124, 205, 5), new KitPlacement("banner", -61, 295, 5, 1.2f), new KitPlacement("banner", 61, 295, 5, 1.2f),
+            new KitPlacement("lamp", -60, 220, 2, .875f), new KitPlacement("lamp", 60, 220, 3, .875f), // the pillar lanterns use the wall lamp (the art lane's "lantern" came back as a ring chandelier)
+            new KitPlacement("shelf", -175, 380, 4),
+            new KitPlacement("bust", -63, 380, 4), new KitPlacement("bust", 64, 380, 4),
+            new KitPlacement("plant", -83, 380, 5), new KitPlacement("plant", 84, 380, 5),
+            new KitPlacement("candlestand", -156, 385, 2), new KitPlacement("candlestand", 169, 385, 2),
+            new KitPlacement("bench", 147, 405, 3),
+            new KitPlacement("desk", -107, 445, 2),
+            new KitPlacement("plant", -164, 495, 5, 1.3f), new KitPlacement("plant", 160, 485, 5, 1.8f),
+        };
+        public static readonly float[] AtriumGrime = { 1, .8f, .6f, .4f, .2f, 0 }, AtriumVeil = { .62f, .46f, .32f, .2f, .09f, 0 }; // by Atrium stage 1 to 6 (tuning variables)
+        RoomKit BuildAtriumKit(RectTransform panel, SliceScreen screen)
+        {
+            var k = BuildKit(panel, "akit-", AtriumKit, "atrium-grime", null, AtriumGrime, AtriumVeil, null, () => Mathf.Clamp(screen == SliceScreen.Atrium ? 0 : Flow.AtriumStage - 1, 0, 5), p => (screen == SliceScreen.Atrium ? 1 : Flow.AtriumStage) >= p.Key);
+            // The Zodiac Wing's door is open to the Keeper from the start; the Chamber's unlocks with the first Key (the return); the sealed door stays sealed.
+            k.VeilTint = new Color(.02f, .035f, .09f); // the Atrium shell carries warm lantern light; asleep, a cold blue night sits over it
+            k.DoorUnlocked = id => id == "wing-door" || (id == "chamber-door" && screen != SliceScreen.Atrium);
+            AddDoor(k, "sealed-left", null, -117.5f, 385, 60, 130, 262, 56);
+            AddDoor(k, "wing-door", "THE ZODIAC WING", 0, 385, 70, 135, 256, 64);
+            AddDoor(k, "chamber-door", "THE CRYSTAL BOOK CHAMBER", 117.5f, 385, 60, 130, 262, 56);
+            FinishKit(panel, k); atriumKits.Add(k); return k;
+        }
+        bool AtriumKitted => Slots.Image("akit-door-closed") != null || Slots.Image("akit-desk-restored") != null;
+        // With the kit in, the greybox props and their grey labels go; their tap areas stay.
+        void RetireProps(RectTransform block, bool keepTap)
+        {
+            if (block == null) return;
+            if (!keepTap) { block.gameObject.SetActive(false); return; }
+            var image = block.GetComponent<Image>(); if (image != null) { image.sprite = null; image.color = new Color(0, 0, 0, 0); }
+            foreach (Transform child in block) child.gameObject.SetActive(false);
+        }
+        void PulseDoors()
+        {
+            foreach (var k in atriumKits)
+            {
+                if (k.Fade != null || !k.Container.gameObject.activeInHierarchy) continue;
+                foreach (var d in k.Doors) if (d.Shown && (d.Closed == null || d.Closed.alpha > .99f)) d.Glow.color = new Color(1, .82f, .5f, ReducedMotion ? .4f : .28f + .24f * Mathf.PingPong(Time.unscaledTime / 1.1f, 1f));
+            }
         }
         const float GridKeyTop = 230;
         // Build I: glows are soft discs, not flat squares (a radial falloff made once at startup, no file).
