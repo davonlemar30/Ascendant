@@ -1271,8 +1271,8 @@ namespace Ascendant.CelestialDial
         }
         Text PlateText(RectTransform plate, string text)
         {
-            var name = Label(plate, text, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x - 10, plate.sizeDelta.y - 6, 7);
-            name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 5; name.resizeTextMaxSize = 8; return name;
+            var name = Label(plate, text, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x * .8f, plate.sizeDelta.y * .7f, 9); name.lineSpacing = .85f;
+            name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 6; name.resizeTextMaxSize = 11; return name;
         }
         // Doors fill the painted arch openings; the plate sits on the arch's keystone.
         void AddDoor(RoomKit k, string id, string name, float x, float bottom, float w, float h, float plateBottom, float plateW)
@@ -1417,9 +1417,9 @@ namespace Ascendant.CelestialDial
             // The Zodiac Wing's door is open to the Keeper from the start; the Chamber's unlocks with the first Key (the return); the sealed door stays sealed.
             k.VeilTint = new Color(.02f, .035f, .09f); // the Atrium shell carries warm lantern light; asleep, a cold blue night sits over it
             k.DoorUnlocked = id => id == "wing-door" || (id == "chamber-door" && screen != SliceScreen.Atrium);
-            AddDoor(k, "sealed-left", null, -117.5f, 385, 60, 130, 262, 56);
-            AddDoor(k, "wing-door", "THE ZODIAC WING", 0, 385, 70, 135, 256, 64);
-            AddDoor(k, "chamber-door", "THE CRYSTAL BOOK CHAMBER", 117.5f, 385, 60, 130, 262, 56);
+            AddDoor(k, "sealed-left", null, -117.5f, 385, 60, 130, 264, 74); // plates ~30% larger for phone reading (owner, Sept 25)
+            AddDoor(k, "wing-door", "THE ZODIAC\nWING", 0, 385, 70, 135, 258, 84);
+            AddDoor(k, "chamber-door", "THE CRYSTAL\nBOOK CHAMBER", 117.5f, 385, 60, 130, 266, 86);
             FinishKit(panel, k); atriumKits.Add(k); return k;
         }
         bool AtriumKitted => Slots.Image("akit-door-closed") != null || Slots.Image("akit-desk-restored") != null;
