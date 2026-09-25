@@ -89,7 +89,7 @@
     for(let i=0;i<7;i++)if(byId('sound-'+i))box('sound-'+i,-129+(i%4)*86,686+Math.floor(i/4)*42,82,38);
     // Points of interest sit where their placeholder geometry is drawn (v0.4 tap-to-move).
     const chamberRoom=state&&state.room==='chamber';
-    const POI={desk:[-125,426,70,40],'wing-door':[0,310,72,128],caspar:[100,402,64,112],'sealed-left':[-118,310,62,128],'chamber-door':[118,310,62,128],'atrium-door':chamberRoom?[-150,347,48,124]:[-136,325,48,150],dial:[38,338,175,205],shelf:[158,320,48,240],grid:[-67,407,79,75],books:[0,300,330,90]};
+    const POI={desk:[-125,426,70,40],'wing-door':[0,310,72,128],caspar:[100,402,64,112],'sealed-left':[-118,310,62,128],'chamber-door':[118,310,62,128],'atrium-door':chamberRoom?[-150,347,48,124]:[-138,292,48,145],dial:[40,337,175,205],shelf:[157,295,48,290],grid:[-62,400,90,90],books:[0,300,330,90]};
     for(const id in POI)if(byId('poi-'+id))box('poi-'+id,POI[id][0],POI[id][1],POI[id][2],POI[id][3]);
     for(let i=0;i<4;i++)box('element-'+i,-78+(i%2)*156,300+Math.floor(i/2)*64,150,56);
     for(let i=0;i<3;i++)box('modality-'+i,0,300+i*64,300,56);

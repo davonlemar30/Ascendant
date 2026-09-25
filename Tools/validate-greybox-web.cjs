@@ -125,9 +125,11 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-walk.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).room==='wing' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,grid,dial,shelf' && (await state()).canEnterDial && !(await state()).canEnterShelf && !(await state()).canEnterGrid && (await state()).canLeaveWing,'the Wing doorway fades into the Wing room with the Dial, the doorway back, a dark shelf, and a dark table at '+viewport.width);
+    { const k=await state(); check(k.kitPieces===19 && k.kitLevel===k.keys && k.kitRestored<k.kitPieces && k.grime>0,'Build M: the Wing kit shows the Keys earned so far, worn pieces and grime still in place at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-wing-kit-early.png')}); }
     check(events.some(e=>e.event_name==='room_entered_wing'),'room events at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room.png')});
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('Dark and quiet'),{},{timeout:5000});
+    check(!(await state()).kitUp.includes('shelf') && !(await state()).kitUp.includes('table'),'Build M: before they wake, the shelf and the table lie worn at '+viewport.width);
     check(!(await state()).walking,'before the wheel is lit the shelf only says it is dark at '+viewport.width);
     await semantic('poi-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('dark and bare'),{},{timeout:5000});
     check(!(await state()).walking && !(await state()).gridOpen,'before the modality unit the table only says it is bare at '+viewport.width);
@@ -226,6 +228,7 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveWing,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).kitUp.includes('shelf'),'Build M: the shelf stands restored once the book of symbols wakes, before its lesson at '+viewport.width);
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
     check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'the book opens Part A: a symbol and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
@@ -358,6 +361,7 @@ const path=require('path');
     // ---- Build B: the table and Key 3 ----
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).canEnterGrid && (await state()).caspar.includes('table has woken'),'the finished modality unit wakes the table with a room button at '+viewport.width);
+    check((await state()).kitUp.includes('table'),'Build M: the table stands restored the moment it wakes, before its lesson at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room-table.png')});
     await semantic('enter-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='grid'&&window.ascendantDial.snapshot().canGridPick,{},{timeout:15000});
     { const g=await state(); check(g.avatarAt==='grid'&&g.gridStarted && g.gridTiles.length===12 && g.gridCells.length===12 && g.gridCells.every(c=>c.endsWith(': empty')) && g.gridTiles.every(t=>t.endsWith(', not placed')) && g.caspar.startsWith('Four elements and three modalities') && g.keys===2,'the room button walks to the table and opens it: twelve tiles, twelve empty cells, the intro line at '+viewport.width); }
@@ -488,6 +492,7 @@ const path=require('path');
     // Build L: the Wing at full light (Stage 6), the capture the owner judges the light overlay by
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await page.waitForTimeout(1200);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room-stage6.png')});
+    { const k=await state(); check(k.kitPieces===19 && k.kitLevel===4 && k.kitRestored===k.kitPieces && k.grime===0,'Build M: with four Keys every Wing kit piece is restored and the grime is gone at '+viewport.width); }
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(true,'Start over wipes the save at '+viewport.width);
@@ -537,7 +542,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===33&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===66&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
@@ -560,9 +565,9 @@ const path=require('path');
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===33&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 33 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===66&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 66 art and 7 sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===33&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===66&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');
