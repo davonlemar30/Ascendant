@@ -390,29 +390,31 @@ namespace Ascendant.CelestialDial
         {
             // Q06 phase 2, decision 2: the Wing as a room with two points of interest, the Dial and the doorway back.
             wingRoom = ScreenPanel("Wing room", "wing"); LightOverlay(wingRoom, "wing-light");
+            BuildWingKit(); // Build M: grime under the light, the kit pieces, the veil; everything after draws above the veil
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
             // Build L (Wing composition, owner-approved mockup B, Sept 24): the room art carries the Dial, the table, the chair, and the shelf,
             // painted in place. Each object keeps an invisible tap area and its glow over its painted footprint; without room art the greybox shows.
             bool wingBaked = HasArt(wingRoom);
-            var shelf = Block(wingRoom, "Collapsed bookshelf", 158, 320, 45, 240, wingBaked ? null : "shelf"); if (wingBaked) shelf.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            var shelf = Block(wingRoom, "Collapsed bookshelf", 157, 295, 45, 290, wingBaked ? null : "shelf"); if (wingBaked) shelf.GetComponent<Image>().color = new Color(0, 0, 0, 0);
             if (!wingBaked) for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
-            var glow = Rect("Shelf glow", shelf, 0, 120, 80, 270); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
+            var glow = Rect("Shelf glow", shelf, 0, 145, 90, 320); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
-            var dial = Rect("The Dial", wingRoom, 38, 338, 175, 205); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
+            var dial = Rect("The Dial", wingRoom, 40, 337, 175, 205); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
             var rings = Rect("Rings", dial, 0, 102, 175, 175); rings.gameObject.SetActive(!wingBaked && !Slots.Dress(dialImage, "dial-face")); if (wingBaked) dialImage.color = new Color(0, 0, 0, 0); // the face seen from the room
             RingLines(rings, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(rings, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
-            var waitingGlow = Rect("Dial glow", wingRoom, 38, 330, 250, 250); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
-            var dialLabel = Label(wingRoom, "The Dial", 38, 452, 120, 16, 10); dialLabel.color = Muted;
+            var waitingGlow = Rect("Dial glow", wingRoom, 40, 330, 250, 250); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
+            var dialLabel = Label(wingRoom, "The Dial", 40, 452, 120, 16, 10); dialLabel.gameObject.SetActive(wingKit.Count == 0); // Build M: the grey labels go once the kit is in (owner, Sept 24) dialLabel.color = Muted;
             Tappable(dial, () => Walk("dial"));
             // Build B (07 Room Scope amendment): a second interactive object, the table with its board of twelve, dark until the modality unit is complete.
-            var table = Block(wingRoom, "The table", -67, 407, 79, 75, wingBaked ? null : "table"); if (wingBaked) table.GetComponent<Image>().color = new Color(0, 0, 0, 0);
-            var board = Rect("Board", table, 0, 37, 60, 30); board.gameObject.SetActive(!wingBaked && !HasArt(table));
+            var table = Block(wingRoom, "The table", -62, 400, 90, 90, wingBaked ? null : "table"); if (wingBaked) table.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+            var board = Rect("Board", table, 0, 45, 60, 30); board.gameObject.SetActive(!wingBaked && !HasArt(table));
             for (int i = 0; i < 12; i++) { var square = Rect("Square", board, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
-            var tableGlow = Rect("Table glow", table, 0, 37, 110, 100); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
+            var tableGlow = Rect("Table glow", table, 0, 45, 120, 120); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
             Tappable(table, () => Walk("grid"));
-            var door = Block(wingRoom, "Doorway back", -136, 325, 36, 150, "door-open"); Tappable(door, () => Walk("atrium-door")); HitArea(door, 48); // Build K: the painted doorway
-            var light = Rect("Doorway light", door, 0, 75, 26, 123); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
+            var door = Block(wingRoom, "Doorway back", -138, 292, 42, 145, "door-open"); Tappable(door, () => Walk("atrium-door")); HitArea(door, 48); // Build K: the painted doorway
+            if (wingKit.Count > 0) foreach (var block in new[] { shelf, table, door }) foreach (var t in block.GetComponentsInChildren<Text>(true)) t.gameObject.SetActive(false); // Build M: the plates name the doors now
+            var light = Rect("Doorway light", door, 0, 72, 30, 118); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
             var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f, wingBaked ? 0 : 1); floorImage.raycastTarget = false;
             wingRoomCaption = Label(wingRoom, "The Dial stands at the center of the room. The doorway behind you leads back to the Atrium.", 0, 466, 340, 36, 12); // owner (worksheet section 6) // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
             enterGrid = MakeButton(wingRoom, "The Table", 0, 512, 300, 52, () => Walk("grid")); enterGrid.gameObject.SetActive(false); // Build B: shown once the table has woken // owner (worksheet section 11)
@@ -832,6 +834,7 @@ namespace Ascendant.CelestialDial
             avatar.gameObject.SetActive(roomScreen);
             if (s == SliceScreen.WingRoom)
             {
+                ApplyWingKit(true); // Build M: the room shows the Keys earned, turning what they newly restore
                 enterDial.interactable = !busy; wingRoomBack.interactable = !busy;
                 enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
@@ -1045,6 +1048,8 @@ namespace Ascendant.CelestialDial
             state.canEnterGrid = s == SliceScreen.WingRoom && Flow.CanOpenGrid && !busy;
             state.keys = Math.Max(state.keys, Flow.Keys); // the lesson counts two Keys; the table adds the third
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
+            state.kitLevel = kitShown; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; // Build M
+            state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
             if (s == SliceScreen.Grid)
             {
                 state.caspar = Grid.Message; state.gridReadout = Grid.Readout; state.gridStatus = gridStatus.text;
@@ -1169,6 +1174,117 @@ namespace Ascendant.CelestialDial
         }
         // Build I (task 86bc1brxu): Keys 2 to 4 get the Key 1 ceremony on the screen where they are earned: the seam splits the wheel
         // (on the Dial), the Key rises and glows, the count ticks, the Key settles into the count. Under two seconds; reduced motion cuts.
+        // ---- Build M: the Wing room kit (owner, Sept 24). The shell is the restored architecture; a grime layer and a dark veil sit over it
+        // at the start and wear away Key by Key; each piece has a worn and a restored file and turns when its Key comes, light burning across it.
+        // Placements are bottom-centred on the 360 x 800 layout, measured on the owner's approved "restored" image (shifted up 60 with the shell).
+        struct KitPlacement
+        {
+            public string Name, Wake; public float X, Bottom, Scale, WornScale, WornX; public int Key;
+            public KitPlacement(string name, float x, float bottom, int key, float scale = 1, float wornScale = 0, float wornX = float.NaN, string wake = null) { Name = name; X = x; Bottom = bottom; Key = key; Scale = scale; WornScale = wornScale; WornX = wornX; Wake = wake; }
+        }
+        static readonly KitPlacement[] WingKit =
+        {
+            new KitPlacement("window", -10, 247, 1, .82f),
+            new KitPlacement("carpet", -1, 565, 3, 1, .6f, -10),
+            new KitPlacement("chandelier", -64, 135, 4),
+            new KitPlacement("banner", -156, 135, 4),
+            new KitPlacement("banner", -99, 190, 4),
+            new KitPlacement("banner", 62, 170, 4, .83f),
+            new KitPlacement("orrery", 147, 170, 4),
+            new KitPlacement("armillary", -59, 285, 3),
+            new KitPlacement("lectern", -110, 372, 2, .8f),
+            new KitPlacement("globe", -30, 350, 3),
+            new KitPlacement("shelf", 157, 440, 2, 1, .7f, 118, "wheel"), // the book of symbols wakes on it once the wheel is lit: it must stand by then (owner, Sept 25)
+            new KitPlacement("dial", 40, 440, 4),
+            new KitPlacement("telescope", 139, 445, 4),
+            new KitPlacement("table", -62, 445, 3, wake: "modalities"), // the Table lesson happens on it: it rights itself when it wakes, not at Key 3 (owner, Sept 25)
+            new KitPlacement("candles", -144, 185, 1),
+            new KitPlacement("candles", 125, 205, 1, .75f),
+            new KitPlacement("books", 160, 490, 2),
+            new KitPlacement("chair", 144, 475, 3),
+            new KitPlacement("plate", -138, 222, 1),
+        };
+        public static readonly float[] KitGrime = { 1, .75f, .5f, .25f, 0 }, KitVeil = { .45f, .3f, .18f, .08f, 0 }; // by Keys earned, 0 to 4 (tuning variables)
+        const string WingPlateName = "THE GRAND ATRIUM"; // the Wing's doorway leads back to the Atrium
+        class KitPiece { public KitPlacement P; public CanvasGroup Worn, Restored; public Image Flash; public bool Shown; }
+        readonly List<KitPiece> wingKit = new List<KitPiece>(); Image wingGrime, wingVeil; int kitShown = -1; Coroutine kitFade;
+        public int KitLevel => kitShown;
+        public int KitRestored => wingKit.Count(p => p.Restored != null && p.Restored.alpha > .99f);
+        void BuildWingKit()
+        {
+            var grime = Rect("Grime", wingRoom, 0, 400, 360, 800); wingGrime = grime.gameObject.AddComponent<Image>(); wingGrime.raycastTarget = false;
+            grime.gameObject.SetActive(Slots.Dress(wingGrime, "wing-grime")); grime.SetAsFirstSibling(); // under the light overlay, over the shell
+            var kit = Rect("Wing kit", wingRoom, 0, 400, 360, 800);
+            foreach (var p in WingKit)
+            {
+                if (Slots.Image("kit-" + p.Name + "-restored") == null) continue; // no file, no piece: the greybox stays as it was
+                var piece = new KitPiece { P = p, Worn = KitState(kit, p, "worn"), Restored = KitState(kit, p, "restored") };
+                if (p.Name == "plate" && piece.Restored != null)
+                {
+                    var plate = (RectTransform)piece.Restored.transform;
+                    var name = Label(plate, WingPlateName, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x - 10, plate.sizeDelta.y - 6, 7);
+                    name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 5; name.resizeTextMaxSize = 8;
+                }
+                wingKit.Add(piece);
+            }
+            var veil = Rect("Veil", wingRoom, 0, 400, 360, 800); wingVeil = veil.gameObject.AddComponent<Image>(); wingVeil.color = new Color(0, 0, 0, 0); wingVeil.raycastTarget = false;
+            veil.gameObject.SetActive(wingKit.Count > 0);
+        }
+        CanvasGroup KitState(RectTransform kit, KitPlacement p, string state)
+        {
+            string slot = "kit-" + p.Name + "-" + state; var sprite = Slots.Image(slot); if (sprite == null) return null;
+            bool worn = state == "worn"; float scale = worn && p.WornScale > 0 ? p.WornScale : p.Scale; float x = worn && !float.IsNaN(p.WornX) ? p.WornX : p.X;
+            float w = sprite.rect.width / 2 * scale, h = sprite.rect.height / 2 * scale; // files are drawn at twice their size on the layout
+            var r = Rect(p.Name + " (" + state + ")", kit, x, p.Bottom - h / 2, w, h); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot);
+            return r.gameObject.AddComponent<CanvasGroup>();
+        }
+        // A piece restores on its Key, or, for an instrument a lesson uses, the moment that instrument wakes (the shelf's book, the table).
+        bool KitRestoredNow(KitPlacement p) => p.Wake == "wheel" ? Flow.WheelComplete : p.Wake == "modalities" ? Flow.ModalitiesComplete : Flow.Keys >= p.Key;
+        void ApplyWingKit(bool animate)
+        {
+            if (wingKit.Count == 0) return;
+            int level = Mathf.Clamp(Flow.Keys, 0, 4);
+            if (kitFade != null) { StopCoroutine(kitFade); kitFade = null; SetKit(kitShown); }
+            var turning = kitShown < 0 ? new List<KitPiece>() : wingKit.Where(p => !p.Shown && KitRestoredNow(p.P)).ToList();
+            if (animate && kitShown >= 0 && (turning.Count > 0 || level > kitShown) && !ReducedMotion) kitFade = StartCoroutine(RestoreKit(Mathf.Max(kitShown, 0), level, turning));
+            else SetKit(level);
+            kitShown = level;
+        }
+        void SetKit(int level)
+        {
+            foreach (var piece in wingKit)
+            {
+                bool restored = KitRestoredNow(piece.P); piece.Shown = restored;
+                if (piece.Restored != null) piece.Restored.alpha = restored ? 1 : 0;
+                if (piece.Worn != null) piece.Worn.alpha = restored ? 0 : 1;
+                if (piece.Flash != null) piece.Flash.color = new Color(1, .85f, .55f, 0);
+            }
+            if (wingGrime != null) wingGrime.color = new Color(1, 1, 1, KitGrime[level]);
+            if (wingVeil != null) wingVeil.color = new Color(0, 0, 0, KitVeil[level]);
+        }
+        IEnumerator RestoreKit(int from, int to, List<KitPiece> turning)
+        {
+            // Light burns across each piece newly earned: a gold flash swells, the worn file gives way to the restored one, the grime thins.
+            foreach (var piece in turning)
+                if (piece.Flash == null && piece.Restored != null)
+                {
+                    var target = (RectTransform)piece.Restored.transform;
+                    var flash = Rect(piece.P.Name + " (light)", target.parent, target.anchoredPosition.x, -target.anchoredPosition.y, target.sizeDelta.x * 1.5f + 30, target.sizeDelta.y * 1.3f + 30);
+                    piece.Flash = flash.gameObject.AddComponent<Image>(); piece.Flash.sprite = SoftGlow(); piece.Flash.raycastTarget = false; piece.Flash.color = new Color(1, .85f, .55f, 0);
+                }
+            yield return new WaitForSecondsRealtime(.35f);
+            yield return Tween(1.4f, k => {
+                foreach (var piece in turning)
+                {
+                    if (piece.Restored != null) piece.Restored.alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01(k * 1.6f - .3f));
+                    if (piece.Worn != null) piece.Worn.alpha = 1 - Mathf.SmoothStep(0, 1, Mathf.Clamp01(k * 1.6f - .3f));
+                    if (piece.Flash != null) piece.Flash.color = new Color(1, .85f, .55f, .8f * Mathf.Sin(k * Mathf.PI));
+                }
+                if (wingGrime != null) wingGrime.color = new Color(1, 1, 1, Mathf.Lerp(KitGrime[from], KitGrime[to], k));
+                if (wingVeil != null) wingVeil.color = new Color(0, 0, 0, Mathf.Lerp(KitVeil[from], KitVeil[to], k));
+            });
+            SetKit(to); kitFade = null; Publish();
+        }
         const float GridKeyTop = 230;
         // Build I: glows are soft discs, not flat squares (a radial falloff made once at startup, no file).
         static Sprite softGlow;

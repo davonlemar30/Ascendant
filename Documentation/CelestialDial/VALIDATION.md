@@ -2,6 +2,16 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build M: the Wing room kit
+
+Owner decisions, Sept 24–25 (Decisions Log, week of Sept 21–27; ClickUp 86bc74f9p): the Library starts dark and worn and each Key brings it to life; rooms are kits; the grey labels go; name plates on the door arches; instruments restore when they wake.
+
+`SliceView.BuildWingKit` builds, over the shell: `wing-grime` (under the light overlay), the 19 pieces from `WingKit` (each a worn and a restored `CanvasGroup`, bottom-centred, files at half size), and a black veil. `ApplyWingKit` on every Wing room show: grime and veil by Keys (`KitGrime` 1 → 0, `KitVeil` .45 → 0), each piece restored by `KitRestoredNow` (its Key; the shelf on `WheelComplete`; the table on `ModalitiesComplete`). Pieces newly restored since the last show turn with a gold flare (`RestoreKit`, 1.75 s; reduced motion cuts). The restored plate carries "THE GRAND ATRIUM" in engraved text. With the kit present, the shelf, table, doorway, and Dial labels hide. Tap areas, walk points, and glows follow the approved layout (doorway −138, table −62, Dial 40, shelf 157). The kit art is the owner-approved pair's pieces (the art lane), cropped and scaled by Claude to the measured scene sizes, the room layers shifted up 120 px so the walk line meets the floor band; the test set gains 33 generated placeholders. Slots: 66.
+
+Web state: `kitLevel`, `kitPieces`, `kitRestored`, `grime`, `kitUp` (the restored piece names). Suite checks: worn at the first visit, the shelf and table worn before they wake and restored when they wake, everything restored with no grime at Stage 6.
+
+Validation: mechanical 458/458, slice fixture 177/177, WebGL clean (22.0 MB), browser suite 283/283. Captures: [`Evidence/wing-kit-2026-09-25/`](Evidence/wing-kit-2026-09-25/).
+
 ## Build L: the 100 px Keeper and the composed Wing
 
 Owner decisions, Sept 24 (Decisions Log, week of Sept 21–27): the Keeper stands 100 px tall (the Wing mockup's scale), and the Wing is the owner's approved mockup B painted as one scene. A stopgap until the Wing room kit (ClickUp 86bc74f9p).
