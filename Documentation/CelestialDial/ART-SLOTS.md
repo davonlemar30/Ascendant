@@ -79,6 +79,16 @@ The Zodiac Wing is built as a kit (owner, Sept 24): `wing` is the restored **she
 
 Not slots, on purpose: the Caspar panels, buttons, and text (interface, not placeholder art); the glows (doorway light, shelf and table glow, the Key's glow, the seam) and the fade, which are effects drawn over whatever is there; the Dial screen's charcoal backdrop; the table's board of cells and tiles, which is a control.
 
+### The Grand Atrium kit (Build N, Sept 25)
+
+The Grand Atrium is built as a kit, on the same `RoomKit` code as the Wing: `atrium` is the restored **shell** (architecture only), `atrium-grime` (360 × 800) is the dust, cobwebs, and cold blue tint over it that fades out by the Atrium's stage, and each **piece** has a worn and a restored file, `akit-<piece>-worn` / `akit-<piece>-restored`. Piece files are drawn at **half their pixel size**, positioned from `SliceView.AtriumKit`; the slot sizes below are the restored piece on the 360 × 800 layout, cap 1024. The pieces: `banner`, `bench`, `bust`, `candlestand`, `chandelier`, `chart`, `desk`, `lamp`, `plant`, `rug`, `shelf`.
+
+The three doors and the doorway plates are their own slots, tracked by lock state rather than worn/restored: `akit-door-closed` / `akit-door-locked` / `akit-door-open`, and `akit-plate-clean` / `akit-plate-locked` (from `SliceView.AtriumKit` / `AddDoor`). A door goes locked (weathered, chains and a padlock) → unlocked (clean, edges glowing) → open as the Keeper reaches it; the Wing door starts unlocked, the Chamber's unlocks at the first Key, and the sealed door stays locked. The clean plate is where the engine writes the room's name (THE ZODIAC WING, THE CRYSTAL BOOK CHAMBER); the sealed door's plate stays locked and unreadable.
+
+### The Crystal Book Chamber kit (Build O, Sept 25)
+
+The Chamber is built on the same kit code: `chamber` is the restored shell, `chamber-grime` (360 × 800) is the dust, cobwebs, clouded crystals, and cold tint that fades out by Keys spent, and each piece has a worn and a restored file, `ckit-<piece>-worn` / `ckit-<piece>-restored`, drawn at half their pixel size from `SliceView.ChamberKit`. The pieces: `banner`, `book`, `brazier`, `candle`, `crystal`, `mechanism`, `reliquary`. The seven Books stand on the altar and are drawn separately, sealed or open by `BooksOpen`, with a lock at each Book's foot; the old candles, mechanism, pages, labels, and floor band hide once the kit is in.
+
 ## Sound slots
 
 | Slot | Plays when |
