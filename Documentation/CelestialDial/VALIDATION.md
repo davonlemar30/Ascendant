@@ -14,6 +14,8 @@ Checks:
 
 Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB; the font adds about 90 KB), and browser suite 305/305 at 390 and 360, at phone density (`DEVICE_SCALE=2 MOBILE=1`). Captures: [`Evidence/journal-blackletter-2026-09-26/`](Evidence/journal-blackletter-2026-09-26/).
 
+Production suite after the deploy of `3f0ce66`: 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), the Web build using UnifrakturMaguntia for the titles and the contents title drawing at 13% ink, the same as the local run.
+
 ## Key 3's ceremony and the table's seating
 
 Sealing the twelfth seat started two coroutines side by side, and both cleared the one `busy` flag: `GridSeated` (1.1 s) and Key 3's `KeyCeremony`, started from `Update` (about 1.7 s). The game reported idle mid-ceremony, and the ceremony's own end could land during the walk home to the Atrium and clear that walk's busy mid-fade; since the fade overlay is a raycast target during a fade, the first tap in the Atrium hit it instead of the door. It happened on every Key 3 return. Only Key 3 did this — Keys 2 and 4 are earned on the Dial, whose ceremony doesn't overlap a second busy coroutine this way. `GridSeated` now runs the ceremony inside its own busy span (`yield return KeyCeremony(3)`); the `Update` trigger stays as a fallback for a restored save, guarded (`!busy`) to fire only when nothing else is.
