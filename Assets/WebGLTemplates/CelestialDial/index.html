@@ -26,6 +26,7 @@
 <button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="leave-wing">Return to the Atrium</button><button id="leave-chamber">Return to the Atrium</button>
 <button id="continue-lesson">Continue the lesson</button><button id="enter-practice">Practice what you know</button><button id="leave-practice">Leave the instrument</button>
 <button id="open-journal">Your journal</button><button id="close-journal">Close the journal</button><button id="journal-prev">Previous page</button><button id="journal-next">Next page</button>
+<button id="journal-contents">Contents</button><div id="journal-rows" role="group" aria-label="Contents"><button id="journal-entry-0"></button><button id="journal-entry-1"></button><button id="journal-entry-2"></button><button id="journal-entry-3"></button><button id="journal-entry-4"></button><button id="journal-entry-5"></button></div>
 <div id="modalities" role="group" aria-label="Which modality?"><button id="modality-0">Cardinal</button><button id="modality-1">Fixed</button><button id="modality-2">Mutable</button></div>
 <div id="elements" role="group" aria-label="To which element does this sign owe its nature?"><button id="element-0">Fire</button><button id="element-1">Earth</button><button id="element-2">Air</button><button id="element-3">Water</button></div>
 <div id="room" role="group" aria-label="Points of interest, tap to walk there"></div>
@@ -54,10 +55,11 @@
     const gs=document.createElement('button');gs.id='grid-sign-'+i;gs.textContent=SIGNS[i];gs.onclick=()=>send('grid-sign:'+i);byId('grid-signs').appendChild(gs);
     const gc=document.createElement('button');gc.id='grid-cell-'+i;gc.textContent='Cell '+(i+1);gc.onclick=()=>send('grid-cell:'+i);byId('grid-cells').appendChild(gc);
   }
-  for(const id of ['back','seal','forward','ask-caspar','continue','optional','motion','insert','restart','enter-wing','leave-wing','continue-lesson','enter-practice','leave-practice','open-journal','close-journal','journal-prev','journal-next','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
+  for(const id of ['back','seal','forward','ask-caspar','continue','optional','motion','insert','restart','enter-wing','leave-wing','continue-lesson','enter-practice','leave-practice','open-journal','close-journal','journal-prev','journal-next','journal-contents','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
   for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
+  for(let i=0;i<6;i++)byId('journal-entry-'+i).onclick=()=>send('journal-entry:'+i); // Build J: the contents rows
   byId('next-screen').onclick=()=>send('next-screen');byId('mute').onclick=()=>send('mute');
   for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
   byId('name').addEventListener('change',e=>send('name:'+e.target.value));
@@ -83,7 +85,8 @@
     // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
     const practiceDial=state&&state.screen==='practice'&&state.practiceMode==='dial';
     box('continue-lesson',-78,714,150,48);box('enter-practice',78,714,150,48);if(practiceDial)box('leave-practice',-72,714,128,48);else box('leave-practice',0,654,190,56);
-    if(hub)box('open-journal',0,680,300,52);else box('open-journal',0,774,216,40);box('close-journal',0,714,190,48);box('journal-prev',-78,654,150,56);box('journal-next',78,654,150,56);
+    if(hub)box('open-journal',0,680,300,52);else box('open-journal',0,774,216,40);box('close-journal',0,714,190,48);box('journal-prev',-122,654,64,56);box('journal-contents',0,654,146,56);box('journal-next',122,654,64,56);
+    for(let i=0;i<6;i++)box('journal-entry-'+i,-18,161+i*80,232,46); // Build J: the book's contents rows
     if(hub)box('restart',118,774,112,40);
     // Build E: the style page's sound slots sit where the canvas draws them.
     for(let i=0;i<7;i++)if(byId('sound-'+i))box('sound-'+i,-129+(i%4)*86,686+Math.floor(i/4)*42,82,38);
@@ -126,6 +129,8 @@
       byId('leave-wing').disabled=!state.canLeaveWing;
       byId('continue-lesson').disabled=!state.canContinueLesson;byId('enter-practice').disabled=!state.canEnterPractice;byId('leave-practice').disabled=!state.canLeavePractice;
       byId('open-journal').disabled=!state.canOpenJournal;byId('close-journal').disabled=!state.canCloseJournal;byId('journal-prev').disabled=!state.canJournalPrev;byId('journal-next').disabled=!state.canJournalNext;
+      byId('journal-contents').disabled=!state.canJournalContents;const contentsPage=journal&&state.journalView==='contents',titles=state.journalContents||[];byId('journal-rows').hidden=!contentsPage;
+      for(let i=0;i<6;i++){const row=byId('journal-entry-'+i),title=titles[i]||'';row.textContent=title;row.setAttribute('aria-label',title+(state.journalTabs&&state.journalTabs[i]?', ready for practice':''));row.disabled=!(contentsPage&&title&&!state.busy);}
       const pois=state.pois||[],poiKey=pois.join('|');
       if(poiKey!==lastPois){lastPois=poiKey;const roomGroup=byId('room');roomGroup.innerHTML='';pois.forEach((id,i)=>{const b=document.createElement('button');b.id='poi-'+id;b.textContent=state.poiLabels[i];b.onclick=()=>send('walk:'+id);roomGroup.appendChild(b);});}
       pois.forEach(id=>{byId('poi-'+id).disabled=!state.canWalk;});byId('room').hidden=pois.length===0;
@@ -154,7 +159,7 @@
       if(document.activeElement===document.body || document.activeElement.disabled || document.activeElement===autoFocused){
         const firstTile=grid&&state.gridTiles?state.gridTiles.findIndex(t=>!t.endsWith(', placed')):-1;
         const firstShare=sharing&&state.shared?['Modality','Polarity','Element'].findIndex(l=>!state.shared.includes(l)):-1;
-        const focus=style?byId('mute'):state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canInsert&&chamber?byId('insert'):chamber&&state.canWalk&&!state.atBooks&&state.keysInHand>0?byId('poi-books'):chamber&&state.canLeaveChamber?byId('leave-chamber'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):naming&&state.canBuilderName?byId('builder-name-0'):sharing&&state.canBuilderShare&&firstShare>=0?byId('builder-share-'+firstShare):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
+        const focus=style?byId('mute'):journal&&state.journalView==='contents'?byId('journal-entry-0'):journal&&state.canJournalNext?byId('journal-next'):journal&&state.canJournalContents?byId('journal-contents'):journal?byId('close-journal'):state.canName?byId('name'):state.canBirth?byId('birth-chart'):state.canBirthDate?byId('birthdate'):state.canSignPick?byId('sign-0'):state.canEnterWing?byId('enter-wing'):state.canInsert&&chamber?byId('insert'):chamber&&state.canWalk&&!state.atBooks&&state.keysInHand>0?byId('poi-books'):chamber&&state.canLeaveChamber?byId('leave-chamber'):state.canEnterGrid?byId('enter-grid'):state.canEnterDial?byId('enter-dial'):naming&&state.canBuilderName?byId('builder-name-0'):sharing&&state.canBuilderShare&&firstShare>=0?byId('builder-share-'+firstShare):grid&&state.canGridSeal?byId('grid-seal'):grid&&state.canGridPick&&firstTile>=0?byId('grid-sign-'+firstTile):grid?byId('leave-grid'):tap?byId('element-0'):modTap?byId('modality-0'):glyph?byId('glyph-name-0'):state.canLeaveReview?byId('leave-review'):state.canInsert?byId('insert'):state.ended?byId('restart'):state.canSliceContinue&&!wing?byId('next-screen'):state.canContinue?byId('continue'):state.active?byId('seat-'+Math.max(0,state.seats.findIndex(s=>s.includes(', selected')))):state.canSliceContinue?byId('next-screen'):state.canOptional?byId('optional'):byId('motion');
         focus.focus({preventScroll:true});if(document.activeElement===focus)autoFocused=focus; // a target still disabled (a beat in progress) keeps the last auto-focus, so the next state can try again
       }
     },

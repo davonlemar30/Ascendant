@@ -118,9 +118,21 @@ const path=require('path');
     await semantic('poi-desk');await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='desk'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).note.includes('journal') && (await state()).canOpenJournal,'the desk only speaks; the journal is in hand at the Atrium at '+viewport.width);
     await semantic('open-journal');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='journal',{},{timeout:5000});
-    { const j=await state(); check(j.journal && j.journalEntries.length===12 && j.journalEntries[0].startsWith('Aries — Fire') && !j.canJournalNext && !j.canJournalPrev && j.journalSection==='The elements' && j.caspar.includes('journal'),'the journal opens from the Atrium on twelve element entries, one section so far, at '+viewport.width); }
-    await page.screenshot({path:path.join(out,viewport.width+'-journal.png')});
+    // Build J: the journal is a book: its contents, a page per sign met, the sections; no state word on screen; the arrows and rows work on the canvas
+    { const j=await state(); check(j.journal && j.journalView==='contents' && j.journalContents.join()==='The Elements,The Signs' && j.journalTabs.join()==='true,true' && !j.canJournalNext && !j.canJournalPrev && !j.canJournalContents && j.caspar.includes('Contents'),'the journal opens from the Atrium on its contents: the elements and the signs met, both flagged as due, at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-journal-contents.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll in the journal at '+viewport.width);
+    await semantic('journal-entry-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='sign',{},{timeout:5000});
+    { const j=await state(); check(j.journalSign==='Aries' && j.journalFacts.join()==='Element: Fire' && j.journalGlyph==='' && !j.journalTable && j.journalRibbonOut && j.journalShader && !/introduced|practicing/.test(j.journalText) && j.canJournalNext && !j.canJournalPrev && j.canJournalContents,'The Signs opens on Aries with only its element, its ribbon pulled out (due), the Illumination shader loaded, no state word on screen, at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-journal-sign.png')});
+    await tap(122,654); // the next-page arrow, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().journalSign==='Taurus',{},{timeout:5000});check(true,'the arrow on the canvas turns to the next sign at '+viewport.width);
+    await semantic('journal-contents');await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='contents',{},{timeout:5000});
+    await page.waitForTimeout(400); // Unity ignores pointer input in the first frame after the rows reappear (see waitActive)
+    await tap(-18,161); // the first contents row, on the canvas (SliceView.ContentsRow(0))
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='section',{},{timeout:5000});
+    { const j=await state(); check(j.journalSection==='The Elements' && j.journalEntries.length===12 && j.journalEntries[0]==='Aries — Fire' && !/introduced|practicing/.test(j.journalText) && !j.canJournalPrev && !j.canJournalNext,'a contents row on the canvas opens the elements: twelve entries in wheel order, no state word on screen, at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-journal-elements.png')});
     await tap(0,714); // Close the journal, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});
     check((await state()).avatarAt==='desk','the journal closes back to the Atrium, the marker where it stood, on a canvas tap at '+viewport.width);
@@ -547,7 +559,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===109&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===124&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
@@ -570,9 +582,9 @@ const path=require('path');
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===109&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 109 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===124&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 124 art and 7 sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===109&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===124&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');
