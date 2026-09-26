@@ -38,9 +38,9 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `shelf-book` | 10 × 26 | 64 | a book on a shelf: three on the Wing's, three that return to the Atrium's at Stage 4 |
 | `book-cover` | 140 × 140 | 512 | the book on the shelf, closed |
 | `book-page` | 140 × 140 | 512 | the book's open page behind each symbol |
-| `journal-page` | 360 × 800 | 2048 | the journal's page (Build F; Build J: one page to a screen, vellum, room for text; a section's entries and a sign's page sit on it) |
+| `journal-page` | 360 × 800 | 2048 | the journal's page (Build F; Build J: the left page of an open crimson binder, loose-leaf with twelve ruled lines the engine writes on; a section's entries and a sign's page sit on it) |
 | `journal-cover` | 60 × 60 | 256 | the journal's cover, at the head of the contents page (Build F) |
-| `journal-contents` | 360 × 800 | 2048 | the journal's contents page: a header, ruled rows for the entries (the engine writes them) |
+| `journal-contents` | 360 × 800 | 2048 | the journal's contents page: the same page with the Library's illuminated border and vine; the engine writes the entries on every other line |
 | `journal-ribbon` | 16 × 120 | 256 | a silk ribbon bookmark, forked tail at the bottom; nine-sliced to the ladder's length on a sign page, a short tab on the contents |
 | `journal-plate` | 112 × 34 | 512 | an engraved brass plate a sign's fact is written on (element, modality, polarity, opposite) |
 | `sign-aries` | 200 × 200 | 512 | Aries's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |

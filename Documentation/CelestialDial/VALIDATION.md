@@ -2,6 +2,12 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build J's art: the journal drawn
+
+The journal's 17 files in `Resources/Art`, drawn to the Art Bible by the art lane: `journal-page` and `journal-contents` (the left page of a crimson ring binder; loose-leaf with the owner's twelve ruled lines, which the engine writes on; the contents page with the Library's illuminated border and vine), `journal-cover`, `journal-ribbon`, `journal-plate`, and `sign-aries` … `sign-pisces` (one set; the four figure signs Black, per the owner's ruling). Tuned to the art: unpracticed ink at 60%, the plates' labels in ink at 78%, and the gilt edge on the painted page (y 28–578).
+
+Validation: mechanical 476/476, slice fixture 195/195 (new: at the Wing's end on the Art folder, Aries' page with every fact in full colour, then as line art, and the contents), WebGL clean (25.7 MB, about 1 MB more for the art), browser suite 297/297. Captures: [`Evidence/journal-art-2026-09-25/`](Evidence/journal-art-2026-09-25/).
+
 ## Build J: the journal as a book
 
 The owner's Sept 23 REVISE on the journal ("functional but not yet a journal"), rebuilt on main after Builds I–O; PR #39 is superseded. Opening the journal shows a **contents page**: the sections the deck holds (the Elements, Symbols, Modalities, Table, and Opposites, in curriculum order), then **The Signs**. Nothing not yet learned appears. An entry opens its section. The Signs opens **a page per sign met**, in zodiac order, showing only what the player has learned: the name with an illuminated capital, the sign's picture, its symbol (after the symbols unit), its table cell (a 4 × 3 mini-table, after the table), and plates for element, modality, polarity, and opposite.

@@ -265,6 +265,17 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.CanSpend && !View.Busy,"the last Key to spend");Act("insert");});
             Steps.Enqueue(()=>{Check(View.Flow.LocksFilled==4 && View.Flow.BooksOpen==1 && View.Flow.WingWhole && !View.Flow.CanSpend && View.Flow.KeysInHand==0,"Key 4 fills Book 2's first lock: the Wing is whole");Capture("slice-390-wing-whole.png");Act("leave-chamber");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.AtriumStage==6 && View.Flow.Keys==4,"the return takes the Atrium to Stage 6 with four Keys spent; the Wing's end card shows");Capture("slice-390-hub-key4.png");});
+            // Build J: the late sign page on the Art folder (the files in Resources/Art, or the greybox without them), every fact learned;
+            // Aries staged to full colour, then back to line art, for the owner's look at Illumination on the real picture
+            Steps.Enqueue(()=>Act("open-journal"));
+            Steps.Enqueue(()=>Act("journal-entry:5"));
+            Steps.Enqueue(()=>{foreach(var it in View.Flow.SignItems(0)){it.state=(int)ItemState.Practicing;it.streak=3;it.dueDay=999;}Act("journal-next");Act("journal-prev");});
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalSign=="Aries" && snap.journalColour==1 && snap.journalGilt && snap.journalFacts.Length==4 && snap.journalGlyph!="" && snap.journalTable,"at the Wing's end Aries' page holds every fact; staged, it is in full colour with the gilt edge");Capture("slice-390-journal-sign-late.png");});
+            Steps.Enqueue(()=>{foreach(var it in View.Flow.SignItems(0)){it.state=(int)ItemState.Introduced;it.streak=0;}Act("journal-next");Act("journal-prev");});
+            Steps.Enqueue(()=>{Check(View.Dial.Snapshot().journalInk==SliceFlow.IntroducedInk && View.Dial.Snapshot().journalColour==0,"staged back to introduced: line art");Capture("slice-390-journal-sign-lineart.png");});
+            Steps.Enqueue(()=>Act("journal-contents"));
+            Steps.Enqueue(()=>{Check(View.Dial.Snapshot().journalView=="contents","the contents at the Wing's end");Capture("slice-390-journal-contents-late.png");});
+            Steps.Enqueue(()=>Act("close-journal"));
             Steps.Enqueue(()=>Act("reload"));
             Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==6 && View.Flow.Keys==4 && View.Flow.LocksFilled==4 && View.Flow.WingWhole && View.Dial.Lesson.Key4Earned && View.Dial.Lesson.PolarityShown && View.Dial.Lesson.OppositesComplete && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && View.Grid.Key3Earned && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with four Keys spent, the Books, the sides, the six pairs, and the pair items as data");stashedSave=PlayerPrefs.GetString(SliceView.SaveKey);Act("restart");});
             Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});

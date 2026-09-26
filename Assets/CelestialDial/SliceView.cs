@@ -84,7 +84,7 @@ namespace Ascendant.CelestialDial
         static readonly Color LampDark = new Color(.3f,.27f,.24f), LampLit = new Color(.95f,.8f,.5f);
         static readonly Color Held = new Color(.45f,.36f,.28f), Seated = new Color(.29f,.27f,.28f), TileGone = new Color(.1f,.1f,.12f);
         // Build J: ink on the journal's vellum (the Art Bible's line colour, crimson, amber); the greybox panel keeps bone and muted.
-        static readonly Color JournalInk = new Color(.17f,.11f,.086f), JournalFaint = new Color(.17f,.11f,.086f,.42f), Rubric = new Color(.49f,.16f,.2f), Gilt = new Color(.89f,.64f,.29f);
+        static readonly Color JournalInk = new Color(.17f,.11f,.086f), JournalFaint = new Color(.17f,.11f,.086f,.6f), Rubric = new Color(.49f,.16f,.2f), Gilt = new Color(.89f,.64f,.29f);
         static readonly string[] Elements = { "Fire", "Earth", "Air", "Water" };
         public static readonly string[] AtriumPages = {
             "You are awake. Good. I hope the trip was not too rough. You were... let us say 'unavailable' for most of it.",
@@ -1164,8 +1164,8 @@ namespace Ascendant.CelestialDial
                 journalLines[i] = Label(journal, "", -3, RuleTop - 9 + i * RuleGap, 206, 38, 14); journalLines[i].alignment = TextAnchor.MiddleLeft; journalLines[i].verticalOverflow = VerticalWrapMode.Overflow;
             }
             // a sign: the gilt edge (full colour), the ribbon, the picture, its symbol and table cell, the fact plates
-            journalGilt = Rect("Gilt edge", journal, -20, 319, 292, 586); // the left page: x -166 to 126, y 26 to 612
-            foreach (var bar in new[] { new Vector4(0, 1, 292, 2), new Vector4(0, 585, 292, 2), new Vector4(-145, 293, 2, 586), new Vector4(145, 293, 2, 586) })
+            journalGilt = Rect("Gilt edge", journal, -20, 303, 292, 550); // the left page as painted: x -166 to 126, y 28 to 578
+            foreach (var bar in new[] { new Vector4(0, 1, 292, 2), new Vector4(0, 549, 292, 2), new Vector4(-145, 275, 2, 550), new Vector4(145, 275, 2, 550) })
             { var edge = Rect("Gilt", journalGilt, bar.x, bar.y, bar.z, bar.w).gameObject.AddComponent<Image>(); edge.color = Gilt; edge.raycastTarget = false; }
             var ribbon = Rect("Ribbon", journal, 92, JournalTop + 20, 16, 40); journalRibbon = ribbon.gameObject.AddComponent<Image>(); journalRibbon.raycastTarget = false; journalRibbon.color = Crimson;
             if (Slots.Dress(journalRibbon, "journal-ribbon")) // nine-sliced so the forked tail and the head keep their shape at every length
@@ -1183,7 +1183,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < journalPlates.Length; i++)
             {
                 var plate = Rect("Fact plate", journal, JournalX, 0, 112, 34); journalPlates[i] = plate.gameObject.AddComponent<Image>(); journalPlates[i].raycastTarget = false; journalPlates[i].color = PanelColor; Slots.Dress(journalPlates[i], "journal-plate");
-                journalPlateValues[i] = Label(plate, "", 0, 17, 104, 28, 15); journalPlateLabels[i] = Label(journal, "", JournalX, 0, 112, 16, 10);
+                journalPlateValues[i] = Label(plate, "", 0, 17, 104, 28, 15); journalPlateLabels[i] = Label(journal, "", JournalX, 0, 112, 16, 11);
             }
             journalPrev = MakeButton(journal, "", -122, 654, 64, 56, () => JournalTurn(-1)); StyleAtriumButton(journalPrev); journalChevrons[0] = Chevron(journalPrev, -1); // owner, Sept 25: an arrow flips the page
             journalToContents = MakeButton(journal, "Contents", 0, 654, 146, 56, JournalContents); StyleAtriumButton(journalToContents);
@@ -1254,7 +1254,7 @@ namespace Ascendant.CelestialDial
                 bool alone = facts.Count % 2 == 1 && i == facts.Count - 1; float x = JournalX + (alone ? 0 : i % 2 == 0 ? -60 : 60), plateTop = y + 34 + i / 2 * 70;
                 journalPlates[i].gameObject.SetActive(true); journalPlates[i].rectTransform.anchoredPosition = new Vector2(x, -plateTop);
                 journalPlateValues[i].text = facts[i][1]; journalPlateValues[i].color = journalPlates[i].sprite != null ? JournalInk : Bone;
-                journalPlateLabels[i].gameObject.SetActive(true); journalPlateLabels[i].rectTransform.anchoredPosition = new Vector2(x, -(plateTop - 27)); journalPlateLabels[i].text = facts[i][0].ToUpperInvariant(); journalPlateLabels[i].color = PageFaint;
+                journalPlateLabels[i].gameObject.SetActive(true); journalPlateLabels[i].rectTransform.anchoredPosition = new Vector2(x, -(plateTop - 27)); journalPlateLabels[i].text = facts[i][0].ToUpperInvariant(); journalPlateLabels[i].color = OnVellum ? new Color(JournalInk.r, JournalInk.g, JournalInk.b, .78f) : Muted;
             }
         }
         // What a screen reader hears: the page as words, and the ribbon's meaning, since it is only seen. placeholder (owner writes)
