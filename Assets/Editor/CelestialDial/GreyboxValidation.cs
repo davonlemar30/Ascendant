@@ -223,6 +223,37 @@ namespace Ascendant.Build
             Check(new[] { "journal-contents", "journal-ribbon", "journal-plate" }.All(n => Slots.Find(n) != null) && Zodiac.Seats.All(z => Slots.Find("sign-" + z.Name.ToLowerInvariant()) != null && Slots.Find("sign-" + z.Name.ToLowerInvariant()).Width == 200 && Slots.Find("sign-" + z.Name.ToLowerInvariant()).Height == 200), "Build J's slots: the contents page, the ribbon, the plate, and a 200 × 200 picture per sign");
             Check(Resources.Load<Shader>("Shaders/Illumination") != null, "the Illumination shader is under Resources, so the Web build carries it");
         }
+        // Sept 25: a `//` inserted before the rest of a statement had made code dead for days (the Atrium doors' and the Chamber doorway's
+        // taps, the Chamber floor band); it compiles and every other check passes. No line of the game's C# may carry statements after a comment.
+        static void ValidateNoSwallowedCode()
+        {
+            var statement = new System.Text.RegularExpressions.Regex(@";\s*(?:var |string |int |float |bool )?[A-Za-z_][\w\.\[\]]*\s*(?:\(|=[^=>])");
+            var swallowed = new List<string>();
+            foreach (var file in Directory.GetFiles("Assets/CelestialDial", "*.cs").Concat(Directory.GetFiles("Assets/Editor/CelestialDial", "*.cs")))
+            {
+                var lines = File.ReadAllLines(file);
+                for (int n = 0; n < lines.Length; n++)
+                {
+                    int c = CommentStart(lines[n]); if (c < 0) continue;
+                    var tail = lines[n].Substring(c + 2);
+                    if (System.Text.RegularExpressions.Regex.IsMatch(tail, @"\)\s*;") && statement.IsMatch(tail)) swallowed.Add(Path.GetFileName(file) + ":" + (n + 1));
+                }
+            }
+            Check(swallowed.Count == 0, "no line of the game's C# hides statements behind a // comment" + (swallowed.Count > 0 ? ": " + string.Join(", ", swallowed) : ""));
+        }
+        static int CommentStart(string line) // the first // outside a string or char literal
+        {
+            bool inString = false, inChar = false;
+            for (int i = 0; i < line.Length - 1; i++)
+            {
+                char ch = line[i];
+                if (inString) { if (ch == '\\') i++; else if (ch == '"') inString = false; continue; }
+                if (inChar) { if (ch == '\\') i++; else if (ch == '\'') inChar = false; continue; }
+                if (ch == '"') inString = true; else if (ch == '\'') inChar = true;
+                else if (ch == '/' && line[i + 1] == '/') return i;
+            }
+            return -1;
+        }
         static void ValidateBuildF()
         {
             // ---- Build F: the practice fork on the Dial (Sept 15 ruling), the sitting rule (Sept 17), the three-strikes gate, the journal in the inventory ----
@@ -680,6 +711,7 @@ namespace Ascendant.Build
             ValidateEvidenceRouting();
             ValidateBuildF();
             ValidateBuildJ();
+            ValidateNoSwallowedCode();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");
         }
