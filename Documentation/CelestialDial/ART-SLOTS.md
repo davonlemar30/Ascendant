@@ -38,8 +38,23 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `shelf-book` | 10 × 26 | 64 | a book on a shelf: three on the Wing's, three that return to the Atrium's at Stage 4 |
 | `book-cover` | 140 × 140 | 512 | the book on the shelf, closed |
 | `book-page` | 140 × 140 | 512 | the book's open page behind each symbol |
-| `journal-page` | 360 × 800 | 2048 | the journal's open page, behind its entries (Build F) |
-| `journal-cover` | 60 × 60 | 256 | the journal's cover, at the head of its page (Build F) |
+| `journal-page` | 360 × 800 | 2048 | the journal's page (Build F; Build J: one page to a screen, vellum, room for text; a section's entries and a sign's page sit on it) |
+| `journal-cover` | 60 × 60 | 256 | the journal's cover, at the head of the contents page (Build F) |
+| `journal-contents` | 360 × 800 | 2048 | the journal's contents page: a header, ruled rows for the entries (the engine writes them) |
+| `journal-ribbon` | 16 × 120 | 256 | a silk ribbon bookmark, forked tail at the bottom; nine-sliced to the ladder's length on a sign page, a short tab on the contents |
+| `journal-plate` | 112 × 34 | 512 | an engraved brass plate a sign's fact is written on (element, modality, polarity, opposite) |
+| `sign-aries` | 200 × 200 | 512 | Aries's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-taurus` | 200 × 200 | 512 | Taurus's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-gemini` | 200 × 200 | 512 | Gemini's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-cancer` | 200 × 200 | 512 | Cancer's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-leo` | 200 × 200 | 512 | Leo's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-virgo` | 200 × 200 | 512 | Virgo's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-libra` | 200 × 200 | 512 | Libra's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-scorpio` | 200 × 200 | 512 | Scorpio's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-sagittarius` | 200 × 200 | 512 | Sagittarius's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-capricorn` | 200 × 200 | 512 | Capricorn's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-aquarius` | 200 × 200 | 512 | Aquarius's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
+| `sign-pisces` | 200 × 200 | 512 | Pisces's picture on its journal page: one full-colour file, drawn as line art until the deck colours it (Illumination) |
 | `shelves` | 60 × 180 | 512 | the Atrium's shelves, mostly empty (60 × 120 in the room) |
 | `furniture-covered` | 120 × 70 | 512 | the covered furniture of the opening (its dust cloth goes) |
 | `desk` | 70 × 30 | 256 | the desk, uncovered, in the Atrium room |
@@ -57,6 +72,8 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `chamber-light` | 360 × 800 | 2048 | the Crystal Book Chamber's golden-hour light, the same fade |
 
 ### The Wing room kit (Build M, Sept 25)
+
+The journal is a book (Build J, owner Sept 23 and 25). The screen shows the left page of an open ring binder: a loose-leaf sheet in the Library's palette, with the brass rings and the edge of the facing page at the right. Draw `journal-page` and `journal-contents` at 720 × 1600 with the same camera. The left page runs x 28–612, y 52–1224, and the writing column x 92–560. The page carries the loose-leaf lines (owner, Sept 25: "the fat double spaced lines"): twelve rules 80 px apart, the first at y 264, and a crimson margin line at x 80. The engine writes each entry on a line (`RuleTop` and `RuleGap` in `SliceView`), so a new page must keep those rules where they are. Each `sign-*` picture is **one full-colour file on a transparent background** (400 × 400). The engine draws it as line art and brings its colour up as the player learns the sign (Illumination, the `Ascendant/Illumination` shader in `Resources/Shaders`), so clean outlines and flat colour shapes matter more than detail. The ribbon is nine-sliced (its top 6% and bottom 20% keep their shape), so keep its middle a plain band.
 
 The Zodiac Wing is built as a kit (owner, Sept 24): `wing` is the restored **shell** (architecture only), `wing-grime` (360 × 800) is the dust, cobwebs, and cold tint over it that fade out by Keys, and each **piece** has a worn and a restored file, `kit-<piece>-worn` / `kit-<piece>-restored`. Piece files are drawn at **half their pixel size**, bottom-centred on their placement in `SliceView.WingKit` (x, bottom, the Key that restores it, a scale); the slot sizes below are the restored piece on the 360 × 800 layout, cap 1024. The pieces: `window`, `carpet`, `chandelier`, `banner` (three placements), `orrery`, `armillary`, `lectern`, `globe`, `shelf`, `dial`, `telescope`, `table`, `candles` (two placements), `books`, `chair`, `plate` (the doorway's name plate; the engine writes the name on the restored one). A piece restores on its Key, except the shelf (when the book of symbols wakes: the wheel lit) and the table (when it wakes: the modalities complete), because their lessons happen on them.
 

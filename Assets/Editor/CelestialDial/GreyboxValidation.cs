@@ -193,6 +193,36 @@ namespace Ascendant.Build
             review.BeginReview(2, 4); review.Dial.Select(Zodiac.Destination(2), DialInput.DirectSeat); var reviewAnswer = review.Seal(); review.AfterCorrect(reviewAnswer);
             Check(reviewAnswer.correctness && review.Phase == LessonPhase.Review && Others(reviewFlow.Deck, ItemKind.Grid) + Kind(reviewFlow.Deck, ItemKind.Grid) == allBefore, "a compressed Dial review answer records no lesson evidence of any kind");
         }
+        static void ValidateBuildJ()
+        {
+            // ---- Build J (owner, Sept 23): the journal as a book. Contents, sections, a page per sign met; Illumination plus Ribbons; no state words ----
+            var f = new SliceFlow(() => 1); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.Continue(); f.Continue(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, twelve element items entered
+            string DeckKey() => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
+            string Facts(int seat) => string.Join(", ", f.SignFacts(seat).Select(x => x[0] + ": " + x[1]));
+            Check(f.OpenJournal() && f.JournalAt == JournalView.Contents && f.JournalContents.SequenceEqual(new[] { "The Elements", "The Signs" }) && !f.JournalOpenEntry(2) && f.JournalAt == JournalView.Contents, "the contents list only what has entered the deck (the elements, the signs met); no entry past the end opens");
+            Check(f.JournalOpenEntry(1) && f.JournalAt == JournalView.Sign && f.JournalSigns.Count == 12 && f.JournalSignSeat == 0 && Facts(0) == "Element: Fire" && !f.SignKnows(0, ItemKind.Glyph) && !f.SignKnows(0, ItemKind.Grid), "The Signs opens on Aries with only what is learned: its element; no symbol, no table cell, no empty rows");
+            Check(f.JournalNext() && f.JournalSignSeat == 1 && f.CanJournalPrev && f.CanJournalContents && f.JournalToContents() && f.JournalAt == JournalView.Contents && !f.CanJournalContents, "sign pages turn in zodiac order; Contents returns to the contents page");
+            Check(f.CloseJournal() && f.AtHub, "the journal closes back to the Atrium");
+            f.StartGlyphs(); f.StartModalities(); f.StartGrid(); f.StartOpposites();
+            Check(Facts(6) == "Element: Air, Modality: Cardinal, Polarity: Yang, Opposite: Aries" && f.SignKnows(6, ItemKind.Glyph) && f.SignKnows(6, ItemKind.Grid) && f.SignKnows(6, ItemKind.Opposite), "a page grows as the player learns: Libra's modality, polarity and opposite (its pair's item), its symbol and table cell drawn");
+            Check(SliceFlow.JournalOrder.All(k => f.JournalEntries(k).All(e => !e.Contains("introduced") && !e.Contains("practicing"))) && f.JournalContents.All(t => !t.Contains("introduced") && !t.Contains("practicing")) && Enumerable.Range(0, 12).All(seat => !Facts(seat).Contains("introduced") && !Facts(seat).Contains("practicing")), "no journal string carries a state word (the play fixture reads the screen itself)");
+            foreach (var it in f.Deck.Items) it.dueDay = 99; // nothing due
+            foreach (var it in f.SignItems(4)) { it.state = (int)ItemState.Introduced; it.streak = 0; it.interval = 0; }
+            var leo = f.Deck.Item(4, ItemKind.Element);
+            Check(f.SignInk(4) == SliceFlow.IntroducedInk && f.SignColour(4) == 0 && !f.SignGilt(4) && f.SignLadder(4) == 0 && !f.SignDue(4), "Illumination: an introduced sign is line art at about a third of its ink, no colour; its ribbon is at its shortest");
+            leo.state = (int)ItemState.Practicing; leo.streak = 1; Check(f.SignInk(4) == 1 && Mathf.Approximately(f.SignColour(4), .4f), "a first streak brings the colour to 40% at full ink");
+            leo.streak = 2; Check(Mathf.Approximately(f.SignColour(4), .7f) && !f.SignGilt(4), "70% at a streak of two");
+            leo.streak = 3; Check(f.SignColour(4) == 1 && f.SignGilt(4), "full colour and the gilt edge at three and on");
+            leo.dueDay = f.Sitting; leo.interval = 3; Check(Mathf.Approximately(f.SignColour(4), SliceFlow.DueFade) && f.SignGilt(4) && f.SignDue(4), "due for practice, the colour fades a little; the gilt stays");
+            Check(f.SignLadder(4) == 3 && f.SignDue(4) && !f.SignDue(5) && f.SignLadder(5) == 0, "Ribbons: Leo's is three rungs long and pulled out (due for practice); Virgo's is not pulled out");
+            var virgoTable = f.Deck.Item(5, ItemKind.Grid); virgoTable.dueDay = 0; virgoTable.interval = 4;
+            Check(!f.SignDue(5) && f.SignLadder(5) == 0 && !f.SectionDue(ItemKind.Grid), "the table and the opposites are data only (never asked in practice), so they never pull a ribbon out or lengthen it");
+            Check(f.OpenJournal() && f.JournalContents.SequenceEqual(new[] { "The Elements", "The Symbols", "The Modalities", "The Table", "The Opposites", "The Signs" }) && f.JournalEntryDue(0) && !f.JournalEntryDue(1) && !f.JournalEntryDue(2) && !f.JournalEntryDue(3) && !f.JournalEntryDue(4) && f.JournalEntryDue(5) && !f.JournalEntryDue(6), "the contents flag the section with a due item (the elements) and the signs, and nothing else");
+            string before = DeckKey(); f.JournalOpenEntry(5); f.JournalNext(); f.JournalPrev(); f.JournalToContents(); f.JournalOpenEntry(3); f.JournalNext(); f.JournalToContents();
+            Check(DeckKey() == before && f.CloseJournal(), "turning every kind of page changes no deck field");
+            Check(new[] { "journal-contents", "journal-ribbon", "journal-plate" }.All(n => Slots.Find(n) != null) && Zodiac.Seats.All(z => Slots.Find("sign-" + z.Name.ToLowerInvariant()) != null && Slots.Find("sign-" + z.Name.ToLowerInvariant()).Width == 200 && Slots.Find("sign-" + z.Name.ToLowerInvariant()).Height == 200), "Build J's slots: the contents page, the ribbon, the plate, and a 200 × 200 picture per sign");
+            Check(Resources.Load<Shader>("Shaders/Illumination") != null, "the Illumination shader is under Resources, so the Web build carries it");
+        }
         // Sept 25: a `//` inserted before the rest of a statement had made code dead for days (the Atrium doors' and the Chamber doorway's
         // taps, the Chamber floor band); it compiles and every other check passes. No line of the game's C# may carry statements after a comment.
         static void ValidateNoSwallowedCode()
@@ -255,15 +285,16 @@ namespace Ascendant.Build
             Check(f.CloseInstrument() && f.Screen == SliceScreen.WingRoom && f.Note == "gated" && !f.Gated && f.ReviewQueue.Count == 0 && f.CanOpenJournal, "the gate closes the instrument into the room, journal offered, nobody locked out");
             Check(f.EnterDial() && f.CanEnterPractice && f.EnterPractice() && f.Strikes == 0 && f.Sittings == 5, "re-entry is immediate with three fresh strikes and a new sitting");
             f.LeavePractice(); f.LeaveDial();
-            Check(f.JournalSections.SequenceEqual(new[] { ItemKind.Element }), "before the symbols the journal has one section");
+            Check(f.JournalSections.SequenceEqual(new[] { ItemKind.Element }) && f.JournalContents.SequenceEqual(new[] { "The Elements", SliceFlow.SignsTitle }), "before the symbols the journal has one section, and the signs met");
             f.StartGlyphs(); f.Deck.RecordLesson(3, true, f.Sitting, ItemKind.Glyph);
             string deckBefore = DeckKey(f);
-            Check(f.OpenJournal() && f.AtJournal && f.JournalFrom == SliceScreen.WingRoom && f.JournalKind == ItemKind.Element && f.JournalEntries(ItemKind.Element).Count == 12 && f.JournalEntries(ItemKind.Element)[0] == "Aries — Fire · " + SliceFlow.StateWord(f.Deck.Item(0, ItemKind.Element)) && !f.CanJournalPrev && f.CanJournalNext, "the journal opens from the room on the elements, twelve entries in wheel order");
-            Check(f.JournalNext() && f.JournalKind == ItemKind.Glyph && f.JournalEntries(ItemKind.Glyph).Count == 12 && f.JournalEntries(ItemKind.Glyph)[3].EndsWith("practicing") && f.JournalEntries(ItemKind.Glyph)[4].EndsWith("introduced") && !f.CanJournalNext && !f.JournalNext() && f.JournalPrev() && f.JournalKind == ItemKind.Element && !f.JournalPrev(), "the symbols are a second section; pages turn both ways and stop at the ends; the state word follows the deck");
+            Check(f.OpenJournal() && f.AtJournal && f.JournalFrom == SliceScreen.WingRoom && f.JournalAt == JournalView.Contents && f.JournalContents.SequenceEqual(new[] { "The Elements", "The Symbols", SliceFlow.SignsTitle }) && !f.CanJournalPrev && !f.CanJournalNext && !f.CanJournalContents, "Build J: the journal opens from the room on its contents: the sections learned, then the signs");
+            Check(f.JournalOpenEntry(0) && f.JournalAt == JournalView.Section && f.JournalKind == ItemKind.Element && f.JournalEntries(ItemKind.Element).Count == 12 && f.JournalEntries(ItemKind.Element)[0] == "Aries — Fire" && !f.CanJournalPrev && f.CanJournalNext, "an entry opens its section: the elements, twelve entries in wheel order, no state word");
+            Check(f.JournalNext() && f.JournalKind == ItemKind.Glyph && f.JournalEntries(ItemKind.Glyph).Count == 12 && f.JournalStates(ItemKind.Glyph)[3] == "practicing" && f.JournalStates(ItemKind.Glyph)[4] == "introduced" && !f.CanJournalNext && !f.JournalNext() && f.JournalPrev() && f.JournalKind == ItemKind.Element && !f.JournalPrev(), "the symbols are a second section; pages turn both ways and stop at the ends; the deck's state is kept for the tests, never drawn");
             Check(DeckKey(f) == deckBefore && f.CloseJournal() && f.Screen == SliceScreen.WingRoom && f.Note == "" && DeckKey(f) == deckBefore, "reading the journal changes no deck field; closing returns to the room and clears the gate note");
             Check(f.LeaveWing() && f.CanOpenJournal && f.OpenJournal() && f.JournalFrom == SliceScreen.Hub && f.CloseJournal() && f.AtHub && f.EnterChamber() && f.CanOpenJournal && f.OpenJournal() && f.CloseJournal() && f.AtChamberRoom, "the journal opens from the Atrium and the Chamber too");
             f.StartGrid(); f.StartOpposites();
-            Check(f.JournalSections.SequenceEqual(new[] { ItemKind.Element, ItemKind.Glyph, ItemKind.Grid, ItemKind.Opposite }) && f.JournalEntries(ItemKind.Grid)[0] == "Aries — Fire · Cardinal · introduced" && f.JournalEntries(ItemKind.Opposite).Count == 6 && f.JournalEntries(ItemKind.Opposite)[0].StartsWith("Aries and Libra"), "the table and the opposites show in the journal as data, in curriculum order");
+            Check(f.JournalSections.SequenceEqual(new[] { ItemKind.Element, ItemKind.Glyph, ItemKind.Grid, ItemKind.Opposite }) && f.JournalEntries(ItemKind.Grid)[0] == "Aries — Fire · Cardinal" && f.JournalEntries(ItemKind.Opposite).Count == 6 && f.JournalEntries(ItemKind.Opposite)[0].StartsWith("Aries and Libra"), "the table and the opposites show in the journal as data, in curriculum order");
             Check(f.LeaveChamber() && f.ApproachDesk() && f.Note == SliceFlow.DeskLine && f.Screen == SliceScreen.Hub, "the desk is dressing: it only speaks");
             var save = UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true))); var back = new SliceFlow(() => 1);
             Check(save.version == 4 && save.sittings == 5 && save.reviewsChecked == 5 && back.Restore(save) && back.Sittings == 5, "the save carries the sitting count both ways");
@@ -652,7 +683,7 @@ namespace Ascendant.Build
             Check(dsave.locksFilled==4 && dback.Restore(dsave) && dback.LocksFilled==4 && dback.KeysSpent==4 && dback.KeysInHand==0 && dback.BooksOpen==1 && dback.WingWhole && dback.AtriumStage==6 && dback.CanEnterChamber,"the save carries the Keys spent and the Books");
             var oldSave=new SaveData{atriumStage=6,sunSign=1,keyEarned=true,keys=4};var oldBack=new SliceFlow(()=>1);Check(oldBack.Restore(oldSave) && oldBack.LocksFilled==1 && oldBack.KeysInHand==3 && oldBack.AtriumStage==6,"a save from before Build D keeps its stage and holds its Keys in hand");
             // Build E: art slots and sound hooks. The manifest, the URL, the loader on the shipped test set, the import settings, the cues, the size budget.
-            Check(Slots.Art.Length==109 && Slots.Art.Select(a=>a.Name).Distinct().Count()==109 && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),"109 art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
+            Check(Slots.Art.Length==124 && Slots.Art.Select(a=>a.Name).Distinct().Count()==124 && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),"124 art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
             Check(Slots.Sounds.Select(s=>s.Name).SequenceEqual(new[]{"step","seal","miss","key","page","door","ambient"}) && Slots.Sounds.All(s=>s.When.Length>0),"seven sound slots: step, seal, miss, key, page, door, ambient");
             Slots.ParseQuery("https://davonlemar30.github.io/Ascendant/?style",out var qSet,out var qStyle);Check(qSet=="" && qStyle,"?style asks for the style page on the Art folder");
             Slots.ParseQuery("http://127.0.0.1:8765/?art=test",out qSet,out qStyle);Check(qSet=="test" && !qStyle,"?art=test plays with the test set");
@@ -662,7 +693,7 @@ namespace Ascendant.Build
             Slots.Request(Slots.TestSet,null);
             Check(new[]{"atrium-light","wing-light","chamber-light"}.All(n=>Slots.Art.Any(a=>a.Name==n && a.Width==360 && a.Height==800)) && SliceView.LightSlots.Length==3,"Build H: one light overlay slot per room, full-screen");
             Check(SliceView.LightAlphaFor(0)==0f && SliceView.LightAlphaFor(1)==0f && SliceView.LightAlphaFor(2)==.25f && SliceView.LightAlphaFor(3)==.5f && SliceView.LightAlphaFor(4)==.75f && SliceView.LightAlphaFor(5)==1f && SliceView.LightAlphaFor(6)==1f,"the overlay's alpha follows the Atrium stage: nothing at Stage 1, full at Stages 5 and 6 (Option C)");
-            Check(Slots.Set=="test" && Slots.Art.All(a=>Slots.Image(a.Name)!=null) && Slots.Sounds.All(s=>Slots.Clip(s.Name)!=null) && Slots.ArtFiles==109 && Slots.SoundFiles==7,"the shipped test set has a file for every slot and the loader finds each one");
+            Check(Slots.Set=="test" && Slots.Art.All(a=>Slots.Image(a.Name)!=null) && Slots.Sounds.All(s=>Slots.Clip(s.Name)!=null) && Slots.ArtFiles==124 && Slots.SoundFiles==7,"the shipped test set has a file for every slot and the loader finds each one");
             Check(Slots.Art.All(a=>Slots.Source(a.Name)=="test set") && Slots.Sounds.All(s=>Slots.SoundSource(s.Name)=="test set"),"sources on the test set read 'test set'");
             Check(Slots.Image("no-such-slot")==null && Slots.Clip("no-such-slot")==null && Slots.Source("no-such-slot")=="placeholder" && Slots.SoundSource("no-such-slot")=="silent","an unknown slot loads nothing and reads placeholder or silent");
             var atriumImporter=AssetImporter.GetAtPath(SlotImport.ArtRoot+"test/atrium.png") as TextureImporter;var lockImporter=AssetImporter.GetAtPath(SlotImport.ArtRoot+"test/lock.png") as TextureImporter;
@@ -679,6 +710,7 @@ namespace Ascendant.Build
             ValidateCommittedSaves();
             ValidateEvidenceRouting();
             ValidateBuildF();
+            ValidateBuildJ();
             ValidateNoSwallowedCode();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");

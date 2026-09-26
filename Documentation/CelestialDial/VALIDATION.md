@@ -2,6 +2,18 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build J: the journal as a book
+
+The owner's Sept 23 REVISE on the journal ("functional but not yet a journal"), rebuilt on main after Builds I–O; PR #39 is superseded. Opening the journal shows a **contents page**: the sections the deck holds (the Elements, Symbols, Modalities, Table, and Opposites, in curriculum order), then **The Signs**. Nothing not yet learned appears. An entry opens its section. The Signs opens **a page per sign met**, in zodiac order, showing only what the player has learned: the name with an illuminated capital, the sign's picture, its symbol (after the symbols unit), its table cell (a 4 × 3 mini-table, after the table), and plates for element, modality, polarity, and opposite.
+
+- **Illumination (owner, Sept 23):** the picture is one full-colour file drawn through the `Ascendant/Illumination` shader (`Resources/Shaders`). It is line art at 35% ink while introduced, then 40, 70, or 100% colour by streak, with a gilt edge at full colour, and a little faded when due. A section's entries show the same state in ink, with a gilding symbol.
+- **Ribbons:** a sign's ribbon is as long as the ladder climbed, and pulled up past the page's head when the sign is due for practice. The contents flag a section, and The Signs, with a ribbon tab when anything in it is due. "Due" means due for practice: the table and the opposites are data only, so they never pull a ribbon.
+- **No state words** are drawn. `journalStates` keeps them for the tests.
+- **One tall page to a screen (owner, Sept 25):** the left page of an open binder. Drawn chevron arrows flip pages, and Contents returns. The page art carries the loose-leaf lines (owner, Sept 25), and the engine writes on them: a section's rows on every line, the contents' rows on every other line (`RuleTop` 132, `RuleGap` 40 on the 360 × 800 layout).
+- **Slots:** 124 (15 new): `journal-contents`, `journal-ribbon`, `journal-plate`, and `sign-aries` … `sign-pisces`.
+
+Validation: mechanical 476/476 (new in `ValidateBuildJ`: the contents, the sign facts unit by unit, no state words, Illumination's levels, the ribbons and "due", the contents' flags, reading changes nothing, the slots and the shader), slice fixture 192/192 (new: the contents, the early sign page, the elements; on the test set, the late sign page, Illumination read off the screen at saturation 0.17 at 20% against 0.55 at full, the ribbon lying and pulled out, and every line of every section fitting its rule), WebGL clean (24.8 MB), browser suite 297/297 (new: the contents, the sign page, and the elements, with the arrow and a contents row tapped on the canvas). Captures: [`Evidence/journal-book-2026-09-25/`](Evidence/journal-book-2026-09-25/).
+
 ## Build O: the Chamber kit
 
 The Crystal Book Chamber, the Zodiac Wing's last room, as a kit (owner-approved pair, Sept 25). `ChamberKit` over the shell (`chamber`, shifted up 160 px at 2x so the long altar's top lands at y 335 and the walk line meets the floor in front of it), `chamber-grime` (the art lane's mechanism ghost erased), a cold blue veil, and 16 pieces restored by Keys spent (0–4): nine candles and the mechanism (1), two banners (2), two braziers (3), a crystal cluster and a reliquary (4). The seven Books stand on the altar (`ckit-book-worn` sealed / `ckit-book-restored` open by `BooksOpen`), their locks at each Book's foot; the old candles, mechanism, pages, labels, and floor band hide with the kit. The doorway back's tap area moves to the painted arch. Slots: 109 (15 new).
