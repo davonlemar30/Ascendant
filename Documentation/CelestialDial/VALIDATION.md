@@ -2,6 +2,14 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Key 3's ceremony and the table's seating
+
+Sealing the twelfth seat started two coroutines side by side, and both cleared the one `busy` flag: `GridSeated` (1.1 s) and Key 3's `KeyCeremony`, started from `Update` (about 1.7 s). The game reported idle mid-ceremony, and the ceremony's own end could land during the walk home to the Atrium and clear that walk's busy mid-fade; since the fade overlay is a raycast target during a fade, the first tap in the Atrium hit it instead of the door. It happened on every Key 3 return. Only Key 3 did this — Keys 2 and 4 are earned on the Dial, whose ceremony doesn't overlap a second busy coroutine this way. `GridSeated` now runs the ceremony inside its own busy span (`yield return KeyCeremony(3)`); the `Update` trigger stays as a fallback for a restored save, guarded (`!busy`) to fire only when nothing else is.
+
+Checks: the slice fixture requires the game idle (`Table Keeper Key` inactive) only once the ceremony is over. The browser suite's `tapToWalk` now fails a room tap that takes no walk on the first try instead of retapping (the `NOTE: retaps` line is gone).
+
+Validation: mechanical 477/477, slice fixture 198/198, WebGL clean, browser suite 301/301 at 390 and 360 with no retaps. Production suite after the deploy of `f3aea9c` (which also carries Whitney's docs-upkeep and branch-health PRs, #58 and #59): 301/301 at phone density (`DEVICE_SCALE=2 MOBILE=1`), no retaps.
+
 ## Build J's art: the journal drawn
 
 The journal's 17 files in `Resources/Art`, drawn to the Art Bible by the art lane: `journal-page` and `journal-contents` (the left page of a crimson ring binder; loose-leaf with the owner's twelve ruled lines, which the engine writes on; the contents page with the Library's illuminated border and vine), `journal-cover`, `journal-ribbon`, `journal-plate`, and `sign-aries` … `sign-pisces` (one set; the four figure signs Black, per the owner's ruling). Tuned to the art: unpracticed ink at 60%, the plates' labels in ink at 78%, and the gilt edge on the painted page (y 28–578).
