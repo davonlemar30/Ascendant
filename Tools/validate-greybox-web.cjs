@@ -289,6 +289,7 @@ const path=require('path');
     await spendAtBooks('Key 2');
     check((await state()).keysSpent===2 && (await state()).keysInHand===0 && (await state()).booksOpen===0 && !(await state()).canInsert && events.filter(e=>e.event_name==='key_spent').length===1,'Key 2 fills the second lock; the Book stays shut; nothing more to spend at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber-lock2.png')});
+    { const c=await state(); check(c.chamberKitPieces===16 && c.chamberKitLevel===2 && c.chamberKitRestored>0 && c.chamberKitRestored<c.chamberKitPieces,'Build O: the Chamber kit shows two Keys spent: some pieces restored, others still worn at '+viewport.width); }
     await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).v03Complete && (await state()).avatarAt==='chamber-door' && (await state()).caspar.includes('Two locks filled'),'the return after spending takes the Atrium to Stage 4 at '+viewport.width);
     // ---- v0.3 revision, build 3: a clean replay hardens the symbols ----
@@ -546,7 +547,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===94&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===109&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
@@ -569,9 +570,9 @@ const path=require('path');
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===94&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 94 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===109&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 109 art and 7 sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===94&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===109&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');

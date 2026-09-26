@@ -223,6 +223,7 @@ namespace Ascendant.CelestialDial
         void BuildChamber()
         {
             chamber = ScreenPanel("Chamber", "chamber"); LightOverlay(chamber, "chamber-light");
+            if (ChamberKitted) { chamberKit = BuildKit(chamber, "ckit-", ChamberKit, "chamber-grime", null, ChamberGrime, ChamberVeil, null, () => Mathf.Clamp(Flow.KeysSpent, 0, 4), p => Flow.KeysSpent >= p.Key); chamberKit.VeilTint = new Color(.02f, .035f, .09f); FinishKit(chamber, chamberKit); atriumKits.Add(chamberKit); } // Build O
             Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18);
             for (int i = 0; i < candles.Length; i++)
             { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].raycastTarget = false; Slots.Dress(candles[i], "candle"); Slots.Paint(candles[i], LampDark, DarkArt); }
@@ -242,9 +243,21 @@ namespace Ascendant.CelestialDial
                 { var dot = Rect("Lock", chamber, x - 10 + l * 10, 348, 7, 7); locks[b * 3 + l] = dot.gameObject.AddComponent<Image>(); Slots.Dress(locks[b * 3 + l], "lock"); Slots.Paint(locks[b * 3 + l], LockDark, LockDarkArt); }
             }
             chamberBooksLabel = Label(chamber, "Seven sealed Books, three locks each", 0, 376, 330, 20, 12); chamberBooksLabel.color = Muted;
+            if (ChamberKitted)
+            {
+                // Build O: the seven Books stand on the altar (top at 335), sealed or open; the locks sit on each Book's foot; the old candles, mechanism, and labels go.
+                for (int b = 0; b < SliceFlow.Books; b++)
+                {
+                    var rt = bookImages[b].rectTransform; rt.anchoredPosition = new Vector2(-102 + b * 34, -302); rt.sizeDelta = new Vector2(30, 66);
+                    bookImages[b].sprite = Slots.Image("ckit-book-worn"); bookImages[b].color = Color.white; bookImages[b].preserveAspect = true; var o = bookImages[b].GetComponent<Outline>(); if (o != null) o.enabled = false;
+                    bookPages[b].gameObject.SetActive(false);
+                    for (int l = 0; l < SliceFlow.LocksPerBook; l++) { var lt = locks[b * 3 + l].rectTransform; lt.anchoredPosition = new Vector2(-102 + b * 34 - 8 + l * 8, -326); lt.sizeDelta = new Vector2(6, 6); }
+                }
+                foreach (var c in candles) c.gameObject.SetActive(false); mechanism.gameObject.SetActive(false); chandelierLabel.gameObject.SetActive(false); chamberBooksLabel.text = "";
+            }
             // Build D: the Chamber as a room. A doorway back, the Books as a point of interest, a floor band; all hidden on the first (Continue) visit.
-            chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f); chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band
-            chamberDoor = Block(chamber, "Doorway back", -150, 347, 30, 124, "door-open"); HitArea(chamberDoor, 48); // Build K: the painted doorway Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
+            chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f, ChamberKitted ? 0 : 1); // Build O: the painted floor carries it chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band
+            chamberDoor = Block(chamber, "Doorway back", ChamberKitted ? -145 : -150, ChamberKitted ? 287 : 347, ChamberKitted ? 40 : 30, ChamberKitted ? 165 : 124, ChamberKitted ? null : "door-open"); if (ChamberKitted) RetireProps(chamberDoor, true); HitArea(chamberDoor, 48); // Build K: the painted doorway Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false);
             chamberBooksTap = Rect("The Books, tap to walk", chamber, 0, 300, 330, 90); var booksTapImage = chamberBooksTap.gameObject.AddComponent<Image>(); booksTapImage.color = new Color(0, 0, 0, 0); Tappable(chamberBooksTap, () => Walk("books")); chamberBooksTap.gameObject.SetActive(false);
             var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
             Label(panel, "CASPAR", 0, 16, 290, 22, 13);
@@ -597,7 +610,8 @@ namespace Ascendant.CelestialDial
             journalChamber.gameObject.SetActive(room && Flow.CanOpenJournal); journalChamber.interactable = !busy; // Build F
             if (!room) return;
             for (int l = 0; l < locks.Length; l++) Slots.Paint(locks[l], l < Flow.LocksFilled ? Bone : LockDark, l < Flow.LocksFilled ? 1f : LockDarkArt);
-            for (int b = 0; b < SliceFlow.Books; b++) { bool open = b < Flow.BooksOpen; if (!busy) { Slots.Paint(bookImages[b], open ? BookOpen : Dim, open ? 1f : ShutArt); Slots.Paint(bookPages[b], new Color(Bone.r, Bone.g, Bone.b, open ? .9f : 0), 1f); bookPages[b].rectTransform.anchoredPosition = new Vector2(0, open ? -17 : -35); } }
+            if (ChamberKitted) for (int b = 0; b < SliceFlow.Books; b++) { bookImages[b].sprite = Slots.Image(b < Flow.BooksOpen ? "ckit-book-restored" : "ckit-book-worn"); bookImages[b].color = Color.white; } // Build O
+            else for (int b = 0; b < SliceFlow.Books; b++) { bool open = b < Flow.BooksOpen; if (!busy) { Slots.Paint(bookImages[b], open ? BookOpen : Dim, open ? 1f : ShutArt); Slots.Paint(bookPages[b], new Color(Bone.r, Bone.g, Bone.b, open ? .9f : 0), 1f); bookPages[b].rectTransform.anchoredPosition = new Vector2(0, open ? -17 : -35); } }
             if (Flow.BooksOpen > 0) Candles(true);
             bool canSpend = Flow.CanSpend && atBooks && !busy;
             insert.gameObject.SetActive(Flow.CanSpend && atBooks); insert.interactable = canSpend; insert.GetComponentInChildren<Text>().text = Flow.KeysInHand > 1 ? "Insert Key (" + Flow.KeysInHand + " in hand)" : "Insert Key"; // owner (worksheet section 13)
@@ -1066,6 +1080,7 @@ namespace Ascendant.CelestialDial
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
             state.kitLevel = KitLevel; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
             state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
+            if (chamberKit != null) { state.chamberKitLevel = chamberKit.Shown; state.chamberKitRestored = chamberKit.Pieces.Count(p => p.Shown); state.chamberKitPieces = chamberKit.Pieces.Count; } // Build O
             if (hubKit != null) { state.atriumKitLevel = hubKit.Shown; state.atriumKitPieces = hubKit.Pieces.Count; state.atriumKitRestored = hubKit.Pieces.Count(p => p.Shown); state.atriumGrime = hubKit.GrimeImage.gameObject.activeSelf ? hubKit.GrimeImage.color.a : -1; state.doors = hubKit.Doors.Select(d => d.Id + ":" + (d.Shown ? "unlocked" : "locked")).ToArray(); state.lastDoorOpened = LastDoorOpened; } // Build N
             if (s == SliceScreen.Grid)
             {
@@ -1422,6 +1437,19 @@ namespace Ascendant.CelestialDial
             AddDoor(k, "chamber-door", "THE CRYSTAL\nBOOK CHAMBER", 117.5f, 385, 60, 130, 266, 86);
             FinishKit(panel, k); atriumKits.Add(k); return k;
         }
+        // ---- Build O: the Chamber kit. It restores by Keys spent (the locks filled, 0 to 4); the Books stand on the altar, sealed or open.
+        static readonly KitPlacement[] ChamberKit =
+        {
+            new KitPlacement("banner", -56, 175, 2), new KitPlacement("banner", 43, 175, 2),
+            new KitPlacement("mechanism", 0, 235, 1),
+            new KitPlacement("brazier", -108, 405, 3), new KitPlacement("brazier", 108, 405, 3),
+            new KitPlacement("crystal", 140, 398, 4), new KitPlacement("reliquary", 163, 404, 4),
+            new KitPlacement("candle", -120, 388, 1), new KitPlacement("candle", -90, 388, 1), new KitPlacement("candle", -60, 388, 1), new KitPlacement("candle", -30, 388, 1), new KitPlacement("candle", 0, 388, 1),
+            new KitPlacement("candle", 30, 388, 1), new KitPlacement("candle", 60, 388, 1), new KitPlacement("candle", 90, 388, 1), new KitPlacement("candle", 120, 388, 1),
+        };
+        public static readonly float[] ChamberGrime = { 1, .75f, .5f, .25f, 0 }, ChamberVeil = { .6f, .42f, .26f, .12f, 0 };
+        RoomKit chamberKit;
+        bool ChamberKitted => Slots.Image("ckit-book-restored") != null;
         bool AtriumKitted => Slots.Image("akit-door-closed") != null || Slots.Image("akit-desk-restored") != null;
         // With the kit in, the greybox props and their grey labels go; their tap areas stay.
         void RetireProps(RectTransform block, bool keepTap)

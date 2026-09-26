@@ -2,6 +2,12 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Build O: the Chamber kit
+
+The Crystal Book Chamber, the Zodiac Wing's last room, as a kit (owner-approved pair, Sept 25). `ChamberKit` over the shell (`chamber`, shifted up 160 px at 2x so the long altar's top lands at y 335 and the walk line meets the floor in front of it), `chamber-grime` (the art lane's mechanism ghost erased), a cold blue veil, and 16 pieces restored by Keys spent (0–4): nine candles and the mechanism (1), two banners (2), two braziers (3), a crystal cluster and a reliquary (4). The seven Books stand on the altar (`ckit-book-worn` sealed / `ckit-book-restored` open by `BooksOpen`), their locks at each Book's foot; the old candles, mechanism, pages, labels, and floor band hide with the kit. The doorway back's tap area moves to the painted arch. Slots: 109 (15 new).
+
+Validation: mechanical 458/458, slice fixture 177/177, WebGL clean (24.7 MB), browser suite 291/291 (new: the Chamber kit at two Keys spent). Capture: [`Evidence/chamber-kit-2026-09-25/`](Evidence/chamber-kit-2026-09-25/).
+
 ## Build N: the Atrium kit and the doors
 
 Owner decisions, Sept 25 (Decisions Log, week of Sept 21–27): the Atrium restores stage by stage like the Wing, and each unlockable door goes from weathered and chained to clean with its edges glowing, and swings open as the Keeper reaches it.
