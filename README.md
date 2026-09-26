@@ -46,10 +46,10 @@ Your progress saves on the device you're playing on, in the browser, the moment 
 
 ## What's placeholder, what's coming
 
-- **Art:** landing, room by room. The Atrium, Caspar, the Keeper, and the Key are illustrated; the Wing room, the Chamber, the Dial, and the book are still placeholder blocks, and the golden-hour light that fills each room as the Library wakes is wired but not yet painted. Every grey box is a named slot that takes an image, so the art arrives one file at a time (see below).
+- **Art:** landing, room by room. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are now built as **kits** — a restored shell, a grime layer that fades away by Key, and every prop with a worn and a restored state — with Caspar, the Keeper, the Key, and the journal also illustrated. The Celestial Dial's own instrument (its seats, bracket, and floor pattern) and the book on the shelf are still placeholder blocks. Every grey box is a named slot that takes an image, so the art arrives one file at a time (see below).
 - **Sound:** none yet. One ambient loop and a few interface sounds are planned; the hooks are in, and each is a named slot that takes a sound file.
-- **Caspar's voice:** the Wing's lines are now the writer's own, from the first return to the Chamber's end. The few stand-ins left are around practice and the journal (the fork, the gate, the journal's pages); they follow.
-- **Next up:** the rest of the Wing's art and its sounds, Caspar's last few lines, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
+- **Caspar's voice:** the Zodiac Wing's lines are now the writer's own, from the first return to the Chamber's end. The few stand-ins left are around practice and the journal (the fork, the gate, the journal's pages); they follow.
+- **Next up:** the Dial's own art and the book on the shelf, the game's sounds, Caspar's last few lines, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
 
 The full game teaches the whole of beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
 
