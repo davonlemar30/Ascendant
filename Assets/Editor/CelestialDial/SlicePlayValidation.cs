@@ -273,6 +273,15 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalSign=="Aries" && snap.journalColour==1 && snap.journalGilt && snap.journalFacts.Length==4 && snap.journalGlyph!="" && snap.journalTable,"at the Wing's end Aries' page holds every fact; staged, it is in full colour with the gilt edge");Capture("slice-390-journal-sign-late.png");});
             Steps.Enqueue(()=>{foreach(var it in View.Flow.SignItems(0)){it.state=(int)ItemState.Introduced;it.streak=0;}Act("journal-next");Act("journal-prev");});
             Steps.Enqueue(()=>{Check(View.Dial.Snapshot().journalInk==SliceFlow.IntroducedInk && View.Dial.Snapshot().journalColour==0,"staged back to introduced: line art");Capture("slice-390-journal-sign-lineart.png");});
+            // the page titles in blackletter, bigger (owner, Sept 26): only the title is, and every title fits its line (a line that doesn't fit is truncated away)
+            Steps.Enqueue(()=>{var texts=GameObject.Find("Journal").GetComponentsInChildren<UnityEngine.UI.Text>(false);var title=texts.FirstOrDefault(t=>t.font!=null && t.font.name=="UnifrakturMaguntia");
+                Check(title!=null && title.fontSize==SliceView.SignTitleSize && texts.Count(t=>t.font!=null && t.font.name=="UnifrakturMaguntia")==1 && View.Dial.Snapshot().journalTitleFont=="UnifrakturMaguntia","the page title is in blackletter at the bigger size, and nothing else on the page is");
+                if(title==null)return;var saved=title.text;var misfits=new List<string>();
+                bool Fits(string text,int size){title.fontSize=size;title.text=text;return title.preferredWidth<=title.rectTransform.rect.width+1 && title.preferredHeight<=title.rectTransform.rect.height+1;}
+                foreach(var z in Zodiac.Seats)if(!Fits(SliceView.SignTitle(z.Name,Color.red),SliceView.SignTitleSize))misfits.Add(z.Name);
+                foreach(var t in new[]{"Contents",SliceFlow.SignsTitle}.Concat(SliceFlow.JournalOrder.Select(SliceFlow.SectionTitle)))if(!Fits(t,SliceView.TitleSize))misfits.Add(t);
+                title.fontSize=SliceView.SignTitleSize;title.text=saved;
+                Check(misfits.Count==0,"every title fits its line in blackletter: the twelve signs, the sections, The Signs, and Contents"+(misfits.Count>0?"; too big: "+string.Join(", ",misfits):""));});
             Steps.Enqueue(()=>Act("journal-contents"));
             Steps.Enqueue(()=>{Check(View.Dial.Snapshot().journalView=="contents","the contents at the Wing's end");Capture("slice-390-journal-contents-late.png");});
             Steps.Enqueue(()=>Act("close-journal"));

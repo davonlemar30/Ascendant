@@ -86,7 +86,7 @@ namespace Ascendant.CelestialDial
             public int practiceIndex, practiceCount, strikes, sitting, journalPage, journalCount;
             public string[] journalEntries;
             // Build J: the journal as a book (journalStates and journalText are test evidence: the state words are never drawn)
-            public string journalView = "", journalSign = "", journalGlyph = "", journalArt = "", journalText = "";
+            public string journalView = "", journalSign = "", journalGlyph = "", journalArt = "", journalText = "", journalTitleFont = "";
             public string[] journalContents, journalStates, journalFacts; public bool[] journalTabs;
             public float journalInk, journalColour; public int journalRibbon; public bool journalRibbonOut, journalGilt, journalTable, journalShader, canJournalContents;
             public string sunSign = "";
