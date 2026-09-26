@@ -1062,7 +1062,7 @@ namespace Ascendant.CelestialDial
             state.journalGlyph = onSign && Flow.SignKnows(signSeat, ItemKind.Glyph) ? Zodiac.Seats[signSeat].Glyph : ""; state.journalTable = onSign && Flow.SignKnows(signSeat, ItemKind.Grid);
             state.journalInk = onSign ? Flow.SignInk(signSeat) : 0; state.journalColour = onSign ? Flow.SignColour(signSeat) : 0; state.journalGilt = onSign && Flow.SignGilt(signSeat);
             state.journalRibbon = onSign ? Flow.SignLadder(signSeat) : 0; state.journalRibbonOut = onSign && Flow.SignDue(signSeat);
-            state.journalArt = onSign ? Slots.Source(SignSlot(signSeat)) : ""; state.journalShader = journalIllumination != null;
+            state.journalArt = onSign ? Slots.Source(SignSlot(signSeat)) : ""; state.journalShader = journalIllumination != null; state.journalTitleFont = journalTitle != null && journalTitle.font != null ? journalTitle.font.name : "";
             state.journalText = state.journal ? string.Join(" | ", journal.GetComponentsInChildren<Text>(false).Select(t => t.text).Where(t => t != "")) : "";
             state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
             bool partA = s == SliceScreen.Book && Dial.Lesson.Phase == LessonPhase.GlyphNames;
@@ -1145,13 +1145,15 @@ namespace Ascendant.CelestialDial
         Color PageInk => OnVellum ? JournalInk : Bone;
         Color PageFaint => OnVellum ? JournalFaint : Muted;
         public static float ContentsRow(int i) => RuleTop + RuleGap - 11 + i * 2 * RuleGap; // a contents entry's centre: its letters sit on every other line (the web template's boxes match)
+        public const string TitleFont = "Fonts/UnifrakturMaguntia"; public const int TitleSize = 28, SignTitleSize = 32, CapitalSize = 58; // the page titles in blackletter, the Library's hand, and bigger (owner, Sept 26); the entries and facts stay plain
+        public static string SignTitle(string name, Color capital) => "<size=" + CapitalSize + "><color=#" + ColorUtility.ToHtmlStringRGB(capital) + ">" + name.Substring(0, 1) + "</color></size>" + name.Substring(1); // a sign's name with its illuminated capital
         static string SignSlot(int seat) => "sign-" + Zodiac.Seats[Zodiac.Wrap(seat)].Name.ToLowerInvariant();
         void BuildJournal()
         {
             journal = ScreenPanel("Journal", "journal-page"); journalPage = journal.GetComponent<Image>();
             var contents = Rect("Contents page", journal, 0, 400, 360, 800); journalContentsArt = contents.gameObject.AddComponent<Image>(); journalContentsArt.raycastTarget = false; Slots.Dress(journalContentsArt, "journal-contents");
             var cover = Rect("Journal cover", journal, JournalX - 78, 108, 40, 40); journalCover = cover.gameObject.AddComponent<Image>(); journalCover.color = PanelColor; journalCover.raycastTarget = false; Slots.Dress(journalCover, "journal-cover"); // beside the contents' title, under the page's illuminated head
-            journalTitle = Label(journal, "", JournalX, 70, 232, 56, 22); journalTitle.supportRichText = true;
+            journalTitle = Label(journal, "", JournalX, 70, 232, 64, TitleSize); journalTitle.supportRichText = true; journalTitle.font = Resources.Load<Font>(TitleFont) ?? journalTitle.font; // 64 tall: a line that doesn't fit is truncated away, and a sign's capital is 58
             // the contents: a row per entry, a ribbon tab at the page's edge when the entry has something due
             for (int i = 0; i < journalRows.Length; i++)
             {
@@ -1197,7 +1199,7 @@ namespace Ascendant.CelestialDial
         {
             var at = Flow.JournalAt; bool contents = at == JournalView.Contents, section = at == JournalView.Section, sign = at == JournalView.Sign;
             journalContentsArt.gameObject.SetActive(contents && journalContentsArt.sprite != null); journalCover.gameObject.SetActive(contents && journalCover.sprite != null);
-            journalTitle.color = PageInk; journalTitle.fontSize = 22;
+            journalTitle.color = PageInk; journalTitle.fontSize = TitleSize;
             journalTitle.rectTransform.anchoredPosition = new Vector2(JournalX, contents ? -108 : -70);
             var titles = Flow.JournalContents;
             for (int i = 0; i < journalRows.Length; i++)
@@ -1231,7 +1233,7 @@ namespace Ascendant.CelestialDial
         void ShowJournalSign()
         {
             int seat = Flow.JournalSignSeat; var name = Zodiac.Seats[seat].Name;
-            journalTitle.fontSize = 26; journalTitle.text = "<size=48><color=#" + ColorUtility.ToHtmlStringRGB(OnVellum ? Rubric : Gilt) + ">" + name.Substring(0, 1) + "</color></size>" + name.Substring(1); // the illuminated capital
+            journalTitle.fontSize = SignTitleSize; journalTitle.text = SignTitle(name, OnVellum ? Rubric : Gilt); // the illuminated capital
             // Illumination: the picture is one full-colour file, drawn as line art and coloured by the deck (the Illumination shader); no file, a grey box
             var picture = Slots.Image(SignSlot(seat)); journalSignArt.sprite = picture; journalSignArt.color = picture != null ? Color.white : PanelColor;
             float ink = Flow.SignInk(seat), colour = Flow.SignColour(seat);

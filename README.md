@@ -70,4 +70,4 @@ If something feels wrong, confusing, or too easy, that is exactly what this buil
 
 ## Credits
 
-Ascendant is designed and written by Davon G. The zodiac symbols are drawn with Noto Sans Symbols (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt`](Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt)). Built with Unity.
+Ascendant is designed and written by Davon G. The zodiac symbols are drawn with Noto Sans Symbols (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt`](Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt)), and the journal's titles are set in UnifrakturMaguntia (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt`](Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt)). Built with Unity.

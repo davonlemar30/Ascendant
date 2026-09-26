@@ -131,6 +131,12 @@ const path=require('path');
     await semantic('open-journal');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='journal',{},{timeout:5000});
     // Build J: the journal is a book: its contents, a page per sign met, the sections; no state word on screen; the arrows and rows work on the canvas
     { const j=await state(); check(j.journal && j.journalView==='contents' && j.journalContents.join()==='The Elements,The Signs' && j.journalTabs.join()==='true,true' && !j.canJournalNext && !j.canJournalPrev && !j.canJournalContents && j.caspar.includes('Contents'),'the journal opens from the Atrium on its contents: the elements and the signs met, both flagged as due, at '+viewport.width); }
+    check((await state()).journalTitleFont==='UnifrakturMaguntia','the journal\'s titles are drawn in blackletter in the Web build (owner, Sept 26) at '+viewport.width);
+    // and the title really draws: the Web player can leave a font blank where the Editor shows it (the symbols, Sept 12), so count the ink in the contents title's box
+    { const scale=Math.min(viewport.width/360,viewport.height/800),ox=viewport.width/2,oy=(viewport.height-800*scale)/2;
+      const shot=await page.screenshot({clip:{x:ox-70*scale,y:oy+88*scale,width:104*scale,height:40*scale}});
+      const ink=await page.evaluate(async b64=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);const d=g.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i]+d[i+1]+d[i+2]<330)n++;return n/(d.length/4);},shot.toString('base64'));
+      check(ink>.03,'the blackletter title draws in the Web build: '+Math.round(ink*100)+'% ink in its box on the contents page at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-journal-contents.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll in the journal at '+viewport.width);
     await semantic('journal-entry-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='sign',{},{timeout:5000});

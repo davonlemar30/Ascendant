@@ -2,6 +2,18 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The journal's titles in blackletter
+
+The owner's ruling (Sept 26), after a preview: the journal's page titles are set in UnifrakturMaguntia (SIL Open Font License; `Resources/Fonts/UnifrakturMaguntia.ttf` with `OFL-UnifrakturMaguntia.txt`), and bigger. `SliceView` sets the one title label's font (`TitleFont`) and its sizes. Page titles use `TitleSize` 28. A sign's name uses `SignTitleSize` 32, with its illuminated capital at `CapitalSize` 58, built by `SignTitle`. The label is 64 tall, since a line that doesn't fit its box is truncated away. The font is imported dynamic, so the Web player rasterizes it as it draws. It is a static font (no variation tables), unlike the variable Noto Sans Symbols that drew blank on the Web on Sept 12. The web state carries `journalTitleFont`.
+
+Checks:
+
+- Mechanical: the font and its license load from Resources, and the font has every letter of the 19 titles.
+- Slice fixture: on a sign page only the title is blackletter, at the sign size. Every title fits its box in blackletter: the twelve sign names at 32 with the capital, and the five sections, The Signs, and Contents at 28.
+- Browser suite: the Web build's title font is UnifrakturMaguntia, and the contents title draws. That means at least 3% dark ink in its box; about 13% was measured, and blank parchment reads 0%.
+
+Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB; the font adds about 90 KB), and browser suite 305/305 at 390 and 360, at phone density (`DEVICE_SCALE=2 MOBILE=1`). Captures: [`Evidence/journal-blackletter-2026-09-26/`](Evidence/journal-blackletter-2026-09-26/).
+
 ## Key 3's ceremony and the table's seating
 
 Sealing the twelfth seat started two coroutines side by side, and both cleared the one `busy` flag: `GridSeated` (1.1 s) and Key 3's `KeyCeremony`, started from `Update` (about 1.7 s). The game reported idle mid-ceremony, and the ceremony's own end could land during the walk home to the Atrium and clear that walk's busy mid-fade; since the fade overlay is a raycast target during a fade, the first tap in the Atrium hit it instead of the door. It happened on every Key 3 return. Only Key 3 did this — Keys 2 and 4 are earned on the Dial, whose ceremony doesn't overlap a second busy coroutine this way. `GridSeated` now runs the ceremony inside its own busy span (`yield return KeyCeremony(3)`); the `Update` trigger stays as a fallback for a restored save, guarded (`!busy`) to fire only when nothing else is.

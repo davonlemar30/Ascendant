@@ -222,6 +222,9 @@ namespace Ascendant.Build
             Check(DeckKey() == before && f.CloseJournal(), "turning every kind of page changes no deck field");
             Check(new[] { "journal-contents", "journal-ribbon", "journal-plate" }.All(n => Slots.Find(n) != null) && Zodiac.Seats.All(z => Slots.Find("sign-" + z.Name.ToLowerInvariant()) != null && Slots.Find("sign-" + z.Name.ToLowerInvariant()).Width == 200 && Slots.Find("sign-" + z.Name.ToLowerInvariant()).Height == 200), "Build J's slots: the contents page, the ribbon, the plate, and a 200 × 200 picture per sign");
             Check(Resources.Load<Shader>("Shaders/Illumination") != null, "the Illumination shader is under Resources, so the Web build carries it");
+            // the page titles in blackletter (owner, Sept 26): the font ships with its license and carries every letter a title uses
+            var titleFont = Resources.Load<Font>(SliceView.TitleFont); var license = Resources.Load<TextAsset>("Fonts/OFL-UnifrakturMaguntia"); var titles = new[] { "Contents", SliceFlow.SignsTitle }.Concat(SliceFlow.JournalOrder.Select(SliceFlow.SectionTitle)).Concat(Zodiac.Seats.Select(z => z.Name)).ToList();
+            Check(titleFont != null && titles.All(t => t.All(c => c == ' ' || titleFont.HasCharacter(c))) && license != null && license.text.Contains("SIL Open Font License"), "the journal's titles have their blackletter font (UnifrakturMaguntia) under Resources with its license, carrying every letter of the " + titles.Count + " titles");
         }
         // Sept 25: a `//` inserted before the rest of a statement had made code dead for days (the Atrium doors' and the Chamber doorway's
         // taps, the Chamber floor band); it compiles and every other check passes. No line of the game's C# may carry statements after a comment.
