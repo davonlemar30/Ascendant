@@ -70,15 +70,15 @@ The owner wants dead branches gone (owner, Sept 25). A branch is **dead** when a
 
 - Its PR has merged, or `git branch -r --merged origin/main` lists it, and it has no commits that aren't on `main` (`git log origin/main..<branch>` is empty). A branch whose PR was closed without merging is dead only when that PR says it was superseded by a PR that merged.
 - No open PR uses it as its head.
-- No worktree has it checked out (`git worktree list`).
+- No worktree has it checked out (`git worktree list`), once finished worktrees are removed (below).
 - It is not `main` and not a `review/*` branch.
 
-In `fix` mode, delete what is dead:
+In `fix` mode, delete what is dead, worktrees first:
+- Worktrees: `git worktree prune` clears worktrees whose folders are already gone. A worktree under `~/Documents/Ascendant-worktrees/` is **finished** when its branch meets every other condition above: merged with nothing ahead of `main`, no open PR, and not `main` or `review/*` (owner, Sept 26). Remove a finished worktree when `git status` inside it is clean (`git worktree remove`, never `--force`); its branch is then dead and goes with the rest. If `git status` isn't clean, leave the worktree and name it in the report with the files it has changed, since only the owner can say they can go. Never touch worktrees under `~/.codex/` (ChatGPT's) or `.claude/worktrees/`.
 - Remote: `git push origin --delete <branch>`. GitHub can restore a deleted PR branch from the PR page.
 - Local: `git branch -d <branch>`, never `-D`. If `-d` refuses, the branch has work that isn't on `main`, so it isn't dead; report it. Deleting a local branch changes only the repository's refs, never the files in the main checkout.
-- Worktrees: `git worktree prune` clears worktrees whose folders are already gone. Remove a worktree under `~/Documents/Ascendant-worktrees/` (`git worktree remove`, never `--force`) only when its branch is dead by the rules above and `git status` inside it is clean. Never touch worktrees under `~/.codex/` (ChatGPT's) or `.claude/worktrees/`.
 
-Report any branch that has commits not on `main` and hasn't moved for seven days or more. It might be abandoned or it might be unfinished work, and only the owner can tell, so don't delete it. In `report` mode, list what you would delete. In the report, give counts, and name only the branches you didn't delete.
+Report any branch that has commits not on `main` and hasn't moved for seven days or more. It might be abandoned or it might be unfinished work, and only the owner can tell, so don't delete it. In `report` mode, list what you would delete. In the report, give counts, and name only the branches you didn't delete and the finished worktrees you left.
 
 ## Memory upkeep
 
