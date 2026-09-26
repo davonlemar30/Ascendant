@@ -158,7 +158,7 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
             if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Practice) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); Save(); StartCoroutine(KeyCeremony(2)); }
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.ModalitiesComplete && !Flow.ModalitiesComplete) { Flow.MarkModalitiesComplete(); Save(); Publish(); } // Build B: the table wakes
-            if (Flow.Screen == SliceScreen.Grid && Grid.Key3Earned && Flow.Keys < 3) { Flow.MarkKey3(); Save(); StartCoroutine(KeyCeremony(3)); }
+            if (Flow.Screen == SliceScreen.Grid && Grid.Key3Earned && Flow.Keys < 3 && !busy) { Flow.MarkKey3(); Save(); StartCoroutine(KeyCeremony(3)); } // a fallback (a restored save); the seating runs the ceremony itself
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Key4Earned && Flow.Keys < 4) { Flow.MarkKey4(); Save(); StartCoroutine(KeyCeremony(4)); } // Build C; Build I: every Key rises
             if (insertGlow != null && insert.gameObject.activeInHierarchy && insert.interactable && (!Flow.KeyInserted || Flow.CanSpend))
             {
@@ -687,6 +687,9 @@ namespace Ascendant.CelestialDial
         {
             busy = true; ShowGrid(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.1f);
+            // Key 3's ceremony follows the seating inside the same busy span. Run side by side, the seating cleared busy mid-ceremony, and the
+            // ceremony's end later cleared the walk home's busy mid-fade, so the fade ate the first tap in the Atrium (Sept 25).
+            if (Grid.Key3Earned && Flow.Keys < 3) { Flow.MarkKey3(); Save(); yield return KeyCeremony(3); yield break; }
             busy = false; ShowGrid(); Publish();
         }
         // Level 3: Caspar names the rule, the cell lights, the sign lands. Exposure only, never evidence.
