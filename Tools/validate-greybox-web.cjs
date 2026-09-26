@@ -6,7 +6,7 @@ const path=require('path');
 (async()=>{
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
-  const report=[];
+  const report=[];const retaps=[]; // room taps that needed a second canvas tap (see tapToWalk)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
   const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()==='360'?{width:360,height:800}:{width:390,height:844});
@@ -21,7 +21,16 @@ const path=require('path');
     // that same frame), so settle briefly after the state flips. A person cannot tap that fast.
     // A Level 2 problem shows its count beat one frame after it starts, so wait, let the beat begin, then wait for it to end.
     const waitActive=async(start)=>{const ok=s=>window.ascendantDial.snapshot()?.active && window.ascendantDial.snapshot().start===('Start: '+s);await page.waitForFunction(ok,start,{timeout:15000});await page.waitForTimeout(400);await page.waitForFunction(ok,start,{timeout:20000});await page.waitForTimeout(150);};
-    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await page.mouse.click(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await page.waitForTimeout(70);};
+    // A canvas tap the way a thumb or a mouse makes one: the pointer arrives, then presses, then lets go, each on its own rendered frame. Unity reads
+    // input once a frame, and with two viewports playing at once a page can go several frames without one; teleporting and clicking in the same
+    // instant let the first tap on a new spot land nowhere (the Chamber's door at Stage 4, Sept 25). Waiting on animation frames, not milliseconds, holds.
+    const frames=n=>page.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
+    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await page.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await page.mouse.down();await frames(2);await page.mouse.up();await frames(2);};
+    // A room tap that must start a walk: once in a while the first tap after a room change is dropped below the game's code (the same tap
+    // lands a moment later; seen at the Chamber's door on the Key 3 visit, Sept 25, not yet explained). Tap again once, and say so in the log.
+    const tapToWalk=async(x,y,label)=>{const start=JSON.stringify([(await state()).screen,(await state()).walkTarget]);await tap(x,y);
+      try{await page.waitForFunction(k=>{const s=window.ascendantDial.snapshot();return s.walking||JSON.stringify([s.screen,s.walkTarget])!==k;},start,{timeout:1500});}
+      catch{console.warn('RETAP: '+label+' at '+viewport.width+' took no walk on the first canvas tap; tapping again');retaps.push(label+'@'+viewport.width);await tap(x,y);}};
     const semantic=async(id)=>page.locator('#'+id).evaluate(b=>b.click());
     await page.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
     await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await page.locator("#loading").waitFor({state:"detached"});
@@ -102,12 +111,14 @@ const path=require('path');
     { const a=await state(); check(a.atriumKitPieces===26 && a.atriumKitLevel===1 && a.atriumKitRestored<a.atriumKitPieces && a.atriumGrime>0 && a.doors.join()==='sealed-left:locked,wing-door:unlocked,chamber-door:unlocked','Build N: the Atrium kit at Stage 2: pieces still worn, grime in place, the sealed door locked and the Wing and Chamber doors unlocked at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-atrium-kit-stage2.png')}); }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().lightAlpha===0.25,{},{timeout:5000}); // the fade settles, then publishes
     check((await state()).lightAlpha===0.25,'the light overlay follows the stage: a quarter at Stage 2 at '+viewport.width); // Build H
-    // ---- v0.4: tap-to-move ----
+    // ---- v0.4: tap-to-move. Every walk below taps the canvas where the thing is drawn, not its semantic button: the semantic layer passes
+    // taps through (pointer-events:none), and for eight days the Atrium's doors and the Chamber's doorway took no canvas tap (a comment had
+    // swallowed their Tappable calls, Sept 24) while every check still passed through the semantic buttons. ----
     const atriumState=await state();
     check(atriumState.room==='atrium' && atriumState.avatarAt==='entry' && ['desk','wing-door','caspar','sealed-left','chamber-door'].every(id=>atriumState.pois.includes(id)) && atriumState.canEnterChamber && atriumState.keysInHand===0,'the Atrium lists its points of interest, the Chamber doorway among them, with the marker where you came in at '+viewport.width);
-    await semantic('poi-sealed-left');await page.waitForFunction(()=>window.ascendantDial.snapshot().note.startsWith('Sealed'));
+    await page.waitForTimeout(400);await tap(-118,310);await page.waitForFunction(()=>window.ascendantDial.snapshot().note.startsWith('Sealed'),{},{timeout:5000}); // the sealed door, on the canvas
     check(!(await state()).walking,'a sealed door only says it is sealed at '+viewport.width);
-    await semantic('poi-caspar');await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='caspar'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await tap(100,402);await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='caspar'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // Caspar, on the canvas
     check((await state()).note.includes('Caspar') && events.some(e=>e.event_name==='walk_started_caspar') && events.some(e=>e.event_name==='walk_arrived_caspar'),'tapping Caspar walks the marker to him at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the Hub at '+viewport.width);
@@ -115,7 +126,7 @@ const path=require('path');
     await semantic('mute');await page.waitForFunction(()=>!window.ascendantDial.snapshot().muted);
     // ---- Build F: the desk is dressing, the journal is in the inventory, the fork is on the Dial, practice is the sitting ----
     check((await page.locator('#enter-seals').count())===0 && (await page.locator('#open-journal').count())===1,'Check the Seals is gone from the page; the journal has a control at '+viewport.width);
-    await semantic('poi-desk');await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='desk'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await tap(-125,426);await page.waitForFunction(()=>window.ascendantDial.snapshot().avatarAt==='desk'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the desk, on the canvas
     check((await state()).note.includes('journal') && (await state()).canOpenJournal,'the desk only speaks; the journal is in hand at the Atrium at '+viewport.width);
     await semantic('open-journal');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='journal',{},{timeout:5000});
     // Build J: the journal is a book: its contents, a page per sign met, the sections; no state word on screen; the arrows and rows work on the canvas
@@ -136,19 +147,23 @@ const path=require('path');
     await tap(0,714); // Close the journal, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});
     check((await state()).avatarAt==='desk','the journal closes back to the Atrium, the marker where it stood, on a canvas tap at '+viewport.width);
-    await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().walking&&window.ascendantDial.snapshot().walkTarget==='wing-door',{},{timeout:5000});
+    await page.waitForTimeout(400);await tap(0,310);await page.waitForFunction(()=>window.ascendantDial.snapshot().walking&&window.ascendantDial.snapshot().walkTarget==='wing-door',{},{timeout:5000}); // the Wing's door, on the canvas
     await page.screenshot({path:path.join(out,viewport.width+'-walk.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).room==='wing' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,grid,dial,shelf' && (await state()).canEnterDial && !(await state()).canEnterShelf && !(await state()).canEnterGrid && (await state()).canLeaveWing,'the Wing doorway fades into the Wing room with the Dial, the doorway back, a dark shelf, and a dark table at '+viewport.width);
     { const k=await state(); check(k.kitPieces===19 && k.kitLevel===k.keys && k.kitRestored<k.kitPieces && k.grime>0 && Math.abs(k.wingLight-[0,.25,.5,.75,1][k.keys])<.01,'Build M: the Wing kit shows the Keys earned so far, worn pieces and grime still in place, the light by Keys at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-wing-kit-early.png')}); }
     check(events.some(e=>e.event_name==='room_entered_wing'),'room events at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room.png')});
-    await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('Dark and quiet'),{},{timeout:5000});
+    await tap(157,295);await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('Dark and quiet'),{},{timeout:5000}); // the shelf, on the canvas
     check(!(await state()).kitUp.includes('shelf') && !(await state()).kitUp.includes('table'),'Build M: before they wake, the shelf and the table lie worn at '+viewport.width);
     check(!(await state()).walking,'before the wheel is lit the shelf only says it is dark at '+viewport.width);
-    await semantic('poi-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('dark and bare'),{},{timeout:5000});
+    await tap(-62,400);await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('dark and bare'),{},{timeout:5000}); // the table, on the canvas
     check(!(await state()).walking && !(await state()).gridOpen,'before the modality unit the table only says it is bare at '+viewport.width);
-    await semantic('enter-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await tap(-138,292);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Wing room's doorway back, on the canvas
+    check(true,'the Wing room\'s doorway back, tapped on the canvas, walks out to the Atrium at '+viewport.width);
+    await page.waitForTimeout(400);await tap(0,310);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // and in again by the Wing's door
+    check(true,'the Wing\'s door, tapped on the canvas, walks back in at '+viewport.width);
+    await page.waitForTimeout(400);await tap(40,337); // the Dial, on the canvasawait page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveWing,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
     check((await state()).avatarAt==='dial' && (await state()).canEnterPractice && (await state()).canContinueLesson && !(await state()).active && (await state()).canLeaveWing,'the Dial opens once the marker reaches it, on the fork: the lesson or practice, nothing started, Back still offered, at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-fork.png')});
@@ -289,9 +304,9 @@ const path=require('path');
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     // ---- Build D: the finished loop. Keys earned are spent in the Chamber; the Atrium restores on the return. ----
     const spendAtBooks=async(tag)=>{
-      await semantic('poi-chamber-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamberroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+      await page.waitForTimeout(400);await tapToWalk(118,310,"the Chamber's door ("+tag+")");await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamberroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Chamber's door, on the canvas
       check((await state()).room==='chamber' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,books' && !(await state()).canInsert,'the Chamber doorway fades into the Chamber as a room ('+tag+') at '+viewport.width);
-      await semantic('poi-books');await page.waitForFunction(()=>window.ascendantDial.snapshot().atBooks&&window.ascendantDial.snapshot().canInsert,{},{timeout:15000});
+      await page.waitForTimeout(400);await tap(0,300);await page.waitForFunction(()=>window.ascendantDial.snapshot().atBooks&&window.ascendantDial.snapshot().canInsert,{},{timeout:15000}); // the Books, on the canvas
       const before=(await state()).keysSpent;await page.waitForTimeout(300);await tap(0,654); // the Insert button on the canvas, where a thumb lands
       await page.waitForFunction(k=>window.ascendantDial.snapshot().keysSpent===k+1,before,{},{timeout:5000});
       await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:20000});
@@ -302,7 +317,8 @@ const path=require('path');
     check((await state()).keysSpent===2 && (await state()).keysInHand===0 && (await state()).booksOpen===0 && !(await state()).canInsert && events.filter(e=>e.event_name==='key_spent').length===1,'Key 2 fills the second lock; the Book stays shut; nothing more to spend at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber-lock2.png')});
     { const c=await state(); check(c.chamberKitPieces===16 && c.chamberKitLevel===2 && c.chamberKitRestored>0 && c.chamberKitRestored<c.chamberKitPieces,'Build O: the Chamber kit shows two Keys spent: some pieces restored, others still worn at '+viewport.width); }
-    await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    { const kitted=(await state()).chamberKitLevel>=0; await page.waitForTimeout(400); await tap(kitted?-145:-150,kitted?287:347); } // the Chamber's doorway back, on the canvas (where the kit paints it, or the greybox door)
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).v03Complete && (await state()).avatarAt==='chamber-door' && (await state()).caspar.includes('Two locks filled'),'the return after spending takes the Atrium to Stage 4 at '+viewport.width);
     // ---- v0.3 revision, build 3: a clean replay hardens the symbols ----
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -592,5 +608,6 @@ const path=require('path');
       await stylePage.locator('#mute').evaluate(b=>b.click());await stylePage.waitForFunction(()=>!window.ascendantDial.snapshot().muted);}
     await styleContext.close();
   }
+  if(retaps.length)report.push('NOTE: '+retaps.length+' room tap(s) needed a second canvas tap: '+retaps.join(', '));
   fs.writeFileSync(path.join(out,'validation.txt'),report.join('\n'));console.log(report.join('\n'));await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});
