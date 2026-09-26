@@ -6,7 +6,7 @@ const path=require('path');
 (async()=>{
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
-  const report=[];
+  const report=[];const retaps=[]; // room taps that needed a second canvas tap (see tapToWalk)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
   const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()==='360'?{width:360,height:800}:{width:390,height:844});
@@ -26,6 +26,11 @@ const path=require('path');
     // instant let the first tap on a new spot land nowhere (the Chamber's door at Stage 4, Sept 25). Waiting on animation frames, not milliseconds, holds.
     const frames=n=>page.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await page.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await page.mouse.down();await frames(2);await page.mouse.up();await frames(2);};
+    // A room tap that must start a walk: once in a while the first tap after a room change is dropped below the game's code (the same tap
+    // lands a moment later; seen at the Chamber's door on the Key 3 visit, Sept 25, not yet explained). Tap again once, and say so in the log.
+    const tapToWalk=async(x,y,label)=>{const start=JSON.stringify([(await state()).screen,(await state()).walkTarget]);await tap(x,y);
+      try{await page.waitForFunction(k=>{const s=window.ascendantDial.snapshot();return s.walking||JSON.stringify([s.screen,s.walkTarget])!==k;},start,{timeout:1500});}
+      catch{console.warn('RETAP: '+label+' at '+viewport.width+' took no walk on the first canvas tap; tapping again');retaps.push(label+'@'+viewport.width);await tap(x,y);}};
     const semantic=async(id)=>page.locator('#'+id).evaluate(b=>b.click());
     await page.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
     await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await page.locator("#loading").waitFor({state:"detached"});
@@ -299,7 +304,7 @@ const path=require('path');
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     // ---- Build D: the finished loop. Keys earned are spent in the Chamber; the Atrium restores on the return. ----
     const spendAtBooks=async(tag)=>{
-      await page.waitForTimeout(400);await tap(118,310);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamberroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Chamber's door, on the canvas
+      await page.waitForTimeout(400);await tapToWalk(118,310,"the Chamber's door ("+tag+")");await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamberroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Chamber's door, on the canvas
       check((await state()).room==='chamber' && (await state()).avatarAt==='atrium-door' && (await state()).pois.join()==='atrium-door,books' && !(await state()).canInsert,'the Chamber doorway fades into the Chamber as a room ('+tag+') at '+viewport.width);
       await page.waitForTimeout(400);await tap(0,300);await page.waitForFunction(()=>window.ascendantDial.snapshot().atBooks&&window.ascendantDial.snapshot().canInsert,{},{timeout:15000}); // the Books, on the canvas
       const before=(await state()).keysSpent;await page.waitForTimeout(300);await tap(0,654); // the Insert button on the canvas, where a thumb lands
@@ -603,5 +608,6 @@ const path=require('path');
       await stylePage.locator('#mute').evaluate(b=>b.click());await stylePage.waitForFunction(()=>!window.ascendantDial.snapshot().muted);}
     await styleContext.close();
   }
+  if(retaps.length)report.push('NOTE: '+retaps.length+' room tap(s) needed a second canvas tap: '+retaps.join(', '));
   fs.writeFileSync(path.join(out,'validation.txt'),report.join('\n'));console.log(report.join('\n'));await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});
