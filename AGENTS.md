@@ -36,6 +36,7 @@ These instructions apply to the entire repository.
 - The validation ladder for a build, in order: mechanical checks (`Ascendant.Build.GreyboxValidation.Run`, batch mode), the slice Play Mode fixture (`Ascendant.Build.SlicePlayValidation.Begin`), the headless WebGL build, then the browser suite (`Tools/validate-greybox-web.cjs`) at desktop and phone density against the served build, and against production after the deploy. A build's pass record and captures go on its ClickUp task.
 - Copy and counts are quoted in several places at once: the Editor checks, the browser suite, the web template's labels, and the docs. A change to a line of Caspar's or to the slot count must sweep all of them.
 - Decisions live in the ClickUp Decisions Log (doc 2kyd583p-6954, page 2kyd583p-24214); build briefs are ClickUp tasks in the Development list. Record a design choice taken inside a build's latitude on the Decisions Log, dated, as a working choice.
+- Docs upkeep belongs to Whitney, the documentation agent defined in `.claude/agents/whitney.md` (owner, Sept 25). Claude calls her at the end of every build, once its PR has merged; she also runs on Mondays (opening the week's Decisions Log page) and Thursdays (a stale sweep). She fixes mirrors, indexes, and records, never rulings, and posts her report on the ClickUp task "Whitney — docs upkeep".
 
 ## Scope discipline
 

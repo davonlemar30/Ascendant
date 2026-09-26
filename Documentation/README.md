@@ -43,7 +43,7 @@ Production: [Ascendant](https://davonlemar30.github.io/Ascendant/).
 | [SOLO-PLAYTEST.md](CelestialDial/SOLO-PLAYTEST.md) | History: the owner's tap-by-tap checklist for the Sept 14 build. The live checklists are the owner session pages in ClickUp. |
 | [solo-playtest-3-2026-09-12.md](CelestialDial/solo-playtest-3-2026-09-12.md), [OBSERVATIONS.md](CelestialDial/OBSERVATIONS.md) | History: the Sept 12 playtest record and the original observation sheet. |
 
-Tools: `Tools/validate-greybox-web.cjs` is the browser suite (Playwright; `GREYBOX_URL`, `PLAYWRIGHT_MODULE`, `EVIDENCE_DIR`, `DEVICE_SCALE=2 MOBILE=1` for phone density), `Tools/make-test-set.py` regenerates the shipped test art and sound set (append new slots at the end of its list). The Editor checks are `Ascendant.Build.GreyboxValidation.Run` (mechanical) and `Ascendant.Build.SlicePlayValidation.Begin` (the slice fixture), under `Assets/Editor/CelestialDial/`.
+Tools: `Tools/validate-greybox-web.cjs` is the browser suite (Playwright; `GREYBOX_URL`, `PLAYWRIGHT_MODULE`, `EVIDENCE_DIR`, `DEVICE_SCALE=2 MOBILE=1` for phone density), `Tools/make-test-set.py` regenerates the shipped test art and sound set (append new slots at the end of its list). Docs upkeep: Whitney (`.claude/agents/whitney.md`) checks these docs, ClickUp, and Claude's memory against the code at the end of each build and on Mondays and Thursdays. The Editor checks are `Ascendant.Build.GreyboxValidation.Run` (mechanical) and `Ascendant.Build.SlicePlayValidation.Begin` (the slice fixture), under `Assets/Editor/CelestialDial/`.
 
 ## Build log — the vertical slice, September 12 to 19, 2026
 
