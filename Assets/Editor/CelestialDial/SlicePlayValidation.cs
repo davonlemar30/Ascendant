@@ -124,19 +124,23 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && View.Flow.Note=="" && !View.Busy,"closing the journal returns to the room and clears the gate");Act("walk:dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Snapshot().fork=="both","the fork is back after the gate");Act("enter-practice");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Practice && View.Flow.Strikes==0 && View.Flow.Sittings==6,"re-entry is immediate with three fresh strikes and a new sitting");Act("leave-practice");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && !View.Busy,"an exit at any point");Act("leave-wing");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"one press from the Dial walks out through the room to the Atrium");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && !View.Busy,"an exit at any point");Act("leave-dial");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"leaving the Dial lands in the Zodiac Wing, not the Atrium (note 10)");Act("leave-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"the room's own button returns to the Atrium");});
             Steps.Enqueue(()=>{Act("walk:wing-door");Check(View.Flow.Walk.TargetId=="wing-door","tapping the Wing doorway walks the marker");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && View.Flow.Walk.Room==Room.Wing && View.Flow.Walk.At=="atrium-door" && !View.Busy,"the doorway fades into the Wing room at its doorway");Capture("slice-390-wing-room.png");Act("walk:grid");Check(View.Flow.Note=="grid-dark" && !View.Flow.Walk.Walking && View.Flow.Screen==SliceScreen.WingRoom && !View.Flow.CanOpenGrid,"before the modality unit the table is dark: a note, no walk");Act("enter-dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Snapshot().fork=="both" && View.Dial.Lesson.Phase!=LessonPhase.Continuation,"the fork waits before the third family");Act("continue-lesson");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Flow.Walk.At=="dial" && View.Dial.Lesson.Phase==LessonPhase.Continuation && View.Dial.Lesson.Dial.Start==2 && View.Dial.Lesson.Dial.HintLevel==0,"the Wing continues with the third family on the player's own");Capture("slice-390-wing-unit11.png");});
             for(int i=0;i<4;i++) Steps.Enqueue(()=>{Act("seat:"+Zodiac.Destination(View.Dial.Lesson.Dial.Start));Act("seal");});
-            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.AllLit && View.Flow.WheelComplete && View.Dial.Lesson.Lit.All(v=>v) && View.Dial.Lesson.KeyEarned && !View.Dial.Lesson.Key2Earned && View.Flow.Keys==1,"twelve seats lit with no second Key");Capture("slice-390-wing-lit.png");Act("leave-wing");});
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.AllLit && View.Flow.WheelComplete && View.Dial.Lesson.Lit.All(v=>v) && View.Dial.Lesson.KeyEarned && !View.Dial.Lesson.Key2Earned && View.Flow.Keys==1,"twelve seats lit with no second Key");Capture("slice-390-wing-lit.png");});
+            Steps.Enqueue(()=>Act("leave-dial")); // note 10: the Dial's exit lands in the room; the capture lands at the end of its frame, so the action waits its own step
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.V02Complete,"one more return completes v0.2");Capture("slice-390-hub-complete.png");});
             // ---- v0.3: glyphs and Key 2 ----
             Steps.Enqueue(()=>Act("enter-wing"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Flow.CanOpenBook,"the Wing button walks through the same doorway; the lit wheel wakes the shelf");Capture("slice-390-wing-room-lit.png");Act("walk:dial");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase!=LessonPhase.GlyphNames && View.Dial.Lesson.Message==DialLesson.ShelfFirst,"the Dial before the book only points at the shelf");Act("leave-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase!=LessonPhase.GlyphNames && View.Dial.Lesson.Message==DialLesson.ShelfFirst,"the Dial before the book only points at the shelf");Act("leave-dial");}); // note 10: the Dial's exit lands in the room
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back out to the Atrium");Act("enter-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"and in again");Act("walk:shelf");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Book && View.Dial.Lesson.Phase==LessonPhase.GlyphNames && View.Flow.GlyphsStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Glyph && i.entered)==12,"the shelf opens the book: Part A, and introduces the symbol items");Capture("slice-390-glyphs-a.png");});
@@ -157,7 +161,8 @@ namespace Ascendant.Build
             for(int i=0;i<12;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphWheel)return;int target=l.Dial.Target;if(l.GlyphIndex==3 && !missedOnce){missedOnce=true;Act("seat:"+Zodiac.Wrap(target+2));Act("seal");return;}Act("seat:"+target);Act("seal");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase==LessonPhase.GlyphWheel){Act("seat:"+l.Dial.Target);Act("seal");}});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Key2Earned && View.Flow.Keys==2 && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key2_earned")==1 && View.LastCeremony==2,"twelve marks placed earns Key 2 once, with its Key ceremony (Build I)");Capture("slice-390-key2.png");});
-            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             // ---- Build D: the finished loop. Keys earned are spent in the Chamber; the Atrium restores on the return. ----
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.KeysInHand==1 && View.Flow.CanEnterChamber,"one more return: Key 2 in hand, the Atrium waits for it to be spent");Capture("slice-390-hub-key-in-hand.png");Act("walk:chamber-door");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.ChamberRoom && View.Flow.Walk.Room==Room.Chamber && View.Flow.Walk.At=="atrium-door" && !View.Busy && View.Flow.CanSpend,"the Chamber doorway fades into the Chamber as a room, a Key in hand");Capture("slice-390-chamber-room.png");Act("walk:books");});
@@ -169,7 +174,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Practice && View.Flow.ReviewQueue.Count==6,"a practice with the deck open begins");});
             for(int i=0;i<6;i++) Steps.Enqueue(()=>AnswerReview(true));
             Steps.Enqueue(()=>{Check(View.Flow.PracticeDone,"a practice with the deck open completes");Act("leave-practice");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && !View.Busy,"back on the Dial");Act("leave-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && !View.Busy,"back on the Dial");Act("leave-dial");});
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             // ---- v0.3 revision, build 3: the book tests again after Key 2; a clean replay hardens the next one ----
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub with two Keys");Act("enter-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Lesson.CanPractice,"after Key 2 the shelf offers practice");Act("walk:shelf");});
@@ -179,7 +185,8 @@ namespace Ascendant.Build
             for(int i=0;i<12;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase!=LessonPhase.GlyphWheel)return;Act("seat:"+l.Dial.Target);Act("seal");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(l.Phase==LessonPhase.GlyphWheel){Act("seat:"+l.Dial.Target);Act("seal");}});
             Steps.Enqueue(()=>{Check(!View.Dial.Lesson.Practice && View.Dial.Lesson.CleanRuns==1 && View.Flow.CleanRuns==1 && View.Dial.Lesson.Hard && View.Flow.Keys==2 && View.Dial.Lesson.Dial.Events.Count(e=>e.event_name=="key2_earned")==1,"a clean replay is recorded once; Key 2 is not re-earned; the next replay is hard");Capture("slice-390-practice-clean.png");});
-            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back at the Hub");Act("enter-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"in the Wing room again");Act("walk:shelf");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(View.Flow.Screen==SliceScreen.Book && l.Practice && l.Hard && l.SeatAt(0)!=0 && l.GlyphOptions(l.CurrentGlyph).Length==4 && l.GlyphOptions(l.CurrentGlyph).Distinct().Count()==4 && l.GlyphOptions(l.CurrentGlyph).Contains(l.CurrentGlyph),"the hard replay shuffles the order and keeps four distinct names including the answer");Capture("slice-390-practice-hard.png");Act("close-book");});
@@ -190,7 +197,8 @@ namespace Ascendant.Build
             for(int i=0;i<9;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(!(l.Phase==LessonPhase.ModalityGuided||l.Phase==LessonPhase.ModalityOwn)||!l.Dial.Active)return;if(l.LitMod.Count(v=>v)==6 && l.Phase==LessonPhase.ModalityOwn && l.Dial.Attempts==0){Act("seat:"+Zodiac.Wrap(l.Dial.Start+2));Act("seal");return;}Act("seat:"+Zodiac.Destination(l.Dial.Start,3));Act("seal");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;if((l.Phase==LessonPhase.ModalityGuided||l.Phase==LessonPhase.ModalityOwn) && l.Dial.Active){Act("seat:"+Zodiac.Destination(l.Dial.Start,3));Act("seal");}});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.ModalityComplete && l.ModalitiesComplete && View.Flow.Keys==2 && l.Dial.Events.Count(e=>e.event_name=="modality_family_completed")==3,"three modality families of four complete with no new Key");Capture("slice-390-modalities-complete.png");});
-            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.Deck.Due(View.Flow.Sitting).Any(i=>i.Kind==ItemKind.Modality),"back at the Hub with modality items ready");});
             bool sawModality=false; // older items come first (three kinds, thirty-six items), so the modality items may wait a few sittings
             for(int round=0;round<6;round++)
@@ -200,7 +208,7 @@ namespace Ascendant.Build
                 Steps.Enqueue(()=>{if(sawModality||View.Flow.Screen!=SliceScreen.Wing)return;Act("enter-practice");});
                 for(int i=0;i<6;i++) Steps.Enqueue(()=>{if(View.Flow.Screen==SliceScreen.Practice)AnswerReview(false);});
                 Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Practice)return;if(View.Flow.ReviewQueue.Any(t=>t.Mode==ReviewMode.TapModality||t.Mode==ReviewMode.DialModality))sawModality=true;Act("leave-practice");});
-                Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-wing");});
+                Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");});
                 Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             }
             Steps.Enqueue(()=>{Check(sawModality && View.Flow.Screen==SliceScreen.Hub,"a practice carries modality items within six sittings");});
@@ -259,7 +267,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.BuilderOpposite && l.Message.StartsWith("It is "),"two wrong names reveal the sign");Act("seat:"+Zodiac.Opposite(l.BuilderTarget));Act("seal");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.BuilderShare,"the last share step");Act("builder-share:1");Act("builder-share:0");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Key4Earned && l.Phase==LessonPhase.Key4 && View.Flow.Keys==4 && l.Dial.Events.Count(e=>e.event_name=="key4_earned")==1 && View.LastCeremony==4,"three signs built with one unassisted earns Key 4 once, with its Key ceremony (Build I)");Capture("slice-390-key4.png");});
-            Steps.Enqueue(()=>Act("leave-wing"));
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.AtriumStage==5 && View.Flow.Keys==4 && View.Flow.KeysInHand==1,"back in the Atrium with Key 4 in hand");Act("walk:chamber-door");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.ChamberRoom && !View.Busy,"the Chamber, one last time");Act("walk:books");});
             Steps.Enqueue(()=>{Check(View.Flow.CanSpend && !View.Busy,"the last Key to spend");Act("insert");});
@@ -297,7 +306,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && Sound.LastCue=="door" && Sound.Played>playedBefore,"the doorway plays the door cue from the test set (cues played: "+Sound.Played+")");
                 Check(new[]{"wing","wing-light"}.All(Slots.IsDressed) && !Slots.IsDressed("table") && (Slots.IsDressed("keeper-idle") || Slots.IsDressed("keeper-walk")),"the Wing room takes its files: the composed room (its Dial, table, chair, and shelf painted in, so no separate table file is drawn), its light, the Keeper (Build L; the shelf and the Dial's face are checked on the Dial screen next)");Capture("slice-360-art-wing-room.png");Act("walk:dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && new[]{"dial-face","seat","bracket","floor-markings","shelf","chair","candle"}.All(Slots.IsDressed),"the Dial takes its files: face, seats, bracket, floor markings, and the props beside it");Capture("slice-360-art-dial.png");});
-            Steps.Enqueue(()=>Act("leave-wing")); // captures land at the end of the frame: the next action waits its own step
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
+            Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");}); // captures land at the end of the frame: the next action waits its own step
             Steps.Enqueue(()=>Act("walk:atrium-door"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back in the Atrium with the test set");Act("walk:chamber-door");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.ChamberRoom && new[]{"chamber","chamber-light","chamber-grime","lock","ckit-mechanism-restored","ckit-candle-restored","ckit-banner-restored","ckit-crystal-worn"}.All(Slots.IsDressed),"the Chamber takes its files: the shell, its light and grime, the locks, the kit (mechanism, candles, banners, crystals; Build O); missing: "+string.Join(",",new[]{"chamber","chamber-light","chamber-grime","lock","ckit-mechanism-restored","ckit-candle-restored","ckit-banner-restored","ckit-crystal-worn"}.Where(x=>!Slots.IsDressed(x))));Capture("slice-360-art-chamber.png");});
