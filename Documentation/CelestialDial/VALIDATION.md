@@ -2,6 +2,16 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Leaving the Dial keeps the player in the Zodiac Wing
+
+The owner's Sept 26 playtest (note 10): exiting the wheel sent the player all the way back to the Grand Atrium, when the player should leave the Dial and still be standing in the Zodiac Wing. One press of the Dial's exit did both steps: `SliceView.LeaveWing` left the Dial, then walked the Keeper out through the room.
+
+Now the Dial's exit (`LeaveDial`, web action `leave-dial`) lands in the Wing room, and the room's own button ("Return to the Atrium", `leave-wing`) walks back to the Atrium. From Stage 2 the Dial's exit button reads "Leave the Dial" (it read "Return to the Atrium"), after the Table's "Leave the Table"; the label waits on the owner's word. The web state splits the flag: `canLeaveDial` on the Dial, `canLeaveWing` in the room, with a semantic button for each. Caspar's line on the lit wheel still says "let us return to the Atrium"; that is now two taps away, and his line is unchanged.
+
+Checks: the suite asserts that leaving the Dial lands in the room with the way back offered, at both widths, and every walk out from the Dial takes the two presses; the fixture's ten Dial exits use `leave-dial` and its ten room exits `leave-wing`.
+
+Validation: mechanical 478/478, WebGL clean (25.8 MB), browser suite 307/307 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, slice fixture 201/201. Capture: [`Evidence/leave-the-dial-2026-09-27/`](Evidence/leave-the-dial-2026-09-27/).
+
 ## The door plates, unsquished
 
 The owner's Sept 26 playtest (notes 6 and 12): the names on the Atrium's door plates and on the Wing's plate back to the Atrium were squeezed into their signs. The cause was geometry, not the names: `PlateText` set its box to 80% by 70% of the plate, larger than the plate file's engraved field, with the lines at 0.85 spacing, so bold caps ran into the border; and the Wing-room plate, 64 px wide, carried "THE GRAND ATRIUM" on one line at 6 px.
