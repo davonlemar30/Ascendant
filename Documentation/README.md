@@ -27,6 +27,7 @@ Production: [Ascendant](https://davonlemar30.github.io/Ascendant/).
 
 - Use Unity `6000.3.24f1`, pinned in `ProjectSettings/ProjectVersion.txt`.
 - Local and CI WebGL builds use `Ascendant.Build.WebBuild.Build` in `Assets/Editor/Build/WebBuild.cs`.
+- The owner's playtest APK builds locally, on demand, with `Ascendant.Build.AndroidBuild.Build` in `Assets/Editor/Build/AndroidBuild.cs` (needs Unity's Android Build Support module; not part of CI): `-buildTarget Android -executeMethod Ascendant.Build.AndroidBuild.Build -buildOutput Builds/Android/Ascendant.apk`. It is a development build (IL2CPP, ARM64, portrait, inside the safe area, package `io.github.davonlemar30.ascendant`) signed with the debug keystore and sideloaded; it is cut only when the owner asks for it. It is not the store package, which the Sept 13 scope ruling defers.
 - `.github/workflows/web.yml` builds pull requests into `main`; only `main` publishes to production. PR preview deployment is intentionally unavailable.
 - Before starting the greybox, merge the documentation prerequisite with required checks green, then branch from updated `main` as `codex/celestial-dial-greybox`.
 - Preserve unrelated local Unity changes and untracked files. Do not include them in the milestone.
