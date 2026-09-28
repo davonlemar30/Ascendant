@@ -107,7 +107,7 @@ const path=require('path');
     // ---- v0.2: the return ----
     const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'],ELEMENTS=['Fire','Earth','Air','Water'],ELEMENT_OF=i=>ELEMENTS[i%4];
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub');
-    check((await state()).atriumStage===2 && (await state()).dueCount>=6,'the Chamber leads to the Hub in Stage 2 with twelve items ready for practice at once, no in-game time, at '+viewport.width);
+    check((await state()).atriumStage===2 && (await state()).dueCount>=6 && (await state()).caspar.includes('Stirring: one lamp lit'),'the Chamber leads to the Hub in Stage 2 with twelve items ready for practice at once, no in-game time, and the Stirring caption said once, at '+viewport.width);
     { const a=await state(); check(a.atriumKitPieces===26 && a.atriumKitLevel===1 && a.atriumKitRestored<a.atriumKitPieces && a.atriumGrime>0 && a.doors.join()==='sealed-left:locked,wing-door:unlocked,chamber-door:unlocked','Build N: the Atrium kit at Stage 2: pieces still worn, grime in place, the sealed door locked and the Wing and Chamber doors unlocked at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-atrium-kit-stage2.png')}); }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().lightAlpha===0.25,{},{timeout:5000}); // the fade settles, then publishes
     check((await state()).lightAlpha===0.25,'the light overlay follows the stage: a quarter at Stage 2 at '+viewport.width); // Build H
@@ -454,7 +454,7 @@ const path=require('path');
     check((await state()).keysSpent===3 && (await state()).booksOpen===1 && !(await state()).wingWhole && events.some(e=>e.event_name==='book_opened_1') && (await state()).caspar.includes('Book opens'),'Key 3 fills the third lock and Book 1 opens at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-book-opens.png')});
     await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===5&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).caspar.includes('Three locks') && (await state()).caspar.includes('a piece at a time'),'the return takes the Atrium to Stage 5 with three Keys spent; the caption stays on the arc at '+viewport.width);
+    check((await state()).caspar.includes('Three locks') && !(await state()).caspar.includes('Stirring'),'the return takes the Atrium to Stage 5 with three Keys spent; the Stirring caption is not repeated (note 9) at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key3.png')});
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -522,7 +522,7 @@ const path=require('path');
     check((await state()).keysSpent===4 && (await state()).booksOpen===1 && (await state()).wingWhole && !(await state()).canInsert && events.some(e=>e.event_name==='wing_whole') && (await state()).caspar.includes('Wing is whole') && (await state()).caspar.includes('The Zodiac Wing is complete'),'Key 4 fills Book 2\'s first lock: the Wing is whole, with the closing line and the end card at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-whole.png')});
     await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===6&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).caspar.includes('Four Keys spent') && (await state()).caspar.includes('a piece at a time'),'the return takes the Atrium to Stage 6 with four Keys spent; the caption tells the slower truth at '+viewport.width);
+    check((await state()).caspar.includes('Four Keys spent') && !(await state()).caspar.includes('Stirring'),'the return takes the Atrium to Stage 6 with four Keys spent; no caption repeats itself (note 9) at '+viewport.width);
     await page.waitForFunction(()=>{const l=window.ascendantDial.snapshot().lightAlpha;return l>0.59&&l<0.6;},{},{timeout:5000});
     check((await state()).lightAlpha>0.59&&(await state()).lightAlpha<0.6,'the light overlay sits at half plus four of 21 locks once the Wing is whole; full light waits for the last Book (owner, Sept 27) at '+viewport.width); // Build H, rekeyed to the arc
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
