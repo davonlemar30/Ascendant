@@ -78,7 +78,7 @@ namespace Ascendant.CelestialDial
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
             public int atriumStage, dueCount;
-            public bool canEnterWing, canLeaveWing, v02Complete, resumed;
+            public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
             public string hubNote = "";
             // Build F: the practice fork, the sitting, the gate, the journal
             public string fork = "", practiceMode = "", practiceSign = "", practiceSummary = "", journalSection = "";

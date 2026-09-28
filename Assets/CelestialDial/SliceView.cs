@@ -528,6 +528,7 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("walk:")) Walk(command.Substring(5));
             else if (command == "walk-speed") CycleWalkSpeed();
             else if (command == "leave-wing") LeaveWing();
+            else if (command == "leave-dial") LeaveDial(); // note 10
             else if (command == "continue-lesson") ContinueLesson(); // Build F
             else if (command == "enter-practice") EnterPractice();
             else if (command == "leave-practice") LeavePractice();
@@ -575,7 +576,7 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Hub) Save();
             if (from == SliceScreen.Birth) StartCoroutine(WhiteLight()); else { Show(); Publish(); }
         }
-        void WingContinue() { if (Flow.AtriumStage >= 2) LeaveWing(); else Continue(); }
+        void WingContinue() { if (Flow.AtriumStage >= 2) LeaveDial(); else Continue(); }
         void Insert()
         {
             if (busy) return;
@@ -779,12 +780,13 @@ namespace Ascendant.CelestialDial
             reviewNote.text = Flow.Note; Save(); Publish();
             if (task.done) StartCoroutine(AfterTap());
         }
-        void LeaveWing()
+        // Leaving the Dial lands the player in the Zodiac Wing; the room's own button returns to the Atrium (owner, Sept 26 playtest, note 10).
+        void LeaveDial()
         {
-            if (busy) return;
-            if (Flow.Screen == SliceScreen.Wing) { if (Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveDial()) return; forkShown = false; Save(); Show(); Publish(); }
-            if (Flow.Screen == SliceScreen.WingRoom) Walk("atrium-door"); // one press from the Dial walks back out through the room
+            if (busy || Flow.Screen != SliceScreen.Wing || Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveDial()) return;
+            forkShown = false; Save(); Show(); Publish();
         }
+        void LeaveWing() { if (busy || Flow.Screen != SliceScreen.WingRoom) return; Walk("atrium-door"); }
         // ---- Build F: practice on the Dial. One entry is one sitting; the same forms as before; an exit on every item; three strikes close the instrument. ----
         void EnterPractice()
         {
@@ -906,7 +908,7 @@ namespace Ascendant.CelestialDial
             {
                 if (!sunSent && Flow.HasSunSign) { Dial.Lesson.SetSunSign(Flow.SunSign); sunSent = true; }
                 if (Flow.AtriumStage >= 2) { keyRect.gameObject.SetActive(false); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); seam.color = new Color(Bone.r, Bone.g, Bone.b, 0); Dial.Ring.localScale = Vector3.one; }
-                if (Flow.AtriumStage >= 2) { var t = wingContinue.GetComponentInChildren<Text>(); t.text = "Return to the Atrium"; } // owner (worksheet section 6)
+                if (Flow.AtriumStage >= 2) { var t = wingContinue.GetComponentInChildren<Text>(); t.text = "Leave the Dial"; } // the Dial's exit goes to the room (note 10); the label follows "Leave the Table" and awaits the owner's word
                 Dial.ForceRefresh();
             }
             if (s == SliceScreen.Hub) ShowHub();
@@ -1040,7 +1042,7 @@ namespace Ascendant.CelestialDial
             // v0.2
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.resumed = Resumed;
             state.canEnterWing = s == SliceScreen.Hub && !busy;
-            state.canLeaveWing = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy && Dial.Lesson.Phase != LessonPhase.GlyphNames;
+            state.canLeaveDial = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy && Dial.Lesson.Phase != LessonPhase.GlyphNames; // note 10: the Dial's exit; canLeaveWing is the room's
             // Build F: the fork, practice, the gate, the journal
             state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
             state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
