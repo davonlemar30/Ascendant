@@ -1376,10 +1376,10 @@ namespace Ascendant.CelestialDial
             new KitPlacement("candles", 125, 205, 1, .75f),
             new KitPlacement("books", 160, 490, 2),
             new KitPlacement("chair", 144, 475, 3),
-            new KitPlacement("plate", -138, 222, 1),
+            new KitPlacement("plate", -138, 222, 1, 1.35f), // 35% larger so the name has room (Sept 26 playtest, note 12)
         };
         public static readonly float[] KitGrime = { 1, .75f, .5f, .25f, 0 }, KitVeil = { .45f, .3f, .18f, .08f, 0 }, KitLight = { 0, .25f, .5f, .75f, 1 }; // by Keys earned, 0 to 4 (tuning variables)
-        const string WingPlateName = "THE GRAND ATRIUM"; // the Wing's doorway leads back to the Atrium
+        const string WingPlateName = "THE GRAND\nATRIUM"; // the Wing's doorway leads back to the Atrium; two balanced lines, like the Atrium's plates (Sept 26 playtest, note 12)
         class KitPiece { public KitPlacement P; public CanvasGroup Worn, Restored; public Image Flash; public bool Shown; }
         // Build N (owner, Sept 25): a door is weathered and chained while locked, clean with its edges glowing once unlocked, and swings open as the
         // Keeper reaches it. The leaves are the two halves of the closed door's file, each swinging toward its outer edge.
@@ -1428,8 +1428,10 @@ namespace Ascendant.CelestialDial
         }
         Text PlateText(RectTransform plate, string text)
         {
-            var name = Label(plate, text, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x * .8f, plate.sizeDelta.y * .7f, 9); name.lineSpacing = .85f;
-            name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 6; name.resizeTextMaxSize = 11; return name;
+            // The text box is the plate's engraved field (about 74% by 52% of the file), not the whole plate; a line of air between the lines.
+            // The old 80% by 70% box let bold caps run into the border - the "squished" plates of the Sept 26 playtest (notes 6 and 12).
+            var name = Label(plate, text, 0, plate.sizeDelta.y / 2, plate.sizeDelta.x * .74f, plate.sizeDelta.y * .52f, 9); name.lineSpacing = 1f;
+            name.color = new Color(.23f, .14f, .07f); name.fontStyle = FontStyle.Bold; name.resizeTextForBestFit = true; name.resizeTextMinSize = 6; name.resizeTextMaxSize = 12; return name;
         }
         // Doors fill the painted arch openings; the plate sits on the arch's keystone.
         void AddDoor(RoomKit k, string id, string name, float x, float bottom, float w, float h, float plateBottom, float plateW)
@@ -1581,9 +1583,9 @@ namespace Ascendant.CelestialDial
             // The Zodiac Wing's door is open to the Keeper from the start; the Chamber's unlocks with the first Key (the return); the sealed door stays sealed.
             k.VeilTint = new Color(.02f, .035f, .09f); // the Atrium shell carries warm lantern light; asleep, a cold blue night sits over it
             k.DoorUnlocked = id => id == "wing-door" || (id == "chamber-door" && screen != SliceScreen.Atrium);
-            AddDoor(k, "sealed-left", null, -117.5f, 385, 60, 130, 264, 74); // plates ~30% larger for phone reading (owner, Sept 25)
-            AddDoor(k, "wing-door", "THE ZODIAC\nWING", 0, 385, 70, 135, 258, 84);
-            AddDoor(k, "chamber-door", "THE CRYSTAL\nBOOK CHAMBER", 117.5f, 385, 60, 130, 266, 86);
+            AddDoor(k, "sealed-left", null, -117.5f, 385, 60, 130, 264, 88); // plates ~30% larger for phone reading (owner, Sept 25), then 18% more so the names sit inside the engraved field (Sept 26 playtest, note 6)
+            AddDoor(k, "wing-door", "THE ZODIAC\nWING", 0, 385, 70, 135, 258, 100);
+            AddDoor(k, "chamber-door", "THE CRYSTAL\nBOOK CHAMBER", 117.5f, 385, 60, 130, 266, 102);
             FinishKit(panel, k); atriumKits.Add(k); return k;
         }
         // ---- Build O: the Chamber kit. It restores by Keys spent across the whole arc of 21 (owner, Sept 27); the Books stand on the altar, sealed or open.
