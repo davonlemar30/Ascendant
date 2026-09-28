@@ -4,7 +4,7 @@ This is an interaction test, not production art or a gameplay-validation result.
 
 ## The interactives carry their own names
 
-The owner's Sept 26 playtest (note 13): the header on the Dial, the Bookshelf's book and the Table said THE ZODIAC WING, the room's name, and for the longest time read as the game's title. Now each instrument's screen is headed with its own name — THE DIAL, THE BOOKSHELF, THE TABLE, the same names as the buttons that open them — and only the room's screen says THE ZODIAC WING. Three labels; the names await the owner's word.
+The owner's Sept 26 playtest (note 13): the header on the Dial, the Bookshelf's book and the Table said THE ZODIAC WING, the room's name, and for the longest time read as the game's title. Now each instrument's screen is headed with its own name — THE CELESTIAL DIAL, THE BOOK OF SYMBOLS, THE ELEMENTAL TABLE, the owner's pick from a set of options (Sept 27) — and only the room's screen says THE ZODIAC WING. Three labels; the room's buttons keep their short names (The Dial, The Bookshelf, The Table).
 
 Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/instrument-names-2026-09-27/`](Evidence/instrument-names-2026-09-27/).
 

@@ -125,7 +125,7 @@ namespace Ascendant.CelestialDial
             ScaleCanvas();
             var bg = canvasObject.AddComponent<Image>(); bg.color = Charcoal;
             root = Rect("Portrait", canvasObject.transform, 0, 0, 360, 800);
-            Label(root, "THE DIAL", 0, 32, 340, 24, 18); // the instrument's own name, not the room's (owner, Sept 26 playtest, note 13)
+            Label(root, "THE CELESTIAL DIAL", 0, 32, 340, 24, 18); // the instrument's own name, not the room's (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
             subtitle = Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14);
             ring = Rect("Twelve-seat Dial", root, 0, 270, 332, 332);
             var hit = ring.gameObject.AddComponent<Image>(); hit.color = new Color(0,0,0,.001f);
