@@ -28,6 +28,7 @@ namespace Ascendant.CelestialDial
         public int LocksFilled { get; private set; }
         public const int LocksPerBook = 3;
         public const int Books = 7;
+        public const int LocksTotal = Books * LocksPerBook; // the Library's whole arc: 21 Keys spent restores everything (owner, Sept 27)
         // v0.2
         public readonly ReviewDeck Deck = new ReviewDeck();
         public int AtriumStage { get; private set; } = 1;   // 1 Forgotten, 2 Stirring, 3 one more change
@@ -79,6 +80,7 @@ namespace Ascendant.CelestialDial
         {
             if (!AtChamberRoom) return false;
             Screen = SliceScreen.Hub; Note = "";
+            // Stages 4-6 stay the return script's beats. The rooms' visible restoration paces on LocksFilled across the whole arc instead (owner, Sept 27).
             if (LocksFilled >= 2 && AtriumStage < 4) { AtriumStage = 4; Logged?.Invoke("atrium_stage_4"); }
             if (LocksFilled >= 3 && AtriumStage < 5) { AtriumStage = 5; Logged?.Invoke("atrium_stage_5"); }
             if (LocksFilled >= 4 && AtriumStage < 6) { AtriumStage = 6; Logged?.Invoke("atrium_stage_6"); }

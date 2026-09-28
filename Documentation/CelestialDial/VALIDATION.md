@@ -2,6 +2,23 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The long restoration: the shared rooms restore across the whole game
+
+The owner's Sept 26 playtest (note 15) found the Grand Atrium and the Crystal Book Chamber fully restored the moment the Zodiac Wing was — too soon for a Library with six more Books to earn. His ruling (Sept 27, Decisions Log): a wing restores on its own challenges; the shared rooms restore across the Library's whole arc — 7 Books, 21 Keys (`SliceFlow.LocksTotal`) — in small, subtle steps, with the Atrium at its stage-3 look when the Zodiac Wing finishes, and no protection for saves that had seen more.
+
+The stage counter keeps its role: `AtriumStage` still steps 4, 5, 6 on the returns with Keys spent, so Caspar's return script and every stage check stand. What moved to the arc is what the player sees:
+
+- **The Atrium kit.** The opening's pieces (Key 2–3: the pillar lantern, candle stands, desk, charts, bench) still restore by stage. The other fifteen carry `arcLock`, the lock count that restores each — a bust at the 2nd, the shelf at the 3rd, the rug at the 4th, then a piece most Keys, the chandelier at the 21st. The kit's level (grime, veil) climbs to 2 on the opening's beats and then only at the 7th, 14th and 21st Keys (`AtriumArcLevel`).
+- **The Chamber kit.** Its pieces' Keys are lock counts across the arc: the mechanism and a candle per Key first (nine candles over the first nine), the banners and braziers through the middle Books, the crystal and the reliquary at the 20th and 21st. Level 1 from the first Key, then the 7th, 14th, 21st.
+- **The light.** `LightAlphaFor(stage, locks)`: nothing at Stage 1, a quarter at Stage 2, then half plus the arc — about .6 with the Wing whole, full only at the last lock.
+- **The hub caption.** Stages 2 and 3 keep the owner's lines. Past the second Key spent: "Stirring: two lamps, a clear desk, and the hall wakes a piece at a time."; at the 21st: "Every lamp burns, every shelf is filled. The Library is whole." These two lines are new player-facing copy and await the owner's word; the old stage 4–6 lines described a room that no longer restores that fast.
+
+With the Wing whole (four Keys spent) the Atrium holds 14 of 26 pieces at grime .6, the Chamber the mechanism and four candles. Caspar's "what remains is sealed, for now" stays true.
+
+Checks: the mechanical light table (Stage 1–2, half at Stage 3, ~.6 at four locks, 1 at 21, `LocksTotal` 21); the slice fixture's Atrium light check takes the locks; the browser suite expects the Chamber at level 1 with three pieces after the second Key, the Atrium at level 2 with 14 pieces and its grime with the Wing whole, the light between .59 and .6, and the caption on the arc — each kit count read after the restore fade settles (the fade is not part of `busy`).
+
+Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/long-restoration-2026-09-27/`](Evidence/long-restoration-2026-09-27/).
+
 ## The journal's titles in blackletter
 
 The owner's ruling (Sept 26), after a preview: the journal's page titles are set in UnifrakturMaguntia (SIL Open Font License; `Resources/Fonts/UnifrakturMaguntia.ttf` with `OFL-UnifrakturMaguntia.txt`), and bigger. `SliceView` sets the one title label's font (`TitleFont`) and its sizes. Page titles use `TitleSize` 28. A sign's name uses `SignTitleSize` 32, with its illuminated capital at `CapitalSize` 58, built by `SignTitle`. The label is 64 tall, since a line that doesn't fit its box is truncated away. The font is imported dynamic, so the Web player rasterizes it as it draws. It is a static font (no variation tables), unlike the variable Noto Sans Symbols that drew blank on the Web on Sept 12. The web state carries `journalTitleFont`.

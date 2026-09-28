@@ -322,7 +322,8 @@ const path=require('path');
     await spendAtBooks('Key 2');
     check((await state()).keysSpent===2 && (await state()).keysInHand===0 && (await state()).booksOpen===0 && !(await state()).canInsert && events.filter(e=>e.event_name==='key_spent').length===1,'Key 2 fills the second lock; the Book stays shut; nothing more to spend at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber-lock2.png')});
-    { const c=await state(); check(c.chamberKitPieces===16 && c.chamberKitLevel===2 && c.chamberKitRestored>0 && c.chamberKitRestored<c.chamberKitPieces,'Build O: the Chamber kit shows two Keys spent: some pieces restored, others still worn at '+viewport.width); }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().chamberKitRestored===3,{},{timeout:8000}); // the restore fade settles piece by piece
+    { const c=await state(); check(c.chamberKitPieces===16 && c.chamberKitLevel===1 && c.chamberKitRestored===3,'Build O on the arc: two Keys spent light the mechanism and two candles; the rest of the Chamber waits for later Books at '+viewport.width); }
     { const kitted=(await state()).chamberKitLevel>=0; await page.waitForTimeout(400); await tap(kitted?-145:-150,kitted?287:347); } // the Chamber's doorway back, on the canvas (where the kit paints it, or the greybox door)
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===4&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).v03Complete && (await state()).avatarAt==='chamber-door' && (await state()).caspar.includes('Two locks filled'),'the return after spending takes the Atrium to Stage 4 at '+viewport.width);
@@ -453,7 +454,7 @@ const path=require('path');
     check((await state()).keysSpent===3 && (await state()).booksOpen===1 && !(await state()).wingWhole && events.some(e=>e.event_name==='book_opened_1') && (await state()).caspar.includes('Book opens'),'Key 3 fills the third lock and Book 1 opens at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-book-opens.png')});
     await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===5&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).caspar.includes('Three locks') && (await state()).caspar.includes('Three lamps'),'the return takes the Atrium to Stage 5 with three Keys spent at '+viewport.width);
+    check((await state()).caspar.includes('Three locks') && (await state()).caspar.includes('a piece at a time'),'the return takes the Atrium to Stage 5 with three Keys spent; the caption stays on the arc at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key3.png')});
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await semantic('leave-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -521,14 +522,15 @@ const path=require('path');
     check((await state()).keysSpent===4 && (await state()).booksOpen===1 && (await state()).wingWhole && !(await state()).canInsert && events.some(e=>e.event_name==='wing_whole') && (await state()).caspar.includes('Wing is whole') && (await state()).caspar.includes('The Zodiac Wing is complete'),'Key 4 fills Book 2\'s first lock: the Wing is whole, with the closing line and the end card at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-whole.png')});
     await semantic('leave-chamber');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===6&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    check((await state()).caspar.includes('Four Keys spent') && (await state()).caspar.includes('Four lamps'),'the return takes the Atrium to Stage 6 with four Keys spent at '+viewport.width);
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().lightAlpha===1,{},{timeout:5000});
-    check((await state()).lightAlpha===1,'the light overlay is full once the Wing is whole (Stage 6) at '+viewport.width); // Build H
+    check((await state()).caspar.includes('Four Keys spent') && (await state()).caspar.includes('a piece at a time'),'the return takes the Atrium to Stage 6 with four Keys spent; the caption tells the slower truth at '+viewport.width);
+    await page.waitForFunction(()=>{const l=window.ascendantDial.snapshot().lightAlpha;return l>0.59&&l<0.6;},{},{timeout:5000});
+    check((await state()).lightAlpha>0.59&&(await state()).lightAlpha<0.6,'the light overlay sits at half plus four of 21 locks once the Wing is whole; full light waits for the last Book (owner, Sept 27) at '+viewport.width); // Build H, rekeyed to the arc
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check((await state()).atriumStage===6 && (await state()).keys===4 && (await state()).keysSpent===4 && (await state()).wingWhole && (await state()).key4 && (await state()).polarityShown && (await state()).oppositesComplete && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with four Keys spent, the Wing whole, the sides, and the six pairs at '+viewport.width);
     // Build L: the Wing at full light (Stage 6), the capture the owner judges the light overlay by
-    { const a=await state(); check(a.atriumKitLevel===5 && a.atriumKitRestored===a.atriumKitPieces && a.atriumGrime===0,'Build N: at Stage 6 every Atrium piece is restored and the grime is gone at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-atrium-kit-stage6.png')}); }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().atriumKitRestored===14,{},{timeout:8000}); // the restore fade settles piece by piece
+    { const a=await state(); check(a.atriumKitLevel===2 && a.atriumKitRestored===14 && a.atriumGrime>0.59 && a.atriumGrime<0.61,'Build N on the arc: with the Wing whole the Atrium holds 14 of 26 pieces and its grime; the rest waits for the other six Books (owner, Sept 27) at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-atrium-kit-wing-whole.png')}); }
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await page.waitForTimeout(1200);check((await state()).lastDoorOpened==='wing-door','Build N: the Wing door swings open as the Keeper reaches it at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room-stage6.png')});
     { const k=await state(); check(k.kitPieces===19 && k.kitLevel===4 && k.kitRestored===k.kitPieces && k.grime===0 && k.wingLight===1,'Build M: with four Keys every Wing kit piece is restored, the grime gone, the light full at '+viewport.width); }
