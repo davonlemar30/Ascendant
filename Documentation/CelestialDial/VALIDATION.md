@@ -8,6 +8,8 @@ The owner's Sept 26 playtest (note 13): the header on the Dial, the Bookshelf's 
 
 Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/instrument-names-2026-09-27/`](Evidence/instrument-names-2026-09-27/).
 
+Production suite after the deploy of `2200c29` (which also carries #70 and #71): 307/307 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, main's own suite. The production capture of the book shows THE BOOK OF SYMBOLS; no suite check quotes the headers, so the branch's 360 captures are the visual record for all three.
+
 ## Leaving the Dial keeps the player in the Zodiac Wing
 
 The owner's Sept 26 playtest (note 10): exiting the wheel sent the player all the way back to the Grand Atrium, when the player should leave the Dial and still be standing in the Zodiac Wing. One press of the Dial's exit did both steps: `SliceView.LeaveWing` left the Dial, then walked the Keeper out through the room.
@@ -17,6 +19,8 @@ Now the Dial's exit (`LeaveDial`, web action `leave-dial`) lands in the Wing roo
 Checks: the suite asserts that leaving the Dial lands in the room with the way back offered, at both widths, and every walk out from the Dial takes the two presses; the fixture's ten Dial exits use `leave-dial` and its ten room exits `leave-wing`.
 
 Validation: mechanical 478/478, WebGL clean (25.8 MB), browser suite 307/307 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, slice fixture 201/201. Capture: [`Evidence/leave-the-dial-2026-09-27/`](Evidence/leave-the-dial-2026-09-27/).
+
+Production suite after the deploy of `2200c29` (which also carries #69 and #70): 307/307 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, main's own suite. Both note 10 checks pass in production: leaving the Dial lands in the Zodiac Wing with the way back offered, at 390 and 360.
 
 ## The blue box, gone: no native focus ring on the semantic layer
 
@@ -30,6 +34,8 @@ Noted for later, not fixed here: the semantic layer's boxes also sit slightly of
 
 Validation: mechanical 478/478, WebGL build clean (25.8 MB), slice fixture 200/200, browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, against the served build of this branch.
 
+Production suite after the deploy of `9c6eb1f` (which carries #65–#68): 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, main's own suite. A focus probe on production (Chrome, 390 wide at 2x, mobile) found the same result as the branch: a scripted focus on a `#semantic` button computes `outline: none 0px`; after a Tab keypress the focused button computes `solid 3px rgb(240, 232, 220)`.
+
 ## The door plates, unsquished
 
 The owner's Sept 26 playtest (notes 6 and 12): the names on the Atrium's door plates and on the Wing's plate back to the Atrium were squeezed into their signs. The cause was geometry, not the names: `PlateText` set its box to 80% by 70% of the plate, larger than the plate file's engraved field, with the lines at 0.85 spacing, so bold caps ran into the border; and the Wing-room plate, 64 px wide, carried "THE GRAND ATRIUM" on one line at 6 px.
@@ -37,6 +43,8 @@ The owner's Sept 26 playtest (notes 6 and 12): the names on the Atrium's door pl
 Now the text box is the engraved field (74% by 52%), the lines a full line apart, best fit up to 12. The Atrium's plates are 18% larger (sealed 88, the Zodiac Wing 100, the Crystal Book Chamber 102 — after the 30% of Sept 25), the Wing-room plate 35% larger with "THE GRAND / ATRIUM" on two balanced lines. The names, caps and weight are unchanged. An offline mock of four settings (today's, this one, regular weight, blackletter in title case) sits in the evidence folder for the owner's eye.
 
 Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/door-plates-2026-09-27/`](Evidence/door-plates-2026-09-27/).
+
+Production suite after the deploy of `9c6eb1f` (which carries #65–#68): 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, main's own suite.
 
 ## The long restoration: the shared rooms restore across the whole game
 
@@ -54,6 +62,8 @@ With the Wing whole (four Keys spent) the Atrium holds 14 of 26 pieces at grime 
 Checks: the mechanical light table (Stage 1–2, half at Stage 3, ~.6 at four locks, 1 at 21, `LocksTotal` 21); the slice fixture's Atrium light check takes the locks; the browser suite expects the Chamber at level 1 with three pieces after the second Key, the Atrium at level 2 with 14 pieces and its grime with the Wing whole, the light between .59 and .6, and the caption on the arc — each kit count read after the restore fade settles (the fade is not part of `busy`).
 
 Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/long-restoration-2026-09-27/`](Evidence/long-restoration-2026-09-27/).
+
+Production suite after the deploy of `9c6eb1f` (which carries #65–#68): 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, main's own suite.
 
 ## The journal's titles in blackletter
 
