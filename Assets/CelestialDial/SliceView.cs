@@ -67,7 +67,7 @@ namespace Ascendant.CelestialDial
         readonly List<Image> lightOverlays = new List<Image>(); float lightAlpha; Coroutine lightFade;
         public float LightAlpha => lightAlpha; // fixture evidence
         public static readonly string[] LightSlots = { "atrium-light", "wing-light", "chamber-light" };
-        public static float LightAlphaFor(int stage) => stage <= 1 ? 0f : stage == 2 ? .25f : stage == 3 ? .5f : stage == 4 ? .75f : 1f; // nothing at Stage 1, full at Stages 5–6; the steps between are a tuning variable
+        public static float LightAlphaFor(int stage, int locks) => stage <= 1 ? 0f : stage == 2 ? .25f : Mathf.Lerp(.5f, 1f, locks / (float)SliceFlow.LocksTotal); // nothing at Stage 1, half once the wheel lights, full only at the 21st Key (owner, Sept 27)
         const string ForkLine = "The wheel is yours. We can go on with the lesson, or you can practice what you already know."; // placeholder (owner writes)
         const string ForkPracticeOnlyLine = "Nothing new waits on the wheel today. Practice what you know, or rest."; // placeholder (owner writes)
         const string ForkReturnLine = "Back at the wheel. The lesson, or more practice: your choice."; // placeholder (owner writes)
@@ -230,7 +230,7 @@ namespace Ascendant.CelestialDial
         void BuildChamber()
         {
             chamber = ScreenPanel("Chamber", "chamber"); LightOverlay(chamber, "chamber-light");
-            if (ChamberKitted) { chamberKit = BuildKit(chamber, "ckit-", ChamberKit, "chamber-grime", null, ChamberGrime, ChamberVeil, null, () => Mathf.Clamp(Flow.KeysSpent, 0, 4), p => Flow.KeysSpent >= p.Key); chamberKit.VeilTint = new Color(.02f, .035f, .09f); FinishKit(chamber, chamberKit); atriumKits.Add(chamberKit); } // Build O
+            if (ChamberKitted) { chamberKit = BuildKit(chamber, "ckit-", ChamberKit, "chamber-grime", null, ChamberGrime, ChamberVeil, null, () => Flow.KeysSpent >= SliceFlow.LocksTotal ? 4 : Flow.KeysSpent >= 14 ? 3 : Flow.KeysSpent >= 7 ? 2 : Flow.KeysSpent >= 1 ? 1 : 0, p => Flow.KeysSpent >= p.Key); chamberKit.VeilTint = new Color(.02f, .035f, .09f); FinishKit(chamber, chamberKit); atriumKits.Add(chamberKit); } // Build O
             Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18);
             for (int i = 0; i < candles.Length; i++)
             { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].raycastTarget = false; Slots.Dress(candles[i], "candle"); Slots.Paint(candles[i], LampDark, DarkArt); }
@@ -961,7 +961,7 @@ namespace Ascendant.CelestialDial
             Lamp(lampOne, stage >= 2); Lamp(lampTwo, stage >= 3); Lamp(lampThree, stage >= 5); Lamp(lampFour, stage >= 6);
             foreach (var book in shelfBooks) book.gameObject.SetActive(stage >= 4); shelvesLabel.text = stage >= 4 ? "Shelves, filling with books" : "Shelves, mostly bare"; // owner (worksheet section 13)
             sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? (HasArt(sealedLeftLight.transform.parent as RectTransform) ? .06f : .3f) : 0);
-            hubCaption.text = stage >= 6 ? "Four lamps, shelves filling. The Zodiac Wing is whole." : stage >= 5 ? "Three lamps burn, and light glows behind a sealed door." : stage >= 4 ? "The shelves stir, books returning to their places." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Zodiac Wing open." : "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open."; // owner (worksheet sections 1 and 13; Stages 2 and 3 kept as written, marked X)
+            hubCaption.text = Flow.LocksFilled >= SliceFlow.LocksTotal ? "Every lamp burns, every shelf is filled. The Library is whole." : Flow.LocksFilled >= 2 ? "Stirring: two lamps, a clear desk, and the hall wakes a piece at a time." : stage >= 3 ? "Stirring: two lamps, a clear desk, the Zodiac Wing open." : "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open."; // owner (worksheet sections 1 and 13; Stages 2 and 3 kept as written, marked X). The old stage 4-6 lines described a room now restored across the arc (owner, Sept 27); the new lines await the owner's word.
             hubText.text = Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
             enterChamber.interactable = !busy && Flow.CanEnterChamber;
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
@@ -1123,7 +1123,7 @@ namespace Ascendant.CelestialDial
         }
         void ApplyLight(bool animate)
         {
-            float target = LightAlphaFor(Flow.AtriumStage);
+            float target = LightAlphaFor(Flow.AtriumStage, Flow.LocksFilled);
             if (Mathf.Approximately(target, lightAlpha)) return;
             if (lightFade != null) { StopCoroutine(lightFade); lightFade = null; }
             if (!animate || ReducedMotion) { SetLight(target); return; }
@@ -1309,7 +1309,7 @@ namespace Ascendant.CelestialDial
             Grid.Restore(save.gridPlaced, save.gridEvidence, save.gridStarted, save.keys >= 3);
             Dial.Lesson.SetKey3(save.keys >= 3); Dial.Lesson.RestoreOpposites(save.polarityShown, save.oppKnown, save.oppositesStarted, save.built, save.builderEvidence, save.keys >= 4);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: " + Math.Max(2, save.keys);
-            sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true; SetLight(LightAlphaFor(save.atriumStage)); // Build H: no fade on a reload
+            sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true; SetLight(LightAlphaFor(save.atriumStage, Mathf.Max(save.locksFilled, save.keyEarned ? 1 : 0))); // Build H: no fade on a reload
             keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { FloorLight(.55f); Slots.Paint(candle, Bone, 1f); }
         }
 
@@ -1353,8 +1353,8 @@ namespace Ascendant.CelestialDial
         // Placements are bottom-centred on the 360 x 800 layout, measured on the owner's approved "restored" image (shifted up 60 with the shell).
         struct KitPlacement
         {
-            public string Name, Wake; public float X, Bottom, Scale, WornScale, WornX; public int Key;
-            public KitPlacement(string name, float x, float bottom, int key, float scale = 1, float wornScale = 0, float wornX = float.NaN, string wake = null) { Name = name; X = x; Bottom = bottom; Key = key; Scale = scale; WornScale = wornScale; WornX = wornX; Wake = wake; }
+            public string Name, Wake; public float X, Bottom, Scale, WornScale, WornX; public int Key, Lock;
+            public KitPlacement(string name, float x, float bottom, int key, float scale = 1, float wornScale = 0, float wornX = float.NaN, string wake = null, int arcLock = 0) { Name = name; X = x; Bottom = bottom; Key = key; Scale = scale; WornScale = wornScale; WornX = wornX; Wake = wake; Lock = arcLock; }
         }
         static readonly KitPlacement[] WingKit =
         {
@@ -1550,27 +1550,34 @@ namespace Ascendant.CelestialDial
         public string LastDoorOpened { get; private set; } = "";
         // A Wing piece restores on its Key, or, for an instrument a lesson uses, the moment that instrument wakes (the shelf's book, the table).
         bool KitRestoredNow(KitPlacement p) => p.Wake == "wheel" ? Flow.WheelComplete : p.Wake == "modalities" ? Flow.ModalitiesComplete : Flow.Keys >= p.Key;
-        // ---- Build N: the Atrium kit. Pieces restore by the Atrium's stage (the Key here is the stage, 2 to 6); the light keeps following the stage too.
+        // ---- Build N: the Atrium kit. The opening pieces restore by stage (Key 2-3); the rest by Keys spent across the arc (arcLock), the light following the arc too (owner, Sept 27).
         static readonly KitPlacement[] AtriumKit =
         {
-            new KitPlacement("rug", 0, 800, 4, 1, 1, 60),
-            new KitPlacement("chandelier", -36, 150, 6),
+            // Key 2-3 pieces are the opening's beats and follow the stage. Everything else carries arcLock, its Key spent on the
+            // Library's whole arc of 21 (owner, Sept 27): a small change most Keys, the chandelier last.
+            new KitPlacement("rug", 0, 800, 4, 1, 1, 60, arcLock: 4),
+            new KitPlacement("chandelier", -36, 150, 6, arcLock: 21),
             new KitPlacement("chart", -140, 125, 3), new KitPlacement("chart", 138, 122, 3), new KitPlacement("chart", -86, 215, 3, .65f), new KitPlacement("chart", 88, 220, 3, .6f), new KitPlacement("chart", 165, 250, 3, 1.6f),
-            new KitPlacement("lamp", -94, 127, 6), new KitPlacement("lamp", 91, 127, 5),
-            new KitPlacement("banner", -124, 205, 5), new KitPlacement("banner", 124, 205, 5), new KitPlacement("banner", -61, 295, 5, 1.2f), new KitPlacement("banner", 61, 295, 5, 1.2f),
+            new KitPlacement("lamp", -94, 127, 6, arcLock: 19), new KitPlacement("lamp", 91, 127, 5, arcLock: 12),
+            new KitPlacement("banner", -124, 205, 5, arcLock: 8), new KitPlacement("banner", 124, 205, 5, arcLock: 11), new KitPlacement("banner", -61, 295, 5, 1.2f, arcLock: 15), new KitPlacement("banner", 61, 295, 5, 1.2f, arcLock: 17),
             new KitPlacement("lamp", -60, 220, 2, .875f), new KitPlacement("lamp", 60, 220, 3, .875f), // the pillar lanterns use the wall lamp (the art lane's "lantern" came back as a ring chandelier)
-            new KitPlacement("shelf", -175, 380, 4),
-            new KitPlacement("bust", -63, 380, 4), new KitPlacement("bust", 64, 380, 4),
-            new KitPlacement("plant", -83, 380, 5), new KitPlacement("plant", 84, 380, 5),
+            new KitPlacement("shelf", -175, 380, 4, arcLock: 3),
+            new KitPlacement("bust", -63, 380, 4, arcLock: 2), new KitPlacement("bust", 64, 380, 4, arcLock: 6),
+            new KitPlacement("plant", -83, 380, 5, arcLock: 7), new KitPlacement("plant", 84, 380, 5, arcLock: 10),
             new KitPlacement("candlestand", -156, 385, 2), new KitPlacement("candlestand", 169, 385, 2),
             new KitPlacement("bench", 147, 405, 3),
             new KitPlacement("desk", -107, 445, 2),
-            new KitPlacement("plant", -164, 495, 5, 1.3f), new KitPlacement("plant", 160, 485, 5, 1.8f),
+            new KitPlacement("plant", -164, 495, 5, 1.3f, arcLock: 13), new KitPlacement("plant", 160, 485, 5, 1.8f, arcLock: 16),
         };
-        public static readonly float[] AtriumGrime = { 1, .8f, .6f, .4f, .2f, 0 }, AtriumVeil = { .62f, .46f, .32f, .2f, .09f, 0 }; // by Atrium stage 1 to 6 (tuning variables)
+        public static readonly float[] AtriumGrime = { 1, .8f, .6f, .4f, .2f, 0 }, AtriumVeil = { .62f, .46f, .32f, .2f, .09f, 0 }; // by arc level 0 to 5 (tuning variables)
+        // The Atrium's grime, veil and level: the opening's beats carry it to level 2 (stage 3), then only the long arc lifts it further -
+        // level 3 at the 7th Key spent, 4 at the 14th, clean at the 21st (owner, Sept 27).
+        int AtriumArcLevel => Flow.LocksFilled >= SliceFlow.LocksTotal ? 5 : Flow.LocksFilled >= 14 ? 4 : Flow.LocksFilled >= 7 ? 3 : Mathf.Clamp(Flow.AtriumStage - 1, 0, 2);
         RoomKit BuildAtriumKit(RectTransform panel, SliceScreen screen)
         {
-            var k = BuildKit(panel, "akit-", AtriumKit, "atrium-grime", null, AtriumGrime, AtriumVeil, null, () => Mathf.Clamp(screen == SliceScreen.Atrium ? 0 : Flow.AtriumStage - 1, 0, 5), p => (screen == SliceScreen.Atrium ? 1 : Flow.AtriumStage) >= p.Key);
+            var k = BuildKit(panel, "akit-", AtriumKit, "atrium-grime", null, AtriumGrime, AtriumVeil, null,
+                () => screen == SliceScreen.Atrium ? 0 : AtriumArcLevel,
+                p => screen != SliceScreen.Atrium && (p.Lock > 0 ? Flow.LocksFilled >= p.Lock : Flow.AtriumStage >= p.Key));
             // The Zodiac Wing's door is open to the Keeper from the start; the Chamber's unlocks with the first Key (the return); the sealed door stays sealed.
             k.VeilTint = new Color(.02f, .035f, .09f); // the Atrium shell carries warm lantern light; asleep, a cold blue night sits over it
             k.DoorUnlocked = id => id == "wing-door" || (id == "chamber-door" && screen != SliceScreen.Atrium);
@@ -1579,15 +1586,17 @@ namespace Ascendant.CelestialDial
             AddDoor(k, "chamber-door", "THE CRYSTAL\nBOOK CHAMBER", 117.5f, 385, 60, 130, 266, 86);
             FinishKit(panel, k); atriumKits.Add(k); return k;
         }
-        // ---- Build O: the Chamber kit. It restores by Keys spent (the locks filled, 0 to 4); the Books stand on the altar, sealed or open.
+        // ---- Build O: the Chamber kit. It restores by Keys spent across the whole arc of 21 (owner, Sept 27); the Books stand on the altar, sealed or open.
         static readonly KitPlacement[] ChamberKit =
         {
-            new KitPlacement("banner", -56, 175, 2), new KitPlacement("banner", 43, 175, 2),
+            // Key = the lock count that restores the piece, across the whole arc of 21 (owner, Sept 27): the mechanism and a
+            // candle per Key first, the braziers and banners through the middle Books, the crystal and the reliquary last.
+            new KitPlacement("banner", -56, 175, 10), new KitPlacement("banner", 43, 175, 12),
             new KitPlacement("mechanism", 0, 235, 1),
-            new KitPlacement("brazier", -108, 405, 3), new KitPlacement("brazier", 108, 405, 3),
-            new KitPlacement("crystal", 140, 398, 4), new KitPlacement("reliquary", 163, 404, 4),
-            new KitPlacement("candle", -120, 388, 1), new KitPlacement("candle", -90, 388, 1), new KitPlacement("candle", -60, 388, 1), new KitPlacement("candle", -30, 388, 1), new KitPlacement("candle", 0, 388, 1),
-            new KitPlacement("candle", 30, 388, 1), new KitPlacement("candle", 60, 388, 1), new KitPlacement("candle", 90, 388, 1), new KitPlacement("candle", 120, 388, 1),
+            new KitPlacement("brazier", -108, 405, 14), new KitPlacement("brazier", 108, 405, 16),
+            new KitPlacement("crystal", 140, 398, 20), new KitPlacement("reliquary", 163, 404, 21),
+            new KitPlacement("candle", -120, 388, 1), new KitPlacement("candle", -90, 388, 2), new KitPlacement("candle", -60, 388, 3), new KitPlacement("candle", -30, 388, 4), new KitPlacement("candle", 0, 388, 5),
+            new KitPlacement("candle", 30, 388, 6), new KitPlacement("candle", 60, 388, 7), new KitPlacement("candle", 90, 388, 8), new KitPlacement("candle", 120, 388, 9),
         };
         public static readonly float[] ChamberGrime = { 1, .75f, .5f, .25f, 0 }, ChamberVeil = { .6f, .42f, .26f, .12f, 0 };
         RoomKit chamberKit;
