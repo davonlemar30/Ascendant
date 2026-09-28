@@ -343,7 +343,7 @@ namespace Ascendant.CelestialDial
         {
             // v0.3 Part A: name the glyph by direct tap. Same layout as a review item so the two read as one family.
             glyphs = ScreenPanel("Glyphs");
-            Label(glyphs, "THE ZODIAC WING", 0, 32, 340, 24, 18);
+            Label(glyphs, "THE BOOK OF SYMBOLS", 0, 32, 340, 24, 18); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
             glyphProgress = Label(glyphs, "", 0, 62, 300, 20, 12); glyphProgress.color = Muted;
             var card = Rect("Glyph card", glyphs, 0, 200, 140, 140); bookCard = card.gameObject.AddComponent<Image>(); bookCard.color = PanelColor; // Build E: book-cover shut, book-page open
             glyphCard = Label(card, "", 0, 70, 130, 130, 84); glyphCard.font = Dial.GlyphFont; glyphCard.horizontalOverflow = HorizontalWrapMode.Overflow; glyphCard.verticalOverflow = VerticalWrapMode.Overflow;
@@ -359,8 +359,7 @@ namespace Ascendant.CelestialDial
         {
             // Build B: the table. Four element rows by three kind columns, twelve sign tiles below. Tap a sign, tap a cell, Seal.
             gridScreen = ScreenPanel("Grid");
-            Label(gridScreen, "THE ZODIAC WING", 0, 32, 340, 24, 18);
-            Label(gridScreen, "The Table", 0, 62, 200, 22, 14); // placeholder unit name (owner writes)
+            Label(gridScreen, "THE ELEMENTAL TABLE", 0, 32, 340, 24, 18); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
             gridKeys = Label(gridScreen, "Keeper Keys: 2", 100, 62, 140, 20, 12); gridKeys.alignment = TextAnchor.MiddleRight; // ten px in from the edge: at 360 wide the Dial's indicator touches it
             for (int c = 0; c < GridModel.Columns; c++) Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, 96, 86, 18, 11).color = Muted;
             for (int r = 0; r < GridModel.Rows; r++) Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12).color = Muted;

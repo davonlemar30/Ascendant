@@ -2,6 +2,12 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The interactives carry their own names
+
+The owner's Sept 26 playtest (note 13): the header on the Dial, the Bookshelf's book and the Table said THE ZODIAC WING, the room's name, and for the longest time read as the game's title. Now each instrument's screen is headed with its own name — THE CELESTIAL DIAL, THE BOOK OF SYMBOLS, THE ELEMENTAL TABLE, the owner's pick from a set of options (Sept 27) — and only the room's screen says THE ZODIAC WING. Three labels; the room's buttons keep their short names (The Dial, The Bookshelf, The Table). The Table's placeholder subtitle ("The Table") is gone, the owner's call, since it only repeated the header.
+
+Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/instrument-names-2026-09-27/`](Evidence/instrument-names-2026-09-27/).
+
 ## Leaving the Dial keeps the player in the Zodiac Wing
 
 The owner's Sept 26 playtest (note 10): exiting the wheel sent the player all the way back to the Grand Atrium, when the player should leave the Dial and still be standing in the Zodiac Wing. One press of the Dial's exit did both steps: `SliceView.LeaveWing` left the Dial, then walked the Keeper out through the room.
