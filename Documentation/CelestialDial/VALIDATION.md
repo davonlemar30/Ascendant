@@ -12,6 +12,18 @@ Checks: the suite asserts that leaving the Dial lands in the room with the way b
 
 Validation: mechanical 478/478, WebGL clean (25.8 MB), browser suite 307/307 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, slice fixture 201/201. Capture: [`Evidence/leave-the-dial-2026-09-27/`](Evidence/leave-the-dial-2026-09-27/).
 
+## The blue box, gone: no native focus ring on the semantic layer
+
+The owner's Sept 26 playtest (note 2, with two screenshots): a blue rectangle sat above and overlapping the Continue button on the Grand Atrium opening screen, offset from the drawn button. It was iOS Safari's own focus ring, painted around the invisible `#semantic` accessibility button the page auto-focuses after every state change; nothing told Safari not to paint a native ring around a scripted focus. It was never a tap zone — those buttons are `pointer-events:none` and taps go to the canvas.
+
+One CSS rule, `#semantic button:focus{outline:0}`, suppresses it. The deliberate bone-white ring shown to keyboard players (`.kb` plus `:focus-visible`) is untouched — it has higher specificity and still applies.
+
+Probe (Chrome via Playwright, served build): plain scripted focus computes `outline: none 0px`; keyboard mode computes `solid 3px rgb(240, 232, 220)`.
+
+Noted for later, not fixed here: the semantic layer's boxes also sit slightly offset from where Unity draws the buttons on a phone (visible in the owner's screenshot). Invisible now, but if the keyboard ring ever looks misplaced, the `box()` mapping in the template is where to look.
+
+Validation: mechanical 478/478, WebGL build clean (25.8 MB), slice fixture 200/200, browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, against the served build of this branch.
+
 ## The door plates, unsquished
 
 The owner's Sept 26 playtest (notes 6 and 12): the names on the Atrium's door plates and on the Wing's plate back to the Atrium were squeezed into their signs. The cause was geometry, not the names: `PlateText` set its box to 80% by 70% of the plate, larger than the plate file's engraved field, with the lines at 0.85 spacing, so bold caps ran into the border; and the Wing-room plate, 64 px wide, carried "THE GRAND ATRIUM" on one line at 6 px.
@@ -19,6 +31,7 @@ The owner's Sept 26 playtest (notes 6 and 12): the names on the Atrium's door pl
 Now the text box is the engraved field (74% by 52%), the lines a full line apart, best fit up to 12. The Atrium's plates are 18% larger (sealed 88, the Zodiac Wing 100, the Crystal Book Chamber 102 — after the 30% of Sept 25), the Wing-room plate 35% larger with "THE GRAND / ATRIUM" on two balanced lines. The names, caps and weight are unchanged. An offline mock of four settings (today's, this one, regular weight, blackletter in title case) sits in the evidence folder for the owner's eye.
 
 Validation: mechanical 478/478, slice fixture 200/200, WebGL clean (25.8 MB), browser suite 305/305 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/door-plates-2026-09-27/`](Evidence/door-plates-2026-09-27/).
+
 ## The long restoration: the shared rooms restore across the whole game
 
 The owner's Sept 26 playtest (note 15) found the Grand Atrium and the Crystal Book Chamber fully restored the moment the Zodiac Wing was — too soon for a Library with six more Books to earn. His ruling (Sept 27, Decisions Log): a wing restores on its own challenges; the shared rooms restore across the Library's whole arc — 7 Books, 21 Keys (`SliceFlow.LocksTotal`) — in small, subtle steps, with the Atrium at its stage-3 look when the Zodiac Wing finishes, and no protection for saves that had seen more.
