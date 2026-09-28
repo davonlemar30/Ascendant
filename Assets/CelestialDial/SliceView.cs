@@ -360,7 +360,6 @@ namespace Ascendant.CelestialDial
             // Build B: the table. Four element rows by three kind columns, twelve sign tiles below. Tap a sign, tap a cell, Seal.
             gridScreen = ScreenPanel("Grid");
             Label(gridScreen, "THE ELEMENTAL TABLE", 0, 32, 340, 24, 18); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
-            Label(gridScreen, "The Table", 0, 62, 200, 22, 14); // placeholder unit name (owner writes)
             gridKeys = Label(gridScreen, "Keeper Keys: 2", 100, 62, 140, 20, 12); gridKeys.alignment = TextAnchor.MiddleRight; // ten px in from the edge: at 360 wide the Dial's indicator touches it
             for (int c = 0; c < GridModel.Columns; c++) Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, 96, 86, 18, 11).color = Muted;
             for (int r = 0; r < GridModel.Rows; r++) Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12).color = Muted;
