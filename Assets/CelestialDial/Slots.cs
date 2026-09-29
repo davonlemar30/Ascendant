@@ -156,7 +156,7 @@ namespace Ascendant.CelestialDial
             new ArtSlot("kit-plate-restored", 64, 28, 1024, "the Wing kit (Build M): the plate, restored; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
             new ArtSlot("chamber-light", 360, 800, 2048, "the Crystal Book Chamber's golden-hour light, over the background, faded by stage"),
             // Build P (note 3; the owner's B2 ruling, Sept 28): the chat box on the story screens, and Caspar unframed behind it, one pose per page.
-            new ArtSlot("chat-box", 324, 240, 1024, "the chat box on the story screens (Build P): the dark see-through fill and the gold frame in one image; the line and Continue sit inside it"),
+            new ArtSlot("chat-box", 324, 240, 1024, "the chat box (Build P): the dark see-through fill and the gold frame in one image, sliced to each panel; on the story screens (Build P), the Atrium hub and the Chamber (Build R); the instrument screens draw a slim box in code instead"),
             new ArtSlot("chat-plate", 170, 22, 512, "the speaker's plate on the chat box's top-left edge (Build P); blank, the game writes the name"),
             new ArtSlot("caspar-calm", 264, 468, 1024, "Caspar from the waist up behind the chat box (Build P), calm: the default, short instructions; all six poses share one registration"),
             new ArtSlot("caspar-explain", 264, 468, 1024, "Caspar behind the chat box (Build P), explaining: teaching, the lessons, the history (the opening's fourth page, the return's second)"),
