@@ -117,8 +117,8 @@ namespace Ascendant.CelestialDial
         const string HubKey4Line = "Four Keys, acolyte. Every pattern the wheel held, you hold now.\nRest, for the Chamber will want to see what you carry."; // owner (worksheet section 12)
         // Build D placeholder lines (owner writes; worksheet section 13).
         // Build T (owner, APK playtest, Sept 29): the opening's walk. Caspar sends the player to the Zodiac Wing; in the Wing he points to the Dial.
-        public const string HubFirstLine = "Our work begins in the Zodiac Wing. That door there. Go on, it will open for you."; // owner (Sept 29)
-        public const string WingFirstLine = "The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready."; // owner (Sept 29)
+        public const string HubOpeningLine = "Our work begins in the Zodiac Wing. That door there. Go on, it will open for you."; // owner (Sept 29)
+        public const string WingOpeningLine = "The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready."; // owner (Sept 29)
         const string HubKeyInHandLine = "You carry a Key the Chamber has not yet seen, acolyte. Its door stands open when you are ready."; // owner (worksheet section 13)
         const string HubKeysInHandLine = "You carry {0} Keys the Chamber has not yet seen. Its door stands open when you are ready."; // owner (worksheet section 13)
         const string HubSpent2Line = "Two locks filled, acolyte. The first Book is one Key from opening, and I confess the air in this room has changed.\nThe shelves are taking their books back."; // owner (worksheet section 13)
@@ -931,7 +931,7 @@ namespace Ascendant.CelestialDial
                 wingRoomCaption.text = Flow.Note == "gated" ? SliceFlow.GateLine // Build F: the instrument closed on the third strike; the journal is below
                     : Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Flow.Note == "grid-dark" ? GridModel.DarkLine
-                    : Flow.AtriumStage == 1 ? WingFirstLine // Build T: the first lesson waits at the Dial
+                    : Flow.AtriumStage == 1 ? WingOpeningLine // Build T: the first lesson waits at the Dial
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "Ah. The Dial has turned sly. It wears only its symbols now, twelve marks with no names beneath them. Shall we find out which of them you truly know?" // owner (APK playtest rewrite, Sept 29; was worksheet, Sept 14 flags)
                     : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The second pattern awaits you at the Dial. Go to it." // owner (worksheet section 10)
                     : Flow.ModalitiesComplete && !Grid.Key3Earned ? (Grid.PlacedCount > 0 ? "The table waits, some signs already placed. Go to it." : "A table has woken beside the wheel. Go to it.") // owner (worksheet section 11)
@@ -1007,7 +1007,7 @@ namespace Ascendant.CelestialDial
             sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? (HasArt(sealedLeftLight.transform.parent as RectTransform) ? .06f : .3f) : 0);
             // The caption is said once: on the first return, while the Atrium is at Stage 2. After that the room shows its own state (owner, Sept 26 playtest, note 9).
             hubCaption.text = stage == 2 ? "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open." : ""; // owner (worksheet section 1, kept as written, marked X)
-            hubText.text = stage == 1 ? HubFirstLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
+            hubText.text = stage == 1 ? HubOpeningLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
             enterChamber.interactable = !busy && Flow.CanEnterChamber;
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";

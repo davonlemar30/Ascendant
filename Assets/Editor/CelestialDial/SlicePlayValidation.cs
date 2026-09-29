@@ -62,9 +62,9 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Atrium && !View.Busy,"white light leads to the atrium");Capture("slice-390-atrium.png");});
             Steps.Enqueue(()=>{for(int i=0;i<SliceView.AtriumPages.Length;i++)Act("next-screen");});
             // Build T (owner, APK playtest, Sept 29): the opening hands over the Atrium; Caspar sends the player to the Zodiac Wing, and the Dial is tapped there.
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==1 && !View.Busy && View.Dial.Snapshot().caspar.StartsWith(SliceView.HubFirstLine) && !View.Flow.CanEnterChamber,"Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing, the Chamber shut");Capture("slice-390-opening-hub.png");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==1 && !View.Busy && View.Dial.Snapshot().caspar.StartsWith(SliceView.HubOpeningLine) && !View.Flow.CanEnterChamber,"Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing, the Chamber shut");Capture("slice-390-opening-hub.png");});
             Steps.Enqueue(()=>Act("enter-wing"));
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Snapshot().caspar==SliceView.WingFirstLine,"Build T: in the Zodiac Wing Caspar points to the Dial");Capture("slice-390-opening-wing.png");Act("walk:dial");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Snapshot().caspar==SliceView.WingOpeningLine,"Build T: in the Zodiac Wing Caspar points to the Dial");Capture("slice-390-opening-wing.png");Act("walk:dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.UiCanvas.gameObject.activeSelf && View.Dial.Lesson.DialDormant && View.Dial.Lesson.Sun==1,"atrium continues into the wing; the Dial is dormant and knows the sun sign");Capture("slice-390-wing.png");});
             for(int i=0;i<7;i++) Steps.Enqueue(()=>Act("continue"));
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Guided && !View.Dial.Lesson.DialDormant,"seven intro beats reach the guided problem");Capture("slice-390-wing-guided.png");});
