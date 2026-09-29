@@ -2,6 +2,14 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Caspar behind the chat box (Build P)
+
+The owner's Sept 26 playtest (note 3) asked for the speaker's art above the text box at the start of the game. After the side-by-side tests the owner ruled for B2 (Sept 28): Caspar unframed, from the waist up, standing behind a gold-framed see-through chat box, one still pose per page. On the Grand Atrium opening (four pages) and the return with the first Keeper Key (two pages) the box replaces the old panel: `chat-box` at 324 × 240 (centre 600), the `chat-plate` on its top-left edge with CASPAR written by the game, the line left-aligned and best-fit (14 to 10 pt), Continue (150 × 42) inside the box at 671. Caspar's pose (264 × 468 at (5, 408), behind the box) turns with the page: `SliceView.AtriumPoses` wry, warm, solemn, explain; `SliceView.ReturnPoses` moved, explain. No `chat-box` file keeps the old panel; no pose file shows no figure. The web state carries `casparPose`. Eight new slots (132).
+
+New checks: mechanical, six pose slots at 264 × 468 plus the box and plate, and a pose for every page of the opening and the return; suite, the opening's first page shows `wry`, the next `warm`, the return's first `moved`, at each viewport. The slot count is swept to 132 in the mechanical checks, the fixture, and the suite; `Tools/make-test-set.py` appends the eight test images at the end of its list (its run also rewrote five older hand-edited test files, which were restored).
+
+Validation: mechanical 480/480, slice fixture 201/201, WebGL clean (26.7 MB, +0.9 MB for the poses and box), browser suite 311/311 at desktop density and 311/311 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/chat-box-2026-09-28/`](Evidence/chat-box-2026-09-28/) (the opening at phone density, the return from the fixture).
+
 ## The interactives carry their own names
 
 The owner's Sept 26 playtest (note 13): the header on the Dial, the Bookshelf's book and the Table said THE ZODIAC WING, the room's name, and for the longest time read as the game's title. Now each instrument's screen is headed with its own name — THE CELESTIAL DIAL, THE BOOK OF SYMBOLS, THE ELEMENTAL TABLE, the owner's pick from a set of options (Sept 27) — and only the room's screen says THE ZODIAC WING. Three labels; the room's buttons keep their short names (The Dial, The Bookshelf, The Table). The Table's placeholder subtitle ("The Table") is gone, the owner's call, since it only repeated the header.

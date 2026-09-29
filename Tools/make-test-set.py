@@ -27,6 +27,8 @@ IMAGES = [
     ("journal-contents", 180, 400), ("journal-ribbon", 16, 120), ("journal-plate", 112, 36),  # Build J: the journal as a book
     ("sign-aries", 200, 200), ("sign-taurus", 200, 200), ("sign-gemini", 200, 200), ("sign-cancer", 200, 200), ("sign-leo", 200, 200), ("sign-virgo", 200, 200),
     ("sign-libra", 200, 200), ("sign-scorpio", 200, 200), ("sign-sagittarius", 200, 200), ("sign-capricorn", 200, 200), ("sign-aquarius", 200, 200), ("sign-pisces", 200, 200),
+    ("chat-box", 164, 120), ("chat-plate", 172, 24),  # Build P: the chat box on the story screens
+    ("caspar-calm", 132, 236), ("caspar-explain", 132, 236), ("caspar-warm", 132, 236), ("caspar-wry", 132, 236), ("caspar-moved", 132, 236), ("caspar-solemn", 132, 236),
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row

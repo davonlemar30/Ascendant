@@ -76,6 +76,7 @@ namespace Ascendant.CelestialDial
             public string glyphMode = "", glyphChar = "", glyphTarget = "";
             public string[] glyphOptions;
             public string screen = "wing", playerName = "", caspar = "", note = "";
+            public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
             public int atriumStage, dueCount;
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
