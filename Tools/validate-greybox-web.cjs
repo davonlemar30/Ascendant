@@ -203,7 +203,16 @@ const path=require('path');
       if(s.practiceMode==='dial'){
         await semantic('seat-'+((seat+(s.step||4))%12));
         if(n===0){ // the owner's thumb path: the Seal on the canvas must not be covered by the Wing's Back button
-          if(!reloadedMidPractice){reloadedMidPractice=true;const before=(await state()).dueCount;await page.screenshot({path:path.join(out,viewport.width+'-practice-dial.png')});await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+          if(!reloadedMidPractice){ // Build S (owner, APK playtest, Sept 29): the long intro turns in pages, its element words in colour
+            await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPages>0,{},{timeout:5000});
+            const p1=await state();check(p1.casparPages>=2&&p1.casparPage===1&&p1.message.startsWith('Before you turn the wheel')&&p1.casparShown.length<p1.message.length,'Build S: the Dial\'s long line shows page 1 of '+p1.casparPages+' ('+JSON.stringify(p1.casparShown)+'), the whole line still in the state at '+viewport.width);
+            await tap(114,462+p1.dialBoxHeight-17);await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPage===2,{},{timeout:5000}).catch(()=>{});
+            await page.waitForTimeout(150);await page.screenshot({path:path.join(out,viewport.width+'-dial-page2.png')});
+            const p2=await state();check(p2.casparPage===2&&p2.message===p1.message&&p2.casparShown!==p1.casparShown&&p2.active,'Build S: a tap on the box\'s Continue turns to the next page and the wheel stays live at '+viewport.width);
+            const shown=[p1.casparShown,p2.casparShown];for(let k=3;k<=p2.casparPages;k++){await semantic('caspar-page');await page.waitForFunction(k=>window.ascendantDial.snapshot().casparPage===k,k,{timeout:5000});shown.push((await state()).casparShown);}
+            check(shown.some(t=>t.includes('<color=#E0643C>Fire</color>'))&&shown.some(t=>t.includes('<color=#63A6E0>Water</color>')),'Build S: the pages name Fire and Water in their colours at '+viewport.width);
+            await page.screenshot({path:path.join(out,viewport.width+'-dial-pages.png')});
+            reloadedMidPractice=true;const before=(await state()).dueCount;await page.screenshot({path:path.join(out,viewport.width+'-practice-dial.png')});await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
             check((await state()).dueCount===before && (await state()).sitting===1,'a reload during practice keeps the deck, its ready count, and the sitting at '+viewport.width);
             await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
             await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});

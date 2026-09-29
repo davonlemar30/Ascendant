@@ -2,6 +2,18 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Caspar's lines in pages (Build S)
+
+From the owner's APK playtest (Sept 29, page 2kyd583p-25274), rulings on the Decisions Log week page 2kyd583p-25254.
+
+- **Pages.** `FitBox` (the slim box on the Dial, the Book of Symbols, the Elemental Table) keeps the whole line the code writes as `Source` and cuts it at its sentences (". ? !" and Caspar's "..." before a space) into pages of at most `FitBox.PageLines` (3) lines at the box's width. A page with more to come keeps a 22 row (`Slots.InstrumentMore`) for a small gold Continue at the box's bottom right, which turns the page; the wheel stays live meanwhile. The same line written again keeps its page; a new line starts at page 1. Web state: `message` stays the whole line; `casparPage`, `casparPages` and `casparShown` report the page drawn; web action `caspar-page`; semantic button `#caspar-page`.
+- **Element colours.** `FitBox.Colour` tags whole-word Fire #E0643C, Earth #8DB36A, Air #E8D38F and Water #63A6E0 on the page drawn (Claude's working colours).
+- **Copy.** The Wing's Part B line is the owner's rewrite; the Dial's step hint reads "Find the sign, seal it."
+
+New checks: mechanical, the paged box height and the colour tagging (whole words only); suite, the practice intro shows page 1 of 3 with the whole line in the state, a canvas tap on the box's Continue turns the page with the wheel live, and the pages name Fire and Water in their colours, at each viewport.
+
+Validation: mechanical 484/484, slice fixture 201/201, WebGL clean (26.4 MB), browser suite 323/323 at desktop density and 323/323 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. The first phone run failed once on the unrelated "mid-placement reload resumes at Virgo" check (a reload 300 ms after a seal); the rerun passed. Captures: [`Evidence/caspar-pages-2026-09-29/`](Evidence/caspar-pages-2026-09-29/).
+
 ## The chat box everywhere Caspar speaks (Build R)
 
 The owner ruled (Sept 28) that where the player taps the room or the Dial only a box shows, no figure, and handed Claude the remaining poses. On the Dial's first mock the owner rejected the ornate chat box there ("looks ugly") and picked a slim one, fitted to each line, for the three instrument screens (Sept 29).

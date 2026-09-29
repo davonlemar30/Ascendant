@@ -919,7 +919,7 @@ namespace Ascendant.CelestialDial
                 wingRoomCaption.text = Flow.Note == "gated" ? SliceFlow.GateLine // Build F: the instrument closed on the third strike; the journal is below
                     : Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Flow.Note == "grid-dark" ? GridModel.DarkLine
-                    : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "The wheel has hidden its names. Twelve symbols await you at the Dial." // owner (worksheet, Sept 14 flags)
+                    : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "Ah. The Dial has turned sly. It wears only its symbols now, twelve marks with no names beneath them. Shall we find out which of them you truly know?" // owner (APK playtest rewrite, Sept 29; was worksheet, Sept 14 flags)
                     : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The second pattern awaits you at the Dial. Go to it." // owner (worksheet section 10)
                     : Flow.ModalitiesComplete && !Grid.Key3Earned ? (Grid.PlacedCount > 0 ? "The table waits, some signs already placed. Go to it." : "A table has woken beside the wheel. Go to it.") // owner (worksheet section 11)
                     : Flow.Keys >= 3 && !Dial.Lesson.Key4Earned ? (Dial.Lesson.OppositesStarted ? "The final pattern awaits. Go to the Dial." : "The wheel holds one last pattern. Go to the Dial.") // owner (worksheet section 12)

@@ -47,7 +47,7 @@ namespace Ascendant.CelestialDial
         Canvas canvas;
         DialGeometry geometry;
         Font font;
-        bool busy, dragging, webPublished;
+        bool busy, dragging, webPublished; string lastBoxKey="";
         float turns, target, snapFrom, snapAt, dragTurns, velocity, lastDragTime;
         float targetTurns { get => target; set { snapFrom=turns; snapAt=Time.unscaledTime; target=value; } }
         int dragDetent;
@@ -78,6 +78,8 @@ namespace Ascendant.CelestialDial
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
+            public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
+            public string casparShown = ""; // Build S: that page's words, colour tags and all
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
             public int atriumStage, dueCount;
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
@@ -156,7 +158,7 @@ namespace Ascendant.CelestialDial
             start = Label(root,"",0,223,220,30,13); start.resizeTextForBestFit=true; start.resizeTextMinSize=10; start.resizeTextMaxSize=13; // Build I: the wheel's challenge line
             destination = Label(root,"",0,271,188,50,20); // Names the sign under the bracket, live while dragging (owner request, Sept 12; reverses the Sept 11 "no label" row).
             count = Label(root,"",0,319,178,36,15);
-            Label(root,"Move  >  Inspect  >  Seal",0,441,340,24,14);
+            Label(root,"Find the sign, seal it.",0,441,340,24,14); // the step hint, now in the Library's voice (owner pick, APK playtest, Sept 29; was "Move > Inspect > Seal")
             panel = Rect("Caspar instruction panel",root,0,526,340,128);
             var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.13f,.13f,.15f);
             var casparLabel = Label(panel,"CASPAR",0,18,290,22,13);
@@ -194,6 +196,7 @@ namespace Ascendant.CelestialDial
         {
             ScaleCanvas();
             if(!webPublished)Publish();
+            var shownBox=FitBox.Visible; string boxKey=shownBox!=null?shownBox.Page+"/"+shownBox.Pages+"/"+shownBox.Source.Length:""; if(boxKey!=lastBoxKey){lastBoxKey=boxKey;Publish();} // Build S: a page turned or a line paged
 #if !UNITY_WEBGL || UNITY_EDITOR
             var k=Keyboard.current;
             if(k!=null)
@@ -453,7 +456,7 @@ namespace Ascendant.CelestialDial
         {
             var labels=new string[12];for(int i=0;i<12;i++) labels[i]=Lesson.SeatLabel(i);
             var glyphs=new string[12];for(int i=0;i<12;i++) glyphs[i]=Zodiac.Seats[i].Glyph;
-            var state=new WebState {message=message.text,destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=Lesson.Phase==LessonPhase.GlyphWheel ? "" : Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : start.text,challenge=Lesson.Challenge,phase=phase.text,count=count.text,seats=labels,
+            var box=FitBox.Visible; var state=new WebState {message=FitBox.Whole(message),casparPage=box!=null?box.Page+1:0,casparPages=box!=null?box.Pages:0,casparShown=box!=null?box.Shown:"",destination=(dragging ? "Passing: " : "Selected: ")+(Lesson.Phase==LessonPhase.GlyphWheel ? "symbol "+Zodiac.Seats[Lesson.Dial.Selected].Glyph : Zodiac.Seats[Lesson.Dial.Selected].Name),start=Lesson.Phase==LessonPhase.GlyphWheel ? "" : Lesson.IsProblem ? "Start: "+Zodiac.Seats[Lesson.Dial.Start].Name : start.text,challenge=Lesson.Challenge,phase=phase.text,count=count.text,seats=labels,
                 active=Lesson.Dial.Active && !busy,canContinue=next.gameObject.activeSelf,canOptional=optional.gameObject.activeSelf,
                 reducedMotion=Lesson.Dial.ReducedMotion,keyEarned=Lesson.KeyEarned,dormant=Lesson.DialDormant,introAuto=Lesson.IntroAuto,busy=busy,review=Lesson.Phase==LessonPhase.Review,wheelComplete=Lesson.WheelComplete,familiesComplete=Lesson.FamiliesComplete,
                 glyphs=glyphs,namesHidden=Lesson.NamesHidden,glyphWheel=Lesson.Phase==LessonPhase.GlyphWheel,canAsk=Lesson.CanAsk && !busy,hintLevel=Lesson.Dial.HintLevel,cleanRuns=Lesson.CleanRuns,practice=Lesson.Practice,hard=Lesson.Hard,unit=Lesson.InBuilder ? "builder" : Lesson.InOpposites ? "opposites" : Lesson.InModalities ? "modalities" : Lesson.GlyphsShown && !(Lesson.WheelComplete && Lesson.Key2Earned && Lesson.Phase==LessonPhase.Key2) ? "symbols" : "elements",modalitiesComplete=Lesson.ModalitiesComplete,litModCount=Lesson.LitMod.Count(v=>v),step=Lesson.Dial.Forward,key2=Lesson.Key2Earned,keys=Lesson.Keys,glyphTarget=Lesson.Phase==LessonPhase.GlyphWheel && Lesson.Dial.Target>=0 ? Zodiac.Seats[Lesson.Dial.Target].Name : "",
@@ -491,6 +494,7 @@ namespace Ascendant.CelestialDial
             else if(command=="motion")ToggleMotion();
             else if(command=="motion-on") { Lesson.Dial.ReducedMotion=true; Refresh(); }
             else if(command=="ask-caspar") AskCaspar();
+            else if(command=="caspar-page") { var box=FitBox.Visible; if(box!=null && box.More!=null && box.More.gameObject.activeInHierarchy) box.Turn(); Publish(); } // Build S: the box's Continue
             else if(command.StartsWith("builder-name:") && int.TryParse(command.Substring(13),out int nameSlot)) BuilderName(nameSlot);
             else if(command.StartsWith("builder-share:") && int.TryParse(command.Substring(14),out int shareProperty)) BuilderShare(shareProperty);
             else if(command.StartsWith("seat:") && int.TryParse(command.Substring(5),out int seat) && seat>=0 && seat<12)SelectSeat(seat,DialInput.Accessible);
