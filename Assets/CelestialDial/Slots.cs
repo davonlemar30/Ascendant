@@ -262,5 +262,22 @@ namespace Ascendant.CelestialDial
             if (image == null) return;
             image.color = image.sprite != null ? new Color(brightness, brightness, brightness, placeholder.a) : placeholder;
         }
+        // Build R (the owner's B2 ruling, and "only the chat box" where the player acts, Sept 28): a Caspar panel dressed as the chat box.
+        // The frame and its see-through fill are sliced to the panel's own size (the file is drawn at 2x), the old CASPAR label goes,
+        // and the speaker's plate sits on the box's top-left edge with the name written on it. No chat-box file, no change.
+        public static bool DressChatBox(Image panel, Text oldLabel, Font font)
+        {
+            if (Image("chat-box") == null) return false;
+            Dress(panel, "chat-box"); panel.type = UnityEngine.UI.Image.Type.Sliced; panel.pixelsPerUnitMultiplier = 2;
+            if (oldLabel != null) oldLabel.gameObject.SetActive(false);
+            var plate = new GameObject("Caspar plate", typeof(RectTransform)).GetComponent<RectTransform>(); plate.SetParent(panel.transform, false);
+            plate.anchorMin = plate.anchorMax = new Vector2(0, 1); plate.pivot = new Vector2(0, .5f); plate.anchoredPosition = new Vector2(12, 0); plate.sizeDelta = new Vector2(170, 22);
+            var plateImage = plate.gameObject.AddComponent<Image>(); plateImage.raycastTarget = false; plateImage.color = new Color(.18f, .12f, .07f); Dress(plateImage, "chat-plate");
+            var nameRect = new GameObject("CASPAR", typeof(RectTransform)).GetComponent<RectTransform>(); nameRect.SetParent(plate, false);
+            nameRect.anchorMin = Vector2.zero; nameRect.anchorMax = Vector2.one; nameRect.offsetMin = new Vector2(10, 2); nameRect.offsetMax = new Vector2(-10, -2);
+            var name = nameRect.gameObject.AddComponent<Text>(); name.font = font; name.text = "CASPAR"; name.fontSize = 12; name.fontStyle = FontStyle.Bold;
+            name.alignment = TextAnchor.MiddleCenter; name.color = new Color(.91f, .76f, .48f); name.raycastTarget = false;
+            return true;
+        }
     }
 }

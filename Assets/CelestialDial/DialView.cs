@@ -157,9 +157,10 @@ namespace Ascendant.CelestialDial
             count = Label(root,"",0,319,178,36,15);
             Label(root,"Move  >  Inspect  >  Seal",0,441,340,24,14);
             panel = Rect("Caspar instruction panel",root,0,526,340,128);
-            panel.gameObject.AddComponent<Image>().color = new Color(.13f,.13f,.15f);
-            Label(panel,"CASPAR",0,18,290,22,13);
+            var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.13f,.13f,.15f);
+            var casparLabel = Label(panel,"CASPAR",0,18,290,22,13);
             message = Label(panel,"",0,74,326,100,13); message.resizeTextForBestFit=true; message.resizeTextMinSize=9; message.resizeTextMaxSize=13; // Build I: the text shrinks to fit instead of being cut off (owner playtest, Sept 23)
+            if(Slots.DressChatBox(panelImage,casparLabel,font)) { message.alignment=TextAnchor.MiddleLeft; message.rectTransform.sizeDelta=new Vector2(304,100); } // Build R: the chat box alone; the wheel stays in view (owner, Sept 28)
             phase = Label(root,"",0,608,330,28,13);
             back = MakeButton(root,"Previous",-122,654,64,56,()=>Step(-1,ClickMethod(DialInput.BackStep)));
             seal = MakeButton(root,"SEAL",0,654,146,56,Commit); // Amended canon (Sept 11): "Keeper's Seal" renamed to "Seal".

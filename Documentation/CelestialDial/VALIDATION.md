@@ -2,6 +2,16 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The chat box everywhere Caspar speaks (Build R)
+
+The owner ruled (Sept 28) that where the player taps the room or the Dial only the chat box shows, and handed Claude the remaining poses. `Slots.DressChatBox` dresses a Caspar panel as the box: `chat-box` sliced to the panel (import borders 56, 64, 56, 56 at the file's 2x; `pixelsPerUnitMultiplier` 2), the old CASPAR label hidden, the `chat-plate` on the top-left edge with the name written on it. It now dresses the Atrium opening and return (replacing Build P's own plate code, the same place and size), the Atrium hub, the Chamber, the Book of Symbols, the Elemental Table, and the Dial, each at its old rect, so no button moves; the line is left-aligned and 22 px narrower, clear of the frame. On the Table the readout ("In hand: ...") moves up 7 px, clear of the plate. `SlotImport` goes to version 4 (every slot file re-imports once).
+
+Caspar's figure stays on story beats only: the Chamber's introduction joins the opening and the return (`SliceView.ChamberPoses` explain, solemn, calm), the figure's waist at the Chamber panel's top (435). On the first Key he steps away while the Chamber wakes and returns for his two lines (`ChamberBreathesPose` moved, `ChamberContinuePose` warm); after the ending, and in the Chamber as a room, the box stands alone. `casparPose` reports the Chamber's pose.
+
+New checks: mechanical, the Chamber's poses (one per page; moved and warm for the two lines after the first Key); suite, the Chamber opens on `explain`, Caspar steps in as `moved` for "She breathes", and after the ending no figure shows, at each viewport.
+
+Validation: mechanical 481/481, slice fixture 201/201, WebGL clean (26.4 MB), browser suite 315/315 at desktop density and 315/315 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/chat-box-everywhere-2026-09-28/`](Evidence/chat-box-everywhere-2026-09-28/) (the Chamber's introduction with Caspar, and the box alone on the hub, the Dial, and the Table).
+
 ## The domed Grand Atrium (Build Q)
 
 The owner approved the new Grand Atrium (Sept 28, the B2 world) and its layout check, and asked for the art pass now. The Atrium kit moves onto it: `atrium` is the new restored shell (glass dome on the night sky, dark wood Gothic shelves and balcony, the statue's lit niche, the empty doorways) and `atrium-grime` is the same room asleep (cold moonlight, grimy cracked dome, dust, cobwebs), opaque, so the kit's grime fade is a clean cross-fade; the two shells line up at offset (0, 0) by edge correlation. The new scene was an edit of the old restored scene and sat 22 px low (at 1×); both files are moved 22 px up so the doors fill the game's door rects. New art for `banner`, `pennant` (new slot, both states), `lamp`, and `chandelier` (now the armillary ring), cut from full-canvas isolations of the restored and dormant scenes, so their placements were measured, not guessed; the worn lanterns, banners, and ring are scaled (`wornScale`) to hang as far as the restored ones. The chart and shelf placements are retired (files kept). 20 pieces (was 26); the lanterns take Key 3 from the shelf; the armillary ring is last (Key 21). Two slots (134).
