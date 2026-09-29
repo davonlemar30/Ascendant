@@ -14,6 +14,8 @@ New checks: mechanical, the paged box height and the colour tagging (whole words
 
 Validation: mechanical 484/484, slice fixture 201/201, WebGL clean (26.4 MB), browser suite 323/323 at desktop density and 323/323 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. The first phone run failed once on the unrelated "mid-placement reload resumes at Virgo" check (a reload 300 ms after a seal); the rerun passed. Captures: [`Evidence/caspar-pages-2026-09-29/`](Evidence/caspar-pages-2026-09-29/).
 
+Production suite after the deploy of `9f03eee` (PR #79; GitHub Actions Web run 36641373027, build and Pages deploy both passed): 323/323 at desktop density and 323/323 at phone density (`DEVICE_SCALE=2 MOBILE=1`), run against `https://davonlemar30.github.io/Ascendant/?v=9f03eee`.
+
 ## The chat box everywhere Caspar speaks (Build R)
 
 The owner ruled (Sept 28) that where the player taps the room or the Dial only a box shows, no figure, and handed Claude the remaining poses. On the Dial's first mock the owner rejected the ornate chat box there ("looks ugly") and picked a slim one, fitted to each line, for the three instrument screens (Sept 29).
