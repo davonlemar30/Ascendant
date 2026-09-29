@@ -281,8 +281,9 @@ namespace Ascendant.CelestialDial
         }
         // Build R (owner, Sept 29): the instrument screens (the Dial, the Book of Symbols, the Elemental Table) take a slim box, not the chat box:
         // a flat dark panel with a hairline gold border and CASPAR small at its top left, pinned at its top and fitted to the line (FitBox).
-        public const float InstrumentHead = 32, InstrumentFoot = 12, InstrumentMin = 60;
-        public static float InstrumentBoxHeight(float lineHeight, float max) => Mathf.Clamp(InstrumentHead + lineHeight + InstrumentFoot, Mathf.Min(InstrumentMin, max), max);
+        public const float InstrumentHead = 32, InstrumentFoot = 12, InstrumentMin = 60, InstrumentMore = 22;
+        // Build S: a page with more to come keeps a row at the bottom for its Continue.
+        public static float InstrumentBoxHeight(float lineHeight, float max, bool more = false) => Mathf.Clamp(InstrumentHead + lineHeight + InstrumentFoot + (more ? InstrumentMore : 0), Mathf.Min(InstrumentMin, max), max);
         static Sprite instrumentBox;
         static Sprite InstrumentBoxSprite()
         {
@@ -316,7 +317,17 @@ namespace Ascendant.CelestialDial
             var ruleImage = rule.gameObject.AddComponent<Image>(); ruleImage.color = new Color(.84f, .69f, .38f, .55f); ruleImage.raycastTarget = false;
             var lr = line.rectTransform; lr.anchorMin = lr.anchorMax = lr.pivot = new Vector2(0, 1); lr.anchoredPosition = new Vector2(14, -InstrumentHead);
             lr.sizeDelta = new Vector2(rect.sizeDelta.x - 28, max - InstrumentHead - InstrumentFoot); line.alignment = TextAnchor.UpperLeft;
-            var fit = panel.gameObject.AddComponent<FitBox>(); fit.Line = line; fit.Max = max;
+            var fit = panel.gameObject.AddComponent<FitBox>(); fit.Line = line; fit.Max = max + InstrumentMore; // Build S: room for the page's Continue
+            // Build S (owner, APK playtest, Sept 29): a long line turns in pages; Continue sits at the box's bottom right while more is to come.
+            var moreRect = new GameObject("Caspar Continue", typeof(RectTransform)).GetComponent<RectTransform>(); moreRect.SetParent(rect, false);
+            moreRect.anchorMin = moreRect.anchorMax = moreRect.pivot = new Vector2(1, 0); moreRect.anchoredPosition = new Vector2(-8, 4); moreRect.sizeDelta = new Vector2(96, 26);
+            var hit = moreRect.gameObject.AddComponent<Image>(); hit.color = new Color(0, 0, 0, .001f); hit.canvasRenderer.cullTransparentMesh = false; // a see-through button still takes taps
+            var more = moreRect.gameObject.AddComponent<Button>(); more.targetGraphic = hit; more.onClick.AddListener(fit.Turn);
+            var moreTextRect = new GameObject("Label", typeof(RectTransform)).GetComponent<RectTransform>(); moreTextRect.SetParent(moreRect, false);
+            moreTextRect.anchorMin = Vector2.zero; moreTextRect.anchorMax = Vector2.one; moreTextRect.offsetMin = new Vector2(0, 0); moreTextRect.offsetMax = new Vector2(-6, 0);
+            var moreText = moreTextRect.gameObject.AddComponent<Text>(); moreText.font = font; moreText.text = "Continue"; moreText.fontSize = 12; moreText.fontStyle = FontStyle.Bold;
+            moreText.alignment = TextAnchor.MiddleRight; moreText.color = new Color(.84f, .69f, .38f); moreText.raycastTarget = false; // Latin-1 only: the web font has no arrow glyphs
+            fit.More = more; moreRect.gameObject.SetActive(false);
         }
     }
 }
