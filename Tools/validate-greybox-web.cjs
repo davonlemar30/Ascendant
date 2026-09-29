@@ -635,6 +635,9 @@ const path=require('path');
     check(await art.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll with the test set at '+viewport.width);
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='page'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a page turn plays the page cue from the test set at '+viewport.width);
     for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await art.waitForTimeout(150);}
+    await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // Build T: the walk to the Dial
+    await act('enter-wing');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await act('poi-dial');
     await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().canContinue,{},{timeout:120000});
     await art.screenshot({path:path.join(out,viewport.width+'-art-dial.png')});
     for(let n=0;n<16&&(await snap()).start!=='Start: Taurus';n++){if((await snap()).canContinue)await act('continue');await art.waitForTimeout(500);}
