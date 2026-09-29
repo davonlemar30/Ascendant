@@ -1581,15 +1581,16 @@ namespace Ascendant.CelestialDial
         // ---- Build N: the Atrium kit. The opening pieces restore by stage (Key 2-3); the rest by Keys spent across the arc (arcLock), the light following the arc too (owner, Sept 27).
         static readonly KitPlacement[] AtriumKit =
         {
+            // Build Q (the domed Atrium, owner-approved Sept 28): the banners, pennants, lanterns, and armillary ring are measured on the new
+            // restored scene (moved 22 px up to meet the game's doors); the rug, busts, plants, candlestands, bench, and desk keep Build N's places.
             // Key 2-3 pieces are the opening's beats and follow the stage. Everything else carries arcLock, its Key spent on the
-            // Library's whole arc of 21 (owner, Sept 27): a small change most Keys, the chandelier last.
+            // Library's whole arc of 21 (owner, Sept 27): a small change most Keys, the armillary ring last.
             new KitPlacement("rug", 0, 800, 4, 1, 1, 60, arcLock: 4),
-            new KitPlacement("chandelier", -36, 150, 6, arcLock: 21),
-            new KitPlacement("chart", -140, 125, 3), new KitPlacement("chart", 138, 122, 3), new KitPlacement("chart", -86, 215, 3, .65f), new KitPlacement("chart", 88, 220, 3, .6f), new KitPlacement("chart", 165, 250, 3, 1.6f),
-            new KitPlacement("lamp", -94, 127, 6, arcLock: 19), new KitPlacement("lamp", 91, 127, 5, arcLock: 12),
-            new KitPlacement("banner", -124, 205, 5, arcLock: 8), new KitPlacement("banner", 124, 205, 5, arcLock: 11), new KitPlacement("banner", -61, 295, 5, 1.2f, arcLock: 15), new KitPlacement("banner", 61, 295, 5, 1.2f, arcLock: 17),
-            new KitPlacement("lamp", -60, 220, 2, .875f), new KitPlacement("lamp", 60, 220, 3, .875f), // the pillar lanterns use the wall lamp (the art lane's "lantern" came back as a ring chandelier)
-            new KitPlacement("shelf", -175, 380, 4, arcLock: 3),
+            new KitPlacement("chandelier", -3.6f, 195, 6, 1, 1.58f, arcLock: 21), // the armillary ring keeps the chandelier's slot; the tarnished one is drawn smaller, so it is scaled to hang as far
+            new KitPlacement("lamp", -92, 119, 6, 1, 1.45f, arcLock: 3), new KitPlacement("lamp", 92, 119, 5, 1, 1.45f, arcLock: 12), // the balcony lanterns (the dark ones are drawn smaller)
+            new KitPlacement("banner", -121, 261, 5, 1, .9f, arcLock: 8), new KitPlacement("banner", 121, 261, 5, 1, .9f, arcLock: 11), // the torn banners hang as long as the whole ones
+            new KitPlacement("pennant", -58, 370, 5, arcLock: 15), new KitPlacement("pennant", 58, 370, 5, arcLock: 17),
+            new KitPlacement("lamp", -57, 223, 2, 1, 1.45f), new KitPlacement("lamp", 57, 223, 3, 1, 1.45f), // the lanterns beside the statue's niche
             new KitPlacement("bust", -63, 380, 4, arcLock: 2), new KitPlacement("bust", 64, 380, 4, arcLock: 6),
             new KitPlacement("plant", -83, 380, 5, arcLock: 7), new KitPlacement("plant", 84, 380, 5, arcLock: 10),
             new KitPlacement("candlestand", -156, 385, 2), new KitPlacement("candlestand", 169, 385, 2),

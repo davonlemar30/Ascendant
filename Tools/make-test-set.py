@@ -29,6 +29,7 @@ IMAGES = [
     ("sign-libra", 200, 200), ("sign-scorpio", 200, 200), ("sign-sagittarius", 200, 200), ("sign-capricorn", 200, 200), ("sign-aquarius", 200, 200), ("sign-pisces", 200, 200),
     ("chat-box", 164, 120), ("chat-plate", 172, 24),  # Build P: the chat box on the story screens
     ("caspar-calm", 132, 236), ("caspar-explain", 132, 236), ("caspar-warm", 132, 236), ("caspar-wry", 132, 236), ("caspar-moved", 132, 236), ("caspar-solemn", 132, 236),
+    ("akit-pennant-restored", 48, 132), ("akit-pennant-worn", 44, 132),  # Build Q: the domed Atrium's pennants
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
