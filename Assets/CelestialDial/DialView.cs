@@ -175,7 +175,7 @@ namespace Ascendant.CelestialDial
             for(int i=0;i<4;i++){ int slot=i; builderNames[i]=MakeButton(root,"",-78+(i%2)*156,654+(i/2)*60,150,56,()=>BuilderName(slot)); builderNames[i].gameObject.SetActive(false); }
             for(int i=0;i<3;i++){ int property=i; builderShares[i]=MakeButton(root,DialLesson.ShareLabels[i],-110+i*110,654,104,56,()=>BuilderShare(property)); builderShares[i].GetComponentInChildren<Text>().fontSize=13; builderShares[i].gameObject.SetActive(false); }
             optional=MakeButton(root,"Try one more (optional)",0,714,244,48,()=> { Lesson.BeginOptional(); AlignStart(); });
-            var motion = MakeButton(root,"Reduced motion: off",0,768,216,48,ToggleMotion);
+            var motion = MakeButton(root,"Reduced motion: off",92,768,160,44,ToggleMotion); // Build T: the bottom row's right half; Leave the Dial has the left (until the Settings menu holds both)
             motionText=motion.GetComponentInChildren<Text>(); motionText.fontSize=13;
             if (EventSystem.current == null)
             {

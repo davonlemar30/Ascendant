@@ -51,7 +51,18 @@ const path=require('path');
     check((await state()).casparPose==='wry','Build P: Caspar stands wry behind the chat box on the opening\'s first page at '+viewport.width);
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPose==='warm',{},{timeout:5000}); // Build P: the pose turns with the page
     for(let n=0;n<8&&(await state()).screen==='atrium';n++){await semantic('next-screen');await page.waitForTimeout(150);}
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing');await ready();
+    // Build T (owner, APK playtest, Sept 29): the opening hands over the Atrium; Caspar sends the player to the Zodiac Wing, and the Dial is tapped there.
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).atriumStage===1&&(await state()).caspar.startsWith('Our work begins in the Zodiac Wing. That door there.')&&(await state()).canEnterWing,'Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-opening-hub.png')});
+    check(!(await state()).canEnterChamber,'Build T: the Chamber button waits for Key 1 at '+viewport.width);
+    await semantic('poi-chamber-door');await page.waitForTimeout(300);check((await state()).screen==='hub'&&(await state()).hubNote.startsWith('Sealed.'),'Build T: before Key 1 the Chamber door only says it is sealed at '+viewport.width);
+    await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    check((await state()).caspar==='The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready.'&&(await state()).canEnterDial,'Build T: in the Zodiac Wing Caspar points to the Dial at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
+    await semantic('poi-dial');
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await ready();
+    check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on at '+viewport.width);
     check((await state()).dormant,'the Dial is dormant on arrival at '+viewport.width);
     check((await state()).artSet===''&&!(await state()).style&&(await state()).lastCue==='page','no query: the game plays on the Art folder, no style page; the page hook fired on Caspar\'s pages, file or not, at '+viewport.width); // Build E
     await page.screenshot({path:path.join(out,viewport.width+'-encounter.png')});
@@ -59,6 +70,11 @@ const path=require('path');
     // Seven intro beats, two of them automatic, then the teaching page and the guided problem.
     for(let n=0;n<16&&(await state()).start!=='Start: Taurus';n++){if((await state()).canContinue)await semantic('continue');await page.waitForTimeout(500);}
     await waitActive('Taurus');check(!(await state()).dormant,'the Dial has woken and the guided problem began at '+viewport.width);
+    // Build T: mid-challenge, a tap on the canvas's Leave the Dial goes to the Zodiac Wing; the Dial, tapped again, resumes the same problem.
+    await tap(-92,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+    check((await state()).screen==='wingroom'&&(await state()).atriumStage===1,'Build T: Leave the Dial, tapped mid-challenge in the first lesson, lands in the Zodiac Wing at '+viewport.width);
+    await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await waitActive('Taurus');check((await state()).start==='Start: Taurus'&&(await state()).active,'Build T: back at the Dial the same problem is waiting at '+viewport.width);
     const boxes=await page.locator('#seats button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,label:b.getAttribute('aria-label')})));
     check(boxes.length===12 && boxes.every(b=>b.width>=48 && b.height>=48 && b.label.includes('position')),'12 semantic seats and effective target floor at '+viewport.width);
     check((await state()).challenge==='Next Earth after Taurus' && (await page.locator('#count').count())===0,'the wheel shows its own challenge and there is no Count button (Build I) at '+viewport.width);
@@ -574,7 +590,10 @@ const path=require('path');
   await recovery.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');check(true,'a birth date derives the sun sign in the browser');
   await action('next-screen');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
   for(let n=0;n<8&&(await recovery.evaluate(()=>window.ascendantDial.snapshot().screen))==='atrium';n++){await action('next-screen');await recovery.waitForTimeout(150);}
-  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().canContinue);
+  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // Build T: the walk to the Dial
+  await action('enter-wing');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+  await action('poi-dial');
+  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().canContinue,{},{timeout:15000});
   const active=async(sign)=>{const ok=s=>window.ascendantDial.snapshot().active && window.ascendantDial.snapshot().start==='Start: '+s;await recovery.waitForFunction(ok,sign,{timeout:15000});await recovery.waitForTimeout(400);await recovery.waitForFunction(ok,sign,{timeout:20000});await recovery.waitForTimeout(150);};
   check(await recovery.evaluate(()=>window.ascendantDial.snapshot().reducedMotion),'OS reduced-motion preference reaches Unity');
   for(let n=0;n<16&&(await recovery.evaluate(()=>window.ascendantDial.snapshot().start))!=='Start: Taurus';n++){if(await recovery.evaluate(()=>window.ascendantDial.snapshot().canContinue))await action('continue');await recovery.waitForTimeout(500);}
