@@ -70,6 +70,14 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `atrium-light` | 360 × 800 | 2048 | the Atrium's golden-hour light (Build H): a transparent overlay drawn over the background and under everything else, faded by the Atrium stage (nothing at Stage 1, a quarter at 2, half at 3, three quarters at 4, full at 5 and 6) |
 | `wing-light` | 360 × 800 | 2048 | the Zodiac Wing room's golden-hour light, the same fade |
 | `chamber-light` | 360 × 800 | 2048 | the Crystal Book Chamber's golden-hour light, the same fade |
+| `chat-box` | 324 × 240 | 1024 | the chat box on the story screens (Build P): the dark see-through fill and the gold frame in one image; Caspar's line and Continue sit inside it |
+| `chat-plate` | 170 × 22 | 512 | the speaker's plate on the chat box's top-left edge (Build P); blank, the game writes the name |
+| `caspar-calm` | 264 × 468 | 1024 | Caspar from the waist up behind the chat box (Build P), calm: the default, short instructions |
+| `caspar-explain` | 264 × 468 | 1024 | Caspar behind the chat box, explaining: teaching, the lessons, the history (the opening's fourth page, the return's second) |
+| `caspar-warm` | 264 × 468 | 1024 | Caspar behind the chat box, warm: welcomes, thanks, praise (the opening's second page) |
+| `caspar-wry` | 264 × 468 | 1024 | Caspar behind the chat box, wry: his dry humour (the opening's first page) |
+| `caspar-moved` | 264 × 468 | 1024 | Caspar behind the chat box, moved: wonder at the Library waking (the return's first page, the Keeper Key) |
+| `caspar-solemn` | 264 × 468 | 1024 | Caspar behind the chat box, solemn: honesty and the backstory (the opening's third page) |
 
 ### The Wing room kit (Build M, Sept 25)
 
@@ -77,7 +85,11 @@ The journal is a book (Build J, owner Sept 23 and 25). The screen shows the left
 
 The Zodiac Wing is built as a kit (owner, Sept 24): `wing` is the restored **shell** (architecture only), `wing-grime` (360 × 800) is the dust, cobwebs, and cold tint over it that fade out by Keys, and each **piece** has a worn and a restored file, `kit-<piece>-worn` / `kit-<piece>-restored`. Piece files are drawn at **half their pixel size**, bottom-centred on their placement in `SliceView.WingKit` (x, bottom, the Key that restores it, a scale); the slot sizes below are the restored piece on the 360 × 800 layout, cap 1024. The pieces: `window`, `carpet`, `chandelier`, `banner` (three placements), `orrery`, `armillary`, `lectern`, `globe`, `shelf`, `dial`, `telescope`, `table`, `candles` (two placements), `books`, `chair`, `plate` (the doorway's name plate; the engine writes the name on the restored one). A piece restores on its Key, except the shelf (when the book of symbols wakes: the wheel lit) and the table (when it wakes: the modalities complete), because their lessons happen on them.
 
-Not slots, on purpose: the Caspar panels, buttons, and text (interface, not placeholder art); the glows (doorway light, shelf and table glow, the Key's glow, the seam) and the fade, which are effects drawn over whatever is there; the Dial screen's charcoal backdrop; the table's board of cells and tiles, which is a control.
+Not slots, on purpose (except the story screens' chat box and plate, Build P): the Caspar panels, buttons, and text (interface, not placeholder art); the glows (doorway light, shelf and table glow, the Key's glow, the seam) and the fade, which are effects drawn over whatever is there; the Dial screen's charcoal backdrop; the table's board of cells and tiles, which is a control.
+
+### The chat box and Caspar's poses (Build P, Sept 28)
+
+The owner's B2 ruling (Sept 28, note 3): on the story screens (the Grand Atrium opening and the return with the first Keeper Key) Caspar stands unframed behind a chat box, from the waist up, in one still pose per page. `chat-box` is drawn at the box's rect (324 × 240, centre 600 on the 360 × 800 layout); `chat-plate` sits on its top-left edge and the game writes CASPAR on it; the line is left-aligned in the box and Continue sits inside it. The six `caspar-<pose>` files share one registration: each is the whole pose canvas, scaled together, so the head lands in the same place in every pose and a swap does not jump; the game draws each at 264 × 468 centred at (5, 408). The pose per page is `SliceView.AtriumPoses` (wry, warm, solemn, explain) and `SliceView.ReturnPoses` (moved, explain), the working choice recorded on the Decisions Log (Sept 28). No `chat-box` file, no change: the old panel and Continue stay where they were. No pose file, no figure.
 
 ### The Grand Atrium kit (Build N, Sept 25)
 
