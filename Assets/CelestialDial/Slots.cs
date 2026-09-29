@@ -309,7 +309,7 @@ namespace Ascendant.CelestialDial
             panel.sprite = InstrumentBoxSprite(); panel.type = UnityEngine.UI.Image.Type.Sliced; panel.pixelsPerUnitMultiplier = 2; panel.color = Color.white;
             if (oldLabel != null) oldLabel.gameObject.SetActive(false);
             var nameRect = new GameObject("CASPAR", typeof(RectTransform)).GetComponent<RectTransform>(); nameRect.SetParent(rect, false);
-            nameRect.anchorMin = nameRect.anchorMax = nameRect.pivot = new Vector2(0, 1); nameRect.anchoredPosition = new Vector2(14, -7); nameRect.sizeDelta = new Vector2(140, 16);
+            nameRect.anchorMin = nameRect.anchorMax = nameRect.pivot = new Vector2(0, 1); nameRect.anchoredPosition = new Vector2(14, -7); nameRect.sizeDelta = new Vector2(rect.sizeDelta.x - 28, 16); // Build V: wide enough for the Dial's own name
             var name = nameRect.gameObject.AddComponent<Text>(); name.font = font; name.text = "C A S P A R"; name.fontSize = 11; name.fontStyle = FontStyle.Bold; // spaced: the legacy Text has no letter spacing
             name.alignment = TextAnchor.UpperLeft; name.color = new Color(.84f, .69f, .38f); name.raycastTarget = false;
             var rule = new GameObject("Rule", typeof(RectTransform)).GetComponent<RectTransform>(); rule.SetParent(rect, false);
@@ -317,7 +317,7 @@ namespace Ascendant.CelestialDial
             var ruleImage = rule.gameObject.AddComponent<Image>(); ruleImage.color = new Color(.84f, .69f, .38f, .55f); ruleImage.raycastTarget = false;
             var lr = line.rectTransform; lr.anchorMin = lr.anchorMax = lr.pivot = new Vector2(0, 1); lr.anchoredPosition = new Vector2(14, -InstrumentHead);
             lr.sizeDelta = new Vector2(rect.sizeDelta.x - 28, max - InstrumentHead - InstrumentFoot); line.alignment = TextAnchor.UpperLeft;
-            var fit = panel.gameObject.AddComponent<FitBox>(); fit.Line = line; fit.Max = max + InstrumentMore; // Build S: room for the page's Continue
+            var fit = panel.gameObject.AddComponent<FitBox>(); fit.Name = name; fit.Line = line; fit.Max = max + InstrumentMore; // Build S: room for the page's Continue
             // Build S (owner, APK playtest, Sept 29): a long line turns in pages; Continue sits at the box's bottom right while more is to come.
             var moreRect = new GameObject("Caspar Continue", typeof(RectTransform)).GetComponent<RectTransform>(); moreRect.SetParent(rect, false);
             moreRect.anchorMin = moreRect.anchorMax = moreRect.pivot = new Vector2(1, 0); moreRect.anchoredPosition = new Vector2(-8, 4); moreRect.sizeDelta = new Vector2(96, 26);

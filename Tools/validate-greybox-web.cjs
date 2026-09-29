@@ -538,6 +538,8 @@ const path=require('path');
     check((await state()).pairsKnown===6 && events.filter(e=>e.event_name==='opposites_completed').length===1,'six pairs complete the last pattern at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opposites-complete.png')});
     await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='name'&&window.ascendantDial.snapshot().canBuilderName,{},{timeout:5000});
+    check((await state()).speaker==='dial'&&(await state()).message.startsWith('Build me a sign from its parts'),'Build V: the Dial, not Caspar, asks for the sign built from its parts at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-dial-speaks.png')});
     { const b=await state(); check(b.unit==='builder' && b.builderAsk==='Earth, fixed' && b.builderOptions.length===4 && b.builderOptions.includes('Taurus') && b.built===0,'Continue opens the builder on the sun sign\'s parts: four names (Leave the Dial on its own row below them), at '+viewport.width); }
     const nameBoxes=await page.locator('#builder-names button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height})));
     check(nameBoxes.length===4 && nameBoxes.every(b=>b.width>=48 && b.height>=48),'four semantic names at the target floor at '+viewport.width);

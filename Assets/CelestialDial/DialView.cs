@@ -78,6 +78,7 @@ namespace Ascendant.CelestialDial
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public bool settingsOpen, canQuit; // Build U: the Settings menu is open; the app (not a web page) can quit
+            public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
             public string casparShown = ""; // Build S: that page's words, colour tags and all
@@ -384,6 +385,7 @@ namespace Ascendant.CelestialDial
         void Refresh()
         {
             message.text=Lesson.Message; panel.gameObject.SetActive(Lesson.Message!=""); // Build I: Caspar's panel shows only when he speaks
+            ShowSpeaker(); // Build V
             // In the marks (Part B) the names are the answer: the center shows the mark under the bracket, no start line, no count
             // (owner playtest v0.3, test 2: the readout gave the sign away).
             bool marks=Lesson.Phase==LessonPhase.GlyphWheel;
@@ -467,7 +469,7 @@ namespace Ascendant.CelestialDial
                 builderOptions=Lesson.Phase==LessonPhase.BuilderName ? Lesson.BuilderOptions.Select(o=>Zodiac.Seats[o].Name).ToArray() : new string[0],
                 shared=Lesson.Phase==LessonPhase.BuilderShare ? Enumerable.Range(0,3).Where(i=>Lesson.Shared[i]).Select(i=>DialLesson.ShareLabels[i]).ToArray() : new string[0],
                 canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy,
-                dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
+                speaker=panel.gameObject.activeInHierarchy?(DialSpeaking?DialLesson.DialSpeaker:DialLesson.CasparSpeaker):"",dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
             Slice?.Fill(state); return state;
         }
         public void Publish()
@@ -482,6 +484,10 @@ namespace Ascendant.CelestialDial
             DialPublish(json);
 #endif
         }
+        // Build V: the plate names the Dial when the line shown is its challenge, Caspar otherwise.
+        bool DialSpeaking => Lesson.Speaker==DialLesson.DialSpeaker && FitBox.Whole(message)==Lesson.Message && Lesson.Message!="";
+        void ShowSpeaker() { var fit=panel.GetComponent<FitBox>(); if(fit!=null) fit.SetSpeaker(DialSpeaking); }
+        void LateUpdate() { ShowSpeaker(); }
         [Preserve] public void WebAction(string command)
         {
             if(Inert) { ExtraActions?.Invoke(command); return; }
