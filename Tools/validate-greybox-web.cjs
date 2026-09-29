@@ -99,13 +99,16 @@ const path=require('path');
     check((await state()).casparPose==='moved','Build P: Caspar is moved by the Keeper Key on the return\'s first page at '+viewport.width);
     for(let n=0;n<4&&(await state()).screen==='atriumreturn';n++){await semantic('next-screen');await page.waitForTimeout(150);}
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamber');
+    check((await state()).casparPose==='explain','Build R: Caspar stands behind the Chamber\'s box, explaining, on its first page at '+viewport.width);
     check(!(await state()).canInsert,'the Key cannot be inserted before Caspar finishes at '+viewport.width);
     for(let n=0;n<4&&!(await state()).canInsert;n++){await tap(0,654);await page.waitForTimeout(200);} // the visible Continue on the canvas, where a thumb lands
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canInsert,{},{timeout:5000});
     check(true,'a visible Continue turns Caspar\'s pages in the Chamber at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber.png')});
-    await semantic('insert');await page.waitForFunction(()=>window.ascendantDial.snapshot().ended,{},{timeout:40000});
+    await semantic('insert');await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPose==='moved',{},{timeout:30000}); // Build R: he steps into view for "She breathes"
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().ended,{},{timeout:40000});
     check((await state()).locksFilled===1 && (await state()).caspar.includes('Let us continue, shall we?'),'one Key fills one lock and the amended ending plays at '+viewport.width);
+    check((await state()).casparPose==='','Build R: after the first Key he steps away and the Chamber stays in view at '+viewport.width);
     check(events.some(e=>e.event_name==='key_inserted') && events.some(e=>e.event_name==='prototype_ended'),'chamber events at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-chamber-end.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the ending at '+viewport.width);
@@ -177,7 +180,9 @@ const path=require('path');
     await page.waitForTimeout(400);await tap(40,337); // the Dial, on the canvasawait page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
     check((await state()).avatarAt==='dial' && (await state()).canEnterPractice && (await state()).canContinueLesson && !(await state()).active && (await state()).canLeaveDial,'the Dial opens once the marker reaches it, on the fork: the lesson or practice, nothing started, Back still offered, at '+viewport.width);
+    await page.waitForFunction(()=>{const h=window.ascendantDial.snapshot().dialBoxHeight;return h>0&&h<128;},{},{timeout:5000}); // Build R: the fork's short line gets a short box
     await page.screenshot({path:path.join(out,viewport.width+'-fork.png')});
+    check((await state()).dialBoxHeight<128,'Build R: the Dial\'s box fits its short line (no empty space) at '+viewport.width);
     await tap(78,714); // Practice what you know, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice'&&window.ascendantDial.snapshot().practiceMode==='dial',{},{timeout:10000});
     check((await state()).sitting===1 && (await state()).practiceCount===6 && (await state()).phase==='Practice · 1 of 6' && (await state()).canLeavePractice && !(await state()).canLeaveDial,'a canvas tap on the fork opens practice as the first sitting: six items, headed as practice, an exit on the item, no Back over the Seal at '+viewport.width);

@@ -262,5 +262,61 @@ namespace Ascendant.CelestialDial
             if (image == null) return;
             image.color = image.sprite != null ? new Color(brightness, brightness, brightness, placeholder.a) : placeholder;
         }
+        // Build R (the owner's B2 ruling, and "only the chat box" where the player acts, Sept 28): a Caspar panel dressed as the chat box.
+        // The frame and its see-through fill are sliced to the panel's own size (the file is drawn at 2x), the old CASPAR label goes,
+        // and the speaker's plate sits on the box's top-left edge with the name written on it. No chat-box file, no change.
+        public static bool DressChatBox(Image panel, Text oldLabel, Font font)
+        {
+            if (Image("chat-box") == null) return false;
+            Dress(panel, "chat-box"); panel.type = UnityEngine.UI.Image.Type.Sliced; panel.pixelsPerUnitMultiplier = 2;
+            if (oldLabel != null) oldLabel.gameObject.SetActive(false);
+            var plate = new GameObject("Caspar plate", typeof(RectTransform)).GetComponent<RectTransform>(); plate.SetParent(panel.transform, false);
+            plate.anchorMin = plate.anchorMax = new Vector2(0, 1); plate.pivot = new Vector2(0, .5f); plate.anchoredPosition = new Vector2(12, 0); plate.sizeDelta = new Vector2(170, 22);
+            var plateImage = plate.gameObject.AddComponent<Image>(); plateImage.raycastTarget = false; plateImage.color = new Color(.18f, .12f, .07f); Dress(plateImage, "chat-plate");
+            var nameRect = new GameObject("CASPAR", typeof(RectTransform)).GetComponent<RectTransform>(); nameRect.SetParent(plate, false);
+            nameRect.anchorMin = Vector2.zero; nameRect.anchorMax = Vector2.one; nameRect.offsetMin = new Vector2(10, 2); nameRect.offsetMax = new Vector2(-10, -2);
+            var name = nameRect.gameObject.AddComponent<Text>(); name.font = font; name.text = "CASPAR"; name.fontSize = 12; name.fontStyle = FontStyle.Bold;
+            name.alignment = TextAnchor.MiddleCenter; name.color = new Color(.91f, .76f, .48f); name.raycastTarget = false;
+            return true;
+        }
+        // Build R (owner, Sept 29): the instrument screens (the Dial, the Book of Symbols, the Elemental Table) take a slim box, not the chat box:
+        // a flat dark panel with a hairline gold border and CASPAR small at its top left, pinned at its top and fitted to the line (FitBox).
+        public const float InstrumentHead = 32, InstrumentFoot = 12, InstrumentMin = 60;
+        public static float InstrumentBoxHeight(float lineHeight, float max) => Mathf.Clamp(InstrumentHead + lineHeight + InstrumentFoot, Mathf.Min(InstrumentMin, max), max);
+        static Sprite instrumentBox;
+        static Sprite InstrumentBoxSprite()
+        {
+            if (instrumentBox != null) return instrumentBox;
+            const int size = 32; const float radius = 10, stroke = 2; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+            Color fill = new Color(.086f, .078f, .094f, .96f), gold = new Color(.84f, .69f, .38f, .55f);
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+            {
+                // the distance from the pixel's centre to the rounded rectangle's edge, inset half a pixel: negative inside
+                float px = Mathf.Abs(x + .5f - size / 2f) - (size / 2f - .5f - radius), py = Mathf.Abs(y + .5f - size / 2f) - (size / 2f - .5f - radius);
+                float d = new Vector2(Mathf.Max(px, 0), Mathf.Max(py, 0)).magnitude + Mathf.Min(Mathf.Max(px, py), 0) - radius;
+                float inside = Mathf.Clamp01(.5f - d), line = Mathf.Clamp01(stroke / 2 + .5f - Mathf.Abs(d + stroke / 2));
+                Color c = Color.Lerp(fill, gold, line / Mathf.Max(inside, .0001f)); c.a = Mathf.Max(fill.a * inside, gold.a * line);
+                texture.SetPixel(x, y, c);
+            }
+            texture.Apply();
+            return instrumentBox = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
+        }
+        public static void DressInstrumentBox(Image panel, Text oldLabel, Text line, Font font)
+        {
+            var rect = panel.rectTransform; float max = rect.sizeDelta.y;
+            rect.pivot = new Vector2(.5f, 1); rect.anchoredPosition += new Vector2(0, max / 2); // pinned at its top edge
+            panel.sprite = InstrumentBoxSprite(); panel.type = UnityEngine.UI.Image.Type.Sliced; panel.pixelsPerUnitMultiplier = 2; panel.color = Color.white;
+            if (oldLabel != null) oldLabel.gameObject.SetActive(false);
+            var nameRect = new GameObject("CASPAR", typeof(RectTransform)).GetComponent<RectTransform>(); nameRect.SetParent(rect, false);
+            nameRect.anchorMin = nameRect.anchorMax = nameRect.pivot = new Vector2(0, 1); nameRect.anchoredPosition = new Vector2(14, -7); nameRect.sizeDelta = new Vector2(140, 16);
+            var name = nameRect.gameObject.AddComponent<Text>(); name.font = font; name.text = "C A S P A R"; name.fontSize = 11; name.fontStyle = FontStyle.Bold; // spaced: the legacy Text has no letter spacing
+            name.alignment = TextAnchor.UpperLeft; name.color = new Color(.84f, .69f, .38f); name.raycastTarget = false;
+            var rule = new GameObject("Rule", typeof(RectTransform)).GetComponent<RectTransform>(); rule.SetParent(rect, false);
+            rule.anchorMin = rule.anchorMax = rule.pivot = new Vector2(0, 1); rule.anchoredPosition = new Vector2(14, -24); rule.sizeDelta = new Vector2(60, 1);
+            var ruleImage = rule.gameObject.AddComponent<Image>(); ruleImage.color = new Color(.84f, .69f, .38f, .55f); ruleImage.raycastTarget = false;
+            var lr = line.rectTransform; lr.anchorMin = lr.anchorMax = lr.pivot = new Vector2(0, 1); lr.anchoredPosition = new Vector2(14, -InstrumentHead);
+            lr.sizeDelta = new Vector2(rect.sizeDelta.x - 28, max - InstrumentHead - InstrumentFoot); line.alignment = TextAnchor.UpperLeft;
+            var fit = panel.gameObject.AddComponent<FitBox>(); fit.Line = line; fit.Max = max;
+        }
     }
 }

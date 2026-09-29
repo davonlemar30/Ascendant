@@ -29,6 +29,7 @@ namespace Ascendant.CelestialDial
         RectTransform identity, birth, atrium, atriumReturn, chamber, hub, review, birthChoices, birthDate, birthSigns, glyphs;
         Text birthNote, atriumText, returnText, chamberText, chamberEnd, keyIndicator, keyLabel, dateHint;
         Image atriumPose, returnPose; // Build P: Caspar behind the chat box on the story screens, one pose per page
+        Image chamberPose; string chamberPoseName = ""; // Build R: Caspar behind the Chamber's box on its story beats only
         Text hubText, hubNote, hubCaption, endCard, reviewProgress, reviewQuestion, reviewNote, reviewSummary, reviewGlyph;
         Text glyphCard, glyphProgress, glyphCaspar, glyphNote;
         // v0.4 tap-to-move (Q06 phase 2): two walkable rooms, a placeholder marker, fades at doorways.
@@ -99,6 +100,9 @@ namespace Ascendant.CelestialDial
         public static readonly string[] CasparPoses = { "calm", "explain", "warm", "wry", "moved", "solemn" };
         public static readonly string[] AtriumPoses = { "wry", "warm", "solemn", "explain" };
         public static readonly string[] ReturnPoses = { "moved", "explain" };
+        // Build R (the owner handed Claude the remaining poses, Sept 28): the Chamber's introduction, then his two spoken lines after the first Key.
+        public static readonly string[] ChamberPoses = { "explain", "solemn", "calm" };
+        public const string ChamberBreathesPose = "moved", ChamberContinuePose = "warm";
         public static readonly string[] ChamberPages = {
             "This is the Crystal Chamber. These are the Crystal Books. Seven in all.\nThey are connected to the Library the way a heart is connected to a body. They are what give these halls life, what pushes knowledge through every room, every shelf, every door.",
             "Before your ancestor left, he sealed them. All seven. He knew that the power inside these Books, paired with the knowledge this Library holds, could unbalance the world in the wrong hands.",
@@ -233,9 +237,7 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", screen, 0, chatBox ? 600 : 560, 324, chatBox ? 240 : 150); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.045f, .025f, .03f, .92f);
             if (chatBox)
             {
-                Slots.Dress(panelImage, "chat-box");
-                var plate = Rect("Caspar plate", panel, -65, 0, 170, 22); var plateImage = plate.gameObject.AddComponent<Image>(); plateImage.raycastTarget = false; plateImage.color = new Color(.18f, .12f, .07f); Slots.Dress(plateImage, "chat-plate");
-                var plateName = Label(plate, "CASPAR", 0, 11, 150, 18, 12); plateName.fontStyle = FontStyle.Bold; plateName.color = new Color(.91f, .76f, .48f);
+                Slots.DressChatBox(panelImage, null, font); // Build R: the shared chat box, the same frame and plate as every Caspar panel
                 caspar = Label(panel, "", 0, 78, 276, 104, 14); caspar.alignment = TextAnchor.UpperLeft; caspar.resizeTextForBestFit = true; caspar.resizeTextMinSize = 10; caspar.resizeTextMaxSize = 14;
                 next = MakeButton(screen, "Continue", 0, 671, 150, 42, () => Continue());
             }
@@ -249,6 +251,8 @@ namespace Ascendant.CelestialDial
             return screen;
         }
         static void SetPose(Image pose, string name) { var sprite = Slots.Image("caspar-" + name); pose.sprite = sprite; pose.enabled = sprite != null; pose.color = Color.white; pose.preserveAspect = true; } // Build P: no file, no figure
+        void ChamberPose(string name) { chamberPoseName = name ?? ""; if (name == null) chamberPose.enabled = false; else SetPose(chamberPose, name); } // Build R: null puts him away
+        static void ChatText(Text line) { line.alignment = TextAnchor.MiddleLeft; line.rectTransform.sizeDelta -= new Vector2(22, 0); } // Build R: left-aligned, clear of the frame
         void BuildChamber()
         {
             chamber = ScreenPanel("Chamber", "chamber"); LightOverlay(chamber, "chamber-light");
@@ -288,9 +292,11 @@ namespace Ascendant.CelestialDial
             chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f, ChamberKitted ? 0 : 1); chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band; Build O: the painted floor carries it
             chamberDoor = Block(chamber, "Doorway back", ChamberKitted ? -145 : -150, ChamberKitted ? 287 : 347, ChamberKitted ? 40 : 30, ChamberKitted ? 165 : 124, ChamberKitted ? null : "door-open"); if (ChamberKitted) RetireProps(chamberDoor, true); HitArea(chamberDoor, 48); Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false); // Build K: the painted doorway
             chamberBooksTap = Rect("The Books, tap to walk", chamber, 0, 300, ChamberKitted ? 236 : 330, 90); var booksTapImage = chamberBooksTap.gameObject.AddComponent<Image>(); booksTapImage.color = new Color(0, 0, 0, 0); Tappable(chamberBooksTap, () => Walk("books")); chamberBooksTap.gameObject.SetActive(false); // kitted, as wide as the painted Books (x -116 to 116), clear of the doorway at the far left
-            var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); panel.gameObject.AddComponent<Image>().color = PanelColor;
-            Label(panel, "CASPAR", 0, 16, 290, 22, 13);
+            var chamberPoseRect = Rect("Caspar pose", chamber, 5, 363, 264, 468); chamberPose = chamberPoseRect.gameObject.AddComponent<Image>(); chamberPose.raycastTarget = false; chamberPose.enabled = false; // Build R: his waist at the box's top edge (435)
+            var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
+            var casparLabel = Label(panel, "CASPAR", 0, 16, 290, 22, 13);
             chamberText = Label(panel, "", 0, 96, 306, 136, 13);
+            if (Slots.DressChatBox(panelImage, casparLabel, font)) ChatText(chamberText); // Build R
             chamberEnd = Label(chamber, "The first Key is spent. The Library has taken her first breath.", 0, 720, 330, 40, 12); chamberEnd.color = Muted; chamberEnd.gameObject.SetActive(false);
             var glow = Rect("Insert glow", chamber, 0, 654, 214, 80); insertGlow = glow.gameObject.AddComponent<Image>(); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); insertGlow.raycastTarget = false;
             insert = MakeButton(chamber, "Insert Key", 0, 654, 190, 56, Insert); insert.GetComponent<Image>().color = Crimson; // owner (worksheet section 13)
@@ -334,9 +340,10 @@ namespace Ascendant.CelestialDial
                 foreach (var t in hub.GetComponentsInChildren<Text>(true)) if (t.text == "Caspar" && t.transform.parent == hub) t.gameObject.SetActive(false);
             }
             hubCaption = Label(hub, "", 0, 92, 340, 36, 11); hubCaption.color = Muted;
-            var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); panel.gameObject.AddComponent<Image>().color = new Color(.045f, .025f, .03f, .92f);
-            Label(panel, "CASPAR", 0, 14, 290, 20, 13);
+            var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.045f, .025f, .03f, .92f);
+            var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
+            if (Slots.DressChatBox(panelImage, casparLabel, font)) ChatText(hubText); // Build R: the box alone, the room stays in view (owner, Sept 28)
             enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing); StyleAtriumButton(enterWing);
             enterChamber = MakeButton(hub, "The Crystal Book Chamber", 78, 624, 150, 52, EnterChamber); StyleAtriumButton(enterChamber); enterChamber.GetComponentInChildren<Text>().fontSize = 12; // Build D; owner (worksheet section 13)
             journalHub = MakeButton(hub, "Your journal", 0, 680, 300, 52, OpenJournal); StyleAtriumButton(journalHub); journalHub.gameObject.SetActive(false); // Build F: the journal takes the row Check the Seals held (retired Sept 15)
@@ -371,9 +378,10 @@ namespace Ascendant.CelestialDial
             glyphCard = Label(card, "", 0, 70, 130, 130, 84); glyphCard.font = Dial.GlyphFont; glyphCard.horizontalOverflow = HorizontalWrapMode.Overflow; glyphCard.verticalOverflow = VerticalWrapMode.Overflow;
             Label(glyphs, "This symbol belongs to which sign?", 0, 290, 330, 24, 15); // owner (worksheet section 4)
             for (int i = 0; i < 4; i++) { int slot = i; glyphNameButtons[i] = MakeButton(glyphs, "", -78 + (i % 2) * 156, 340 + (i / 2) * 64, 150, 56, () => AnswerGlyphName(slot)); }
-            var panel = Rect("Caspar panel", glyphs, 0, 520, 324, 120); panel.gameObject.AddComponent<Image>().color = PanelColor;
-            Label(panel, "CASPAR", 0, 14, 290, 20, 13);
+            var panel = Rect("Caspar panel", glyphs, 0, 520, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
+            var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             glyphCaspar = Label(panel, "", 0, 70, 306, 90, 12);
+            Slots.DressInstrumentBox(panelImage, casparLabel, glyphCaspar, font); // Build R: the slim box fitted to the line on the Book of Symbols (owner, Sept 29)
             glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14);
             closeBook = MakeButton(glyphs, "Close the Book", 0, 680, 300, 52, CloseBook); // owner (worksheet section 7) // between the name buttons (to 432) and the Caspar panel (from 460)
         }
@@ -402,9 +410,10 @@ namespace Ascendant.CelestialDial
                 gridTileGlyphs[seat] = Label(gridTiles[seat].transform, Zodiac.Seats[seat].Glyph, -28, 20, 24, 36, 16); gridTileGlyphs[seat].font = Dial.GlyphFont; gridTileGlyphs[seat].horizontalOverflow = HorizontalWrapMode.Overflow; gridTileGlyphs[seat].verticalOverflow = VerticalWrapMode.Overflow;
             }
             gridReadout = Label(gridScreen, "", 0, 470, 340, 20, 12);
-            var panel = Rect("Caspar panel", gridScreen, 0, 540, 324, 112); panel.gameObject.AddComponent<Image>().color = PanelColor;
-            Label(panel, "CASPAR", 0, 14, 290, 20, 13);
+            var panel = Rect("Caspar panel", gridScreen, 0, 540, 324, 112); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
+            var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             gridCaspar = Label(panel, "", 0, 66, 306, 84, 12);
+            Slots.DressInstrumentBox(panelImage, casparLabel, gridCaspar, font); // Build R: the slim box fitted to the line on the Elemental Table (owner, Sept 29)
             gridStatus = Label(gridScreen, "", 0, 614, 330, 24, 12); gridStatus.color = Muted;
             gridSeal = MakeButton(gridScreen, "SEAL", 0, 654, 146, 56, GridSeal); gridSeal.GetComponent<Image>().color = Crimson;
             leaveGrid = MakeButton(gridScreen, "Leave the Table", -72, 714, 128, 48, LeaveGrid); leaveGrid.GetComponentInChildren<Text>().fontSize = 13; // owner (worksheet section 11)
@@ -1016,6 +1025,7 @@ namespace Ascendant.CelestialDial
             atriumText.text = AtriumPages[Mathf.Min(Page, AtriumPages.Length - 1)];
             returnText.text = ReturnPages[Mathf.Min(Page, ReturnPages.Length - 1)];
             SetPose(atriumPose, AtriumPoses[Mathf.Min(Page, AtriumPoses.Length - 1)]); SetPose(returnPose, ReturnPoses[Mathf.Min(Page, ReturnPoses.Length - 1)]); // Build P
+            ChamberPose(Flow.Screen == SliceScreen.Chamber && !Flow.KeyInserted ? ChamberPoses[Mathf.Min(Page, ChamberPoses.Length - 1)] : null); // Build R: the introduction only; the room and the Key's spectacle stay in view
             if (!Flow.KeyInserted) chamberText.text = ChamberPages[Mathf.Min(Page, ChamberPages.Length - 1)];
             bool chamberReady = Flow.Screen == SliceScreen.Chamber && Page >= ChamberPages.Length - 1;
             // A visible Continue turns Caspar's pages; the glowing Insert appears only on his last page. (The hidden
@@ -1053,7 +1063,7 @@ namespace Ascendant.CelestialDial
                 s == SliceScreen.Hub ? hubText.text + " " + hubCaption.text :
                 s == SliceScreen.Practice && !practiceOnDial ? (Flow.PracticeDone ? Flow.PracticeSummary + " " + reviewNote.text : reviewProgress.text + ". " + reviewQuestion.text + " " + reviewNote.text) :
                 s == SliceScreen.Journal ? JournalSpoken() : "";
-            state.casparPose = s == SliceScreen.Atrium && atriumPose.enabled ? AtriumPoses[Mathf.Min(Page, AtriumPoses.Length - 1)] : s == SliceScreen.AtriumReturn && returnPose.enabled ? ReturnPoses[Mathf.Min(Page, ReturnPoses.Length - 1)] : ""; // Build P
+            state.casparPose = s == SliceScreen.Atrium && atriumPose.enabled ? AtriumPoses[Mathf.Min(Page, AtriumPoses.Length - 1)] : s == SliceScreen.AtriumReturn && returnPose.enabled ? ReturnPoses[Mathf.Min(Page, ReturnPoses.Length - 1)] : s == SliceScreen.Chamber && chamberPose.enabled ? chamberPoseName : ""; // Build P, Build R
             state.keyRevealed = Flow.KeyRevealed; state.keyInserted = Flow.KeyInserted; state.ended = Flow.Ended; state.locksFilled = Flow.LocksFilled;
             state.sunSign = Flow.HasSunSign ? Zodiac.Seats[Flow.SunSign].Name : "";
             state.canInsert = (s == SliceScreen.Chamber && !Flow.KeyInserted && Page >= ChamberPages.Length - 1 && !busy) || (s == SliceScreen.ChamberRoom && Flow.CanSpend && Flow.Walk.At == "books" && !busy);
@@ -1729,8 +1739,10 @@ namespace Ascendant.CelestialDial
             chamberText.text = "Caspar presses his palm flat against the nearest pillar. His eyes close. The whole room hums faintly.";
             yield return new WaitForSecondsRealtime(hold * 2.2f);
             chamberText.text = "\"She breathes. After all this time... she breathes.\""; // Amended canon line (Sept 11).
+            ChamberPose(ChamberBreathesPose); Publish(); // Build R: he speaks, so he steps into view
             yield return new WaitForSecondsRealtime(hold * 2.4f);
             chamberText.text = "He opens his eyes and looks at you like he is seeing you for the first time.\n\"It is faint though. Let us continue, shall we?\"";
+            ChamberPose(ChamberContinuePose); Publish(); // Build R
             yield return new WaitForSecondsRealtime(hold * 2f);
             Flow.End(); chamberEnd.gameObject.SetActive(true); insert.gameObject.SetActive(false); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
             busy = false; ShowPage(); Publish();

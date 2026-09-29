@@ -10,7 +10,7 @@ namespace Ascendant.Build
     // phone build stays small (no mipmaps, crunched compression, a size cap per slot) and a PNG is a sprite without a click.
     public sealed class SlotImport : AssetPostprocessor
     {
-        public override uint GetVersion() => 3; // 3: no crunch at all (2: none on transparent images); bumping it re-imports every slot file, cached Library included
+        public override uint GetVersion() => 4; // 4: the chat box is sliced (3: no crunch at all; 2: none on transparent images); bumping it re-imports every slot file, cached Library included
         public const string ArtRoot = "Assets/CelestialDial/Resources/Art/", AudioRoot = "Assets/CelestialDial/Resources/Audio/";
         void OnPreprocessTexture()
         {
@@ -23,7 +23,9 @@ namespace Ascendant.Build
             importer.maxTextureSize = entry != null ? entry.MaxSize : 512;
             importer.textureCompression = TextureImporterCompression.Compressed; importer.crunchedCompression = false; importer.compressionQuality = 50; // no crunch at all: the crunch compressor crashes the Linux CI Editor at random (transparent overlays and signs, then opaque rooms on main after #43/#44 while the same files passed on the PRs)
             var settings = new TextureImporterSettings(); importer.ReadTextureSettings(settings);
-            settings.spriteMeshType = SpriteMeshType.FullRect; settings.spriteGenerateFallbackPhysicsShape = false; importer.SetTextureSettings(settings);
+            settings.spriteMeshType = SpriteMeshType.FullRect; settings.spriteGenerateFallbackPhysicsShape = false;
+            if (assetPath == ArtRoot + "chat-box.png") settings.spriteBorder = new Vector4(56, 64, 56, 56); // Build R: sliced (left, bottom, right, top at the file's 2x), so every Caspar panel keeps the corner stars whole at its own height
+            importer.SetTextureSettings(settings);
         }
         void OnPostprocessTexture(Texture2D texture)
         {
