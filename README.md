@@ -8,7 +8,7 @@ Ascendant teaches Western astrology the way a patient tutor would: one pattern a
 
 ## What you are playing right now
 
-This is an early, playable build — a **greybox** with its first art landing. The shapes, rooms, and instruments are real and the learning is real; the Atrium and the characters now have illustrated art, the other rooms and instruments are still placeholder blocks, the sounds are not in yet, and Caspar speaks in the writer's own lines. Expect a museum at night rendered in charcoal and bone, not a finished painting.
+This is an early, playable build — a **greybox** with its first art landing. The shapes, rooms, and instruments are real and the learning is real; the Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber now have illustrated art as restoring kits, with Caspar, the Keeper, and the journal illustrated too; the Celestial Dial's own instrument and the book on the shelf are still placeholder blocks, the sounds are not in yet, and Caspar speaks in the writer's own lines. Expect a museum at night rendered in charcoal and bone, not a finished painting.
 
 The current build is **the Zodiac Wing**, the first wing of the Library. It holds one curriculum: the twelve signs, and how to *derive* what a sign is instead of memorizing twelve personalities.
 
