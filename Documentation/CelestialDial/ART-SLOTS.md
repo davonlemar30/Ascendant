@@ -70,7 +70,7 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `atrium-light` | 360 × 800 | 2048 | the Atrium's golden-hour light (Build H): a transparent overlay drawn over the background and under everything else, faded by the Atrium stage (nothing at Stage 1, a quarter at 2, half at 3, three quarters at 4, full at 5 and 6) |
 | `wing-light` | 360 × 800 | 2048 | the Zodiac Wing room's golden-hour light, the same fade |
 | `chamber-light` | 360 × 800 | 2048 | the Crystal Book Chamber's golden-hour light, the same fade |
-| `chat-box` | 324 × 240 | 1024 | the chat box (Build P; on every Caspar panel since Build R): the dark see-through fill and the gold frame in one image, imported sliced (borders 56, 64, 56, 56 at the file's 2x) so each panel keeps the corner stars whole at its own height |
+| `chat-box` | 324 × 240 | 1024 | the chat box (Build P; since Build R also on the Atrium hub and the Chamber, while the Dial, the Book of Symbols and the Elemental Table draw a slim box in code): the dark see-through fill and the gold frame in one image, imported sliced (borders 56, 64, 56, 56 at the file's 2x) so each panel keeps the corner stars whole at its own height |
 | `chat-plate` | 170 × 22 | 512 | the speaker's plate on the chat box's top-left edge (Build P); blank, the game writes the name |
 | `caspar-calm` | 264 × 468 | 1024 | Caspar from the waist up behind the chat box (Build P), calm: the default, short instructions |
 | `caspar-explain` | 264 × 468 | 1024 | Caspar behind the chat box, explaining: teaching, the lessons, the history (the opening's fourth page, the return's second) |
