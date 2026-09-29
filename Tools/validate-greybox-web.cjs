@@ -180,7 +180,9 @@ const path=require('path');
     await page.waitForTimeout(400);await tap(40,337); // the Dial, on the canvasawait page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
     check((await state()).avatarAt==='dial' && (await state()).canEnterPractice && (await state()).canContinueLesson && !(await state()).active && (await state()).canLeaveDial,'the Dial opens once the marker reaches it, on the fork: the lesson or practice, nothing started, Back still offered, at '+viewport.width);
+    await page.waitForFunction(()=>{const h=window.ascendantDial.snapshot().dialBoxHeight;return h>0&&h<128;},{},{timeout:5000}); // Build R: the fork's short line gets a short box
     await page.screenshot({path:path.join(out,viewport.width+'-fork.png')});
+    check((await state()).dialBoxHeight<128,'Build R: the Dial\'s box fits its short line (no empty space) at '+viewport.width);
     await tap(78,714); // Practice what you know, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='practice'&&window.ascendantDial.snapshot().practiceMode==='dial',{},{timeout:10000});
     check((await state()).sitting===1 && (await state()).practiceCount===6 && (await state()).phase==='Practice · 1 of 6' && (await state()).canLeavePractice && !(await state()).canLeaveDial,'a canvas tap on the fork opens practice as the first sitting: six items, headed as practice, an exit on the item, no Back over the Seal at '+viewport.width);

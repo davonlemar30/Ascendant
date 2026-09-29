@@ -381,7 +381,7 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", glyphs, 0, 520, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
             var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             glyphCaspar = Label(panel, "", 0, 70, 306, 90, 12);
-            if (Slots.DressChatBox(panelImage, casparLabel, font)) ChatText(glyphCaspar); // Build R: the box alone on the Book of Symbols
+            Slots.DressInstrumentBox(panelImage, casparLabel, glyphCaspar, font); // Build R: the slim box fitted to the line on the Book of Symbols (owner, Sept 29)
             glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14);
             closeBook = MakeButton(glyphs, "Close the Book", 0, 680, 300, 52, CloseBook); // owner (worksheet section 7) // between the name buttons (to 432) and the Caspar panel (from 460)
         }
@@ -410,11 +410,10 @@ namespace Ascendant.CelestialDial
                 gridTileGlyphs[seat] = Label(gridTiles[seat].transform, Zodiac.Seats[seat].Glyph, -28, 20, 24, 36, 16); gridTileGlyphs[seat].font = Dial.GlyphFont; gridTileGlyphs[seat].horizontalOverflow = HorizontalWrapMode.Overflow; gridTileGlyphs[seat].verticalOverflow = VerticalWrapMode.Overflow;
             }
             gridReadout = Label(gridScreen, "", 0, 470, 340, 20, 12);
-            if (Slots.Image("chat-box") != null) gridReadout.rectTransform.anchoredPosition = new Vector2(0, -463); // Build R: clear of the chat box's plate (its top at 473)
             var panel = Rect("Caspar panel", gridScreen, 0, 540, 324, 112); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
             var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             gridCaspar = Label(panel, "", 0, 66, 306, 84, 12);
-            if (Slots.DressChatBox(panelImage, casparLabel, font)) ChatText(gridCaspar); // Build R: the box alone on the Elemental Table
+            Slots.DressInstrumentBox(panelImage, casparLabel, gridCaspar, font); // Build R: the slim box fitted to the line on the Elemental Table (owner, Sept 29)
             gridStatus = Label(gridScreen, "", 0, 614, 330, 24, 12); gridStatus.color = Muted;
             gridSeal = MakeButton(gridScreen, "SEAL", 0, 654, 146, 56, GridSeal); gridSeal.GetComponent<Image>().color = Crimson;
             leaveGrid = MakeButton(gridScreen, "Leave the Table", -72, 714, 128, 48, LeaveGrid); leaveGrid.GetComponentInChildren<Text>().fontSize = 13; // owner (worksheet section 11)
