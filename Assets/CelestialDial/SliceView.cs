@@ -682,7 +682,7 @@ namespace Ascendant.CelestialDial
         void EnterDialNow()
         {
             if (!Flow.EnterDial()) return;
-            Dial.SliceHidesOptional = true; Dial.Lesson.SetKey3(Flow.Keys >= 3);
+            if (Flow.AtriumStage >= 2) Dial.SliceHidesOptional = true; Dial.Lesson.SetKey3(Flow.Keys >= 3); // Build T: the first lesson, now reached through the Wing, keeps its optional extra
             Dial.ForceRefresh(); // the Dial's own buttons follow the restored lesson only after a refresh (a reload leaves Continue active by construction)
             bool forkMoment = Flow.CanEnterPractice && !Dial.Lesson.Dial.Active && !Dial.ControlsShown && Dial.Lesson.Phase != LessonPhase.GlyphWheel && !Dial.Lesson.UnitInProgress; // a wheel mid-unit resumes as before; the fork is for an idle wheel
             if (forkMoment) { forkShown = true; Dial.Lesson.Say(LessonAvailable ? ForkLine : Dial.Lesson.CanBeginGlyphs && !Dial.Lesson.AllNamed ? DialLesson.ShelfFirst : ForkPracticeOnlyLine); Show(); Dial.Realign(); Publish(); return; } // the fork (Sept 15 ruling): nothing starts until the player chooses

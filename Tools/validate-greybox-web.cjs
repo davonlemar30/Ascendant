@@ -55,6 +55,7 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).atriumStage===1&&(await state()).caspar.startsWith('Our work begins in the Zodiac Wing. That door there.')&&(await state()).canEnterWing,'Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-hub.png')});
+    check((await state()).lastCue==='page','Build E: the page hook fired on Caspar\'s pages, file or not, at '+viewport.width);
     check(!(await state()).canEnterChamber,'Build T: the Chamber button waits for Key 1 at '+viewport.width);
     await semantic('poi-chamber-door');await page.waitForTimeout(300);check((await state()).screen==='hub'&&(await state()).hubNote.startsWith('Sealed.'),'Build T: before Key 1 the Chamber door only says it is sealed at '+viewport.width);
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -62,9 +63,9 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
     await semantic('poi-dial');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await ready();
-    check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on at '+viewport.width);
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:10000}).catch(()=>{});check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on (tappable once the wheel\'s opening beat settles) at '+viewport.width);
     check((await state()).dormant,'the Dial is dormant on arrival at '+viewport.width);
-    check((await state()).artSet===''&&!(await state()).style&&(await state()).lastCue==='page','no query: the game plays on the Art folder, no style page; the page hook fired on Caspar\'s pages, file or not, at '+viewport.width); // Build E
+    check((await state()).artSet===''&&!(await state()).style,'no query: the game plays on the Art folder, no style page at '+viewport.width); // Build E (the page cue is checked in the Atrium, before the walk: Build T)
     await page.screenshot({path:path.join(out,viewport.width+'-encounter.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at '+viewport.width);
     // Seven intro beats, two of them automatic, then the teaching page and the guided problem.
