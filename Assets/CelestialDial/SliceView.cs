@@ -1088,7 +1088,7 @@ namespace Ascendant.CelestialDial
             // v0.2
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.resumed = Resumed;
             state.canEnterWing = s == SliceScreen.Hub && !busy;
-            state.canLeaveDial = leaveDial != null && leaveDial.gameObject.activeSelf && leaveDial.interactable; // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
+            state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             // Build F: the fork, practice, the gate, the journal
             state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
             state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
