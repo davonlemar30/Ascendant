@@ -77,6 +77,7 @@ namespace Ascendant.CelestialDial
             public string[] glyphOptions;
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
+            public bool settingsOpen, canQuit; // Build U: the Settings menu is open; the app (not a web page) can quit
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
             public string casparShown = ""; // Build S: that page's words, colour tags and all
@@ -175,8 +176,8 @@ namespace Ascendant.CelestialDial
             for(int i=0;i<4;i++){ int slot=i; builderNames[i]=MakeButton(root,"",-78+(i%2)*156,654+(i/2)*60,150,56,()=>BuilderName(slot)); builderNames[i].gameObject.SetActive(false); }
             for(int i=0;i<3;i++){ int property=i; builderShares[i]=MakeButton(root,DialLesson.ShareLabels[i],-110+i*110,654,104,56,()=>BuilderShare(property)); builderShares[i].GetComponentInChildren<Text>().fontSize=13; builderShares[i].gameObject.SetActive(false); }
             optional=MakeButton(root,"Try one more (optional)",0,714,244,48,()=> { Lesson.BeginOptional(); AlignStart(); });
-            var motion = MakeButton(root,"Reduced motion: off",92,768,160,44,ToggleMotion); // Build T: the bottom row's right half; Leave the Dial has the left (until the Settings menu holds both)
-            motionText=motion.GetComponentInChildren<Text>(); motionText.fontSize=13;
+            var motion = MakeButton(root,"Reduced motion: off",92,768,160,44,ToggleMotion);
+            motionText=motion.GetComponentInChildren<Text>(); motionText.fontSize=13; motion.gameObject.SetActive(false); // Build U: Reduced motion lives in Settings now (owner, Sept 29); the web action stays
             if (EventSystem.current == null)
             {
                 var events=new GameObject("Dial EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule));

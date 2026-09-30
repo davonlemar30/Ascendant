@@ -285,7 +285,7 @@ namespace Ascendant.CelestialDial
         // Build S: a page with more to come keeps a row at the bottom for its Continue.
         public static float InstrumentBoxHeight(float lineHeight, float max, bool more = false) => Mathf.Clamp(InstrumentHead + lineHeight + InstrumentFoot + (more ? InstrumentMore : 0), Mathf.Min(InstrumentMin, max), max);
         static Sprite instrumentBox;
-        static Sprite InstrumentBoxSprite()
+        public static Sprite InstrumentBoxSprite() // Build U: the Settings box wears it too
         {
             if (instrumentBox != null) return instrumentBox;
             const int size = 32; const float radius = 10, stroke = 2; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };

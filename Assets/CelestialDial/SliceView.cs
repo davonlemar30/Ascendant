@@ -130,6 +130,7 @@ namespace Ascendant.CelestialDial
         const string ChamberChooseLine = "Choose a lock, acolyte, and give it your Key."; // owner (worksheet section 13)
         const string ChamberEndCard = "The Zodiac Wing is complete. The Library remembers, and the rest remains sealed, for now."; // owner (worksheet section 13); two lines at 330 wide
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
+        public SettingsMenu Settings { get; private set; } // Build U
 
         void Awake()
         {
@@ -158,6 +159,12 @@ namespace Ascendant.CelestialDial
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
             flash = flashObject.AddComponent<Image>(); flash.color = new Color(1, 1, 1, 0); flash.raycastTarget = false;
+            // Build U (owner, APK playtest, Sept 29): Settings, from a gear at the top right of every screen.
+            Settings = gameObject.AddComponent<SettingsMenu>();
+            Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
+            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish;
+            Settings.Build(font);
+            if (Slots.StyleRequested) Settings.GearShown = false; // the style page is a test page, not the game
             if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
             TryRestore();
             Show(); Publish();
@@ -361,6 +368,7 @@ namespace Ascendant.CelestialDial
             walkSpeed = TestButton(hub, "Walk: normal (test)", -118, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
             mute = TestButton(hub, MuteLabel, 0, 774, ToggleMute); // Build E: sound on or off, apart from reduced motion
             hubRestart = TestButton(hub, "Start over (test)", 118, 774, Restart);
+            foreach (var test in new[] { walkSpeed, mute, hubRestart }) test.gameObject.SetActive(false); // Build U: off the Atrium, into Settings (owner, Sept 26 playtest, note 8); their web actions stay
         }
         void BuildReview()
         {
@@ -452,8 +460,8 @@ namespace Ascendant.CelestialDial
             keyIndicator = Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
             wingContinue = MakeButton(r, "Continue", 0, 654, 190, 56, WingContinue); wingContinue.name = "Slice Continue"; wingContinue.gameObject.SetActive(false);
             // Build T (owner, APK playtest, Sept 29): Leave the Dial shows at all times, the first lesson included. It has the bottom row's left half
-            // (Claude's working choice), clear of Seal and of the fork's row; Reduced motion takes the right half until the Settings menu holds it.
-            leaveDial = MakeButton(r, "Leave the Dial", -92, 768, 160, 44, LeaveDial); leaveDial.name = "Leave the Dial"; leaveDial.GetComponentInChildren<Text>().fontSize = 13; leaveDial.gameObject.SetActive(false);
+            // (Claude's working choice), clear of Seal and of the fork's row; Build U gave it the whole row once Reduced motion moved into Settings.
+            leaveDial = MakeButton(r, "Leave the Dial", 0, 768, 216, 44, LeaveDial); leaveDial.name = "Leave the Dial"; leaveDial.GetComponentInChildren<Text>().fontSize = 13; leaveDial.gameObject.SetActive(false);
             // Build F: the fork (Sept 15 ruling) on the row below Back; the practice exit where the table's exit sits, clear of Ask Caspar.
             forkLesson = MakeButton(r, "Continue the lesson", -78, 714, 150, 48, ContinueLesson); forkLesson.GetComponentInChildren<Text>().fontSize = 12; forkLesson.gameObject.SetActive(false);
             forkPractice = MakeButton(r, "Practice what you know", 78, 714, 150, 48, EnterPractice); forkPractice.GetComponentInChildren<Text>().fontSize = 12; forkPractice.gameObject.SetActive(false);
@@ -569,7 +577,8 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("grid-sign:") && int.TryParse(command.Substring(10), out int gridSign) && gridSign >= 0 && gridSign < 12) PickSign(gridSign);
             else if (command.StartsWith("grid-cell:") && int.TryParse(command.Substring(10), out int gridCell) && gridCell >= 0 && gridCell < 12) ChooseCell(gridCell);
             else if (command.StartsWith("walk:")) Walk(command.Substring(5));
-            else if (command == "walk-speed") CycleWalkSpeed();
+            else if (command == "walk-speed") { CycleWalkSpeed(); Settings.Refresh(); }
+            else if (command == "settings") Settings.Toggle(); // Build U: the gear
             else if (command == "leave-wing") LeaveWing();
             else if (command == "leave-dial") LeaveDial(); // note 10
             else if (command == "continue-lesson") ContinueLesson(); // Build F
@@ -1009,6 +1018,7 @@ namespace Ascendant.CelestialDial
             hubCaption.text = stage == 2 ? "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open." : ""; // owner (worksheet section 1, kept as written, marked X)
             hubText.text = stage == 1 ? HubOpeningLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
             enterChamber.interactable = !busy && Flow.CanEnterChamber; enterChamber.gameObject.SetActive(stage >= 2); // Build T: no dead button on the opening walk; the sealed door itself answers a tap
+            { var wingRect = (RectTransform)enterWing.transform; wingRect.anchoredPosition = new Vector2(stage >= 2 ? -78 : 0, wingRect.anchoredPosition.y); } // Build U: alone on the opening walk, the Zodiac Wing button sits centred
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
             endCard.text = Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber awaits them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber awaits them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber awaits them." : "The whole wheel burns. The symbols await you next."; // owner (worksheet sections 1 and 13)
@@ -1089,6 +1099,7 @@ namespace Ascendant.CelestialDial
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.resumed = Resumed;
             state.canEnterWing = s == SliceScreen.Hub && !busy;
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
+            state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             // Build F: the fork, practice, the gate, the journal
             state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
             state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
