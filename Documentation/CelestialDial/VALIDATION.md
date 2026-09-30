@@ -17,6 +17,16 @@ The owner's rulings (Sept 29–30, Decisions Log week of Sept 28–Oct 4; task 8
 New checks: mechanical, the slots and files, the open pieces' canvases, the font and its licence, every line the eye can show fitting at 15 px or more on two lines (the tightest is 18 px), the save field, the motion budget; fixture, the room in place and the retired pieces gone; suite, the Wing Dial's eye closed, opening and closed again, the dormant arrival, the elements' reveal mid-sweep and lit, the challenge in the eye with the sign above, the symbols' reveal and empty label, each of the five reveals played once, and the box's colour matching its speaker, at each viewport.
 
 Validation: mechanical 571/571, slice fixture 208/208, WebGL clean (27.7 MB), browser suite 393/393 at desktop density and 393/393 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/dial-redesign-2026-09-30/`](Evidence/dial-redesign-2026-09-30/).
+## The bookshelf glows itself (Build Y)
+
+The Sept 26 playtest's note 11 ("the glow should imbue the bookshelf itself") and the APK playtest ("a portal ring instead of a glow"); task 86bc8ddxp. Since the Wing became art-dressed, the shelf's glow was `SoftRing()`, a 90 × 320 ring behind the shelf.
+
+- With the Wing kit's shelf file (`kit-shelf-restored`), "Shelf light" is a child of that piece: the same sprite, tinted warm gold at 22%, with two `Outline` edges (1.5 and 3.5, gold at 50%) that follow the file's silhouette, under a `CanvasGroup` for its level. The ring is switched off; without the kit file the greybox keeps its soft disc.
+- Level: 1 while the Book waits (the wheel lit, the symbols unread), breathing .6–1 like the Dial's glow; still under reduced motion; .3 after the Book is read; 0 before the wheel is lit. Web state `shelfLight` (-1 without the kit file) and `shelfRing`.
+
+New check: suite, when the lit wheel wakes the shelf, the shelf's own light is at full and no ring shows, at each viewport.
+
+Validation: mechanical 502/502, slice fixture 207/207, WebGL clean (26.4 MB), browser suite 375/375 at desktop density and 375/375 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/shelf-glow-2026-09-30/`](Evidence/shelf-glow-2026-09-30/).
 
 ## The gold chat box fits its line (Build X)
 
