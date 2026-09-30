@@ -503,12 +503,12 @@ namespace Ascendant.CelestialDial
             if (kitShelf != null)
             {
                 glow.gameObject.SetActive(false);
-                var light = new GameObject("Shelf light", typeof(RectTransform)).GetComponent<RectTransform>(); light.SetParent(kitShelf.transform, false);
-                light.anchorMin = Vector2.zero; light.anchorMax = Vector2.one; light.offsetMin = light.offsetMax = Vector2.zero;
-                var lightImage = light.gameObject.AddComponent<Image>(); lightImage.sprite = kitShelf.GetComponent<Image>().sprite; lightImage.preserveAspect = kitShelf.GetComponent<Image>().preserveAspect; lightImage.raycastTarget = false;
-                lightImage.color = new Color(1f, .82f, .5f, .22f); // a warm wash over the shelf, not a flat fill: its own detail shows through
-                foreach (var d in new[] { 1.5f, 3.5f }) { var edge = light.gameObject.AddComponent<Outline>(); edge.effectColor = new Color(1f, .8f, .45f, .5f); edge.effectDistance = new Vector2(d, d); edge.useGraphicAlpha = false; } // the edge follows the file's silhouette
-                shelfLight = light.gameObject.AddComponent<CanvasGroup>(); shelfLight.alpha = 0; shelfLight.blocksRaycasts = false;
+                var shelfLit = new GameObject("Shelf light", typeof(RectTransform)).GetComponent<RectTransform>(); shelfLit.SetParent(kitShelf.transform, false);
+                shelfLit.anchorMin = Vector2.zero; shelfLit.anchorMax = Vector2.one; shelfLit.offsetMin = shelfLit.offsetMax = Vector2.zero;
+                var shelfLitImage = shelfLit.gameObject.AddComponent<Image>(); shelfLitImage.sprite = kitShelf.GetComponent<Image>().sprite; shelfLitImage.preserveAspect = kitShelf.GetComponent<Image>().preserveAspect; shelfLitImage.raycastTarget = false;
+                shelfLitImage.color = new Color(1f, .82f, .5f, .22f); // a warm wash over the shelf, not a flat fill: its own detail shows through
+                foreach (var d in new[] { 1.5f, 3.5f }) { var edge = shelfLit.gameObject.AddComponent<Outline>(); edge.effectColor = new Color(1f, .8f, .45f, .5f); edge.effectDistance = new Vector2(d, d); edge.useGraphicAlpha = false; } // the edge follows the file's silhouette
+                shelfLight = shelfLit.gameObject.AddComponent<CanvasGroup>(); shelfLight.alpha = 0; shelfLight.blocksRaycasts = false;
             }
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
             var dial = Rect("The Dial", wingRoom, 40, 337, 175, 205); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
