@@ -2,6 +2,18 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Settings (Build U)
+
+From the owner's APK playtest (Sept 29): Quit and Reduced motion live in a Settings menu, the gear at the top right of every screen (Decisions Log week page 2kyd583p-25254); the Sept 26 playtest's note 8 moved the Atrium's test buttons into it (task 86bc8ddzd).
+
+- `SettingsMenu` (its own overlay canvas, sort order 5: over the slice, under the white light) draws the gear in code (the web font has no gear glyph) at (158, 22), 36 × 36, and the menu: a dim veil (a tap closes), the instruments' slim-box sprite (`Slots.InstrumentBoxSprite`, now public), S E T T I N G S, the rows Sound, Reduced motion, Quit the game (`SettingsMenu.CanQuit`, false on WebGL), a T E S T I N G section with Walk and Start over, and Close. Working choices (Claude): the slim-box look, the Testing section in the same menu, no Quit on the web.
+- The Atrium's test buttons and the Dial's Reduced motion button are hidden; their web actions stay. Leave the Dial takes the Dial's bottom row (0, 768, 216 × 44). At Stage 1 the Zodiac Wing button is centred (the Chamber button is hidden until Key 1).
+- Web state `settingsOpen`, `canQuit`; web action and semantic button `settings`.
+
+New checks: fixture, the gear opens and closes Settings over the Atrium; suite, a canvas tap on the gear opens Settings with no Quit on the web, the Sound and Reduced motion rows work on the canvas, and Close shuts it with both settings as they were, at each viewport.
+
+Validation: mechanical 485/485, slice fixture 205/205, WebGL clean (26.4 MB), browser suite 347/347 at desktop density and 347/347 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/settings-2026-09-29/`](Evidence/settings-2026-09-29/).
+
 ## Caspar leads to the Zodiac Wing first (Build T)
 
 From the owner's APK playtest (Sept 29, page 2kyd583p-25274), rulings on the Decisions Log week page 2kyd583p-25254 (items 1 and 6 and the follow-up answers).
