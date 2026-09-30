@@ -479,7 +479,7 @@ namespace Ascendant.CelestialDial
         {
             switch (step)
             {
-                case 0: return "This is the Zodiac Wing. The wheel at its center has been still for as long as I can remember.\nGo ahead. Step closer.";
+                case 0: return ""; // cut by the owner (APK playtest, Sept 29): Caspar has just said "The Zodiac Wing. Mind the dust..." in the room (Build T); was "This is the Zodiac Wing. The wheel at its center has been still for as long as I can remember. Go ahead. Step closer." (Sept 11 lock)
                 case 1: return "The Dial stirs. Faded symbols along the rim begin to glow. The ring shifts.";
                 case 2: return "It responds to you.\nI have stood in this room a thousand times and it never so much as flickered for me. You carry the Ancestor's blood. There is no question now.";
                 case 3: return "It wants you to solve it. Go ahead.";

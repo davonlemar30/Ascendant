@@ -75,7 +75,7 @@ const path=require('path');
     await semantic('poi-dial');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await ready();
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:10000}).catch(()=>{});check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on (tappable once the wheel\'s opening beat settles) at '+viewport.width);
-    check((await state()).dormant,'the Dial is dormant on arrival at '+viewport.width);
+    check((await state()).dormant&&(await state()).message===''&&(await state()).dialBoxHeight===0,'the Dial is dormant on arrival, Caspar silent (the owner cut his repeated Wing line) at '+viewport.width);
     check((await state()).artSet===''&&!(await state()).style,'no query: the game plays on the Art folder, no style page at '+viewport.width); // Build E (the page cue is checked in the Atrium, before the walk: Build T)
     await page.screenshot({path:path.join(out,viewport.width+'-encounter.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at '+viewport.width);
