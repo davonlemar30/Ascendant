@@ -11,6 +11,7 @@ namespace Ascendant.CelestialDial
     {
         public const float Head = 34, Foot = 30, NextRow = 50, Min = 84; // Head clears the name plate; Foot the frame's bottom border and its diamond
         public Text Line; public RectTransform Next, Clip; public float Top, Max; // Top: the box's top edge, measured from its parent's top
+        public System.Action Fitted; // the web state republishes the new height
         string last; float lastWidth = -1; bool lastNext;
         public float Height => ((RectTransform)transform).sizeDelta.y;
         public static float BoxHeight(float text, bool next, float max) => Mathf.Clamp(Head + text + (next ? NextRow : 0) + Foot, Mathf.Min(Min, max), max);
@@ -30,6 +31,7 @@ namespace Ascendant.CelestialDial
             lr.sizeDelta = new Vector2(lr.sizeDelta.x, lineHeight); lr.anchoredPosition = new Vector2(lr.anchoredPosition.x, -(Head + lineHeight / 2));
             if (next) Next.anchoredPosition = new Vector2(Next.anchoredPosition.x, -(Top + h - Foot - NextRow / 2 + 4));
             if (Clip != null) Clip.sizeDelta = new Vector2(Clip.sizeDelta.x, Top + h);
+            Fitted?.Invoke();
         }
     }
 }

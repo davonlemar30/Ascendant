@@ -257,7 +257,7 @@ namespace Ascendant.CelestialDial
                 caspar = Label(panel, "", 0, 78, 276, 104, 14); caspar.alignment = TextAnchor.UpperLeft; caspar.resizeTextForBestFit = true; caspar.resizeTextMinSize = 10; caspar.resizeTextMaxSize = 14;
                 next = MakeButton(screen, "Continue", 0, 671, 150, 42, () => Continue());
                 // Build X: the box fits the page; Continue rides at its bottom; the figure behind it is clipped at its bottom edge.
-                var fit = panel.gameObject.AddComponent<ChatFit>(); fit.Line = caspar; fit.Next = (RectTransform)next.transform; fit.Top = 480; fit.Max = 240; fit.Clip = ClipBehind(screen, poseRect);
+                var fit = panel.gameObject.AddComponent<ChatFit>(); fit.Line = caspar; fit.Next = (RectTransform)next.transform; fit.Top = 480; fit.Max = 240; fit.Clip = ClipBehind(screen, poseRect); fit.Fitted = Publish;
                 if (name == "Atrium") atriumFit = fit; else returnFit = fit;
             }
             else
@@ -324,7 +324,7 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
             var casparLabel = Label(panel, "CASPAR", 0, 16, 290, 22, 13);
             chamberText = Label(panel, "", 0, 96, 306, 136, 13);
-            if (Slots.DressChatBox(panelImage, casparLabel, font)) { ChatText(chamberText); chamberFit = panel.gameObject.AddComponent<ChatFit>(); chamberFit.Line = chamberText; chamberFit.Top = 435; chamberFit.Max = 170; chamberFit.Clip = ClipBehind(chamber, chamberPoseRect); } // Build R; Build X: fitted
+            if (Slots.DressChatBox(panelImage, casparLabel, font)) { ChatText(chamberText); chamberFit = panel.gameObject.AddComponent<ChatFit>(); chamberFit.Line = chamberText; chamberFit.Top = 435; chamberFit.Max = 170; chamberFit.Clip = ClipBehind(chamber, chamberPoseRect); chamberFit.Fitted = Publish; } // Build R; Build X: fitted
             chamberEnd = Label(chamber, "The first Key is spent. The Library has taken her first breath.", 0, 720, 330, 40, 12); chamberEnd.color = Muted; chamberEnd.gameObject.SetActive(false);
             var glow = Rect("Insert glow", chamber, 0, 654, 214, 80); insertGlow = glow.gameObject.AddComponent<Image>(); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); insertGlow.raycastTarget = false;
             insert = MakeButton(chamber, "Insert Key", 0, 654, 190, 56, Insert); insert.GetComponent<Image>().color = Crimson; // owner (worksheet section 13)
@@ -371,7 +371,7 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.045f, .025f, .03f, .92f);
             var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
-            if (Slots.DressChatBox(panelImage, casparLabel, font)) { ChatText(hubText); hubFit = panel.gameObject.AddComponent<ChatFit>(); hubFit.Line = hubText; hubFit.Top = 476; hubFit.Max = 120; } // Build R: the box alone, the room stays in view (owner, Sept 28); Build X: fitted
+            if (Slots.DressChatBox(panelImage, casparLabel, font)) { ChatText(hubText); hubFit = panel.gameObject.AddComponent<ChatFit>(); hubFit.Line = hubText; hubFit.Top = 476; hubFit.Max = 120; hubFit.Fitted = Publish; } // Build R: the box alone, the room stays in view (owner, Sept 28); Build X: fitted
             enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing); StyleAtriumButton(enterWing);
             enterChamber = MakeButton(hub, "The Crystal Book Chamber", 78, 624, 150, 52, EnterChamber); StyleAtriumButton(enterChamber); enterChamber.GetComponentInChildren<Text>().fontSize = 12; // Build D; owner (worksheet section 13)
             journalHub = MakeButton(hub, "Your journal", 0, 680, 300, 52, OpenJournal); StyleAtriumButton(journalHub); journalHub.gameObject.SetActive(false); // Build F: the journal takes the row Check the Seals held (retired Sept 15)
