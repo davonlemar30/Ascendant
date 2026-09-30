@@ -2,6 +2,17 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The Dial speaks its own challenges (Build V)
+
+From the owner's APK playtest (Sept 29): "Build me a sign from its parts" and similar challenge prompts are the Dial's, plate THE CELESTIAL DIAL; the Dial's own look waits for concept art (Decisions Log week page 2kyd583p-25254, item 7).
+
+- `DialLesson.Speaker` is `CasparSpeaker` for every line set through `Message` and `DialSpeaker` for a line set through `DialSays`: the builder's asks (three), the builder's share step, and the opposites' own-pair prompt. Build I already put the per-problem targets on the wheel's face (`DialLesson.Challenge`); those are unchanged.
+- `FitBox.Name` is the plate; `FitBox.SetSpeaker` writes C A S P A R or T H E  C E L E S T I A L  D I A L (spaced; the plate is now as wide as the box). `DialView` sets it whenever the line shown is the lesson's own (`FitBox.Whole(message) == Lesson.Message`). Web state `speaker`.
+
+New checks: mechanical, the Dial asks for the sign built from its parts and Caspar answers a wrong name; suite, the builder's first ask is the Dial's at each viewport.
+
+Validation: mechanical 487/487, slice fixture 205/205, WebGL clean (26.4 MB), browser suite 349/349 at desktop density and 349/349 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/dial-speaker-2026-09-29/`](Evidence/dial-speaker-2026-09-29/).
+
 ## Settings (Build U)
 
 From the owner's APK playtest (Sept 29): Quit and Reduced motion live in a Settings menu, the gear at the top right of every screen (Decisions Log week page 2kyd583p-25254); the Sept 26 playtest's note 8 moved the Atrium's test buttons into it (task 86bc8ddzd).
