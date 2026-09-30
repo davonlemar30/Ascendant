@@ -117,7 +117,7 @@ The Chamber is built on the same kit code: `chamber` is the restored shell, `cha
 | `door` | the Keeper crosses a doorway (at the fade) |
 | `ambient` | the room loop, from the first screen, looping (browsers start it at the first tap) |
 
-A cue plays at most once per frame (a direct seat tap that crosses five detents is one step). The **Sound: on/off (test)** button on the Atrium's bottom row and on the style page mutes everything for the session; it has nothing to do with reduced motion, and it is a test control that will go.
+A cue plays at most once per frame (a direct seat tap that crosses five detents is one step). The **Sound** row in Settings (the gear at the top right; before Build U a test button on the Atrium's bottom row) and the button on the style page mute everything for the session; it has nothing to do with reduced motion.
 
 ## Import settings
 
