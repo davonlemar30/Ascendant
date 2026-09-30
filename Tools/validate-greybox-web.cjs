@@ -49,12 +49,15 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await page.screenshot({path:path.join(out,viewport.width+'-atrium.png')});
     check((await state()).casparPose==='wry','Build P: Caspar stands wry behind the chat box on the opening\'s first page at '+viewport.width);
-    await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPose==='warm',{},{timeout:5000}); // Build P: the pose turns with the page
+    { const h=(await state()).chatBoxHeight; check(h>0&&h<240,'Build X: the opening\'s chat box fits its first page ('+h+' of 240) at '+viewport.width);
+      await tap(0,429+h);await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPose==='warm',{},{timeout:5000}).catch(()=>{}); // Build P: the pose turns with the page; Build X: Continue rides at the fitted box's bottom
+      check((await state()).casparPose==='warm','Build X: a canvas tap on Continue, at the fitted box\'s bottom, turns the page at '+viewport.width); }
     for(let n=0;n<8&&(await state()).screen==='atrium';n++){await semantic('next-screen');await page.waitForTimeout(150);}
     // Build T (owner, APK playtest, Sept 29): the opening hands over the Atrium; Caspar sends the player to the Zodiac Wing, and the Dial is tapped there.
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).atriumStage===1&&(await state()).caspar.startsWith('Our work begins in the Zodiac Wing. That door there.')&&(await state()).canEnterWing,'Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-hub.png')});
+    check((await state()).chatBoxHeight>0&&(await state()).chatBoxHeight<120,'Build X: the Atrium\'s chat box fits Caspar\'s two lines ('+(await state()).chatBoxHeight+' of 120) at '+viewport.width);
     check((await state()).lastCue==='page','Build E: the page hook fired on Caspar\'s pages, file or not, at '+viewport.width);
     // Build U (owner, APK playtest, Sept 29): the gear at the top right opens Settings; its rows work on the canvas; the web build has no Quit.
     const muted0=(await state()).muted;

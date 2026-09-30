@@ -2,6 +2,17 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The gold chat box fits its line (Build X)
+
+The owner (Sept 29): dead space inside the chat box when Caspar speaks. The first pass fitted only the box's outer height; the owner's screenshot showed the gap meant was *inside*, between the plate and the first line. The padding was tightened and approved from a phone-size capture before this record.
+
+- `ChatFit` (on the story pages' box, the hub's, and the Chamber's): the top stays at the old top (story 480, hub 476, Chamber 435); height = `Head` 22 + the line's height + `NextRow` 50 when a Continue sits inside + `Foot` 30, clamped from `Min` 76 (the sliced frame's corners whole) to the old height (240, 120, 170), past which the text's best fit shrinks it as before. The line is placed just under the plate. The story pages' Continue rides at the box's bottom. Caspar's figure (story pages, Chamber) sits in a `RectMask2D` clip from the screen's top to the box's bottom edge. `Fitted` republishes the web state.
+- Web state `chatBoxHeight` (0 when no gold box shows).
+
+New checks: mechanical, the height rule; suite, the opening's first page and the Atrium hub come out shorter than their old heights, and a canvas tap on Continue at the fitted box's bottom turns the page, at each viewport.
+
+Validation: mechanical 502/502, slice fixture 207/207, WebGL clean (26.4 MB), browser suite 373/373 at desktop density and 373/373 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/chat-box-fit-2026-09-29/`](Evidence/chat-box-fit-2026-09-29/).
+
 ## DEV Mode: Jump to a checkpoint (Build W)
 
 The Sept 26 playtest's note 5 ("testing means doing every interactive all the way through, every time"). Brief: task 86bca0163, approved Sept 29 with the six checkpoints and Keys earned, not spent (Decisions Log week page 2kyd583p-25254).
