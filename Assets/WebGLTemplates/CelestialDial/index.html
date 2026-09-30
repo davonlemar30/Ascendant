@@ -16,7 +16,7 @@
 <p id="instructions" class="sr"></p>
 <div id="seats" role="group" aria-label="Zodiac seats in order"></div>
 <button id="back">Previous</button><button id="seal">Seal</button><button id="forward">Next</button>
-<button id="ask-caspar">Ask Caspar</button><button id="caspar-page">Continue Caspar's line</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
+<button id="settings">Settings</button><button id="ask-caspar">Ask Caspar</button><button id="caspar-page">Continue Caspar's line</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
 <label id="name-label" for="name" class="sr">Your name</label><input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Your name" hidden>
 <label id="birthdate-label" for="birthdate" class="sr">Your birth date</label><input id="birthdate" type="date" hidden>
 <button id="use-date">Use this date</button><button id="change-birth">Change my answer</button>
@@ -55,7 +55,7 @@
     const gs=document.createElement('button');gs.id='grid-sign-'+i;gs.textContent=SIGNS[i];gs.onclick=()=>send('grid-sign:'+i);byId('grid-signs').appendChild(gs);
     const gc=document.createElement('button');gc.id='grid-cell-'+i;gc.textContent='Cell '+(i+1);gc.onclick=()=>send('grid-cell:'+i);byId('grid-cells').appendChild(gc);
   }
-  for(const id of ['back','seal','forward','ask-caspar','caspar-page','continue','optional','motion','insert','restart','enter-wing','leave-dial','leave-wing','continue-lesson','enter-practice','leave-practice','open-journal','close-journal','journal-prev','journal-next','journal-contents','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
+  for(const id of ['settings','back','seal','forward','ask-caspar','caspar-page','continue','optional','motion','insert','restart','enter-wing','leave-dial','leave-wing','continue-lesson','enter-practice','leave-practice','open-journal','close-journal','journal-prev','journal-next','journal-contents','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
   for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
@@ -81,7 +81,7 @@
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
     box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
-    box('leave-dial',-92,768,160,44);box('leave-wing',0,680,300,52); // note 10: the Dial's exit and the room's are two buttons
+    box('leave-dial',0,768,216,44);box('settings',158,22,36,36);box('leave-wing',0,680,300,52); // note 10: the Dial's exit and the room's are two buttons
     // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
     const practiceDial=state&&state.screen==='practice'&&state.practiceMode==='dial';
     box('continue-lesson',-78,714,150,48);box('enter-practice',78,714,150,48);if(practiceDial)box('leave-practice',-72,714,128,48);else box('leave-practice',0,654,190,56);
@@ -117,7 +117,7 @@
       byId('mute').disabled=!((state.screen==='hub'&&!state.busy)||style);byId('mute').setAttribute('aria-pressed',String(!!state.muted));byId('mute').setAttribute('aria-label','Sound: '+(state.muted?'off':'on')+', test only');
       byId('instructions').textContent=style?[state.caspar,'Tab moves between the sound slots and the sound toggle.'].join(' '):chamber?[state.caspar,state.canWalk?'Tap the Books or the doorway to walk there, or use the buttons below.':'','Tab moves between controls.'].filter(Boolean).join(' '):naming?[state.message,'Four names: choose the sign Caspar described. Tab moves between controls.'].join(' '):sharing?[state.message,(state.shared&&state.shared.length?'Shared so far: '+state.shared.join(', ')+'.':''),'Tap each thing the two signs share. Tab moves between controls.'].filter(Boolean).join(' '):wing?[state.start,state.message,'Left and right arrow keys move one sign at a time. Tab moves between controls. Enter or Space activates the focused control. Only Seal submits.'].join(' '):grid?[state.caspar,state.gridReadout,state.gridStatus,'Tap a sign, then the cell where it belongs, then Seal. Tab moves between controls. Only Seal submits.'].filter(Boolean).join(' '):[state.caspar,state.note,state.canWalk?'Tap a doorway, the desk, or Caspar to walk there, or use the buttons below.':'','Tab moves between controls. Enter or Space activates the focused control.'].filter(Boolean).join(' ');
       for(let i=0;i<12;i++){const b=byId('seat-'+i);b.setAttribute('aria-label',state.seats[i]);b.textContent=state.seats[i].split(',')[0];b.disabled=!state.active;}
-      for(const id of ['back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('ask-caspar').disabled=!(wing&&state.canAsk);byId('caspar-page').disabled=!(state.casparPages>state.casparPage); // Build S: the slim box's page Continue
+      for(const id of ['settings','back','forward','seal'])byId(id).disabled=!(wing&&state.active);byId('ask-caspar').disabled=!(wing&&state.canAsk);byId('caspar-page').disabled=!(state.casparPages>state.casparPage); // Build S: the slim box's page Continue
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
       byId('motion').disabled=false;
       byId('next-screen').disabled=!state.canSliceContinue;byId('insert').disabled=!state.canInsert;byId('restart').disabled=!(state.ended||state.screen==='hub');

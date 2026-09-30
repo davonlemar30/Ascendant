@@ -56,6 +56,17 @@ const path=require('path');
     check((await state()).atriumStage===1&&(await state()).caspar.startsWith('Our work begins in the Zodiac Wing. That door there.')&&(await state()).canEnterWing,'Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-hub.png')});
     check((await state()).lastCue==='page','Build E: the page hook fired on Caspar\'s pages, file or not, at '+viewport.width);
+    // Build U (owner, APK playtest, Sept 29): the gear at the top right opens Settings; its rows work on the canvas; the web build has no Quit.
+    const muted0=(await state()).muted;
+    await tap(158,22);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+    check((await state()).settingsOpen&&!(await state()).canQuit,'Build U: a tap on the gear opens Settings; a web page offers no Quit at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-settings.png')});
+    await tap(0,291);await page.waitForTimeout(200);check((await state()).muted!==muted0,'Build U: the Sound row turns the sound '+(muted0?'on':'off')+' at '+viewport.width);
+    await tap(0,291);await page.waitForTimeout(200);
+    const reduced0=(await state()).reducedMotion;await tap(0,347);await page.waitForTimeout(200);check((await state()).reducedMotion!==reduced0,'Build U: the Reduced motion row works from Settings at '+viewport.width);
+    await tap(0,347);await page.waitForTimeout(200);
+    await tap(0,529);await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+    check(!(await state()).settingsOpen&&(await state()).muted===muted0&&(await state()).reducedMotion===reduced0,'Build U: Close shuts Settings, both settings back as they were at '+viewport.width);
     check(!(await state()).canEnterChamber,'Build T: the Chamber button waits for Key 1 at '+viewport.width);
     await semantic('poi-chamber-door');await page.waitForTimeout(300);check((await state()).screen==='hub'&&(await state()).hubNote.startsWith('Sealed.'),'Build T: before Key 1 the Chamber door only says it is sealed at '+viewport.width);
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -72,7 +83,7 @@ const path=require('path');
     for(let n=0;n<16&&(await state()).start!=='Start: Taurus';n++){if((await state()).canContinue)await semantic('continue');await page.waitForTimeout(500);}
     await waitActive('Taurus');check(!(await state()).dormant,'the Dial has woken and the guided problem began at '+viewport.width);
     // Build T: mid-challenge, a tap on the canvas's Leave the Dial goes to the Zodiac Wing; the Dial, tapped again, resumes the same problem.
-    await tap(-92,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+    await tap(0,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
     check((await state()).screen==='wingroom'&&(await state()).atriumStage===1,'Build T: Leave the Dial, tapped mid-challenge in the first lesson, lands in the Zodiac Wing at '+viewport.width);
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await waitActive('Taurus');check((await state()).start==='Start: Taurus'&&(await state()).active,'Build T: back at the Dial the same problem is waiting at '+viewport.width);
