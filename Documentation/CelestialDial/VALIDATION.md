@@ -2,6 +2,17 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The bookshelf glows itself (Build Y)
+
+The Sept 26 playtest's note 11 ("the glow should imbue the bookshelf itself") and the APK playtest ("a portal ring instead of a glow"); task 86bc8ddxp. Since the Wing became art-dressed, the shelf's glow was `SoftRing()`, a 90 × 320 ring behind the shelf.
+
+- With the Wing kit's shelf file (`kit-shelf-restored`), "Shelf light" is a child of that piece: the same sprite, tinted warm gold at 22%, with two `Outline` edges (1.5 and 3.5, gold at 50%) that follow the file's silhouette, under a `CanvasGroup` for its level. The ring is switched off; without the kit file the greybox keeps its soft disc.
+- Level: 1 while the Book waits (the wheel lit, the symbols unread), breathing .6–1 like the Dial's glow; still under reduced motion; .3 after the Book is read; 0 before the wheel is lit. Web state `shelfLight` (-1 without the kit file) and `shelfRing`.
+
+New check: suite, when the lit wheel wakes the shelf, the shelf's own light is at full and no ring shows, at each viewport.
+
+Validation: mechanical 502/502, slice fixture 207/207, WebGL clean (26.4 MB), browser suite 375/375 at desktop density and 375/375 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/shelf-glow-2026-09-30/`](Evidence/shelf-glow-2026-09-30/).
+
 ## The gold chat box fits its line (Build X)
 
 The owner (Sept 29): dead space inside the chat box when Caspar speaks. The first pass fitted only the box's outer height; the owner's screenshot showed the gap meant was *inside*, between the plate and the first line. The padding was tightened and approved from a phone-size capture before this record.
