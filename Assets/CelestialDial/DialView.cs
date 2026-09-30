@@ -77,7 +77,7 @@ namespace Ascendant.CelestialDial
             public string[] glyphOptions;
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
-            public bool settingsOpen, canQuit; // Build U: the Settings menu is open; the app (not a web page) can quit
+            public bool settingsOpen, canQuit, jumpsShown; // Build W: the Jump to list shows // Build U: the Settings menu is open; the app (not a web page) can quit
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)

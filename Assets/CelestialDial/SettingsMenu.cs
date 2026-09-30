@@ -13,9 +13,11 @@ namespace Ascendant.CelestialDial
         public static readonly bool CanQuit = !(Application.platform == RuntimePlatform.WebGLPlayer);
         public Func<bool> Muted, Reduced; public Func<string> WalkSpeed;
         public Action ToggleSound, ToggleMotion, CycleWalk, StartOver, Changed;
+        public Action<string> Jump; // Build W: DEV Mode's Jump to…, a checkpoint id (DevCheckpoints)
+        public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
         public bool GearShown { get => gear != null && gear.gameObject.activeSelf; set { if (gear != null) gear.gameObject.SetActive(value); if (!value) Close(); } }
-        Canvas canvas; RectTransform menu; Button gear; Text sound, motion, walk; Font font;
+        Canvas canvas; RectTransform menu, mainPanel, jumpPanel; Button gear; Text sound, motion, walk; Font font;
         static readonly Color Gold = new Color(.84f, .69f, .38f), Bone = new Color(.93f, .89f, .8f), RowColor = new Color(.16f, .15f, .18f);
 
         public void Build(Font uiFont)
@@ -33,8 +35,8 @@ namespace Ascendant.CelestialDial
             menu = Rect("Settings", root, 0, 400, 360, 800);
             var veil = menu.gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f);
             var veilButton = menu.gameObject.AddComponent<Button>(); veilButton.targetGraphic = veil; veilButton.transition = Selectable.Transition.None; veilButton.onClick.AddListener(Close);
-            bool quit = CanQuit; float height = quit ? 410 : 350;
-            var panel = Rect("Settings box", menu, 0, 400, 280, height);
+            bool quit = CanQuit; float height = quit ? 454 : 398; // Build W: one more Testing row, Jump to...
+            var panel = mainPanel = Rect("Settings box", menu, 0, 400, 280, height);
             var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.sprite = Slots.InstrumentBoxSprite(); panelImage.type = Image.Type.Sliced; panelImage.pixelsPerUnitMultiplier = 2;
             panel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None; // taps on the box itself do not close it
             var title = Label(panel, "S E T T I N G S", 0, 24, 240, 18, 12); title.color = Gold; title.fontStyle = FontStyle.Bold;
@@ -44,13 +46,26 @@ namespace Ascendant.CelestialDial
             if (quit) { var q = Row(panel, y, Application.Quit); q.text = "Quit the game"; q.transform.parent.name = "Quit the game"; y += 56; }
             var testing = Label(panel, "T E S T I N G", 0, y - 6, 240, 16, 10); testing.color = new Color(Gold.r, Gold.g, Gold.b, .7f); y += 22;
             walk = Row(panel, y, () => CycleWalk?.Invoke(), 40); y += 48;
+            var jump = Row(panel, y, ShowJumps, 40); jump.text = "Jump to..."; jump.transform.parent.name = "Jump to"; y += 48; // Latin-1 dots: the web font has no ellipsis
             var over = Row(panel, y, () => StartOver?.Invoke(), 40); over.text = "Start over"; y += 56;
             var close = Row(panel, y, Close); close.text = "Close"; close.color = Gold;
+            // Build W: the checkpoint list, in place of the main box while it shows.
+            float jumpHeight = 62 + (DevCheckpoints.All.Length - 1) * 46 + 56 + 24 + 22;
+            jumpPanel = Rect("Jump to box", menu, 0, 400, 280, jumpHeight);
+            var jumpImage = jumpPanel.gameObject.AddComponent<Image>(); jumpImage.sprite = Slots.InstrumentBoxSprite(); jumpImage.type = Image.Type.Sliced; jumpImage.pixelsPerUnitMultiplier = 2;
+            jumpPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
+            var jumpTitle = Label(jumpPanel, "J U M P   T O", 0, 24, 240, 18, 12); jumpTitle.color = Gold; jumpTitle.fontStyle = FontStyle.Bold;
+            float jy = 62;
+            foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), 40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
+            var back = Row(jumpPanel, jy + 10, ShowMain); back.text = "Back"; back.color = Gold;
+            jumpPanel.gameObject.SetActive(false);
             menu.gameObject.SetActive(false);
             Refresh();
         }
+        public void ShowJumps() { mainPanel.gameObject.SetActive(false); jumpPanel.gameObject.SetActive(true); Changed?.Invoke(); }
+        public void ShowMain() { jumpPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); Changed?.Invoke(); }
         public void Toggle() { if (Open) Close(); else { Open = true; menu.gameObject.SetActive(true); Refresh(); Changed?.Invoke(); } }
-        public void Close() { if (!Open) return; Open = false; menu.gameObject.SetActive(false); Changed?.Invoke(); }
+        public void Close() { if (!Open) return; Open = false; menu.gameObject.SetActive(false); if (jumpPanel != null) { jumpPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); } Changed?.Invoke(); }
         public void Refresh()
         {
             if (sound == null) return;

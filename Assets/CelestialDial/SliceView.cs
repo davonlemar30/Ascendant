@@ -162,7 +162,7 @@ namespace Ascendant.CelestialDial
             // Build U (owner, APK playtest, Sept 29): Settings, from a gear at the top right of every screen.
             Settings = gameObject.AddComponent<SettingsMenu>();
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
-            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish;
+            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo;
             Settings.Build(font);
             if (Slots.StyleRequested) Settings.GearShown = false; // the style page is a test page, not the game
             if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
@@ -579,6 +579,7 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("walk:")) Walk(command.Substring(5));
             else if (command == "walk-speed") { CycleWalkSpeed(); Settings.Refresh(); }
             else if (command == "settings") Settings.Toggle(); // Build U: the gear
+            else if (command.StartsWith("jump:")) JumpTo(command.Substring(5)); // Build W: DEV Mode
             else if (command == "leave-wing") LeaveWing();
             else if (command == "leave-dial") LeaveDial(); // note 10
             else if (command == "continue-lesson") ContinueLesson(); // Build F
@@ -684,6 +685,17 @@ namespace Ascendant.CelestialDial
         // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
         string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, acolyte. Bring them to the Books." : "You hold a Key, acolyte. " + ChamberBringLine); // owner (worksheet section 13)
         void Restart() { if (busy) return; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+        // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
+        void JumpTo(string id)
+        {
+            if (busy || !DevCheckpoints.Known(id)) return;
+            SaveData save;
+            try { save = DevCheckpoints.Play(id, Flow.PlayerName, Flow.HasSunSign ? Flow.SunSign : 1); }
+            catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return; }
+            PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(save)); PlayerPrefs.Save();
+            Debug.Log("[CelestialDial] jumped to checkpoint " + id);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
         void EnterWing() { Walk("wing-door"); }
         // Build F: whether the wheel has a lesson to offer at the fork (Part A stays on the shelf; the book's replay is the shelf's too).
@@ -1100,6 +1112,7 @@ namespace Ascendant.CelestialDial
             state.canEnterWing = s == SliceScreen.Hub && !busy;
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
+            state.jumpsShown = Settings != null && Settings.JumpsShown; // Build W
             // Build F: the fork, practice, the gate, the journal
             state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
             state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
