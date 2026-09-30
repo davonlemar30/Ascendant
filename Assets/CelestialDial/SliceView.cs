@@ -35,6 +35,7 @@ namespace Ascendant.CelestialDial
         // v0.4 tap-to-move (Q06 phase 2): two walkable rooms, a placeholder marker, fades at doorways.
         RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
         Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
+        CanvasGroup shelfLight; float shelfLightLevel; // Build Y: the shelf's own glow, 0 to 1
         // Build B: the table in the Wing room and its screen.
         RectTransform gridScreen; Text gridCaspar, gridReadout, gridStatus, gridKeys; Button gridSeal, gridAsk, leaveGrid, enterGrid; Image gridGlow, dialGlow, lampThree, lampFour;
         // Build D: the Chamber as a room, the Books, and the Atrium's dressing per stage.
@@ -186,6 +187,7 @@ namespace Ascendant.CelestialDial
                 insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, a);
             }
             if (Flow.Screen == SliceScreen.WingRoom && DialUnitWaiting && !ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .35f + .35f * Mathf.PingPong(Time.unscaledTime / 1.4f, 1f)); // Build I: reduced motion holds it still
+            if (shelfLight != null && Flow.Screen == SliceScreen.WingRoom && shelfLightLevel >= 1 && !ReducedMotion) shelfLight.alpha = .6f + .4f * Mathf.PingPong(Time.unscaledTime / 1.4f, 1f); // Build Y: the waiting shelf breathes, like the Dial; reduced motion holds it still
             PulseDoors(); // Build N: unlocked doors breathe light at their edges
             if (Flow.Gated && !busy && !Dial.Busy && !gating) StartCoroutine(Gate()); // Build F: the third strike closes the instrument once the answer's beat has settled
             if (leaveDial != null)
@@ -495,6 +497,19 @@ namespace Ascendant.CelestialDial
             var shelf = Block(wingRoom, "Collapsed bookshelf", 157, 295, 45, 290, wingBaked ? null : "shelf"); if (wingBaked) shelf.GetComponent<Image>().color = new Color(0, 0, 0, 0);
             if (!wingBaked) for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
             var glow = Rect("Shelf glow", shelf, 0, 145, 90, 320); shelfGlow = glow.gameObject.AddComponent<Image>(); shelfGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); shelfGlow.color = new Color(.95f, .8f, .5f, 0); shelfGlow.raycastTarget = false; glow.SetAsFirstSibling();
+            // Build Y (owner, Sept 26 playtest note 11 and the APK playtest: "a portal ring instead of a glow"): with the shelf's own kit file, the
+            // shelf itself glows. A gold copy of its restored file lies over it and a soft gold edge hugs its silhouette; the ring is retired.
+            var kitShelf = wingKit.FirstOrDefault(p => p.P.Name == "shelf")?.Restored;
+            if (kitShelf != null)
+            {
+                glow.gameObject.SetActive(false);
+                var shelfLit = new GameObject("Shelf light", typeof(RectTransform)).GetComponent<RectTransform>(); shelfLit.SetParent(kitShelf.transform, false);
+                shelfLit.anchorMin = Vector2.zero; shelfLit.anchorMax = Vector2.one; shelfLit.offsetMin = shelfLit.offsetMax = Vector2.zero;
+                var shelfLitImage = shelfLit.gameObject.AddComponent<Image>(); shelfLitImage.sprite = kitShelf.GetComponent<Image>().sprite; shelfLitImage.preserveAspect = kitShelf.GetComponent<Image>().preserveAspect; shelfLitImage.raycastTarget = false;
+                shelfLitImage.color = new Color(1f, .82f, .5f, .22f); // a warm wash over the shelf, not a flat fill: its own detail shows through
+                foreach (var d in new[] { 1.5f, 3.5f }) { var edge = shelfLit.gameObject.AddComponent<Outline>(); edge.effectColor = new Color(1f, .8f, .45f, .5f); edge.effectDistance = new Vector2(d, d); edge.useGraphicAlpha = false; } // the edge follows the file's silhouette
+                shelfLight = shelfLit.gameObject.AddComponent<CanvasGroup>(); shelfLight.alpha = 0; shelfLight.blocksRaycasts = false;
+            }
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
             var dial = Rect("The Dial", wingRoom, 40, 337, 175, 205); var dialImage = dial.gameObject.AddComponent<Image>(); dialImage.color = new Color(0, 0, 0, 0);
             var rings = Rect("Rings", dial, 0, 102, 175, 175); rings.gameObject.SetActive(!wingBaked && !Slots.Dress(dialImage, "dial-face")); if (wingBaked) dialImage.color = new Color(0, 0, 0, 0); // the face seen from the room
@@ -957,6 +972,8 @@ namespace Ascendant.CelestialDial
                 enterDial.interactable = !busy; wingRoomBack.interactable = !busy;
                 enterShelf.gameObject.SetActive(Flow.WheelComplete); enterShelf.interactable = !busy;
                 shelfGlow.color = new Color(.95f, .8f, .5f, Flow.WheelComplete && !Dial.Lesson.AllNamed ? .35f : Flow.WheelComplete ? .12f : 0);
+                shelfLightLevel = Flow.WheelComplete && !Dial.Lesson.AllNamed ? 1f : Flow.WheelComplete ? .3f : 0; // Build Y: the book waiting glows fully; after it, a faint warmth
+                if (shelfLight != null) shelfLight.alpha = shelfLightLevel * (ReducedMotion || shelfLightLevel < 1 ? 1 : .8f);
                 enterGrid.gameObject.SetActive(Flow.CanOpenGrid); enterGrid.interactable = !busy;
                 journalWing.gameObject.SetActive(Flow.CanOpenJournal); journalWing.interactable = !busy; // Build F
                 gridGlow.color = new Color(.95f, .8f, .5f, Flow.ModalitiesComplete && !Grid.Key3Earned ? .35f : Flow.ModalitiesComplete ? .12f : 0); // an instrument with a unit waiting glows, like the shelf
@@ -1186,6 +1203,7 @@ namespace Ascendant.CelestialDial
             state.canEnterGrid = s == SliceScreen.WingRoom && Flow.CanOpenGrid && !busy;
             state.keys = Math.Max(state.keys, Flow.Keys); // the lesson counts two Keys; the table adds the third
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
+            state.shelfLight = shelfLight != null ? shelfLightLevel : -1; state.shelfRing = shelfGlow != null && shelfGlow.gameObject.activeInHierarchy && shelfGlow.color.a > 0; // Build Y
             state.kitLevel = KitLevel; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
             state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
             if (chamberKit != null) { state.chamberKitLevel = chamberKit.Shown; state.chamberKitRestored = chamberKit.Pieces.Count(p => p.Shown); state.chamberKitPieces = chamberKit.Pieces.Count; } // Build O
