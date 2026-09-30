@@ -9,7 +9,7 @@ namespace Ascendant.CelestialDial
     // and Caspar's waist-up figure behind it is clipped at the box's bottom edge, so a shorter box never shows where the figure is cut off.
     public sealed class ChatFit : MonoBehaviour
     {
-        public const float Head = 34, Foot = 30, NextRow = 50, Min = 84; // Head clears the name plate; Foot the frame's bottom border and its diamond
+        public const float Head = 22, Foot = 30, NextRow = 50, Min = 76; // Head just clears the name plate, Foot the frame's bottom border and its diamond: no dead space inside (owner, Sept 29)
         public Text Line; public RectTransform Next, Clip; public float Top, Max; // Top: the box's top edge, measured from its parent's top
         public System.Action Fitted; // the web state republishes the new height
         string last; float lastWidth = -1; bool lastNext;
