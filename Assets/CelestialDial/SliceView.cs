@@ -256,6 +256,9 @@ namespace Ascendant.CelestialDial
                 Slots.DressChatBox(panelImage, null, font); // Build R: the shared chat box, the same frame and plate as every Caspar panel
                 caspar = Label(panel, "", 0, 78, 276, 104, 14); caspar.alignment = TextAnchor.UpperLeft; caspar.resizeTextForBestFit = true; caspar.resizeTextMinSize = 10; caspar.resizeTextMaxSize = 14;
                 next = MakeButton(screen, "Continue", 0, 671, 150, 42, () => Continue());
+                // Build X: the box fits the page; Continue rides at its bottom; the figure behind it is clipped at its bottom edge.
+                var fit = panel.gameObject.AddComponent<ChatFit>(); fit.Line = caspar; fit.Next = (RectTransform)next.transform; fit.Top = 480; fit.Max = 240; fit.Clip = ClipBehind(screen, poseRect);
+                if (name == "Atrium") atriumFit = fit; else returnFit = fit;
             }
             else
             {
@@ -268,6 +271,15 @@ namespace Ascendant.CelestialDial
         }
         static void SetPose(Image pose, string name) { var sprite = Slots.Image("caspar-" + name); pose.sprite = sprite; pose.enabled = sprite != null; pose.color = Color.white; pose.preserveAspect = true; } // Build P: no file, no figure
         void ChamberPose(string name) { chamberPoseName = name ?? ""; if (name == null) chamberPose.enabled = false; else SetPose(chamberPose, name); } // Build R: null puts him away
+        // Build X: a clip from the screen's top to the chat box's bottom edge (ChatFit keeps it there), with Caspar's figure moved inside it.
+        static RectTransform ClipBehind(RectTransform screen, RectTransform figure)
+        {
+            var clip = new GameObject("Caspar clip", typeof(RectTransform), typeof(RectMask2D)).GetComponent<RectTransform>(); clip.SetParent(screen, false);
+            clip.anchorMin = clip.anchorMax = clip.pivot = new Vector2(.5f, 1); clip.anchoredPosition = Vector2.zero; clip.sizeDelta = new Vector2(360, 800);
+            clip.SetSiblingIndex(figure.GetSiblingIndex()); figure.SetParent(clip, false); // the same place: both hang from the screen's top centre
+            return clip;
+        }
+        ChatFit atriumFit, returnFit, chamberFit, hubFit; // Build X
         static void ChatText(Text line) { line.alignment = TextAnchor.MiddleLeft; line.rectTransform.sizeDelta -= new Vector2(22, 0); } // Build R: left-aligned, clear of the frame
         void BuildChamber()
         {
@@ -312,7 +324,7 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", chamber, 0, 520, 324, 170); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
             var casparLabel = Label(panel, "CASPAR", 0, 16, 290, 22, 13);
             chamberText = Label(panel, "", 0, 96, 306, 136, 13);
-            if (Slots.DressChatBox(panelImage, casparLabel, font)) ChatText(chamberText); // Build R
+            if (Slots.DressChatBox(panelImage, casparLabel, font)) { ChatText(chamberText); chamberFit = panel.gameObject.AddComponent<ChatFit>(); chamberFit.Line = chamberText; chamberFit.Top = 435; chamberFit.Max = 170; chamberFit.Clip = ClipBehind(chamber, chamberPoseRect); } // Build R; Build X: fitted
             chamberEnd = Label(chamber, "The first Key is spent. The Library has taken her first breath.", 0, 720, 330, 40, 12); chamberEnd.color = Muted; chamberEnd.gameObject.SetActive(false);
             var glow = Rect("Insert glow", chamber, 0, 654, 214, 80); insertGlow = glow.gameObject.AddComponent<Image>(); insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); insertGlow.raycastTarget = false;
             insert = MakeButton(chamber, "Insert Key", 0, 654, 190, 56, Insert); insert.GetComponent<Image>().color = Crimson; // owner (worksheet section 13)
@@ -359,7 +371,7 @@ namespace Ascendant.CelestialDial
             var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.045f, .025f, .03f, .92f);
             var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
-            if (Slots.DressChatBox(panelImage, casparLabel, font)) ChatText(hubText); // Build R: the box alone, the room stays in view (owner, Sept 28)
+            if (Slots.DressChatBox(panelImage, casparLabel, font)) { ChatText(hubText); hubFit = panel.gameObject.AddComponent<ChatFit>(); hubFit.Line = hubText; hubFit.Top = 476; hubFit.Max = 120; } // Build R: the box alone, the room stays in view (owner, Sept 28); Build X: fitted
             enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing); StyleAtriumButton(enterWing);
             enterChamber = MakeButton(hub, "The Crystal Book Chamber", 78, 624, 150, 52, EnterChamber); StyleAtriumButton(enterChamber); enterChamber.GetComponentInChildren<Text>().fontSize = 12; // Build D; owner (worksheet section 13)
             journalHub = MakeButton(hub, "Your journal", 0, 680, 300, 52, OpenJournal); StyleAtriumButton(journalHub); journalHub.gameObject.SetActive(false); // Build F: the journal takes the row Check the Seals held (retired Sept 15)
@@ -1113,6 +1125,7 @@ namespace Ascendant.CelestialDial
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             state.jumpsShown = Settings != null && Settings.JumpsShown; // Build W
+            { var fit = s == SliceScreen.Atrium ? atriumFit : s == SliceScreen.AtriumReturn ? returnFit : s == SliceScreen.Hub ? hubFit : s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom ? chamberFit : null; state.chatBoxHeight = fit != null && fit.isActiveAndEnabled ? fit.Height : 0; } // Build X
             // Build F: the fork, practice, the gate, the journal
             state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
             state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
