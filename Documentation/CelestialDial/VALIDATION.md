@@ -9,9 +9,13 @@ From the owner's APK playtest (Sept 29): "Build me a sign from its parts" and si
 - `DialLesson.Speaker` is `CasparSpeaker` for every line set through `Message` and `DialSpeaker` for a line set through `DialSays`: the builder's asks (three), the builder's share step, and the opposites' own-pair prompt. Build I already put the per-problem targets on the wheel's face (`DialLesson.Challenge`); those are unchanged.
 - `FitBox.Name` is the plate; `FitBox.SetSpeaker` writes C A S P A R or T H E  C E L E S T I A L  D I A L (spaced; the plate is now as wide as the box). `DialView` sets it whenever the line shown is the lesson's own (`FitBox.Whole(message) == Lesson.Message`). Web state `speaker`.
 
+- **The opening beat is cut (owner, Sept 29 evening).** The first lesson's "This is the Zodiac Wing. The wheel at its center has been still..." (Sept 11 lock) is gone: since Build T Caspar has just spoken in the room, so the Dial arrives dormant with Caspar silent and Continue wakes it (Decisions Log week page 2kyd583p-25254). The Dial also says "acolyte", and the wheel face's target label counts as the Dial speaking (both the owner's, no code change).
+
 New checks: mechanical, the Dial asks for the sign built from its parts and Caspar answers a wrong name; suite, the builder's first ask is the Dial's at each viewport.
 
 Validation: mechanical 487/487, slice fixture 205/205, WebGL clean (26.4 MB), browser suite 349/349 at desktop density and 349/349 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/dial-speaker-2026-09-29/`](Evidence/dial-speaker-2026-09-29/).
+
+Production suite after the deploy of `207952b` (PR #83; GitHub Actions Web run 36673078488, build and Pages deploy both passed): 349/349 at desktop density and 349/349 at phone density (`DEVICE_SCALE=2 MOBILE=1`), run against `https://davonlemar30.github.io/Ascendant/?v=207952b`.
 
 ## Settings (Build U)
 
@@ -25,6 +29,8 @@ New checks: fixture, the gear opens and closes Settings over the Atrium; suite, 
 
 Validation: mechanical 485/485, slice fixture 205/205, WebGL clean (26.4 MB), browser suite 347/347 at desktop density and 347/347 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/settings-2026-09-29/`](Evidence/settings-2026-09-29/).
 
+Production suite after the deploy of `ff268c8` (PR #82; GitHub Actions Web run 36671138446, build and Pages deploy both passed): 347/347 at desktop density and 347/347 at phone density (`DEVICE_SCALE=2 MOBILE=1`), run against `https://davonlemar30.github.io/Ascendant/?v=ff268c8`.
+
 ## Caspar leads to the Zodiac Wing first (Build T)
 
 From the owner's APK playtest (Sept 29, page 2kyd583p-25274), rulings on the Decisions Log week page 2kyd583p-25254 (items 1 and 6 and the follow-up answers).
@@ -37,6 +43,8 @@ Checks swept: every mechanical test flow now walks to the Dial (`EnterWing`, `En
 New checks: mechanical, the opening lands in the Atrium at Stage 1 with the Chamber shut, and the Dial and the Wing can be left and entered again at Stage 1; fixture, the Atrium's and the Wing's opening lines; suite, the same lines, the sealed Chamber door on a tap, a canvas tap on Leave the Dial mid-challenge in the first lesson, and the same problem waiting on return, at each viewport.
 
 Validation: mechanical 485/485, slice fixture 203/203, WebGL clean (26.4 MB), browser suite 339/339 at desktop density and 339/339 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/wing-first-2026-09-29/`](Evidence/wing-first-2026-09-29/).
+
+PR #81 merged as `5880ac7` (GitHub Actions Web run 36670527692, build and Pages deploy both passed). The production suite was run once for Builds T and U together against the next deploy, `ff268c8` (see Build U, 347/347 at both densities).
 
 ## Caspar's lines in pages (Build S)
 

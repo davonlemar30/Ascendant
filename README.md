@@ -38,7 +38,7 @@ The current build is **the Zodiac Wing**, the first wing of the Library. It hold
 - **Phone:** tap and drag the wheel; tap a seat to jump to it; tap **Seal** to commit. In the rooms, tap a doorway, the desk, the table, the Books, or Caspar to walk there. Buttons under each room do the same thing as tapping. **Your journal** is a button in every room; **Leave the instrument** is on every practice item.
 - **Keyboard:** left and right arrows turn the wheel one seat; Tab moves between controls; Enter or Space activates. Only Seal submits — selecting a seat never counts as an answer.
 - **Screen readers:** every seat, cell, and button is labeled, and Caspar's lines are announced as they change.
-- **Reduced motion:** honored from your system setting, and there's a toggle on the Dial. With it on, the wheel cuts instead of spinning and the walks skip to the door.
+- **Reduced motion:** honored from your system setting, and there's a toggle in Settings (the gear at the top right). With it on, the wheel cuts instead of spinning and the walks skip to the door.
 
 ## Saving
 
