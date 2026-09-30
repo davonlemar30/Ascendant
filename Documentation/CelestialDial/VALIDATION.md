@@ -2,6 +2,19 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Caspar leads to the Zodiac Wing first (Build T)
+
+From the owner's APK playtest (Sept 29, page 2kyd583p-25274), rulings on the Decisions Log week page 2kyd583p-25254 (items 1 and 6 and the follow-up answers).
+
+- **The opening's walk.** `SliceFlow.Continue` takes the Atrium's last page to the Hub, not the Dial; Stage 2 (and `Deck.IntroduceAll`) still begins only on the return from the Chamber (`KeyInserted`). At Stage 1 the hub says `SliceView.HubOpeningLine`, the Wing room `WingOpeningLine` (both the owner's); `EnterWing`, then the Dial point of interest, opens the lesson. The Chamber door stays locked in the Atrium kit until Stage 2 (`DoorUnlocked`), its button is hidden at Stage 1, and a tap on the doorway gives the sealed-door line. `LeaveWing` works at Stage 1 too. The first lesson keeps its optional extra round (`SliceHidesOptional` only from Stage 2).
+- **Leave the Dial at all times.** Its own button (`leaveDial`) on the bottom row (768), left half, Reduced motion the right half (Claude's working choice, until Settings holds Reduced motion). It shows on the Dial whenever the Dial may be left: from Stage 2 always, at Stage 1 until Key 1 shows (then Continue carries the opening on). It leaves mid-challenge; the problem waits on return. `canLeaveDial` follows the same rule; the old Continue at 654 is the opening's Continue only.
+
+Checks swept: every mechanical test flow now walks to the Dial (`EnterWing`, `EnterDial`) before Key 1; the suite's three opening paths (main, recovery, art set) walk through the Atrium and the Wing; the page-cue check moved to the Atrium (the walk plays the door cue); the Stage 2 door check waits for the Chamber door's unlock fade (it was seen locked at Stage 1); the old "Back button stays off" assertions now expect the exit on its own row.
+
+New checks: mechanical, the opening lands in the Atrium at Stage 1 with the Chamber shut, and the Dial and the Wing can be left and entered again at Stage 1; fixture, the Atrium's and the Wing's opening lines; suite, the same lines, the sealed Chamber door on a tap, a canvas tap on Leave the Dial mid-challenge in the first lesson, and the same problem waiting on return, at each viewport.
+
+Validation: mechanical 485/485, slice fixture 203/203, WebGL clean (26.4 MB), browser suite 339/339 at desktop density and 339/339 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/wing-first-2026-09-29/`](Evidence/wing-first-2026-09-29/).
+
 ## Caspar's lines in pages (Build S)
 
 From the owner's APK playtest (Sept 29, page 2kyd583p-25274), rulings on the Decisions Log week page 2kyd583p-25254.

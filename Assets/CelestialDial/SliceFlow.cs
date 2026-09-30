@@ -153,10 +153,10 @@ namespace Ascendant.CelestialDial
             if (!CanContinue) return false;
             Screen = Screen == SliceScreen.Identity ? SliceScreen.Birth :
                 Screen == SliceScreen.Birth ? SliceScreen.Atrium :
-                Screen == SliceScreen.Atrium ? SliceScreen.Wing :
+                Screen == SliceScreen.Atrium ? SliceScreen.Hub : // Build T (owner, APK playtest, Sept 29): the opening hands the player the Atrium; Caspar leads them to the Zodiac Wing, and the Dial is tapped from there
                 Screen == SliceScreen.Wing ? SliceScreen.AtriumReturn :
                 Screen == SliceScreen.AtriumReturn ? SliceScreen.Chamber : SliceScreen.Hub;
-            if (Screen == SliceScreen.Hub) { Note = ""; if (AtriumStage < 2) { AtriumStage = 2; Deck.IntroduceAll(Sitting); } Walk.Enter(Room.Atrium, "entry"); }
+            if (Screen == SliceScreen.Hub) { Note = ""; if (AtriumStage < 2 && KeyInserted) { AtriumStage = 2; Deck.IntroduceAll(Sitting); } Walk.Enter(Room.Atrium, "entry"); } // Stage 2 still begins on the return from the Chamber, not on the opening's walk
             Logged?.Invoke("screen_entered:" + Screen);
             return true;
         }
@@ -209,14 +209,14 @@ namespace Ascendant.CelestialDial
         }
         public bool LeaveDial()
         {
-            if (Screen != SliceScreen.Wing || AtriumStage < 2) return false;
+            if (Screen != SliceScreen.Wing || (AtriumStage < 2 && KeyRevealed)) return false; // Build T: from the first lesson on; once Key 1 shows, Continue carries the opening on
             Screen = SliceScreen.WingRoom; Logged?.Invoke("screen_entered:wingroom"); return true;
         }
         public bool LeaveWing()
         {
-            if (Screen != SliceScreen.WingRoom || AtriumStage < 2) return false;
+            if (Screen != SliceScreen.WingRoom) return false; // Build T: the Stage 1 walk goes both ways too
             Screen = SliceScreen.Hub; Note = "";
-            if (WheelComplete && AtriumStage < 3) { AtriumStage = 3; Logged?.Invoke("atrium_stage_3"); }
+            if (WheelComplete && AtriumStage == 2) { AtriumStage = 3; Logged?.Invoke("atrium_stage_3"); }
             // Stages 4–6 follow Keys spent, on the return from the Chamber (Build D); Keys earned show in hand until then.
             Walk.Enter(Room.Atrium, "wing-door"); Logged?.Invoke("screen_entered:hub"); return true;
         }

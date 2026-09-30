@@ -54,6 +54,7 @@ namespace Ascendant.CelestialDial
         readonly Button[] glyphNameButtons = new Button[4];
         readonly Button[] reviewGlyphButtons = new Button[4];
         InputField nameField, dateField;
+        Button leaveDial; // Build T
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
         Button enterWing, hubRestart, leavePractice;
         // Build F: the fork and the practice exit on the Dial, the journal's buttons and screen.
@@ -115,6 +116,9 @@ namespace Ascendant.CelestialDial
         const string HubKey3Line = "Three Keys, acolyte. The table is full and the Zodiac Wing has one last pattern to teach you.\nRest now, and let the Library remember what you have done."; // owner (worksheet section 11)
         const string HubKey4Line = "Four Keys, acolyte. Every pattern the wheel held, you hold now.\nRest, for the Chamber will want to see what you carry."; // owner (worksheet section 12)
         // Build D placeholder lines (owner writes; worksheet section 13).
+        // Build T (owner, APK playtest, Sept 29): the opening's walk. Caspar sends the player to the Zodiac Wing; in the Wing he points to the Dial.
+        public const string HubOpeningLine = "Our work begins in the Zodiac Wing. That door there. Go on, it will open for you."; // owner (Sept 29)
+        public const string WingOpeningLine = "The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready."; // owner (Sept 29)
         const string HubKeyInHandLine = "You carry a Key the Chamber has not yet seen, acolyte. Its door stands open when you are ready."; // owner (worksheet section 13)
         const string HubKeysInHandLine = "You carry {0} Keys the Chamber has not yet seen. Its door stands open when you are ready."; // owner (worksheet section 13)
         const string HubSpent2Line = "Two locks filled, acolyte. The first Book is one Key from opening, and I confess the air in this room has changed.\nThe shelves are taking their books back."; // owner (worksheet section 13)
@@ -177,11 +181,16 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.WingRoom && DialUnitWaiting && !ReducedMotion) dialGlow.color = new Color(.95f, .8f, .5f, .35f + .35f * Mathf.PingPong(Time.unscaledTime / 1.4f, 1f)); // Build I: reduced motion holds it still
             PulseDoors(); // Build N: unlocked doors breathe light at their edges
             if (Flow.Gated && !busy && !Dial.Busy && !gating) StartCoroutine(Gate()); // Build F: the third strike closes the instrument once the answer's beat has settled
+            if (leaveDial != null)
+            {
+                bool leave = Flow.Screen == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed), can = leave && !busy && !Dial.Busy; // Build T: at all times; Key 1's Continue carries the opening on
+                if (leaveDial.gameObject.activeSelf != leave || leaveDial.interactable != can) { leaveDial.gameObject.SetActive(leave); leaveDial.interactable = can; Publish(); }
+            }
             if (wingContinue != null && Flow.AtriumStage >= 2)
             {
-                // The Wing's Back button belongs to the Wing screen only; left on, it sat over the review's Seal (owner playtest, Sept 14).
+                // From Stage 2 the slice's Continue is no longer the Dial's exit (Build T moved Leave the Dial to its own button); it stays off.
                 bool idle = Flow.Screen == SliceScreen.Wing && !Dial.Lesson.Dial.Active && !Dial.Busy && !busy && Dial.Lesson.Phase != LessonPhase.Review && !Dial.ControlsShown; // Build C: nor over the beat's Continue or the builder's buttons
-                if (wingContinue.gameObject.activeSelf != idle) { wingContinue.gameObject.SetActive(idle); Publish(); }
+                if (wingContinue.gameObject.activeSelf) { wingContinue.gameObject.SetActive(false); Publish(); }
                 // Build F: the fork sits on the row below Back, under the same idle rule, only while the fork is open.
                 bool fork = idle && forkShown && Flow.CanEnterPractice, lesson = fork && LessonAvailable;
                 if (forkPractice.gameObject.activeSelf != fork || forkLesson.gameObject.activeSelf != lesson) { forkPractice.gameObject.SetActive(fork); forkLesson.gameObject.SetActive(lesson); Publish(); }
@@ -442,6 +451,9 @@ namespace Ascendant.CelestialDial
             keyLabel = Label(keyRect, "KEEPER KEY", 0, 20, 80, 36, 12); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0); keyLabel.gameObject.SetActive(!keyArt); // the file draws its own Key
             keyIndicator = Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
             wingContinue = MakeButton(r, "Continue", 0, 654, 190, 56, WingContinue); wingContinue.name = "Slice Continue"; wingContinue.gameObject.SetActive(false);
+            // Build T (owner, APK playtest, Sept 29): Leave the Dial shows at all times, the first lesson included. It has the bottom row's left half
+            // (Claude's working choice), clear of Seal and of the fork's row; Reduced motion takes the right half until the Settings menu holds it.
+            leaveDial = MakeButton(r, "Leave the Dial", -92, 768, 160, 44, LeaveDial); leaveDial.name = "Leave the Dial"; leaveDial.GetComponentInChildren<Text>().fontSize = 13; leaveDial.gameObject.SetActive(false);
             // Build F: the fork (Sept 15 ruling) on the row below Back; the practice exit where the table's exit sits, clear of Ask Caspar.
             forkLesson = MakeButton(r, "Continue the lesson", -78, 714, 150, 48, ContinueLesson); forkLesson.GetComponentInChildren<Text>().fontSize = 12; forkLesson.gameObject.SetActive(false);
             forkPractice = MakeButton(r, "Practice what you know", 78, 714, 150, 48, EnterPractice); forkPractice.GetComponentInChildren<Text>().fontSize = 12; forkPractice.gameObject.SetActive(false);
@@ -607,7 +619,7 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Hub) Save();
             if (from == SliceScreen.Birth) StartCoroutine(WhiteLight()); else { Show(); Publish(); }
         }
-        void WingContinue() { if (Flow.AtriumStage >= 2) LeaveDial(); else Continue(); }
+        void WingContinue() { Continue(); } // Build T: only the opening's Continue after Key 1; the Dial's exit is its own button
         void Insert()
         {
             if (busy) return;
@@ -670,7 +682,7 @@ namespace Ascendant.CelestialDial
         void EnterDialNow()
         {
             if (!Flow.EnterDial()) return;
-            Dial.SliceHidesOptional = true; Dial.Lesson.SetKey3(Flow.Keys >= 3);
+            if (Flow.AtriumStage >= 2) Dial.SliceHidesOptional = true; Dial.Lesson.SetKey3(Flow.Keys >= 3); // Build T: the first lesson, now reached through the Wing, keeps its optional extra
             Dial.ForceRefresh(); // the Dial's own buttons follow the restored lesson only after a refresh (a reload leaves Continue active by construction)
             bool forkMoment = Flow.CanEnterPractice && !Dial.Lesson.Dial.Active && !Dial.ControlsShown && Dial.Lesson.Phase != LessonPhase.GlyphWheel && !Dial.Lesson.UnitInProgress; // a wheel mid-unit resumes as before; the fork is for an idle wheel
             if (forkMoment) { forkShown = true; Dial.Lesson.Say(LessonAvailable ? ForkLine : Dial.Lesson.CanBeginGlyphs && !Dial.Lesson.AllNamed ? DialLesson.ShelfFirst : ForkPracticeOnlyLine); Show(); Dial.Realign(); Publish(); return; } // the fork (Sept 15 ruling): nothing starts until the player chooses
@@ -739,7 +751,7 @@ namespace Ascendant.CelestialDial
         {
             if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom && Flow.Screen != SliceScreen.ChamberRoom)) return;
             var poi = Flow.Walk.Find(id); if (poi == null) return;
-            if (!poi.Walkable) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; }
+            if (!poi.Walkable || (id == "chamber-door" && Flow.Screen == SliceScreen.Hub && !Flow.CanEnterChamber)) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; } // Build T: before Key 1 the Chamber is sealed
             if (id == "shelf" && !Flow.WheelComplete) { if (Flow.TouchDarkShelf()) { wingRoomCaption.text = DialLesson.ShelfDark; Publish(); } return; }
             if (id == "grid" && !Flow.CanOpenGrid) { if (Flow.TouchDarkGrid()) { wingRoomCaption.text = GridModel.DarkLine; Publish(); } return; } // Build B: dark and tappable with a note before the unit
             if (!Flow.Walk.GoTo(id)) return;
@@ -814,7 +826,7 @@ namespace Ascendant.CelestialDial
         // Leaving the Dial lands the player in the Zodiac Wing; the room's own button returns to the Atrium (owner, Sept 26 playtest, note 10).
         void LeaveDial()
         {
-            if (busy || Flow.Screen != SliceScreen.Wing || Dial.Busy || Dial.Lesson.Dial.Active || !Flow.LeaveDial()) return;
+            if (busy || Flow.Screen != SliceScreen.Wing || Dial.Busy || !Flow.LeaveDial()) return; // Build T: mid-challenge too; the wheel resumes where it was
             forkShown = false; Save(); Show(); Publish();
         }
         void LeaveWing() { if (busy || Flow.Screen != SliceScreen.WingRoom) return; Walk("atrium-door"); }
@@ -919,6 +931,7 @@ namespace Ascendant.CelestialDial
                 wingRoomCaption.text = Flow.Note == "gated" ? SliceFlow.GateLine // Build F: the instrument closed on the third strike; the journal is below
                     : Flow.Note == "shelf-dark" ? DialLesson.ShelfDark
                     : Flow.Note == "grid-dark" ? GridModel.DarkLine
+                    : Flow.AtriumStage == 1 ? WingOpeningLine // Build T: the first lesson waits at the Dial
                     : Dial.Lesson.Phase == LessonPhase.GlyphWheel ? "Ah. The Dial has turned sly. It wears only its symbols now, twelve marks with no names beneath them. Shall we find out which of them you truly know?" // owner (APK playtest rewrite, Sept 29; was worksheet, Sept 14 flags)
                     : Dial.Lesson.CanBeginModalities && Dial.Lesson.Phase != LessonPhase.GlyphWheel ? "The second pattern awaits you at the Dial. Go to it." // owner (worksheet section 10)
                     : Flow.ModalitiesComplete && !Grid.Key3Earned ? (Grid.PlacedCount > 0 ? "The table waits, some signs already placed. Go to it." : "A table has woken beside the wheel. Go to it.") // owner (worksheet section 11)
@@ -939,7 +952,6 @@ namespace Ascendant.CelestialDial
             {
                 if (!sunSent && Flow.HasSunSign) { Dial.Lesson.SetSunSign(Flow.SunSign); sunSent = true; }
                 if (Flow.AtriumStage >= 2) { keyRect.gameObject.SetActive(false); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); seam.color = new Color(Bone.r, Bone.g, Bone.b, 0); Dial.Ring.localScale = Vector3.one; }
-                if (Flow.AtriumStage >= 2) { var t = wingContinue.GetComponentInChildren<Text>(); t.text = "Leave the Dial"; } // the Dial's exit goes to the room (note 10); the label follows "Leave the Table" and awaits the owner's word
                 Dial.ForceRefresh();
             }
             if (s == SliceScreen.Hub) ShowHub();
@@ -995,8 +1007,8 @@ namespace Ascendant.CelestialDial
             sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? (HasArt(sealedLeftLight.transform.parent as RectTransform) ? .06f : .3f) : 0);
             // The caption is said once: on the first return, while the Atrium is at Stage 2. After that the room shows its own state (owner, Sept 26 playtest, note 9).
             hubCaption.text = stage == 2 ? "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open." : ""; // owner (worksheet section 1, kept as written, marked X)
-            hubText.text = Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
-            enterChamber.interactable = !busy && Flow.CanEnterChamber;
+            hubText.text = stage == 1 ? HubOpeningLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
+            enterChamber.interactable = !busy && Flow.CanEnterChamber; enterChamber.gameObject.SetActive(stage >= 2); // Build T: no dead button on the opening walk; the sealed door itself answers a tap
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
             endCard.text = Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber awaits them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber awaits them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber awaits them." : "The whole wheel burns. The symbols await you next."; // owner (worksheet sections 1 and 13)
@@ -1076,7 +1088,7 @@ namespace Ascendant.CelestialDial
             // v0.2
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.resumed = Resumed;
             state.canEnterWing = s == SliceScreen.Hub && !busy;
-            state.canLeaveDial = s == SliceScreen.Wing && Flow.AtriumStage >= 2 && wingContinue.gameObject.activeSelf && !busy && Dial.Lesson.Phase != LessonPhase.GlyphNames; // note 10: the Dial's exit; canLeaveWing is the room's
+            state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             // Build F: the fork, practice, the gate, the journal
             state.practicing = s == SliceScreen.Practice; state.canLeavePractice = state.practicing && !busy;
             state.practiceMode = !state.practicing ? "" : Flow.PracticeDone ? "done" : task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) ? "dial" : task != null && task.Mode == ReviewMode.TapModality ? "modality" : "tap";
@@ -1619,7 +1631,7 @@ namespace Ascendant.CelestialDial
                 p => screen != SliceScreen.Atrium && (p.Lock > 0 ? Flow.LocksFilled >= p.Lock : Flow.AtriumStage >= p.Key));
             // The Zodiac Wing's door is open to the Keeper from the start; the Chamber's unlocks with the first Key (the return); the sealed door stays sealed.
             k.VeilTint = new Color(.02f, .035f, .09f); // the Atrium shell carries warm lantern light; asleep, a cold blue night sits over it
-            k.DoorUnlocked = id => id == "wing-door" || (id == "chamber-door" && screen != SliceScreen.Atrium);
+            k.DoorUnlocked = id => id == "wing-door" || (id == "chamber-door" && screen != SliceScreen.Atrium && Flow.AtriumStage >= 2); // Build T: sealed on the opening's walk, before Key 1
             AddDoor(k, "sealed-left", null, -117.5f, 385, 60, 130, 264, 88); // plates ~30% larger for phone reading (owner, Sept 25), then 18% more so the names sit inside the engraved field (Sept 26 playtest, note 6)
             AddDoor(k, "wing-door", "THE ZODIAC\nWING", 0, 385, 70, 135, 258, 100);
             AddDoor(k, "chamber-door", "THE CRYSTAL\nBOOK CHAMBER", 117.5f, 385, 60, 130, 266, 102);
