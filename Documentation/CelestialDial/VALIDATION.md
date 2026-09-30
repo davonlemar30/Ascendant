@@ -2,6 +2,18 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## DEV Mode: Jump to a checkpoint (Build W)
+
+The Sept 26 playtest's note 5 ("testing means doing every interactive all the way through, every time"). Brief: task 86bca0163, approved Sept 29 with the six checkpoints and Keys earned, not spent (Decisions Log week page 2kyd583p-25254).
+
+- `DevCheckpoints.Play(id, name, sun)` runs one continuous, scripted Wing in memory through `SliceFlow`, `DialLesson` and `GridModel`, with the production progress subscriptions (`ObserveProgress`). It plays the opening (Build T's walk, Key 1 into the Chamber), the element continuation, the Book (Parts A and B), the modalities and the Table, the opposites and the builder, and, for the last checkpoint, spends the three Keys in hand. Every answer is at Level 0. It stops at the checkpoint and returns `CaptureProgress`, and it throws rather than write a partial save if a step fails.
+- `SliceView.JumpTo` writes that save and reloads, as Start over does. `SettingsMenu` gains a Testing row, Jump to..., which swaps the box for the checkpoint list and Back. The Settings box is 48 taller on every screen.
+- Web state `jumpsShown`; web action `jump:<id>`; semantic buttons `#jump-<id>`.
+
+New checks: mechanical, each checkpoint's save holds its Keys, locks, stage, units and proven items (after Key 1, two element items proven, as a played run leaves them), and play continues from After Key 2 and After Key 4; fixture, Jump to After Key 3 reloads into the Atrium with Keys 2 and 3 in hand and the last pattern waiting; suite, a canvas tap through Settings → Jump to... → After Key 4, then every checkpoint through its web button with its Keys and stage checked, the Dial offering the next lesson and practice from After Key 2, and no runtime exceptions, at each viewport. Build U's canvas taps moved with the taller box.
+
+Validation: mechanical 501/501, slice fixture 207/207, WebGL clean (26.4 MB), browser suite 367/367 at desktop density and 367/367 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. A first run failed on the suite's `jumpsShown` check: the assignment had been appended after a trailing `// Build U` comment. Fixed. Captures: [`Evidence/dev-mode-2026-09-29/`](Evidence/dev-mode-2026-09-29/).
+
 ## The Dial speaks its own challenges (Build V)
 
 From the owner's APK playtest (Sept 29): "Build me a sign from its parts" and similar challenge prompts are the Dial's, plate THE CELESTIAL DIAL; the Dial's own look waits for concept art (Decisions Log week page 2kyd583p-25254, item 7).
