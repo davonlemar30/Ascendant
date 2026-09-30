@@ -193,6 +193,29 @@ namespace Ascendant.Build
             review.BeginReview(2, 4); review.Dial.Select(Zodiac.Destination(2), DialInput.DirectSeat); var reviewAnswer = review.Seal(); review.AfterCorrect(reviewAnswer);
             Check(reviewAnswer.correctness && review.Phase == LessonPhase.Review && Others(reviewFlow.Deck, ItemKind.Grid) + Kind(reviewFlow.Deck, ItemKind.Grid) == allBefore, "a compressed Dial review answer records no lesson evidence of any kind");
         }
+        static void ValidateBuildW()
+        {
+            // ---- Build W (owner, Sept 26 note 5; task 86bca0163): DEV Mode's checkpoints, each a real save from one scripted run; Keys earned, not spent ----
+            Check(DevCheckpoints.All.Select(c => c.id).SequenceEqual(new[] { "key1", "wheel", "key2", "key3", "key4", "whole" }), "Build W: six checkpoints, in play order (owner, Sept 29)");
+            SaveData Round(string id) => JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(DevCheckpoints.Play(id, "Tester", 4)));
+            SliceFlow Flow(SaveData save) { var f = new SliceFlow(); Check(f.Restore(save), "Build W: the " + save.keys + "-Key checkpoint restores its flow"); return f; }
+            int Proven(SaveData s, ItemKind kind) => s.deck.Count(i => i.kind == (int)kind && i.entered && i.state == (int)ItemState.Practicing);
+            var k1 = Round("key1"); var f1 = Flow(k1);
+            Check(k1.playerName == "Tester" && k1.sunSign == 4 && k1.keys == 1 && k1.locksFilled == 1 && k1.atriumStage == 2 && !k1.wheelComplete && k1.lit.Count(v => v) == 6 && f1.AtHub && f1.KeysInHand == 0 && Proven(k1, ItemKind.Element) == 2,
+                "Build W: after Key 1, the Atrium at Stage 2, six seats lit, Key 1 in the Chamber (the opening inserts it), the two independent answers proven, as a played run leaves them [name=" + k1.playerName + " sun=" + k1.sunSign + " keys=" + k1.keys + " locks=" + k1.locksFilled + " stage=" + k1.atriumStage + " wheel=" + k1.wheelComplete + " lit=" + k1.lit.Count(v => v) + " hub=" + f1.AtHub + " inHand=" + f1.KeysInHand + " proven=" + Proven(k1, ItemKind.Element) + "]");
+            var wh = Round("wheel");
+            Check(wh.keys == 1 && wh.wheelComplete && wh.lit.All(v => v) && wh.atriumStage == 3 && wh.glyphStage == 0, "Build W: the whole wheel lit, the Atrium at Stage 3, the Book waiting");
+            var k2 = Round("key2"); var f2 = Flow(k2);
+            Check(k2.keys == 2 && k2.glyphStage == 2 && k2.locksFilled == 1 && f2.KeysInHand == 1 && !k2.modalitiesStarted && Proven(k2, ItemKind.Glyph) == 12, "Build W: after Key 2, Key 2 in hand, the symbols proven, the second pattern waiting");
+            var k3 = Round("key3"); var f3 = Flow(k3);
+            Check(k3.keys == 3 && k3.gridPlaced.All(v => v) && k3.litMod.All(v => v) && f3.KeysInHand == 2 && !k3.oppositesStarted && Proven(k3, ItemKind.Grid) == 12, "Build W: after Key 3, Keys 2 and 3 in hand, the Table full, the last pattern waiting");
+            var k4 = Round("key4"); var f4 = Flow(k4);
+            Check(k4.keys == 4 && k4.built == 3 && k4.builderEvidence && k4.oppKnown.All(v => v) && f4.KeysInHand == 3 && k4.locksFilled == 1 && k4.atriumStage == 3, "Build W: after Key 4, three Keys in hand, nothing more spent");
+            var wo = Round("whole"); var fw = Flow(wo);
+            Check(wo.keys == 4 && wo.locksFilled == 4 && wo.atriumStage == 6 && fw.WingWhole && fw.KeysInHand == 0, "Build W: the Zodiac Wing whole, all four Keys spent, the Atrium at Stage 6");
+            Check(f4.EnterChamber() && f4.SpendKey() && f4.KeysInHand == 2, "Build W: from after Key 4 the Chamber takes a Key: the checkpoint plays on");
+            Check(f2.EnterWing() && f2.EnterDial() && f2.Screen == SliceScreen.Wing, "Build W: from after Key 2 the Dial opens: the checkpoint plays on");
+        }
         static void ValidateBuildJ()
         {
             // ---- Build J (owner, Sept 23): the journal as a book. Contents, sections, a page per sign met; Illumination plus Ribbons; no state words ----
@@ -723,6 +746,7 @@ namespace Ascendant.Build
             ValidateEvidenceRouting();
             ValidateBuildF();
             ValidateBuildJ();
+            ValidateBuildW();
             ValidateNoSwallowedCode();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");

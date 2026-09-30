@@ -61,11 +61,11 @@ const path=require('path');
     await tap(158,22);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
     check((await state()).settingsOpen&&!(await state()).canQuit,'Build U: a tap on the gear opens Settings; a web page offers no Quit at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-settings.png')});
-    await tap(0,291);await page.waitForTimeout(200);check((await state()).muted!==muted0,'Build U: the Sound row turns the sound '+(muted0?'on':'off')+' at '+viewport.width);
-    await tap(0,291);await page.waitForTimeout(200);
-    const reduced0=(await state()).reducedMotion;await tap(0,347);await page.waitForTimeout(200);check((await state()).reducedMotion!==reduced0,'Build U: the Reduced motion row works from Settings at '+viewport.width);
-    await tap(0,347);await page.waitForTimeout(200);
-    await tap(0,529);await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+    await tap(0,267);await page.waitForTimeout(200);check((await state()).muted!==muted0,'Build U: the Sound row turns the sound '+(muted0?'on':'off')+' at '+viewport.width);
+    await tap(0,267);await page.waitForTimeout(200);
+    const reduced0=(await state()).reducedMotion;await tap(0,323);await page.waitForTimeout(200);check((await state()).reducedMotion!==reduced0,'Build U: the Reduced motion row works from Settings at '+viewport.width);
+    await tap(0,323);await page.waitForTimeout(200);
+    await tap(0,553);await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
     check(!(await state()).settingsOpen&&(await state()).muted===muted0&&(await state()).reducedMotion===reduced0,'Build U: Close shuts Settings, both settings back as they were at '+viewport.width);
     check(!(await state()).canEnterChamber,'Build T: the Chamber button waits for Key 1 at '+viewport.width);
     await semantic('poi-chamber-door');await page.waitForTimeout(300);check((await state()).screen==='hub'&&(await state()).hubNote.startsWith('Sealed.'),'Build T: before Key 1 the Chamber door only says it is sealed at '+viewport.width);
@@ -592,6 +592,41 @@ const path=require('path');
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);
     fs.writeFileSync(path.join(out,viewport.width+'-events.json'),JSON.stringify(events,null,2));
     await context.close();
+  }));
+  // Build W (owner, Sept 26 note 5; task 86bca0163): DEV Mode's Jump to. A canvas tap through Settings to one checkpoint, the rest through their web buttons.
+  await Promise.all(VIEWPORTS.map(async viewport=>{
+    const devContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
+    const dev=await devContext.newPage();const devErrors=[];dev.on('pageerror',e=>devErrors.push(String(e)));
+    const snap=()=>dev.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>dev.locator('#'+id).evaluate(b=>b.click());
+    const frames=async n=>{for(let i=0;i<n;i++)await dev.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>r())));};
+    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await dev.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await dev.mouse.down();await frames(2);await dev.mouse.up();await frames(2);};
+    const resumed=()=>dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,{},{timeout:120000});
+    await dev.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
+    await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await dev.locator('#loading').waitFor({state:'detached'});
+    await dev.locator('#name').fill('Tester');await dev.locator('#name').dispatchEvent('change');await dev.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
+    await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
+    await act('birth-known');await dev.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-4');await dev.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Leo');
+    await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
+    for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await dev.waitForTimeout(150);}
+    await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+    await tap(158,22);await dev.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+    await tap(0,449);await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
+    check((await snap()).settingsOpen&&(await snap()).jumpsShown,'Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at '+viewport.width);
+    await dev.screenshot({path:path.join(out,viewport.width+'-dev-jump.png')});
+    await tap(0,449);await resumed(); // the fifth row: After Key 4
+    { const s=await snap(); check(s.keys===4&&s.keysInHand===3&&s.locksFilled===1&&s.atriumStage===3&&s.playerName==='Tester'&&s.sunSign==='Leo','Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at '+viewport.width); }
+    await dev.screenshot({path:path.join(out,viewport.width+'-dev-key4.png')});
+    const expect={key1:s=>s.keys===1&&s.keysInHand===0&&s.locksFilled===1&&s.atriumStage===2&&!s.wheelComplete,
+      wheel:s=>s.keys===1&&s.wheelComplete&&s.atriumStage===3,
+      key2:s=>s.keys===2&&s.keysInHand===1&&s.atriumStage===3,
+      key3:s=>s.keys===3&&s.keysInHand===2&&s.atriumStage===3,
+      whole:s=>s.keys===4&&s.locksFilled===4&&s.wingWhole&&s.atriumStage===6&&s.keysInHand===0};
+    for(const id of Object.keys(expect)){await act('jump-'+id);await dev.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();check(expect[id](await snap()),'Build W: the checkpoint '+id+' lands with its Keys and stage at '+viewport.width);
+      if(id==='key2'){await act('enter-wing');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await act('poi-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+        check((await snap()).fork==='both'&&(await snap()).canContinueLesson&&(await snap()).canEnterPractice,'Build W: from after Key 2 the Dial offers the next lesson and practice at '+viewport.width);}}
+    await act('restart');await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
+    await devContext.close();
   }));
   const recoveryContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const recovery=await recoveryContext.newPage();

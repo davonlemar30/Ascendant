@@ -339,6 +339,10 @@ namespace Ascendant.Build
                     Check(View.Dial.Snapshot().journalView=="section" && lines.Count==12 && over.Count==0,"every line of "+View.Dial.Snapshot().journalSection+" fits on its rule ("+lines.Count+" lines)"+(over.Count>0?"; too long: "+string.Join(" / ",over):""));if(entry==4)Capture("slice-390-art-journal-opposites.png");});
             }
             Steps.Enqueue(()=>Act("close-journal"));
+            // Build W (DEV Mode): Jump to After Key 3 writes a real save and reloads into it; the game plays on from there.
+            Steps.Enqueue(()=>Act("jump:key3"));
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.Keys==3 && View.Flow.KeysInHand==2 && View.Flow.LocksFilled==1 && View.Dial.Lesson.ModalitiesComplete,"Build W: Jump to After Key 3 reloads into the Atrium, Keys 2 and 3 in hand");Capture("slice-390-dev-key3.png");Act("enter-wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Lesson.CanBeginOpposites,"Build W: from the checkpoint the Wing opens and the last pattern waits at the Dial");});
             Steps.Enqueue(()=>{Slots.Request(Slots.TestSet,true);Act("reload");});
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.screen=="style" && s.style && s.styleSlots.Length==134 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": test set")) && s.styleSounds.All(t=>t.EndsWith(": test set")) && s.artSet==Slots.TestSet,"?style=test: the style page lists every slot on the test set, each with its source");Capture("slice-390-style-test.png");});
             Steps.Enqueue(()=>{int played=Sound.Played;Act("sound:seal");Check(Sound.LastCue=="seal" && Sound.Played==played+1,"a sound slot plays from the style page");Act("mute");Check(Sound.Muted && View.Dial.Snapshot().muted,"the test mute toggle silences the game");Act("mute");Check(!Sound.Muted,"and back");Slots.Request("",true);Act("reload");});
