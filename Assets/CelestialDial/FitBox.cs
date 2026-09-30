@@ -14,6 +14,9 @@ namespace Ascendant.CelestialDial
     {
         public const int PageLines = 3;
         public Text Line; public float Max; public Button More;
+        public Text Name; // Build V: the speaker's plate
+        public const string CasparPlate = "C A S P A R", DialPlate = "T H E   C E L E S T I A L   D I A L"; // spaced: the legacy Text has no letter spacing
+        public void SetSpeaker(bool dial) { if (Name != null) { string plate = dial ? DialPlate : CasparPlate; if (Name.text != plate) Name.text = plate; } }
         public string Source { get; private set; } = "";
         public int Page { get; private set; }
         public int Pages => pages.Count;

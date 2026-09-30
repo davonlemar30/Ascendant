@@ -37,7 +37,12 @@ namespace Ascendant.CelestialDial
         public bool DialDormant => Phase == LessonPhase.Encounter && IntroStep <= 1;
         // A Level 2 problem shows the count once, one click per beat, before the player takes over.
         public bool CountBeatPending { get; private set; }
-        public string Message { get; private set; }
+        // Build V (owner, APK playtest, Sept 29): the Dial speaks its own challenges; every other line is Caspar's.
+        public const string CasparSpeaker = "caspar", DialSpeaker = "dial";
+        string message = "";
+        public string Message { get => message; private set { message = value ?? ""; Speaker = CasparSpeaker; } }
+        public string Speaker { get; private set; } = CasparSpeaker;
+        void DialSays(string text) { Message = text; Speaker = DialSpeaker; } // a line that poses the problem, said by the Dial
         public bool IsProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation || Phase == LessonPhase.Review || Phase == LessonPhase.GlyphWheel || Phase == LessonPhase.ModalityGuided || Phase == LessonPhase.ModalityOwn || InOppositeProblem;
         // The element-family problems, the only phases whose answer_correct is sign → element evidence (evidence routing audit, Sept 17).
         public bool InElementProblem => Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Optional || Phase == LessonPhase.Continuation;
@@ -111,8 +116,8 @@ namespace Ascendant.CelestialDial
         {
             lastStart = Zodiac.Wrap(start); Phase = hint >= 2 ? LessonPhase.OppositeGuided : LessonPhase.OppositeOwn;
             Dial.Begin(lastStart, hint, -1, 6); CountBeatPending = hint >= 2;
-            Message = hint >= 2 ? "Now the final pattern, acolyte: every sign has an opposite, the sign that sits straight across the wheel.\nFrom " + SignName(lastStart) + ", count six signs forward: one, two, three, four, five, six.\nWhen the sign is selected, press Seal." // owner (worksheet section 12)
-                : "Your turn now, acolyte. Find the sign that sits across the wheel from " + SignName(lastStart) + ".\nWhen it is selected, press Seal."; // owner (worksheet section 12)
+            if (hint >= 2) Message = "Now the final pattern, acolyte: every sign has an opposite, the sign that sits straight across the wheel.\nFrom " + SignName(lastStart) + ", count six signs forward: one, two, three, four, five, six.\nWhen the sign is selected, press Seal."; // owner (worksheet section 12)
+            else DialSays("Your turn now, acolyte. Find the sign that sits across the wheel from " + SignName(lastStart) + ".\nWhen it is selected, press Seal."); // owner (worksheet section 12); Build V: the Dial's
         }
         void AfterOppositeCorrect(DialEvent result)
         {
@@ -143,7 +148,7 @@ namespace Ascendant.CelestialDial
             if (Built >= 3) { FinishBuilder(); return; }
             BuilderTarget = BuilderTargets[Built]; BuilderStep = 1; builderMisses = 0; builderAssisted = false; for (int i = 0; i < 3; i++) Shared[i] = false;
             Phase = LessonPhase.BuilderName; Dial.Home();
-            Message = Built == 0 ? "Build me a sign from its parts, acolyte. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign is that?" : Built == 1 ? "Again. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Name it." : "One more. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign?"; // owner (worksheet section 12)
+            DialSays(Built == 0 ? "Build me a sign from its parts, acolyte. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign is that?" : Built == 1 ? "Again. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Name it." : "One more. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign?"); // owner (worksheet section 12); Build V: the Dial asks (the owner's example)
             Dial.Log("builder_sign_started");
         }
         public bool AnswerBuilderName(int seat)
@@ -173,7 +178,7 @@ namespace Ascendant.CelestialDial
         void StartBuilderShare()
         {
             Phase = LessonPhase.BuilderShare; BuilderStep = 3; builderMisses = 0; Dial.Home();
-            Message = SignName(BuilderTarget) + " and " + SignName(Zodiac.Opposite(BuilderTarget)) + ", straight across the wheel from one another.\nNow tap what the two share."; // owner (worksheet section 12)
+            DialSays(SignName(BuilderTarget) + " and " + SignName(Zodiac.Opposite(BuilderTarget)) + ", straight across the wheel from one another.\nNow tap what the two share."); // owner (worksheet section 12); Build V: the Dial's
         }
         public bool AnswerBuilderShare(int property)
         {
@@ -474,7 +479,7 @@ namespace Ascendant.CelestialDial
         {
             switch (step)
             {
-                case 0: return "This is the Zodiac Wing. The wheel at its center has been still for as long as I can remember.\nGo ahead. Step closer.";
+                case 0: return ""; // cut by the owner (APK playtest, Sept 29): Caspar has just said "The Zodiac Wing. Mind the dust..." in the room (Build T); was "This is the Zodiac Wing. The wheel at its center has been still for as long as I can remember. Go ahead. Step closer." (Sept 11 lock)
                 case 1: return "The Dial stirs. Faded symbols along the rim begin to glow. The ring shifts.";
                 case 2: return "It responds to you.\nI have stood in this room a thousand times and it never so much as flickered for me. You carry the Ancestor's blood. There is no question now.";
                 case 3: return "It wants you to solve it. Go ahead.";
