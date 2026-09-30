@@ -42,7 +42,7 @@ The current build is **the Zodiac Wing**, the first wing of the Library. It hold
 
 ## Saving
 
-Your progress saves on the device you're playing on, in the browser, the moment anything changes. Come back later and you'll be in the Atrium with your Keys and everything the wheel remembers. There is no account and nothing leaves your device. **Start over (test)** on the Atrium wipes it — that button is there for testing and will go away.
+Your progress saves on the device you're playing on, in the browser, the moment anything changes. Come back later and you'll be in the Atrium with your Keys and everything the wheel remembers. There is no account and nothing leaves your device. **Start over**, under Testing in Settings (the gear at the top right), wipes it. Testing also has **Jump to...**, which loads a saved checkpoint (After Key 1 up to the whole Zodiac Wing) so you can test any stage without replaying — those buttons are for testing and will go away.
 
 ## What's placeholder, what's coming
 

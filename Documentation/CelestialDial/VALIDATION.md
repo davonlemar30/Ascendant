@@ -13,6 +13,8 @@ New checks: mechanical, the height rule; suite, the opening's first page and the
 
 Validation: mechanical 502/502, slice fixture 207/207, WebGL clean (26.4 MB), browser suite 373/373 at desktop density and 373/373 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/chat-box-fit-2026-09-29/`](Evidence/chat-box-fit-2026-09-29/).
 
+PR #86 merged as `3bf74c8` (GitHub Actions Web run: build and Pages deploy both passed). Production suite against `?v=3bf74c8`: 373/373 at desktop density and 373/373 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
+
 ## DEV Mode: Jump to a checkpoint (Build W)
 
 The Sept 26 playtest's note 5 ("testing means doing every interactive all the way through, every time"). Brief: task 86bca0163, approved Sept 29 with the six checkpoints and Keys earned, not spent (Decisions Log week page 2kyd583p-25254).
@@ -24,6 +26,8 @@ The Sept 26 playtest's note 5 ("testing means doing every interactive all the wa
 New checks: mechanical, each checkpoint's save holds its Keys, locks, stage, units and proven items (after Key 1, two element items proven, as a played run leaves them), and play continues from After Key 2 and After Key 4; fixture, Jump to After Key 3 reloads into the Atrium with Keys 2 and 3 in hand and the last pattern waiting; suite, a canvas tap through Settings → Jump to... → After Key 4, then every checkpoint through its web button with its Keys and stage checked, the Dial offering the next lesson and practice from After Key 2, and no runtime exceptions, at each viewport. Build U's canvas taps moved with the taller box.
 
 Validation: mechanical 501/501, slice fixture 207/207, WebGL clean (26.4 MB), browser suite 367/367 at desktop density and 367/367 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. A first run failed on the suite's `jumpsShown` check: the assignment had been appended after a trailing `// Build U` comment. Fixed. Captures: [`Evidence/dev-mode-2026-09-29/`](Evidence/dev-mode-2026-09-29/).
+
+PR #85 merged as `75aa74f` (GitHub Actions Web run: build and Pages deploy both passed). Production suite against `?v=75aa74f`: 367/367 at desktop density and 367/367 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
 
 ## The Dial speaks its own challenges (Build V)
 
