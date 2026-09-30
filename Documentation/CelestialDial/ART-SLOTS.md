@@ -28,8 +28,10 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `caspar` | 64 × 112 | 256 | Caspar standing in the Atrium |
 | `keeper-idle` | 44 × 100 | 256 | the Keeper standing; flipped to face the way it last walked |
 | `keeper-walk` | 44 × 100 | 256 | the Keeper mid-step; alternates with idle every step while walking (either frame alone serves for both) |
-| `dial-face` | 332 × 332 | 1024 | the Dial's face under the twelve seats (the ring's lines go); also the Dial seen from the Wing room, at 200 × 200 |
-| `seat` | 52 × 52 | 256 | one seat tile, twelve times; dimmed while dormant or unlit |
+| `dial-face` | 332 × 332 | 1024 | the wheel alone, cut from the Dial room (Build Z): the Wing room's fallback Dial when its kit piece has no file (200 × 200); the Dial screen draws `dial-room` instead |
+| `dial-room` | 360 × 800 | 2048 | the Dial screen's background (Build Z, owner, Sept 29–30): Room A, the Zodiac Wing behind the Dial, drawn dormant. The wheel's twelve sockets sit under the seats (radius 136 around y 270) and the eye's glass is centred on the wheel; with this file the floor markings, shelf and chair leave the Dial screen and the face slot is not drawn there |
+| `dial-room-light` | 360 × 800 | 2048 | the Dial's glow over `dial-room` (Build Z): the amber in the sockets, the ring's line and the rims, transparent elsewhere. Off while the Dial sleeps; swept in round the ring, clockwise from the top, as each pattern opens |
+| `seat` | 52 × 52 | 256 | one seat: a dark glass cap in a bronze bezel (Build Z), twelve times, sitting in the wheel's sockets; the glass lets the socket glow through; dimmed while dormant or unlit |
 | `bracket` | 58 × 58 | 256 | the fixed focus bracket over the framed seat (the four bars go) |
 | `floor-markings` | 320 × 320 | 1024 | the faded floor pattern under the wheel; brightens as the wheel wakes |
 | `shelf` | 50 × 36 | 256 | the collapsed bookshelf, in the Wing room and beside the wheel |
@@ -59,7 +61,7 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `furniture-covered` | 120 × 70 | 512 | the covered furniture of the opening (its dust cloth goes) |
 | `desk` | 70 × 30 | 256 | the desk, uncovered, in the Atrium room |
 | `lamp` | 8 × 22 | 64 | a wall lamp, four in the Atrium; dark until its stage |
-| `candle` | 8 × 20 | 64 | a candle: the opening's one, the Wing's, the Chamber's nine; dark until lit |
+| `candle` | 8 × 20 | 64 | a candle: the opening's one and the Chamber's nine; dark until lit (the Wing's, beside the Dial's step hint, was cut in Build Z: it read as "!", owner, Sept 30) |
 | `door-open` | 64 × 128 | 512 | an open door leaf filling a painted arch: the Wing's (72 × 128) and the Chamber's (62 × 128) in the Atrium, the doorways back (36 × 140 in the Wing, 30 × 124 in the Chamber); no frame of its own, the painted arch is the frame; the doorway glows stay |
 | `door-sealed` | 64 × 128 | 512 | the sealed door leaf filling the Atrium's left arch (62 × 128); no frame of its own; the light behind it stays |
 | `mechanism` | 110 × 110 | 512 | the Chamber's old mechanism; turns one degree at the first Key |
@@ -100,6 +102,10 @@ The Grand Atrium is built as a kit, on the same `RoomKit` code as the Wing: `atr
 **The domed Atrium (Build Q, Sept 28).** The owner approved the new Grand Atrium (the B2 world: a glass dome on the night sky, dark wood Gothic shelves on a balcony, navy banners, the statue in a lit niche above the Zodiac Wing door) and its layout check. The art pass made it as an edit of the old restored scene, so the doors, plates, steps, desk, bench, busts, plants, candlestands, and rug keep their places; the new scene sat 22 px low (at 1×) and every file is moved 22 px up to meet the game's doors. `atrium` is the new restored shell, and `atrium-grime` is now the same empty room asleep (cold moonlight, a grimy cracked dome, dust, cobwebs), opaque, so the kit's grime fade is a clean cross-fade from the dormant room to the awake one (the two shells line up at offset 0, 0). New art for `banner` (the long navy banner), `pennant` (new: the narrow star pennant beside the niche), `lamp` (the wall lantern), and `chandelier` (now the armillary ring under the dome; the slot keeps its name); their worn files come from the dormant scene and are scaled in `SliceView.AtriumKit` (`wornScale`) to hang as far as the restored ones. The old `chart` and `shelf` pieces are retired from the placements (the new shell paints its own shelves); their files stay. The kit is 20 pieces; the lanterns take the shelf's Key 3, and the armillary ring stays last (Key 21). `atrium-light` is unchanged.
 
 The three doors and the doorway plates are their own slots, tracked by lock state rather than worn/restored: `akit-door-closed` / `akit-door-locked` / `akit-door-open`, and `akit-plate-clean` / `akit-plate-locked` (from `SliceView.AtriumKit` / `AddDoor`). A door goes locked (weathered, chains and a padlock) → unlocked (clean, edges glowing) → open as the Keeper reaches it; the Wing door starts unlocked, the Chamber's unlocks at the first Key, and the sealed door stays locked. The clean plate is where the engine writes the room's name (THE ZODIAC WING, THE CRYSTAL BOOK CHAMBER); the sealed door's plate stays locked and unreadable.
+
+### The Wing Dial's eye (Build Z, Sept 30)
+
+The Wing kit's `dial` piece rests with its **eye closed**, worn and restored alike (owner, Sept 30), and opens it when the player taps the Dial. The open eye has a slot per state, `kit-dial-worn-open` and `kit-dial-restored-open`, each **the same canvas as its closed piece and identical to it outside the eye**. The game lays the open file under a mask at the eye that grows from the seam (about 0.35 s), so only the lids move; the Keeper then walks over and the Dial screen opens. Back in the room the eye rests closed again. Reduced motion opens it at once.
 
 ### The Crystal Book Chamber kit (Build O, Sept 25)
 

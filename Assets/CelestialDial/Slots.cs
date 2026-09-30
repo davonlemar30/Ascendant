@@ -32,8 +32,10 @@ namespace Ascendant.CelestialDial
             new ArtSlot("caspar", 64, 112, 256, "Caspar standing in the Atrium"),
             new ArtSlot("keeper-idle", 44, 100, 256, "the Keeper standing; faces the way it last walked"),
             new ArtSlot("keeper-walk", 44, 100, 256, "the Keeper mid-step; alternates with idle every step while walking"),
-            new ArtSlot("dial-face", 332, 332, 1024, "the Dial's face under the twelve seats; also the Dial seen from the Wing room (200 x 200)"),
-            new ArtSlot("seat", 52, 52, 256, "one seat tile, twelve times; dimmed while dormant or unlit"),
+            new ArtSlot("dial-face", 332, 332, 1024, "the wheel alone, cut from the Dial room (Build Z): the Wing room's fallback Dial when its kit piece has no file (200 x 200); the Dial screen draws dial-room instead"),
+            new ArtSlot("dial-room", 360, 800, 2048, "the Dial screen's background (Build Z, owner, Sept 29-30): Room A, the Zodiac Wing behind the Dial, drawn dormant; the wheel's twelve sockets sit under the seats (radius 136 at y 270) and the eye's glass is centred on the wheel"),
+            new ArtSlot("dial-room-light", 360, 800, 2048, "the Dial's glow over dial-room (Build Z): the amber in the sockets, the ring's line and the rims, transparent elsewhere; off while the Dial sleeps, swept in round the ring when a pattern opens"),
+            new ArtSlot("seat", 52, 52, 256, "one seat: a dark glass cap in a bronze bezel (Build Z), twelve times, sitting in the wheel's sockets; the glass lets the socket glow through; dimmed while dormant or unlit"),
             new ArtSlot("bracket", 58, 58, 256, "the fixed focus bracket over the framed seat"),
             new ArtSlot("floor-markings", 320, 320, 1024, "the faded floor pattern under the wheel; brightens as the wheel wakes"),
             new ArtSlot("shelf", 50, 36, 256, "the collapsed bookshelf, in the Wing room and beside the wheel"),
@@ -64,7 +66,7 @@ namespace Ascendant.CelestialDial
             new ArtSlot("furniture-covered", 120, 70, 512, "the covered furniture of the opening"),
             new ArtSlot("desk", 70, 30, 256, "the desk, uncovered, in the Atrium room"),
             new ArtSlot("lamp", 8, 22, 64, "a wall lamp, four in the Atrium; dark until its stage"),
-            new ArtSlot("candle", 8, 20, 64, "a candle: the opening's one, the Wing's, the Chamber's nine; dark until lit"),
+            new ArtSlot("candle", 8, 20, 64, "a candle: the opening's one and the Chamber's nine; dark until lit (the Wing's, beside the Dial's step hint, was cut in Build Z: it read as \"!\", owner, Sept 30)"),
             new ArtSlot("door-open", 64, 128, 512, "an open door leaf filling a painted arch: the Wing's (72 x 128) and the Chamber's (62 x 128) in the Atrium, the doorways back (36 x 140 in the Wing, 30 x 124 in the Chamber)"),
             new ArtSlot("door-sealed", 64, 128, 512, "the sealed door leaf filling the Atrium's left arch (62 x 128)"),
             new ArtSlot("mechanism", 110, 110, 512, "the Chamber's old mechanism; turns one degree at the first Key"),
@@ -140,8 +142,10 @@ namespace Ascendant.CelestialDial
             new ArtSlot("kit-globe-restored", 34, 50, 1024, "the Wing kit (Build M): the globe, restored; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
             new ArtSlot("kit-shelf-worn", 96, 290, 1024, "the Wing kit (Build M): the shelf, worn; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
             new ArtSlot("kit-shelf-restored", 96, 290, 1024, "the Wing kit (Build M): the shelf, restored; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
-            new ArtSlot("kit-dial-worn", 188, 206, 1024, "the Wing kit (Build M): the dial, worn; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
-            new ArtSlot("kit-dial-restored", 188, 206, 1024, "the Wing kit (Build M): the dial, restored; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
+            new ArtSlot("kit-dial-worn", 188, 206, 1024, "the Wing kit (Build M): the dial, worn; since Build Z its eye rests closed (owner, Sept 30); drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
+            new ArtSlot("kit-dial-restored", 188, 206, 1024, "the Wing kit (Build M): the dial, restored; since Build Z its eye rests closed (owner, Sept 30); drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
+            new ArtSlot("kit-dial-worn-open", 186, 200, 1024, "the Wing kit (Build Z): the worn dial with its eye open; identical to kit-dial-worn outside the eye; the eye opens when the player taps the Dial (owner, Sept 30)"),
+            new ArtSlot("kit-dial-restored-open", 188, 206, 1024, "the Wing kit (Build Z): the restored dial with its eye open; identical to kit-dial-restored outside the eye; the eye opens when the player taps the Dial, even with every challenge done (owner, Sept 30)"),
             new ArtSlot("kit-telescope-worn", 66, 116, 1024, "the Wing kit (Build M): the telescope, worn; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
             new ArtSlot("kit-telescope-restored", 66, 116, 1024, "the Wing kit (Build M): the telescope, restored; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
             new ArtSlot("kit-table-worn", 108, 90, 1024, "the Wing kit (Build M): the table, worn; drawn at the file's half size, bottom-centred on its placement in SliceView.WingKit"),
@@ -284,12 +288,13 @@ namespace Ascendant.CelestialDial
         public const float InstrumentHead = 32, InstrumentFoot = 12, InstrumentMin = 60, InstrumentMore = 22;
         // Build S: a page with more to come keeps a row at the bottom for its Continue.
         public static float InstrumentBoxHeight(float lineHeight, float max, bool more = false) => Mathf.Clamp(InstrumentHead + lineHeight + InstrumentFoot + (more ? InstrumentMore : 0), Mathf.Min(InstrumentMin, max), max);
-        static Sprite instrumentBox;
-        public static Sprite InstrumentBoxSprite() // Build U: the Settings box wears it too
+        static Sprite instrumentBox, dialBox;
+        public static readonly Color DialVoice = new Color(.39f, .65f, .88f); // Build Z: the Dial's own voice is sea blue (#63A6E0, the Water hue), Caspar's gold
+        public static Sprite InstrumentBoxSprite(bool dial = false) // Build U: the Settings box wears it too; Build Z: the Dial's voice wears a sea-blue edge
         {
-            if (instrumentBox != null) return instrumentBox;
+            if (!dial && instrumentBox != null) return instrumentBox; if (dial && dialBox != null) return dialBox;
             const int size = 32; const float radius = 10, stroke = 2; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
-            Color fill = new Color(.086f, .078f, .094f, .96f), gold = new Color(.84f, .69f, .38f, .55f);
+            Color fill = new Color(.086f, .078f, .094f, .96f), gold = dial ? new Color(DialVoice.r, DialVoice.g, DialVoice.b, .6f) : new Color(.84f, .69f, .38f, .55f);
             for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
             {
                 // the distance from the pixel's centre to the rounded rectangle's edge, inset half a pixel: negative inside
@@ -300,7 +305,23 @@ namespace Ascendant.CelestialDial
                 texture.SetPixel(x, y, c);
             }
             texture.Apply();
-            return instrumentBox = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
+            var sprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
+            if (dial) dialBox = sprite; else instrumentBox = sprite; return sprite;
+        }
+        static Sprite eyeMark;
+        // Build Z: the small eye beside THE CELESTIAL DIAL on the plate: an almond outline and a pupil, drawn here (the web font has no eye glyph).
+        public static Sprite EyeMarkSprite()
+        {
+            if (eyeMark != null) return eyeMark;
+            const int w = 40, h = 24; var texture = new Texture2D(w, h, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+            for (int y = 0; y < h; y++) for (int x = 0; x < w; x++)
+            {
+                float u = (x + .5f - w / 2f) / (w / 2f - 1), v = (y + .5f - h / 2f) / (h / 2f - 1); // -1..1
+                float lid = Mathf.Abs(v) - (1 - u * u) * .95f; // the almond: two arcs meeting at the corners
+                float edge = Mathf.Clamp01(1.4f - Mathf.Abs(lid) * 9f), pupil = Mathf.Clamp01((.34f - new Vector2(u * 1.7f, v).magnitude) * 8f);
+                texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.Max(lid < 0 ? edge : edge, pupil)));
+            }
+            texture.Apply(); return eyeMark = Sprite.Create(texture, new Rect(0, 0, w, h), new Vector2(.5f, .5f), 100);
         }
         public static void DressInstrumentBox(Image panel, Text oldLabel, Text line, Font font)
         {
@@ -318,6 +339,10 @@ namespace Ascendant.CelestialDial
             var lr = line.rectTransform; lr.anchorMin = lr.anchorMax = lr.pivot = new Vector2(0, 1); lr.anchoredPosition = new Vector2(14, -InstrumentHead);
             lr.sizeDelta = new Vector2(rect.sizeDelta.x - 28, max - InstrumentHead - InstrumentFoot); line.alignment = TextAnchor.UpperLeft;
             var fit = panel.gameObject.AddComponent<FitBox>(); fit.Name = name; fit.Line = line; fit.Max = max + InstrumentMore; // Build S: room for the page's Continue
+            var eyeRect = new GameObject("Dial's eye", typeof(RectTransform)).GetComponent<RectTransform>(); eyeRect.SetParent(rect, false); // Build Z: the Dial's mark, shown when it speaks
+            eyeRect.anchorMin = eyeRect.anchorMax = eyeRect.pivot = new Vector2(0, 1); eyeRect.anchoredPosition = new Vector2(14, -9); eyeRect.sizeDelta = new Vector2(16, 10);
+            var eye = eyeRect.gameObject.AddComponent<Image>(); eye.sprite = EyeMarkSprite(); eye.color = DialVoice; eye.raycastTarget = false; eyeRect.gameObject.SetActive(false);
+            fit.Panel = panel; fit.Rule = ruleImage; fit.Eye = eye; fit.NameX = 14;
             // Build S (owner, APK playtest, Sept 29): a long line turns in pages; Continue sits at the box's bottom right while more is to come.
             var moreRect = new GameObject("Caspar Continue", typeof(RectTransform)).GetComponent<RectTransform>(); moreRect.SetParent(rect, false);
             moreRect.anchorMin = moreRect.anchorMax = moreRect.pivot = new Vector2(1, 0); moreRect.anchoredPosition = new Vector2(-8, 4); moreRect.sizeDelta = new Vector2(96, 26);

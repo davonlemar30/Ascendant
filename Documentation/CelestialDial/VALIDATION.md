@@ -2,6 +2,22 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The Dial redesign: Room A, the eye, the pattern reveal (Build Z)
+
+The owner's rulings (Sept 29–30, Decisions Log week of Sept 28–Oct 4; task 86bca6fmv): Room A behind the Dial, its glow kept, the Dial's voice is the eye, a reveal each time a pattern opens, the Dial-screen candle cut, the shelf, chair and floor markings retired from the Dial screen, the Wing room's Dial redrawn with the eye (closed at rest, opening when tapped, worn and restored), and EB Garamond for the Dial's words. The art pass was approved by the owner before the build.
+
+- **Art** (`dial-room`, `dial-room-light`, `seat`, `dial-face`, `kit-dial-worn` / `-restored`, and the new `kit-dial-worn-open` / `-restored-open`; manifest 134 → 138 slots). The room is fitted so the sockets' cups sit under the seats: measured from the dormant art (a dark cup inside a bright rim, robust circle fit), centre (360.4, 540.3) and radius 272.8 on the 720 × 1600 file, against the seats' (360, 540) and 272. The glow layer is the exact difference between the lit and dormant plates, masked to the Dial, at 65% strength (the owner found the first cut bright). The open Wing pieces are identical to the closed ones outside the eye (measured change 0).
+- **The Dial screen** (`DialView`): the room and its glow sit behind everything; the glow is off while the Dial sleeps. The challenge line moves into the eye (EB Garamond Bold, 150 × 54 at y 270, best fit 15–20 px; the symbols unit's "Find the symbol of / Sign" too); the sign-name label moves above the eye (y 226, 15 px bold) and stays empty in the symbols unit (a name there would give the answer away). Title, hint, count and phase labels get a shadow; dark fades under the title and under the wheel. The family lines are a faint gold over the room so the eye's words read through them.
+- **The reveal**: once per pattern (elements at the first approach's wake, symbols, modalities, polarity and opposites, the builder), saved in `revealsPlayed`. The glow sweeps round clockwise from the top (a radial fill), each seat pops as the sweep passes, the names fade up, the line rises in the eye; 1.2 + 0.35 + 0.4 s. A tap or `skip-reveal` skips it; Reduced motion shows the end at once.
+- **The slim box**: when the Dial speaks the plate, rule and frame turn sea blue (#63A6E0) with an eye mark; Caspar keeps gold.
+- **The Wing room**: the Dial's eye opens (a mask growing from the seam, 0.35 s) when the player taps it, before the Keeper walks; it rests closed again back in the room.
+- **Removed** from the Dial screen: the candle (not built), the floor markings, shelf and chair (inactive with the room art). The `candle` slot still draws the opening's and the Chamber's.
+- Web state: `dialRoom`, `dialLit`, `dialEye`, `revealing`, `revealsPlayed`, `eyeText`, `eyeSize` (layout px), `signLabel`, `dialVoice`.
+
+New checks: mechanical, the slots and files, the open pieces' canvases, the font and its licence, every line the eye can show fitting at 15 px or more on two lines (the tightest is 18 px), the save field, the motion budget; fixture, the room in place and the retired pieces gone; suite, the Wing Dial's eye closed, opening and closed again, the dormant arrival, the elements' reveal mid-sweep and lit, the challenge in the eye with the sign above, the symbols' reveal and empty label, each of the five reveals played once, and the box's colour matching its speaker, at each viewport.
+
+Validation: mechanical 571/571, slice fixture 208/208, WebGL clean (27.7 MB), browser suite 393/393 at desktop density and 393/393 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports. Captures: [`Evidence/dial-redesign-2026-09-30/`](Evidence/dial-redesign-2026-09-30/).
+
 ## The gold chat box fits its line (Build X)
 
 The owner (Sept 29): dead space inside the chat box when Caspar speaks. The first pass fitted only the box's outer height; the owner's screenshot showed the gap meant was *inside*, between the plate and the first line. The padding was tightened and approved from a phone-size capture before this record.

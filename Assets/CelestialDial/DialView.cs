@@ -44,6 +44,14 @@ namespace Ascendant.CelestialDial
         readonly Button[] builderNames = new Button[4], builderShares = new Button[3]; // Build C: the builder's name and share steps
         RectTransform root, ring, bracket;
         Image faceImage; // Build E: the dial-face slot under the seats
+        // Build Z (owner, Sept 29-30): Room A behind the wheel, the Dial's glow, the eye that speaks, a reveal as each pattern opens
+        Image roomImage, roomLight; bool roomArt; Font voiceFont; CanvasGroup eyeGroup;
+        readonly CanvasGroup[] seatGroups = new CanvasGroup[12], nameGroups = new CanvasGroup[12];
+        bool revealing, skipReveal; string revealNow = ""; float revealStarted, lastSweepPublish;
+        public bool RoomArt => roomArt;
+        public bool Showing = true; // the slice sets it: the Dial is the screen in front (a reveal plays only where the player sees it)
+        public const float RevealSweepSeconds = 1.2f, RevealNamesSeconds = .35f, RevealEyeSeconds = .4f;
+        static readonly Color EyeInk = new Color(.95f, .91f, .84f);
         Canvas canvas;
         DialGeometry geometry;
         Font font;
@@ -81,6 +89,7 @@ namespace Ascendant.CelestialDial
             public bool settingsOpen, canQuit, jumpsShown; // Build W: the Jump to list shows // Build U: the Settings menu is open; the app (not a web page) can quit
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
+            public bool dialRoom, dialVoice; public float dialLit, dialEye; public string revealing = "", eyeText = "", signLabel = ""; public string[] revealsPlayed; public int eyeSize; // Build Z: the room, the glow, the reveal, the eye's words, the sign label; dialVoice = the box wears the Dial's blue; dialEye = the Wing room Dial's eye, 0 shut to 1 open
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
             public string casparShown = ""; // Build S: that page's words, colour tags and all
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
@@ -132,20 +141,28 @@ namespace Ascendant.CelestialDial
             ScaleCanvas();
             var bg = canvasObject.AddComponent<Image>(); bg.color = Charcoal;
             root = Rect("Portrait", canvasObject.transform, 0, 0, 360, 800);
-            Label(root, "THE CELESTIAL DIAL", 0, 32, 340, 24, 18); // the instrument's own name, not the room's (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
-            subtitle = Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14);
+            // Build Z: the Zodiac Wing behind the wheel (Room A), its glow swept in over it, and dark fades under the title and under the wheel so the words read
+            var room = Rect("Dial room", root, 0, 400, 360, 800); roomImage = room.gameObject.AddComponent<Image>(); roomImage.raycastTarget = false;
+            roomArt = Slots.Dress(roomImage, "dial-room"); room.gameObject.SetActive(roomArt);
+            var glowRect = Rect("Dial room light", root, 0, 400, 360, 800); roomLight = glowRect.gameObject.AddComponent<Image>(); roomLight.raycastTarget = false;
+            glowRect.gameObject.SetActive(roomArt && Slots.Dress(roomLight, "dial-room-light"));
+            roomLight.type = Image.Type.Filled; roomLight.fillMethod = Image.FillMethod.Radial360; roomLight.fillOrigin = (int)Image.Origin360.Top; roomLight.fillClockwise = true; roomLight.fillAmount = 0;
+            if (roomArt) { Fade(root, 0, 0, 140, true, .55f); Fade(root, 0, 430, 370, false, .62f); }
+            voiceFont = Resources.Load<Font>("Fonts/EBGaramond-Bold") ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Shade(Label(root, "THE CELESTIAL DIAL", 0, 32, 340, 24, 18)); // the instrument's own name, not the room's (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
+            subtitle = Shade(Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14));
             ring = Rect("Twelve-seat Dial", root, 0, 270, 332, 332);
             var hit = ring.gameObject.AddComponent<Image>(); hit.color = new Color(0,0,0,.001f);
             ring.gameObject.AddComponent<DialDrag>().View = this;
-            var face = Rect("Dial face", ring, 0,166,332,332); faceImage = face.gameObject.AddComponent<Image>(); faceImage.raycastTarget = false; face.gameObject.SetActive(Slots.Dress(faceImage, "dial-face")); // Build E: the face under the seats; the ring's lines stay without it
+            var face = Rect("Dial face", ring, 0,166,332,332); faceImage = face.gameObject.AddComponent<Image>(); faceImage.raycastTarget = false; face.gameObject.SetActive(!roomArt && Slots.Dress(faceImage, "dial-face")); // Build Z: the room carries the wheel; the face is the Wing room's fallback now // Build E: the face under the seats; the ring's lines stay without it
             var drawing = Rect("Ring and family connections", ring, 0,166,332,332);
-            geometry = drawing.gameObject.AddComponent<DialGeometry>(); geometry.View = this; geometry.RingHidden = face.gameObject.activeSelf;
+            geometry = drawing.gameObject.AddComponent<DialGeometry>(); geometry.View = this; geometry.RingHidden = face.gameObject.activeSelf || roomArt; geometry.Soft = roomArt;
             for (int i=0;i<12;i++)
             {
                 int seat = i;
                 seats[i] = MakeButton(ring, Zodiac.Seats[i].Name, 0,166,52,52, () => SelectSeat(seat, ClickMethod(DialInput.DirectSeat)));
                 seats[i].gameObject.AddComponent<DialDrag>().View = this; Slots.Dress(seats[i].GetComponent<Image>(), "seat");
-                seatTexts[i] = seats[i].GetComponentInChildren<Text>(); seatTexts[i].fontSize = 11;
+                seatTexts[i] = seats[i].GetComponentInChildren<Text>(); seatTexts[i].fontSize = 11; seatGroups[i] = seats[i].gameObject.AddComponent<CanvasGroup>(); nameGroups[i] = seatTexts[i].gameObject.AddComponent<CanvasGroup>(); // Build Z: the reveal pops each seat and fades the names up
                 seatTexts[i].horizontalOverflow = HorizontalWrapMode.Overflow; // Long names spill past the tile instead of breaking mid-word.
                 // The symbol font sits low in its box, so the box sits high in the tile. (A v0.4 edit turned the rest of this line into a comment,
                 // which left the seats on the plain text font: no marks on the Web, owner playtest v0.3.)
@@ -159,15 +176,23 @@ namespace Ascendant.CelestialDial
             // Four short bars visibly frame exactly one seat, without relying on color.
             if(!bracketArt) { Bar(bracket,-27,29,3,58); Bar(bracket,27,29,3,58); Bar(bracket,0,1,56,3); Bar(bracket,0,57,56,3); }
             start = Label(root,"",0,223,220,30,13); start.resizeTextForBestFit=true; start.resizeTextMinSize=10; start.resizeTextMaxSize=13; // Build I: the wheel's challenge line
+            if (roomArt) // Build Z (owner, Sept 30): the Dial speaks through the eye: its line sits in the glass, in the Dial's own serif, one or two lines, 20 px down to 15
+            {
+                var eyeRect = start.rectTransform; eyeRect.anchoredPosition = new Vector2(0, -270); eyeRect.sizeDelta = new Vector2(150, 54);
+                start.font = voiceFont; start.resizeTextMinSize = 15; start.resizeTextMaxSize = 20; start.fontSize = 20; start.lineSpacing = .92f; start.color = EyeInk;
+                var glow = start.gameObject.AddComponent<Outline>(); glow.effectColor = new Color(Slots.DialVoice.r, Slots.DialVoice.g, Slots.DialVoice.b, .5f); glow.effectDistance = new Vector2(1, -1);
+                eyeGroup = start.gameObject.AddComponent<CanvasGroup>();
+            }
             destination = Label(root,"",0,271,188,50,20); // Names the sign under the bracket, live while dragging (owner request, Sept 12; reverses the Sept 11 "no label" row).
-            count = Label(root,"",0,319,178,36,15);
-            Label(root,"Find the sign, seal it.",0,441,340,24,14); // the step hint, now in the Library's voice (owner pick, APK playtest, Sept 29; was "Move > Inspect > Seal")
+            if (roomArt) { destination.rectTransform.anchoredPosition = new Vector2(0, -226); destination.rectTransform.sizeDelta = new Vector2(188, 22); destination.fontSize = 15; destination.fontStyle = FontStyle.Bold; Shade(destination); } // Build Z (owner pick, Sept 30): above the eye
+            count = Shade(Label(root,"",0,319,178,36,15));
+            Shade(Label(root,"Find the sign, seal it.",0,441,340,24,14)); // the step hint, now in the Library's voice (owner pick, APK playtest, Sept 29; was "Move > Inspect > Seal")
             panel = Rect("Caspar instruction panel",root,0,526,340,128);
             var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.13f,.13f,.15f);
             var casparLabel = Label(panel,"CASPAR",0,18,290,22,13);
             message = Label(panel,"",0,74,326,100,13); message.resizeTextForBestFit=true; message.resizeTextMinSize=9; message.resizeTextMaxSize=13; // Build I: the text shrinks to fit instead of being cut off (owner playtest, Sept 23)
             Slots.DressInstrumentBox(panelImage,casparLabel,message,font); // Build R: the slim box fitted to the line, not the chat box; the wheel stays in view (owner, Sept 28-29)
-            phase = Label(root,"",0,608,330,28,13);
+            phase = Shade(Label(root,"",0,608,330,28,13));
             back = MakeButton(root,"Previous",-122,654,64,56,()=>Step(-1,ClickMethod(DialInput.BackStep)));
             seal = MakeButton(root,"SEAL",0,654,146,56,Commit); // Amended canon (Sept 11): "Keeper's Seal" renamed to "Seal".
             seal.GetComponent<Image>().color=Crimson; sealText=seal.GetComponentInChildren<Text>();
@@ -216,6 +241,7 @@ namespace Ascendant.CelestialDial
             }
 #endif
             if(!busy && !dragging && Lesson.IntroAuto) StartCoroutine(IntroBeat());
+            if(!busy && !dragging && CanReveal && PatternOpening is string opening && !Lesson.RevealsPlayed.Contains(opening)) StartCoroutine(Reveal(opening)); // Build Z (owner, Sept 30): once as each pattern opens
             if(!busy && !dragging && Lesson.CountBeatPending && Lesson.Dial.Active) StartCoroutine(CountBeat());
             if(!dragging && Mathf.Abs(turns-targetTurns)>.001f)
             {
@@ -310,7 +336,8 @@ namespace Ascendant.CelestialDial
             {
                 // The Dial wakes to the player: seats brighten one by one.
                 waking=true;
-                if(Lesson.Dial.ReducedMotion) { RefreshSeats(); yield return new WaitForSecondsRealtime(.6f); }
+                if(CanReveal) yield return RevealBody("elements"); // Build Z: the first approach's wake is the elements' reveal
+                else if(Lesson.Dial.ReducedMotion) { RefreshSeats(); yield return new WaitForSecondsRealtime(.6f); }
                 else for(int i=0;i<12;i++){ RefreshSeats(); yield return new WaitForSecondsRealtime(.09f); }
                 yield return new WaitForSecondsRealtime(.6f);
             }
@@ -351,6 +378,35 @@ namespace Ascendant.CelestialDial
             Lesson.RevealDemonstration();
             yield return new WaitForSecondsRealtime(Lesson.Dial.ReducedMotion ? .6f : 1.2f);
             yield return ReturnHome(); Lesson.AfterDemonstration(); busy=false; AlignStart();
+        }
+        // ---- Build Z: the reveal (owner, Sept 29-30). The glow sweeps round the ring from the top, each seat pops as the sweep passes it, the names fade up,
+        // and the pattern's first line rises in the eye; small built motions, about two seconds; a tap skips it; Reduced motion shows the end at once.
+        bool CanReveal => roomArt && roomLight != null && roomLight.gameObject.activeSelf && Showing && !Inert;
+        string PatternOpening => Lesson.Practice || Lesson.Phase==LessonPhase.Review ? null : Lesson.Phase==LessonPhase.GlyphWheel ? "symbols" :
+            Lesson.Phase==LessonPhase.ModalityGuided || Lesson.Phase==LessonPhase.ModalityOwn ? "modalities" : Lesson.InBuilder ? "builder" :
+            Lesson.Phase==LessonPhase.Polarity || Lesson.InOppositeProblem ? "opposites" : null;
+        IEnumerator Reveal(string pattern) { busy=true; Refresh(); yield return RevealBody(pattern); busy=false; AlignStart(); }
+        float SeatSweep(int i) { var v=SeatPosition(i); float a=Mathf.Atan2(v.x,v.y)*Mathf.Rad2Deg; if(a<0)a+=360; return a/360f; } // clockwise from the top, as the fill runs
+        bool SkipPressed => skipReveal || (Time.unscaledTime-revealStarted>.2f && Pointer.current!=null && Pointer.current.press.wasPressedThisFrame);
+        IEnumerator RevealBody(string pattern)
+        {
+            Lesson.RevealsPlayed.Add(pattern); revealing=true; revealNow=pattern; skipReveal=false; revealStarted=Time.unscaledTime;
+            bool instant=Lesson.Dial.ReducedMotion; RefreshSeats();
+            roomLight.fillAmount=0; for(int i=0;i<12;i++){ seatGroups[i].alpha=0; nameGroups[i].alpha=0; } if(eyeGroup!=null) eyeGroup.alpha=0; Publish();
+            for(float t=0; !instant && t<RevealSweepSeconds && !SkipPressed; t+=Time.unscaledDeltaTime)
+            {
+                float f=t/RevealSweepSeconds; roomLight.fillAmount=f;
+                for(int i=0;i<12;i++){ float past=(f-SeatSweep(i))*RevealSweepSeconds; seatGroups[i].alpha=past>=0 ? 1 : 0; seats[i].transform.localScale=Vector3.one*(past>=0 ? 1+.25f*(1-Mathf.Clamp01(past/.15f)) : 1); }
+                if(Time.unscaledTime-lastSweepPublish>.1f){ lastSweepPublish=Time.unscaledTime; Publish(); } // the web state follows the sweep (test evidence)
+                yield return null;
+            }
+            roomLight.fillAmount=1; for(int i=0;i<12;i++){ seatGroups[i].alpha=1; seats[i].transform.localScale=Vector3.one; }
+            for(float t=0; !instant && t<RevealNamesSeconds && !SkipPressed; t+=Time.unscaledDeltaTime) { for(int i=0;i<12;i++) nameGroups[i].alpha=t/RevealNamesSeconds; yield return null; }
+            for(int i=0;i<12;i++) nameGroups[i].alpha=1;
+            var eye=start.rectTransform;
+            for(float t=0; eyeGroup!=null && !instant && t<RevealEyeSeconds && !SkipPressed; t+=Time.unscaledDeltaTime) { float k=t/RevealEyeSeconds; eyeGroup.alpha=k; eye.anchoredPosition=new Vector2(0,-270-8*(1-k)); yield return null; }
+            if(eyeGroup!=null){ eyeGroup.alpha=1; eye.anchoredPosition=new Vector2(0,-270); }
+            revealing=false; revealNow=""; skipReveal=false; Publish();
         }
         IEnumerator ReturnHome()
         {
@@ -393,9 +449,9 @@ namespace Ascendant.CelestialDial
             // Build I (owner playtest, Sept 23): in the symbols the center holds the target's name, fixed while the wheel turns;
             // elsewhere the line above the center is the wheel's own challenge, and the center names the framed sign live.
             string challenge=Lesson.Challenge;
-            destination.text=marks ? challenge : Zodiac.Seats[Lesson.Dial.Selected].Name;
+            destination.text=marks ? (roomArt ? "" : challenge) : Zodiac.Seats[Lesson.Dial.Selected].Name; // Build Z: with the eye, the symbols' target is posed in the eye and the label above it stays empty (a name there would give the answer away)
             destination.font=font;
-            start.text=marks ? (challenge=="" ? "" : "Find the symbol of") : challenge!="" ? challenge : Lesson.IsProblem ? "" : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
+            start.text=marks ? (challenge=="" ? "" : roomArt ? "Find the symbol of\n"+challenge : "Find the symbol of") : challenge!="" ? challenge : Lesson.IsProblem ? "" : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
             count.text=""; // Build I: no Count button, no running count (owner playtest, Sept 23); the worked demonstration still counts aloud
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :
                 Lesson.Phase==LessonPhase.Paused ? "Paused for now · No Key yet" :
@@ -444,6 +500,7 @@ namespace Ascendant.CelestialDial
                 seatTexts[i].color=dormant ? new Color(Bone.r,Bone.g,Bone.b,.3f) : Bone;
                 Slots.Paint(seats[i].GetComponent<Image>(),dormant ? new Color(.1f,.1f,.12f) : Lesson.Lit[i] ? new Color(.29f,.27f,.28f) : new Color(.13f,.13f,.15f),dormant ? .35f : Lesson.Lit[i] ? 1f : .6f); // Build E: a seat file dims the same way
                 geometry.Dormant=dormant; geometry.Dim=Lesson.Phase==LessonPhase.Review; if(faceImage.gameObject.activeSelf) faceImage.color=dormant ? new Color(.4f,.4f,.4f) : Color.white;
+                if(!revealing && roomLight!=null) roomLight.fillAmount=dormant ? 0 : 1; // Build Z: the glow sleeps with the Dial
                 seats[i].interactable=Lesson.Dial.Active && !busy;
             }
         }
@@ -470,7 +527,7 @@ namespace Ascendant.CelestialDial
                 builderOptions=Lesson.Phase==LessonPhase.BuilderName ? Lesson.BuilderOptions.Select(o=>Zodiac.Seats[o].Name).ToArray() : new string[0],
                 shared=Lesson.Phase==LessonPhase.BuilderShare ? Enumerable.Range(0,3).Where(i=>Lesson.Shared[i]).Select(i=>DialLesson.ShareLabels[i]).ToArray() : new string[0],
                 canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy,
-                speaker=panel.gameObject.activeInHierarchy?(DialSpeaking?DialLesson.DialSpeaker:DialLesson.CasparSpeaker):"",dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
+                speaker=panel.gameObject.activeInHierarchy?(DialSpeaking?DialLesson.DialSpeaker:DialLesson.CasparSpeaker):"",dialRoom=roomArt,dialLit=roomLight!=null && roomLight.gameObject.activeSelf ? roomLight.fillAmount : 0,revealing=revealNow,revealsPlayed=Lesson.RevealsPlayed.OrderBy(p=>p).ToArray(),eyeText=roomArt ? start.text : "",eyeSize=roomArt && start.text!="" ? Mathf.RoundToInt(start.cachedTextGenerator.fontSizeUsedForBestFit/Mathf.Max(.01f,canvas.scaleFactor)) : 0,signLabel=destination.text,dialVoice=panel.GetComponent<FitBox>()!=null && panel.GetComponent<FitBox>().DialVoiceShown && panel.gameObject.activeInHierarchy,dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
             Slice?.Fill(state); return state;
         }
         public void Publish()
@@ -500,6 +557,7 @@ namespace Ascendant.CelestialDial
             else if(command=="continue")ContinueLesson();
             else if(command=="optional") { if(!busy) { Lesson.BeginOptional(); AlignStart(); } }
             else if(command=="motion")ToggleMotion();
+            else if(command=="skip-reveal") skipReveal=true; // Build Z: the tap that skips a reveal
             else if(command=="motion-on") { Lesson.Dial.ReducedMotion=true; Refresh(); }
             else if(command=="ask-caspar") AskCaspar();
             else if(command=="caspar-page") { var box=FitBox.Visible; if(box!=null && box.More!=null && box.More.gameObject.activeInHierarchy) box.Turn(); Publish(); } // Build S: the box's Continue
@@ -529,6 +587,15 @@ namespace Ascendant.CelestialDial
             var colors=button.colors;colors.selectedColor=new Color(.85f,.7f,.55f);colors.highlightedColor=Color.white;button.colors=colors;
             Label(r,text,0,height/2,width-4,height-4,15);navigation.Add(button);return button;
         }
+        // Build Z: a dark fade (the room's art stays readable under the title and under the wheel) and a soft shadow under a label
+        static Sprite fadeDown, fadeUp;
+        void Fade(Transform parent,float x,float top,float height,bool fromTop,float alpha)
+        {
+            ref Sprite cache=ref (fromTop ? ref fadeDown : ref fadeUp);
+            if(cache==null){ var tex=new Texture2D(1,64,TextureFormat.RGBA32,false){wrapMode=TextureWrapMode.Clamp}; for(int y=0;y<64;y++){ float k=y/63f; tex.SetPixel(0,y,new Color(.08f,.07f,.09f,fromTop ? k*k : (1-k)*(1-k))); } tex.Apply(); cache=Sprite.Create(tex,new UnityEngine.Rect(0,0,1,64),new Vector2(.5f,.5f),100); }
+            var r=Rect(fromTop ? "Fade under the title" : "Fade under the wheel",parent,x,top+height/2,360,height); var image=r.gameObject.AddComponent<Image>(); image.sprite=cache; image.color=new Color(1,1,1,alpha); image.raycastTarget=false;
+        }
+        Text Shade(Text label) { if(roomArt){ var shadow=label.gameObject.AddComponent<Shadow>(); shadow.effectColor=new Color(0,0,0,.85f); shadow.effectDistance=new Vector2(1,-1.5f); } return label; }
         void Bar(Transform parent,float x,float top,float width,float height)
         { var r=Rect("Bracket bar",parent,x,top,width,height);var image=r.gameObject.AddComponent<Image>();image.color=Bone;image.raycastTarget=false; }
     }
