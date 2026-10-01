@@ -16,7 +16,7 @@ AUDIO = "Assets/CelestialDial/Resources/Audio/test"
 IMAGES = [
     ("atrium", 180, 400), ("wing", 180, 400), ("chamber", 180, 400),
     ("caspar", 64, 112), ("keeper-idle", 44, 100), ("keeper-walk", 44, 100),
-    ("dial-face", 332, 332), ("seat", 52, 52), ("bracket", 60, 60), ("floor-markings", 320, 320),
+    ("dial-face", 332, 332), ("seat", 52, 52), ("bracket", 64, 88), ("floor-markings", 320, 320),
     ("shelf", 52, 36), ("chair", 44, 36), ("table", 60, 32), ("shelf-book", 12, 28),
     ("book-cover", 140, 140), ("book-page", 140, 140),
     ("shelves", 60, 180), ("furniture-covered", 120, 72), ("desk", 72, 32), ("lamp", 8, 24), ("candle", 8, 20),
@@ -30,7 +30,7 @@ IMAGES = [
     ("chat-box", 164, 120), ("chat-plate", 172, 24),  # Build P: the chat box on the story screens
     ("caspar-calm", 132, 236), ("caspar-explain", 132, 236), ("caspar-warm", 132, 236), ("caspar-wry", 132, 236), ("caspar-moved", 132, 236), ("caspar-solemn", 132, 236),
     ("akit-pennant-restored", 48, 132), ("akit-pennant-worn", 44, 132),  # Build Q: the domed Atrium's pennants
-    ("dial-room", 180, 400), ("dial-room-light", 180, 400), ("kit-dial-worn-open", 188, 208), ("kit-dial-restored-open", 188, 208),  # Build Z: the Dial's room, its glow, the Wing Dial's open eye
+    ("dial-room", 180, 400), ("dial-room-light", 180, 400), ("dial-ring", 180, 180), ("dial-ring-light", 180, 180), ("kit-dial-worn-open", 188, 208), ("kit-dial-restored-open", 188, 208),  # Build Z: the Dial's room, its glow, the Wing Dial's open eye
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
