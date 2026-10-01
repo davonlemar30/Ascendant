@@ -17,6 +17,9 @@ The owner's rulings (Sept 29–30, Decisions Log week of Sept 28–Oct 4; task 8
 New checks: mechanical, the slots and files, the open pieces' canvases, the font and its licence, every line the eye can show fitting at 15 px or more on two lines (the tightest is 18 px), the save field, the motion budget; fixture, the room in place and the retired pieces gone; suite, the Wing Dial's eye closed, opening and closed again, the dormant arrival, the elements' reveal mid-sweep and lit, the challenge in the eye with the sign above, the symbols' reveal and empty label, each of the five reveals played once, and the box's colour matching its speaker, at each viewport.
 
 Validation: mechanical 571/571, slice fixture 208/208, WebGL clean (27.7 MB), browser suite 395/395 at desktop density and 395/395 at phone density (`DEVICE_SCALE=2 MOBILE=1`), both viewports, on the branch merged with main (Build Y). Captures: [`Evidence/dial-redesign-2026-09-30/`](Evidence/dial-redesign-2026-09-30/).
+
+Merged as PR #89 (main `4e2c4f4`, reviewed head `9a26634`, Sept 30). Production recheck after the Pages deploy (passed): browser suite 395/395 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against `https://davonlemar30.github.io/Ascendant/`.
+
 ## The bookshelf glows itself (Build Y)
 
 The Sept 26 playtest's note 11 ("the glow should imbue the bookshelf itself") and the APK playtest ("a portal ring instead of a glow"); task 86bc8ddxp. Since the Wing became art-dressed, the shelf's glow was `SoftRing()`, a 90 × 320 ring behind the shelf.
