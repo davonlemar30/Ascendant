@@ -205,7 +205,9 @@ namespace Ascendant.Build
             Sprite Art(string n) => Resources.Load<Sprite>("Art/" + n);
             Check(new[] { "dial-room", "dial-room-light", "seat", "dial-face", "kit-dial-worn", "kit-dial-restored", "kit-dial-worn-open", "kit-dial-restored-open" }.All(n => Art(n) != null), "Build Z: the approved art is in the Art folder: the room, its glow, the seat, the face, and the Wing Dial closed and open");
             Check(Art("dial-room").rect.width == 720 && Art("dial-room").rect.height == 1600 && Art("dial-room-light").rect.size == Art("dial-room").rect.size, "Build Z: the room and its glow are drawn at twice the 360 x 800 layout, the same size");
-            Check(Art("kit-dial-worn-open").rect.size == Art("kit-dial-worn").rect.size && Art("kit-dial-restored-open").rect.size == Art("kit-dial-restored").rect.size, "Build Z: each open Wing Dial is the same canvas as its closed piece, so the eye opens in place");
+            Check(Art("kit-dial-worn-open").rect.size == Art("kit-dial-worn").rect.size && Art("kit-dial-restored-open").rect.size == Art("kit-dial-restored").rect.size
+                && new[] { "kit-dial-worn", "kit-dial-restored", "kit-dial-worn-open", "kit-dial-restored-open" }.All(n => Slot(n).Width * 2 == (int)Art(n).rect.width && Slot(n).Height * 2 == (int)Art(n).rect.height),
+                "Build Z: each open Wing Dial is the same canvas as its closed piece, so the eye opens in place; the manifest gives each Wing Dial file at half size");
             var voice = Resources.Load<Font>("Fonts/EBGaramond-Bold");
             Check(voice != null && File.Exists("Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt"), "Build Z: the Dial's serif, EB Garamond Bold, ships with its open licence");
             Check(EyeLines.All(l => l.All(c => c == '\n' || (c >= 32 && c <= 255))), "Build Z: every line the eye can show is Latin-1 (the web font rule)");
