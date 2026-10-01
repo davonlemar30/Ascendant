@@ -92,6 +92,7 @@ namespace Ascendant.CelestialDial
         public int atriumStage;
         public ReviewItem[] deck;
         public int keys;
+        public string[] revealsPlayed = new string[0]; // Build Z: the Dial's patterns whose reveal has played (elements, symbols, modalities, opposites, builder)
         public int glyphStage;      // 0 not started, 1 Part A done, 2 Part B done (Key 2)
         public int glyphIndex;      // next glyph in zodiac order within the current part
         public int reviewsChecked;  // through Build E: completed Check the Seals batches; read as the sitting count by Build F

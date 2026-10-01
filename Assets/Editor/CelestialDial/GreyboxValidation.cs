@@ -193,6 +193,36 @@ namespace Ascendant.Build
             review.BeginReview(2, 4); review.Dial.Select(Zodiac.Destination(2), DialInput.DirectSeat); var reviewAnswer = review.Seal(); review.AfterCorrect(reviewAnswer);
             Check(reviewAnswer.correctness && review.Phase == LessonPhase.Review && Others(reviewFlow.Deck, ItemKind.Grid) + Kind(reviewFlow.Deck, ItemKind.Grid) == allBefore, "a compressed Dial review answer records no lesson evidence of any kind");
         }
+        // ---- Build Z (owner, Sept 29-30; task 86bca6fmv): the Dial's room, its glow, the eye that speaks, the Wing Dial's eye ----
+        public static readonly string[] EyeLines = Enumerable.Range(0, 12).SelectMany(i => new[] {
+            "Next " + Zodiac.Seats[i].Element + " after " + Zodiac.Seats[i].Name, "Next " + Zodiac.ModalityAt(i) + " after " + Zodiac.Seats[i].Name,
+            "Across from " + Zodiac.Seats[i].Name, "Find the symbol of\n" + Zodiac.Seats[i].Name, "Your sign: " + Zodiac.Seats[i].Name }).ToArray();
+        static void ValidateBuildZ()
+        {
+            Slots.ArtSlot Slot(string n) => Slots.Art.FirstOrDefault(a => a.Name == n);
+            Check(Slot("dial-room") is Slots.ArtSlot room && room.Width == 360 && room.Height == 800 && Slot("dial-room-light") is Slots.ArtSlot light && light.Width == 360 && light.Height == 800
+                && Slot("kit-dial-worn-open") != null && Slot("kit-dial-restored-open") != null && Slot("candle") != null, "Build Z: the Dial's room and its glow are full-screen slots; the Wing Dial's open eye has a slot per state; the candle slot stays (the opening's and the Chamber's)");
+            Sprite Art(string n) => Resources.Load<Sprite>("Art/" + n);
+            Check(new[] { "dial-room", "dial-room-light", "seat", "dial-face", "kit-dial-worn", "kit-dial-restored", "kit-dial-worn-open", "kit-dial-restored-open" }.All(n => Art(n) != null), "Build Z: the approved art is in the Art folder: the room, its glow, the seat, the face, and the Wing Dial closed and open");
+            Check(Art("dial-room").rect.width == 720 && Art("dial-room").rect.height == 1600 && Art("dial-room-light").rect.size == Art("dial-room").rect.size, "Build Z: the room and its glow are drawn at twice the 360 x 800 layout, the same size");
+            Check(Art("kit-dial-worn-open").rect.size == Art("kit-dial-worn").rect.size && Art("kit-dial-restored-open").rect.size == Art("kit-dial-restored").rect.size, "Build Z: each open Wing Dial is the same canvas as its closed piece, so the eye opens in place");
+            var voice = Resources.Load<Font>("Fonts/EBGaramond-Bold");
+            Check(voice != null && File.Exists("Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt"), "Build Z: the Dial's serif, EB Garamond Bold, ships with its open licence");
+            Check(EyeLines.All(l => l.All(c => c == '\n' || (c >= 32 && c <= 255))), "Build Z: every line the eye can show is Latin-1 (the web font rule)");
+            var settings = new TextGenerationSettings { font = voice, fontSize = 20, resizeTextForBestFit = true, resizeTextMinSize = 15, resizeTextMaxSize = 20, lineSpacing = .92f, textAnchor = TextAnchor.MiddleCenter,
+                generationExtents = new Vector2(150, 54), pivot = new Vector2(.5f, .5f), horizontalOverflow = HorizontalWrapMode.Wrap, verticalOverflow = VerticalWrapMode.Truncate, scaleFactor = 1, color = Color.white, richText = false, updateBounds = true };
+            var generator = new TextGenerator(); int smallest = 99; string tightest = "";
+            foreach (var line in EyeLines)
+            {
+                generator.Populate(line, settings); int size = generator.fontSizeUsedForBestFit;
+                Check(generator.lineCount <= 2 && size >= 15 && generator.characterCountVisible >= line.Replace("\n", "").Length, "Build Z: \"" + line.Replace("\n", " / ") + "\" fits the eye on at most two lines at 15 px or more (" + size + " px, " + generator.lineCount + " lines)");
+                if (size < smallest) { smallest = size; tightest = line; }
+            }
+            Check(smallest >= 15, "Build Z: the eye's smallest line is " + smallest + " px (\"" + tightest.Replace("\n", " / ") + "\")");
+            var zsave = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(new SaveData { revealsPlayed = new[] { "elements", "symbols" } }));
+            Check(zsave.revealsPlayed.SequenceEqual(new[] { "elements", "symbols" }) && new SaveData().revealsPlayed.Length == 0, "Build Z: the save carries the patterns whose reveal has played; a new save has none");
+            Check(DialView.RevealSweepSeconds + DialView.RevealNamesSeconds + DialView.RevealEyeSeconds <= 2.1f && SliceView.DialEyeSeconds <= .4f, "Build Z: the reveal is about two seconds of small built motions; the Wing Dial's eye opens in under half a second");
+        }
         static void ValidateBuildW()
         {
             // ---- Build W (owner, Sept 26 note 5; task 86bca0163): DEV Mode's checkpoints, each a real save from one scripted run; Keys earned, not spent ----
@@ -712,7 +742,7 @@ namespace Ascendant.Build
             Check(dsave.locksFilled==4 && dback.Restore(dsave) && dback.LocksFilled==4 && dback.KeysSpent==4 && dback.KeysInHand==0 && dback.BooksOpen==1 && dback.WingWhole && dback.AtriumStage==6 && dback.CanEnterChamber,"the save carries the Keys spent and the Books");
             var oldSave=new SaveData{atriumStage=6,sunSign=1,keyEarned=true,keys=4};var oldBack=new SliceFlow(()=>1);Check(oldBack.Restore(oldSave) && oldBack.LocksFilled==1 && oldBack.KeysInHand==3 && oldBack.AtriumStage==6,"a save from before Build D keeps its stage and holds its Keys in hand");
             // Build E: art slots and sound hooks. The manifest, the URL, the loader on the shipped test set, the import settings, the cues, the size budget.
-            Check(Slots.Art.Length==134 && Slots.Art.Select(a=>a.Name).Distinct().Count()==134 && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),"134 art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
+            Check(Slots.Art.Length==138 && Slots.Art.Select(a=>a.Name).Distinct().Count()==138 && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),"138 art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
             Check(Slots.Sounds.Select(s=>s.Name).SequenceEqual(new[]{"step","seal","miss","key","page","door","ambient"}) && Slots.Sounds.All(s=>s.When.Length>0),"seven sound slots: step, seal, miss, key, page, door, ambient");
             Check(SliceView.CasparPoses.SequenceEqual(new[]{"calm","explain","warm","wry","moved","solemn"}) && SliceView.CasparPoses.All(p=>Slots.Art.Any(a=>a.Name=="caspar-"+p && a.Width==264 && a.Height==468)) && Slots.Art.Any(a=>a.Name=="chat-box" && a.Width==324 && a.Height==240) && Slots.Art.Any(a=>a.Name=="chat-plate"),"Build P: six poses of Caspar, each a 264 x 468 slot, and the chat box with its plate");
             Check(SliceView.AtriumPoses.Length==SliceView.AtriumPages.Length && SliceView.ReturnPoses.Length==SliceView.ReturnPages.Length && SliceView.AtriumPoses.Concat(SliceView.ReturnPoses).All(p=>SliceView.CasparPoses.Contains(p)) && SliceView.AtriumPoses.SequenceEqual(new[]{"wry","warm","solemn","explain"}) && SliceView.ReturnPoses.SequenceEqual(new[]{"moved","explain"}),"Build P: every page of the opening and the return has its pose (wry, warm, solemn, explain; moved, explain)");
@@ -729,7 +759,7 @@ namespace Ascendant.Build
             Slots.Request(Slots.TestSet,null);
             Check(new[]{"atrium-light","wing-light","chamber-light"}.All(n=>Slots.Art.Any(a=>a.Name==n && a.Width==360 && a.Height==800)) && SliceView.LightSlots.Length==3,"Build H: one light overlay slot per room, full-screen");
             Check(SliceView.LightAlphaFor(0,0)==0f && SliceView.LightAlphaFor(1,0)==0f && SliceView.LightAlphaFor(2,0)==.25f && SliceView.LightAlphaFor(3,0)==.5f && SliceView.LightAlphaFor(6,4)>.59f && SliceView.LightAlphaFor(6,4)<.6f && SliceView.LightAlphaFor(6,SliceFlow.LocksTotal)==1f && SliceFlow.LocksTotal==21,"the overlay's alpha: nothing at Stage 1, a quarter at Stage 2, then half plus the arc of 21 Keys spent - about .6 with the Wing whole, full only at the last lock (owner, Sept 27)");
-            Check(Slots.Set=="test" && Slots.Art.All(a=>Slots.Image(a.Name)!=null) && Slots.Sounds.All(s=>Slots.Clip(s.Name)!=null) && Slots.ArtFiles==134 && Slots.SoundFiles==7,"the shipped test set has a file for every slot and the loader finds each one");
+            Check(Slots.Set=="test" && Slots.Art.All(a=>Slots.Image(a.Name)!=null) && Slots.Sounds.All(s=>Slots.Clip(s.Name)!=null) && Slots.ArtFiles==138 && Slots.SoundFiles==7,"the shipped test set has a file for every slot and the loader finds each one");
             Check(Slots.Art.All(a=>Slots.Source(a.Name)=="test set") && Slots.Sounds.All(s=>Slots.SoundSource(s.Name)=="test set"),"sources on the test set read 'test set'");
             Check(Slots.Image("no-such-slot")==null && Slots.Clip("no-such-slot")==null && Slots.Source("no-such-slot")=="placeholder" && Slots.SoundSource("no-such-slot")=="silent","an unknown slot loads nothing and reads placeholder or silent");
             var atriumImporter=AssetImporter.GetAtPath(SlotImport.ArtRoot+"test/atrium.png") as TextureImporter;var lockImporter=AssetImporter.GetAtPath(SlotImport.ArtRoot+"test/lock.png") as TextureImporter;
@@ -748,6 +778,7 @@ namespace Ascendant.Build
             ValidateBuildF();
             ValidateBuildJ();
             ValidateBuildW();
+            ValidateBuildZ();
             ValidateNoSwallowedCode();
             Directory.CreateDirectory("Logs");File.WriteAllLines("Logs/greybox-mechanical-validation.txt",Passed);
             Debug.Log("[GreyboxValidation] PASS: "+Passed.Count+" checks. Report: Logs/greybox-mechanical-validation.txt");

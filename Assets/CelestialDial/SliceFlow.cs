@@ -465,6 +465,7 @@ namespace Ascendant.CelestialDial
             var save = ToSave(lesson.Lit, lesson.Kin, lesson.KeyEarned, lesson.LitMod, lesson.KinMod,
                 grid.Placed, grid.Evidence, lesson.PolarityShown, lesson.OppKnown, lesson.Built, lesson.BuilderEvidence);
             save.wheelComplete = lesson.WheelComplete;
+            save.revealsPlayed = lesson.RevealsPlayed.OrderBy(p => p).ToArray(); // Build Z
             save.keys = Math.Max(Keys, lesson.Key4Earned ? 4 : grid.Key3Earned ? 3 : lesson.Key2Earned ? 2 : lesson.KeyEarned ? 1 : 0);
             return save;
         }

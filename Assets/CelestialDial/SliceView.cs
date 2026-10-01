@@ -465,8 +465,9 @@ namespace Ascendant.CelestialDial
             var shelf = Block(r, "Collapsed bookshelf", -125, 90, 50, 36, "shelf"); shelf.SetAsFirstSibling();
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelf, -14 + i * 14, 18, 8, 24); var bookImage = book.gameObject.AddComponent<Image>(); bookImage.color = new Color(.3f, .28f, .3f); Slots.Dress(bookImage, "shelf-book"); book.localRotation = Quaternion.Euler(0, 0, i * 9 - 9); }
             var chair = Block(r, "Covered chair", 125, 90, 44, 36, "chair"); chair.SetAsFirstSibling();
+            if (Dial.RoomArt) foreach (var retired in new[] { floor, shelf, chair }) retired.gameObject.SetActive(false); // Build Z (owner pick, Sept 30): the room behind the wheel replaces them on the Dial screen
             var cloth = Rect("Dust cloth", chair, 0, 10, 48, 14); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(chair));
-            var c = Rect("Candle", r, -160, 445, 6, 18); c.SetAsFirstSibling(); candle = c.gameObject.AddComponent<Image>(); candle.raycastTarget = false; Slots.Dress(candle, "candle"); Slots.Paint(candle, LampDark, DarkArt);
+            // Build Z (owner, Sept 30): the Dial screen's candle is cut (it read as "!"); the candle slot still draws the opening's and the Chamber's
             var s = Rect("Seam", r, 0, 270, 332, 2); seam = s.gameObject.AddComponent<Image>(); seam.color = new Color(Bone.r, Bone.g, Bone.b, 0); seam.raycastTarget = false;
             var glow = Rect("Key glow", r, 0, 270, 140, 140); keyGlow = glow.gameObject.AddComponent<Image>(); keyGlow.sprite = SoftGlow(); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); keyGlow.raycastTarget = false;
             keyRect = Rect("Keeper Key", r, 0, 270, 84, 40); var keyImage = keyRect.gameObject.AddComponent<Image>(); keyImage.raycastTarget = false; bool keyArt = Slots.Dress(keyImage, "keeper-key"); Slots.Paint(keyImage, new Color(Bone.r, Bone.g, Bone.b, 0), 1f);
@@ -489,6 +490,7 @@ namespace Ascendant.CelestialDial
             wingRoomKit = BuildKit(wingRoom, "kit-", WingKit, "wing-grime", wingLight, KitGrime, KitVeil, KitLight, () => Mathf.Clamp(Flow.Keys, 0, 4), KitRestoredNow); // Build M/N: grime under the light, the pieces, then the veil
             var wingPlate = wingKit.FirstOrDefault(p => p.P.Name == "plate"); if (wingPlate?.Restored != null) PlateText((RectTransform)wingPlate.Restored.transform, WingPlateName);
             FinishKit(wingRoom, wingRoomKit); // everything built after this draws above the veil
+            BuildDialEyes(); // Build Z
             Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
             Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
             // Build L (Wing composition, owner-approved mockup B, Sept 24): the room art carries the Dial, the table, the chair, and the shelf,
@@ -803,6 +805,7 @@ namespace Ascendant.CelestialDial
             if (id == "shelf" && !Flow.WheelComplete) { if (Flow.TouchDarkShelf()) { wingRoomCaption.text = DialLesson.ShelfDark; Publish(); } return; }
             if (id == "grid" && !Flow.CanOpenGrid) { if (Flow.TouchDarkGrid()) { wingRoomCaption.text = GridModel.DarkLine; Publish(); } return; } // Build B: dark and tappable with a note before the unit
             if (!Flow.Walk.GoTo(id)) return;
+            if (id == "dial" && Flow.Screen == SliceScreen.WingRoom) StartCoroutine(OpenDialEye()); // Build Z (owner, Sept 30): the Dial opens its eye as the player comes to it
             StartCoroutine(Travel(id));
         }
         IEnumerator Travel(string id)
@@ -812,6 +815,7 @@ namespace Ascendant.CelestialDial
             if (ReducedMotion) walk.Jump(); // decision 4: reduced motion jumps
             else while (!walk.Tick(Time.unscaledDeltaTime)) { PlaceAvatar(); yield return null; }
             PlaceAvatar();
+            while (id == "dial" && dialEyes.Count > 0 && dialEyeOpen < 1) yield return null; // Build Z: the eye finishes opening before the Dial screen
             yield return Arrive(id);
             busy = false; Show(); Publish();
         }
@@ -959,6 +963,8 @@ namespace Ascendant.CelestialDial
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom); hub.gameObject.SetActive(s == SliceScreen.Hub);
             wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
+            Dial.Showing = s == SliceScreen.Wing || practiceOnDial; // Build Z: a pattern's reveal plays only where the player sees the wheel
+            if (s == SliceScreen.WingRoom && !busy && dialEyeOpen > 0) SetDialEye(0); // Build Z: back in the room, the Dial's eye rests closed
             gridScreen.gameObject.SetActive(s == SliceScreen.Grid); if (s == SliceScreen.Grid) ShowGrid();
             bool book = s == SliceScreen.Book;
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
@@ -1099,7 +1105,37 @@ namespace Ascendant.CelestialDial
             if (Flow.Screen == SliceScreen.Chamber) { chamberEnd.text = "The first Key is spent. The Library has taken her first breath."; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -720); }
             if (!chamberReady && insertGlow != null) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
         }
-        void LightWing() { FloorLight(.8f); Slots.Paint(candle, LampLit, 1f); }
+        void PaintCandle(Color color, float alpha) { if (candle != null) Slots.Paint(candle, color, alpha); } // Build Z: the Dial screen's candle was cut
+        // ---- Build Z (owner, Sept 30): the Wing room's Dial rests with its eye closed, worn and restored alike, and opens it when the player taps the Dial.
+        // The open art is identical to the closed piece outside the eye, so the opening is a mask at the eye that grows from the seam: the lids part.
+        readonly List<(RectTransform box, float height)> dialEyes = new List<(RectTransform, float)>(); float dialEyeOpen;
+        public const float DialEyeSeconds = .35f;
+        void BuildDialEyes()
+        {
+            dialEyes.Clear(); var piece = wingKit.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;
+            AddDialEye(piece.Worn, "kit-dial-worn-open", .446f); AddDialEye(piece.Restored, "kit-dial-restored-open", .434f); // the eye's centre, as a share of the file's height (measured)
+            SetDialEye(0);
+        }
+        void AddDialEye(CanvasGroup state, string slot, float eyeAt)
+        {
+            if (state == null || Slots.Image(slot) == null) return;
+            var piece = (RectTransform)state.transform; float w = piece.sizeDelta.x, h = piece.sizeDelta.y, y = h / 2 - eyeAt * h;
+            var box = new GameObject("Eye opening", typeof(RectTransform)).GetComponent<RectTransform>(); box.SetParent(piece, false);
+            box.anchorMin = box.anchorMax = box.pivot = new Vector2(.5f, .5f); box.anchoredPosition = new Vector2(0, y); box.sizeDelta = new Vector2(w, 0); box.gameObject.AddComponent<RectMask2D>();
+            var open = new GameObject("Open", typeof(RectTransform)).GetComponent<RectTransform>(); open.SetParent(box, false);
+            open.anchorMin = open.anchorMax = open.pivot = new Vector2(.5f, .5f); open.anchoredPosition = new Vector2(0, -y); open.sizeDelta = new Vector2(w, h);
+            var image = open.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot);
+            dialEyes.Add((box, h));
+        }
+        void SetDialEye(float k) { dialEyeOpen = k; foreach (var (box, h) in dialEyes) box.sizeDelta = new Vector2(box.sizeDelta.x, k >= 1 ? h * 2 : Mathf.Lerp(0, h * .2f, k)); }
+        IEnumerator OpenDialEye()
+        {
+            if (dialEyes.Count == 0) yield break;
+            if (ReducedMotion) { SetDialEye(1); Publish(); yield break; }
+            for (float t = 0; t < DialEyeSeconds; t += Time.unscaledDeltaTime) { SetDialEye(Mathf.SmoothStep(0, 1, t / DialEyeSeconds) * .999f); yield return null; }
+            SetDialEye(1); Publish();
+        }
+        void LightWing() { FloorLight(.8f); PaintCandle(LampLit, 1f); }
         // Build E: the floor's lines at an alpha, or the floor's file at a brightness that follows it.
         void FloorLight(float alpha) { foreach (var line in floorLines) if (line != null) line.color = new Color(.62f, .57f, .53f, alpha); if (floorArt != null && floorArt.enabled) floorArt.color = Color.white * (.45f + .55f * alpha / .8f); }
         static void Lamp(Image lamp, bool lit) => Slots.Paint(lamp, lit ? LampLit : LampDark, lit ? 1f : DarkArt);
@@ -1203,6 +1239,7 @@ namespace Ascendant.CelestialDial
             state.canEnterGrid = s == SliceScreen.WingRoom && Flow.CanOpenGrid && !busy;
             state.keys = Math.Max(state.keys, Flow.Keys); // the lesson counts two Keys; the table adds the third
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
+            state.dialEye = dialEyes.Count > 0 ? dialEyeOpen : -1; // Build Z: the Wing room Dial's eye, -1 without the open art
             state.shelfLight = shelfLight != null ? shelfLightLevel : -1; state.shelfRing = shelfGlow != null && shelfGlow.gameObject.activeInHierarchy && shelfGlow.color.a > 0; // Build Y
             state.kitLevel = KitLevel; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
             state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
@@ -1407,13 +1444,14 @@ namespace Ascendant.CelestialDial
             try { save = JsonUtility.FromJson<SaveData>(json); } catch (Exception e) { Debug.LogWarning("[CelestialDial] save unreadable: " + e.Message); }
             if (save == null || !Flow.Restore(save)) return;
             Dial.Lesson.RestoreProgress(save.sunSign, save.lit, save.kin, save.keyEarned);
+            Dial.Lesson.RevealsPlayed.Clear(); if (save.revealsPlayed != null) Dial.Lesson.RevealsPlayed.UnionWith(save.revealsPlayed); // Build Z
             Dial.Lesson.RestoreGlyphs(save.glyphStage, save.glyphIndex, save.keys >= 2); Dial.Lesson.SetCleanRuns(save.cleanRuns);
             Dial.Lesson.RestoreModalities(save.litMod, save.kinMod, save.modalitiesStarted);
             Grid.Restore(save.gridPlaced, save.gridEvidence, save.gridStarted, save.keys >= 3);
             Dial.Lesson.SetKey3(save.keys >= 3); Dial.Lesson.RestoreOpposites(save.polarityShown, save.oppKnown, save.oppositesStarted, save.built, save.builderEvidence, save.keys >= 4);
             if (save.keys >= 2) keyIndicator.text = "Keeper Keys: " + Math.Max(2, save.keys);
             sunSent = true; revealStarted = true; Resumed = true; Dial.SliceHidesOptional = true; SetLight(LightAlphaFor(save.atriumStage, Mathf.Max(save.locksFilled, save.keyEarned ? 1 : 0))); // Build H: no fade on a reload
-            keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { FloorLight(.55f); Slots.Paint(candle, Bone, 1f); }
+            keyIndicator.gameObject.SetActive(save.keyEarned); if (save.wheelComplete) LightWing(); else if (save.keyEarned) { FloorLight(.55f); PaintCandle(Bone, 1f); }
         }
 
         // ---- beats ----
@@ -1445,7 +1483,7 @@ namespace Ascendant.CelestialDial
             Dial.Lesson.Say("Aah... the Library stirs."); // Q04 locked line.
             Dial.ForceRefresh();
             FloorLight(.55f);
-            Slots.Paint(candle, Bone, 1f); keyIndicator.gameObject.SetActive(true);
+            PaintCandle(Bone, 1f); keyIndicator.gameObject.SetActive(true);
             Flow.RevealKey(); wingContinue.gameObject.SetActive(true);
             busy = false; Publish();
         }

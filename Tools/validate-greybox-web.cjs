@@ -75,19 +75,35 @@ const path=require('path');
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).caspar==='The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready.'&&(await state()).canEnterDial,'Build T: in the Zodiac Wing Caspar points to the Dial at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
+    check((await state()).dialEye===0,'Build Z: in the Zodiac Wing the Dial rests with its eye closed at '+viewport.width);
     await semantic('poi-dial');
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().dialEye>0&&window.ascendantDial.snapshot().dialEye<1,{},{timeout:3000}).catch(()=>{});
+    await page.screenshot({path:path.join(out,viewport.width+'-wing-eye-opening.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await ready();
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:10000}).catch(()=>{});check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on (tappable once the wheel\'s opening beat settles) at '+viewport.width);
     check((await state()).dormant&&(await state()).message===''&&(await state()).dialBoxHeight===0,'the Dial is dormant on arrival, Caspar silent (the owner cut his repeated Wing line) at '+viewport.width);
     check((await state()).artSet===''&&!(await state()).style,'no query: the game plays on the Art folder, no style page at '+viewport.width); // Build E (the page cue is checked in the Atrium, before the walk: Build T)
     await page.screenshot({path:path.join(out,viewport.width+'-encounter.png')});
+    { const z=await state(); check(z.dialEye===1,'Build Z: the Wing Dial opened its eye as the Keeper came to it at '+viewport.width);
+      check(z.dialRoom&&z.dialLit===0&&z.revealsPlayed.length===0&&z.eyeText===''&&z.revealing==='','Build Z: the Dial arrives in its room, asleep: no glow, the eye empty, no reveal yet at '+viewport.width); }
+    // Build Z (owner, Sept 29-30): the first Continue wakes the Dial with the elements' reveal: the glow sweeps round from the top, the seats pop as it passes.
+    await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().revealing==='elements',{},{timeout:5000}).catch(()=>{});
+    await page.waitForFunction(()=>{const z=window.ascendantDial.snapshot();return z.dialLit>.3&&z.dialLit<.9;},{},{timeout:3000}).catch(()=>{});
+    { const z=await state(); await page.screenshot({path:path.join(out,viewport.width+'-reveal-sweep.png')});
+      check(z.revealing==='elements'&&z.dialLit>0&&z.dialLit<1,'Build Z: mid-reveal the glow has swept part of the ring ('+z.dialLit.toFixed(2)+') at '+viewport.width); }
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().revealing==='',{},{timeout:8000});
+    { const z=await state(); check(z.dialLit===1&&z.revealsPlayed.join()==='elements','Build Z: the reveal ends with the whole ring lit, the elements marked played at '+viewport.width); }
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at '+viewport.width);
     // Seven intro beats, two of them automatic, then the teaching page and the guided problem.
     for(let n=0;n<16&&(await state()).start!=='Start: Taurus';n++){if((await state()).canContinue)await semantic('continue');await page.waitForTimeout(500);}
     await waitActive('Taurus');check(!(await state()).dormant,'the Dial has woken and the guided problem began at '+viewport.width);
+    { const z=await state(); await page.screenshot({path:path.join(out,viewport.width+'-eye-challenge.png')});
+      check(z.eyeText==='Next Earth after Taurus'&&z.eyeSize>=15&&z.eyeSize<=20&&z.signLabel==='Taurus','Build Z: the Dial poses its challenge in the eye ('+z.eyeSize+' px) and names the framed sign above it at '+viewport.width);
+      check((z.speaker==='dial')===z.dialVoice,'Build Z: the box wears the Dial\'s blue exactly when the Dial speaks ('+z.speaker+') at '+viewport.width); }
     // Build T: mid-challenge, a tap on the canvas's Leave the Dial goes to the Zodiac Wing; the Dial, tapped again, resumes the same problem.
     await tap(0,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
     check((await state()).screen==='wingroom'&&(await state()).atriumStage===1,'Build T: Leave the Dial, tapped mid-challenge in the first lesson, lands in the Zodiac Wing at '+viewport.width);
+    check((await state()).dialEye===0,'Build Z: back in the room the Dial\'s eye has closed again at '+viewport.width);
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await waitActive('Taurus');check((await state()).start==='Start: Taurus'&&(await state()).active,'Build T: back at the Dial the same problem is waiting at '+viewport.width);
     const boxes=await page.locator('#seats button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,label:b.getAttribute('aria-label')})));
@@ -342,6 +358,8 @@ const path=require('path');
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active,{},{timeout:20000});
     check((await state()).namesHidden && (await state()).seats.every(x=>x.startsWith('Symbol')),'Part B hides every name, labels included, at '+viewport.width);
     await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Part A hold ends, then the wheel's labels refresh
+    { const z=await state(); await page.screenshot({path:path.join(out,viewport.width+'-eye-symbols.png')});
+      check(z.revealsPlayed.includes('symbols')&&z.eyeText==='Find the symbol of\n'+z.glyphTarget&&z.signLabel==='','Build Z: the symbols open with their own reveal; the eye asks for the symbol and nothing above it names a sign at '+viewport.width); }
     { const b=await state(); check(!SIGNS.some(n=>b.destination.includes(n)) && b.destination.startsWith('Selected: symbol ') && b.start==='' && b.count==='' && b.challenge===b.glyphTarget,'Part B readouts do not name the sign under the bracket; the center holds the target name (Build I) at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
     for(let n=0;n<12;n++){
@@ -409,7 +427,7 @@ const path=require('path');
     // ---- Build A: the modalities on the Dial ----
     check((await state()).dialGlow===1,'with Key 2 in hand the Dial glows in the Wing room: a unit waits there (Build I) at '+viewport.width);await page.screenshot({path:path.join(out,viewport.width+'-wing-room-dial-glow.png')});
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    await semantic('continue-lesson');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='modalities'&&window.ascendantDial.snapshot().active,{},{timeout:15000});
+    await semantic('continue-lesson');await page.waitForFunction(()=>{const z=window.ascendantDial.snapshot();return z.unit==='modalities'&&z.active&&z.revealsPlayed.includes('modalities')&&z.revealing==='';},{},{timeout:15000}); // Build Z: the pattern's reveal plays first
     check((await state()).step===3 && (await state()).start==='Start: Taurus' && (await state()).message.includes('second pattern'),'after Key 2 the Dial opens the modality unit at the sun sign, three forward, at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-modalities.png')});
     for(let n=0;n<12;n++){
@@ -521,7 +539,7 @@ const path=require('path');
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).caspar.includes('last pattern'),'with three Keys the room points at the wheel\'s last pattern at '+viewport.width);
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    await semantic('continue-lesson');await page.waitForFunction(()=>window.ascendantDial.snapshot().unit==='opposites'&&window.ascendantDial.snapshot().canContinue,{},{timeout:15000});
+    await semantic('continue-lesson');await page.waitForFunction(()=>{const z=window.ascendantDial.snapshot();return z.unit==='opposites'&&z.canContinue&&z.revealsPlayed.includes('opposites')&&z.revealing===''&&!z.busy;},{},{timeout:15000}); // Build Z: the pattern's reveal plays first
     check(!(await state()).polarityShown && (await state()).message.startsWith('The wheel holds one last secret') && !(await state()).active && (await state()).canLeaveDial,'after Key 3 the Dial opens the polarity beat; Leave the Dial stays on its own row, clear of the beat\'s Continue (Build T) at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-polarity.png')});
     await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().polarityShown,{},{timeout:5000});
@@ -541,7 +559,8 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().oppositesComplete&&window.ascendantDial.snapshot().canContinue,{},{timeout:20000});
     check((await state()).pairsKnown===6 && events.filter(e=>e.event_name==='opposites_completed').length===1,'six pairs complete the last pattern at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opposites-complete.png')});
-    await semantic('continue');await page.waitForFunction(()=>window.ascendantDial.snapshot().builderStep==='name'&&window.ascendantDial.snapshot().canBuilderName,{},{timeout:5000});
+    await semantic('continue');await page.waitForFunction(()=>{const z=window.ascendantDial.snapshot();return z.builderStep==='name'&&z.canBuilderName&&z.revealsPlayed.includes('builder')&&z.revealing==='';},{},{timeout:8000}); // Build Z: the pattern's reveal plays first
+    check((await state()).revealsPlayed.join()==='builder,elements,modalities,opposites,symbols','Build Z: each of the five patterns has played its reveal once at '+viewport.width);
     check((await state()).speaker==='dial'&&(await state()).message.startsWith('Build me a sign from its parts'),'Build V: the Dial, not Caspar, asks for the sign built from its parts at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-dial-speaks.png')});
     { const b=await state(); check(b.unit==='builder' && b.builderAsk==='Earth, fixed' && b.builderOptions.length===4 && b.builderOptions.includes('Taurus') && b.built===0,'Continue opens the builder on the sun sign\'s parts: four names (Leave the Dial on its own row below them), at '+viewport.width); }
@@ -677,7 +696,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===134&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===138&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
@@ -703,9 +722,9 @@ const path=require('path');
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===134&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 134 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===138&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 138 art and 7 sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===134&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===138&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');

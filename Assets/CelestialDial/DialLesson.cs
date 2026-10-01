@@ -32,6 +32,7 @@ namespace Ascendant.CelestialDial
         // Zodiac Wing entrance (Sept 11 decision): dormant Dial wakes to the player, Caspar reacts,
         // a simulated hesitation, disbelief, composure, then teaching. Linear; no branching.
         public int IntroStep { get; private set; }
+        public readonly HashSet<string> RevealsPlayed = new HashSet<string>(); // Build Z (owner, Sept 30): the reveal plays once each time the Dial opens a new pattern
         public const int IntroTeaching = 7;
         public bool IntroAuto => Phase == LessonPhase.Encounter && (IntroStep == 1 || IntroStep == 4);
         public bool DialDormant => Phase == LessonPhase.Encounter && IntroStep <= 1;

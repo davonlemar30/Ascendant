@@ -16,7 +16,20 @@ namespace Ascendant.CelestialDial
         public Text Line; public float Max; public Button More;
         public Text Name; // Build V: the speaker's plate
         public const string CasparPlate = "C A S P A R", DialPlate = "T H E   C E L E S T I A L   D I A L"; // spaced: the legacy Text has no letter spacing
-        public void SetSpeaker(bool dial) { if (Name != null) { string plate = dial ? DialPlate : CasparPlate; if (Name.text != plate) Name.text = plate; } }
+        public Image Panel, Rule, Eye; public float NameX; // Build Z: the box's frame, the rule under the plate, and the Dial's eye mark
+        static readonly Color Gold = new Color(.84f, .69f, .38f);
+        bool? speakerShown;
+        // Build V: the plate names the speaker; Build Z (owner, Sept 30): the Dial's voice is sea blue with its eye mark, Caspar's gold.
+        public void SetSpeaker(bool dial)
+        {
+            if (Name == null) return; string plate = dial ? DialPlate : CasparPlate; if (Name.text != plate) Name.text = plate;
+            if (speakerShown == dial) return; speakerShown = dial;
+            Name.color = dial ? Slots.DialVoice : Gold;
+            if (Eye != null) { Eye.gameObject.SetActive(dial); Name.rectTransform.anchoredPosition = new Vector2(NameX + (dial ? 21 : 0), Name.rectTransform.anchoredPosition.y); }
+            if (Rule != null) Rule.color = dial ? new Color(Slots.DialVoice.r, Slots.DialVoice.g, Slots.DialVoice.b, .6f) : new Color(Gold.r, Gold.g, Gold.b, .55f);
+            if (Panel != null) Panel.sprite = Slots.InstrumentBoxSprite(dial);
+        }
+        public bool DialVoiceShown => speakerShown == true; // for the web state
         public string Source { get; private set; } = "";
         public int Page { get; private set; }
         public int Pages => pages.Count;
