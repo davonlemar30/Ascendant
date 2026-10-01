@@ -46,10 +46,10 @@ Your progress saves on the device you're playing on, in the browser, the moment 
 
 ## What's placeholder, what's coming
 
-- **Art:** landing, room by room. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are now built as **kits** — a restored shell, a grime layer that fades away by Key, and every prop with a worn and a restored state — with Caspar, the Keeper, the Key, and the journal also illustrated. The Celestial Dial's own instrument (its seats, bracket, and floor pattern) and the book on the shelf are still placeholder blocks. Every grey box is a named slot that takes an image, so the art arrives one file at a time (see below).
+- **Art:** landing, room by room. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are now built as **kits** — a restored shell, a grime layer that fades away by Key, and every prop with a worn and a restored state — with Caspar, the Keeper, the Key, and the journal also illustrated. The Celestial Dial now has its own room, glow, seats, and an eye that speaks. The book on the shelf is still a placeholder block. Every grey box is a named slot that takes an image, so the art arrives one file at a time (see below).
 - **Sound:** none yet. One ambient loop and a few interface sounds are planned; the hooks are in, and each is a named slot that takes a sound file.
 - **Caspar's voice:** the Zodiac Wing's lines are now the writer's own, from the first return to the Chamber's end. The few stand-ins left are around practice and the journal (the fork, the gate, the journal's pages); they follow.
-- **Next up:** the Dial's own art and the book on the shelf, the game's sounds, Caspar's last few lines, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
+- **Next up:** the book on the shelf, the game's sounds, Caspar's last few lines, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
 
 The full game teaches the whole of beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
 
@@ -70,4 +70,4 @@ If something feels wrong, confusing, or too easy, that is exactly what this buil
 
 ## Credits
 
-Ascendant is designed and written by Davon G. The zodiac symbols are drawn with Noto Sans Symbols (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt`](Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt)), and the journal's titles are set in UnifrakturMaguntia (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt`](Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt)). Built with Unity.
+Ascendant is designed and written by Davon G. The zodiac symbols are drawn with Noto Sans Symbols (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt`](Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt)), and the journal's titles are set in UnifrakturMaguntia (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt`](Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt)), and the Dial's words are set in EB Garamond (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt`](Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt)). Built with Unity.
