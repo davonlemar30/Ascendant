@@ -10,6 +10,7 @@ Shader "Ascendant/Illumination"
         _Color ("Tint", Color) = (1,1,1,1)
         _Saturation ("Colour", Range(0, 1)) = 1
         _Ink ("Ink", Range(0, 1)) = 1
+        _Round ("Round", Range(0, 1)) = 0
 
         _StencilComp ("Stencil Comparison", Float) = 8
         _Stencil ("Stencil ID", Float) = 0
@@ -73,6 +74,7 @@ Shader "Ascendant/Illumination"
             float4 _MainTex_ST;
             half _Saturation;
             half _Ink;
+            half _Round;
 
             v2f vert(appdata_t v)
             {
@@ -92,6 +94,10 @@ Shader "Ascendant/Illumination"
                 half grey = dot(color.rgb, half3(0.299, 0.587, 0.114)); // the line art: the file's own values, without its hue
                 color.rgb = lerp(grey.xxx, color.rgb, _Saturation);
                 color.a *= _Ink;
+                // Build AA: a journal seat's picture is clipped to a circle here, not by a UI Mask (a Mask draws a copy of the material
+                // made once, so later _Saturation and _Ink changes never reach the screen). The sprites are whole files, so UV 0..1.
+                half2 fromCentre = IN.texcoord - 0.5;
+                color.a *= lerp(1, saturate((0.5 - length(fromCentre)) * 120), _Round);
                 #ifdef UNITY_UI_CLIP_RECT
                 color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
                 #endif

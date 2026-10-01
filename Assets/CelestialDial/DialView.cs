@@ -98,14 +98,13 @@ namespace Ascendant.CelestialDial
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
             public string hubNote = "";
             // Build F: the practice fork, the sitting, the gate, the journal
-            public string fork = "", practiceMode = "", practiceSign = "", practiceSummary = "", journalSection = "";
+            public string fork = "", practiceMode = "", practiceSign = "", practiceSummary = "";
             public bool practicing, gated, journal, canContinueLesson, canEnterPractice, canLeavePractice, canOpenJournal, canCloseJournal, canJournalNext, canJournalPrev;
             public int practiceIndex, practiceCount, strikes, sitting, journalPage, journalCount;
-            public string[] journalEntries;
-            // Build J: the journal as a book (journalStates and journalText are test evidence: the state words are never drawn)
-            public string journalView = "", journalSign = "", journalGlyph = "", journalArt = "", journalText = "", journalTitleFont = "";
-            public string[] journalContents, journalStates, journalFacts; public bool[] journalTabs;
-            public float journalInk, journalColour; public int journalRibbon; public bool journalRibbonOut, journalGilt, journalTable, journalShader, canJournalContents;
+            // Build J / AA: the journal (journalSeats, journalSeatState and journalText are test evidence: the state words are never drawn)
+            public string journalView = "", journalSign = "", journalGlyph = "", journalArt = "", journalText = "", journalTitleFont = "", journalLens = "", journalSelected = "", journalPreview = "", journalSeatState = "";
+            public string[] journalLenses, journalSeats, journalFacts, journalChips; public bool[] journalDue; public float[] journalChipBoxes;
+            public float journalInk, journalColour; public int journalRibbon; public bool journalRibbonOut, journalGilt, journalShader, canJournalWheel, canJournalTable, canJournalOpen;
             public string sunSign = "";
             public int locksFilled;
             // v0.4 tap-to-move

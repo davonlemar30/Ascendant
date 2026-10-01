@@ -59,12 +59,10 @@ namespace Ascendant.CelestialDial
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
         Button enterWing, hubRestart, leavePractice;
         // Build F: the fork and the practice exit on the Dial, the journal's buttons and screen.
-        Button forkLesson, forkPractice, leavePracticeDial, journalHub, journalWing, journalChamber, journalPrev, journalNext, journalClose, journalToContents;
-        RectTransform journal; Text journalTitle; Image journalPage, journalContentsArt, journalCover; readonly Text[] journalGlyphs = new Text[12], journalLines = new Text[12];
-        // Build J: the book's parts. Contents rows with their ribbon tabs; the sign page's picture (Illumination), symbol, table cell, fact plates, ribbon, gilt edge.
-        readonly Button[] journalRows = new Button[6]; readonly Text[] journalRowText = new Text[6]; readonly Image[] journalTabs = new Image[6];
-        Image journalSignArt, journalRibbon; Material journalIllumination; Text journalSignGlyph; RectTransform journalTable, journalGilt; readonly Image[] journalCells = new Image[12];
-        readonly Image[] journalPlates = new Image[4]; readonly Text[] journalPlateLabels = new Text[4], journalPlateValues = new Text[4];
+        Button forkLesson, forkPractice, leavePracticeDial, journalHub, journalWing, journalChamber, journalPrev, journalNext, journalClose;
+        RectTransform journal; Text journalTitle; Image journalPage;
+        // Build J / AA: a sign's picture (Illumination) and its ribbon; the rest of the book's parts are declared with BuildJournal.
+        Image journalSignArt, journalRibbon; Material journalIllumination;
         readonly Image[][] journalChevrons = new Image[2][]; // the page arrows, drawn (the fonts carry no arrow glyphs)
         bool forkShown, gating;
         // Build H (the Sept 17 lighting decision, Option C): one golden-hour overlay per room, over the background and under everything else, faded by the Atrium stage.
@@ -618,8 +616,12 @@ namespace Ascendant.CelestialDial
             else if (command == "close-journal") CloseJournal();
             else if (command == "journal-next") JournalTurn(1);
             else if (command == "journal-prev") JournalTurn(-1);
-            else if (command == "journal-contents") JournalContents(); // Build J
-            else if (command.StartsWith("journal-entry:") && int.TryParse(command.Substring(14), out int entry)) JournalEntry(entry);
+            else if (command == "journal-wheel") JournalWheel(); // Build AA: the Wheel, its views and tabs, a seat's preview, a page's links
+            else if (command.StartsWith("journal-view:")) JournalSetView(command.Substring(13) == "table");
+            else if (command.StartsWith("journal-lens:") && int.TryParse(command.Substring(13), out int jlens) && jlens >= 0 && jlens < 4) JournalLensTap((JournalLens)jlens);
+            else if (command.StartsWith("journal-seat:") && int.TryParse(command.Substring(13), out int jseat) && jseat >= 0 && jseat < 12) JournalSeatTap(jseat);
+            else if (command == "journal-open") JournalOpenSelected();
+            else if (command.StartsWith("journal-chip:") && int.TryParse(command.Substring(13), out int jchip)) JournalChipTap(jchip);
             else if (command.StartsWith("element:") && int.TryParse(command.Substring(8), out int element) && element >= 0 && element < 4) AnswerTap(Elements[element]);
             else if (command.StartsWith("modality:") && int.TryParse(command.Substring(9), out int modality) && modality >= 0 && modality < 3) AnswerModalityTap(Zodiac.Modalities[modality]);
             else if (command.StartsWith("glyph-name:") && int.TryParse(command.Substring(11), out int slot) && slot >= 0 && slot < 4) { if (Flow.AtPractice) AnswerGlyphReview(slot); else AnswerGlyphName(slot); }
@@ -1188,20 +1190,24 @@ namespace Ascendant.CelestialDial
             state.canEnterPractice = forkOpen; state.canContinueLesson = forkOpen && LessonAvailable;
             state.fork = !forkOpen ? "none" : LessonAvailable ? "both" : "practice";
             state.journal = s == SliceScreen.Journal; state.canOpenJournal = Flow.CanOpenJournal && !busy; state.canCloseJournal = state.journal && !busy;
-            state.canJournalNext = Flow.CanJournalNext && !busy; state.canJournalPrev = Flow.CanJournalPrev && !busy; state.canJournalContents = Flow.CanJournalContents && !busy;
-            // Build J: which page, the contents and their ribbon tabs, the sign page's facts, its Illumination and its ribbon; the text on screen as evidence
-            var at = Flow.JournalAt; bool onSection = state.journal && at == JournalView.Section, onSign = state.journal && at == JournalView.Sign; int signSeat = Flow.JournalSignSeat;
-            state.journalView = !state.journal ? "" : at == JournalView.Contents ? "contents" : onSection ? "section" : "sign";
-            state.journalPage = onSign ? Flow.JournalSign : Flow.JournalSection; state.journalCount = onSign ? Flow.JournalSigns.Count : Flow.JournalSections.Count;
-            state.journalSection = !state.journal ? "" : at == JournalView.Contents ? "Contents" : onSection ? SliceFlow.SectionTitle(Flow.JournalKind) : SliceFlow.SignsTitle;
-            state.journalContents = state.journal ? Flow.JournalContents.ToArray() : new string[0]; state.journalTabs = state.journalContents.Select((_, i) => Flow.JournalEntryDue(i)).ToArray();
-            state.journalEntries = onSection ? Flow.JournalEntries(Flow.JournalKind).ToArray() : new string[0]; state.journalStates = onSection ? Flow.JournalStates(Flow.JournalKind).ToArray() : new string[0];
+            state.canJournalNext = Flow.CanJournalNext && !busy; state.canJournalPrev = Flow.CanJournalPrev && !busy; state.canJournalWheel = Flow.CanJournalWheel && !busy;
+            // Build AA: which view, the tabs, each seat's state and ribbon, the preview, a sign page's facts and links, its Illumination and ribbon; the text on screen as evidence
+            var at = Flow.JournalAt; bool onSign = state.journal && at == JournalView.Sign, onWheel = state.journal && !onSign; int signSeat = Flow.JournalSignSeat;
+            state.journalView = !state.journal ? "" : onSign ? "sign" : Flow.JournalTableView ? "table" : "wheel";
+            state.journalPage = Flow.JournalSign; state.journalCount = Flow.JournalSigns.Count;
+            state.journalLenses = onWheel && Flow.JournalLenses.Count > 1 ? Flow.JournalLenses.Select(SliceFlow.LensTitle).ToArray() : new string[0]; state.journalLens = state.journal ? SliceFlow.LensTitle(Flow.Lens) : ""; state.canJournalTable = onWheel && Flow.CanJournalTable;
+            state.journalSeats = state.journal ? Enumerable.Range(0, 12).Select(seat => SliceFlow.SeatStateNames[Flow.SeatState(seat)]).ToArray() : new string[0];
+            state.journalDue = state.journal ? Enumerable.Range(0, 12).Select(seat => Flow.SeatState(seat) > 0 && Flow.SignDue(seat)).ToArray() : new bool[0];
+            state.journalSelected = state.journal && Flow.JournalSelected >= 0 ? Zodiac.Seats[Flow.JournalSelected].Name : ""; state.canJournalOpen = onWheel && Flow.CanOpenSelected && !busy;
+            state.journalPreview = onWheel && Flow.JournalSelected >= 0 ? PlainText(journalCardTitle.text) + ": " + PlainText(journalCardLine.text) : "";
+            state.journalChips = onSign ? Enumerable.Range(0, journalChips.Length).Where(i => journalChips[i].gameObject.activeSelf).Select(i => Zodiac.Seats[journalChipSeats[i]].Name).ToArray() : new string[0];
+            state.journalChipBoxes = onSign ? JournalChipBoxes() : new float[0];
             state.journalSign = onSign ? Zodiac.Seats[signSeat].Name : ""; state.journalFacts = onSign ? Flow.SignFacts(signSeat).Select(f => f[0] + ": " + f[1]).ToArray() : new string[0];
-            state.journalGlyph = onSign && Flow.SignKnows(signSeat, ItemKind.Glyph) ? Zodiac.Seats[signSeat].Glyph : ""; state.journalTable = onSign && Flow.SignKnows(signSeat, ItemKind.Grid);
+            state.journalGlyph = onSign && Flow.SignKnows(signSeat, ItemKind.Glyph) ? Zodiac.Seats[signSeat].Glyph : ""; state.journalSeatState = onSign ? SliceFlow.SeatStateNames[Flow.SeatState(signSeat)] : "";
             state.journalInk = onSign ? Flow.SignInk(signSeat) : 0; state.journalColour = onSign ? Flow.SignColour(signSeat) : 0; state.journalGilt = onSign && Flow.SignGilt(signSeat);
             state.journalRibbon = onSign ? Flow.SignLadder(signSeat) : 0; state.journalRibbonOut = onSign && Flow.SignDue(signSeat);
             state.journalArt = onSign ? Slots.Source(SignSlot(signSeat)) : ""; state.journalShader = journalIllumination != null; state.journalTitleFont = journalTitle != null && journalTitle.font != null ? journalTitle.font.name : "";
-            state.journalText = state.journal ? string.Join(" | ", journal.GetComponentsInChildren<Text>(false).Select(t => t.text).Where(t => t != "")) : "";
+            state.journalText = state.journal ? string.Join(" | ", journal.GetComponentsInChildren<Text>(false).Select(t => PlainText(t.text)).Where(t => t != "")) : "";
             state.hubNote = hubNote != null ? hubNote.text : ""; state.v02Complete = Flow.V02Complete;
             bool partA = s == SliceScreen.Book && Dial.Lesson.Phase == LessonPhase.GlyphNames;
             bool glyphItem = s == SliceScreen.Practice && task != null && !Flow.PracticeDone && task.Mode == ReviewMode.Glyph;
@@ -1273,149 +1279,375 @@ namespace Ascendant.CelestialDial
         IEnumerator FadeLight(float target) { float from = lightAlpha; yield return Tween(.8f, k => SetLight(Mathf.Lerp(from, target, k))); lightFade = null; Publish(); } // the settled alpha reaches the web state
 
         // ---- Build F: the journal. In the inventory (owner, Sept 15): a button in every room, never a room object. It renders straight from the
-        // deck and reading changes nothing. Build J (owner, Sept 23): a book. A contents page lists what has entered the deck; a page per section;
-        // a page per sign met. Illumination (a sign's picture from line art to full colour) and Ribbons (the ladder climbed, what is due) carry the
-        // deck's state instead of words. One page to a screen (owner, Sept 25: the left page of an open binder in full, the rings and the facing
-        // page's edge at the right, an arrow to flip). The paper is loose-leaf in the Library's hand. A part with no file keeps the greybox look. ----
+        // deck and reading changes nothing. Build AA (owner, Sept 30; Sept 26 notes 7 and 14): one index page, the Wheel, with a Wheel / Table
+        // switch and tabs that appear as each pattern is learned; tap a seat for its preview, then its page; a sign's page links the signs
+        // that share each fact. The look is the Black Hours, silver-ruled: black-blue vellum in gold and silver (painterly, the owner's
+        // journal-only exception to the Art Bible). Gold means mastery: a sign met is a silver ring, one practised a gold ring, a mastered one
+        // gold leaf (Illumination, re-dressed); Ribbons still carry the ladder and what is due. A part with no file keeps the greybox look. ----
         public const float JournalTop = 26f; // the page's head edge on the 360 x 800 layout: a sign's ribbon hangs from it; a due ribbon stands out above it
-        public const float JournalX = -18f;  // the page's writing column: from the margin line (x -140) to the punched holes (x 112), clear of the rings
-        public const float SignPictureTop = 206f, SignPictureSize = 200f; // a sign's picture on its page (the fixture reads Illumination off the screen here)
-        public const float RuleTop = 132f, RuleGap = 40f; // the page art's twelve lines (owner, Sept 25: "the fat double spaced lines"), 132 to 572: a section's rows sit on each, the contents' on every other
-        bool OnVellum => journalPage.sprite != null || (Flow.JournalAt == JournalView.Contents && journalContentsArt.sprite != null); // the page art is vellum: dark ink
-        Color PageInk => OnVellum ? JournalInk : Bone;
-        Color PageFaint => OnVellum ? JournalFaint : Muted;
-        public static float ContentsRow(int i) => RuleTop + RuleGap - 11 + i * 2 * RuleGap; // a contents entry's centre: its letters sit on every other line (the web template's boxes match)
-        public const string TitleFont = "Fonts/UnifrakturMaguntia"; public const int TitleSize = 28, SignTitleSize = 32, CapitalSize = 58; // the page titles in blackletter, the Library's hand, and bigger (owner, Sept 26); the entries and facts stay plain
+        public const float JournalX = 7f;    // the page's calm column (the art's inner border, x 50 to 325, centred at 187.5)
+        public const float JournalWidth = 266f;
+        public const float SignPictureTop = 150f, SignPictureSize = 112f; // a sign's picture on its page (the fixture reads Illumination off the screen here)
+        public const float WheelTop = 296f, WheelSize = 270f; // the wheel art, 600 px across: sockets on radius 216 (socket 1 at 9 o'clock), 92 across
+        public const float SeatRadius = WheelSize * 216f / 600f, SocketSize = WheelSize * 92f / 600f, SeatHit = 46f;
+        public const float RuleFirst = 96f, RuleGap = 26f, RuleLast = 590f; // the silver rules the game draws (the art has none), under the text
+        public const float TableTop = 152f, TableRowTop = 202f, TableRowGap = 66f, TableColGap = 70f, TableSeat = 44f;
+        public const float CardTop = 498f, CardHeight = 92f, JournalRowY = 654f, JournalCloseY = 714f;
+        static readonly Color Silver = new Color(.79f, .81f, .86f), VellumPanel = new Color(.04f, .05f, .09f, .74f), PageText = new Color(.94f, .9f, .82f), PageFaintText = new Color(.84f, .85f, .91f, .62f), Vermilion = new Color(.89f, .38f, .25f);
+        public static float TableColumnX(int column) => JournalX + 30 + (column - 1) * TableColGap;
+        public static float TableRowY(int row) => TableRowTop + row * TableRowGap;
+        // Where a seat sits: on the wheel, or in its Table cell (element row, modality column). The web template's boxes match.
+        public static Vector2 SeatCentre(int seat, bool table)
+        {
+            if (table) return new Vector2(TableColumnX(seat % 3), TableRowY(seat % 4));
+            float a = (180 + seat * 30) * Mathf.Deg2Rad; return new Vector2(JournalX + Mathf.Cos(a) * SeatRadius, WheelTop - Mathf.Sin(a) * SeatRadius);
+        }
+        public static float LensX(int index, int count) => JournalX + (index - (count - 1) / 2f) * 66f;
+        public const string TitleFont = "Fonts/UnifrakturMaguntia"; public const int TitleSize = 30, SignTitleSize = 34, CapitalSize = 52; // the page titles in blackletter, the Library's hand (owner, Sept 26); the facts stay plain
         public static string SignTitle(string name, Color capital) => "<size=" + CapitalSize + "><color=#" + ColorUtility.ToHtmlStringRGB(capital) + ">" + name.Substring(0, 1) + "</color></size>" + name.Substring(1); // a sign's name with its illuminated capital
         static string SignSlot(int seat) => "sign-" + Zodiac.Seats[Zodiac.Wrap(seat)].Name.ToLowerInvariant();
+        static Color ElementColour(int seat) { var hex = FitBox.Elements[Zodiac.Wrap(seat) % 4].hex; return ColorUtility.TryParseHtmlString(hex, out var c) ? c : Gilt; } // Build S's colours (the owner's default for the journal)
+        static readonly Color[] ModalityColours = { new Color(.89f, .64f, .29f), new Color(.79f, .81f, .86f), new Color(.89f, .55f, .45f) }; // Cardinal gold, Fixed silver, Mutable faded vermilion (working choice)
+        // A disc, made once (no file): the round mask a seat's picture is clipped to, and the badge behind its symbol.
+        static Sprite disc;
+        static Sprite Disc()
+        {
+            if (disc != null) return disc;
+            const int size = 96; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+            {
+                float dx = (x + .5f) - size / 2f, dy = (y + .5f) - size / 2f, d = Mathf.Sqrt(dx * dx + dy * dy);
+                texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.Clamp01(size / 2f - d)));
+            }
+            texture.Apply(); disc = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); return disc;
+        }
+        // One seat on the index: a hit area, the picture clipped round (its own Illumination material), the state ring, the frame when tapped, the symbol's badge, a ribbon when due.
+        class JournalSeatParts { public Button hit; public RectTransform root; public CanvasGroup group; public Image picture, ring, frame, badge, ribbon; public Text glyph; public Material illumination; }
+        readonly JournalSeatParts[] journalSeats = new JournalSeatParts[12];
+        // A sign's picture clipped round by its own Illumination material (_Round), so the deck's ink and colour reach the screen
+        Image MaskedPicture(Transform parent, float x, float top, float size, out Material material)
+        {
+            var round = Rect("Round", parent, x, top, size, size);
+            var picture = Rect("Picture", round, 0, size / 2, size, size).gameObject.AddComponent<Image>(); picture.raycastTarget = false; picture.preserveAspect = true;
+            material = null; var shader = Resources.Load<Shader>("Shaders/Illumination"); if (shader != null) { material = new Material(shader); material.SetFloat("_Round", 1); picture.material = material; }
+            return picture;
+        }
+        // A thin border drawn as four edges (Outline copies the whole quad, which shows through a see-through fill as a tint)
+        static void Frame(RectTransform r, Color colour)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                var edge = new GameObject("Edge", typeof(RectTransform)).GetComponent<RectTransform>(); edge.SetParent(r, false);
+                edge.anchorMin = new Vector2(k == 3 ? 1 : 0, k == 0 ? 1 : 0); edge.anchorMax = new Vector2(k == 2 ? 0 : 1, k == 1 ? 0 : 1); edge.pivot = new Vector2(.5f, .5f);
+                edge.sizeDelta = k < 2 ? new Vector2(0, 1) : new Vector2(1, 0); edge.anchoredPosition = Vector2.zero;
+                var line = edge.gameObject.AddComponent<Image>(); line.color = colour; line.raycastTarget = false;
+            }
+        }
+        Image Line(Transform parent, Color colour) { var line = Rect("Line", parent, 0, 0, 1, 1).gameObject.AddComponent<Image>(); line.color = colour; line.raycastTarget = false; return line; }
+        static void PlaceLine(Image line, Vector2 from, Vector2 to, float width)
+        {
+            var r = line.rectTransform; var mid = (from + to) / 2; var d = to - from;
+            r.anchoredPosition = new Vector2(mid.x, -mid.y); r.sizeDelta = new Vector2(d.magnitude, width); r.localRotation = Quaternion.Euler(0, 0, -Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg);
+        }
+        Button JournalChoice(Transform parent, string text, float x, float top, float width, float height, UnityEngine.Events.UnityAction action)
+        {
+            var b = MakeButton(parent, text, x, top, width, height, action); var image = b.GetComponent<Image>(); image.canvasRenderer.cullTransparentMesh = false;
+            Frame(b.GetComponent<RectTransform>(), new Color(Gilt.r, Gilt.g, Gilt.b, .7f));
+            var label = b.GetComponentInChildren<Text>(); label.fontSize = 11; return b;
+        }
+        static void PaintChoice(Button b, bool on)
+        {
+            b.GetComponent<Image>().color = on ? Gilt : new Color(.04f, .05f, .09f, .6f); b.GetComponentInChildren<Text>().color = on ? new Color(.08f, .08f, .13f) : Gilt;
+            var tint = b.colors; tint.normalColor = Color.white; tint.highlightedColor = new Color(1, 1, 1, .9f); b.colors = tint;
+        }
+        RectTransform journalWheelLayer, journalTableLayer, journalCard, journalSignPage; Image journalWheelArt, journalCardPicture, journalCardRing; Material journalCardIllumination;
+        Text journalCardTitle, journalCardLine, journalSignGlyph; Button journalOpen, journalBack, journalViewWheel, journalViewTable; readonly Button[] journalLensButtons = new Button[4];
+        readonly Image[] journalLines = new Image[12]; readonly Text[] journalRowLabels = new Text[4], journalColumnLabels = new Text[3];
+        readonly RectTransform[] journalPanels = new RectTransform[4]; readonly Text[] journalPanelLabels = new Text[4], journalPanelValues = new Text[4], journalPanelNotes = new Text[4];
+        readonly Button[] journalChips = new Button[6]; readonly Text[] journalChipGlyphs = new Text[6]; readonly int[] journalChipSeats = new int[6];
+        Image journalSignRing; Text journalCardMark;
+        static Sprite RingSprite() { var line = Slots.Image("journal-seat-line"); return line != null ? line : Disc(); }
         void BuildJournal()
         {
             journal = ScreenPanel("Journal", "journal-page"); journalPage = journal.GetComponent<Image>();
-            var contents = Rect("Contents page", journal, 0, 400, 360, 800); journalContentsArt = contents.gameObject.AddComponent<Image>(); journalContentsArt.raycastTarget = false; Slots.Dress(journalContentsArt, "journal-contents");
-            var cover = Rect("Journal cover", journal, JournalX - 78, 108, 40, 40); journalCover = cover.gameObject.AddComponent<Image>(); journalCover.color = PanelColor; journalCover.raycastTarget = false; Slots.Dress(journalCover, "journal-cover"); // beside the contents' title, under the page's illuminated head
-            journalTitle = Label(journal, "", JournalX, 70, 232, 64, TitleSize); journalTitle.supportRichText = true; journalTitle.font = Resources.Load<Font>(TitleFont) ?? journalTitle.font; // 64 tall: a line that doesn't fit is truncated away, and a sign's capital is 58
-            // the contents: a row per entry, a ribbon tab at the page's edge when the entry has something due
-            for (int i = 0; i < journalRows.Length; i++)
+            // the silver rules and the faded vermilion margin, drawn by the game so they sit under the text (the art has none)
+            for (float y = RuleFirst; y <= RuleLast; y += RuleGap) { var rule = Rect("Rule", journal, JournalX, y, 274, 1).gameObject.AddComponent<Image>(); rule.color = new Color(Silver.r, Silver.g, Silver.b, .09f); rule.raycastTarget = false; }
+            var margin = Rect("Margin", journal, JournalX - 125, 318, 1, 556).gameObject.AddComponent<Image>(); margin.color = new Color(Vermilion.r, Vermilion.g, Vermilion.b, .28f); margin.raycastTarget = false;
+            journalTitle = Label(journal, "", JournalX, 56, 250, 60, TitleSize); journalTitle.supportRichText = true; journalTitle.font = Resources.Load<Font>(TitleFont) ?? journalTitle.font; journalTitle.color = Gilt;
+            journalSignGlyph = Label(journal, "", JournalX, 60, 40, 40, 22); journalSignGlyph.font = Dial.GlyphFont; journalSignGlyph.horizontalOverflow = HorizontalWrapMode.Overflow;
+            // the Wheel / Table switch and the tabs
+            journalViewWheel = JournalChoice(journal, "Wheel", JournalX - 36, 96, 72, 24, () => JournalSetView(false)); // placeholder labels (owner writes)
+            journalViewTable = JournalChoice(journal, "Table", JournalX + 36, 96, 72, 24, () => JournalSetView(true));
+            for (int i = 0; i < journalLensButtons.Length; i++) { var lens = (JournalLens)i; journalLensButtons[i] = JournalChoice(journal, SliceFlow.LensTitle(lens), 0, 126, 62, 22, () => JournalLensTap(lens)); }
+            // the Wheel: the gold wheel art, the pattern's lines, then the seats
+            journalWheelLayer = Rect("Wheel view", journal, 0, 400, 360, 800);
+            journalWheelArt = Rect("Wheel", journalWheelLayer, JournalX, WheelTop, WheelSize, WheelSize).gameObject.AddComponent<Image>(); journalWheelArt.raycastTarget = false; journalWheelArt.color = new Color(1, 1, 1, .1f);
+            if (Slots.Dress(journalWheelArt, "journal-wheel")) journalWheelArt.color = Color.white;
+            for (int i = 0; i < journalLines.Length; i++) journalLines[i] = Line(journalWheelLayer, Gilt);
+            // the Table: its row and column names (the seats move into the cells)
+            journalTableLayer = Rect("Table view", journal, 0, 400, 360, 800);
+            var tablePanel = Rect("Table", journalTableLayer, JournalX, TableTop + 140, JournalWidth, 280).gameObject.AddComponent<Image>(); tablePanel.color = VellumPanel; tablePanel.raycastTarget = false;
+            Frame(tablePanel.rectTransform, new Color(Gilt.r, Gilt.g, Gilt.b, .5f));
+            for (int c = 0; c < 3; c++) { journalColumnLabels[c] = Label(journalTableLayer, Zodiac.Modalities[c].ToUpperInvariant(), TableColumnX(c), TableTop + 12, 68, 16, 9); journalColumnLabels[c].color = Silver; }
+            for (int r = 0; r < 4; r++) { journalRowLabels[r] = Label(journalTableLayer, Elements[r], JournalX - 98, TableRowY(r), 60, 30, 17); journalRowLabels[r].font = journalTitle.font; journalRowLabels[r].alignment = TextAnchor.MiddleLeft; }
+            for (int seat = 0; seat < 12; seat++)
             {
-                int entry = i; var row = MakeButton(journal, "", JournalX, ContentsRow(i), 232, 46, () => JournalEntry(entry)); // on every other line
-                row.GetComponent<Image>().color = Color.white; row.GetComponent<Image>().canvasRenderer.cullTransparentMesh = false; var tint = row.colors; tint.normalColor = new Color(1, 1, 1, 0); tint.highlightedColor = new Color(1, 1, 1, .12f); tint.pressedColor = new Color(1, 1, 1, .2f); tint.selectedColor = new Color(.85f, .7f, .55f, .3f); tint.disabledColor = new Color(1, 1, 1, 0); row.colors = tint;
-                journalRowText[i] = row.GetComponentInChildren<Text>(); journalRowText[i].alignment = TextAnchor.MiddleLeft; journalRowText[i].fontSize = 18; journalRowText[i].rectTransform.anchoredPosition += new Vector2(12, 0); journalRowText[i].rectTransform.sizeDelta -= new Vector2(24, 0); journalRows[i] = row; // inset: clear of the contents page's vine
-                var tab = Rect("Ribbon tab", journal, -168, ContentsRow(i), 14, 40); journalTabs[i] = tab.gameObject.AddComponent<Image>(); journalTabs[i].raycastTarget = false; journalTabs[i].color = Crimson; Slots.Dress(journalTabs[i], "journal-ribbon"); // out past the page's outer edge
+                int s = seat; var parts = new JournalSeatParts(); journalSeats[seat] = parts;
+                parts.root = Rect("Seat " + Zodiac.Seats[seat].Name, journal, 0, 0, SeatHit, SeatHit); parts.group = parts.root.gameObject.AddComponent<CanvasGroup>();
+                parts.picture = MaskedPicture(parts.root, 0, SeatHit / 2, 34, out parts.illumination);
+                parts.ring = Rect("Ring", parts.root, 0, SeatHit / 2, 50, 50).gameObject.AddComponent<Image>(); parts.ring.raycastTarget = false;
+                parts.frame = Rect("Frame", parts.root, 0, SeatHit / 2, 60, 60).gameObject.AddComponent<Image>(); parts.frame.raycastTarget = false; parts.frame.color = new Color(.95f, .78f, .47f, .9f);
+                parts.badge = Rect("Badge", parts.root, 15, SeatHit / 2 + 15, 16, 16).gameObject.AddComponent<Image>(); parts.badge.sprite = Disc(); parts.badge.raycastTarget = false;
+                parts.glyph = Label(parts.badge.transform, "", 0, 8, 16, 16, 11); parts.glyph.font = Dial.GlyphFont; parts.glyph.horizontalOverflow = HorizontalWrapMode.Overflow; parts.glyph.verticalOverflow = VerticalWrapMode.Overflow;
+                parts.ribbon = Rect("Due", parts.root, 17, 2, 8, 22).gameObject.AddComponent<Image>(); parts.ribbon.raycastTarget = false; parts.ribbon.color = Crimson;
+                var hit = parts.root.gameObject.AddComponent<Image>(); hit.color = new Color(1, 1, 1, 0); hit.canvasRenderer.cullTransparentMesh = false; // taps reach an invisible hit area only with culling off
+                parts.hit = parts.root.gameObject.AddComponent<Button>(); parts.hit.targetGraphic = hit; parts.hit.onClick.AddListener(() => JournalSeatTap(s)); Dial.RegisterNavigation(parts.hit);
             }
-            // a section: its entries, one to a row, the symbol beside
-            for (int i = 0; i < 12; i++)
-            {
-                journalGlyphs[i] = Label(journal, "", -124, RuleTop - 12 + i * RuleGap, 28, 36, 20); journalGlyphs[i].font = Dial.GlyphFont; journalGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow; journalGlyphs[i].verticalOverflow = VerticalWrapMode.Overflow;
-                journalLines[i] = Label(journal, "", -3, RuleTop - 9 + i * RuleGap, 206, 38, 14); journalLines[i].alignment = TextAnchor.MiddleLeft; journalLines[i].verticalOverflow = VerticalWrapMode.Overflow;
-            }
-            // a sign: the gilt edge (full colour), the ribbon, the picture, its symbol and table cell, the fact plates
-            journalGilt = Rect("Gilt edge", journal, -20, 303, 292, 550); // the left page as painted: x -166 to 126, y 28 to 578
-            foreach (var bar in new[] { new Vector4(0, 1, 292, 2), new Vector4(0, 549, 292, 2), new Vector4(-145, 275, 2, 550), new Vector4(145, 275, 2, 550) })
-            { var edge = Rect("Gilt", journalGilt, bar.x, bar.y, bar.z, bar.w).gameObject.AddComponent<Image>(); edge.color = Gilt; edge.raycastTarget = false; }
-            var ribbon = Rect("Ribbon", journal, 92, JournalTop + 20, 16, 40); journalRibbon = ribbon.gameObject.AddComponent<Image>(); journalRibbon.raycastTarget = false; journalRibbon.color = Crimson;
+            // the preview card under the wheel
+            journalCard = Rect("Preview", journal, JournalX, CardTop, JournalWidth, CardHeight); var cardBack = journalCard.gameObject.AddComponent<Image>(); cardBack.color = VellumPanel; cardBack.raycastTarget = false;
+            Frame(journalCard, new Color(Gilt.r, Gilt.g, Gilt.b, .55f));
+            journalCardPicture = MaskedPicture(journalCard, -95, CardHeight / 2, 58, out journalCardIllumination);
+            journalCardRing = Rect("Ring", journalCard, -95, CardHeight / 2, 72, 72).gameObject.AddComponent<Image>(); journalCardRing.raycastTarget = false;
+            journalCardTitle = Label(journalCard, "", 38, 20, 172, 30, 22); journalCardTitle.font = journalTitle.font; journalCardTitle.alignment = TextAnchor.MiddleLeft; journalCardTitle.supportRichText = true; journalCardTitle.horizontalOverflow = HorizontalWrapMode.Overflow;
+            journalCardMark = Label(journalCard, "", 0, 24, 24, 24, 15); journalCardMark.font = Dial.GlyphFont; journalCardMark.horizontalOverflow = HorizontalWrapMode.Overflow;
+            journalCardLine = Label(journalCard, "", 38, 46, 172, 30, 12); journalCardLine.alignment = TextAnchor.MiddleLeft; journalCardLine.supportRichText = true; journalCardLine.color = PageFaintText;
+            journalOpen = JournalChoice(journalCard, "Open the page", -4, 77, 108, 22, JournalOpenSelected); PaintChoice(journalOpen, true); // placeholder (owner writes)
+            // a sign's page: its picture in the state ring, the ribbon, a panel per fact learned with the signs that share it
+            journalSignPage = Rect("Sign page", journal, 0, 400, 360, 800);
+            journalSignArt = MaskedPicture(journalSignPage, JournalX, SignPictureTop, SignPictureSize, out journalIllumination);
+            journalSignRing = Rect("Ring", journalSignPage, JournalX, SignPictureTop, 140, 140).gameObject.AddComponent<Image>(); journalSignRing.raycastTarget = false;
+            var ribbon = Rect("Ribbon", journalSignPage, 92, JournalTop + 20, 16, 40); journalRibbon = ribbon.gameObject.AddComponent<Image>(); journalRibbon.raycastTarget = false; journalRibbon.color = Crimson;
             if (Slots.Dress(journalRibbon, "journal-ribbon")) // nine-sliced so the forked tail and the head keep their shape at every length
             {
                 var file = journalRibbon.sprite; var r = file.rect;
                 journalRibbon.sprite = Sprite.Create(file.texture, r, new Vector2(.5f, .5f), file.pixelsPerUnit, 0, SpriteMeshType.FullRect, new Vector4(0, r.height * .2f, 0, r.height * .06f));
                 journalRibbon.type = Image.Type.Sliced; journalRibbon.pixelsPerUnitMultiplier = r.height / Slots.Find("journal-ribbon").Height; // the file's pixels at the slot's scale
-                foreach (var tab in journalTabs) { tab.sprite = journalRibbon.sprite; tab.type = Image.Type.Sliced; tab.pixelsPerUnitMultiplier = journalRibbon.pixelsPerUnitMultiplier; }
             }
-            var picture = Rect("Sign picture", journal, JournalX, SignPictureTop, SignPictureSize, SignPictureSize); journalSignArt = picture.gameObject.AddComponent<Image>(); journalSignArt.raycastTarget = false;
-            var shader = Resources.Load<Shader>("Shaders/Illumination"); if (shader != null) { journalIllumination = new Material(shader); journalSignArt.material = journalIllumination; }
-            journalSignGlyph = Label(journal, "", JournalX, 358, 90, 64, 56); journalSignGlyph.font = Dial.GlyphFont; journalSignGlyph.horizontalOverflow = HorizontalWrapMode.Overflow; journalSignGlyph.verticalOverflow = VerticalWrapMode.Overflow;
-            journalTable = Rect("Table cell", journal, JournalX, 358, 42, 57); // the table's four element rows by three modality columns, the sign's cell filled
-            for (int c = 0; c < 12; c++) { journalCells[c] = Rect("Cell", journalTable, (c % GridModel.Columns - 1) * 15, 6 + c / GridModel.Columns * 15, 12, 12).gameObject.AddComponent<Image>(); journalCells[c].raycastTarget = false; }
-            for (int i = 0; i < journalPlates.Length; i++)
+            foreach (var parts in journalSeats) { parts.ribbon.sprite = journalRibbon.sprite; parts.ribbon.type = journalRibbon.type; parts.ribbon.pixelsPerUnitMultiplier = journalRibbon.pixelsPerUnitMultiplier; if (journalRibbon.sprite != null) parts.ribbon.color = Color.white; }
+            if (journalRibbon.sprite != null) journalRibbon.color = Color.white;
+            for (int i = 0; i < journalPanels.Length; i++)
             {
-                var plate = Rect("Fact plate", journal, JournalX, 0, 112, 34); journalPlates[i] = plate.gameObject.AddComponent<Image>(); journalPlates[i].raycastTarget = false; journalPlates[i].color = PanelColor; Slots.Dress(journalPlates[i], "journal-plate");
-                journalPlateValues[i] = Label(plate, "", 0, 17, 104, 28, 15); journalPlateLabels[i] = Label(journal, "", JournalX, 0, 112, 16, 11);
+                journalPanels[i] = Rect("Fact", journalSignPage, JournalX, 0, JournalWidth, 46); var back = journalPanels[i].gameObject.AddComponent<Image>(); back.color = VellumPanel; back.raycastTarget = false;
+                Frame(journalPanels[i], new Color(Gilt.r, Gilt.g, Gilt.b, .5f));
+                journalPanelLabels[i] = Label(journalPanels[i], "", -66, 14, 120, 16, 10); journalPanelLabels[i].alignment = TextAnchor.MiddleLeft; journalPanelLabels[i].color = PageFaintText;
+                journalPanelValues[i] = Label(journalPanels[i], "", 66, 14, 120, 22, 15); journalPanelValues[i].alignment = TextAnchor.MiddleRight; journalPanelValues[i].fontStyle = FontStyle.Bold;
+                journalPanelNotes[i] = Label(journalPanels[i], "", 0, 34, JournalWidth - 22, 18, 11); journalPanelNotes[i].alignment = TextAnchor.MiddleLeft; journalPanelNotes[i].color = PageFaintText;
             }
-            journalPrev = MakeButton(journal, "", -122, 654, 64, 56, () => JournalTurn(-1)); StyleAtriumButton(journalPrev); journalChevrons[0] = Chevron(journalPrev, -1); // owner, Sept 25: an arrow flips the page
-            journalToContents = MakeButton(journal, "Contents", 0, 654, 146, 56, JournalContents); StyleAtriumButton(journalToContents);
-            journalNext = MakeButton(journal, "", 122, 654, 64, 56, () => JournalTurn(1)); StyleAtriumButton(journalNext); journalChevrons[1] = Chevron(journalNext, 1);
-            journalClose = MakeButton(journal, "Close the journal", 0, 714, 190, 48, CloseJournal); StyleAtriumButton(journalClose);
+            for (int i = 0; i < journalChips.Length; i++)
+            {
+                int chip = i; journalChips[i] = JournalChoice(journalSignPage, "", 0, 0, 70, 20, () => JournalChipTap(chip));
+                var label = journalChips[i].GetComponentInChildren<Text>(); label.alignment = TextAnchor.MiddleRight; label.color = PageText; var lr = label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = new Vector2(4, 0); lr.offsetMax = new Vector2(-6, 0);
+                journalChips[i].GetComponent<Image>().color = new Color(.04f, .05f, .09f, .6f); foreach (Transform child in journalChips[i].transform) if (child.name == "Edge") child.GetComponent<Image>().color = new Color(Silver.r, Silver.g, Silver.b, .45f);
+                journalChipGlyphs[i] = Label(journalChips[i].transform, "", 0, 10, 14, 18, 11); journalChipGlyphs[i].font = Dial.GlyphFont; journalChipGlyphs[i].horizontalOverflow = HorizontalWrapMode.Overflow;
+            }
+            journalPrev = MakeButton(journal, "", -122, JournalRowY, 64, 56, () => JournalTurn(-1)); StyleAtriumButton(journalPrev); journalChevrons[0] = Chevron(journalPrev, -1); // owner, Sept 25: an arrow flips the page
+            journalBack = MakeButton(journal, "Back to the Wheel", 0, JournalRowY, 146, 56, JournalWheel); StyleAtriumButton(journalBack); journalBack.GetComponentInChildren<Text>().fontSize = 14; // placeholder (owner writes)
+            journalNext = MakeButton(journal, "", 122, JournalRowY, 64, 56, () => JournalTurn(1)); StyleAtriumButton(journalNext); journalChevrons[1] = Chevron(journalNext, 1);
+            journalClose = MakeButton(journal, "Close the journal", 0, JournalCloseY, 190, 48, CloseJournal); StyleAtriumButton(journalClose);
+        }
+        // A seat's ring and picture from its state (SliceFlow.SeatState): met silver, practising gold, mastered gold leaf; the picture's ink and colour from the deck.
+        void DressSeatPicture(Image picture, Material material, Image ring, int seat, int state)
+        {
+            var file = Slots.Image(SignSlot(seat)); picture.sprite = file; picture.color = file != null ? Color.white : PanelColor;
+            float ink = Flow.SignInk(seat), colour = Flow.SignColour(seat);
+            if (material != null) { material.SetFloat("_Saturation", colour); material.SetFloat("_Ink", ink); } else if (file != null) picture.color = new Color(1, 1, 1, ink);
+            var leaf = Slots.Image("journal-seat-leaf"); var line = Slots.Image("journal-seat-line");
+            ring.sprite = state == 3 && leaf != null ? leaf : line != null ? line : Disc();
+            ring.color = state == 3 ? (leaf != null ? Color.white : Gilt) : state == 2 ? Gilt : new Color(Silver.r, Silver.g, Silver.b, .6f);
+            if (line == null && state != 3) ring.color = new Color(ring.color.r, ring.color.g, ring.color.b, .25f);
+        }
+        Color LensColour(int seat)
+        {
+            switch (Flow.Lens)
+            {
+                case JournalLens.Modality: return ModalityColours[seat % 3];
+                case JournalLens.Polarity: return Zodiac.PolarityAt(seat) == "Yang" ? Gilt : Silver;
+                case JournalLens.Opposites: return Flow.JournalSelected >= 0 && (seat == Flow.JournalSelected || seat == Zodiac.Opposite(Flow.JournalSelected)) ? Gilt : Silver;
+                default: return ElementColour(seat);
+            }
         }
         void ShowJournal()
         {
-            var at = Flow.JournalAt; bool contents = at == JournalView.Contents, section = at == JournalView.Section, sign = at == JournalView.Sign;
-            journalContentsArt.gameObject.SetActive(contents && journalContentsArt.sprite != null); journalCover.gameObject.SetActive(contents && journalCover.sprite != null);
-            journalTitle.color = PageInk; journalTitle.fontSize = TitleSize;
-            journalTitle.rectTransform.anchoredPosition = new Vector2(JournalX, contents ? -108 : -70);
-            var titles = Flow.JournalContents;
-            for (int i = 0; i < journalRows.Length; i++)
+            bool sign = Flow.JournalAt == JournalView.Sign, wheel = !sign, table = wheel && Flow.JournalTableView;
+            var lenses = Flow.JournalLenses; var met = Flow.JournalSigns;
+            journalTitle.fontSize = TitleSize; journalTitle.text = SliceFlow.WheelTitle; journalSignGlyph.gameObject.SetActive(false);
+            journalViewWheel.gameObject.SetActive(wheel && Flow.CanJournalTable); journalViewTable.gameObject.SetActive(wheel && Flow.CanJournalTable);
+            PaintChoice(journalViewWheel, !table); PaintChoice(journalViewTable, table); journalViewWheel.interactable = journalViewTable.interactable = !busy;
+            for (int i = 0; i < journalLensButtons.Length; i++)
             {
-                bool show = contents && i < titles.Count; journalRows[i].gameObject.SetActive(show); journalTabs[i].gameObject.SetActive(show && Flow.JournalEntryDue(i));
+                int at = lenses.IndexOf((JournalLens)i); bool show = wheel && lenses.Count > 1 && at >= 0; journalLensButtons[i].gameObject.SetActive(show);
                 if (!show) continue;
-                journalRowText[i].text = titles[i]; journalRowText[i].color = PageInk; journalRows[i].interactable = !busy;
+                journalLensButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(LensX(at, lenses.Count), -126); PaintChoice(journalLensButtons[i], Flow.Lens == (JournalLens)i); journalLensButtons[i].interactable = !busy;
             }
-            var kind = Flow.JournalKind; var items = section ? Flow.JournalItems(kind) : new List<ReviewItem>();
-            bool pairs = kind == ItemKind.Opposite; // a pair takes two lines, its names and then the fact: six pairs fill the page, nothing wraps across a rule
-            for (int i = 0; i < 12; i++)
+            journalWheelLayer.gameObject.SetActive(wheel && !table); journalTableLayer.gameObject.SetActive(table);
+            // the pattern's lines on the wheel: the element triangles, the modality crosses, or the six opposites across (Polarity draws none)
+            for (int i = 0; i < journalLines.Length; i++) journalLines[i].gameObject.SetActive(false);
+            if (wheel && !table)
             {
-                int n = pairs ? i / 2 : i; bool show = n < items.Count; journalGlyphs[i].gameObject.SetActive(show && !pairs); journalLines[i].gameObject.SetActive(show);
-                if (!show) continue;
-                var item = items[n]; var ink = item.State == ItemState.Introduced ? PageFaint : PageInk; // Illumination for words: faint ink until practiced, the symbol gilds as it is learned
-                journalGlyphs[i].text = Zodiac.Seats[item.seat].Glyph; journalGlyphs[i].color = Color.Lerp(ink, Gilt, Flow.ItemColour(item));
-                journalLines[i].text = !pairs ? SliceFlow.JournalName(item) + " — " + SliceFlow.JournalFact(item) : i % 2 == 0 ? SliceFlow.JournalName(item) : SliceFlow.JournalFact(item);
-                journalLines[i].color = pairs && i % 2 == 1 ? PageFaint : ink;
+                int n = 0;
+                if (Flow.Lens == JournalLens.Element || Flow.Lens == JournalLens.Modality)
+                {
+                    int groups = Flow.Lens == JournalLens.Element ? 4 : 3, size = 12 / groups;
+                    for (int g = 0; g < groups; g++) for (int k = 0; k < size; k++)
+                    {
+                        int from = g + k * groups, to = g + (k + 1) % size * groups; var line = journalLines[n++];
+                        line.gameObject.SetActive(true); PlaceLine(line, SeatCentre(from, false), SeatCentre(to, false), 1.5f);
+                        var c = Flow.Lens == JournalLens.Element ? ElementColour(g) : ModalityColours[g]; line.color = new Color(c.r, c.g, c.b, .45f);
+                    }
+                }
+                else if (Flow.Lens == JournalLens.Opposites)
+                    for (int p = 0; p < 6; p++)
+                    {
+                        var line = journalLines[n++]; bool lit = Flow.JournalSelected >= 0 && Flow.JournalSelected % 6 == p;
+                        line.gameObject.SetActive(true); PlaceLine(line, SeatCentre(p, false), SeatCentre(p + 6, false), lit ? 2.5f : 1f); line.color = lit ? Gilt : new Color(Silver.r, Silver.g, Silver.b, .3f);
+                    }
             }
-            journalGilt.gameObject.SetActive(sign && Flow.SignGilt(Flow.JournalSignSeat)); journalRibbon.gameObject.SetActive(sign); journalSignArt.gameObject.SetActive(sign);
-            journalSignGlyph.gameObject.SetActive(false); journalTable.gameObject.SetActive(false);
-            for (int i = 0; i < journalPlates.Length; i++) { journalPlates[i].gameObject.SetActive(false); journalPlateLabels[i].gameObject.SetActive(false); }
-            if (contents) journalTitle.text = "Contents"; // placeholder (owner writes)
-            else if (section) journalTitle.text = SliceFlow.SectionTitle(kind);
-            else ShowJournalSign();
-            journalPrev.gameObject.SetActive(!contents); journalNext.gameObject.SetActive(!contents); journalToContents.gameObject.SetActive(!contents);
-            journalPrev.interactable = Flow.CanJournalPrev && !busy; journalNext.interactable = Flow.CanJournalNext && !busy; journalToContents.interactable = Flow.CanJournalContents && !busy; journalClose.interactable = !busy;
+            for (int seat = 0; seat < 12; seat++)
+            {
+                var parts = journalSeats[seat]; parts.root.gameObject.SetActive(wheel);
+                if (!wheel) continue;
+                int state = Flow.SeatState(seat); var centre = SeatCentre(seat, table); float scale = table ? TableSeat / SeatHit : 1;
+                parts.root.anchoredPosition = new Vector2(centre.x, -centre.y); parts.root.localScale = Vector3.one * (table ? 1.1f : 1);
+                parts.picture.transform.parent.gameObject.SetActive(state > 0); parts.ring.gameObject.SetActive(state > 0 || table);
+                if (state > 0) DressSeatPicture(parts.picture, parts.illumination, parts.ring, seat, state);
+                else { parts.ring.sprite = RingSprite(); parts.ring.color = new Color(Silver.r, Silver.g, Silver.b, .2f); }
+                bool dim = Flow.Lens == JournalLens.Polarity && Zodiac.PolarityAt(seat) != "Yang" || Flow.Lens == JournalLens.Opposites && Flow.JournalSelected >= 0 && seat % 6 != Flow.JournalSelected % 6;
+                parts.group.alpha = dim ? .45f : 1;
+                parts.frame.gameObject.SetActive(seat == Flow.JournalSelected); parts.frame.sprite = RingSprite();
+                bool glyph = Flow.SignKnows(seat, ItemKind.Glyph); var tone = LensColour(seat);
+                parts.badge.gameObject.SetActive(state > 0); parts.badge.color = glyph ? new Color(.05f, .06f, .11f) : tone;
+                parts.badge.rectTransform.sizeDelta = Vector2.one * (glyph ? 16 : 7); parts.badge.rectTransform.anchoredPosition = glyph ? new Vector2(15, -(SeatHit / 2 + 15)) : new Vector2(0, -(SeatHit / 2 + 22));
+                parts.glyph.text = glyph ? Zodiac.Seats[seat].Glyph : ""; parts.glyph.color = tone;
+                parts.ribbon.gameObject.SetActive(state > 0 && Flow.SignDue(seat));
+                parts.hit.interactable = state > 0 && !busy;
+            }
+            ShowJournalCard(wheel);
+            journalSignPage.gameObject.SetActive(sign);
+            if (sign) ShowJournalSign();
+            journalPrev.gameObject.SetActive(sign); journalNext.gameObject.SetActive(sign); journalBack.gameObject.SetActive(sign);
+            journalPrev.interactable = Flow.CanJournalPrev && !busy; journalNext.interactable = Flow.CanJournalNext && !busy; journalBack.interactable = Flow.CanJournalWheel && !busy; journalClose.interactable = !busy;
             foreach (var bar in journalChevrons[0]) bar.color = journalPrev.interactable ? Bone : new Color(Muted.r, Muted.g, Muted.b, .4f);
             foreach (var bar in journalChevrons[1]) bar.color = journalNext.interactable ? Bone : new Color(Muted.r, Muted.g, Muted.b, .4f);
         }
+        // The preview: the tapped seat's picture, name and symbol, its facts in one line (on the Opposites tab, what the pair shares), and Open the page.
+        void ShowJournalCard(bool wheel)
+        {
+            int seat = Flow.JournalSelected; bool show = wheel && seat >= 0; journalCard.gameObject.SetActive(show);
+            if (!show) return;
+            var name = Zodiac.Seats[seat].Name; bool glyph = Flow.SignKnows(seat, ItemKind.Glyph);
+            DressSeatPicture(journalCardPicture, journalCardIllumination, journalCardRing, seat, Flow.SeatState(seat));
+            string Hex(Color c) => "#" + ColorUtility.ToHtmlStringRGB(c);
+            if (Flow.Lens == JournalLens.Opposites && Flow.SignKnows(seat, ItemKind.Opposite))
+            {
+                int other = Zodiac.Opposite(seat);
+                journalCardTitle.text = name + " <size=13>and</size> " + Zodiac.Seats[other].Name; journalCardTitle.fontSize = 19;
+                journalCardLine.text = SliceFlow.PairShares(seat) + ": <color=" + Hex(ElementColour(seat)) + ">" + Zodiac.Seats[seat].Element + "</color> / <color=" + Hex(ElementColour(other)) + ">" + Zodiac.Seats[other].Element + "</color>";
+            }
+            else
+            {
+                journalCardTitle.text = name; journalCardTitle.fontSize = 22;
+                var summary = Flow.SeatSummary(seat); var element = Zodiac.Seats[seat].Element;
+                journalCardLine.text = Flow.SignKnows(seat, ItemKind.Element) && summary.StartsWith(element) ? "<color=" + Hex(ElementColour(seat)) + ">" + element + "</color>" + summary.Substring(element.Length) : summary;
+            }
+            journalCardLine.horizontalOverflow = HorizontalWrapMode.Wrap; journalCardLine.verticalOverflow = VerticalWrapMode.Overflow;
+            // the symbol, beside the name (a second font, so its own label)
+            var mark = journalCardMark;
+            mark.gameObject.SetActive(glyph && Flow.Lens != JournalLens.Opposites); mark.text = Zodiac.Seats[seat].Glyph; mark.color = ElementColour(seat);
+            mark.rectTransform.anchoredPosition = new Vector2(38 - 86 + journalCardTitle.preferredWidth + 12, -20);
+            journalOpen.interactable = Flow.CanOpenSelected && !busy;
+        }
         void ShowJournalSign()
         {
-            int seat = Flow.JournalSignSeat; var name = Zodiac.Seats[seat].Name;
-            journalTitle.fontSize = SignTitleSize; journalTitle.text = SignTitle(name, OnVellum ? Rubric : Gilt); // the illuminated capital
-            // Illumination: the picture is one full-colour file, drawn as line art and coloured by the deck (the Illumination shader); no file, a grey box
-            var picture = Slots.Image(SignSlot(seat)); journalSignArt.sprite = picture; journalSignArt.color = picture != null ? Color.white : PanelColor;
-            float ink = Flow.SignInk(seat), colour = Flow.SignColour(seat);
-            if (journalIllumination != null) { journalIllumination.SetFloat("_Saturation", colour); journalIllumination.SetFloat("_Ink", ink); }
-            else if (picture != null) journalSignArt.color = new Color(1, 1, 1, ink);
+            int seat = Flow.JournalSignSeat; var name = Zodiac.Seats[seat].Name; int state = Flow.SeatState(seat);
+            journalTitle.fontSize = SignTitleSize; journalTitle.text = SignTitle(name, Gilt); // the illuminated capital
+            bool glyph = Flow.SignKnows(seat, ItemKind.Glyph); journalSignGlyph.gameObject.SetActive(glyph);
+            journalSignGlyph.text = Zodiac.Seats[seat].Glyph; journalSignGlyph.color = ElementColour(seat); journalSignGlyph.rectTransform.anchoredPosition = new Vector2(JournalX + journalTitle.preferredWidth / 2 + 16, -60);
+            DressSeatPicture(journalSignArt, journalIllumination, journalSignRing, seat, state);
             // the ribbon: its length is the ladder climbed; due, it is pulled out past the page's head edge (position and length carry it, not colour alone)
             float length = 40 + Flow.SignLadder(seat) * 20, top = Flow.SignDue(seat) ? JournalTop - 22 : JournalTop;
             journalRibbon.rectTransform.sizeDelta = new Vector2(16, length); journalRibbon.rectTransform.anchoredPosition = new Vector2(92, -(top + length / 2));
-            // the facts learned, each in its own place; nothing learned, nothing drawn
-            bool glyph = Flow.SignKnows(seat, ItemKind.Glyph), table = Flow.SignKnows(seat, ItemKind.Grid); float y = 326;
-            if (glyph || table)
+            // a panel per fact learned, in reading order; Element, Modality and Opposite link the signs that share them
+            for (int i = 0; i < journalChips.Length; i++) journalChips[i].gameObject.SetActive(false);
+            var facts = Flow.SignFacts(seat).Where(f => f[0] != "Opposite").ToList(); bool opposite = Flow.SignKnows(seat, ItemKind.Opposite);
+            var rows = new List<(string label, string value, Color colour, ItemKind kind, string note)>();
+            foreach (var f in facts)
             {
-                bool both = glyph && table;
-                journalSignGlyph.gameObject.SetActive(glyph); journalSignGlyph.text = Zodiac.Seats[seat].Glyph; journalSignGlyph.color = Color.Lerp(PageInk, Gilt, Flow.ItemColour(Flow.SignItem(seat, ItemKind.Glyph)));
-                journalSignGlyph.rectTransform.anchoredPosition = new Vector2(JournalX + (both ? -56 : 0), -(y + 32));
-                journalTable.gameObject.SetActive(table); journalTable.anchoredPosition = new Vector2(JournalX + (both ? 56 : 0), -(y + 32));
-                for (int c = 0; c < 12; c++) journalCells[c].color = c == GridModel.CellOf(seat) ? Rubric : new Color(PageInk.r, PageInk.g, PageInk.b, .22f);
-                y += 80;
+                var kind = f[0] == "Element" ? ItemKind.Element : f[0] == "Modality" ? ItemKind.Modality : ItemKind.Opposite; // Polarity rides on the opposites item
+                if (f[0] == "Polarity") rows.Add((f[0], f[1], PageText, kind, SliceFlow.PolarityWords(seat)));
+                else rows.Add((f[0], f[1], f[0] == "Element" ? ElementColour(seat) : PageText, kind, ""));
             }
-            var facts = Flow.SignFacts(seat);
-            for (int i = 0; i < facts.Count && i < journalPlates.Length; i++)
+            if (opposite) rows.Add(("Opposite", "", PageText, ItemKind.Opposite, SliceFlow.PairShares(seat)));
+            float y = SignPictureTop + SignPictureSize / 2 + 26; int chip = 0;
+            for (int i = 0; i < journalPanels.Length; i++)
             {
-                bool alone = facts.Count % 2 == 1 && i == facts.Count - 1; float x = JournalX + (alone ? 0 : i % 2 == 0 ? -60 : 60), plateTop = y + 34 + i / 2 * 70;
-                journalPlates[i].gameObject.SetActive(true); journalPlates[i].rectTransform.anchoredPosition = new Vector2(x, -plateTop);
-                journalPlateValues[i].text = facts[i][1]; journalPlateValues[i].color = journalPlates[i].sprite != null ? JournalInk : Bone;
-                journalPlateLabels[i].gameObject.SetActive(true); journalPlateLabels[i].rectTransform.anchoredPosition = new Vector2(x, -(plateTop - 27)); journalPlateLabels[i].text = facts[i][0].ToUpperInvariant(); journalPlateLabels[i].color = OnVellum ? new Color(JournalInk.r, JournalInk.g, JournalInk.b, .78f) : Muted;
+                bool show = i < rows.Count; journalPanels[i].gameObject.SetActive(show);
+                if (!show) continue;
+                var row = rows[i]; journalPanelLabels[i].text = row.label.ToUpperInvariant(); journalPanelValues[i].text = row.value; journalPanelValues[i].color = row.colour;
+                var kin = row.label == "Polarity" ? new List<int>() : Flow.SignKin(seat, row.kind); float height = 30, x = -JournalWidth / 2 + 11, chipTop = 34;
+                if (row.label == "Opposite") { x = JournalWidth / 2 - 11; chipTop = 14; } // the opposite's chip stands where a value would
+                else if (kin.Count > 0) { journalPanelNotes[i].text = "with"; x += 28; height = 54; }
+                journalPanelNotes[i].text = row.label == "Opposite" || row.label == "Polarity" ? row.note : kin.Count > 0 ? "with" : "";
+                foreach (var other in kin)
+                {
+                    if (chip >= journalChips.Length) break;
+                    var b = journalChips[chip]; var label = b.GetComponentInChildren<Text>(); bool mark = Flow.SignKnows(other, ItemKind.Glyph);
+                    label.text = Zodiac.Seats[other].Name; float w = label.preferredWidth + (mark ? 26 : 14);
+                    if (row.label != "Opposite" && x + w > JournalWidth / 2 - 8) { x = -JournalWidth / 2 + 39; chipTop += 24; height += 24; } // wrap to a second line
+                    float cx = row.label == "Opposite" ? x - w / 2 : x + w / 2;
+                    b.transform.SetParent(journalPanels[i], false); var r = b.GetComponent<RectTransform>(); r.anchorMin = r.anchorMax = new Vector2(.5f, 1); r.sizeDelta = new Vector2(w, 20); r.anchoredPosition = new Vector2(cx, -chipTop);
+                    journalChipGlyphs[chip].gameObject.SetActive(mark); journalChipGlyphs[chip].text = Zodiac.Seats[other].Glyph; journalChipGlyphs[chip].color = ElementColour(other); journalChipGlyphs[chip].rectTransform.anchoredPosition = new Vector2(-w / 2 + 10, -10);
+                    b.gameObject.SetActive(true); b.interactable = !busy; journalChipSeats[chip++] = other;
+                    if (row.label != "Opposite") x += w + 5;
+                }
+                if (row.label == "Opposite" || row.label == "Polarity") height = 50;
+                journalPanelNotes[i].rectTransform.anchoredPosition = new Vector2(row.label == "Opposite" || row.label == "Polarity" ? 0 : -JournalWidth / 2 + 11 + 12, -(row.label == "Opposite" || row.label == "Polarity" ? 36 : 34));
+                journalPanelNotes[i].rectTransform.sizeDelta = new Vector2(row.label == "Opposite" || row.label == "Polarity" ? JournalWidth - 22 : 26, 18);
+                journalPanels[i].sizeDelta = new Vector2(JournalWidth, height); journalPanels[i].anchoredPosition = new Vector2(JournalX, -(y + height / 2)); y += height + 6;
             }
         }
-        // What a screen reader hears: the page as words, and the ribbon's meaning, since it is only seen. placeholder (owner writes)
+        // What a screen reader hears: the page as words, and what the rings and ribbons mean, since they are only seen. placeholder (owner writes)
         string JournalSpoken()
         {
-            if (Flow.JournalAt == JournalView.Contents) return "Your journal. Contents: " + string.Join(", ", Flow.JournalContents.Select((t, i) => t + (Flow.JournalEntryDue(i) ? ", ready for practice" : ""))) + ".";
-            if (Flow.JournalAt == JournalView.Section) return "Your journal. " + SliceFlow.SectionTitle(Flow.JournalKind) + ".";
+            if (Flow.JournalAt == JournalView.Wheel)
+            {
+                var lead = "Your journal. " + SliceFlow.WheelTitle + (Flow.JournalTableView ? ", as the table" : "") + (Flow.JournalLenses.Count > 1 ? ", showing " + SliceFlow.LensTitle(Flow.Lens).ToLowerInvariant() : "") + ". ";
+                var signs = Flow.JournalSigns.Select(s => Zodiac.Seats[s].Name + ", " + SliceFlow.SeatStateNames[Flow.SeatState(s)] + (Flow.SignDue(s) ? ", ready for practice" : ""));
+                var preview = Flow.JournalSelected >= 0 ? " Selected: " + Zodiac.Seats[Flow.JournalSelected].Name + ". " + Flow.SeatSummary(Flow.JournalSelected) + "." : "";
+                return lead + string.Join("; ", signs) + "." + preview;
+            }
             int seat = Flow.JournalSignSeat; var facts = Flow.SignFacts(seat).Select(f => f[0] + ": " + f[1]).ToList();
             if (Flow.SignKnows(seat, ItemKind.Glyph)) facts.Insert(0, "Symbol: " + Zodiac.Seats[seat].Glyph);
-            return "Your journal. " + Zodiac.Seats[seat].Name + ". " + string.Join(". ", facts) + (Flow.SignDue(seat) ? ". Ready for practice." : ".");
+            return "Your journal. " + Zodiac.Seats[seat].Name + ", " + SliceFlow.SeatStateNames[Flow.SeatState(seat)] + ". " + string.Join(". ", facts) + (Flow.SignDue(seat) ? ". Ready for practice." : ".");
         }
         void OpenJournal() { if (busy || !Flow.OpenJournal()) return; Sound.Play("page"); Show(); Publish(); }
         void CloseJournal() { if (busy || !Flow.CloseJournal()) return; Sound.Play("page"); Save(); Show(); Publish(); }
         void JournalTurn(int direction) { if (busy || !(direction > 0 ? Flow.JournalNext() : Flow.JournalPrev())) return; Sound.Play("page"); ShowJournal(); Publish(); }
-        void JournalEntry(int entry) { if (busy || !Flow.JournalOpenEntry(entry)) return; Sound.Play("page"); ShowJournal(); Publish(); }
-        void JournalContents() { if (busy || !Flow.JournalToContents()) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void JournalWheel() { if (busy || !Flow.JournalToWheel()) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void JournalSetView(bool table) { if (busy || !Flow.SetJournalTable(table)) return; ShowJournal(); Publish(); }
+        void JournalLensTap(JournalLens lens) { if (busy || !Flow.SetLens(lens)) return; ShowJournal(); Publish(); }
+        // a tap frames a seat and shows its preview; a second tap on the framed seat opens its page (working choice)
+        void JournalSeatTap(int seat) { if (busy) return; if (Flow.JournalSelected == seat && Flow.CanOpenSelected) { JournalOpenSelected(); return; } if (!Flow.SelectSeat(seat)) return; ShowJournal(); Publish(); }
+        void JournalOpenSelected() { if (busy || !Flow.OpenSelected()) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void JournalChipTap(int chip) { if (busy || chip < 0 || chip >= journalChips.Length || !journalChips[chip].gameObject.activeSelf || !Flow.OpenSign(journalChipSeats[chip])) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        // The chips' boxes on the 360 x 800 layout, for the web template's semantic buttons (x, top, width, height per chip shown)
+        float[] JournalChipBoxes()
+        {
+            var boxes = new List<float>();
+            for (int i = 0; i < journalChips.Length; i++)
+            {
+                if (!journalChips[i].gameObject.activeInHierarchy) continue;
+                var r = journalChips[i].GetComponent<RectTransform>(); var panel = r.parent as RectTransform;
+                boxes.Add(panel.anchoredPosition.x + r.anchoredPosition.x); boxes.Add(-panel.anchoredPosition.y - panel.sizeDelta.y / 2 - r.anchoredPosition.y); boxes.Add(r.sizeDelta.x); boxes.Add(r.sizeDelta.y);
+            }
+            return boxes.ToArray();
+        }
+        // Rich text without its tags (the web state carries words, not markup)
+        static string PlainText(string text)
+        {
+            var sb = new System.Text.StringBuilder(); bool tag = false;
+            foreach (var c in text ?? "") { if (c == '<') tag = true; else if (c == '>') tag = false; else if (!tag) sb.Append(c); }
+            return sb.ToString();
+        }
         // A chevron of two bars, pointing the way the page turns (the symbols font is imported with the twelve signs only; no arrow glyphs)
         Image[] Chevron(Button arrow, int direction)
         {

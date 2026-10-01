@@ -10,7 +10,7 @@ namespace Ascendant.Build
     // phone build stays small (no mipmaps, crunched compression, a size cap per slot) and a PNG is a sprite without a click.
     public sealed class SlotImport : AssetPostprocessor
     {
-        public override uint GetVersion() => 4; // 4: the chat box is sliced (3: no crunch at all; 2: none on transparent images); bumping it re-imports every slot file, cached Library included
+        public override uint GetVersion() => 5; // 5: Build AA's journal slots, first imported before their manifest entries existed; 4: the chat box is sliced (3: no crunch at all; 2: none on transparent images); bumping it re-imports every slot file, cached Library included
         public const string ArtRoot = "Assets/CelestialDial/Resources/Art/", AudioRoot = "Assets/CelestialDial/Resources/Audio/";
         void OnPreprocessTexture()
         {
