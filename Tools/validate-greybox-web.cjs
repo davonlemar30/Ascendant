@@ -76,8 +76,15 @@ const path=require('path');
     check((await state()).caspar==='The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready.'&&(await state()).canEnterDial,'Build T: in the Zodiac Wing Caspar points to the Dial at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
     check((await state()).dialEye===0,'Build Z: in the Zodiac Wing the Dial rests with its eye closed at '+viewport.width);
+    // Build AB (owner, Oct 1: "the eye no longer blinks open once tapped"): read the eye off the screen, not the state. The Wing Dial's eye sits at
+    // (220, 325) on the 360 x 800 layout (measured on a capture); the shut lids are brass, the open glass indigo: count the glass.
+    const eyeGlass=async()=>{const scale=Math.min(viewport.width/360,viewport.height/800),ox=viewport.width/2+(220-180)*scale,oy=(viewport.height-800*scale)/2+325*scale;
+      const shot=await page.screenshot({clip:{x:ox-15*scale,y:oy-3*scale,width:30*scale,height:6*scale}});
+      return page.evaluate(async b64=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);const d=g.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+2]>d[i]+8)n++;return n/(d.length/4);},shot.toString('base64'));};
+    const glassShut=await eyeGlass();
     await semantic('poi-dial');
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().dialEye>0&&window.ascendantDial.snapshot().dialEye<1,{},{timeout:3000}).catch(()=>{});
+    await page.waitForTimeout(500);const glassOpen=await eyeGlass(); // the eye opens in 0.35 s and holds while the Keeper walks
+    check(glassOpen>glassShut+.5,'Build AB: the Wing Dial\'s eye is seen open on screen as the Keeper goes to it ('+Math.round(glassShut*100)+'% blue glass shut, '+Math.round(glassOpen*100)+'% open) at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-eye-opening.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await ready();
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:10000}).catch(()=>{});check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on (tappable once the wheel\'s opening beat settles) at '+viewport.width);
@@ -98,7 +105,7 @@ const path=require('path');
     for(let n=0;n<16&&(await state()).start!=='Start: Taurus';n++){if((await state()).canContinue)await semantic('continue');await page.waitForTimeout(500);}
     await waitActive('Taurus');check(!(await state()).dormant,'the Dial has woken and the guided problem began at '+viewport.width);
     { const z=await state(); await page.screenshot({path:path.join(out,viewport.width+'-eye-challenge.png')});
-      check(z.eyeText==='Next Earth after Taurus'&&z.eyeSize>=15&&z.eyeSize<=20&&z.signLabel==='Taurus','Build Z: the Dial poses its challenge in the eye ('+z.eyeSize+' px) and names the framed sign above it at '+viewport.width);
+      check(z.eyeText==='Next Earth after Taurus'&&z.eyeSize>=13&&z.eyeSize<=16&&z.signLabel==='Taurus','Build Z: the Dial poses its challenge in the eye ('+z.eyeSize+' px) and names the framed sign above it at '+viewport.width);
       check((z.speaker==='dial')===z.dialVoice,'Build Z: the box wears the Dial\'s blue exactly when the Dial speaks ('+z.speaker+') at '+viewport.width); }
     // Build T: mid-challenge, a tap on the canvas's Leave the Dial goes to the Zodiac Wing; the Dial, tapped again, resumes the same problem.
     await tap(0,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});

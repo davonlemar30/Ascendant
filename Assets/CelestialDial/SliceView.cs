@@ -818,6 +818,7 @@ namespace Ascendant.CelestialDial
             else while (!walk.Tick(Time.unscaledDeltaTime)) { PlaceAvatar(); yield return null; }
             PlaceAvatar();
             while (id == "dial" && dialEyes.Count > 0 && dialEyeOpen < 1) yield return null; // Build Z: the eye finishes opening before the Dial screen
+            if (id == "dial" && dialEyes.Count > 0 && !ReducedMotion) yield return new WaitForSecondsRealtime(DialEyeHold); // Build AB: and stays open a beat, so it is seen even with no walk
             yield return Arrive(id);
             busy = false; Show(); Publish();
         }
@@ -966,7 +967,8 @@ namespace Ascendant.CelestialDial
             chamber.gameObject.SetActive(s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom); hub.gameObject.SetActive(s == SliceScreen.Hub);
             wingRoom.gameObject.SetActive(s == SliceScreen.WingRoom);
             Dial.Showing = s == SliceScreen.Wing || practiceOnDial; // Build Z: a pattern's reveal plays only where the player sees the wheel
-            if (s == SliceScreen.WingRoom && !busy && dialEyeOpen > 0) SetDialEye(0); // Build Z: back in the room, the Dial's eye rests closed
+            if (s == SliceScreen.WingRoom && shownScreen != SliceScreen.WingRoom && dialEyeOpen > 0) SetDialEye(0); // Build Z: back in the room, the Dial's eye rests closed. Build AB (owner, Oct 1: "the eye no longer blinks open"): only on coming back, not on every refresh, which shut it mid-opening when the Keeper already stood at the Dial
+            shownScreen = s;
             gridScreen.gameObject.SetActive(s == SliceScreen.Grid); if (s == SliceScreen.Grid) ShowGrid();
             bool book = s == SliceScreen.Book;
             bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom;
@@ -1111,7 +1113,7 @@ namespace Ascendant.CelestialDial
         // ---- Build Z (owner, Sept 30): the Wing room's Dial rests with its eye closed, worn and restored alike, and opens it when the player taps the Dial.
         // The open art is identical to the closed piece outside the eye, so the opening is a mask at the eye that grows from the seam: the lids part.
         readonly List<(RectTransform box, float height)> dialEyes = new List<(RectTransform, float)>(); float dialEyeOpen;
-        public const float DialEyeSeconds = .35f;
+        public const float DialEyeSeconds = .35f; public const float DialEyeHold = .25f; SliceScreen shownScreen = SliceScreen.Identity; // Build AB: the open eye's beat; the screen last shown
         void BuildDialEyes()
         {
             dialEyes.Clear(); var piece = wingKit.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;

@@ -216,16 +216,16 @@ namespace Ascendant.Build
             var voice = Resources.Load<Font>("Fonts/EBGaramond-Bold");
             Check(voice != null && File.Exists("Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt"), "Build Z: the Dial's serif, EB Garamond Bold, ships with its open licence");
             Check(EyeLines.All(l => l.All(c => c == '\n' || (c >= 32 && c <= 255))), "Build Z: every line the eye can show is Latin-1 (the web font rule)");
-            var settings = new TextGenerationSettings { font = voice, fontSize = 20, resizeTextForBestFit = true, resizeTextMinSize = 15, resizeTextMaxSize = 20, lineSpacing = .92f, textAnchor = TextAnchor.MiddleCenter,
-                generationExtents = new Vector2(150, 54), pivot = new Vector2(.5f, .5f), horizontalOverflow = HorizontalWrapMode.Wrap, verticalOverflow = VerticalWrapMode.Truncate, scaleFactor = 1, color = Color.white, richText = false, updateBounds = true };
+            var settings = new TextGenerationSettings { font = voice, fontSize = DialView.EyeMax, resizeTextForBestFit = true, resizeTextMinSize = DialView.EyeMin, resizeTextMaxSize = DialView.EyeMax, lineSpacing = .92f, textAnchor = TextAnchor.MiddleCenter,
+                generationExtents = DialView.EyeBox, pivot = new Vector2(.5f, .5f), horizontalOverflow = HorizontalWrapMode.Wrap, verticalOverflow = VerticalWrapMode.Truncate, scaleFactor = 1, color = Color.white, richText = false, updateBounds = true };
             var generator = new TextGenerator(); int smallest = 99; string tightest = "";
             foreach (var line in EyeLines)
             {
                 generator.Populate(line, settings); int size = generator.fontSizeUsedForBestFit;
-                Check(generator.lineCount <= 2 && size >= 15 && generator.characterCountVisible >= line.Replace("\n", "").Length, "Build Z: \"" + line.Replace("\n", " / ") + "\" fits the eye on at most two lines at 15 px or more (" + size + " px, " + generator.lineCount + " lines)");
+                Check(generator.lineCount <= 2 && size >= DialView.EyeMin && generator.characterCountVisible >= line.Replace("\n", "").Length, "Build Z: \"" + line.Replace("\n", " / ") + "\" fits inside the eye's glass (Build AB: " + DialView.EyeBox.x + " x " + DialView.EyeBox.y + ") on at most two lines at " + DialView.EyeMin + " px or more (" + size + " px, " + generator.lineCount + " lines)");
                 if (size < smallest) { smallest = size; tightest = line; }
             }
-            Check(smallest >= 15, "Build Z: the eye's smallest line is " + smallest + " px (\"" + tightest.Replace("\n", " / ") + "\")");
+            Check(smallest >= DialView.EyeMin, "Build Z: the eye's smallest line is " + smallest + " px (\"" + tightest.Replace("\n", " / ") + "\")");
             var zsave = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(new SaveData { revealsPlayed = new[] { "elements", "symbols" } }));
             Check(zsave.revealsPlayed.SequenceEqual(new[] { "elements", "symbols" }) && new SaveData().revealsPlayed.Length == 0, "Build Z: the save carries the patterns whose reveal has played; a new save has none");
             Check(DialView.RevealSweepSeconds + DialView.RevealNamesSeconds + DialView.RevealEyeSeconds <= 2.1f && SliceView.DialEyeSeconds <= .4f, "Build Z: the reveal is about two seconds of small built motions; the Wing Dial's eye opens in under half a second");

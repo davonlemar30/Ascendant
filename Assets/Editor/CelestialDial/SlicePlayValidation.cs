@@ -260,6 +260,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>Act("continue"));
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.Polarity && l.PolarityShown && l.SeatLabel(0).Contains(", Yang") && l.SeatLabel(1).Contains(", Yin"),"the second line shows every seat's side");Capture("slice-390-polarity-shown.png");});
             Steps.Enqueue(()=>AstrolabeCheck(Enumerable.Range(0,12).Select(Zodiac.PolarityAt).ToArray(),"polarity shown"));
+            Steps.Enqueue(AstrolabeSweep); // the owner's condition (Oct 1): the words properly seated at every position round the wheel
             Steps.Enqueue(()=>Act("continue"));
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.OppositeGuided && l.Dial.Forward==6 && l.Dial.Start==l.Sun && l.Dial.HintLevel==2 && !l.CountBeatPending,"the first pair is guided from the sun sign; the six-count has played");Capture("slice-390-opposites.png");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("seat:"+Zodiac.Opposite(l.Dial.Start));Act("seal");});
@@ -429,6 +430,52 @@ namespace Ascendant.Build
             Check(snap.seatFacts.Select((f,i)=>f==facts[i]).All(v=>v),"Build AB, "+when+": each seat shows one fact, the newest it has learned: "+string.Join(",",snap.seatFacts));
             Check(Mathf.Abs(Mathf.DeltaAngle(turn,want))<.5f && Vector2.Distance(framed,new Vector2(-DialView.AstroSeatRadius,0))<1 && snap.framedFacts.Contains(facts[sel]),"Build AB, "+when+": the ring has turned with the seats ("+turn.ToString("0.0")+" for "+want.ToString("0.0")+"), "+Zodiac.Seats[sel].Name+" sits under the pointer, and its facts read above the eye: "+snap.framedFacts);
             Capture("slice-390-astrolabe-"+when.Replace(" ","-")+".png");
+        }
+        // Build AB (owner, Oct 1: "only if we are making sure the words are properly seated"): pose the wheel at all 24 half-turns and check that
+        // every name sits on the name band and every symbol and fact on its tablet, each centred on its own segment of the turned ring
+        static void AstrolabeSweep()
+        {
+            var d=View.Dial; float keep=d.Turns; var off=new List<string>(); int poses=0;
+            for(int h=0;h<24;h++)
+            {
+                float t=h*.5f; d.PoseTurns(t); poses++;
+                float ring=d.RingTurn, wantRing=((-t*30)%360+360)%360;
+                if(Mathf.Abs(Mathf.DeltaAngle(ring,wantRing))>.5f) off.Add("turn "+t+": ring "+ring.ToString("0.0"));
+                for(int i=0;i<12;i++)
+                {
+                    var seat=(RectTransform)d.SeatNameTexts[i].transform.parent; var wheel=(RectTransform)seat.parent; float segment=180+30*i-30*t;
+                    foreach(var (label,radius,what) in new[]{(d.SeatNameTexts[i].transform,DialView.NameRadius,"name"),(d.SeatFactTexts[i].transform,DialView.TabletRadius-9.5f,"fact")})
+                    {
+                        var v=(Vector2)wheel.InverseTransformPoint(label.position); float r=v.magnitude, a=Mathf.Atan2(v.y,v.x)*Mathf.Rad2Deg;
+                        // the ring's own segment for this seat sits at the same angle, turned with the ring: compare against the ring's rotation, not the seat's
+                        float ringSegment=180+30*i+ring;
+                        if(Mathf.Abs(r-radius)>1.5f || Mathf.Abs(Mathf.DeltaAngle(a,segment))>1f || Mathf.Abs(Mathf.DeltaAngle(a,ringSegment))>1f)
+                            off.Add("turn "+t+" "+Zodiac.Seats[i].Name+" "+what+" r "+r.ToString("0.0")+" at "+a.ToString("0.0")+" (segment "+Mathf.Repeat(ringSegment,360).ToString("0.0")+")");
+                    }
+                    bool lower=Mathf.Sin(segment*Mathf.Deg2Rad)<-.01f; float up=d.SeatNameTexts[i].transform.parent.eulerAngles.z;
+                    // upright: on the lower half the seat's own up points at the wheel's centre, on the upper half away from it
+                    float wantUp=Mathf.Repeat(segment-90+(lower?180:0),360);
+                    if(Mathf.Abs(Mathf.DeltaAngle(up,wantUp))>1f) off.Add("turn "+t+" "+Zodiac.Seats[i].Name+" faces "+up.ToString("0.0")+" for "+wantUp.ToString("0.0"));
+                }
+            }
+            d.PoseTurns(keep);
+            Check(poses==24 && off.Count==0,"Build AB: at all 24 half-turns of the wheel, every name sits on the name band and every fact on its tablet, centred on its own segment of the turned ring (within 1 degree and 1.5 px) and turned upright"+(off.Count>0?"; off: "+string.Join(" / ",off.Take(8)):""));
+            Capture("slice-390-astrolabe-sweep-end.png");
+            // the centre's words, each on its own plaque or in the glass: every name, every set of facts, every count word fits inside its face
+            var nameT=d.NameText; var factT=d.FactsText; var countT=d.CountText; string sn=nameT.text,sf=factT.text,sc=countT.text; var misfits=new List<string>();
+            UnityEngine.Rect Box(UnityEngine.UI.Text t){ var r=t.rectTransform; var p=r.anchoredPosition; return new UnityEngine.Rect(180+p.x-r.sizeDelta.x/2,-p.y-r.sizeDelta.y/2,r.sizeDelta.x,r.sizeDelta.y); }
+            bool Inside(UnityEngine.Rect inner,UnityEngine.Rect outer)=>inner.xMin>=outer.xMin-.5f && inner.xMax<=outer.xMax+.5f && inner.yMin>=outer.yMin-.5f && inner.yMax<=outer.yMax+.5f;
+            foreach(var z in Zodiac.Seats){ nameT.text=z.Name; if(nameT.preferredWidth>nameT.rectTransform.sizeDelta.x) misfits.Add(z.Name+" "+nameT.preferredWidth.ToString("0")); }
+            foreach(var el in new[]{"Water","Earth"}) foreach(var mo in Zodiac.Modalities) foreach(var po in new[]{"Yang","Yin"}){ var line=el+" · "+mo+" · "+po; factT.text=line; if(factT.preferredWidth>factT.rectTransform.sizeDelta.x) misfits.Add(line+" "+factT.preferredWidth.ToString("0")); }
+            foreach(var w in new[]{"one","two","three","four","five","six"}){ countT.text=w; if(countT.preferredWidth>countT.rectTransform.sizeDelta.x) misfits.Add(w+" "+countT.preferredWidth.ToString("0")); }
+            nameT.text=sn; factT.text=sf; countT.text=sc;
+            // nothing is cut off: a label taller than its box is dropped whole by Unity (the name was, on the first plaque pass)
+            foreach(var (t,what) in new[]{(nameT,"name"),(factT,"facts"),(countT,"count")}){ var held=t.text; t.text=what=="name"?"Sagittarius":what=="facts"?"Water · Cardinal · Yang":"three"; if(t.verticalOverflow!=VerticalWrapMode.Overflow && t.preferredHeight>t.rectTransform.sizeDelta.y) misfits.Add(what+" taller than its box "+t.preferredHeight.ToString("0")+" > "+t.rectTransform.sizeDelta.y); t.text=held; }
+            Check(nameT.gameObject.activeInHierarchy && nameT.text!="" && d.Snapshot().signLabel!="","Build AB: the framed sign's name is on the plaque: "+nameT.text);
+            var geos=UnityEngine.Object.FindObjectsByType<DialGeometry>(FindObjectsSortMode.None); Check(geos.Length>0 && geos.All(g=>g.GetComponentsInChildren<UnityEngine.UI.Image>(false).Length==0),"Build AB: no family line crosses the medallion on the Astrolabe");
+            var plates=new List<string>(); if(!Inside(Box(nameT),DialView.NamePlate)) plates.Add("name"); if(!Inside(Box(factT),DialView.NamePlate)) plates.Add("facts"); if(!Inside(Box(countT),DialView.CountPlate)) plates.Add("count");
+            if(Mathf.Abs(-d.EyeText.rectTransform.anchoredPosition.y-DialView.EyeY)>.5f || d.EyeText.rectTransform.sizeDelta!=DialView.EyeBox) plates.Add("eye");
+            Check(misfits.Count==0 && plates.Count==0 && nameT.preferredHeight+factT.preferredHeight<=DialView.NamePlate.height,"Build AB (owner, Oct 1): the framed sign's name and facts sit inside the upper plaque, the challenge inside the eye's glass, the count inside the lower plaque; every name, fact line and count word fits its face"+(misfits.Count>0?"; too wide: "+string.Join(", ",misfits):"")+(plates.Count>0?"; outside its plaque: "+string.Join(", ",plates):""));
         }
         static float RibbonTop() { var r=GameObject.Find("Ribbon").GetComponent<RectTransform>();return r.anchoredPosition.y+r.sizeDelta.y/2; } // on the 360 x 800 layout: -40 is the page's head edge
     }
