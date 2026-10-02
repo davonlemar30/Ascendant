@@ -34,9 +34,9 @@ namespace Ascendant.CelestialDial
                 for(int i=0;i<3;i++)
                 {
                     int index=48+family*3+i;
-                    bool show=View!=null && View.Lesson!=null && View.Lesson.Kin[family];
+                    bool show=View!=null && View.Lesson!=null && View.Lesson.Kin[family] && !View.RingArt; // Build AB: on the Astrolabe the chords would cross the medallion's words; its tablets turn gold instead
                     lines[index].gameObject.SetActive(show);
-                    if(show)Line(index,View.SeatPosition(family+4*i)*.77f,View.SeatPosition(family+4*((i+1)%3))*.77f,Soft ? new Color(.95f,.8f,.5f,Dim ? .14f : .34f) : Dim ? new Color(.62f,.57f,.53f,.28f) : new Color(.62f,.57f,.53f));
+                    if(show)Line(index,View.SeatPosition(family+4*i)*View.FamilyScale,View.SeatPosition(family+4*((i+1)%3))*View.FamilyScale,Soft ? new Color(.95f,.8f,.5f,Dim ? .14f : .34f) : Dim ? new Color(.62f,.57f,.53f,.28f) : new Color(.62f,.57f,.53f));
                 }
         }
         void Line(int index,Vector2 a,Vector2 b,Color color)

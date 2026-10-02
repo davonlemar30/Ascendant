@@ -76,8 +76,15 @@ const path=require('path');
     check((await state()).caspar==='The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready.'&&(await state()).canEnterDial,'Build T: in the Zodiac Wing Caspar points to the Dial at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
     check((await state()).dialEye===0,'Build Z: in the Zodiac Wing the Dial rests with its eye closed at '+viewport.width);
+    // Build AB (owner, Oct 1: "the eye no longer blinks open once tapped"): read the eye off the screen, not the state. The Wing Dial's eye sits at
+    // (219, 317) on the 360 x 800 layout (Build AC: measured on the Cast Dial piece); the shut lids are brass, the open glass indigo: count the glass.
+    const eyeGlass=async()=>{const scale=Math.min(viewport.width/360,viewport.height/800),ox=viewport.width/2+(219-180)*scale,oy=(viewport.height-800*scale)/2+317*scale;
+      const shot=await page.screenshot({clip:{x:ox-15*scale,y:oy-3*scale,width:30*scale,height:6*scale}});
+      return page.evaluate(async b64=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);const d=g.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+2]>d[i]+8)n++;return n/(d.length/4);},shot.toString('base64'));};
+    const glassShut=await eyeGlass();
     await semantic('poi-dial');
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().dialEye>0&&window.ascendantDial.snapshot().dialEye<1,{},{timeout:3000}).catch(()=>{});
+    await page.waitForTimeout(500);const glassOpen=await eyeGlass(); // the eye opens in 0.35 s and holds while the Keeper walks
+    check(glassOpen>glassShut+.5,'Build AB: the Wing Dial\'s eye is seen open on screen as the Keeper goes to it ('+Math.round(glassShut*100)+'% blue glass shut, '+Math.round(glassOpen*100)+'% open) at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-eye-opening.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await ready();
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:10000}).catch(()=>{});check((await state()).canLeaveDial,'Build T: Leave the Dial shows from the first lesson on (tappable once the wheel\'s opening beat settles) at '+viewport.width);
@@ -98,7 +105,7 @@ const path=require('path');
     for(let n=0;n<16&&(await state()).start!=='Start: Taurus';n++){if((await state()).canContinue)await semantic('continue');await page.waitForTimeout(500);}
     await waitActive('Taurus');check(!(await state()).dormant,'the Dial has woken and the guided problem began at '+viewport.width);
     { const z=await state(); await page.screenshot({path:path.join(out,viewport.width+'-eye-challenge.png')});
-      check(z.eyeText==='Next Earth after Taurus'&&z.eyeSize>=15&&z.eyeSize<=20&&z.signLabel==='Taurus','Build Z: the Dial poses its challenge in the eye ('+z.eyeSize+' px) and names the framed sign above it at '+viewport.width);
+      check(z.eyeText==='Next Earth after Taurus'&&z.eyeSize>=13&&z.eyeSize<=16&&z.signLabel==='Taurus','Build Z: the Dial poses its challenge in the eye ('+z.eyeSize+' px) and names the framed sign above it at '+viewport.width);
       check((z.speaker==='dial')===z.dialVoice,'Build Z: the box wears the Dial\'s blue exactly when the Dial speaks ('+z.speaker+') at '+viewport.width); }
     // Build T: mid-challenge, a tap on the canvas's Leave the Dial goes to the Zodiac Wing; the Dial, tapped again, resumes the same problem.
     await tap(0,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
@@ -711,7 +718,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===139&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===141&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
@@ -737,9 +744,9 @@ const path=require('path');
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===139&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 138 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===141&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 138 art and 7 sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===139&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===141&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');

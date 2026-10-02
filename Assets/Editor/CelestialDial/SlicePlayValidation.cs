@@ -143,6 +143,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Flow.Walk.At=="dial" && View.Dial.Lesson.Phase==LessonPhase.Continuation && View.Dial.Lesson.Dial.Start==2 && View.Dial.Lesson.Dial.HintLevel==0,"the Wing continues with the third family on the player's own");Capture("slice-390-wing-unit11.png");});
             for(int i=0;i<4;i++) Steps.Enqueue(()=>{Act("seat:"+Zodiac.Destination(View.Dial.Lesson.Dial.Start));Act("seal");});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.AllLit && View.Flow.WheelComplete && View.Dial.Lesson.Lit.All(v=>v) && View.Dial.Lesson.KeyEarned && !View.Dial.Lesson.Key2Earned && View.Flow.Keys==1,"twelve seats lit with no second Key");Capture("slice-390-wing-lit.png");});
+            Steps.Enqueue(()=>AstrolabeCheck(Zodiac.Seats.Select(z=>z.Element).ToArray(),"the wheel lit"));
             Steps.Enqueue(()=>Act("leave-dial")); // note 10: the Dial's exit lands in the room; the capture lands at the end of its frame, so the action waits its own step
             Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.V02Complete,"one more return completes v0.2");Capture("slice-390-hub-complete.png");});
@@ -204,9 +205,11 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Snapshot().fork=="both","the fork before the second pattern");Act("continue-lesson");});
             // ---- Build A: the modalities on the Dial ----
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(View.Flow.Screen==SliceScreen.Wing && l.Phase==LessonPhase.ModalityGuided && l.Dial.Forward==3 && l.Dial.Start==l.Sun && l.LitMod[l.Sun] && View.Flow.ModalitiesStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Modality && i.entered)==12,"after Key 2 the Dial opens the modality unit at the sun sign, three forward, and introduces twelve modality items");Capture("slice-390-modalities.png");});
+            Steps.Enqueue(()=>{var sun=View.Dial.Lesson.Sun;AstrolabeCheck(Enumerable.Range(0,12).Select(i=>i==sun ? Zodiac.ModalityAt(i) : Zodiac.Seats[i].Element).ToArray(),"the modality unit opens");}); // only the sun sign's modality is lit yet
             for(int i=0;i<9;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;if(!(l.Phase==LessonPhase.ModalityGuided||l.Phase==LessonPhase.ModalityOwn)||!l.Dial.Active)return;if(l.LitMod.Count(v=>v)==6 && l.Phase==LessonPhase.ModalityOwn && l.Dial.Attempts==0){Act("seat:"+Zodiac.Wrap(l.Dial.Start+2));Act("seal");return;}Act("seat:"+Zodiac.Destination(l.Dial.Start,3));Act("seal");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;if((l.Phase==LessonPhase.ModalityGuided||l.Phase==LessonPhase.ModalityOwn) && l.Dial.Active){Act("seat:"+Zodiac.Destination(l.Dial.Start,3));Act("seal");}});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.ModalityComplete && l.ModalitiesComplete && View.Flow.Keys==2 && l.Dial.Events.Count(e=>e.event_name=="modality_family_completed")==3,"three modality families of four complete with no new Key");Capture("slice-390-modalities-complete.png");});
+            Steps.Enqueue(()=>AstrolabeCheck(Enumerable.Range(0,12).Select(Zodiac.ModalityAt).ToArray(),"the modalities complete"));
             Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
             Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.Deck.Due(View.Flow.Sitting).Any(i=>i.Kind==ItemKind.Modality),"back at the Hub with modality items ready");});
@@ -256,6 +259,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(View.Flow.Screen==SliceScreen.Wing && l.Phase==LessonPhase.Polarity && !l.PolarityShown && l.Key3Held && View.Flow.OppositesStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && View.Flow.Deck.DueForReview(View.Flow.Sitting).All(i=>i.Kind!=ItemKind.Opposite),"after Key 3 the Dial opens the polarity beat and introduces six pair items as data");Capture("slice-390-polarity.png");});
             Steps.Enqueue(()=>Act("continue"));
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.Polarity && l.PolarityShown && l.SeatLabel(0).Contains(", Yang") && l.SeatLabel(1).Contains(", Yin"),"the second line shows every seat's side");Capture("slice-390-polarity-shown.png");});
+            Steps.Enqueue(()=>AstrolabeCheck(Enumerable.Range(0,12).Select(Zodiac.PolarityAt).ToArray(),"polarity shown"));
+            Steps.Enqueue(AstrolabeSweep); // the owner's condition (Oct 1): the words properly seated at every position round the wheel
             Steps.Enqueue(()=>Act("continue"));
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Check(l.Phase==LessonPhase.OppositeGuided && l.Dial.Forward==6 && l.Dial.Start==l.Sun && l.Dial.HintLevel==2 && !l.CountBeatPending,"the first pair is guided from the sun sign; the six-count has played");Capture("slice-390-opposites.png");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("seat:"+Zodiac.Opposite(l.Dial.Start));Act("seal");});
@@ -316,12 +321,12 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");});
             // Build E: the same save with the test set in every slot, at both viewports; the cues; then the style page on both sets.
             Steps.Enqueue(()=>{Check(Slots.Set=="" && !View.StyleShown && Sound.LastCue!="","the run so far played on the Art folder and the sound hooks fired, files or not (last cue: "+Sound.LastCue+")");PlayerPrefs.SetString(SliceView.SaveKey,stashedSave);PlayerPrefs.Save();Slots.Request(Slots.TestSet,false);Act("reload");});
-            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && Slots.Set==Slots.TestSet && Slots.ArtFiles==139 && Slots.SoundFiles==7,"?art=test: the save resumes at the Hub with the test set, every slot with a file");
+            Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && Slots.Set==Slots.TestSet && Slots.ArtFiles==141 && Slots.SoundFiles==7,"?art=test: the save resumes at the Hub with the test set, every slot with a file");
                 Check(new[]{"atrium","atrium-light","atrium-grime","caspar","akit-desk-restored","akit-pennant-restored","akit-door-open","akit-door-locked","akit-plate-clean","keeper-idle"}.All(Slots.IsDressed) && View.LightAlpha==SliceView.LightAlphaFor(View.Flow.AtriumStage, View.Flow.LocksFilled) && View.LightAlpha>0,"the Atrium takes its files: the shell, its light and grime, Caspar, the kit (desk, pennant, doors locked and unlocked, the name plates), the Keeper (Build N; the pennant since Build Q); missing: "+string.Join(",",new[]{"atrium","atrium-light","atrium-grime","caspar","akit-desk-restored","akit-pennant-restored","akit-door-open","akit-door-locked","akit-plate-clean","keeper-idle"}.Where(x=>!Slots.IsDressed(x))));Capture("slice-360-art-hub.png");Debug.Log("[SlicePlayValidation] ambient loop playing: "+Sound.AmbientPlaying);});
             Steps.Enqueue(()=>{playedBefore=Sound.Played;Act("walk:wing-door");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && Sound.LastCue=="door" && Sound.Played>playedBefore,"the doorway plays the door cue from the test set (cues played: "+Sound.Played+")");
                 Check(new[]{"wing","wing-light"}.All(Slots.IsDressed) && !Slots.IsDressed("table") && (Slots.IsDressed("keeper-idle") || Slots.IsDressed("keeper-walk")),"the Wing room takes its files: the composed room (its Dial, table, chair, and shelf painted in, so no separate table file is drawn), its light, the Keeper (Build L; the shelf and the Dial's face are checked on the Dial screen next)");Capture("slice-360-art-wing-room.png");Act("walk:dial");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && new[]{"dial-room","dial-room-light","seat","bracket"}.All(Slots.IsDressed),"the Dial takes its files: its room, its glow, the seats and the bracket (Build Z: the room replaces the face, floor markings, shelf, chair and candle there)");Capture("slice-360-art-dial.png");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && new[]{"dial-room","dial-room-light","dial-ring","dial-ring-light","bracket"}.All(Slots.IsDressed) && !Slots.IsDressed("seat"),"the Dial takes its files: its room, its glow, the seats and the bracket (Build Z: the room replaces the face, floor markings, shelf, chair and candle there)");Capture("slice-360-art-dial.png");});
             Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.Wing)return;Act("leave-dial");}); // note 10: the Dial's exit lands in the room
             Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");}); // captures land at the end of the frame: the next action waits its own step
             Steps.Enqueue(()=>Act("walk:atrium-door"));
@@ -360,9 +365,9 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.Keys==3 && View.Flow.KeysInHand==2 && View.Flow.LocksFilled==1 && View.Dial.Lesson.ModalitiesComplete,"Build W: Jump to After Key 3 reloads into the Atrium, Keys 2 and 3 in hand");Capture("slice-390-dev-key3.png");Act("enter-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Lesson.CanBeginOpposites,"Build W: from the checkpoint the Wing opens and the last pattern waits at the Dial");});
             Steps.Enqueue(()=>{Slots.Request(Slots.TestSet,true);Act("reload");});
-            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.screen=="style" && s.style && s.styleSlots.Length==139 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": test set")) && s.styleSounds.All(t=>t.EndsWith(": test set")) && s.artSet==Slots.TestSet,"?style=test: the style page lists every slot on the test set, each with its source");Capture("slice-390-style-test.png");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.screen=="style" && s.style && s.styleSlots.Length==141 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": test set")) && s.styleSounds.All(t=>t.EndsWith(": test set")) && s.artSet==Slots.TestSet,"?style=test: the style page lists every slot on the test set, each with its source");Capture("slice-390-style-test.png");});
             Steps.Enqueue(()=>{int played=Sound.Played;Act("sound:seal");Check(Sound.LastCue=="seal" && Sound.Played==played+1,"a sound slot plays from the style page");Act("mute");Check(Sound.Muted && View.Dial.Snapshot().muted,"the test mute toggle silences the game");Act("mute");Check(!Sound.Muted,"and back");Slots.Request("",true);Act("reload");});
-            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.styleSlots.Length==139 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": file") || t.EndsWith(": placeholder")) && s.styleSounds.All(t=>t.EndsWith(": file") || t.EndsWith(": silent")) && s.artSet=="" && (Slots.DressedCount==0 || Slots.ArtFiles>0),"?style: the style page on the Art folder lists every slot as file or placeholder; nothing is dressed without a file");Capture("slice-390-style.png");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.styleSlots.Length==141 && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": file") || t.EndsWith(": placeholder")) && s.styleSounds.All(t=>t.EndsWith(": file") || t.EndsWith(": silent")) && s.artSet=="" && (Slots.DressedCount==0 || Slots.ArtFiles>0),"?style: the style page on the Art folder lists every slot as file or placeholder; nothing is dressed without a file");Capture("slice-390-style.png");});
             Steps.Enqueue(()=>{Slots.Request(null,null);PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save();});
             Steps.Enqueue(()=>{
                 Check(!PlayerPrefs.HasKey(SliceView.SaveKey) && Slots.Set=="" && !Slots.StyleRequested,"the fixture leaves no save and no set request behind");
@@ -402,6 +407,78 @@ namespace Ascendant.Build
         }
         // The test set's ring files are opaque boxes; on a sign page the ring would cover the picture the saturation is read from, so the two Illumination captures hide it
         static void SignRing(bool on) { var page = GameObject.Find("Journal"); var ring = page != null ? page.transform.Find("Sign page/Ring") : null; if (ring != null) ring.gameObject.SetActive(on); }
+        // Build AB (owner, Sept 30: the Astrolabe): every name and fact fits its band; one fact per seat, the newest learned; the ring turns with the seats
+        static void AstrolabeCheck(string[] facts,string when)
+        {
+            var d=View.Dial; var snap=d.Snapshot(); var misfits=new List<string>();
+            if(d.RingArt)
+            {
+                var nt=d.SeatNameTexts[0]; var ft=d.SeatFactTexts[0]; string sn=nt.text,sf=ft.text; int ns=nt.fontSize;
+                foreach(var z in Zodiac.Seats){ nt.fontSize=z.Name.Length>=9 ? 13 : 14; nt.text=z.Name; if(nt.preferredWidth>DialView.NameRoom) misfits.Add(z.Name+" "+nt.preferredWidth.ToString("0")); }
+                foreach(var w in new[]{"Fire","Earth","Air","Water","Cardinal","Fixed","Mutable","Yang","Yin"}){ ft.text=w; if(ft.preferredWidth>DialView.TabletRoom) misfits.Add(w+" "+ft.preferredWidth.ToString("0")); }
+                nt.text=sn; nt.fontSize=ns; ft.text=sf;
+            }
+            int sel=d.Lesson.Dial.Selected; float want=((-sel*30)%360+360)%360, turn=d.RingTurn; var framed=((RectTransform)d.SeatNameTexts[sel].transform.parent).anchoredPosition;
+            Check(d.RingArt && snap.dialRing && misfits.Count==0,"Build AB, "+when+": every name fits its band and every fact its tablet ("+(misfits.Count>0?"too wide: "+string.Join(", ",misfits):"names within "+DialView.NameRoom.ToString("0")+", facts within "+DialView.TabletRoom.ToString("0"))+")");
+            // each seat's name on the name band, its symbol and fact on its tablet, measured from the wheel's centre, at every position round the ring
+            var off=new List<string>();
+            for(int i=0;i<12;i++){ var seat=(RectTransform)d.SeatNameTexts[i].transform.parent; var wheel=(RectTransform)seat.parent;
+                float R(Transform t)=>((Vector2)wheel.InverseTransformPoint(t.position)).magnitude;
+                float n=R(d.SeatNameTexts[i].transform), f=R(d.SeatFactTexts[i].transform);
+                if(Mathf.Abs(n-DialView.NameRadius)>1.5f || Mathf.Abs(f-(DialView.TabletRadius+DialView.FactLift))>1.5f) off.Add(Zodiac.Seats[i].Name+" name "+n.ToString("0")+" fact "+f.ToString("0")); }
+            Check(off.Count==0,"Build AB, "+when+": every name sits on the name band (r "+DialView.NameRadius+") and every fact on its window (r "+(DialView.TabletRadius+DialView.FactLift)+")"+(off.Count>0?"; off: "+string.Join(", ",off):""));
+            Check(snap.seatFacts.Select((f,i)=>f==facts[i]).All(v=>v),"Build AB, "+when+": each seat shows one fact, the newest it has learned: "+string.Join(",",snap.seatFacts));
+            Check(Mathf.Abs(Mathf.DeltaAngle(turn,want))<.5f && Vector2.Distance(framed,new Vector2(-DialView.AstroSeatRadius,0))<1 && snap.framedFacts.Contains(facts[sel]),"Build AB, "+when+": the ring has turned with the seats ("+turn.ToString("0.0")+" for "+want.ToString("0.0")+"), "+Zodiac.Seats[sel].Name+" sits under the pointer, and its facts read above the eye: "+snap.framedFacts);
+            Capture("slice-390-astrolabe-"+when.Replace(" ","-")+".png");
+        }
+        // Build AB (owner, Oct 1: "only if we are making sure the words are properly seated"): pose the wheel at all 24 half-turns and check that
+        // every name sits on the name band and every symbol and fact on its tablet, each centred on its own segment of the turned ring
+        static void AstrolabeSweep()
+        {
+            var d=View.Dial; float keep=d.Turns; var off=new List<string>(); int poses=0;
+            for(int h=0;h<24;h++)
+            {
+                float t=h*.5f; d.PoseTurns(t); poses++;
+                float ring=d.RingTurn, wantRing=((-t*30)%360+360)%360;
+                if(Mathf.Abs(Mathf.DeltaAngle(ring,wantRing))>.5f) off.Add("turn "+t+": ring "+ring.ToString("0.0"));
+                for(int i=0;i<12;i++)
+                {
+                    var seat=(RectTransform)d.SeatNameTexts[i].transform.parent; var wheel=(RectTransform)seat.parent; float segment=180+30*i-30*t;
+                    foreach(var (label,radius,what) in new[]{(d.SeatNameTexts[i].transform,DialView.NameRadius,"name"),(d.SeatFactTexts[i].transform,DialView.TabletRadius+DialView.FactLift,"fact")})
+                    {
+                        var v=(Vector2)wheel.InverseTransformPoint(label.position); float r=v.magnitude, a=Mathf.Atan2(v.y,v.x)*Mathf.Rad2Deg;
+                        // the ring's own segment for this seat sits at the same angle, turned with the ring: compare against the ring's rotation, not the seat's
+                        float ringSegment=180+30*i+ring;
+                        if(Mathf.Abs(r-radius)>1.5f || Mathf.Abs(Mathf.DeltaAngle(a,segment))>1f || Mathf.Abs(Mathf.DeltaAngle(a,ringSegment))>1f)
+                            off.Add("turn "+t+" "+Zodiac.Seats[i].Name+" "+what+" r "+r.ToString("0.0")+" at "+a.ToString("0.0")+" (segment "+Mathf.Repeat(ringSegment,360).ToString("0.0")+")");
+                    }
+                    bool lower=Mathf.Sin(segment*Mathf.Deg2Rad)<-.01f; float up=d.SeatNameTexts[i].transform.parent.eulerAngles.z;
+                    // upright: on the lower half the seat's own up points at the wheel's centre, on the upper half away from it
+                    float wantUp=Mathf.Repeat(segment-90+(lower?180:0),360);
+                    if(Mathf.Abs(Mathf.DeltaAngle(up,wantUp))>1f) off.Add("turn "+t+" "+Zodiac.Seats[i].Name+" faces "+up.ToString("0.0")+" for "+wantUp.ToString("0.0"));
+                }
+            }
+            d.PoseTurns(keep);
+            Check(poses==24 && off.Count==0,"Build AB: at all 24 half-turns of the wheel, every name sits on the name band and every fact on its tablet, centred on its own segment of the turned ring (within 1 degree and 1.5 px) and turned upright"+(off.Count>0?"; off: "+string.Join(" / ",off.Take(8)):""));
+            Capture("slice-390-astrolabe-sweep-end.png");
+            // Build AC (owner, Oct 1): the centre's words: the framed sign's name and facts along the ribbon's arc, the challenge inside the eye's glass, a running count under it
+            var nameT=d.NameText; var factT=d.FactsText; var countT=d.CountText; string sn=nameT.text,sf=factT.text,sc=countT.text,se=d.EyeText.text; var misfits=new List<string>();
+            foreach(var z in Zodiac.Seats){ nameT.text=z.Name; if(nameT.preferredWidth>DialView.RibbonNameRoom) misfits.Add(z.Name+" "+nameT.preferredWidth.ToString("0")); }
+            foreach(var el in new[]{"Water","Earth"}) foreach(var mo in Zodiac.Modalities) foreach(var po in new[]{"Yang","Yin"}){ var line=el+" · "+mo+" · "+po; factT.text=line; if(factT.preferredWidth>DialView.RibbonFactsRoom) misfits.Add(line+" "+factT.preferredWidth.ToString("0")); }
+            foreach(var w in new[]{"one","two","three","four","five","six"}){ countT.text=w; if(countT.preferredWidth>DialView.CountBox.x) misfits.Add(w+" "+countT.preferredWidth.ToString("0")); }
+            nameT.text=sn; factT.text=sf; countT.text=sc;
+            Check(nameT.gameObject.activeInHierarchy && nameT.text!="" && d.Snapshot().signLabel!="","Build AC: the framed sign's name is on the ribbon: "+nameT.text);
+            var geos=UnityEngine.Object.FindObjectsByType<DialGeometry>(FindObjectsSortMode.None); Check(geos.Length>0 && geos.All(g=>g.GetComponentsInChildren<UnityEngine.UI.Image>(false).Length==0),"Build AB: no family line crosses the medallion on the Astrolabe");
+            var places=new List<string>(); var nr=nameT.rectTransform; var fr=factT.rectTransform; var er=d.EyeText.rectTransform;
+            if(d.RibbonNameArc==null || Mathf.Abs(d.RibbonNameArc.Radius-DialView.RibbonRadius)>.01f || Mathf.Abs(-nr.anchoredPosition.y-DialView.RibbonY)>.5f || Mathf.Abs(nr.anchoredPosition.x)>.5f) places.Add("name");
+            if(d.RibbonFactsArc==null || Mathf.Abs(d.RibbonFactsArc.Radius-(DialView.RibbonRadius-(DialView.RibbonFactsY-DialView.RibbonY)))>.01f || Mathf.Abs(-fr.anchoredPosition.y-DialView.RibbonFactsY)>.5f) places.Add("facts");
+            if(Mathf.Abs(-er.anchoredPosition.y-DialView.EyeY)>.5f || er.sizeDelta!=DialView.EyeBox || d.EyeText.resizeTextMinSize!=DialView.EyeMin) places.Add("eye (y "+(-er.anchoredPosition.y).ToString("0.0")+", "+er.sizeDelta.x+" x "+er.sizeDelta.y+", min "+d.EyeText.resizeTextMinSize+")");
+            countT.text="three"; d.Publish(); // a running count: the challenge keeps the glass's upper part, the count word its lower line
+            if(Mathf.Abs(-er.anchoredPosition.y-DialView.EyeYCount)>.5f || er.sizeDelta!=DialView.EyeBoxCount || d.EyeText.resizeTextMinSize!=DialView.EyeMinCount || d.EyeText.resizeTextMaxSize!=DialView.EyeMaxCount || d.EyeText.text.Contains("\n") || Mathf.Abs(-countT.rectTransform.anchoredPosition.y-DialView.CountY)>.5f || countT.rectTransform.sizeDelta!=DialView.CountBox) places.Add("count");
+            countT.text=sc; d.Publish();
+            if(Mathf.Abs(-er.anchoredPosition.y-DialView.EyeY)>.5f || er.sizeDelta!=DialView.EyeBox || d.EyeText.resizeTextMaxSize!=DialView.EyeMax || d.EyeText.text!=se) places.Add("eye after the count");
+            Check(misfits.Count==0 && places.Count==0,"Build AC (owner, Oct 1): the framed sign's name and facts ride the ribbon's arc, the challenge sits inside the eye's glass and makes room for a running count under it, and every name, facts line and count word fits its place"+(misfits.Count>0?"; too wide: "+string.Join(", ",misfits):"")+(places.Count>0?"; out of place: "+string.Join(", ",places):""));
+        }
         static float RibbonTop() { var r=GameObject.Find("Ribbon").GetComponent<RectTransform>();return r.anchoredPosition.y+r.sizeDelta.y/2; } // on the 360 x 800 layout: -40 is the page's head edge
     }
 }

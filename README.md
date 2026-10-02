@@ -18,7 +18,7 @@ The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zod
 
 1. **Wake up.** Give your name and when you were born. The game finds your sun sign (or picks one if you don't know). Everything Caspar teaches starts from *your* sign.
 2. **The Grand Atrium.** Dust, covered furniture, sealed doors, one weak candle. Every Key you spend in the Chamber wakes it one more step.
-3. **THE CELESTIAL DIAL.** A great wheel of twelve seats that wakes when you step close. Turn it, count the seats, and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Your first **Keeper Key** rises out of it.
+3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Your first **Keeper Key** rises out of it.
 4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. Spend your Key on the first lock and the Library takes her first breath.
 5. **Back to the Wing, on your own time.** It keeps giving:
    - **The symbols.** The Book of Symbols teaches each sign's glyph, then the wheel hides its names and asks you to find each one by its shape. **Key 2.**
