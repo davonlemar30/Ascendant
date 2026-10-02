@@ -57,7 +57,7 @@ The owner's answers (Oct 2, batch run 2, given in Claude's session; Decisions Lo
 
 **The diamonds, corrected.** The approved worn and bright passes graded only part of the 12, 9 and 3 o'clock diamonds. Their outer facets and tips kept today's colour behind a hard diagonal edge, because the pass's diamond outline (`diamondW`) is smaller than the painted diamonds. The 6 o'clock diamond was whole, and the stand under it rightly stays today's.
 - Rerunning the art lane's own pass code (`finalize-passes.cjs`) with the original weights gives the approved files exactly (0 channel values differ).
-- With every bronze pixel of those three diamonds in the finish, 2,794 pixels change in each room look, all of them in those diamonds.
+- With every bronze pixel of those three diamonds in the finish, 2,794 pixels are added to the finish and 2,792 of them change value in each room look (two were already the graded colour), all of them in those diamonds.
 - The bright light (the recipe's glow) changes at 543 pixels, all on them too.
 - The small Dial's files are rebuilt from the corrected passes with the art lane's kit tool. With the original weights it reproduces the approved kits exactly; with the fix, about 420 to 460 pixels change, all at the diamonds, and the 12 o'clock tip is now whole.
 
@@ -75,7 +75,7 @@ Validation (local, worktree `platform-fit-2`, branch `codex/dial-final-art` on t
 
 Merged as PR #107 (main `0d7ee4b`, Oct 2 at 08:16 local, which is 16:16 UTC; head `ef29d43`, two commits on main `e9451b0`: the code `cfe62f6`, then the records commit, which changed only docs; main's tree is the head's tree, checked with `git diff`). The ladder ran on the same code as local commit `66f16b8` on #106's art commit `a72e4fc` (never pushed; the PR's description names it). The branch was then rebased onto #106's records commit `81531f0` and, after #106 merged, onto main `e9451b0`. Nothing under `Assets` or `Tools` differs between `66f16b8` and `cfe62f6` (checked with `git diff`; only #106's own records, which the rebase brought in), so the code on main is the validated code. The PR's GitHub Actions Web run on `ef29d43` (`37031000216`) passed; the main run (`37032819714`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 564/564 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass included) against `https://davonlemar30.github.io/Ascendant/`, using `0d7ee4b`'s own suite file (identical to the validated code's).
 
-One change the room paragraph above does not name, found by comparing the merged files with the ones they replaced (Oct 2): in today's `dial-room` and in the approved worn file, the column's fifth pixel column (x = 4, all 1,600 rows) is 80% opaque (alpha 204). In the masters it is opaque, with the colour unchanged apart from the diamond fix above. It is the same kind of change as the Atrium's bottom row in #106.
+One change the room paragraph above does not name, found by comparing the merged files with the ones they replaced (Oct 2): in today's `dial-room` and in the approved worn file, the column's fifth pixel column (x = 4, all 1,600 rows) is 80% opaque (alpha 204). In the masters it is opaque, with the colour unchanged apart from the diamond fix above. It is the same kind of change as the Atrium's bottom row in #106, and it is meant: the approved master is opaque everywhere, its colour is unchanged, and it shows no visible line at the seam (Claude, Oct 2).
 
 ## The bleed masters: the Atrium, the Zodiac Wing and the Chamber (batch 2)
 
