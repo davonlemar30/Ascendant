@@ -164,6 +164,7 @@ namespace Ascendant.CelestialDial
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
             Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo;
             Settings.Build(font);
+            SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
             if (Slots.StyleRequested) Settings.GearShown = false; // the style page is a test page, not the game
             if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
             TryRestore();
@@ -239,14 +240,14 @@ namespace Ascendant.CelestialDial
         {
             var screen = ScreenPanel(name, "atrium"); LightOverlay(screen, "atrium-light");
             if (AtriumKitted) BuildAtriumKit(screen, name == "Atrium return" ? SliceScreen.AtriumReturn : SliceScreen.Atrium); // Build N
-            Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
+            SafeArea.Top(Label(screen, "THE GRAND ATRIUM", 0, 32, 340, 24, 18));
             var sealedDoor = Block(screen, "Sealed door", -118, 310, 62, 128, "door-sealed"); // Build K: sized to the painted arch (Sept 24 Atrium)
             var shelvesBlock = Block(screen, "Shelves, mostly bare", -130, 200, 60, 120, "shelves");
             var furniture = Block(screen, "Covered furniture", 50, 422, 120, 70, "furniture-covered");
             var cloth = Rect("Dust cloth", screen, 50, 410, 128, 30); cloth.gameObject.AddComponent<Image>().color = new Color(.3f, .3f, .32f); cloth.gameObject.SetActive(!HasArt(furniture));
             var candle = Rect("Candle", screen, 115, 375, 8, 20); var candleImage = candle.gameObject.AddComponent<Image>(); Slots.Dress(candleImage, "candle"); Slots.Paint(candleImage, new Color(.5f, .42f, .3f), .7f);
             if (AtriumKitted) { foreach (var b in new[] { sealedDoor, shelvesBlock, furniture }) RetireProps(b, false); cloth.gameObject.SetActive(false); candle.gameObject.SetActive(false); }
-            Label(screen, "Dust. Covered furniture. Sealed doors. One weak candle.", 0, 92, 330, 20, 12).color = Muted;
+            SafeArea.Top(Label(screen, "Dust. Covered furniture. Sealed doors. One weak candle.", 0, 92, 330, 20, 12), SafeArea.UnderTitle).color = Muted;
             // Build P (note 3; the owner's B2 ruling, Sept 28): with the chat box's art, Caspar stands unframed behind the box, one still pose
             // per page, his name on a plate at the box's top left, Continue inside the box. Without the art the old panel stays (no file, no change).
             bool chatBox = Slots.Image("chat-box") != null;
@@ -286,7 +287,7 @@ namespace Ascendant.CelestialDial
         {
             chamber = ScreenPanel("Chamber", "chamber"); LightOverlay(chamber, "chamber-light");
             if (ChamberKitted) { chamberKit = BuildKit(chamber, "ckit-", ChamberKit, "chamber-grime", null, ChamberGrime, ChamberVeil, null, () => Flow.KeysSpent >= SliceFlow.LocksTotal ? 4 : Flow.KeysSpent >= 14 ? 3 : Flow.KeysSpent >= 7 ? 2 : Flow.KeysSpent >= 1 ? 1 : 0, p => Flow.KeysSpent >= p.Key); chamberKit.VeilTint = new Color(.02f, .035f, .09f); FinishKit(chamber, chamberKit); atriumKits.Add(chamberKit); } // Build O
-            Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18);
+            SafeArea.Top(Label(chamber, "THE CRYSTAL BOOK CHAMBER", 0, 32, 340, 24, 18));
             for (int i = 0; i < candles.Length; i++)
             { var c = Rect("Candle", chamber, -120 + i * 30, 90, 8, 20); candles[i] = c.gameObject.AddComponent<Image>(); candles[i].raycastTarget = false; Slots.Dress(candles[i], "candle"); Slots.Paint(candles[i], LampDark, DarkArt); }
             chandelierLabel = Label(chamber, "The chandelier, dark", 0, 116, 300, 18, 11); chandelierLabel.color = Muted;
@@ -338,7 +339,7 @@ namespace Ascendant.CelestialDial
             // Q05 decisions 1, 6: the Atrium in Stage 2 "Stirring" with two entrances.
             hub = ScreenPanel("Hub", "atrium"); LightOverlay(hub, "atrium-light");
             if (AtriumKitted) hubKit = BuildAtriumKit(hub, SliceScreen.Hub); // Build N
-            Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18);
+            SafeArea.Top(Label(hub, "THE GRAND ATRIUM", 0, 32, 340, 24, 18));
             var shelves = Block(hub, "Shelves, mostly bare", -130, 200, 60, 120, "shelves"); shelvesLabel = shelves.GetComponentInChildren<Text>(); // owner (worksheet section 13)
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; Slots.Dress(shelfBooks[i], "shelf-book"); book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
             var floor = Rect("Floor band", hub, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f, 0); floorImage.raycastTarget = false;
@@ -368,7 +369,7 @@ namespace Ascendant.CelestialDial
                 foreach (Transform child in hub) if (child.name == "Sealed" || child.name == "Zodiac Wing, open" || child.name == "Crystal Book Chamber") RetireProps((RectTransform)child, true);
                 foreach (var t in hub.GetComponentsInChildren<Text>(true)) if (t.text == "Caspar" && t.transform.parent == hub) t.gameObject.SetActive(false);
             }
-            hubCaption = Label(hub, "", 0, 92, 340, 36, 11); hubCaption.color = Muted;
+            hubCaption = SafeArea.Top(Label(hub, "", 0, 92, 340, 36, 11), SafeArea.UnderTitle); hubCaption.color = Muted;
             var panel = Rect("Caspar panel", hub, 0, 536, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.045f, .025f, .03f, .92f);
             var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             hubText = Label(panel, "", 0, 70, 306, 90, 12);
@@ -387,8 +388,8 @@ namespace Ascendant.CelestialDial
         {
             // Q05 decision 2: direct-tap items live here; compressed Dial items use the Wing canvas.
             review = ScreenPanel("Practice");
-            Label(review, "PRACTICE", 0, 32, 340, 24, 18); // Build F: the tap forms of practice; the wheel forms use the Dial canvas with a "Practice · n of N" header
-            reviewProgress = Label(review, "", 0, 62, 300, 20, 12); reviewProgress.color = Muted;
+            SafeArea.Top(Label(review, "PRACTICE", 0, 32, 340, 24, 18)); // Build F: the tap forms of practice; the wheel forms use the Dial canvas with a "Practice · n of N" header
+            reviewProgress = SafeArea.Top(Label(review, "", 0, 62, 300, 20, 12), SafeArea.UnderTitle); reviewProgress.color = Muted;
             reviewQuestion = Label(review, "", 0, 200, 330, 48, 15); // two lines for the owner's element question
             for (int i = 0; i < 4; i++) { string element = Elements[i]; elementButtons[i] = MakeButton(review, element, -78 + (i % 2) * 156, 300 + (i / 2) * 64, 150, 56, () => AnswerTap(element)); }
             for (int i = 0; i < 3; i++) { string modality = Zodiac.Modalities[i]; modalityButtons[i] = MakeButton(review, modality, 0, 300 + i * 64, 300, 56, () => AnswerModalityTap(modality)); modalityButtons[i].gameObject.SetActive(false); }
@@ -402,8 +403,8 @@ namespace Ascendant.CelestialDial
         {
             // v0.3 Part A: name the glyph by direct tap. Same layout as a review item so the two read as one family.
             glyphs = ScreenPanel("Glyphs");
-            Label(glyphs, "THE BOOK OF SYMBOLS", 0, 32, 340, 24, 18); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
-            glyphProgress = Label(glyphs, "", 0, 62, 300, 20, 12); glyphProgress.color = Muted;
+            SafeArea.Top(Label(glyphs, "THE BOOK OF SYMBOLS", 0, 32, 340, 24, 18)); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
+            glyphProgress = SafeArea.Top(Label(glyphs, "", 0, 62, 300, 20, 12), SafeArea.UnderTitle); glyphProgress.color = Muted;
             var card = Rect("Glyph card", glyphs, 0, 200, 140, 140); bookCard = card.gameObject.AddComponent<Image>(); bookCard.color = PanelColor; // Build E: book-cover shut, book-page open
             glyphCard = Label(card, "", 0, 70, 130, 130, 84); glyphCard.font = Dial.GlyphFont; glyphCard.horizontalOverflow = HorizontalWrapMode.Overflow; glyphCard.verticalOverflow = VerticalWrapMode.Overflow;
             Label(glyphs, "This symbol belongs to which sign?", 0, 290, 330, 24, 15); // owner (worksheet section 4)
@@ -419,8 +420,8 @@ namespace Ascendant.CelestialDial
         {
             // Build B: the table. Four element rows by three kind columns, twelve sign tiles below. Tap a sign, tap a cell, Seal.
             gridScreen = ScreenPanel("Grid");
-            Label(gridScreen, "THE ELEMENTAL TABLE", 0, 32, 340, 24, 18); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
-            gridKeys = Label(gridScreen, "Keeper Keys: 2", 100, 62, 140, 20, 12); gridKeys.alignment = TextAnchor.MiddleRight; // ten px in from the edge: at 360 wide the Dial's indicator touches it
+            SafeArea.Top(Label(gridScreen, "THE ELEMENTAL TABLE", 0, 32, 340, 24, 18)); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
+            gridKeys = SafeArea.Top(Label(gridScreen, "Keeper Keys: 2", 100, 62, 140, 20, 12), SafeArea.UnderTitle); gridKeys.alignment = TextAnchor.MiddleRight; // ten px in from the edge: at 360 wide the Dial's indicator touches it
             for (int c = 0; c < GridModel.Columns; c++) Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, 96, 86, 18, 11).color = Muted;
             for (int r = 0; r < GridModel.Rows; r++) Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12).color = Muted;
             for (int cell = 0; cell < 12; cell++)
@@ -471,7 +472,7 @@ namespace Ascendant.CelestialDial
             var glow = Rect("Key glow", r, 0, 270, 140, 140); keyGlow = glow.gameObject.AddComponent<Image>(); keyGlow.sprite = SoftGlow(); keyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); keyGlow.raycastTarget = false;
             keyRect = Rect("Keeper Key", r, 0, 270, 84, 40); var keyImage = keyRect.gameObject.AddComponent<Image>(); keyImage.raycastTarget = false; bool keyArt = Slots.Dress(keyImage, "keeper-key"); Slots.Paint(keyImage, new Color(Bone.r, Bone.g, Bone.b, 0), 1f);
             keyLabel = Label(keyRect, "KEEPER KEY", 0, 20, 80, 36, 12); keyLabel.color = new Color(Charcoal.r, Charcoal.g, Charcoal.b, 0); keyLabel.gameObject.SetActive(!keyArt); // the file draws its own Key
-            keyIndicator = Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
+            keyIndicator = SafeArea.Top(Label(r, "Keeper Key: 1", 110, 92, 140, 20, 12), SafeArea.UnderTitle); keyIndicator.alignment = TextAnchor.MiddleRight; keyIndicator.gameObject.SetActive(false);
             wingContinue = MakeButton(r, "Continue", 0, 654, 190, 56, WingContinue); wingContinue.name = "Slice Continue"; wingContinue.gameObject.SetActive(false);
             // Build T (owner, APK playtest, Sept 29): Leave the Dial shows at all times, the first lesson included. It has the bottom row's left half
             // (Claude's working choice), clear of Seal and of the fork's row; Build U gave it the whole row once Reduced motion moved into Settings.
@@ -490,8 +491,8 @@ namespace Ascendant.CelestialDial
             var wingPlate = wingKit.FirstOrDefault(p => p.P.Name == "plate"); if (wingPlate?.Restored != null) PlateText((RectTransform)wingPlate.Restored.transform, WingPlateName);
             FinishKit(wingRoom, wingRoomKit); // everything built after this draws above the veil
             BuildDialEyes(); // Build Z
-            Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18);
-            Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12).color = Muted;
+            SafeArea.Top(Label(wingRoom, "THE ZODIAC WING", 0, 32, 340, 24, 18));
+            SafeArea.Top(Label(wingRoom, "The Elemental Pattern", 0, 62, 300, 20, 12), SafeArea.UnderTitle).color = Muted;
             // Build L (Wing composition, owner-approved mockup B, Sept 24): the room art carries the Dial, the table, the chair, and the shelf,
             // painted in place. Each object keeps an invisible tap area and its glow over its painted footprint; without room art the greybox shows.
             bool wingBaked = HasArt(wingRoom);
@@ -595,6 +596,7 @@ namespace Ascendant.CelestialDial
             if (command == "mute") { ToggleMute(); return; }
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
             if (styleShown && command != "reload") return; // the style page is not the game (a reload, test-only, still gets out of it)
+            if (command.StartsWith("safe-inset:") && float.TryParse(command.Substring(11), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float band)) { SafeArea.Simulated = band; Publish(); return; } // test-only (Platform fit, Part 1): a top band in layout units; -1 restores the screen's own
             if (command == "next-screen") Continue();
             else if (command.StartsWith("birth:")) ChooseBirth(command.Substring(6));
             else if (command.StartsWith("birthdate:")) UseDate(command.Substring(10));
@@ -1193,6 +1195,7 @@ namespace Ascendant.CelestialDial
             state.canEnterWing = s == SliceScreen.Hub && !busy;
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
+            state.safeTop = SafeArea.TopInset(canvas); // Platform fit, Part 1: how far the top row moves down, in layout units
             state.jumpsShown = Settings != null && Settings.JumpsShown; // Build W
             { var fit = s == SliceScreen.Atrium ? atriumFit : s == SliceScreen.AtriumReturn ? returnFit : s == SliceScreen.Hub ? hubFit : s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom ? chamberFit : null; state.chatBoxHeight = fit != null && fit.isActiveAndEnabled ? fit.Height : 0; } // Build X
             // Build F: the fork, practice, the gate, the journal
@@ -1301,6 +1304,7 @@ namespace Ascendant.CelestialDial
         // gold leaf (Illumination, re-dressed); Ribbons still carry the ladder and what is due. A part with no file keeps the greybox look. ----
         public const float JournalTop = 26f; // the page's head edge on the 360 x 800 layout: a sign's ribbon hangs from it; a due ribbon stands out above it
         public const float JournalX = 7f;    // the page's calm column (the art's inner border, x 50 to 325, centred at 187.5)
+        const float JournalTitleClearance = 36; // Platform fit, Part 1: the journal's title sits inside the book, its glyphs about 40 px below the frame's top; it moves only once the safe band reaches them
         public const float JournalWidth = 266f;
         public const float SignPictureTop = 150f, SignPictureSize = 112f; // a sign's picture on its page (the fixture reads Illumination off the screen here)
         public const float WheelTop = 296f, WheelSize = 270f; // the wheel art, 600 px across: sockets on radius 216 (socket 1 at 9 o'clock), 92 across
@@ -1388,7 +1392,7 @@ namespace Ascendant.CelestialDial
             // the silver rules and the faded vermilion margin, drawn by the game so they sit under the text (the art has none)
             for (float y = RuleFirst; y <= RuleLast; y += RuleGap) { var rule = Rect("Rule", journal, JournalX, y, 274, 1).gameObject.AddComponent<Image>(); rule.color = new Color(Silver.r, Silver.g, Silver.b, .09f); rule.raycastTarget = false; }
             var margin = Rect("Margin", journal, JournalX - 125, 318, 1, 556).gameObject.AddComponent<Image>(); margin.color = new Color(Vermilion.r, Vermilion.g, Vermilion.b, .28f); margin.raycastTarget = false;
-            journalTitle = Label(journal, "", JournalX, 56, 250, 60, TitleSize); journalTitle.supportRichText = true; journalTitle.font = Resources.Load<Font>(TitleFont) ?? journalTitle.font; journalTitle.color = Gilt;
+            journalTitle = SafeArea.Top(Label(journal, "", JournalX, 56, 250, 60, TitleSize), JournalTitleClearance); journalTitle.supportRichText = true; journalTitle.font = Resources.Load<Font>(TitleFont) ?? journalTitle.font; journalTitle.color = Gilt;
             journalSignGlyph = Label(journal, "", JournalX, 60, 40, 40, 22); journalSignGlyph.font = Dial.GlyphFont; journalSignGlyph.horizontalOverflow = HorizontalWrapMode.Overflow;
             // the Wheel / Table switch and the tabs
             journalViewWheel = JournalChoice(journal, "Wheel", JournalX - 36, 96, 72, 24, () => JournalSetView(false)); // placeholder labels (owner writes)

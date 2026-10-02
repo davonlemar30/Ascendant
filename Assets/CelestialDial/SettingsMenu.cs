@@ -29,7 +29,7 @@ namespace Ascendant.CelestialDial
             var root = new GameObject("Settings Portrait", typeof(RectTransform)).GetComponent<RectTransform>(); root.SetParent(canvasObject.transform, false);
             root.anchorMin = root.anchorMax = root.pivot = new Vector2(.5f, .5f); root.sizeDelta = new Vector2(360, 800);
             // The gear: drawn in code (the web font has no gear glyph), gold on a dark disc, at the top right.
-            gear = MakeButton(root, "", 158, 22, 36, 36, Toggle); gear.name = "Settings gear";
+            gear = MakeButton(root, "", 158, 22, 36, 36, Toggle); gear.name = "Settings gear"; SafeArea.Top(gear); // Platform fit, Part 1: below the cutout's band
             var gearImage = gear.GetComponent<Image>(); gearImage.sprite = GearSprite(); gearImage.color = Color.white;
             // The menu: a dim veil (a tap on it closes) and the slim box in the middle.
             menu = Rect("Settings", root, 0, 400, 360, 800);

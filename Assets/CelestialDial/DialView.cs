@@ -113,6 +113,7 @@ namespace Ascendant.CelestialDial
             public float shelfLight; public bool shelfRing; // Build Y: the shelf's own glow level (-1 without its kit file) and whether the old ring shows // Build X: the gold chat box on screen, fitted to its line (0 when none shows)
             public string shelfEdge; // APK Session 2, bug 1: "halo" when the lit shelf's edge is drawn from its silhouette (no Outline copies)
             public bool settingsOpen, canQuit, jumpsShown; // Build W: the Jump to list shows // Build U: the Settings menu is open; the app (not a web page) can quit
+            public float safeTop; // Platform fit, Part 1: the top row's move down from the safe area, in layout units (0 without a band)
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
             public bool dialRing; public float ringTurn; public string[] seatNames, seatFacts; public string framedFacts = ""; // Build AB: the Astrolabe
@@ -176,8 +177,8 @@ namespace Ascendant.CelestialDial
             roomLight.type = Image.Type.Filled; roomLight.fillMethod = Image.FillMethod.Radial360; roomLight.fillOrigin = (int)Image.Origin360.Top; roomLight.fillClockwise = true; roomLight.fillAmount = 0;
             if (roomArt) { Fade(root, 0, 0, 140, true, .55f); Fade(root, 0, 430, 370, false, .62f); }
             voiceFont = Resources.Load<Font>("Fonts/EBGaramond-Bold") ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            Shade(Label(root, "THE CELESTIAL DIAL", 0, 32, 340, 24, 18)); // the instrument's own name, not the room's (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
-            subtitle = Shade(Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14));
+            SafeArea.Top(Shade(Label(root, "THE CELESTIAL DIAL", 0, 32, 340, 24, 18))); // the instrument's own name, not the room's (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
+            subtitle = SafeArea.Top(Shade(Label(root, "The Elemental Pattern", 0, 62, 330, 22, 14)), SafeArea.UnderTitle);
             if (roomArt) // Build AB: the Astrolabe's ring and its glow turn with the seats; the room, rim, pointer, phoenix and eye stay put
             {
                 ringLayer = Rect("Dial ring layer", root, 0, 270, 360, 360); var ringImage = ringLayer.gameObject.AddComponent<Image>(); ringImage.raycastTarget = false;
