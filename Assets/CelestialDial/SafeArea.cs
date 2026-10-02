@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Ascendant.CelestialDial
 {
@@ -34,6 +35,19 @@ namespace Ascendant.CelestialDial
             var keeper = new GameObject("Platform fit"); Object.DontDestroyOnLoad(keeper); keeper.AddComponent<ImmersiveKeeper>(); Immersive();
         }
         sealed class ImmersiveKeeper : MonoBehaviour { void OnApplicationFocus(bool focused) { if (focused) Immersive(); } }
+
+        // Android draws the built-in UI font (LegacyRuntime) in its own system sans, a little wider than the web's and the Editor's. Filling a
+        // 9:20 phone edge to edge draws the frame at exactly 3x, and there a line tuned to its box can spill over and lose its end (the emulator,
+        // Oct 2: Caspar's "...when you are ready." in the Atrium, the name screen's second sentence). On Android such a line shrinks by up to
+        // two points to fit its box; a line that fits keeps its size, and the web and the Editor draw exactly as before.
+        public static int FitAndroidText(Transform root, Font builtin, bool force = false)
+        {
+            if ((!force && Application.platform != RuntimePlatform.Android) || root == null || builtin == null) return 0; int fitted = 0;
+            foreach (var t in root.GetComponentsInChildren<Text>(true))
+                if (t.font == builtin && !t.resizeTextForBestFit && t.fontSize > 8 && t.horizontalOverflow == HorizontalWrapMode.Wrap && t.verticalOverflow == VerticalWrapMode.Truncate)
+                { t.resizeTextMaxSize = t.fontSize; t.resizeTextMinSize = Mathf.Max(8, t.fontSize - 2); t.resizeTextForBestFit = true; fitted++; }
+            return fitted;
+        }
     }
 
     // Keeps a top-row piece at its designed place, moved down by SafeArea.TopInset less its clearance.

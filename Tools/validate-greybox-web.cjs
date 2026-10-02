@@ -73,12 +73,12 @@ const path=require('path');
     // Platform fit, Part 1 (owner, Oct 1: "Hide the bar and draw behind it"; 86bcbn6mf): with a top band (a camera cutout's, simulated here: the web has none),
     // the gear moves below it and takes its taps there, its semantic box follows, and its old place no longer opens Settings.
     { const band=24;await page.evaluate(b=>window.ascendantDial.act('safe-inset:'+b),band);await page.waitForFunction(b=>window.ascendantDial.snapshot().safeTop===b,band,{timeout:5000}).catch(()=>{});await frames(3);
-      const s=await state(),scale=Math.min(viewport.width/360,viewport.height/800),gearBox=await page.locator('#settings').evaluate(b=>{const r=b.getBoundingClientRect();return r.top+r.height/2;});
+      const s=await state(),scale=Math.min(viewport.width/360,viewport.height/800),gearBox=await page.locator('#settings').evaluate(b=>parseFloat(b.style.top)+parseFloat(b.style.height)/2); // the box as laid out (off the Dial the semantic gear is disabled, so not displayed)
       await page.screenshot({path:path.join(out,viewport.width+'-safe-band.png')}); // the Atrium's title and the gear below the band
       await tap(158,22);await page.waitForTimeout(300);const oldSpot=(await state()).settingsOpen;
       await tap(158,22+band);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});const newSpot=(await state()).settingsOpen;
       if(newSpot){await tap(0,553);await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});}
-      check(s.safeTop===band&&!oldSpot&&newSpot&&Math.abs(gearBox-((viewport.height-800*scale)/2+(22+band)*scale))<1.5&&!(await state()).settingsOpen,'Platform fit, Part 1: with a '+band+' px top band the gear moves below it, its tap and semantic box with it, at '+viewport.width);
+      check(s.safeTop===band&&!oldSpot&&newSpot&&Math.abs(gearBox-((viewport.height-800*scale)/2+(22+band)*scale))<1.5&&!(await state()).settingsOpen,'Platform fit, Part 1: with a '+band+' px top band the gear moves below it, its tap and semantic box with it, at '+viewport.width+' (band '+s.safeTop+', old spot '+oldSpot+', new spot '+newSpot+', box '+gearBox.toFixed(1)+' for '+((viewport.height-800*scale)/2+(22+band)*scale).toFixed(1)+')');
       await page.evaluate(()=>window.ascendantDial.act('safe-inset:-1'));await page.waitForFunction(()=>window.ascendantDial.snapshot().safeTop===0,{},{timeout:5000}).catch(()=>{});await frames(3);
       check((await state()).safeTop===0,'Platform fit, Part 1: the web page has no top band of its own, so the top row stays where it was at '+viewport.width); }
     check(!(await state()).canEnterChamber,'Build T: the Chamber button waits for Key 1 at '+viewport.width);
