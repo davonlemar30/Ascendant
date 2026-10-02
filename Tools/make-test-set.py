@@ -16,7 +16,7 @@ AUDIO = "Assets/CelestialDial/Resources/Audio/test"
 IMAGES = [
     ("atrium", 180, 400), ("wing", 180, 400), ("chamber", 180, 400),
     ("caspar", 64, 112), ("keeper-idle", 44, 100), ("keeper-walk", 44, 100),
-    ("dial-face", 332, 332), ("seat", 52, 52), ("bracket", 64, 88), ("floor-markings", 320, 320),
+    ("dial-face", 332, 332), ("seat", 52, 52), ("bracket", 72, 88), ("floor-markings", 320, 320),
     ("shelf", 52, 36), ("chair", 44, 36), ("table", 60, 32), ("shelf-book", 12, 28),
     ("book-cover", 140, 140), ("book-page", 140, 140),
     ("shelves", 60, 180), ("furniture-covered", 120, 72), ("desk", 72, 32), ("lamp", 8, 24), ("candle", 8, 20),
