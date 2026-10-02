@@ -2,6 +2,32 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The Dial's final art: its room as a master in every look, the bright passes, the small Dial (batch 2)
+
+The owner's answers (Oct 2, batch run 2, given in Claude's session; Decisions Log, Sept 28 to Oct 4, Part 2; tasks 86bcbn6mf and 86bcbn6w6): "Bleed masters approved", "Make the Dial room's worn and bright masters from the colour tables", and "Keep the repeating cobwebs, leave the glow".
+
+**The room.** dial-room is the approved 1200 x 1840 master. Today's file had 20 clear pixels at the column's top left (x 0 to 3, y 0 to 4), which the master turned black; they take the colour of the next pixel in their row.
+
+**The worn and bright masters.** The passes change only the Dial; the room outside it is today's pixels in every look. So each look's master is the approved master with the pass's own Dial pixels in the column (exact). Past the column, the colour tables grade the only Dial pixels there: the tips of the 9 and 3 o'clock diamonds, which the outpaint completed about 8 px into the margins (182 pixels). The worn tips take the worn pass's dust from the column's edge pixel in their row; the bright tips take the rim's partial lift (.55), as the pass does.
+
+**The diamonds, corrected.** The approved worn and bright passes graded only part of the 12, 9 and 3 o'clock diamonds. Their outer facets and tips kept today's colour behind a hard diagonal edge, because the pass's diamond outline (`diamondW`) is smaller than the painted diamonds. The 6 o'clock diamond was whole, and the stand under it rightly stays today's.
+- Rerunning the art lane's own pass code (`finalize-passes.cjs`) with the original weights gives the approved files exactly (0 channel values differ).
+- With every bronze pixel of those three diamonds in the finish, 2,794 pixels change in each room look, all of them in those diamonds.
+- The bright light (the recipe's glow) changes at 543 pixels, all on them too.
+- The small Dial's files are rebuilt from the corrected passes with the art lane's kit tool. With the original weights it reproduces the approved kits exactly; with the fix, about 420 to 460 pixels change, all at the diamonds, and the 12 o'clock tip is now whole.
+
+**The glow keeps its column files.** The Dial's glow (`dial-room-light` and its looks) is a radial fill over the column only, for the reveal sweep, and `Bleed` leaves a filled picture alone. A master there would squeeze into the column. The light master's margins are clear and its centre is today's glow, so the 720 x 1600 files draw exactly what the master would.
+
+**The rest of the art.** The bright ring and its light (720 x 720) are in. kit-dial-bright and -open are in (2d A), and kit-dial-worn and -open are redrawn to the worn pass, in the same slots.
+
+**Checks**
+- Mechanical: the room's three looks are 1200 x 1840 masters, the glow's three files 720 x 1600, the turning ring's worn and bright looks 720 x 720, and the small Dial's four files at their slots' size.
+- The suite: at each of DEV Mode's five wake steps, the Dial draws the step's room looks as masters and no look stands in. At the seven shapes, the Dial's room draws its masters (worn and today's at Key 1).
+
+Not changed: the Dial's geometry, words, seats, eye and lessons, and the wake-up's steps and timing.
+
+Validation (local, worktree `platform-fit-2`, branch `codex/dial-final-art` on the bleed masters' commit `a72e4fc`, then rebased onto their records commit `81531f0`, docs only): mechanical 589/589 (+1, the Dial's final art; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (34.4 MB, from 32.8 MB: the Dial's three masters and the bright files); browser suite 564/564 at desktop density, with the seven shapes (+17: 10 at the wake steps, 7 at the shapes) and 473/473 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only). Captures: [`Evidence/dial-final-art-2026-10-02/`](Evidence/dial-final-art-2026-10-02/) (the Dial at the three widest shapes, stop-gap then masters; the five steps with the final art; the diamonds before and after at 5x).
+
 ## The bleed masters: the Atrium, the Zodiac Wing and the Chamber (batch 2)
 
 The owner's answers (Oct 2, batch run 2, given in Claude's session; Decisions Log, Sept 28 to Oct 4, Part 2; task 86bcbn6mf): "Bleed masters approved", and "Bleed: i OK, ii default, iii keep, iv no repaint".
