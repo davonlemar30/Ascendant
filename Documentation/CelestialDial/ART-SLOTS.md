@@ -33,7 +33,7 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `dial-room-light` | 360 × 800 | 2048 | the Dial's fixed glow over `dial-room` (Build Z; Build AC): the rim, the diamonds, the hub ring, the ribbon's and the phoenix's bright brass; clear over the turning ring; off while the Dial sleeps, swept in by the reveal |
 | `dial-ring` | 360 × 360 | 1024 | the Cast Dial's turning ring (Build AC, owner Oct 1), centred on the wheel: twelve identical segments, each a cast name recess (faces r 136–155) and a seat window in its spoke (faces r 91–127), a rivet at each junction; clear outside r 156 and inside r 82; it turns with the seats |
 | `dial-ring-light` | 360 × 360 | 1024 | the turning ring's glow (Build AC): the recesses' and windows' bevels, the spokes' enamel lines; turns with the ring, off while the Dial sleeps |
-| `seat` | 52 × 52 | 256 | one seat's cap, twelve times (Build Z): used only without the Astrolabe's ring (the greybox fallback); with `dial-ring` the tablets are in the ring |
+| `seat` | 52 × 52 | 256 | one seat's cap, twelve times (Build Z): the greybox fallback, used only when the Dial has no turning ring (no `dial-ring` file, or no `dial-room` to hold it); with the Cast Dial's `dial-ring` each seat is its segment's name recess and window |
 | `bracket` | 72 × 88 | 256 | the fixed frame over the framed seat (Build AC: a gold wedge outline over the 9 o'clock recess and window, under the rim's diamond) |
 | `floor-markings` | 320 × 320 | 1024 | the faded floor pattern under the wheel; brightens as the wheel wakes |
 | `shelf` | 50 × 36 | 256 | the collapsed bookshelf, in the Wing room and beside the wheel |

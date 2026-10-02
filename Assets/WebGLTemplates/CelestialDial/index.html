@@ -81,7 +81,7 @@
   function layout(){
     // Semantic focus targets follow the selected seat orientation and the canvas reference layout.
     const selected=state?state.seats.findIndex(s=>s.includes(', selected')):0;
-    for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;const r=state&&state.dialRing?127:136,w=state&&state.dialRing?56:52;box('seat-'+i,Math.cos(angle)*r,270-Math.sin(angle)*r,w,w);} // Build AB: the Astrolabe's seats sit on radius 127, their segment
+    for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;const ring=!!(state&&state.dialRing),r=ring?123:136,along=ring?58:52,across=ring?66:52,flat=Math.abs(Math.cos(angle))>Math.abs(Math.sin(angle));box('seat-'+i,Math.cos(angle)*r,270-Math.sin(angle)*r,flat?across:along,flat?along:across);} // Build AC: the Cast Dial's seats sit on radius 123, each 58 along the ring by 66 across it (DialView.AstroSeatRadius, BuildAstrolabeSeat); a box stays upright, its 66 side on the axis its seat's radius runs nearer
     box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
     box('ask-caspar',78,714,164,48);box('caspar-page',118,590,96,26);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',92,768,160,44);
     box('name',0,300,260,48);for(let i=0;i<3;i++)box(['birth-chart','birth-known','birth-unknown'][i],0,300+i*64,300,52);

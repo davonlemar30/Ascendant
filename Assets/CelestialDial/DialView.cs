@@ -115,6 +115,7 @@ namespace Ascendant.CelestialDial
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
             public bool dialRing; public float ringTurn; public string[] seatNames, seatFacts; public string framedFacts = ""; // Build AB: the Astrolabe
+            public float seatRadius; public float[] seatSize; // Build AC follow-up: the radius the seats sit on and one seat's size as drawn (along the ring, across it); the suite holds the template's seat boxes to them
             public bool dialRoom, dialVoice; public float dialLit, dialEye; public string revealing = "", eyeText = "", signLabel = ""; public string[] revealsPlayed; public int eyeSize; // Build Z: the room, the glow, the reveal, the eye's words, the sign label; dialVoice = the box wears the Dial's blue; dialEye = the Wing room Dial's eye, 0 shut to 1 open
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
             public string casparShown = ""; // Build S: that page's words, colour tags and all
@@ -578,6 +579,7 @@ namespace Ascendant.CelestialDial
                 canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy,
                 speaker=panel.gameObject.activeInHierarchy?(DialSpeaking?DialLesson.DialSpeaker:DialLesson.CasparSpeaker):"",dialRoom=roomArt,dialLit=roomLight!=null && roomLight.gameObject.activeSelf ? roomLight.fillAmount : 0,revealing=revealNow,revealsPlayed=Lesson.RevealsPlayed.OrderBy(p=>p).ToArray(),eyeText=roomArt ? start.text : "",eyeSize=roomArt && start.text!="" ? Mathf.RoundToInt(start.cachedTextGenerator.fontSizeUsedForBestFit/Mathf.Max(.01f,canvas.scaleFactor)) : 0,signLabel=destination.text,dialVoice=panel.GetComponent<FitBox>()!=null && panel.GetComponent<FitBox>().DialVoiceShown && panel.gameObject.activeInHierarchy,dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
             state.dialRing=ringArt; state.ringTurn=ringLayer!=null ? ringLayer.localEulerAngles.z : 0; // Build AB
+            if(seats[0]!=null){ var seatSize=((RectTransform)seats[0].transform).sizeDelta; state.seatRadius=SeatR; state.seatSize=new[]{seatSize.x,seatSize.y}; } // Build AC follow-up: read, not set
             state.seatNames=seatTexts.Select(t=>t!=null ? t.text : "").ToArray(); state.seatFacts=Enumerable.Range(0,12).Select(i=>ringArt ? seatFacts[i].text : "").ToArray();
             state.framedFacts=destinationFacts!=null ? System.Text.RegularExpressions.Regex.Replace(destinationFacts.text,"<[^>]+>","") : "";
             Slice?.Fill(state); return state;
