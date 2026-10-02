@@ -83,6 +83,24 @@ const path=require('path');
       check((await state()).safeTop===0,'Platform fit, Part 1: the web page has no top band of its own, so the top row stays where it was at '+viewport.width); }
     check(!(await state()).canEnterChamber,'Build T: the Chamber button waits for Key 1 at '+viewport.width);
     await semantic('poi-chamber-door');await page.waitForTimeout(300);check((await state()).screen==='hub'&&(await state()).hubNote.startsWith('Sealed.'),'Build T: before Key 1 the Chamber door only says it is sealed at '+viewport.width);
+    // The room mini-menu (owner, Oct 1; 86bca07wv: Option A, v2 spacing; rooms only, travel only, one dim Sealed row; the button at the top left, mirroring the gear).
+    // On the canvas: the button opens TRAVEL, the Sealed row is no door, a tap off the panel closes it, a row travels, and the semantic rows sit on the rows.
+    { const rowY=i=>47+52+44*i; // TravelMenu: the panel hangs from 47; rows 44 apart from 52 into it; their centre x -23 (the panel's left edge at 17, 280 wide)
+      let s=await state();check(s.travelShown&&!s.travelOpen,'the mini-menu: its button shows in the Atrium at '+viewport.width);
+      await tap(-158,22);await page.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});s=await state();
+      check(s.travelOpen&&JSON.stringify(s.travelRows)===JSON.stringify(['The Grand Atrium, here','The Zodiac Wing','Sealed']),'the mini-menu: a tap on its button opens TRAVEL: the Atrium here, the Zodiac Wing, one Sealed row (the Chamber waits for Key 1): '+JSON.stringify(s.travelRows)+' at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-travel-atrium.png')});
+      await tap(-23,rowY(2));await page.waitForTimeout(300);check((await state()).travelOpen&&(await state()).screen==='hub','the mini-menu: the Sealed row is no door at '+viewport.width);
+      await tap(0,560);await page.waitForFunction(()=>!window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});check(!(await state()).travelOpen&&(await state()).screen==='hub','the mini-menu: a tap off the panel closes it at '+viewport.width);
+      await tap(-158,22);await page.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});
+      await tap(-23,rowY(1));await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});s=await state();
+      check(s.screen==='wingroom'&&!s.travelOpen&&s.travelShown,'the mini-menu: a tap on the Zodiac Wing row travels there at '+viewport.width);
+      await semantic('travel');await page.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});s=await state();
+      const scale=Math.min(viewport.width/360,viewport.height/800),row=await page.locator('#travel-atrium').evaluate(b=>{const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2,b.hidden];});
+      check(JSON.stringify(s.travelRows)===JSON.stringify(['The Grand Atrium','The Zodiac Wing, here','Sealed'])&&!row[2]&&Math.abs(row[0]-(viewport.width/2-23*scale))<1.5&&Math.abs(row[1]-((viewport.height-800*scale)/2+rowY(0)*scale))<1.5,'the mini-menu: in the Wing the Wing is here, and the semantic rows sit on the panel\'s rows at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-travel-wing.png')});
+      await semantic('travel-atrium');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+      check((await state()).screen==='hub'&&(await state()).atriumStage===1&&!(await state()).travelOpen,'the mini-menu: the Atrium row brings the Keeper back, the Atrium as it was at '+viewport.width); }
     await semantic('enter-wing');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).caspar==='The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready.'&&(await state()).canEnterDial,'Build T: in the Zodiac Wing Caspar points to the Dial at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
@@ -690,6 +708,22 @@ const path=require('path');
         check((await snap()).journalPreview.startsWith('Libra and Aries')&&(await snap()).journalPreview.includes('shares Cardinal · Yang'),'Build AA: the Opposites tab on the canvas: Libra framed, its card reads what the pair shares, at '+viewport.width);
         await dev.screenshot({path:path.join(out,viewport.width+'-journal-opposites.png')});
         await act('close-journal');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen!=='journal',{},{timeout:5000});}
+      if(id==='key3'){ // the room mini-menu (86bca07wv) once the Chamber is a room: two hops each way, and no button on an instrument
+        await act('travel');await dev.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});
+        check(JSON.stringify((await snap()).travelRows)===JSON.stringify(['The Grand Atrium, here','The Zodiac Wing','The Crystal Book Chamber','Sealed']),'the mini-menu: after Key 3 TRAVEL lists the three rooms and one Sealed row: '+JSON.stringify((await snap()).travelRows)+' at '+viewport.width);
+        await act('travel-wing');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+        await act('travel');await dev.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});await act('travel-chamber');
+        await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='chamberroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+        check((await snap()).screen==='chamberroom'&&(await snap()).room==='chamber','the mini-menu: from the Wing the Chamber row goes through the Atrium to the Chamber at '+viewport.width);
+        await dev.screenshot({path:path.join(out,viewport.width+'-travel-chamber.png')});
+        await act('travel');await dev.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});await act('travel-wing');
+        await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+        check((await snap()).screen==='wingroom'&&(await snap()).keysInHand===2,'the mini-menu: and back to the Wing, no Key spent on the way, at '+viewport.width);
+        await act('poi-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+        check((await snap()).screen==='wing'&&!(await snap()).travelShown,'the mini-menu: an instrument keeps its own exit (no Travel button on the Dial) at '+viewport.width);
+        await act('leave-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+        await act('travel');await dev.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});await act('travel-atrium');
+        await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});}
       if(id==='key2'){await act('enter-wing');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await act('poi-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         check((await snap()).fork==='both'&&(await snap()).canContinueLesson&&(await snap()).canEnterPractice,'Build W: from after Key 2 the Dial offers the next lesson and practice at '+viewport.width);}}
     await act('restart');await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});

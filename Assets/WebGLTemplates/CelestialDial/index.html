@@ -16,7 +16,7 @@
 <p id="instructions" class="sr"></p>
 <div id="seats" role="group" aria-label="Zodiac seats in order"></div>
 <button id="back">Previous</button><button id="seal">Seal</button><button id="forward">Next</button>
-<button id="settings">Settings</button><span id="jumps"><button id="jump-key1">Jump to after Key 1 (test)</button><button id="jump-wheel">Jump to the whole wheel lit (test)</button><button id="jump-key2">Jump to after Key 2 (test)</button><button id="jump-key3">Jump to after Key 3 (test)</button><button id="jump-key4">Jump to after Key 4 (test)</button><button id="jump-whole">Jump to the Zodiac Wing whole (test)</button></span><button id="ask-caspar">Ask Caspar</button><button id="caspar-page">Continue Caspar's line</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
+<button id="settings">Settings</button><button id="travel" aria-expanded="false">Travel</button><span id="travel-rows"><button id="travel-atrium">The Grand Atrium</button><button id="travel-wing">The Zodiac Wing</button><button id="travel-chamber">The Crystal Book Chamber</button></span><span id="jumps"><button id="jump-key1">Jump to after Key 1 (test)</button><button id="jump-wheel">Jump to the whole wheel lit (test)</button><button id="jump-key2">Jump to after Key 2 (test)</button><button id="jump-key3">Jump to after Key 3 (test)</button><button id="jump-key4">Jump to after Key 4 (test)</button><button id="jump-whole">Jump to the Zodiac Wing whole (test)</button></span><button id="ask-caspar">Ask Caspar</button><button id="caspar-page">Continue Caspar's line</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
 <label id="name-label" for="name" class="sr">Your name</label><input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Your name" hidden>
 <label id="birthdate-label" for="birthdate" class="sr">Your birth date</label><input id="birthdate" type="date" hidden>
 <button id="use-date">Use this date</button><button id="change-birth">Change my answer</button>
@@ -60,6 +60,7 @@
   }
   for(const id of ['settings','back','seal','forward','ask-caspar','caspar-page','continue','optional','motion','insert','restart','enter-wing','leave-dial','leave-wing','continue-lesson','enter-practice','leave-practice','open-journal','close-journal','journal-prev','journal-next','journal-wheel','journal-open','enter-dial','enter-shelf','close-book','walk-speed','grid-seal','grid-ask','leave-grid','enter-grid','enter-chamber','leave-chamber'])byId(id).onclick=()=>send(id);
   for(let i=0;i<3;i++)byId('modality-'+i).onclick=()=>send('modality:'+i);
+  byId('travel').onclick=()=>send('travel');for(const r of ['atrium','wing','chamber'])byId('travel-'+r).onclick=()=>send('travel:'+r); // the room mini-menu (86bca07wv)
   for(const c of ['key1','wheel','key2','key3','key4','whole'])byId('jump-'+c).onclick=()=>send('jump:'+c); // Build W: DEV Mode
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
   for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
@@ -90,6 +91,7 @@
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
     box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
     box('leave-dial',0,768,216,44);box('settings',158,22+(state&&state.safeTop||0),36,36);box('leave-wing',0,680,300,52); // note 10: the Dial's exit and the room's are two buttons; Platform fit, Part 1: the gear sits below the safe area's top band (state.safeTop)
+    box('travel',-158,22+(state&&state.safeTop||0),36,36);{const rows=(state&&state.travelRows)||[],ids={'The Grand Atrium':'atrium','The Zodiac Wing':'wing','The Crystal Book Chamber':'chamber'};rows.forEach((r,i)=>{const id=ids[r.split(',')[0]];if(id)box('travel-'+id,-23,47+(state.safeTop||0)+52+44*i,264,44);});} // the mini-menu (TravelMenu: the button mirrors the gear; the panel from 47, rows 44 apart from 52 into it)
     // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
     const practiceDial=state&&state.screen==='practice'&&state.practiceMode==='dial';
     box('continue-lesson',-78,714,150,48);box('enter-practice',78,714,150,48);if(practiceDial)box('leave-practice',-72,714,128,48);else box('leave-practice',0,654,190,56);
@@ -141,6 +143,9 @@
       byId('signs').hidden=!state.canSignPick;
       byId('enter-wing').disabled=!state.canEnterWing;byId('enter-chamber').disabled=!state.canEnterChamber;byId('leave-chamber').disabled=!state.canLeaveChamber;
       byId('leave-wing').disabled=!state.canLeaveWing;byId('leave-dial').disabled=!state.canLeaveDial;
+      // The room mini-menu (owner, Oct 1; 86bca07wv): its button in the rooms, a row per room open to travel, the one here marked current; Sealed is not a control
+      byId('travel').disabled=!state.travelShown||state.busy;byId('travel').setAttribute('aria-expanded',String(!!state.travelOpen));
+      {const rows=state.travelRows||[];for(const [id,name] of [['atrium','The Grand Atrium'],['wing','The Zodiac Wing'],['chamber','The Crystal Book Chamber']]){const row=rows.find(r=>r.split(',')[0]===name),b=byId('travel-'+id);b.hidden=!state.travelOpen||!row;b.disabled=!state.travelOpen||!row||state.busy;if(row&&row.endsWith(', here'))b.setAttribute('aria-current','location');else b.removeAttribute('aria-current');}}
       byId('continue-lesson').disabled=!state.canContinueLesson;byId('enter-practice').disabled=!state.canEnterPractice;byId('leave-practice').disabled=!state.canLeavePractice;
       byId('open-journal').disabled=!state.canOpenJournal;byId('close-journal').disabled=!state.canCloseJournal;byId('journal-prev').disabled=!state.canJournalPrev;byId('journal-next').disabled=!state.canJournalNext;
       // Build AA: the Wheel's controls; a seat's name carries its state (the rings and ribbons are only seen)
