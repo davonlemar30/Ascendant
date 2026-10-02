@@ -737,6 +737,7 @@ const path=require('path');
         const w=await snap();check(w.dialWake===step&&w.wakePreview===step&&w.dialLook.replace(/ \(stand-in: today's\)/g,'')===want[step],'the Dial\'s wake-up: DEV Mode\'s step '+step+' blends '+w.dialLook+' at '+viewport.width);
         await act('poi-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});await dev.waitForTimeout(900);
         await dev.screenshot({path:path.join(out,viewport.width+'-dial-wake-'+step+'.png')});
+        { const m=(await snap()).masters||[],need=[['-worn'],['-worn',''],[''],['','-bright'],['-bright']][step].map(l=>'dial-room'+l); check(need.every(n=>m.includes(n))&&!w.dialLook.includes('stand-in'),'batch 2: at step '+step+' the Dial draws '+need.join(', ')+' as masters, and no look stands in ('+m.filter(n=>n.startsWith('dial-room')).join(', ')+') at '+viewport.width); }
         await act('leave-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});}
       await dev.evaluate(()=>window.ascendantDial.act('wake:-1'));await dev.waitForFunction(()=>window.ascendantDial.snapshot().wakePreview===-1,{},{timeout:5000}).catch(()=>{});
       check((await snap()).dialWake===Math.min(4,(await snap()).keys),'the Dial\'s wake-up: back to as earned, the Dial shows the Keys\' step at '+viewport.width); }
@@ -867,6 +868,7 @@ const path=require('path');
       { const m=(await snap()).masters||[]; check(['wing','wing-light'].every(n=>m.includes(n)),'Batch 2: at '+name+' the Zodiac Wing and its light draw their masters whole ('+m.join(', ')+')'); }
       await act('poi-dial');await until(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});await pg.waitForTimeout(1500);
       filled(await margins('dial'),'Dial');
+      { const m=(await snap()).masters||[]; check(['dial-room-worn','dial-room'].every(n=>m.includes(n)),'Batch 2: at '+name+' the Dial\'s room draws its masters whole, worn and today\'s blended at Key 1 ('+m.filter(n=>n.startsWith('dial-room')).join(', ')+')'); }
       await act('leave-dial');await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});
       await act('open-journal');await until(()=>window.ascendantDial.snapshot().screen==='journal'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});await pg.waitForTimeout(800);
       filled(await margins('journal'),'journal');
