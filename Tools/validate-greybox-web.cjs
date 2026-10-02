@@ -9,7 +9,7 @@ const path=require('path');
   const report=[];
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
-  const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()==='360'?{width:360,height:800}:{width:390,height:844});
+  const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()).filter(Boolean).map(w=>w==='360'?{width:360,height:800}:/^\d+x\d+$/.test(w)?{width:+w.split('x')[0],height:+w.split('x')[1]}:{width:390,height:844}); // Part 2: or any WxH
   await Promise.all(VIEWPORTS.map(async viewport=>{
     const context=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE}); // DEVICE_SCALE=2 MOBILE=1 approximates a phone
     const page=await context.newPage();const events=[],errors=[];
@@ -97,7 +97,8 @@ const path=require('path');
       check(s.screen==='wingroom'&&!s.travelOpen&&s.travelShown,'the mini-menu: a tap on the Zodiac Wing row travels there at '+viewport.width);
       await semantic('travel');await page.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});s=await state();
       const scale=Math.min(viewport.width/360,viewport.height/800),row=await page.locator('#travel-atrium').evaluate(b=>{const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2,b.hidden];});
-      check(JSON.stringify(s.travelRows)===JSON.stringify(['The Grand Atrium','The Zodiac Wing, here','Sealed'])&&!row[2]&&Math.abs(row[0]-(viewport.width/2-23*scale))<1.5&&Math.abs(row[1]-((viewport.height-800*scale)/2+rowY(0)*scale))<1.5,'the mini-menu: in the Wing the Wing is here, and the semantic rows sit on the panel\'s rows at '+viewport.width);
+      const at=s.travelAt||[-158,22]; // Part 2: the panel hangs under its button, which on a phone keeps to the screen's corner
+      check(JSON.stringify(s.travelRows)===JSON.stringify(['The Grand Atrium','The Zodiac Wing, here','Sealed'])&&!row[2]&&Math.abs(row[0]-(viewport.width/2+(at[0]+135)*scale))<1.5&&Math.abs(row[1]-((viewport.height-800*scale)/2+(at[1]+25+52)*scale))<1.5,'the mini-menu: in the Wing the Wing is here, and the semantic rows sit on the panel\'s rows at '+viewport.width);
       await page.screenshot({path:path.join(out,viewport.width+'-travel-wing.png')});
       await semantic('travel-atrium');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
       check((await state()).screen==='hub'&&(await state()).atriumStage===1&&!(await state()).travelOpen,'the mini-menu: the Atrium row brings the Keeper back, the Atrium as it was at '+viewport.width); }
@@ -811,6 +812,52 @@ const path=require('path');
       await stylePage.locator('#mute').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().muted);check((await stylePage.locator('#mute').getAttribute('aria-pressed'))==='true','the test mute toggle works from the style page');
       await stylePage.locator('#mute').evaluate(b=>b.click());await stylePage.waitForFunction(()=>!window.ascendantDial.snapshot().muted);}
     await styleContext.close();
+  }
+  // ---- Platform fit, Part 2 (owner, Oct 1; 86bcbn6mf; doc 2kyd583p-7114): the seven test shapes, captured at 3x. Phones from 9:16 to 9:23 fill
+  // edge to edge and tablets keep the column with room art down the sides: at every shape the art reaches every edge (no flat bar in any
+  // margin), the gear and the mini-menu button take their taps where the web state says they sit, and the column's own targets still land.
+  if(!process.env.SKIP_SHAPES){
+    const SHAPES=[['9-16',360,640],['9-19.5',360,780],['9-20',360,800],['9-21',360,840],['9-23',360,920],['10-16',500,800],['3-4',600,800]];
+    const shapeRun=async([name,w,h])=>{
+      const ctx=await browser.newContext({viewport:{width:w,height:h},deviceScaleFactor:3});const pg=await ctx.newPage();const errs=[];pg.on('pageerror',e=>errs.push(String(e)));
+      const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());const act=async id=>pg.locator('#'+id).evaluate(b=>b.click());
+      const until=(fn,t=20000)=>pg.waitForFunction(fn,{},{timeout:t});const scale=Math.min(w/360,h/800),left=(w-360*scale)/2,top=(h-800*scale)/2;
+      const frames=n=>pg.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
+      const tap=async(x,y)=>{await pg.mouse.move(w/2+x*scale,top+y*scale);await frames(2);await pg.mouse.down();await frames(2);await pg.mouse.up();await frames(2);};
+      // The margins past the column, each read from a capture: a flat bar has almost no spread of brightness; art has plenty.
+      const margins=async label=>{const shot=await pg.screenshot({path:path.join(out,'shape-'+name+'-'+label+'.png')});
+        return pg.evaluate(async([b64,box])=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);
+          const k=img.width/box.w,res={};const strips={left:[0,0,box.left,box.h],right:[box.w-box.left,0,box.left,box.h],top:[0,0,box.w,box.top],bottom:[0,box.h-box.top,box.w,box.top]};
+          for(const [side,[x,y,sw,sh]] of Object.entries(strips)){if(sw<8||sh<8)continue;const d=g.getImageData(Math.round(x*k),Math.round(y*k),Math.max(1,Math.round(sw*k)),Math.max(1,Math.round(sh*k))).data;let n=0,m=0,q=0;let bg=0;for(let i=0;i<d.length;i+=16){const l=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];n++;m+=l;q+=l*l;if(Math.abs(d[i]-19)<=3&&Math.abs(d[i+1]-19)<=3&&Math.abs(d[i+2]-23)<=3)bg++;}m/=n;res[side]={sd:Math.sqrt(Math.max(0,q/n-m*m)),bg:bg/n};}
+          return res;},[shot.toString('base64'),{w,h,left,top}]);};
+      const filled=(res,label)=>{const bar=Object.entries(res).filter(([,v])=>v.bg>.5||(v.sd<2.5&&v.bg>.1));check(bar.length===0,'Part 2: at '+name+' ('+w+' x '+h+') the '+label+'\'s art reaches every edge, with no bar of the canvas\'s own colour in any margin ('+(Object.keys(res).length?Object.entries(res).map(([k,v])=>k+' spread '+v.sd.toFixed(1)+', bar '+Math.round(v.bg*100)+'%').join('; '):'none: the column fills the screen')+')');}; // a bar is the canvas's own charcoal (19, 19, 23); an art edge that is dark and even (the journal's desk) carries on and passes
+      await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await pg.locator('#loading').waitFor({state:'detached'});
+      await pg.locator('#name').fill('Tester');await pg.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
+      await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');await act('birth-known');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');
+      await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue);
+      for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await pg.waitForTimeout(150);}
+      await until(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy);
+      await act('jump-key1');await pg.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});
+      await until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);await pg.waitForTimeout(900);
+      filled(await margins('atrium'),'Atrium');
+      const s=await snap(),g=s.gearAt,t=s.travelAt,phone=w/h<=9/16+.01;
+      check(g&&t&&(phone?Math.abs((g[0]+22)*scale-(w/2))<1.5&&Math.abs((t[0]-22)*scale+(w/2))<1.5:Math.abs(g[0]-158)<.01&&Math.abs(t[0]+158)<.01),'Part 2: at '+name+' the gear and the mini-menu button sit '+(phone?'at the screen\'s top corners (a phone)':'at the column\'s corners (a tablet keeps the column)')+': gear '+JSON.stringify(g)+', button '+JSON.stringify(t));
+      const gearBox=await pg.locator('#settings').evaluate(b=>[parseFloat(b.style.left)+parseFloat(b.style.width)/2,parseFloat(b.style.top)+parseFloat(b.style.height)/2]);
+      check(Math.abs(gearBox[0]-(w/2+g[0]*scale))<1.5&&Math.abs(gearBox[1]-(top+g[1]*scale))<1.5,'Part 2: at '+name+' the semantic gear sits on the gear');
+      await tap(g[0],g[1]);await until(()=>window.ascendantDial.snapshot().settingsOpen,5000).catch(()=>{});check((await snap()).settingsOpen,'Part 2: at '+name+' a tap on the gear opens Settings');
+      await tap(0,553);await until(()=>!window.ascendantDial.snapshot().settingsOpen,5000).catch(()=>{});
+      await tap(t[0],t[1]);await until(()=>window.ascendantDial.snapshot().travelOpen,5000).catch(()=>{});check((await snap()).travelOpen,'Part 2: at '+name+' a tap on the mini-menu button opens TRAVEL');
+      await pg.screenshot({path:path.join(out,'shape-'+name+'-travel.png')});await act('travel');await until(()=>!window.ascendantDial.snapshot().travelOpen,5000).catch(()=>{});
+      await tap(0,310);await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});
+      check((await snap()).screen==='wingroom','Part 2: at '+name+' the Zodiac Wing door takes its canvas tap in the column');await pg.waitForTimeout(700);
+      filled(await margins('wing'),'Zodiac Wing');
+      await act('poi-dial');await until(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});await pg.waitForTimeout(1500);
+      filled(await margins('dial'),'Dial');
+      await act('leave-dial');await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});
+      await act('open-journal');await until(()=>window.ascendantDial.snapshot().screen==='journal'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});await pg.waitForTimeout(800);
+      filled(await margins('journal'),'journal');
+      check(errs.length===0,'Part 2: no runtime errors at '+name+(errs.length?': '+errs.join(' | '):''));await ctx.close();};
+    for(let i=0;i<SHAPES.length;i+=4)await Promise.all(SHAPES.slice(i,i+4).map(shapeRun)); // four at a time
   }
   fs.writeFileSync(path.join(out,'validation.txt'),report.join('\n'));console.log(report.join('\n'));await browser.close();
 })().catch(e=>{console.error(e);process.exit(1);});

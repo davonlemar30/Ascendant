@@ -166,6 +166,7 @@ namespace Ascendant.CelestialDial
             Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo;
             Settings.Build(font);
             SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
+            SafeArea.Moved = Publish; // Part 2: the gear and the mini-menu button keep the web page's boxes on them
             if (Slots.StyleRequested) Settings.GearShown = false; // the style page is a test page, not the game
             if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
             TryRestore();
@@ -565,6 +566,7 @@ namespace Ascendant.CelestialDial
         void BuildFade()
         {
             var fade = Rect("Fade", root, 0, 400, 360, 800); fadeImage = fade.gameObject.AddComponent<Image>(); fadeImage.color = new Color(0, 0, 0, 0); fadeImage.raycastTarget = false;
+            Bleed.Add(fadeImage, root); // Part 2: a fade to black covers the whole screen
         }
         void PlaceAvatar()
         {
@@ -1222,7 +1224,8 @@ namespace Ascendant.CelestialDial
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             state.safeTop = SafeArea.TopInset(canvas); // Platform fit, Part 1: how far the top row moves down, in layout units
-            if (MiniMenu != null) { state.travelShown = MiniMenu.ButtonShown; state.travelOpen = MiniMenu.Open; state.travelRows = MiniMenu.Rows; } // the room mini-menu (86bca07wv)
+            if (MiniMenu != null) { state.travelShown = MiniMenu.ButtonShown; state.travelOpen = MiniMenu.Open; state.travelRows = MiniMenu.Rows; var t = MiniMenu.ButtonAt; state.travelAt = new[] { t.x, t.y }; } // the room mini-menu (86bca07wv); Part 2: where its button sits
+            if (Settings != null) { var g = Settings.GearAt; state.gearAt = new[] { g.x, g.y }; } // Part 2: where the gear sits
             state.jumpsShown = Settings != null && Settings.JumpsShown; // Build W
             { var fit = s == SliceScreen.Atrium ? atriumFit : s == SliceScreen.AtriumReturn ? returnFit : s == SliceScreen.Hub ? hubFit : s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom ? chamberFit : null; state.chatBoxHeight = fit != null && fit.isActiveAndEnabled ? fit.Height : 0; } // Build X
             // Build F: the fork, practice, the gate, the journal
@@ -1308,7 +1311,7 @@ namespace Ascendant.CelestialDial
         // ---- Build H: the light overlays. A file in a room's light slot is drawn over the background and under everything else; without one nothing exists. ----
         Image LightOverlay(RectTransform panel, string slot)
         {
-            var r = Rect("Light overlay", panel, 0, 400, 360, 800); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false;
+            var r = Rect("Light overlay", panel, 0, 400, 360, 800); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; Bleed.Add(image, root); // Part 2: the light reaches the edges with its room
             bool file = Slots.Dress(image, slot); image.gameObject.SetActive(file); image.color = new Color(1, 1, 1, 0); r.SetAsFirstSibling();
             lightOverlays.Add(image); return image;
         }
@@ -1416,6 +1419,7 @@ namespace Ascendant.CelestialDial
         void BuildJournal()
         {
             journal = ScreenPanel("Journal", "journal-page"); journalPage = journal.GetComponent<Image>();
+            Bleed.Add(journalPage, root, Bleed.Mode.Clamp, .5f); // Part 2: the book stays in the column; past it the desk's own edge carries on, darker (a mirrored book would show a second spine)
             // the silver rules and the faded vermilion margin, drawn by the game so they sit under the text (the art has none)
             for (float y = RuleFirst; y <= RuleLast; y += RuleGap) { var rule = Rect("Rule", journal, JournalX, y, 274, 1).gameObject.AddComponent<Image>(); rule.color = new Color(Silver.r, Silver.g, Silver.b, .09f); rule.raycastTarget = false; }
             var margin = Rect("Margin", journal, JournalX - 125, 318, 1, 556).gameObject.AddComponent<Image>(); margin.color = new Color(Vermilion.r, Vermilion.g, Vermilion.b, .28f); margin.raycastTarget = false;
@@ -1822,6 +1826,7 @@ namespace Ascendant.CelestialDial
         {
             var k = new RoomKit { Prefix = prefix, Placements = placements, Grime = grime, Veil = veil, Light = lightLevels, Level = level, RestoredNow = restoredNow, LightImage = light };
             var g = Rect("Grime", panel, 0, 400, 360, 800); k.GrimeImage = g.gameObject.AddComponent<Image>(); k.GrimeImage.raycastTarget = false;
+            Bleed.Add(k.GrimeImage, root); // Part 2: the grime reaches the edges with its shell
             g.gameObject.SetActive(Slots.Dress(k.GrimeImage, grimeSlot)); g.SetAsFirstSibling(); // under the light overlay, over the shell
             k.Container = Rect("Kit", panel, 0, 400, 360, 800);
             foreach (var p in placements)
@@ -1834,6 +1839,7 @@ namespace Ascendant.CelestialDial
         void FinishKit(RectTransform panel, RoomKit k)
         {
             var v = Rect("Veil", panel, 0, 400, 360, 800); k.VeilImage = v.gameObject.AddComponent<Image>(); k.VeilImage.color = new Color(0, 0, 0, 0); k.VeilImage.raycastTarget = false;
+            Bleed.Add(k.VeilImage, root);
             v.gameObject.SetActive(k.Pieces.Count > 0 || k.Doors.Count > 0);
             if (k.Pieces.Count > 0 && k.LightImage != null && k.Light != null) { lightOverlays.Remove(k.LightImage); k.OwnsLight = true; } // the Wing's light follows its Keys (owner, Sept 25)
         }
@@ -2214,7 +2220,7 @@ namespace Ascendant.CelestialDial
         }
 
         // ---- placeholder geometry helpers (same reference layout as the Dial: 360 x 800, top-anchored) ----
-        RectTransform ScreenPanel(string name, string slot = null) { var s = Rect(name, root, 0, 400, 360, 800); var image = s.gameObject.AddComponent<Image>(); image.color = Charcoal; if (slot != null) Slots.Dress(image, slot); return s; } // Build E: a room's background is a slot
+        RectTransform ScreenPanel(string name, string slot = null) { var s = Rect(name, root, 0, 400, 360, 800); var image = s.gameObject.AddComponent<Image>(); image.color = Charcoal; if (slot != null) Slots.Dress(image, slot); Bleed.Add(image, root); return s; } // Build E: a room's background is a slot
         // Build K: a narrow door keeps a finger-sized target; an invisible child catches the tap and it bubbles to the door's Button.
         void HitArea(RectTransform door, float width) { var hit = Rect("Hit area", door, 0, door.sizeDelta.y / 2, Mathf.Max(width, door.sizeDelta.x), door.sizeDelta.y); var image = hit.gameObject.AddComponent<Image>(); image.color = new Color(0, 0, 0, 0); image.raycastTarget = true; image.canvasRenderer.cullTransparentMesh = false; hit.SetAsFirstSibling(); }
         RectTransform Block(Transform parent, string name, float x, float top, float width, float height, string slot = null)

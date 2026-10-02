@@ -20,6 +20,7 @@ namespace Ascendant.CelestialDial
         public Func<string> Here; public Func<string, bool> IsOpen; public Func<bool> Busy; public Action<string> Go; public Action Changed;
         public bool Open { get; private set; }
         public bool ButtonShown => button != null && button.gameObject.activeSelf;
+        public Vector2 ButtonAt => button != null && button.GetComponent<SafeTop>() != null ? button.GetComponent<SafeTop>().At : new Vector2(ButtonX, ButtonTop); // Part 2: where the button sits
         public string[] Rows => rows.Where(r => r.Root.gameObject.activeSelf).Select(r => r.Name + (r.Here ? ", here" : "")).ToArray();
         public float PanelHeight => FirstRow + RowStep * (Mathf.Max(1, rows.Count(r => r.Root.gameObject.activeSelf)) - 1) + 28;
         static readonly Color Gold = new Color(.84f, .69f, .38f), Bone = new Color(.94f, .91f, .86f), Amber = new Color(.89f, .64f, .29f), HereFill = new Color(.23f, .19f, .15f, .92f), SealedInk = new Color(.62f, .57f, .53f, .55f);
@@ -34,7 +35,7 @@ namespace Ascendant.CelestialDial
             catcher = Rect("Travel catcher", root, 0, 400, 360, 800); var veil = catcher.gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, 0); veil.canvasRenderer.cullTransparentMesh = false;
             var close = catcher.gameObject.AddComponent<Button>(); close.transition = Selectable.Transition.None; close.onClick.AddListener(Close); catcher.gameObject.SetActive(false);
             // The panel hangs from its top edge, so its rows can come and go without moving it; it and the button sit below the cutout's band, like the gear.
-            panel = Rect("Travel", root, PanelLeft + PanelWidth / 2 - 180, PanelTop, PanelWidth, 240); panel.pivot = new Vector2(.5f, 1); SafeArea.Top(panel);
+            panel = Rect("Travel", root, PanelLeft + PanelWidth / 2 - 180, PanelTop, PanelWidth, 240); panel.pivot = new Vector2(.5f, 1); var panelTop = panel.gameObject.AddComponent<SafeTop>();
             var box = panel.gameObject.AddComponent<Image>(); box.sprite = Slots.InstrumentBoxSprite(); box.type = Image.Type.Sliced; box.pixelsPerUnitMultiplier = 2;
             panel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None; // a tap on the panel itself does not close it
             var heading = Label(panel, "T R A V E L", 15 + 60 - PanelWidth / 2, 15, 120, 16, 11); heading.alignment = TextAnchor.MiddleLeft; heading.color = Gold; heading.fontStyle = FontStyle.Bold;
@@ -42,7 +43,7 @@ namespace Ascendant.CelestialDial
             foreach (var (id, name) in Rooms) rows.Add(MakeRow(id, name, RoomIcon(id)));
             rows.Add(MakeRow("sealed", SealedName, LockSprite()));
             button = MakeButton(root, "Travel", ButtonX, ButtonTop, ButtonSize, ButtonSize, Toggle); button.name = "Travel button"; // over the panel
-            var face = button.GetComponent<Image>(); face.sprite = ButtonSprite(); face.color = Color.white; SafeArea.Top(button);
+            var face = button.GetComponent<Image>(); face.sprite = ButtonSprite(); face.color = Color.white; SafeArea.Corner(button, -1); panelTop.Follow = button.GetComponent<SafeTop>(); // the panel hangs under its button wherever the button sits
             panel.gameObject.SetActive(false); button.gameObject.SetActive(false);
         }
         Row MakeRow(string id, string name, Sprite icon)
