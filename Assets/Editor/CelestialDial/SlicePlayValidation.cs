@@ -149,7 +149,10 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==3 && View.Flow.V02Complete,"one more return completes v0.2");Capture("slice-390-hub-complete.png");});
             // ---- v0.3: glyphs and Key 2 ----
             Steps.Enqueue(()=>Act("enter-wing"));
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Flow.CanOpenBook,"the Wing button walks through the same doorway; the lit wheel wakes the shelf");Capture("slice-390-wing-room-lit.png");Act("walk:dial");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Flow.CanOpenBook,"the Wing button walks through the same doorway; the lit wheel wakes the shelf");
+                var lit=GameObject.Find("Shelf light");var edge=lit!=null?lit.transform.Find("Shelf edge"):null; // APK Session 2, bug 1 (86bcbn6ct)
+                Check(lit!=null && lit.GetComponentsInChildren<UnityEngine.UI.Outline>(true).Length==0 && edge!=null && edge.GetComponent<UnityEngine.UI.Image>().sprite!=null && edge.GetComponent<RectTransform>().rect.width>((RectTransform)lit.transform).rect.width,"APK Session 2, bug 1: the waiting shelf's edge is a halo from its silhouette, wider than the shelf, with no Outline copying the picture");
+                Capture("slice-390-wing-room-lit.png");Act("walk:dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Lesson.Phase!=LessonPhase.GlyphNames && View.Dial.Lesson.Message==DialLesson.ShelfFirst,"the Dial before the book only points at the shelf");Act("leave-dial");}); // note 10: the Dial's exit lands in the room
             Steps.Enqueue(()=>{if(View.Flow.Screen!=SliceScreen.WingRoom)return;Act("leave-wing");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy,"back out to the Atrium");Act("enter-wing");});

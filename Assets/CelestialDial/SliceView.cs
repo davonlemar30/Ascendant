@@ -36,6 +36,7 @@ namespace Ascendant.CelestialDial
         RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
         Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
         CanvasGroup shelfLight; float shelfLightLevel; // Build Y: the shelf's own glow, 0 to 1
+        string shelfEdge = ""; // APK Session 2, bug 1 (86bcbn6ct): "halo" once the shelf's edge is drawn from its silhouette
         // Build B: the table in the Wing room and its screen.
         RectTransform gridScreen; Text gridCaspar, gridReadout, gridStatus, gridKeys; Button gridSeal, gridAsk, leaveGrid, enterGrid; Image gridGlow, dialGlow, lampThree, lampFour;
         // Build D: the Chamber as a room, the Books, and the Atrium's dressing per stage.
@@ -507,7 +508,18 @@ namespace Ascendant.CelestialDial
                 shelfLit.anchorMin = Vector2.zero; shelfLit.anchorMax = Vector2.one; shelfLit.offsetMin = shelfLit.offsetMax = Vector2.zero;
                 var shelfLitImage = shelfLit.gameObject.AddComponent<Image>(); shelfLitImage.sprite = kitShelf.GetComponent<Image>().sprite; shelfLitImage.preserveAspect = kitShelf.GetComponent<Image>().preserveAspect; shelfLitImage.raycastTarget = false;
                 shelfLitImage.color = new Color(1f, .82f, .5f, .22f); // a warm wash over the shelf, not a flat fill: its own detail shows through
-                foreach (var d in new[] { 1.5f, 3.5f }) { var edge = shelfLit.gameObject.AddComponent<Outline>(); edge.effectColor = new Color(1f, .8f, .45f, .5f); edge.effectDistance = new Vector2(d, d); edge.useGraphicAlpha = false; } // the edge follows the file's silhouette
+                // APK Session 2, bug 1 (owner, Oct 1: "the bookshelf smears into a stretched, motion-blurred look"): Build Y drew the edge with two
+                // Outline effects, and an Outline repeats the whole picture at its offset: eight shifted copies of the shelf, the smear. The edge is
+                // now a halo made once from the file's own alpha (SilhouetteHalo), clear over the shelf itself, so no copy of its detail is offset.
+                var halo = SilhouetteHalo(shelfLitImage.sprite);
+                if (halo != null)
+                {
+                    var edge = new GameObject("Shelf edge", typeof(RectTransform)).GetComponent<RectTransform>(); edge.SetParent(shelfLit, false);
+                    float perPixel = ((RectTransform)kitShelf.transform).sizeDelta.x / shelfLitImage.sprite.rect.width; // the layout's units per file pixel
+                    edge.anchorMin = edge.anchorMax = new Vector2(.5f, .5f); edge.anchoredPosition = Vector2.zero; edge.sizeDelta = halo.rect.size * perPixel;
+                    var edgeImage = edge.gameObject.AddComponent<Image>(); edgeImage.sprite = halo; edgeImage.raycastTarget = false; edgeImage.color = new Color(1f, .8f, .45f, .85f);
+                    shelfEdge = "halo";
+                }
                 shelfLight = shelfLit.gameObject.AddComponent<CanvasGroup>(); shelfLight.alpha = 0; shelfLight.blocksRaycasts = false;
             }
             Tappable(shelf, () => Walk("shelf")); // v0.3 revision: the book of symbols lives here once the wheel is lit
@@ -1249,6 +1261,7 @@ namespace Ascendant.CelestialDial
             state.keyCeremony = LastCeremony; state.dialGlow = DialUnitWaiting ? 1 : 0; // Build I
             state.dialEye = dialEyes.Count > 0 ? dialEyeOpen : -1; // Build Z: the Wing room Dial's eye, -1 without the open art
             state.shelfLight = shelfLight != null ? shelfLightLevel : -1; state.shelfRing = shelfGlow != null && shelfGlow.gameObject.activeInHierarchy && shelfGlow.color.a > 0; // Build Y
+            state.shelfEdge = shelfEdge; // APK Session 2, bug 1: "halo" when the shelf's edge comes from its silhouette
             state.kitLevel = KitLevel; state.kitPieces = wingKit.Count; state.kitRestored = KitRestored; state.grime = wingGrime != null && wingGrime.gameObject.activeSelf ? wingGrime.color.a : -1; state.wingLight = wingLight != null && wingLight.gameObject.activeSelf ? wingLight.color.a : -1; // Build M
             state.kitUp = wingKit.Where(p => p.Shown).Select(p => p.P.Name).Distinct().ToArray();
             if (chamberKit != null) { state.chamberKitLevel = chamberKit.Shown; state.chamberKitRestored = chamberKit.Pieces.Count(p => p.Shown); state.chamberKitPieces = chamberKit.Pieces.Count; } // Build O
@@ -2022,6 +2035,43 @@ namespace Ascendant.CelestialDial
                 texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.Clamp01(1 - Mathf.Abs(d - .78f) / .2f)));
             }
             texture.Apply(); softRing = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); return softRing;
+        }
+        // APK Session 2, bug 1 (86bcbn6ct): a soft edge that follows a picture's own silhouette. The file's alpha is read back once through the
+        // GPU (slot files import unreadable), spread by HaloSpread file pixels, softened twice by HaloSoften, and cleared where the picture
+        // itself is opaque. It is white, so the Image's color tints it. Made once per sprite; null when the GPU readback is unavailable.
+        public const int HaloSpread = 3, HaloSoften = 4; // file pixels (2x): the edge reaches about 6 px on the layout, most of it in the first 3
+        static readonly Dictionary<Sprite, Sprite> halos = new Dictionary<Sprite, Sprite>();
+        static Sprite SilhouetteHalo(Sprite source)
+        {
+            if (source == null || SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) return null; // -nographics: no GPU to read back from
+            if (halos.TryGetValue(source, out var made)) return made;
+            var box = source.textureRect; int w = Mathf.RoundToInt(box.width), h = Mathf.RoundToInt(box.height), pad = HaloSpread + 2 * HaloSoften + 2, W = w + 2 * pad, H = h + 2 * pad;
+            var target = RenderTexture.GetTemporary(source.texture.width, source.texture.height, 0, RenderTextureFormat.ARGB32);
+            Graphics.Blit(source.texture, target); var was = RenderTexture.active; RenderTexture.active = target;
+            var read = new Texture2D(w, h, TextureFormat.RGBA32, false); read.ReadPixels(new Rect(box.x, box.y, w, h), 0, 0); read.Apply(false);
+            RenderTexture.active = was; RenderTexture.ReleaseTemporary(target);
+            var pixels = read.GetPixels32(); UnityEngine.Object.Destroy(read);
+            var own = new float[W * H]; for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) own[(y + pad) * W + x + pad] = pixels[y * w + x].a / 255f;
+            var spread = Spread(Spread(Spread(own, W, H, HaloSpread, true), W, H, HaloSoften, false), W, H, HaloSoften, false);
+            var halo = new Texture2D(W, H, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp }; var o = new Color32[W * H];
+            for (int i = 0; i < o.Length; i++) o[i] = new Color32(255, 255, 255, (byte)Mathf.RoundToInt(255 * Mathf.Clamp01(spread[i] * (1 - own[i]))));
+            halo.SetPixels32(o); halo.Apply(false, true);
+            return halos[source] = Sprite.Create(halo, new Rect(0, 0, W, H), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect);
+        }
+        // One separable pass each way over a (2r + 1) window: its maximum (spread) or its mean (soften).
+        static float[] Spread(float[] a, int W, int H, int r, bool max)
+        {
+            var mid = new float[a.Length]; var o = new float[a.Length];
+            for (int pass = 0; pass < 2; pass++)
+            {
+                var src = pass == 0 ? a : mid; var dst = pass == 0 ? mid : o; int n = pass == 0 ? W : H, lines = pass == 0 ? H : W;
+                for (int line = 0; line < lines; line++) for (int i = 0; i < n; i++)
+                {
+                    float v = 0; for (int k = Mathf.Max(0, i - r); k <= Mathf.Min(n - 1, i + r); k++) { float s = src[pass == 0 ? line * W + k : k * W + line]; v = max ? Mathf.Max(v, s) : v + s; }
+                    dst[pass == 0 ? line * W + i : i * W + line] = max ? v : v / (2 * r + 1);
+                }
+            }
+            return o;
         }
         // Build I (86bc1brxd): one rule for the Wing room, "an instrument with a unit waiting glows": the symbols' second half,
         // the modalities once Key 2 is in hand, and the last pattern once the table's Key is.
