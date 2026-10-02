@@ -74,7 +74,7 @@ The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114
 
 Not changed: the column's layout and its tap targets, the rooms' approved compositions, every word, the stand-ins' pixels inside the column.
 
-Validation (local, worktree `platform-fit-2`, branch `codex/platform-fit-part2` on the mini-menu): mechanical MECH (0 compiler warnings); slice fixture FIX; headless WebGL 0 errors / 0 warnings (WEBSIZE); browser suite SUITE_D at desktop density, with the seven shapes; SUITE_P at phone density. Captures: EVID.
+Validation (local, worktree `platform-fit-2`, branch `codex/platform-fit-part2` on the mini-menu): mechanical 586/586 (+1, the bleed mesh; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 509/509 at desktop density, with the seven shapes (+70, the seven-shape pass); 439/439 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only).
 
 ## The room mini-menu (task 86bca07wv)
 
