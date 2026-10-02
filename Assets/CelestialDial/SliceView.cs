@@ -163,6 +163,7 @@ namespace Ascendant.CelestialDial
             // Build U (owner, APK playtest, Sept 29): Settings, from a gear at the top right of every screen.
             Settings = gameObject.AddComponent<SettingsMenu>();
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
+            Settings.WakeLabel = () => WakeLabel; Settings.CycleWake = CycleWake; // the Dial's wake-up preview
             Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo;
             Settings.Build(font);
             SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
@@ -178,6 +179,8 @@ namespace Ascendant.CelestialDial
             if (styleShown) return;
             if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
+            if (!Dial.Showing) Dial.WakeStep = WakeTarget; // the wake-up: a step lands the next time the player comes to the Dial, never mid-lesson
+            WakeKitDial();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.Phase == LessonPhase.AllLit && !Flow.WheelComplete) { Flow.MarkWheelComplete(); Save(); LightWing(); Show(); Publish(); }
             if ((Flow.Screen == SliceScreen.Wing || Flow.Screen == SliceScreen.Practice) && Dial.Lesson.Key2Earned && Flow.Keys < 2) { Flow.MarkKey2(); Save(); StartCoroutine(KeyCeremony(2)); }
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.ModalitiesComplete && !Flow.ModalitiesComplete) { Flow.MarkModalitiesComplete(); Save(); Publish(); } // Build B: the table wakes
@@ -600,6 +603,8 @@ namespace Ascendant.CelestialDial
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
             if (styleShown && command != "reload") return; // the style page is not the game (a reload, test-only, still gets out of it)
             if (command.StartsWith("safe-inset:") && float.TryParse(command.Substring(11), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float band)) { SafeArea.Simulated = band; Publish(); return; } // test-only (Platform fit, Part 1): a top band in layout units; -1 restores the screen's own
+            if (command == "wake-cycle") { CycleWake(); return; } // DEV Mode: the Dial's wake-up preview, a step at a time
+            if (command.StartsWith("wake:") && int.TryParse(command.Substring(5), out int wake)) { wakePreview = Mathf.Clamp(wake, -1, 4); Dial.WakeStep = WakeTarget; Settings?.Refresh(); Publish(); return; } // test-only: a step, or -1 for as earned
             if (command == "next-screen") Continue();
             else if (command.StartsWith("birth:")) ChooseBirth(command.Substring(6));
             else if (command.StartsWith("birthdate:")) UseDate(command.Substring(10));
@@ -839,6 +844,19 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
             yield return FadeTo(0);
             busy = false; Show(); Publish();
+        }
+        // ---- The Dial's wake-up (owner, Oct 1; 86bcbn6w6: 2a A, a step per Key; 2d A, the Wing room's small Dial follows the same steps) ----
+        int wakePreview = -1; // DEV Mode's preview of a step (-1: as earned)
+        int WakeTarget => wakePreview >= 0 ? wakePreview : Mathf.Clamp(Flow.Keys, 0, 4);
+        static readonly string[] WakeNames = { "first visit", "Key 1", "Key 2", "Key 3", "Key 4" };
+        string WakeLabel => wakePreview < 0 ? "as earned" : WakeNames[wakePreview];
+        void CycleWake() { wakePreview = wakePreview >= 4 ? -1 : wakePreview + 1; Dial.WakeStep = WakeTarget; Settings?.Refresh(); Publish(); } // as earned, then each step in turn
+        // The small Dial: worn, half today's over it, today's, half bright over it, bright (a look without its file stands in with today's).
+        void WakeKitDial()
+        {
+            if (wingRoomKit == null || wingRoomKit.Fade != null) return; var piece = wingRoomKit.Pieces.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;
+            int s = WakeTarget; float worn = s <= 1 ? 1 : 0, today = s == 1 ? .5f : s >= 2 ? 1 : 0, bright = s == 3 ? .5f : s == 4 ? 1 : 0;
+            if (piece.Worn != null) piece.Worn.alpha = worn; if (piece.Restored != null) piece.Restored.alpha = today; if (piece.Bright != null) piece.Bright.alpha = bright;
         }
         void Walk(string id)
         {
@@ -1160,6 +1178,7 @@ namespace Ascendant.CelestialDial
         {
             dialEyes.Clear(); var piece = wingKit.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;
             AddDialEye(piece.Worn, "kit-dial-worn-open", .428f); AddDialEye(piece.Restored, "kit-dial-restored-open", .404f); // the eye's centre, as a share of the file's height (measured on the Cast Dial pieces, Build AC)
+            if (piece.Bright != null) AddDialEye(piece.Bright, "kit-dial-bright-open", .404f); // the wake-up's bright dial opens its eye too (its file: kit-dial-restored's canvas)
             SetDialEye(0);
         }
         void AddDialEye(CanvasGroup state, string slot, float eyeAt)
@@ -1224,6 +1243,7 @@ namespace Ascendant.CelestialDial
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             state.safeTop = SafeArea.TopInset(canvas); // Platform fit, Part 1: how far the top row moves down, in layout units
+            state.wakePreview = wakePreview; // the Dial's wake-up: DEV Mode's preview (-1: as earned)
             if (MiniMenu != null) { state.travelShown = MiniMenu.ButtonShown; state.travelOpen = MiniMenu.Open; state.travelRows = MiniMenu.Rows; var t = MiniMenu.ButtonAt; state.travelAt = new[] { t.x, t.y }; } // the room mini-menu (86bca07wv); Part 2: where its button sits
             if (Settings != null) { var g = Settings.GearAt; state.gearAt = new[] { g.x, g.y }; } // Part 2: where the gear sits
             state.jumpsShown = Settings != null && Settings.JumpsShown; // Build W
@@ -1792,7 +1812,7 @@ namespace Ascendant.CelestialDial
             new KitPlacement("lectern", -110, 372, 2, .8f),
             new KitPlacement("globe", -30, 350, 3),
             new KitPlacement("shelf", 157, 440, 2, 1, .7f, 118, "wheel"), // the book of symbols wakes on it once the wheel is lit: it must stand by then (owner, Sept 25)
-            new KitPlacement("dial", 40, 440, 4),
+            new KitPlacement("dial", 40, 440, 2), // the wake-up (owner, Oct 1; 86bcbn6w6 2d A): today's look at Key 2; WakeKitDial blends the steps between
             new KitPlacement("telescope", 139, 445, 4),
             new KitPlacement("table", -62, 445, 3, wake: "modalities"), // the Table lesson happens on it: it rights itself when it wakes, not at Key 3 (owner, Sept 25)
             new KitPlacement("candles", -144, 185, 1),
@@ -1803,7 +1823,7 @@ namespace Ascendant.CelestialDial
         };
         public static readonly float[] KitGrime = { 1, .75f, .5f, .25f, 0 }, KitVeil = { .45f, .3f, .18f, .08f, 0 }, KitLight = { 0, .25f, .5f, .75f, 1 }; // by Keys earned, 0 to 4 (tuning variables)
         const string WingPlateName = "THE GRAND\nATRIUM"; // the Wing's doorway leads back to the Atrium; two balanced lines, like the Atrium's plates (Sept 26 playtest, note 12)
-        class KitPiece { public KitPlacement P; public CanvasGroup Worn, Restored; public Image Flash; public bool Shown; }
+        class KitPiece { public KitPlacement P; public CanvasGroup Worn, Restored, Bright; public Image Flash; public bool Shown; } // Bright: the wake-up's Key 4 look (the dial only)
         // Build N (owner, Sept 25): a door is weathered and chained while locked, clean with its edges glowing once unlocked, and swings open as the
         // Keeper reaches it. The leaves are the two halves of the closed door's file, each swinging toward its outer edge.
         class DoorPiece
@@ -1832,7 +1852,7 @@ namespace Ascendant.CelestialDial
             foreach (var p in placements)
             {
                 if (Slots.Image(prefix + p.Name + "-restored") == null) continue; // no file, no piece: the greybox stays as it was
-                k.Pieces.Add(new KitPiece { P = p, Worn = KitState(k, p, "worn"), Restored = KitState(k, p, "restored") });
+                k.Pieces.Add(new KitPiece { P = p, Worn = KitState(k, p, "worn"), Restored = KitState(k, p, "restored"), Bright = p.Name == "dial" && prefix == "kit-" ? KitState(k, p, "bright") : null });
             }
             return k;
         }

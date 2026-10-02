@@ -1,0 +1,2418 @@
+fileFormatVersion: 2
+guid: 5f5ac25942f4d4eff8e6ab2ecb9b8e71
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 9053624908029588839
+    second: dial-ring-light-worn_0
+  - first:
+      213: 5436333446596778021
+    second: dial-ring-light-worn_1
+  - first:
+      213: -8316555795453998538
+    second: dial-ring-light-worn_2
+  - first:
+      213: 8044357389940014465
+    second: dial-ring-light-worn_3
+  - first:
+      213: -968957186148712284
+    second: dial-ring-light-worn_4
+  - first:
+      213: -8508946092589765736
+    second: dial-ring-light-worn_5
+  - first:
+      213: -8191846018934740880
+    second: dial-ring-light-worn_6
+  - first:
+      213: -3519460268478618239
+    second: dial-ring-light-worn_7
+  - first:
+      213: -1846410368196356860
+    second: dial-ring-light-worn_8
+  - first:
+      213: -7240940963855363913
+    second: dial-ring-light-worn_9
+  - first:
+      213: -7961274707151222652
+    second: dial-ring-light-worn_10
+  - first:
+      213: 1853418059082800036
+    second: dial-ring-light-worn_11
+  - first:
+      213: -5610729344594386543
+    second: dial-ring-light-worn_12
+  - first:
+      213: -3874224562818765625
+    second: dial-ring-light-worn_13
+  - first:
+      213: 5920525920426645221
+    second: dial-ring-light-worn_14
+  - first:
+      213: 6768472299017821068
+    second: dial-ring-light-worn_15
+  - first:
+      213: -6057369473242079993
+    second: dial-ring-light-worn_16
+  - first:
+      213: 6402451674586315308
+    second: dial-ring-light-worn_17
+  - first:
+      213: -5385312779368601799
+    second: dial-ring-light-worn_18
+  - first:
+      213: -8142079068386301723
+    second: dial-ring-light-worn_19
+  - first:
+      213: -4533629116333977339
+    second: dial-ring-light-worn_20
+  - first:
+      213: 1322049350051576600
+    second: dial-ring-light-worn_21
+  - first:
+      213: -2926775153662110843
+    second: dial-ring-light-worn_22
+  - first:
+      213: -4726573223551161750
+    second: dial-ring-light-worn_23
+  - first:
+      213: -7879903820181966887
+    second: dial-ring-light-worn_24
+  - first:
+      213: -9078414634890149031
+    second: dial-ring-light-worn_25
+  - first:
+      213: 671517270459338206
+    second: dial-ring-light-worn_26
+  - first:
+      213: -6523812156824496888
+    second: dial-ring-light-worn_27
+  - first:
+      213: 696092383108865176
+    second: dial-ring-light-worn_28
+  - first:
+      213: -1112318559471985480
+    second: dial-ring-light-worn_29
+  - first:
+      213: -2932949935062860768
+    second: dial-ring-light-worn_30
+  - first:
+      213: -8411306951780418965
+    second: dial-ring-light-worn_31
+  - first:
+      213: -2447492870361148312
+    second: dial-ring-light-worn_32
+  - first:
+      213: -6523563368041116698
+    second: dial-ring-light-worn_33
+  - first:
+      213: 5129659210284126419
+    second: dial-ring-light-worn_34
+  - first:
+      213: -4023251426619826566
+    second: dial-ring-light-worn_35
+  - first:
+      213: 93755238527145021
+    second: dial-ring-light-worn_36
+  - first:
+      213: 4493407226512493116
+    second: dial-ring-light-worn_37
+  - first:
+      213: -50102424882540647
+    second: dial-ring-light-worn_38
+  - first:
+      213: -1296066517940306445
+    second: dial-ring-light-worn_39
+  - first:
+      213: -287806622134548434
+    second: dial-ring-light-worn_40
+  - first:
+      213: 4227655740534741401
+    second: dial-ring-light-worn_41
+  - first:
+      213: 6458549641985303601
+    second: dial-ring-light-worn_42
+  - first:
+      213: -3049615438519346510
+    second: dial-ring-light-worn_43
+  - first:
+      213: 4254098641893951396
+    second: dial-ring-light-worn_44
+  - first:
+      213: -3727579326652019328
+    second: dial-ring-light-worn_45
+  - first:
+      213: -8359351612405561927
+    second: dial-ring-light-worn_46
+  - first:
+      213: -7258059397228172850
+    second: dial-ring-light-worn_47
+  - first:
+      213: -2359154783541779631
+    second: dial-ring-light-worn_48
+  - first:
+      213: -6578285918357875518
+    second: dial-ring-light-worn_49
+  - first:
+      213: 7275153832462228389
+    second: dial-ring-light-worn_50
+  - first:
+      213: -4770897837192977273
+    second: dial-ring-light-worn_51
+  - first:
+      213: 3744069452174756296
+    second: dial-ring-light-worn_52
+  - first:
+      213: -3175131087168533422
+    second: dial-ring-light-worn_53
+  - first:
+      213: -7526210842799409855
+    second: dial-ring-light-worn_54
+  - first:
+      213: 3144722275817368117
+    second: dial-ring-light-worn_55
+  - first:
+      213: 5415339659575142880
+    second: dial-ring-light-worn_56
+  - first:
+      213: -6692314192780834949
+    second: dial-ring-light-worn_57
+  - first:
+      213: -3614089362355553359
+    second: dial-ring-light-worn_58
+  - first:
+      213: -2504704402948189030
+    second: dial-ring-light-worn_59
+  - first:
+      213: -7490438485192322407
+    second: dial-ring-light-worn_60
+  - first:
+      213: -7927443928622290188
+    second: dial-ring-light-worn_61
+  - first:
+      213: -5286702398971049193
+    second: dial-ring-light-worn_62
+  - first:
+      213: -7641177809246786207
+    second: dial-ring-light-worn_63
+  - first:
+      213: -520837421633058380
+    second: dial-ring-light-worn_64
+  - first:
+      213: 3284665631481294567
+    second: dial-ring-light-worn_65
+  - first:
+      213: 904249588867340129
+    second: dial-ring-light-worn_66
+  - first:
+      213: -1137259742732133751
+    second: dial-ring-light-worn_67
+  - first:
+      213: 8507782744987762251
+    second: dial-ring-light-worn_68
+  - first:
+      213: 2834903179253050833
+    second: dial-ring-light-worn_69
+  - first:
+      213: -313199396641260343
+    second: dial-ring-light-worn_70
+  - first:
+      213: -8026795880519776022
+    second: dial-ring-light-worn_71
+  - first:
+      213: 6129915087669690475
+    second: dial-ring-light-worn_72
+  - first:
+      213: -2982809886635332021
+    second: dial-ring-light-worn_73
+  - first:
+      213: -1793669188685739861
+    second: dial-ring-light-worn_74
+  - first:
+      213: -2433445806486490775
+    second: dial-ring-light-worn_75
+  - first:
+      213: -4299978423200371613
+    second: dial-ring-light-worn_76
+  - first:
+      213: -579317357301421349
+    second: dial-ring-light-worn_77
+  - first:
+      213: 6822908127767084088
+    second: dial-ring-light-worn_78
+  - first:
+      213: -2614813659061200914
+    second: dial-ring-light-worn_79
+  - first:
+      213: 755387186095837205
+    second: dial-ring-light-worn_80
+  - first:
+      213: -910653493451260140
+    second: dial-ring-light-worn_81
+  - first:
+      213: -2542672527752055789
+    second: dial-ring-light-worn_82
+  - first:
+      213: 2493154472510573128
+    second: dial-ring-light-worn_83
+  - first:
+      213: 4966627212403317707
+    second: dial-ring-light-worn_84
+  - first:
+      213: -6982391849505143130
+    second: dial-ring-light-worn_85
+  - first:
+      213: -6390818886944695379
+    second: dial-ring-light-worn_86
+  - first:
+      213: 6124325437924088357
+    second: dial-ring-light-worn_87
+  - first:
+      213: 9201242683302640849
+    second: dial-ring-light-worn_88
+  - first:
+      213: 6704824726251441761
+    second: dial-ring-light-worn_89
+  - first:
+      213: 5558044889868634965
+    second: dial-ring-light-worn_90
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: dial-ring-light-worn_0
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 556
+        width: 142
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7657bbcb2efe4ad70800000000000000
+      internalID: 9053624908029588839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_1
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 621
+        width: 17
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 528d9fc777cb17b40800000000000000
+      internalID: 5436333446596778021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_2
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 649
+        width: 150
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63a8f392198a59c80800000000000000
+      internalID: -8316555795453998538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_3
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 623
+        width: 16
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18db9a1ec6c43af60800000000000000
+      internalID: 8044357389940014465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_4
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 580
+        width: 133
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a04b0da2929d82f0800000000000000
+      internalID: -968957186148712284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_5
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 607
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89b2d327c962ae980800000000000000
+      internalID: -8508946092589765736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_6
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 621
+        width: 135
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07862b2b277b05e80800000000000000
+      internalID: -8191846018934740880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_7
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 611
+        width: 114
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1852b30688d582fc0800000000000000
+      internalID: -3519460268478618239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_8
+      rect:
+        serializedVersion: 2
+        x: 420
+        y: 557
+        width: 133
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 405de068d8b3066e0800000000000000
+      internalID: -1846410368196356860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_9
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 573
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b093d9be82038b90800000000000000
+      internalID: -7240940963855363913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_10
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 539
+        width: 116
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48803f0a5ded38190800000000000000
+      internalID: -7961274707151222652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_11
+      rect:
+        serializedVersion: 2
+        x: 197
+        y: 488
+        width: 115
+        height: 107
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ab9ce7a7e9a8b910800000000000000
+      internalID: 1853418059082800036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_12
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 529
+        width: 26
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1916794536fa222b0800000000000000
+      internalID: -5610729344594386543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_13
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 535
+        width: 16
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7cc2811694dfb3ac0800000000000000
+      internalID: -3874224562818765625
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_14
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 530
+        width: 94
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e6d582d4fee92250800000000000000
+      internalID: 5920525920426645221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_15
+      rect:
+        serializedVersion: 2
+        x: 404
+        y: 529
+        width: 25
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8b570fe1b17eed50800000000000000
+      internalID: 6768472299017821068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_16
+      rect:
+        serializedVersion: 2
+        x: 412
+        y: 486
+        width: 114
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d5c12be86efeba0800000000000000
+      internalID: -6057369473242079993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_17
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 551
+        width: 101
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2a725b50e31ad850800000000000000
+      internalID: 6402451674586315308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_18
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 573
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 937ec5d4f868345b0800000000000000
+      internalID: -5385312779368601799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_19
+      rect:
+        serializedVersion: 2
+        x: 569
+        y: 575
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e8e0b3d936810f80800000000000000
+      internalID: -8142079068386301723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_20
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 580
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5019b81c6505511c0800000000000000
+      internalID: -4533629116333977339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_21
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 570
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81b3c5d11ecd85210800000000000000
+      internalID: 1322049350051576600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_22
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 432
+        width: 84
+        height: 139
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 583d78421810267d0800000000000000
+      internalID: -2926775153662110843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_23
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 568
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6a2c5512b6d76eb0800000000000000
+      internalID: -4726573223551161750
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_24
+      rect:
+        serializedVersion: 2
+        x: 146
+        y: 551
+        width: 25
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9df6fcd9935f4a290800000000000000
+      internalID: -7879903820181966887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_25
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 539
+        width: 34
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9534aa33dfdf20280800000000000000
+      internalID: -9078414634890149031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_26
+      rect:
+        serializedVersion: 2
+        x: 574
+        y: 446
+        width: 84
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eddc44e4665b15900800000000000000
+      internalID: 671517270459338206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_27
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 559
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 805d9137863c675a0800000000000000
+      internalID: -6523812156824496888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_28
+      rect:
+        serializedVersion: 2
+        x: 557
+        y: 437
+        width: 73
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89c1f0a955409a900800000000000000
+      internalID: 696092383108865176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_29
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 437
+        width: 92
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bc1999d9204090f0800000000000000
+      internalID: -1112318559471985480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_30
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 437
+        width: 59
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02cb290d2911c47d0800000000000000
+      internalID: -2932949935062860768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_31
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 412
+        width: 104
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6aba5274e8054b80800000000000000
+      internalID: -8411306951780418965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_32
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 483
+        width: 56
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86492d7a332c80ed0800000000000000
+      internalID: -2447492870361148312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_33
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 522
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6eb882a1ea5a775a0800000000000000
+      internalID: -6523563368041116698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_34
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 482
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d0dbc7afd5303740800000000000000
+      internalID: 5129659210284126419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_35
+      rect:
+        serializedVersion: 2
+        x: 489
+        y: 408
+        width: 103
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7edd32c42a8a28c0800000000000000
+      internalID: -4023251426619826566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_36
+      rect:
+        serializedVersion: 2
+        x: 550
+        y: 435
+        width: 62
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d341e3884e51d4100800000000000000
+      internalID: 93755238527145021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_37
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 421
+        width: 44
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3a437fb01acb5e30800000000000000
+      internalID: 4493407226512493116
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_38
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 443
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99f8d7a2c100e4ff0800000000000000
+      internalID: -50102424882540647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_39
+      rect:
+        serializedVersion: 2
+        x: 648
+        y: 433
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fdf3e86e52730ee0800000000000000
+      internalID: -1296066517940306445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_40
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 287
+        width: 23
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e284aabe661810cf0800000000000000
+      internalID: -287806622134548434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_41
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 424
+        width: 29
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 999d6373f76abaa30800000000000000
+      internalID: 4227655740534741401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_42
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 291
+        width: 26
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 134a2c63ea061a950800000000000000
+      internalID: 6458549641985303601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_43
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 421
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bad18d8ae69da5d0800000000000000
+      internalID: -3049615438519346510
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_44
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 404
+        width: 70
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a78f85fc28990b30800000000000000
+      internalID: 4254098641893951396
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_45
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 401
+        width: 71
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08d01da1a5af44cc0800000000000000
+      internalID: -3727579326652019328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_46
+      rect:
+        serializedVersion: 2
+        x: 621
+        y: 292
+        width: 25
+        height: 137
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b54afd8ffd9dfb80800000000000000
+      internalID: -8359351612405561927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_47
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 289
+        width: 24
+        height: 144
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec9678dde61364b90800000000000000
+      internalID: -7258059397228172850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_48
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 302
+        width: 15
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15324d44939924fd0800000000000000
+      internalID: -2359154783541779631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_49
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 307
+        width: 68
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c4135d7fcb35b4a0800000000000000
+      internalID: -6578285918357875518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_50
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 373
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ab9b3e7dd986f460800000000000000
+      internalID: 7275153832462228389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_51
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 305
+        width: 67
+        height: 108
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 784ee62c1bd5acdb0800000000000000
+      internalID: -4770897837192977273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_52
+      rect:
+        serializedVersion: 2
+        x: 606
+        y: 301
+        width: 19
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c9844f645b95f330800000000000000
+      internalID: 3744069452174756296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_53
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 336
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25c050a491bafe3d0800000000000000
+      internalID: -3175131087168533422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_54
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 277
+        width: 31
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1457f323d178d8790800000000000000
+      internalID: -7526210842799409855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_55
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 285
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53a2a579f3c44ab20800000000000000
+      internalID: 3144722275817368117
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_56
+      rect:
+        serializedVersion: 2
+        x: 121
+        y: 292
+        width: 70
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e9af0b8ab6272b40800000000000000
+      internalID: 5415339659575142880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_57
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 197
+        width: 103
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b774ef5f2bf1023a0800000000000000
+      internalID: -6692314192780834949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_58
+      rect:
+        serializedVersion: 2
+        x: 486
+        y: 194
+        width: 105
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bb774a8fdc28ddc0800000000000000
+      internalID: -3614089362355553359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_59
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 290
+        width: 71
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a949ae2bd908d3dd0800000000000000
+      internalID: -2504704402948189030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_60
+      rect:
+        serializedVersion: 2
+        x: 605
+        y: 285
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 992523e32ed9c0890800000000000000
+      internalID: -7490438485192322407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_61
+      rect:
+        serializedVersion: 2
+        x: 624
+        y: 274
+        width: 40
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4fa24a19fbf0cf190800000000000000
+      internalID: -7927443928622290188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_62
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 146
+        width: 106
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71b0024ad2cd1a6b0800000000000000
+      internalID: -5286702398971049193
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_63
+      rect:
+        serializedVersion: 2
+        x: 110
+        y: 181
+        width: 64
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16d6f36644515f590800000000000000
+      internalID: -7641177809246786207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_64
+      rect:
+        serializedVersion: 2
+        x: 182
+        y: 183
+        width: 55
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b9c4d1ef1d95c8f0800000000000000
+      internalID: -520837421633058380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_65
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 129
+        width: 114
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ee606a2df9759d20800000000000000
+      internalID: 3284665631481294567
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_66
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 116
+        width: 25
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1671bbcc53a8c8c00800000000000000
+      internalID: 904249588867340129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_67
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 191
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a59191a44a730f0800000000000000
+      internalID: -1137259742732133751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_68
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 120
+        width: 26
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4e71359457b11670800000000000000
+      internalID: 8507782744987762251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_69
+      rect:
+        serializedVersion: 2
+        x: 408
+        y: 128
+        width: 116
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dde00ceb69975720800000000000000
+      internalID: 2834903179253050833
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_70
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 182
+        width: 55
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ccb453eeca47abf0800000000000000
+      internalID: -313199396641260343
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_71
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 183
+        width: 58
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae8cc09aca71b9090800000000000000
+      internalID: -8026795880519776022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_72
+      rect:
+        serializedVersion: 2
+        x: 558
+        y: 165
+        width: 88
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b600cd76b45d11550800000000000000
+      internalID: 6129915087669690475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_73
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 149
+        width: 84
+        height: 127
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4ee392363eea96d0800000000000000
+      internalID: -2982809886635332021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_74
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 144
+        width: 29
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba8c2db406b9b17e0800000000000000
+      internalID: -1793669188685739861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_75
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 167
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96175349ee9aa3ed0800000000000000
+      internalID: -2433445806486490775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_76
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 110
+        width: 103
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 36c2c4708686354c0800000000000000
+      internalID: -4299978423200371613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_77
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 123
+        width: 107
+        height: 67
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdaa4d1dee9d5f7f0800000000000000
+      internalID: -579317357301421349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_78
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 99
+        width: 118
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83cbeaafac6dfae50800000000000000
+      internalID: 6822908127767084088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_79
+      rect:
+        serializedVersion: 2
+        x: 538
+        y: 167
+        width: 19
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee751d9b4d056bbd0800000000000000
+      internalID: -2614813659061200914
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_80
+      rect:
+        serializedVersion: 2
+        x: 552
+        y: 140
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 510df1fb4acab7a00800000000000000
+      internalID: 755387186095837205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_81
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 135
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41f7e59f875bc53f0800000000000000
+      internalID: -910653493451260140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_82
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 60
+        width: 133
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 314b133cecc96bcd0800000000000000
+      internalID: -2542672527752055789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_83
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 59
+        width: 136
+        height: 104
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84a4b2098c6799220800000000000000
+      internalID: 2493154472510573128
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_84
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 141
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcb9617a2210de440800000000000000
+      internalID: 4966627212403317707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_85
+      rect:
+        serializedVersion: 2
+        x: 284
+        y: 99
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a6c9af6b9f891f90800000000000000
+      internalID: -6982391849505143130
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_86
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 78
+        width: 135
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dabddc315104f47a0800000000000000
+      internalID: -6390818886944695379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_87
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 96
+        width: 114
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52a9a58a989fdf450800000000000000
+      internalID: 6124325437924088357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_88
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 57
+        width: 17
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dc7a6e587161bf70800000000000000
+      internalID: 9201242683302640849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_89
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 47
+        width: 143
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16e097990925c0d50800000000000000
+      internalID: 6704824726251441761
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-ring-light-worn_90
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 63
+        width: 21
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 55b8b4a2164222d40800000000000000
+      internalID: 5558044889868634965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

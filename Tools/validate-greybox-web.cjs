@@ -7,6 +7,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
+  const ART_SLOTS=151,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
   const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()).filter(Boolean).map(w=>w==='360'?{width:360,height:800}:/^\d+x\d+$/.test(w)?{width:+w.split('x')[0],height:+w.split('x')[1]}:{width:390,height:844}); // Part 2: or any WxH
@@ -689,7 +690,7 @@ const path=require('path');
     await tap(0,449);await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
     check((await snap()).settingsOpen&&(await snap()).jumpsShown,'Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at '+viewport.width);
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-jump.png')});
-    await tap(0,449);await resumed(); // the fifth row: After Key 4
+    await tap(0,426);await resumed(); // the fifth row: After Key 4 (the list is a row taller since the Dial's wake-up preview: its top 23 px higher)
     { const s=await snap(); check(s.keys===4&&s.keysInHand===3&&s.locksFilled===1&&s.atriumStage===3&&s.playerName==='Tester'&&s.sunSign==='Leo','Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-key4.png')});
     const expect={key1:s=>s.keys===1&&s.keysInHand===0&&s.locksFilled===1&&s.atriumStage===2&&!s.wheelComplete,
@@ -698,6 +699,7 @@ const path=require('path');
       key3:s=>s.keys===3&&s.keysInHand===2&&s.atriumStage===3,
       whole:s=>s.keys===4&&s.locksFilled===4&&s.wingWhole&&s.atriumStage===6&&s.keysInHand===0};
     for(const id of Object.keys(expect)){await act('jump-'+id);await dev.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();check(expect[id](await snap()),'Build W: the checkpoint '+id+' lands with its Keys and stage at '+viewport.width);
+      { const w=await snap(); check(w.dialWake===Math.min(4,w.keys)&&w.wakePreview===-1,'the Dial\'s wake-up (86bcbn6w6 2a A): after the checkpoint '+id+' the Dial shows step '+w.dialWake+' for '+w.keys+' Keys earned ('+w.dialLook+') at '+viewport.width); }
       if(id==='whole'){ // Build AA: at the Wing's end the journal has the Table and all four tabs; each works on the canvas
         await act('open-journal');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='journal'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});await dev.waitForTimeout(400);
         { const s=await snap(); check(s.journalView==='wheel'&&s.canJournalTable&&s.journalLenses.join()==='Element,Modality,Polarity,Opposites'&&s.journalLens==='Element','Build AA: at the Wing\'s end the journal shows the Table switch and all four tabs at '+viewport.width); }
@@ -727,6 +729,16 @@ const path=require('path');
         await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});}
       if(id==='key2'){await act('enter-wing');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await act('poi-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         check((await snap()).fork==='both'&&(await snap()).canContinueLesson&&(await snap()).canEnterPractice,'Build W: from after Key 2 the Dial offers the next lesson and practice at '+viewport.width);}}
+    // The Dial's wake-up (owner, Oct 1; 86bcbn6w6: 2a A, 2b B): DEV Mode previews each of the five steps; each blends the looks the ruling names,
+    // a look without its file standing in with today's. On the Dial, captured at 3x for the owner's check.
+    { const want=['worn','worn + today','today','today + bright','bright'];await act('enter-wing');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
+      for(let step=0;step<5;step++){await dev.evaluate(n=>window.ascendantDial.act('wake:'+n),step);await dev.waitForFunction(n=>window.ascendantDial.snapshot().dialWake===n,step,{timeout:5000}).catch(()=>{});
+        const w=await snap();check(w.dialWake===step&&w.wakePreview===step&&w.dialLook.replace(/ \(stand-in: today's\)/g,'')===want[step],'the Dial\'s wake-up: DEV Mode\'s step '+step+' blends '+w.dialLook+' at '+viewport.width);
+        await act('poi-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});await dev.waitForTimeout(900);
+        await dev.screenshot({path:path.join(out,viewport.width+'-dial-wake-'+step+'.png')});
+        await act('leave-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});}
+      await dev.evaluate(()=>window.ascendantDial.act('wake:-1'));await dev.waitForFunction(()=>window.ascendantDial.snapshot().wakePreview===-1,{},{timeout:5000}).catch(()=>{});
+      check((await snap()).dialWake===Math.min(4,(await snap()).keys),'the Dial\'s wake-up: back to as earned, the Dial shows the Keys\' step at '+viewport.width); }
     await act('restart');await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
     await devContext.close();
@@ -776,7 +788,7 @@ const path=require('path');
     await art.goto(withQuery('art=test'));
     await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
-    let s=await snap();check(s.artSet==='test'&&s.artFiles===141&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
+    let s=await snap();check(s.artSet==='test'&&s.artFiles===ART_SLOTS&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
@@ -797,7 +809,6 @@ const path=require('path');
     await art.screenshot({path:path.join(out,viewport.width+'-art-dial-guided.png')});
     await artContext.close();
   }));
-  const ART_SLOTS=141,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert
   for(const [query,set] of [['style=test','test'],['style','']]){
     const styleContext=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));

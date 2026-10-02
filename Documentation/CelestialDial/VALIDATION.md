@@ -2,6 +2,42 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The Dial's wake-up: five steps by the Keys (APK Session 2, polish 1)
+
+The owner's rulings (Oct 1, the ruling comments on task 86bcbn6w6; Decisions Log, Sept 28 to Oct 4, Part 2):
+- The order: worn, then today's Dial, then bright and new.
+- 2a A: a step per Key. 2b B: five steps blended from three drawn looks (the first visit worn; Key 1 halfway from worn to today's; Key 2 today's; Key 3 halfway to bright; Key 4 bright and new).
+- 2c A to C: the dust thins, the tarnish polishes, the glow strengthens. D is excluded, so the eye never changes.
+- 2d A: the Wing room's small Dial follows the same steps.
+- Board 2, round 2 is approved, with the bright finish's outer glow dialled back. The build uses stand-ins until Lane 2's final passes are approved, and the swap is a file drop.
+- DEV Mode gets a jump to each step.
+
+**The Dial** (`DialView`)
+- Each of its four layers (the room, its light, the turning ring, its light) has a twin over it that blends toward the next look. `WakeStep` 0 to 4 picks the base look and the twin's blend (`WakeBlend`): worn; worn plus half today's; today's; today's plus half bright; bright.
+- A look's file is the layer's slot with `-worn` or `-bright` (`dial-room-worn`, `dial-ring-light-bright` and so on). A look whose file is not in yet stands in with today's.
+- The eye is drawn the same in every look. The twins keep their layer's radial reveal and its reach to the screen's edges (Part 2).
+
+**The step** (`SliceView`)
+- The step is the Keys earned (0 to 4). It lands the next time the player comes to the Dial, never mid-lesson (Claude's working choice; the Key 4 look greets the player on the visit after the Key).
+
+**The Wing room's small Dial** (2d A): worn; half today's over it at Key 1; restored at Key 2 (its kit placement moves from Key 4 to 2); half bright over it at Key 3; bright at Key 4 (`kit-dial-bright` and `kit-dial-bright-open`, new slots; the restored pair stands in until they land).
+
+**DEV Mode.** Settings, Testing, Jump to... gains a "Dial wake" row. Each tap steps the look (first visit, Key 1 to Key 4, then back to as earned) without touching the save.
+
+**The art.** Ten new slots (151): the four layers' worn and bright looks, and the small Dial's bright pair.
+- The worn stand-in is Lane 2's worn pass: the approved round-2 worn concept's tarnish, dust and cobwebs on the exact geometry, cut from one segment so the twelve stay identical. Its four files are in. A revised pass is a file drop.
+- The bright files are not in, waiting on the owner's approval of Lane 2's bright pass, so Keys 3 and 4 show today's Dial until they land.
+
+**Checks**
+- The mechanical checks hold the five blends and every new slot at its layer's size.
+- The suite, after each DEV checkpoint: the Dial shows the Keys' step.
+- The suite, through DEV Mode's preview: each step blends the looks the ruling names (`dialLook`, with the stand-ins marked), captured on the Dial at each step, and back to as earned.
+- Counts: 151 slots and test files everywhere they are quoted (the mechanical checks, the fixture, the suite, this page's mirror in ART-SLOTS.md).
+
+Not changed: the Dial's geometry, words, seats, eye and lessons; today's look (step 2) is today's files.
+
+Validation (local, worktree `dial-wake`, branch `codex/dial-wake-steps` on Part 2): mechanical 587/587 (+1, the five blends; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (28.4 MB); browser suite 531/531 at desktop density, with the seven shapes (+22: 11 at each width) and 461/461 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only). Captures: [`Evidence/dial-wake-2026-10-02/`](Evidence/dial-wake-2026-10-02/).
+
 ## Platform fit, Part 2: the art fills the screen (APK Session 2, finding 1b)
 
 The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114, points 1 to 4):

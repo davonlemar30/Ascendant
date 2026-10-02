@@ -1,0 +1,2768 @@
+fileFormatVersion: 2
+guid: ed42cb97e118e4027915c3e5ee473dc0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4831359549287660031
+    second: dial-room-light-worn_0
+  - first:
+      213: -1981052773452260623
+    second: dial-room-light-worn_1
+  - first:
+      213: 7619929384546727366
+    second: dial-room-light-worn_2
+  - first:
+      213: 8463872657169820030
+    second: dial-room-light-worn_3
+  - first:
+      213: -5016847022771003604
+    second: dial-room-light-worn_4
+  - first:
+      213: -3712295513203290160
+    second: dial-room-light-worn_5
+  - first:
+      213: 5286254971683424806
+    second: dial-room-light-worn_6
+  - first:
+      213: -5809818896195513146
+    second: dial-room-light-worn_7
+  - first:
+      213: -4677758021754933948
+    second: dial-room-light-worn_8
+  - first:
+      213: -8498206509495609264
+    second: dial-room-light-worn_9
+  - first:
+      213: -4084048310239615952
+    second: dial-room-light-worn_10
+  - first:
+      213: 5498155154164733244
+    second: dial-room-light-worn_11
+  - first:
+      213: 4609974724647271372
+    second: dial-room-light-worn_12
+  - first:
+      213: 2482690227686069574
+    second: dial-room-light-worn_13
+  - first:
+      213: -2373100447574194893
+    second: dial-room-light-worn_14
+  - first:
+      213: -750225859446453476
+    second: dial-room-light-worn_15
+  - first:
+      213: 6546684825802088006
+    second: dial-room-light-worn_16
+  - first:
+      213: -5168827797427102530
+    second: dial-room-light-worn_17
+  - first:
+      213: 3603679333885120978
+    second: dial-room-light-worn_18
+  - first:
+      213: 6348619760512396667
+    second: dial-room-light-worn_19
+  - first:
+      213: -4322458334083567993
+    second: dial-room-light-worn_20
+  - first:
+      213: 3524315298971479114
+    second: dial-room-light-worn_21
+  - first:
+      213: 5904865538825063728
+    second: dial-room-light-worn_22
+  - first:
+      213: -6174757094853266951
+    second: dial-room-light-worn_23
+  - first:
+      213: -5984348492952714381
+    second: dial-room-light-worn_24
+  - first:
+      213: -2045991976386697370
+    second: dial-room-light-worn_25
+  - first:
+      213: 4918260546890388662
+    second: dial-room-light-worn_26
+  - first:
+      213: -6410477979041658572
+    second: dial-room-light-worn_27
+  - first:
+      213: 1962254245752656267
+    second: dial-room-light-worn_28
+  - first:
+      213: 444353888180037075
+    second: dial-room-light-worn_29
+  - first:
+      213: -5218538725450045210
+    second: dial-room-light-worn_30
+  - first:
+      213: 957566840540273537
+    second: dial-room-light-worn_31
+  - first:
+      213: -6304375400257817314
+    second: dial-room-light-worn_32
+  - first:
+      213: 2557230894604127721
+    second: dial-room-light-worn_33
+  - first:
+      213: 2372964255532820808
+    second: dial-room-light-worn_34
+  - first:
+      213: 8113355485874047210
+    second: dial-room-light-worn_35
+  - first:
+      213: -5723214118726622722
+    second: dial-room-light-worn_36
+  - first:
+      213: 6586670058955316965
+    second: dial-room-light-worn_37
+  - first:
+      213: 1418187594644234792
+    second: dial-room-light-worn_38
+  - first:
+      213: 8742214561376456384
+    second: dial-room-light-worn_39
+  - first:
+      213: -1472101025543860561
+    second: dial-room-light-worn_40
+  - first:
+      213: -3530177571519861885
+    second: dial-room-light-worn_41
+  - first:
+      213: -7468938891758794549
+    second: dial-room-light-worn_42
+  - first:
+      213: -6024248450328326289
+    second: dial-room-light-worn_43
+  - first:
+      213: 259777023324958323
+    second: dial-room-light-worn_44
+  - first:
+      213: 4569117611025445939
+    second: dial-room-light-worn_45
+  - first:
+      213: 3806114265029774909
+    second: dial-room-light-worn_46
+  - first:
+      213: 4649063058353126856
+    second: dial-room-light-worn_47
+  - first:
+      213: -7368491320031287838
+    second: dial-room-light-worn_48
+  - first:
+      213: -7609891666077782698
+    second: dial-room-light-worn_49
+  - first:
+      213: 5575419650060602726
+    second: dial-room-light-worn_50
+  - first:
+      213: 3589003586255156503
+    second: dial-room-light-worn_51
+  - first:
+      213: 7072267522049117577
+    second: dial-room-light-worn_52
+  - first:
+      213: -1420805472966095183
+    second: dial-room-light-worn_53
+  - first:
+      213: -7874214120513965683
+    second: dial-room-light-worn_54
+  - first:
+      213: -7669433212268775263
+    second: dial-room-light-worn_55
+  - first:
+      213: -1591110780237384842
+    second: dial-room-light-worn_56
+  - first:
+      213: -5929862677291392245
+    second: dial-room-light-worn_57
+  - first:
+      213: 8719099380995935167
+    second: dial-room-light-worn_58
+  - first:
+      213: -2399721393081625516
+    second: dial-room-light-worn_59
+  - first:
+      213: -6596158340250655851
+    second: dial-room-light-worn_60
+  - first:
+      213: 5657004638709548828
+    second: dial-room-light-worn_61
+  - first:
+      213: -6960136070516209732
+    second: dial-room-light-worn_62
+  - first:
+      213: -745434867992531046
+    second: dial-room-light-worn_63
+  - first:
+      213: -4932842513628276036
+    second: dial-room-light-worn_64
+  - first:
+      213: 5005452746594428575
+    second: dial-room-light-worn_65
+  - first:
+      213: 6791815408374118693
+    second: dial-room-light-worn_66
+  - first:
+      213: -9074791568445647550
+    second: dial-room-light-worn_67
+  - first:
+      213: -8977333976337570297
+    second: dial-room-light-worn_68
+  - first:
+      213: -4997374549993736800
+    second: dial-room-light-worn_69
+  - first:
+      213: -5855527038664858084
+    second: dial-room-light-worn_70
+  - first:
+      213: -2342407085705972838
+    second: dial-room-light-worn_71
+  - first:
+      213: -3944638776961722217
+    second: dial-room-light-worn_72
+  - first:
+      213: 1753514454617236623
+    second: dial-room-light-worn_73
+  - first:
+      213: 671046262290009139
+    second: dial-room-light-worn_74
+  - first:
+      213: -5533823553043157133
+    second: dial-room-light-worn_75
+  - first:
+      213: 3400317022870673607
+    second: dial-room-light-worn_76
+  - first:
+      213: -4132447574056903351
+    second: dial-room-light-worn_77
+  - first:
+      213: -6604126464671388889
+    second: dial-room-light-worn_78
+  - first:
+      213: -1585718933352950913
+    second: dial-room-light-worn_79
+  - first:
+      213: -8504759264997294346
+    second: dial-room-light-worn_80
+  - first:
+      213: 3316087570747479932
+    second: dial-room-light-worn_81
+  - first:
+      213: 6850255299090030840
+    second: dial-room-light-worn_82
+  - first:
+      213: -7001135212023088474
+    second: dial-room-light-worn_83
+  - first:
+      213: -6349122412462730593
+    second: dial-room-light-worn_84
+  - first:
+      213: -7361908776491923428
+    second: dial-room-light-worn_85
+  - first:
+      213: 1119788169482837900
+    second: dial-room-light-worn_86
+  - first:
+      213: -8526146378561327514
+    second: dial-room-light-worn_87
+  - first:
+      213: 8770838653683334487
+    second: dial-room-light-worn_88
+  - first:
+      213: 7112970598846918281
+    second: dial-room-light-worn_89
+  - first:
+      213: 611964547869269883
+    second: dial-room-light-worn_90
+  - first:
+      213: -3501183632561462826
+    second: dial-room-light-worn_91
+  - first:
+      213: 1554124611722033319
+    second: dial-room-light-worn_92
+  - first:
+      213: -4276697471195446275
+    second: dial-room-light-worn_93
+  - first:
+      213: 7877522680272738930
+    second: dial-room-light-worn_94
+  - first:
+      213: -1694354994396235749
+    second: dial-room-light-worn_95
+  - first:
+      213: -5290135028341326723
+    second: dial-room-light-worn_96
+  - first:
+      213: -6305342541958596250
+    second: dial-room-light-worn_97
+  - first:
+      213: -7452214717591018514
+    second: dial-room-light-worn_98
+  - first:
+      213: -296596595341108610
+    second: dial-room-light-worn_99
+  - first:
+      213: -8713428877737119691
+    second: dial-room-light-worn_100
+  - first:
+      213: -4248021625920166921
+    second: dial-room-light-worn_101
+  - first:
+      213: -821987289808401610
+    second: dial-room-light-worn_102
+  - first:
+      213: -8291283080614288557
+    second: dial-room-light-worn_103
+  - first:
+      213: -3733995583768127026
+    second: dial-room-light-worn_104
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: dial-room-light-worn_0
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 1350
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff97b7599ef6c0340800000000000000
+      internalID: 4831359549287660031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_1
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 1357
+        width: 29
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1fa5315aff2e184e0800000000000000
+      internalID: -1981052773452260623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_2
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 1363
+        width: 133
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c5f773376d6fb960800000000000000
+      internalID: 7619929384546727366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_3
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 1360
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e79afb29657b57570800000000000000
+      internalID: 8463872657169820030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_4
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 1358
+        width: 15
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2f12439634906ab0800000000000000
+      internalID: -5016847022771003604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_5
+      rect:
+        serializedVersion: 2
+        x: 451
+        y: 1343
+        width: 36
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0dfcd3a36e64b7cc0800000000000000
+      internalID: -3712295513203290160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_6
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 1301
+        width: 88
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62a455393ec8c5940800000000000000
+      internalID: 5286254971683424806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_7
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 1333
+        width: 20
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c41ae2ee706f5fa0800000000000000
+      internalID: -5809818896195513146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_8
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 1331
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44d2010fcd3451fb0800000000000000
+      internalID: -4677758021754933948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_9
+      rect:
+        serializedVersion: 2
+        x: 511
+        y: 1327
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0581a9d743e401a80800000000000000
+      internalID: -8498206509495609264
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_10
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 1316
+        width: 27
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03422a633bb8257c0800000000000000
+      internalID: -4084048310239615952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_11
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 1312
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c35d8f37bfe5d4c40800000000000000
+      internalID: 5498155154164733244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_12
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 1294
+        width: 29
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccb312e569be9ff30800000000000000
+      internalID: 4609974724647271372
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_13
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 1280
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 645df84bb99447220800000000000000
+      internalID: 2482690227686069574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_14
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 1289
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 335050657bd011fd0800000000000000
+      internalID: -2373100447574194893
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_15
+      rect:
+        serializedVersion: 2
+        x: 573
+        y: 1282
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1bc1624e89a695f0800000000000000
+      internalID: -750225859446453476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_16
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 1266
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64e9f5ac92f7ada50800000000000000
+      internalID: 6546684825802088006
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_17
+      rect:
+        serializedVersion: 2
+        x: 581
+        y: 1274
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebc513df082a448b0800000000000000
+      internalID: -5168827797427102530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_18
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 1264
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d193a4d247d20230800000000000000
+      internalID: 3603679333885120978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_19
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 1212
+        width: 17
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7ded572904da1850800000000000000
+      internalID: 6348619760512396667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_20
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 1236
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78ea588eb0b8304c0800000000000000
+      internalID: -4322458334083567993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_21
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 1247
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4c6baf7712e8e030800000000000000
+      internalID: 3524315298971479114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_22
+      rect:
+        serializedVersion: 2
+        x: 594
+        y: 1228
+        width: 30
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03d0d181ceb42f150800000000000000
+      internalID: 5904865538825063728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_23
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 1132
+        width: 258
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f1b2f2332bde4aa0800000000000000
+      internalID: -6174757094853266951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_24
+      rect:
+        serializedVersion: 2
+        x: 366
+        y: 1202
+        width: 40
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 373c86980c253fca0800000000000000
+      internalID: -5984348492952714381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_25
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 1208
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 667eb2a332d2b93e0800000000000000
+      internalID: -2045991976386697370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_26
+      rect:
+        serializedVersion: 2
+        x: 622
+        y: 1213
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b4583ac8eb214440800000000000000
+      internalID: 4918260546890388662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_27
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 1197
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43902c20e386907a0800000000000000
+      internalID: -6410477979041658572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_28
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 1180
+        width: 16
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b81d61d07d35b3b10800000000000000
+      internalID: 1962254245752656267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_29
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 1199
+        width: 39
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d5e88bc189aa2600800000000000000
+      internalID: 444353888180037075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_30
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 1184
+        width: 9
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e82eee9da60497b0800000000000000
+      internalID: -5218538725450045210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_31
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 1177
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 18b9813d7f5f94d00800000000000000
+      internalID: 957566840540273537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_32
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 967
+        width: 22
+        height: 123
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e15fbe8b9fb5288a0800000000000000
+      internalID: -6304375400257817314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_33
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 1091
+        width: 25
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ed888923fb1d7320800000000000000
+      internalID: 2557230894604127721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_34
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 1165
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 849abbbfa667ee020800000000000000
+      internalID: 2372964255532820808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_35
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 1065
+        width: 13
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae84df7f3dd689070800000000000000
+      internalID: 8113355485874047210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_36
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 1121
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef1acc7f41f0390b0800000000000000
+      internalID: -5723214118726622722
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_37
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 1073
+        width: 315
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ee9bbc558d886b50800000000000000
+      internalID: 6586670058955316965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_38
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 1144
+        width: 41
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 822a2ab7a1a6ea310800000000000000
+      internalID: 1418187594644234792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_39
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 1154
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ce471943d5925970800000000000000
+      internalID: 8742214561376456384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_40
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 1099
+        width: 13
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fae48f2baeb029be0800000000000000
+      internalID: -1472101025543860561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_41
+      rect:
+        serializedVersion: 2
+        x: 647
+        y: 1062
+        width: 32
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38be18fc33a420fc0800000000000000
+      internalID: -3530177571519861885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_42
+      rect:
+        serializedVersion: 2
+        x: 194
+        y: 1008
+        width: 147
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc80e9b66aff85890800000000000000
+      internalID: -7468938891758794549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_43
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 985
+        width: 38
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6f8b77c3f1956ca0800000000000000
+      internalID: -6024248450328326289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_44
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 1008
+        width: 21
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37ea71c83d9ea9300800000000000000
+      internalID: 259777023324958323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_45
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 1010
+        width: 13
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 334372e4244c86f30800000000000000
+      internalID: 4569117611025445939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_46
+      rect:
+        serializedVersion: 2
+        x: 377
+        y: 1008
+        width: 132
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3e85a522c802d430800000000000000
+      internalID: 3806114265029774909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_47
+      rect:
+        serializedVersion: 2
+        x: 473
+        y: 1003
+        width: 36
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8cd7783483ac48040800000000000000
+      internalID: 4649063058353126856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_48
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 1018
+        width: 12
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e56cf23f2cddb990800000000000000
+      internalID: -7368491320031287838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_49
+      rect:
+        serializedVersion: 2
+        x: 658
+        y: 960
+        width: 20
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65d6a3049db346690800000000000000
+      internalID: -7609891666077782698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_50
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 983
+        width: 22
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66d4893c1aedf5d40800000000000000
+      internalID: 5575419650060602726
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_51
+      rect:
+        serializedVersion: 2
+        x: 247
+        y: 997
+        width: 18
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71577501fb3bec130800000000000000
+      internalID: 3589003586255156503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_52
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 996
+        width: 21
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98d054047ddb52260800000000000000
+      internalID: 7072267522049117577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_53
+      rect:
+        serializedVersion: 2
+        x: 472
+        y: 982
+        width: 31
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1becce833f8484ce0800000000000000
+      internalID: -1420805472966095183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_54
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 988
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d81766d0afb29b290800000000000000
+      internalID: -7874214120513965683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_55
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 957
+        width: 8
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a8f22ab023b09590800000000000000
+      internalID: -7669433212268775263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_56
+      rect:
+        serializedVersion: 2
+        x: 237
+        y: 960
+        width: 36
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 673f7a9ec2d3be9e0800000000000000
+      internalID: -1591110780237384842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_57
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 947
+        width: 27
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0323311055e4bda0800000000000000
+      internalID: -5929862677291392245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_58
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 960
+        width: 36
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbb4795f0b6700970800000000000000
+      internalID: 8719099380995935167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_59
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 949
+        width: 41
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 454d6757b1a72bed0800000000000000
+      internalID: -2399721393081625516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_60
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 912
+        width: 41
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 593212fffecb574a0800000000000000
+      internalID: -6596158340250655851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_61
+      rect:
+        serializedVersion: 2
+        x: 368
+        y: 911
+        width: 42
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c17050f2fb7b18e40800000000000000
+      internalID: 5657004638709548828
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_62
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 950
+        width: 37
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb78f78ce11a86f90800000000000000
+      internalID: -6960136070516209732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_63
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 959
+        width: 29
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9f6d12efeea7a5f0800000000000000
+      internalID: -745434867992531046
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_64
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 943
+        width: 29
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbadd328ed50b8bb0800000000000000
+      internalID: -4932842513628276036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_65
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 962
+        width: 31
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f96a3c4c0c0f67540800000000000000
+      internalID: 5005452746594428575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_66
+      rect:
+        serializedVersion: 2
+        x: 468
+        y: 949
+        width: 27
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 529f92c1120614e50800000000000000
+      internalID: 6791815408374118693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_67
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 935
+        width: 18
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2455618162ddf0280800000000000000
+      internalID: -9074791568445647550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_68
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 946
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 706aa5eff4a1a6380800000000000000
+      internalID: -8977333976337570297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_69
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 934
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a5bb02f252c5aab0800000000000000
+      internalID: -4997374549993736800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_70
+      rect:
+        serializedVersion: 2
+        x: 248
+        y: 925
+        width: 28
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c16afa7ae2dfcbea0800000000000000
+      internalID: -5855527038664858084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_71
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 923
+        width: 30
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a9333298a291e7fd0800000000000000
+      internalID: -2342407085705972838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_72
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 893
+        width: 43
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79817f39ee3d149c0800000000000000
+      internalID: -3944638776961722217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_73
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 925
+        width: 30
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8429ff1b1cb55810800000000000000
+      internalID: 1753514454617236623
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_74
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 909
+        width: 15
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33c46ab2509005900800000000000000
+      internalID: 671046262290009139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_75
+      rect:
+        serializedVersion: 2
+        x: 454
+        y: 923
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37f2c274cc8e333b0800000000000000
+      internalID: -5533823553043157133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_76
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 922
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c89bef015a503f20800000000000000
+      internalID: 3400317022870673607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_77
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 905
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94dd96773d896a6c0800000000000000
+      internalID: -4132447574056903351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_78
+      rect:
+        serializedVersion: 2
+        x: 319
+        y: 900
+        width: 36
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72b618578fd6954a0800000000000000
+      internalID: -6604126464671388889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_79
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 909
+        width: 42
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f73d2e718056ef9e0800000000000000
+      internalID: -1585718933352950913
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_80
+      rect:
+        serializedVersion: 2
+        x: 630
+        y: 903
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6febf95328609f980800000000000000
+      internalID: -8504759264997294346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_81
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 872
+        width: 25
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c77dd72831c150e20800000000000000
+      internalID: 3316087570747479932
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_82
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 859
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f0affa76eef01f50800000000000000
+      internalID: 6850255299090030840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_83
+      rect:
+        serializedVersion: 2
+        x: 574
+        y: 828
+        width: 63
+        height: 79
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6aa72e64e98f6de90800000000000000
+      internalID: -7001135212023088474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_84
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 851
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9210b11ec263e7a0800000000000000
+      internalID: -6349122412462730593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_85
+      rect:
+        serializedVersion: 2
+        x: 118
+        y: 858
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c184e5c09fe35d990800000000000000
+      internalID: -7361908776491923428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_86
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 850
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8f95b148694a8f00800000000000000
+      internalID: 1119788169482837900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_87
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 844
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66e6edaca0b0da980800000000000000
+      internalID: -8526146378561327514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_88
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 835
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75d7f0f194748b970800000000000000
+      internalID: 8770838653683334487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_89
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 827
+        width: 12
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98e6112d21956b260800000000000000
+      internalID: 7112970598846918281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_90
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 824
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7f51e293822e7800800000000000000
+      internalID: 611964547869269883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_91
+      rect:
+        serializedVersion: 2
+        x: 570
+        y: 823
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d123c7490c496fc0800000000000000
+      internalID: -3501183632561462826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_92
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 808
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a8326aa91c519510800000000000000
+      internalID: 1554124611722033319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_93
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 805
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df385911f4e16a4c0800000000000000
+      internalID: -4276697471195446275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_94
+      rect:
+        serializedVersion: 2
+        x: 554
+        y: 816
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27a5dbb0425925d60800000000000000
+      internalID: 7877522680272738930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_95
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 797
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b187a931c117c78e0800000000000000
+      internalID: -1694354994396235749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_96
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 795
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7c3dd5583aa596b0800000000000000
+      internalID: -5290135028341326723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_97
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 743
+        width: 151
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 669366f7d5cee78a0800000000000000
+      internalID: -6305342541958596250
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_98
+      rect:
+        serializedVersion: 2
+        x: 523
+        y: 794
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee3ac08a23a649890800000000000000
+      internalID: -7452214717591018514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_99
+      rect:
+        serializedVersion: 2
+        x: 535
+        y: 795
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7a5a1dc7f642ebf0800000000000000
+      internalID: -296596595341108610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_100
+      rect:
+        serializedVersion: 2
+        x: 543
+        y: 800
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53039d6f99ea31780800000000000000
+      internalID: -8713428877737119691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_101
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 761
+        width: 48
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f3e9d496defb05c0800000000000000
+      internalID: -4248021625920166921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_102
+      rect:
+        serializedVersion: 2
+        x: 511
+        y: 787
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63b851d3ae6b794f0800000000000000
+      internalID: -821987289808401610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_103
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 741
+        width: 38
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35367cf97f17fec80800000000000000
+      internalID: -8291283080614288557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: dial-room-light-worn_104
+      rect:
+        serializedVersion: 2
+        x: 376
+        y: 741
+        width: 95
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec99f94dcce2e2cc0800000000000000
+      internalID: -3733995583768127026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
