@@ -14,6 +14,8 @@ The manifest lives in code, in [`Assets/CelestialDial/Slots.cs`](../../Assets/Ce
 
 A file fills its placeholder's rect exactly (no letterboxing), so draw at the slot's proportions: a 360 × 800 room background, a 44 × 100 Keeper. Draw at twice the listed size for phone density (720 × 1600 for a room), never more than the slot's cap. Make both sides multiples of 4 so the texture compresses; anything else imports uncompressed and larger, and the Console says so. Transparent pixels are honoured (the Keeper and Caspar should be cut-outs).
 
+**Masters (Platform fit, Part 2, Oct 2).** A room's background or the Dial's room (`dial-room`) can also take a master: 1200 × 1840 in the file (600 × 920 design units, inside the 2048 cap), dropped into the same slot, which `Bleed` (`Bleed.IsMaster`, by the file's 600:920 shape) draws whole, centred on the 360 × 800 column; a 720 × 1600 file still works as the stop-gap (the rules are in [VALIDATION.md](VALIDATION.md), Platform fit, Part 2). Each file is judged on its own, so the Dial room's worn and bright looks (`dial-room-worn`, `dial-room-bright`) need masters of their own, or they stay stop-gap.
+
 Where the placeholder used color for state (a lit lamp, an open Book, a lit seat), the file is drawn at full brightness in that state and dimmed in the other; the tints are in `SliceView`/`DialView` next to the placeholder colors. Labels under the props (“Shelves, mostly empty”) stay until the owner says otherwise; whether they go once art arrives is an open owner call.
 
 ## Image slots
@@ -199,7 +201,7 @@ Applied by [`Assets/Editor/CelestialDial/SlotImport.cs`](../../Assets/Editor/Cel
 - **Images:** Sprite (2D and UI), single, full-rect mesh, no mipmaps, alpha is transparency, sRGB, not readable, clamp, bilinear, no power-of-two scaling; **max size per slot** (the cap above); **compressed with crunch at quality 50** (the download shrinks several times over; the on-device format follows the WebGL texture setting, DXT by default). A side that is not a multiple of 4 is warned about.
 - **Sounds:** Vorbis at quality 0.5, optimized sample rate, preloaded; cues forced to mono and decompressed on load (no latency), the ambient loop stereo and compressed in memory.
 
-Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (141). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
+Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (151). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
 
 ## The test set and the style page
 

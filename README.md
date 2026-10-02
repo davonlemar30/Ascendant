@@ -12,7 +12,7 @@ Ascendant teaches Western astrology the way a patient tutor would: one pattern a
 
 The first wing of the Library, **the Zodiac Wing**, is playable from start to finish. It holds one lesson: the twelve signs, and how to *derive* what a sign is instead of memorizing twelve personalities. The target is to have the Wing finished, polished, and sounding like itself by **November 13, 2026**.
 
-The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are illustrated and wake up room by room as you earn Keys. Caspar, the Keeper, and the journal are illustrated too. The Celestial Dial was just recast as one bronze wheel, and the small Dial in the Zodiac Wing was redrawn to match. The book on the shelf is still a plain block, and there is no sound yet.
+The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are illustrated and wake up room by room as you earn Keys. Caspar, the Keeper, and the journal are illustrated too. The Celestial Dial was just recast as one bronze wheel, and the small Dial in the Zodiac Wing was redrawn to match. The Dial now begins the game worn and tarnished and wakes a step with each Key you earn; its brightest steps are still to come. The book on the shelf is still a plain block, and there is no sound yet.
 
 ## Your journey through the Wing
 
@@ -43,6 +43,7 @@ The journal is a black book written in gold and silver. It opens on **the Wheel*
 ## Controls
 
 - **Phone:** tap and drag the wheel; tap a seat to jump to it; tap **Seal** to commit. In the rooms, tap a doorway, the desk, the table, the Books, or Caspar to walk there. The buttons under each room do the same.
+- **Travel:** in the rooms, a round gold button at the top left opens a short list of the rooms you can go to: the Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber once your first Key is in its lock. Tap a room and you are there.
 - **Keyboard:** left and right arrows turn the wheel one seat; Tab moves between controls; Enter or Space activates. Only Seal submits.
 - **Screen readers:** every seat, cell, and button is labeled, and Caspar's lines are announced as they change.
 - **Reduced motion:** honored from your system setting, with a toggle in Settings (the gear at the top right).

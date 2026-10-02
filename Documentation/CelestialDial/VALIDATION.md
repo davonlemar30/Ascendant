@@ -38,6 +38,8 @@ Not changed: the Dial's geometry, words, seats, eye and lessons; today's look (s
 
 Validation (local, worktree `dial-wake`, branch `codex/dial-wake-steps` on Part 2): mechanical 587/587 (+1, the five blends; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (28.4 MB); browser suite 531/531 at desktop density, with the seven shapes (+22: 11 at each width) and 461/461 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only). Captures: [`Evidence/dial-wake-2026-10-02/`](Evidence/dial-wake-2026-10-02/).
 
+Merged as PR #104 (main `58d00c3`, Oct 2 at 03:58 local, which is 11:58 UTC; head `f057aee`, one commit, rebased onto main `4fd0b6f` after PR #103 merged. After the ladder only the validation numbers and the evidence board were added, and the rebase onto main changed no file (checked with `git diff`), so the code on main is the validated code). The PR's GitHub Actions Web run on `f057aee` (`37002885709`) passed; the main run (`37003941708`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 531/531 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass and all 22 wake-up checks included) against `https://davonlemar30.github.io/Ascendant/`, using `58d00c3`'s own suite file (identical to the validated head `f057aee`'s).
+
 ## Platform fit, Part 2: the art fills the screen (APK Session 2, finding 1b)
 
 The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114, points 1 to 4):
@@ -74,7 +76,9 @@ The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114
 
 Not changed: the column's layout and its tap targets, the rooms' approved compositions, every word, the stand-ins' pixels inside the column.
 
-Validation (local, worktree `platform-fit-2`, branch `codex/platform-fit-part2` on the mini-menu): mechanical MECH (0 compiler warnings); slice fixture FIX; headless WebGL 0 errors / 0 warnings (WEBSIZE); browser suite SUITE_D at desktop density, with the seven shapes; SUITE_P at phone density. Captures: EVID.
+Validation (local, worktree `platform-fit-2`, branch `codex/platform-fit-part2` on main `547b7bd`): mechanical 586/586 (+1, the mesh; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 509/509 at desktop density, with the seven shapes (+70: each shape's four screens, the corners, the gear's tap and box, the Travel tap, the door, no runtime errors), and 439/439 at phone density. Captures: [the Atrium](Evidence/platform-fit-part2-2026-10-02/shapes-atrium.jpg) and [the Dial](Evidence/platform-fit-part2-2026-10-02/shapes-dial.jpg) at the seven shapes, at 3x. On the 10:16 and 3:4 tablets the Dial room's stop-gap shows its edge colours stretched sideways until its master lands.
+
+Merged as PR #103 (main `4fd0b6f`, Oct 2 at 03:27 local, which is 11:27 UTC; head `9841983`, one commit on main `547b7bd`, so the code on main is the validated code). The PR's GitHub Actions Web run on `9841983` (`37000108109`) passed; the main run (`37001116108`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 509/509 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass included, which the local phone run had left out) against `https://davonlemar30.github.io/Ascendant/`, using `4fd0b6f`'s own suite file.
 
 ## The room mini-menu (task 86bca07wv)
 
@@ -99,6 +103,8 @@ The owner's ruling (Oct 1, the ruling comment on 86bca07wv; Decisions Log, Sept 
 
 Validation (local, worktree `mini-menu`, branch `codex/room-mini-menu` on main 564abae): mechanical 585/585 (0 compiler warnings); slice fixture 247/247 (+5, the round trip); headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 439/439 at desktop density (+22: 11 at each width) and 439/439 at phone density. Evidence: [the approved concept beside the game](Evidence/mini-menu-2026-10-02/board-minimenu.jpg) (the Zodiac Wing at Stage 1, TRAVEL open and closed).
 
+Merged as PR #102 (main `547b7bd`, Oct 2 at 02:42 local, which is 10:42 UTC; head `d6635f1`: the code commit `997c2d3` validated above, then the records commit `d6635f1`, which changes only the docs and the concept board, on main `564abae`, so the code on main is the validated code). The PR's GitHub Actions Web run on `d6635f1` (`36995282594`) passed; the main run (`36996996374`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 439/439 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against `https://davonlemar30.github.io/Ascendant/`, using `547b7bd`'s own suite file.
+
 ## Platform fit, Part 1: no status bar, drawn behind the cutout (APK Session 2, finding 1a)
 
 The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114 and the Decisions Log): "Hide the bar and draw behind it"; Part 1 (immersive fullscreen, drawn behind the cutout, the top row inside the safe area) ships alone first, Part 2 (filling the screen) as its own PR.
@@ -114,6 +120,8 @@ Not changed: the 360 × 800 layout and its scale rule, every tap target below th
 
 Validation (local, worktree `platform-fit`, branch `codex/platform-fit-part1` on main `ec4ba1a`): mechanical 585/585 (+1, the text net; 0 compiler warnings); slice fixture 242/242 (+2, the band); headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 417/417 at desktop density (390 and 360; +4, the band at each width) and 417/417 at phone density (`DEVICE_SCALE=2 MOBILE=1`). Android: a development build of the branch (not delivered; the next cut is on the owner's word) on the emulator, with and without the punch-hole cutout overlay. Not tested: the owner's phone.
 
+Merged as PR #101 (main `564abae`, Oct 2 at 02:12 local, which is 10:12 UTC; head `2d13d13`: the code through `703ee5c` validated above, then the records commit `2d13d13`, which changes only the docs, on main `ec4ba1a`, so the code on main is the validated code). The PR's GitHub Actions Web run on `2d13d13` (`36992774782`) passed; the main run (`36994167093`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 417/417 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against `https://davonlemar30.github.io/Ascendant/`, using `564abae`'s own suite file.
+
 ## The shelf's glow, without the smear (APK Session 2, bug 1)
 
 The owner's APK Session 2 report (Oct 1, page 2kyd583p-25354, bug 1; task 86bcbn6ct): "After activation, the bookshelf smears into a stretched, motion-blurred look." No new ruling: Build Y's stands (the shelf itself glows, a soft gold edge hugs its silhouette); only the edge's drawing changed.
@@ -126,6 +134,8 @@ The owner's APK Session 2 report (Oct 1, page 2kyd583p-25354, bug 1; task 86bcbn
 Not changed: the shelf's file, its place, its levels and breathing, the state fields `shelfLight` and `shelfRing`, anything else drawn.
 
 Validation (local, worktree `greybox`, branch `codex/shelf-glow-silhouette` from main `2599659`): mechanical 584/584 (0 compiler warnings); slice fixture 240/240 (+1, the halo check), no runtime errors; headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 413/413 at desktop density (390 and 360; +2, the halo check at each width) and 413/413 at phone density (`DEVICE_SCALE=2 MOBILE=1`). Not tested: the phone itself; the next APK cut is on the owner's word.
+
+Merged as PR #100 (main `ec4ba1a`, Oct 2 at 01:14 local, which is 09:14 UTC; head `4d7c746`, one commit on main `2599659`, so the code on main is the validated code). The PR's GitHub Actions Web run on `4d7c746` (`36987552332`) passed; the main run (`36988619666`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 413/413 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against `https://davonlemar30.github.io/Ascendant/`, using `ec4ba1a`'s own suite file.
 
 ## The Cast Dial: the phoenix holds the words (Build AC)
 
@@ -382,7 +392,7 @@ Production suite after the deploy of `9c6eb1f` (which carries #65–#68): 305/30
 
 ## The long restoration: the shared rooms restore across the whole game
 
-The owner's Sept 26 playtest (note 15) found the Grand Atrium and the Crystal Book Chamber fully restored the moment the Zodiac Wing was — too soon for a Library with six more Books to earn. His ruling (Sept 27, Decisions Log): a wing restores on its own challenges; the shared rooms restore across the Library's whole arc — 7 Books, 21 Keys (`SliceFlow.LocksTotal`) — in small, subtle steps, with the Atrium at its stage-3 look when the Zodiac Wing finishes, and no protection for saves that had seen more.
+The owner's Sept 26 playtest (note 15) found the Grand Atrium and the Crystal Book Chamber fully restored the moment the Zodiac Wing was — too soon for a Library with six more Books to earn. The owner's ruling (Sept 27, Decisions Log): a wing restores on its own challenges; the shared rooms restore across the Library's whole arc — 7 Books, 21 Keys (`SliceFlow.LocksTotal`) — in small, subtle steps, with the Atrium at its stage-3 look when the Zodiac Wing finishes, and no protection for saves that had seen more.
 
 The stage counter keeps its role: `AtriumStage` still steps 4, 5, 6 on the returns with Keys spent, so Caspar's return script and every stage check stand. What moved to the arc is what the player sees:
 
