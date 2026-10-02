@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,6 +24,10 @@ namespace Ascendant.CelestialDial
         // A file is a master when its shape is the master's (600:920), within a pixel.
         public static bool IsMaster(Sprite sprite) => sprite != null && Mathf.Abs(sprite.rect.width / sprite.rect.height - Width / Height) < .002f;
         public bool ShowsMaster { get { var image = graphic as Image; return image != null && IsMaster(image.sprite); } }
+        // Batch 2 (owner, Oct 2: the bleed masters approved): the full-screen layers on screen drawing a master whole, by file, for the web state.
+        public static string[] Masters(params Transform[] roots) => roots.Where(r => r != null).SelectMany(r => r.GetComponentsInChildren<Bleed>())
+            .Where(b => b.isActiveAndEnabled && b.ShowsMaster && b.graphic.canvas != null && b.graphic.canvas.enabled).Select(b => ((Image)b.graphic).sprite.name)
+            .Distinct().OrderBy(n => n, System.StringComparer.Ordinal).ToArray();
 
         public override void ModifyMesh(VertexHelper vh)
         {

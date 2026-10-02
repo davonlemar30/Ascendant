@@ -1243,6 +1243,7 @@ namespace Ascendant.CelestialDial
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             state.safeTop = SafeArea.TopInset(canvas); // Platform fit, Part 1: how far the top row moves down, in layout units
+            state.masters = Bleed.Masters(root, Dial != null ? Dial.Root : null); // batch 2: the layers on screen drawing a master whole
             state.wakePreview = wakePreview; // the Dial's wake-up: DEV Mode's preview (-1: as earned)
             if (MiniMenu != null) { state.travelShown = MiniMenu.ButtonShown; state.travelOpen = MiniMenu.Open; state.travelRows = MiniMenu.Rows; var t = MiniMenu.ButtonAt; state.travelAt = new[] { t.x, t.y }; } // the room mini-menu (86bca07wv); Part 2: where its button sits
             if (Settings != null) { var g = Settings.GearAt; state.gearAt = new[] { g.x, g.y }; } // Part 2: where the gear sits
