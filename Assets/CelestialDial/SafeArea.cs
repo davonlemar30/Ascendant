@@ -9,6 +9,7 @@ namespace Ascendant.CelestialDial
     // into the 360 x 800 frame. The web and the Editor report no band; tests set one with the web action safe-inset:<px> (layout units).
     public static class SafeArea
     {
+        public static System.Action Moved; // a corner piece moved (a new screen shape or band)
         public static float Simulated = -1; // test-only: a top band in layout units from the screen's top edge, or -1 for the screen's own
         // The lines under a title give up this much of their gap before they move, so a header keeps its order without pushing into what
         // sits below it (a title's glyphs end about 17 px above the next line's: 4 px stay).
@@ -24,6 +25,22 @@ namespace Ascendant.CelestialDial
         }
         // A top-row piece: it moves down by the band, less its clearance (0 for the title, the gear and the mini-menu button).
         public static T Top<T>(T piece, float clearance = 0) where T : Component { piece.gameObject.AddComponent<SafeTop>().Clearance = clearance; return piece; }
+        // A corner piece (Part 2): +1 the top right (the gear), -1 the top left (the mini-menu button).
+        public static T Corner<T>(T piece, int corner) where T : Component { var t = piece.gameObject.AddComponent<SafeTop>(); t.Corner = corner; return piece; }
+        // Part 2 (doc 2kyd583p-7114, point 1): every phone from 9:16 to 9:23 fills; wider shapes (tablets, the Fold's inner screen, desktop
+        // windows) keep the column, with room art down the sides. A 9:16 screen is the widest phone.
+        public static bool Phone(Canvas canvas) { if (canvas == null) return false; var px = canvas.pixelRect; return px.height >= 1 && px.width / px.height <= 9f / 16f + .01f; }
+        // The screen's safe area against the column, in layout units: x its left edge and y its right edge from the column's centre, z its
+        // top edge down from the column's top (negative when the screen reaches above the column).
+        public static Vector3 Edges(Canvas canvas)
+        {
+            if (canvas == null) return new Vector3(-180, 180, 0); var px = canvas.pixelRect; if (px.width < 1 || px.height < 1) return new Vector3(-180, 180, 0);
+            float scale = Mathf.Min(px.width / 360f, px.height / 800f), frameTop = (px.height - 800 * scale) / 2 / scale;
+            var safe = Simulated >= 0 ? new UnityEngine.Rect(0, 0, px.width, px.height) : Screen.safeArea;
+            float band = Simulated >= 0 ? Simulated : Mathf.Max(0, px.height - safe.yMax) / scale;
+            float left = (safe.xMin - px.width / 2) / scale, right = (safe.xMax - px.width / 2) / scale;
+            return new Vector3(Mathf.Round(left * 100) / 100, Mathf.Round(right * 100) / 100, Mathf.Round((band - frameTop) * 100) / 100);
+        }
 
         // Immersive fullscreen on Android: the status and navigation bars hide, and a swipe from an edge shows them for a moment.
         // Set again whenever the game regains focus, since the system can bring the bars back after another app or a dialog.
@@ -50,17 +67,33 @@ namespace Ascendant.CelestialDial
         }
     }
 
-    // Keeps a top-row piece at its designed place, moved down by SafeArea.TopInset less its clearance.
+    // Keeps a top-row piece at its designed place, moved down by SafeArea.TopInset less its clearance. A corner piece (the gear, the
+    // mini-menu button: Corner +1 or -1) on a phone keeps instead to the screen's safe corner, as far in from it as it sits in from the
+    // column's corner today (Part 2: "edge controls anchor to the safe area"); on a tablet or a desktop window it stays with the column.
+    // A piece that Follows another keeps its offset from it (the mini-menu's panel under its button).
     public sealed class SafeTop : MonoBehaviour
     {
-        public float Clearance; public float Shift { get; private set; }
+        public float Clearance; public int Corner; public SafeTop Follow; public float Shift { get; private set; }
+        public Vector2 Home => home; public Vector2 Placed { get; private set; } // anchored positions: designed, and where it is now
+        public Vector2 At => new Vector2(Placed.x, -Placed.y); // where it sits now: x from the column's centre, y down from the column's top (layout units)
         Vector2 home; bool homed; Canvas canvas;
+        // Home is read the moment the piece is made (its place is set before), so the web state has it before the first frame: a scene
+        // that loads and publishes straight away (a DEV jump) would otherwise publish (0, 0) where nothing later moves the piece.
+        void Awake() { home = ((RectTransform)transform).anchoredPosition; Placed = home; homed = true; }
         void LateUpdate()
         {
-            var rect = (RectTransform)transform; if (!homed) { home = rect.anchoredPosition; homed = true; }
+            var rect = (RectTransform)transform; if (!homed) { home = rect.anchoredPosition; Placed = home; homed = true; }
             if (canvas == null) { canvas = GetComponentInParent<Canvas>(); if (canvas != null) canvas = canvas.rootCanvas; }
-            float shift = Mathf.Max(0, SafeArea.TopInset(canvas) - Clearance);
-            if (Mathf.Abs(shift - Shift) < .01f) return; Shift = shift; rect.anchoredPosition = home - new Vector2(0, shift);
+            Vector2 place;
+            if (Follow != null) { if (!Follow.homed) return; place = Follow.Placed + (home - Follow.home); Shift = Follow.Shift; }
+            else if (Corner != 0 && SafeArea.Phone(canvas))
+            {
+                var edges = SafeArea.Edges(canvas); float inset = 180 - Mathf.Abs(home.x); // today's distance from the column's side
+                place = new Vector2(Corner > 0 ? edges.y - inset : edges.x + inset, home.y - edges.z); Shift = edges.z; // edges.z: the safe top, down from the column's top (above it: negative)
+            }
+            else { Shift = Mathf.Max(0, SafeArea.TopInset(canvas) - Clearance); place = home - new Vector2(0, Shift); }
+            if ((place - Placed).sqrMagnitude < .0001f) return; Placed = place; rect.anchoredPosition = place;
+            if (Corner != 0) SafeArea.Moved?.Invoke(); // the web state republishes where the system buttons are
         }
     }
 }

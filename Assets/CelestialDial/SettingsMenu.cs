@@ -16,6 +16,7 @@ namespace Ascendant.CelestialDial
         public Action<string> Jump; // Build W: DEV Mode's Jump to…, a checkpoint id (DevCheckpoints)
         public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
+        public Vector2 GearAt => gear != null && gear.GetComponent<SafeTop>() != null ? gear.GetComponent<SafeTop>().At : new Vector2(158, 22); // Part 2: where the gear sits (x from the column's centre, y down from its top)
         public bool GearShown { get => gear != null && gear.gameObject.activeSelf; set { if (gear != null) gear.gameObject.SetActive(value); if (!value) Close(); } }
         Canvas canvas; RectTransform menu, mainPanel, jumpPanel; Button gear; Text sound, motion, walk; Font font;
         static readonly Color Gold = new Color(.84f, .69f, .38f), Bone = new Color(.93f, .89f, .8f), RowColor = new Color(.16f, .15f, .18f);
@@ -29,11 +30,11 @@ namespace Ascendant.CelestialDial
             var root = new GameObject("Settings Portrait", typeof(RectTransform)).GetComponent<RectTransform>(); root.SetParent(canvasObject.transform, false);
             root.anchorMin = root.anchorMax = root.pivot = new Vector2(.5f, .5f); root.sizeDelta = new Vector2(360, 800);
             // The gear: drawn in code (the web font has no gear glyph), gold on a dark disc, at the top right.
-            gear = MakeButton(root, "", 158, 22, 36, 36, Toggle); gear.name = "Settings gear"; SafeArea.Top(gear); // Platform fit, Part 1: below the cutout's band
+            gear = MakeButton(root, "", 158, 22, 36, 36, Toggle); gear.name = "Settings gear"; SafeArea.Corner(gear, 1); // Platform fit: below the cutout's band (Part 1); on a phone, at the screen's safe top-right corner (Part 2)
             var gearImage = gear.GetComponent<Image>(); gearImage.sprite = GearSprite(); gearImage.color = Color.white;
             // The menu: a dim veil (a tap on it closes) and the slim box in the middle.
             menu = Rect("Settings", root, 0, 400, 360, 800);
-            var veil = menu.gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f);
+            var veil = menu.gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f); Bleed.Add(veil, root); // Part 2: the veil dims the whole screen
             var veilButton = menu.gameObject.AddComponent<Button>(); veilButton.targetGraphic = veil; veilButton.transition = Selectable.Transition.None; veilButton.onClick.AddListener(Close);
             bool quit = CanQuit; float height = quit ? 454 : 398; // Build W: one more Testing row, Jump to...
             var panel = mainPanel = Rect("Settings box", menu, 0, 400, 280, height);

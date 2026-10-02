@@ -2,6 +2,44 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Platform fit, Part 2: the art fills the screen (APK Session 2, finding 1b)
+
+The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114, points 1 to 4):
+- Every phone from 9:16 to 9:23 fills edge to edge. Tablets, the Fold's inner screen and desktop windows keep the centred column, with room art down the sides.
+- Each room and the Dial's room get one 600 × 920 master (1200 × 1840 in the file), cropped from the centre. AI drafts serve only as the stop-gap until a cleaned master lands.
+- The extra space is decoration only: the floor, the doors, the Dial and the chat box stay in the column with their tap targets.
+- Phone browsers fill like the app.
+
+**Code**
+
+- **The column.** The 360 × 800 frame is now the centred design column, under the same scale rule as before (the smaller of the width over 360 and the height over 800). Every layout, door and tap target stays where it was.
+- **The art reaches the edges** (`Bleed`, a mesh effect on each full-screen layer):
+  - Layers: the rooms and the Atrium's opening screens, their light, grime and veil layers, the Dial's room and its two fades, the journal's page, the black fade, the Settings veil, and every plain screen.
+  - A file the master's shape (600:920) draws whole, centred on the column. So a master is a file drop: the same slot, a bigger file, no code change.
+  - Until it lands, today's 720 × 1600 painting stands in: the column draws as it was, and past it the painting continues outward, mirrored at its edges and dimmed toward the screen's edges (to 55%). This is point 2's stop-gap.
+  - The Dial's room is the exception. Its rim runs to within 4 px of the column's sides, so a mirror would hang half-wheels in the margins; its edge colours carry outward instead, darkened to 35%.
+  - The journal's book stays in the column; past it the desk's edge carries on, darker (a mirror would show a second spine).
+  - Plain fills and the gradients just grow.
+  - Only the sides on the column's edge grow: a band on the column's top grows up and sideways.
+  - Taps stay in the column.
+- **Phone or tablet.** A screen is a phone when its width over its height is at most 9:16. On a phone the system buttons keep to the screen's safe corners, as far in as they sit from the column's corners today (22 px): the gear top right, the mini-menu button top left with its panel under it. Everything else stays in the column. On a tablet or a desktop window the system buttons stay with the column.
+- **The web.** The web state reports `gearAt` and `travelAt`, and the template's semantic gear, mini-menu button and rows follow them. The other semantic boxes keep the column's frame as before.
+
+**Checks**
+
+- The mechanical checks build the mesh. A 1200 × 1840 file draws whole across 600 × 920. A 720 × 1600 painting keeps its column and continues in a 3 × 3 grid. A band on the column's top grows up and sideways only.
+- The suite's seven-shape pass runs at 9:16, 9:19.5, 9:20, 9:21, 9:23, 10:16 and 3:4, captured at 3x. At every shape:
+  - the Atrium's, the Wing's, the Dial's and the journal's art reaches every edge (no flat bar in any margin);
+  - the gear and the mini-menu button sit where the web state says (at the screen's corners on a phone, at the column's on a tablet) and take their canvas taps there, with the semantic gear on the gear;
+  - the Zodiac Wing door takes its canvas tap in the column.
+- The main suite also runs at 390 × 844 (9:19.5) and 360 × 800 (9:20), at both densities.
+
+**The Atrium bookshelf, rechecked** (task 86bc8ddwh, ruled web-only on Sept 29). On 9:16 phones and on tablets it now stands whole on screen, over the stop-gap. On 9:19.5 to 9:23 phones the column fills the screen's width, so the shelf still runs 35 px past the edge, as painted. That remains the art question of the Sept 27 diagnosis: the Atrium's master, or a recomposed Atrium.
+
+Not changed: the column's layout and its tap targets, the rooms' approved compositions, every word, the stand-ins' pixels inside the column.
+
+Validation (local, worktree `platform-fit-2`, branch `codex/platform-fit-part2` on the mini-menu): mechanical MECH (0 compiler warnings); slice fixture FIX; headless WebGL 0 errors / 0 warnings (WEBSIZE); browser suite SUITE_D at desktop density, with the seven shapes; SUITE_P at phone density. Captures: EVID.
+
 ## The room mini-menu (task 86bca07wv)
 
 The owner's ruling (Oct 1, the ruling comment on 86bca07wv; Decisions Log, Sept 28 to Oct 4, Part 2): Option A, the room list, with v2 spacing (the 280 px panel). The one dim Sealed row with its lock stays: it hints that the Library has more to wake. Rooms only: the instrument screens keep their own exits. Travel only (the Grand Atrium, the Zodiac Wing, the Crystal Book Chamber), which also answers 3a on 86bcbn6w6 as A; Your journal stays a room button. The button sits at the top left, mirroring the Settings gear, inside the safe area.

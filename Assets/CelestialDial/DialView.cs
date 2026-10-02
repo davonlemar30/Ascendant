@@ -114,6 +114,7 @@ namespace Ascendant.CelestialDial
             public string shelfEdge; // APK Session 2, bug 1: "halo" when the lit shelf's edge is drawn from its silhouette (no Outline copies)
             public bool settingsOpen, canQuit, jumpsShown; // Build W: the Jump to list shows // Build U: the Settings menu is open; the app (not a web page) can quit
             public float safeTop; // Platform fit, Part 1: the top row's move down from the safe area, in layout units (0 without a band)
+            public float[] gearAt, travelAt; // Part 2: where the gear and the mini-menu button sit (x from the column's centre, y down from its top; on a phone at the screen's safe corners)
             public bool travelShown, travelOpen; public string[] travelRows; // the room mini-menu (86bca07wv): its button in a room, its panel, its rows ("The Zodiac Wing, here", "Sealed")
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
@@ -172,6 +173,7 @@ namespace Ascendant.CelestialDial
             root = Rect("Portrait", canvasObject.transform, 0, 0, 360, 800);
             // Build Z: the Zodiac Wing behind the wheel (Room A), its glow swept in over it, and dark fades under the title and under the wheel so the words read
             var room = Rect("Dial room", root, 0, 400, 360, 800); roomImage = room.gameObject.AddComponent<Image>(); roomImage.raycastTarget = false;
+            Bleed.Add(roomImage, root, Bleed.Mode.Clamp, .35f); // Part 2: the Dial's room reaches the screen's edges (the Dial stays in the column). Its rim runs to within 4 px of the column's sides, so a mirror would hang half-wheels in the margins: the stop-gap carries the edge's own colours outward instead, darkened
             roomArt = Slots.Dress(roomImage, "dial-room"); room.gameObject.SetActive(roomArt);
             var glowRect = Rect("Dial room light", root, 0, 400, 360, 800); roomLight = glowRect.gameObject.AddComponent<Image>(); roomLight.raycastTarget = false;
             glowRect.gameObject.SetActive(roomArt && Slots.Dress(roomLight, "dial-room-light"));
@@ -707,6 +709,7 @@ namespace Ascendant.CelestialDial
             ref Sprite cache=ref (fromTop ? ref fadeDown : ref fadeUp);
             if(cache==null){ var tex=new Texture2D(1,64,TextureFormat.RGBA32,false){wrapMode=TextureWrapMode.Clamp}; for(int y=0;y<64;y++){ float k=y/63f; tex.SetPixel(0,y,new Color(.08f,.07f,.09f,fromTop ? k*k : (1-k)*(1-k))); } tex.Apply(); cache=Sprite.Create(tex,new UnityEngine.Rect(0,0,1,64),new Vector2(.5f,.5f),100); }
             var r=Rect(fromTop ? "Fade under the title" : "Fade under the wheel",parent,x,top+height/2,360,height); var image=r.gameObject.AddComponent<Image>(); image.sprite=cache; image.color=new Color(1,1,1,alpha); image.raycastTarget=false;
+            Bleed.Add(image, root, Bleed.Mode.Clamp, 1); // Part 2: the fades run to the screen's sides (and off its top or bottom), their gradient unchanged
         }
         Text Shade(Text label) { if(roomArt){ var shadow=label.gameObject.AddComponent<Shadow>(); shadow.effectColor=new Color(0,0,0,.85f); shadow.effectDistance=new Vector2(1,-1.5f); } return label; }
         void Bar(Transform parent,float x,float top,float width,float height)
