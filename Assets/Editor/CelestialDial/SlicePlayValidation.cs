@@ -73,6 +73,13 @@ namespace Ascendant.Build
                 Check(title!=null && gear!=null && under!=null && Mathf.Abs(title.Shift-24)<.01f && Mathf.Abs(gear.Shift-24)<.01f && Mathf.Abs(under.Shift-(24-SafeArea.UnderTitle))<.01f && Mathf.Abs(View.Dial.Snapshot().safeTop-24)<.01f,"Platform fit, Part 1: a 24 px top band moves the Atrium's title and the gear down 24, the caption under the title 11 (title "+(title!=null?title.Shift:-1)+", gear "+(gear!=null?gear.Shift:-1)+", caption "+(under!=null?under.Shift:-1)+")");
                 Capture("slice-390-safe-band.png");SafeArea.Simulated=-1;});
             Steps.Enqueue(()=>{Check(UnityEngine.Object.FindObjectsByType<SafeTop>(FindObjectsSortMode.None).All(t=>t.Shift==0) && View.Dial.Snapshot().safeTop==0,"Platform fit, Part 1: without a band the top row is back where it was");});
+            // The room mini-menu (owner, Oct 1; 86bca07wv): its button in the Atrium; TRAVEL with the Atrium here, the Zodiac Wing and one Sealed row
+            // (the Chamber waits for Key 1); the Wing row travels, and the Atrium row comes back to the Atrium as it was.
+            Steps.Enqueue(()=>{Check(View.MiniMenu.ButtonShown && !View.MiniMenu.Open,"the mini-menu: its button shows in the Atrium");Act("travel");});
+            Steps.Enqueue(()=>{Check(View.MiniMenu.Open && string.Join("|",View.MiniMenu.Rows)=="The Grand Atrium, here|The Zodiac Wing|Sealed","the mini-menu opens TRAVEL: the Atrium here, the Zodiac Wing, one Sealed row");Capture("slice-390-travel.png");Act("travel:wing");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && !View.MiniMenu.Open && View.MiniMenu.ButtonShown,"the mini-menu's Zodiac Wing row travels to the Wing");Act("travel");});
+            Steps.Enqueue(()=>{Check(string.Join("|",View.MiniMenu.Rows)=="The Grand Atrium|The Zodiac Wing, here|Sealed","in the Wing the mini-menu marks the Wing here");Act("travel:atrium");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && !View.Busy && View.Flow.AtriumStage==1 && !View.MiniMenu.Open,"the mini-menu's Atrium row comes back to the Atrium as it was");});
             Steps.Enqueue(()=>Act("enter-wing"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy && View.Dial.Snapshot().caspar==SliceView.WingOpeningLine,"Build T: in the Zodiac Wing Caspar points to the Dial");Capture("slice-390-opening-wing.png");Act("walk:dial");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.UiCanvas.gameObject.activeSelf && View.Dial.Lesson.DialDormant && View.Dial.Lesson.Sun==1,"atrium continues into the wing; the Dial is dormant and knows the sun sign");Capture("slice-390-wing.png");});

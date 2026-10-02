@@ -131,6 +131,7 @@ namespace Ascendant.CelestialDial
         const string ChamberEndCard = "The Zodiac Wing is complete. The Library remembers, and the rest remains sealed, for now."; // owner (worksheet section 13); two lines at 330 wide
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
         public SettingsMenu Settings { get; private set; } // Build U
+        public TravelMenu MiniMenu { get; private set; } // the room mini-menu (owner, Oct 1; 86bca07wv)
 
         void Awake()
         {
@@ -154,7 +155,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth();
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue, out atriumPose);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue, out returnPose);
-            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildAvatar(); BuildFade();
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildAvatar(); BuildTravel(); BuildFade();
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -607,6 +608,8 @@ namespace Ascendant.CelestialDial
             else if (command == "leave-chamber") LeaveChamber();
             else if (command == "restart") Restart();
             else if (command == "reload") { if (!busy) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); } // test-only: resume from the local save
+            else if (command == "travel") MiniMenu?.Toggle(); // the room mini-menu (86bca07wv): the button, then a row
+            else if (command.StartsWith("travel:")) MiniMenu?.Pick(command.Substring(7));
             else if (command == "enter-wing") EnterWing();
             else if (command == "enter-dial") Walk("dial");
             else if (command == "enter-shelf") Walk("shelf");
@@ -813,6 +816,28 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.2f);
             busy = false; ShowGrid(); Publish();
         }
+        // The room mini-menu (owner, Oct 1; task 86bca07wv): quick travel between the rooms open to the player. Doors stay the main way to
+        // move; a row takes the doorways' own steps (out to the Atrium, then in), behind one fade instead of the walk.
+        void BuildTravel()
+        {
+            MiniMenu = gameObject.AddComponent<TravelMenu>();
+            MiniMenu.Here = TravelHere; MiniMenu.IsOpen = TravelOpen; MiniMenu.Busy = () => busy; MiniMenu.Go = id => StartCoroutine(TravelTo(id)); MiniMenu.Changed = Publish;
+            MiniMenu.Build(root, font);
+        }
+        string TravelHere() => Flow.Screen == SliceScreen.Hub ? "atrium" : Flow.Screen == SliceScreen.WingRoom ? "wing" : Flow.Screen == SliceScreen.ChamberRoom ? "chamber" : "";
+        bool TravelOpen(string id) => id == "atrium" || id == "wing" || (id == "chamber" && Flow.KeyInserted); // the Chamber is a room once Key 1 is in its lock; before, it folds into Sealed
+        IEnumerator TravelTo(string id)
+        {
+            string here = TravelHere(); if (busy || here == "" || id == here || !TravelOpen(id)) yield break;
+            busy = true; hubNote.text = ""; Show(); Publish();
+            Sound.Play("door"); yield return FadeTo(1);
+            if (Flow.Screen == SliceScreen.WingRoom) { Flow.LeaveWing(); Save(); } else if (Flow.Screen == SliceScreen.ChamberRoom) { Flow.LeaveChamber(); Save(); }
+            if (id == "wing") Flow.EnterWing(); else if (id == "chamber") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); }
+            Show(); PlaceAvatar(); Publish();
+            yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
+            yield return FadeTo(0);
+            busy = false; Show(); Publish();
+        }
         void Walk(string id)
         {
             if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom && Flow.Screen != SliceScreen.ChamberRoom)) return;
@@ -990,6 +1015,7 @@ namespace Ascendant.CelestialDial
             foreach (var k in atriumKits) if (k.Container.gameObject.activeInHierarchy) ApplyKit(k, true); // Build N: the Atrium shows its stage, turning what it newly restores
             if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : s == SliceScreen.WingRoom ? wingRoom : chamber, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
             avatar.gameObject.SetActive(roomScreen);
+            MiniMenu?.Refresh(roomScreen); // the mini-menu: rooms only, the instruments keep their own exits (owner, Oct 1)
             if (s == SliceScreen.WingRoom)
             {
                 ApplyKit(wingRoomKit, true); // Build M: the room shows the Keys earned, turning what they newly restore
@@ -1196,6 +1222,7 @@ namespace Ascendant.CelestialDial
             state.canLeaveDial = s == SliceScreen.Wing && (Flow.AtriumStage >= 2 || !Flow.KeyRevealed) && !busy && !Dial.Busy; // the same rule the button follows, read now rather than from last frame's button // Build T: the Dial's own exit, shown at all times; canLeaveWing is the room's
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             state.safeTop = SafeArea.TopInset(canvas); // Platform fit, Part 1: how far the top row moves down, in layout units
+            if (MiniMenu != null) { state.travelShown = MiniMenu.ButtonShown; state.travelOpen = MiniMenu.Open; state.travelRows = MiniMenu.Rows; } // the room mini-menu (86bca07wv)
             state.jumpsShown = Settings != null && Settings.JumpsShown; // Build W
             { var fit = s == SliceScreen.Atrium ? atriumFit : s == SliceScreen.AtriumReturn ? returnFit : s == SliceScreen.Hub ? hubFit : s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom ? chamberFit : null; state.chatBoxHeight = fit != null && fit.isActiveAndEnabled ? fit.Height : 0; } // Build X
             // Build F: the fork, practice, the gate, the journal

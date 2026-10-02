@@ -2,6 +2,29 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The room mini-menu (task 86bca07wv)
+
+The owner's ruling (Oct 1, the ruling comment on 86bca07wv; Decisions Log, Sept 28 to Oct 4, Part 2): Option A, the room list, with v2 spacing (the 280 px panel). The one dim Sealed row with its lock stays: it hints that the Library has more to wake. Rooms only: the instrument screens keep their own exits. Travel only (the Grand Atrium, the Zodiac Wing, the Crystal Book Chamber), which also answers 3a on 86bcbn6w6 as A; Your journal stays a room button. The button sits at the top left, mirroring the Settings gear, inside the safe area.
+
+- **The menu** (`TravelMenu`). A round gold button at the top left (x −158, 22 from the top, 36 × 36: the gear's mirror) drops the slim-box panel headed TRAVEL. The panel's left edge is at 17, it is 280 wide, it hangs from 47, and its rows are 44 apart, the concept's measures.
+  - Each room open to travel gets a row with its line icon (dome, wheel, crystal) and its name in 15 px type.
+  - The room you are in sits on an amber bar and reads "here".
+  - Last comes one dim Sealed row with a lock. The Chamber is a room once Key 1 is in its lock; until then it folds into the Sealed row.
+  - The button and the panel sit below the cutout's band (Part 1).
+- **Travel.** A row takes the doorways' own steps, out to the Atrium and then in, with the door's sound and one fade in place of the walk. The Atrium's stages, the save and the Keys follow as they do through the doors.
+  - Picking the room you are in closes the panel; so does a tap off it. The Sealed row is no door.
+  - The menu shows in the rooms only (the Atrium, the Wing, the Chamber as a room). It does not show on an instrument, in the journal, in the opening or on the style page.
+- **Working choices** (Claude's, inside the build's latitude, recorded on the Decisions Log):
+  - Quick travel is a fade, not a walk.
+  - The button's mark (three linked stars) and the row icons are drawn in code, like the gear, so no art slot is added.
+- **Checks.**
+  - The web state reports `travelShown`, `travelOpen` and `travelRows`. The template has a semantic button (`aria-expanded`) and one row per open room (`aria-current` on the room you are in).
+  - The suite, on the canvas at the opening: the button opens the panel, the Sealed row is no door, a tap off the panel closes it, the Wing row travels, the semantic rows sit on the panel's rows, and the Atrium row comes back.
+  - The suite, after Key 3: two hops each way (the Wing to the Chamber and back, no Key spent), and no button on the Dial.
+  - The fixture: the opening round trip.
+
+Validation (local, worktree `mini-menu`, branch `codex/room-mini-menu` on main 564abae): mechanical 585/585 (0 compiler warnings); slice fixture 247/247 (+5, the round trip); headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 439/439 at desktop density (+22: 11 at each width) and 439/439 at phone density. Evidence: [the approved concept beside the game](Evidence/mini-menu-2026-10-02/board-minimenu.jpg) (the Zodiac Wing at Stage 1, TRAVEL open and closed).
+
 ## Platform fit, Part 1: no status bar, drawn behind the cutout (APK Session 2, finding 1a)
 
 The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114 and the Decisions Log): "Hide the bar and draw behind it"; Part 1 (immersive fullscreen, drawn behind the cutout, the top row inside the safe area) ships alone first, Part 2 (filling the screen) as its own PR.
