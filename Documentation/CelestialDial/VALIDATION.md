@@ -38,7 +38,7 @@ Not changed: the Dial's geometry, words, seats, eye and lessons; today's look (s
 
 Validation (local, worktree `dial-wake`, branch `codex/dial-wake-steps` on Part 2): mechanical 587/587 (+1, the five blends; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (28.4 MB); browser suite 531/531 at desktop density, with the seven shapes (+22: 11 at each width) and 461/461 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only). Captures: [`Evidence/dial-wake-2026-10-02/`](Evidence/dial-wake-2026-10-02/).
 
-Merged as PR #104 (main `58d00c3`, Oct 2 at 03:58 local, which is 11:58 UTC; head `f057aee`, one commit, rebased onto main `4fd0b6f` after PR #103 merged. After the ladder only the validation numbers and the evidence board were added, and the rebase onto main changed no file (checked with `git diff`), so the code on main is the validated code). The PR's GitHub Actions Web run on `f057aee` (`37002885709`) passed.
+Merged as PR #104 (main `58d00c3`, Oct 2 at 03:58 local, which is 11:58 UTC; head `f057aee`, one commit, rebased onto main `4fd0b6f` after PR #103 merged. After the ladder only the validation numbers and the evidence board were added, and the rebase onto main changed no file (checked with `git diff`), so the code on main is the validated code). The PR's GitHub Actions Web run on `f057aee` (`37002885709`) passed; the main run (`37003941708`: Build Web player and Deploy to GitHub Pages) passed.
 
 ## Platform fit, Part 2: the art fills the screen (APK Session 2, finding 1b)
 
