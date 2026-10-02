@@ -23,7 +23,7 @@ The owner's ruling (Oct 1, the ruling comment on 86bca07wv; Decisions Log, Sept 
   - The suite, after Key 3: two hops each way (the Wing to the Chamber and back, no Key spent), and no button on the Dial.
   - The fixture: the opening round trip.
 
-Validation (local, worktree `mini-menu`, branch `codex/room-mini-menu` on main MAIN): mechanical MECH (0 compiler warnings); slice fixture FIX; headless WebGL 0 errors / 0 warnings (WEBSIZE); browser suite SUITE_D at desktop density and SUITE_P at phone density. Evidence: EVID.
+Validation (local, worktree `mini-menu`, branch `codex/room-mini-menu` on main 564abae): mechanical 585/585 (0 compiler warnings); slice fixture 247/247 (+5, the round trip); headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 439/439 at desktop density (+22: 11 at each width) and 439/439 at phone density. Evidence: [the approved concept beside the game](Evidence/mini-menu-2026-10-02/board-minimenu.jpg) (the Zodiac Wing at Stage 1, TRAVEL open and closed).
 
 ## Platform fit, Part 1: no status bar, drawn behind the cutout (APK Session 2, finding 1a)
 
