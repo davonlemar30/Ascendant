@@ -2,6 +2,51 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The buttons: bronze on the instruments, the chat box's language in the rooms (batch 2)
+
+The owner's rulings (Oct 1, task 86bcbn6w6: 3b C, two tiers with engraved arrows for Previous and Next; 3c C, by place, bronze on the instruments and the chat box's gold on dark in the rooms; 3d, pressed darkens and sinks a pixel, unavailable dims to half, every target at least 44 px) and answers (Oct 2, batch run 2: "Buttons at 44 px, bronze on the Table and the Book too"). The look is the art lane's board on 86bcbn6w6 (Oct 2).
+
+**The art.** Seven pieces, cut from the approved art so they fit any button (`ButtonLook`):
+- the plate's frame without its centre marks, nine-sliced (40 px in at 2x);
+- the plate's top notch and bottom diamond, laid back whole at its centre;
+- the bronze arrow (Next is it mirrored, exactly as the art lane drew it);
+- the rule's two lines (their tapered ends kept) and its centre diamond with its gaps.
+
+Seven new slots, 158 in all. The room frame is drawn in code, the CASPAR box's shape at 2x with the chat box's see-through fill.
+
+**By place**
+- The instruments (the Dial, the Elemental Table, the Book of Symbols, practice):
+  - SEAL is a plate with its word engraved at 31 px. Every other action is a plate with its word engraved: EB Garamond Bold in the board's gold, a dark edge and a soft shadow.
+  - Previous and Next are the arrows.
+  - The way out (Leave the Dial, Leave the Table, Leave the instrument, Close the Book) is gold lettering on the rule.
+- The rooms (the Atrium, its story pages, the Zodiac Wing, the Chamber): the chat box's see-through dark fill and gold hairline, and small gold capitals (13 px bold, tracked 2.2 px), kept in capitals when the words change.
+- Not changed: Insert Key keeps its crimson (owner, worksheet section 13); the journal's buttons (the journal's own build); the opening's name and birth screens (neither a room nor an instrument); Settings and DEV Mode; the Table's cells and sign tiles and the Dial's seats, which are the instruments' own pieces.
+
+**3d, the states.** Pressed: every piece darkens (x .78), the words take their darker gold, and the look sinks 1 px. Unavailable: the whole button at half. Keyboard focus keeps today's warm tint; a tap leaves no focus behind.
+
+**3d, 44 px.**
+- Your journal in the Wing and the Chamber goes from 40 to 44.
+- The Atrium story's Continue goes from 42 to 44.
+- The Table's sign tiles go from 40 to 44, on rows 46 apart starting 2 px higher, so the last row clears the readout.
+- The gear and the mini-menu button keep their 36 px icons and take taps over 44 x 44.
+- The Atrium's desk (70 x 30) takes taps over 70 x 44, and the Caspar box's Continue link (96 x 26) over 96 x 44.
+- The web template's boxes follow.
+
+**The web state** publishes `buttons`: each button on screen as "words:look:width x height", the target's size.
+
+**Checks**
+- Mechanical: the seven pieces at their slots' size. A test button in each look builds as the board shows it, and pressed and unavailable apply.
+- The suite:
+  - the Atrium and the Zodiac Wing wear the room look;
+  - the Dial's SEAL is a plate, Previous and Next are arrows, and Leave the Dial is on its rule;
+  - the Book of Symbols' four names are plates and Close the Book is on its rule;
+  - the Table's SEAL is a plate, Leave the Table is on its rule, and its tiles are 44 px tall;
+  - on each of those screens, every target is 44 px or more.
+
+Not changed: every button's words, place and action.
+
+Validation (local, worktree `mini-menu`, branch `codex/buttons` on the Dial's final art, then rebased onto main `0d7ee4b`, docs only): mechanical 590/590 (+1, the looks and states; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (34.5 MB); browser suite 574/574 at desktop density, with the seven shapes (+10: the looks on five screens at each width) and 483/483 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only). Captures: [`Evidence/buttons-2026-10-02/`](Evidence/buttons-2026-10-02/) (the board beside the game).
+
 ## The Dial's final art: its room as a master in every look, the bright passes, the small Dial (batch 2)
 
 The owner's answers (Oct 2, batch run 2, given in Claude's session; Decisions Log, Sept 28 to Oct 4, Part 2; tasks 86bcbn6mf and 86bcbn6w6): "Bleed masters approved", "Make the Dial room's worn and bright masters from the colour tables", and "Keep the repeating cobwebs, leave the glow".
