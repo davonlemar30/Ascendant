@@ -138,6 +138,8 @@ Validation (local, worktree `dial-wake`, branch `codex/dial-wake-steps` on Part 
 
 Merged as PR #104 (main `58d00c3`, Oct 2 at 03:58 local, which is 11:58 UTC; head `f057aee`, one commit, rebased onto main `4fd0b6f` after PR #103 merged. After the ladder only the validation numbers and the evidence board were added, and the rebase onto main changed no file (checked with `git diff`), so the code on main is the validated code). The PR's GitHub Actions Web run on `f057aee` (`37002885709`) passed; the main run (`37003941708`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 531/531 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass and all 22 wake-up checks included) against `https://davonlemar30.github.io/Ascendant/`, using `58d00c3`'s own suite file (identical to the validated head `f057aee`'s).
 
+Update (Oct 2, PR #107): the bright files and the final worn and bright masters landed, so no wake step stands in any more. See "The Dial's final art" above.
+
 ## Platform fit, Part 2: the art fills the screen (APK Session 2, finding 1b)
 
 The owner's rulings (Oct 1; task 86bcbn6mf; the owner's record doc 2kyd583p-7114, points 1 to 4):
@@ -177,6 +179,8 @@ Not changed: the column's layout and its tap targets, the rooms' approved compos
 Validation (local, worktree `platform-fit-2`, branch `codex/platform-fit-part2` on main `547b7bd`): mechanical 586/586 (+1, the mesh; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 509/509 at desktop density, with the seven shapes (+70: each shape's four screens, the corners, the gear's tap and box, the Travel tap, the door, no runtime errors), and 439/439 at phone density. Captures: [the Atrium](Evidence/platform-fit-part2-2026-10-02/shapes-atrium.jpg) and [the Dial](Evidence/platform-fit-part2-2026-10-02/shapes-dial.jpg) at the seven shapes, at 3x. On the 10:16 and 3:4 tablets the Dial room's stop-gap shows its edge colours stretched sideways until its master lands.
 
 Merged as PR #103 (main `4fd0b6f`, Oct 2 at 03:27 local, which is 11:27 UTC; head `9841983`, one commit on main `547b7bd`, so the code on main is the validated code). The PR's GitHub Actions Web run on `9841983` (`37000108109`) passed; the main run (`37001116108`: Build Web player and Deploy to GitHub Pages) passed. Production recheck after the Pages deploy (passed): browser suite 509/509 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass included, which the local phone run had left out) against `https://davonlemar30.github.io/Ascendant/`, using `4fd0b6f`'s own suite file.
+
+Update (Oct 2, PRs #106 and #107): the masters landed (the Atrium, the Zodiac Wing and the Chamber in #106, the Dial's room in every look in #107), so the stop-gap now covers only a file that is not a master. See "The bleed masters" and "The Dial's final art" above.
 
 ## The room mini-menu (task 86bca07wv)
 
