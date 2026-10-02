@@ -18,11 +18,11 @@ Where the placeholder used color for state (a lit lamp, an open Book, a lit seat
 
 ## Image slots
 
-Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is the imported texture's longest side.
+Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is the imported texture's longest side. This table holds the slots that are not kit pieces; the kit pieces, the doors and plates, and the three grime layers have their sizes in the tables in the kit sections below.
 
 | Slot | Size | Cap | Where it is drawn |
 | --- | --- | --- | --- |
-| `atrium` | 360 × 800 | 2048 | the Grand Atrium, behind the opening, the return, and the room; since Build Q the domed Atrium's restored shell |
+| `atrium` | 360 × 800 | 2048 | the Grand Atrium, behind the opening, the return, and the room; since Build Q the domed Atrium's restored shell: the dome, the dark wood shelves and balcony, the statue's niche, the empty doorways |
 | `wing` | 360 × 800 | 2048 | the Zodiac Wing's shell (Build M): the restored room's architecture only; the kit pieces, grime, and light layer over it (see the kit section below). Build L had painted the Dial, the table, the chair and the shelf into this file; since Build M they are separate kit pieces |
 | `chamber` | 360 × 800 | 2048 | the Crystal Book Chamber, first visit and room |
 | `caspar` | 64 × 112 | 256 | Caspar standing in the Atrium |
@@ -72,7 +72,7 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `crystal-page` | 26 × 58 | 256 | the page that rises from an open Book |
 | `lock` | 7 × 7 | 32 | one lock, three per Book; lights when filled |
 | `keeper-key` | 84 × 40 | 256 | the Keeper Key rising from the Dial (the “KEEPER KEY” label goes) |
-| `atrium-light` | 360 × 800 | 2048 | the Atrium's golden-hour light (Build H): a transparent overlay drawn over the background and under everything else, faded by the Atrium stage (nothing at Stage 1, a quarter at 2, half at 3, three quarters at 4, full at 5 and 6) |
+| `atrium-light` | 360 × 800 | 2048 | the Atrium's golden-hour light (Build H): shafts through the arches, glowing dust, warmth on the stone; a transparent overlay drawn over the background and under everything else, faded by the Atrium stage (nothing at Stage 1, a quarter at 2, half at 3, three quarters at 4, full at 5 and 6) |
 | `wing-light` | 360 × 800 | 2048 | the Zodiac Wing room's golden-hour light, the same fade |
 | `chamber-light` | 360 × 800 | 2048 | the Crystal Book Chamber's golden-hour light, the same fade |
 | `chat-box` | 324 × 240 | 1024 | the chat box (Build P; since Build R also on the Atrium hub and the Chamber, while the Dial, the Book of Symbols and the Elemental Table draw a slim box in code): the dark see-through fill and the gold frame in one image, imported sliced (borders 56, 64, 56, 56 at the file's 2x) so each panel keeps the corner stars whole at its own height |
@@ -88,7 +88,28 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 
 The journal is the Black Hours (Build AA, owner Sept 30; it replaces Build J's crimson ring binder). One tall page of black-blue vellum written in gold and silver, painterly by the owner's journal-only exception to the Art Bible; the style reference is `Documentation/ConceptArt/JournalMockup/journal-black-hours-v3-2-silver-ruled.png`. Draw `journal-page` at 720 × 1600: the page runs x 24–696, y 32–1232, its calm field x 72–648, y 160–1100 (nothing there: the engine draws the silver rules 26 px apart from y 96 and the faded vermilion margin, `RuleFirst` and `RuleGap` in `SliceView`), and below y 1260 a quiet dark desk where the buttons sit. `journal-wheel` is drawn at 600 × 600 with its twelve sockets on radius 216 (socket 1 at 9 o'clock, counter-clockwise, as on the Dial) and shown at 270 px (`WheelSize`), so a socket is 41 px; the layout guides are in `Documentation/ConceptArt/JournalMockup/production-2026-09-30/`. The seat rings are 112 × 112 files: `journal-seat-leaf` (mastered) is drawn as painted, `journal-seat-line` is near-white so the engine can tint it silver (met) or gold (practising). Each `sign-*` picture is **one full-colour file on a transparent background** (400 × 400), clipped round in a seat and on its page. The engine draws it as line art and brings its colour up as the player learns the sign (Illumination, the `Ascendant/Illumination` shader in `Resources/Shaders`). The ribbon is nine-sliced (its top 6% and bottom 20% keep their shape), so keep its middle a plain band.
 
-The Zodiac Wing is built as a kit (owner, Sept 24): `wing` is the restored **shell** (architecture only), `wing-grime` (360 × 800) is the dust, cobwebs, and cold tint over it that fade out by Keys, and each **piece** has a worn and a restored file, `kit-<piece>-worn` / `kit-<piece>-restored`. Piece files are drawn at **half their pixel size**, bottom-centred on their placement in `SliceView.WingKit` (x, bottom, the Key that restores it, a scale); the slot sizes below are the restored piece on the 360 × 800 layout, cap 1024. The pieces: `window`, `carpet`, `chandelier`, `banner` (three placements), `orrery`, `armillary`, `lectern`, `globe`, `shelf`, `dial`, `telescope`, `table`, `candles` (two placements), `books`, `chair`, `plate` (the doorway's name plate; the engine writes the name on the restored one). A piece restores on its Key, except the shelf (when the book of symbols wakes: the wheel lit) and the table (when it wakes: the modalities complete), because their lessons happen on them.
+The Zodiac Wing is built as a kit (owner, Sept 24): `wing` is the restored **shell** (architecture only), `wing-grime` (360 × 800, cap 2048) is the dust, cobwebs, and cold tint over it that fade out by Keys, and each **piece** has a worn and a restored file, `kit-<piece>-worn` / `kit-<piece>-restored`. Piece files are drawn at **half their pixel size**, bottom-centred on their placement in `SliceView.WingKit` (x, bottom, the Key that restores it, a scale); the sizes are in the table after this paragraph. The pieces: `window`, `carpet`, `chandelier`, `banner` (three placements), `orrery`, `armillary`, `lectern`, `globe`, `shelf`, `dial`, `telescope`, `table`, `candles` (two placements), `books`, `chair`, `plate` (the doorway's name plate; the engine writes the name on the restored one). A piece restores on its Key, except the shelf (when the book of symbols wakes: the wheel lit) and the table (when it wakes: the modalities complete), because their lessons happen on them.
+
+Sizes on the 360 × 800 layout (draw at twice that), cap 1024 for every piece. The dial's eye-open files, `kit-dial-worn-open` and `kit-dial-restored-open`, are the same size as its closed pieces (see *The Wing Dial's eye*, below).
+
+| Piece | Restored | Worn |
+| --- | --- | --- |
+| `window` | 76 × 192 | 76 × 192 |
+| `carpet` | 352 × 110 | 352 × 110 |
+| `chandelier` | 84 × 106 | 84 × 106 |
+| `banner` | 26 × 130 | 26 × 130 |
+| `orrery` | 80 × 106 | 80 × 106 |
+| `armillary` | 66 × 80 | 66 × 80 |
+| `lectern` | 76 × 90 | 76 × 90 |
+| `globe` | 34 × 50 | 34 × 50 |
+| `shelf` | 96 × 290 | 96 × 290 |
+| `dial` | 188 × 206 | 186 × 200 |
+| `telescope` | 66 × 116 | 66 × 116 |
+| `table` | 108 × 90 | 108 × 90 |
+| `candles` | 16 × 40 | 16 × 40 |
+| `books` | 68 × 46 | 68 × 46 |
+| `chair` | 50 × 82 | 50 × 82 |
+| `plate` | 64 × 28 | 64 × 28 |
 
 Not slots, on purpose (except the story screens' chat box and plate, Build P): the Caspar panels, buttons, and text (interface, not placeholder art); the glows (doorway light, shelf and table glow, the Key's glow, the seam) and the fade, which are effects drawn over whatever is there; the Dial screen's charcoal backdrop; the table's board of cells and tiles, which is a control.
 
@@ -104,11 +125,28 @@ The owner's B2 ruling (Sept 28, note 3): on the story screens (the Grand Atrium 
 
 ### The Grand Atrium kit (Build N, Sept 25)
 
-The Grand Atrium is built as a kit, on the same `RoomKit` code as the Wing: `atrium` is the restored **shell** (architecture only), `atrium-grime` (360 × 800) is the dust, cobwebs, and cold blue tint over it that fades out by the Atrium's stage, and each **piece** has a worn and a restored file, `akit-<piece>-worn` / `akit-<piece>-restored`. Piece files are drawn at **half their pixel size**, positioned from `SliceView.AtriumKit`; the slot sizes below are the restored piece on the 360 × 800 layout, cap 1024. The pieces: `banner`, `bench`, `bust`, `candlestand`, `chandelier`, `desk`, `lamp`, `pennant`, `plant`, `rug`.
+The Grand Atrium is built as a kit, on the same `RoomKit` code as the Wing: `atrium` is the restored **shell** (architecture only), `atrium-grime` (360 × 800, cap 2048) is the dust, cobwebs, and cold blue tint over it that fades out by the Atrium's stage, and each **piece** has a worn and a restored file, `akit-<piece>-worn` / `akit-<piece>-restored`. Piece files are drawn at **half their pixel size**, positioned from `SliceView.AtriumKit`; the sizes are in the table at the end of this section. The pieces: `banner`, `bench`, `bust`, `candlestand`, `chandelier`, `desk`, `lamp`, `pennant`, `plant`, `rug`.
 
 **The domed Atrium (Build Q, Sept 28).** The owner approved the new Grand Atrium (the B2 world: a glass dome on the night sky, dark wood Gothic shelves on a balcony, navy banners, the statue in a lit niche above the Zodiac Wing door) and its layout check. The art pass made it as an edit of the old restored scene, so the doors, plates, steps, desk, bench, busts, plants, candlestands, and rug keep their places; the new scene sat 22 px low (at 1×) and every file is moved 22 px up to meet the game's doors. `atrium` is the new restored shell, and `atrium-grime` is now the same empty room asleep (cold moonlight, a grimy cracked dome, dust, cobwebs), opaque, so the kit's grime fade is a clean cross-fade from the dormant room to the awake one (the two shells line up at offset 0, 0). New art for `banner` (the long navy banner), `pennant` (new: the narrow star pennant beside the niche), `lamp` (the wall lantern), and `chandelier` (now the armillary ring under the dome; the slot keeps its name); their worn files come from the dormant scene and are scaled in `SliceView.AtriumKit` (`wornScale`) to hang as far as the restored ones. The old `chart` and `shelf` pieces are retired from the placements (the new shell paints its own shelves); their files stay. The kit is 20 pieces; the lanterns take the shelf's Key 3, and the armillary ring stays last (Key 21). `atrium-light` is unchanged.
 
-The three doors and the doorway plates are their own slots, tracked by lock state rather than worn/restored: `akit-door-closed` / `akit-door-locked` / `akit-door-open`, and `akit-plate-clean` / `akit-plate-locked` (from `SliceView.AtriumKit` / `AddDoor`). A door goes locked (weathered, chains and a padlock) → unlocked (clean, edges glowing) → open as the Keeper reaches it; the Wing door starts unlocked, the Chamber's unlocks at the first Key, and the sealed door stays locked. The clean plate is where the engine writes the room's name (THE ZODIAC WING, THE CRYSTAL BOOK CHAMBER); the sealed door's plate stays locked and unreadable.
+The three doors and the doorway plates are their own slots, tracked by lock state rather than worn/restored: `akit-door-closed` / `akit-door-locked` / `akit-door-open` (each 70 × 136), and `akit-plate-clean` / `akit-plate-locked` (each 64 × 28; from `SliceView.AtriumKit` / `AddDoor`). A door goes locked (weathered, chains and a padlock) → unlocked (clean, edges glowing) → open as the Keeper reaches it; the Wing door starts unlocked, the Chamber's unlocks at the first Key, and the sealed door stays locked. The clean plate is where the engine writes the room's name (THE ZODIAC WING, THE CRYSTAL BOOK CHAMBER); the sealed door's plate stays locked and unreadable.
+
+Piece sizes on the 360 × 800 layout (draw at twice that), cap 1024. `chart` and `shelf` are retired from the placements (Build Q); their slots and files stay.
+
+| Piece | Restored | Worn |
+| --- | --- | --- |
+| `banner` | 64 × 166 | 66 × 184 |
+| `bench` | 96 × 52 | 104 × 40 |
+| `bust` | 28 × 76 | 44 × 68 |
+| `candlestand` | 28 × 90 | 36 × 88 |
+| `chandelier` | 148 × 218 | 86 × 138 |
+| `chart` | 34 × 46 | 38 × 48 |
+| `desk` | 146 × 96 | 142 × 78 |
+| `lamp` | 22 × 62 | 18 × 42 |
+| `pennant` | 48 × 132 | 42 × 132 |
+| `plant` | 36 × 46 | 34 × 48 |
+| `rug` | 316 × 420 | 200 × 108 |
+| `shelf` | 80 × 300 | 82 × 300 |
 
 ### The Wing Dial's eye (Build Z, Sept 30)
 
@@ -116,7 +154,19 @@ The Wing kit's `dial` piece rests with its **eye closed**, worn and restored ali
 
 ### The Crystal Book Chamber kit (Build O, Sept 25)
 
-The Chamber is built on the same kit code: `chamber` is the restored shell, `chamber-grime` (360 × 800) is the dust, cobwebs, clouded crystals, and cold tint that fades out by Keys spent, and each piece has a worn and a restored file, `ckit-<piece>-worn` / `ckit-<piece>-restored`, drawn at half their pixel size from `SliceView.ChamberKit`. The pieces: `banner`, `book`, `brazier`, `candle`, `crystal`, `mechanism`, `reliquary`. The seven Books stand on the altar and are drawn separately, sealed or open by `BooksOpen`, with a lock at each Book's foot; the old candles, mechanism, pages, labels, and floor band hide once the kit is in.
+The Chamber is built on the same kit code: `chamber` is the restored shell, `chamber-grime` (360 × 800, cap 2048) is the dust, cobwebs, clouded crystals, and cold tint that fades out by Keys spent, and each piece has a worn and a restored file, `ckit-<piece>-worn` / `ckit-<piece>-restored`, drawn at half their pixel size from `SliceView.ChamberKit`. The pieces: `banner`, `book`, `brazier`, `candle`, `crystal`, `mechanism`, `reliquary`. The seven Books stand on the altar and are drawn separately, sealed or open by `BooksOpen`, with a lock at each Book's foot; the old candles, mechanism, pages, labels, and floor band hide once the kit is in.
+
+Sizes on the 360 × 800 layout (draw at twice that), cap 1024 for every piece.
+
+| Piece | Restored | Worn |
+| --- | --- | --- |
+| `banner` | 26 × 90 | 32 × 100 |
+| `book` | 40 × 66 | 40 × 64 |
+| `brazier` | 18 × 56 | 22 × 48 |
+| `candle` | 8 × 22 | 16 × 34 |
+| `crystal` | 22 × 54 | 28 × 52 |
+| `mechanism` | 70 × 110 | 74 × 112 |
+| `reliquary` | 30 × 46 | 26 × 38 |
 
 ## Sound slots
 
