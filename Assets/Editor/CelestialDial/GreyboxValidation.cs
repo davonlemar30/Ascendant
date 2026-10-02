@@ -792,6 +792,9 @@ namespace Ascendant.Build
               Check(Bleed.IsMaster(Sprite.Create(new Texture2D(1200,1840),new UnityEngine.Rect(0,0,1200,1840),Vector2.zero)) && !Bleed.IsMaster(Sprite.Create(new Texture2D(720,1600),new UnityEngine.Rect(0,0,720,1600),Vector2.zero))
                 && master.verts==4 && master.min==new Vector2(-300,-460) && master.max==new Vector2(300,460) && column.verts==36 && column.min==new Vector2(-300,-460) && column.max==new Vector2(300,460)
                 && band.min==new Vector2(-300,-70) && band.max==new Vector2(300,130),"Platform fit, Part 2: a full-screen layer reaches the master's 600 x 920: a 1200 x 1840 file draws whole; a 720 x 1600 painting continues outward in a 3 x 3 grid; a band on the column's top grows up and sideways only"); }
+            // Batch 2 (owner, Oct 2: "Bleed masters approved"; 86bcbn6mf): the three rooms and their light and grime layers are 1200 x 1840 masters, drawn whole.
+            Check(new[] { "atrium", "atrium-light", "atrium-grime", "wing", "wing-light", "wing-grime", "chamber", "chamber-light", "chamber-grime" }.Select(n => Resources.Load<Sprite>("Art/" + n)).All(a => a != null && Bleed.IsMaster(a) && (int)a.rect.width == 1200 && (int)a.rect.height == 1840),
+                "Batch 2: the approved bleed masters are in: the Grand Atrium, the Zodiac Wing and the Crystal Book Chamber, and their light and grime layers, each a 1200 x 1840 master");
             // The Dial's wake-up (owner, Oct 1; 86bcbn6w6: 2a A, 2b B): five steps by the Keys earned, blended from three looks: worn; halfway to today's;
             // today's; halfway to bright; bright. Every layer has its worn and bright slot, and the Wing's small Dial its bright pair (2d A).
             Check(Enumerable.Range(0,5).Select(i=>DialView.WakeBlend(i)).SequenceEqual(new[]{(0,0,0f),(0,1,.5f),(1,1,0f),(1,2,.5f),(2,2,0f)}) && DialView.WakeBlend(-1)==(0,0,0f) && DialView.WakeBlend(9)==(2,2,0f)

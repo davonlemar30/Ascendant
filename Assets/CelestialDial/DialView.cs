@@ -116,6 +116,7 @@ namespace Ascendant.CelestialDial
             public float safeTop; // Platform fit, Part 1: the top row's move down from the safe area, in layout units (0 without a band)
             public int dialWake; public string dialLook; public int wakePreview; // the Dial's wake-up (86bcbn6w6): the step it shows, the looks it blends, DEV Mode's preview (-1: as earned)
             public float[] gearAt, travelAt; // Part 2: where the gear and the mini-menu button sit (x from the column's centre, y down from its top; on a phone at the screen's safe corners)
+            public string[] masters; // batch 2 (the owner approved the bleed masters, Oct 2): the full-screen layers on screen drawing a 1200 x 1840 master whole, by file
             public bool travelShown, travelOpen; public string[] travelRows; // the room mini-menu (86bca07wv): its button in a room, its panel, its rows ("The Zodiac Wing, here", "Sealed")
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)

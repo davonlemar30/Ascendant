@@ -49,6 +49,7 @@ const path=require('path');
     await semantic('next-screen');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await page.screenshot({path:path.join(out,viewport.width+'-atrium.png')});
+    { const m=(await state()).masters||[]; check(m.includes('atrium'),'Batch 2 (the masters approved, Oct 2): the Grand Atrium draws its 1200 x 1840 master whole ('+m.join(', ')+') at '+viewport.width); }
     check((await state()).casparPose==='wry','Build P: Caspar stands wry behind the chat box on the opening\'s first page at '+viewport.width);
     { const h=(await state()).chatBoxHeight; check(h>0&&h<240,'Build X: the opening\'s chat box fits its first page ('+h+' of 240) at '+viewport.width);
       await tap(0,429+h);await page.waitForFunction(()=>window.ascendantDial.snapshot().casparPose==='warm',{},{timeout:5000}).catch(()=>{}); // Build P: the pose turns with the page; Build X: Continue rides at the fitted box's bottom
@@ -852,6 +853,7 @@ const path=require('path');
       await until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);await pg.waitForTimeout(900);
       filled(await margins('atrium'),'Atrium');
       const s=await snap(),g=s.gearAt,t=s.travelAt,phone=w/h<=9/16+.01;
+      check(['atrium','atrium-light'].every(n=>(s.masters||[]).includes(n)),'Batch 2: at '+name+' the Atrium and its light draw their masters whole ('+(s.masters||[]).join(', ')+')');
       check(g&&t&&(phone?Math.abs((g[0]+22)*scale-(w/2))<1.5&&Math.abs((t[0]-22)*scale+(w/2))<1.5:Math.abs(g[0]-158)<.01&&Math.abs(t[0]+158)<.01),'Part 2: at '+name+' the gear and the mini-menu button sit '+(phone?'at the screen\'s top corners (a phone)':'at the column\'s corners (a tablet keeps the column)')+': gear '+JSON.stringify(g)+', button '+JSON.stringify(t));
       const gearBox=await pg.locator('#settings').evaluate(b=>[parseFloat(b.style.left)+parseFloat(b.style.width)/2,parseFloat(b.style.top)+parseFloat(b.style.height)/2]);
       check(Math.abs(gearBox[0]-(w/2+g[0]*scale))<1.5&&Math.abs(gearBox[1]-(top+g[1]*scale))<1.5,'Part 2: at '+name+' the semantic gear sits on the gear');
@@ -862,6 +864,7 @@ const path=require('path');
       await tap(0,310);await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});
       check((await snap()).screen==='wingroom','Part 2: at '+name+' the Zodiac Wing door takes its canvas tap in the column');await pg.waitForTimeout(700);
       filled(await margins('wing'),'Zodiac Wing');
+      { const m=(await snap()).masters||[]; check(['wing','wing-light'].every(n=>m.includes(n)),'Batch 2: at '+name+' the Zodiac Wing and its light draw their masters whole ('+m.join(', ')+')'); }
       await act('poi-dial');await until(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});await pg.waitForTimeout(1500);
       filled(await margins('dial'),'Dial');
       await act('leave-dial');await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});
