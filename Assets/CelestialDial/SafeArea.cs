@@ -18,9 +18,9 @@ namespace Ascendant.CelestialDial
         public static float TopInset(Canvas canvas)
         {
             if (canvas == null) return 0; var px = canvas.pixelRect; if (px.width < 1 || px.height < 1) return 0;
-            float scale = Mathf.Min(px.width / 360f, px.height / 800f), frameTop = (px.height - 800 * scale) / 2;
-            float band = Simulated >= 0 ? Simulated * scale : Mathf.Max(0, Screen.height - Screen.safeArea.yMax);
-            return Mathf.Max(0, band - frameTop) / scale;
+            float scale = Mathf.Min(px.width / 360f, px.height / 800f), frameTop = (px.height - 800 * scale) / 2 / scale; // in layout units
+            float band = Simulated >= 0 ? Simulated : Mathf.Max(0, Screen.height - Screen.safeArea.yMax) / scale;
+            return Mathf.Round(Mathf.Max(0, band - frameTop) * 100) / 100; // to a hundredth of a layout pixel, so a simulated band reads back exactly
         }
         // A top-row piece: it moves down by the band, less its clearance (0 for the title, the gear and the mini-menu button).
         public static T Top<T>(T piece, float clearance = 0) where T : Component { piece.gameObject.AddComponent<SafeTop>().Clearance = clearance; return piece; }
