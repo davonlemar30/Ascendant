@@ -2,6 +2,27 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The bleed masters: the Atrium, the Zodiac Wing and the Chamber (batch 2)
+
+The owner's answers (Oct 2, batch run 2, given in Claude's session; Decisions Log, Sept 28 to Oct 4, Part 2; task 86bcbn6mf): "Bleed masters approved", and "Bleed: i OK, ii default, iii keep, iv no repaint".
+
+**The art.** Nine files drop into their slots as 1200 x 1840 masters: atrium, wing and chamber, and their light and grime layers. Part 2's `Bleed` draws a master whole, centred on the column, so the art needs no code. Each master's column is today's painting:
+- atrium: its bottom row, 86% opaque in today's file, is now opaque (its colour is unchanged);
+- wing-grime: the default file (ii), which fills the column's side fade, so the column's own grime changes at 55,177 pixels;
+- the other seven: the column is byte-identical.
+
+The Dial's room and its looks follow in their own PR.
+
+**The web state** publishes `masters`: the full-screen layers on screen that draw a master whole, by file (`Bleed.Masters`).
+
+**Checks**
+- Mechanical: the nine files are 1200 x 1840 masters.
+- The suite: the Atrium draws its master at both widths and densities; at all seven shapes, the Atrium, the Zodiac Wing and their lights draw theirs.
+
+Not changed: the column's layout, the doors, the tap targets, and the stop-gap for any file that is not a master.
+
+Validation (local, worktree `dial-wake`, branch `codex/bleed-masters` on main `82176e8`): mechanical 588/588 (+1, the masters; 0 compiler warnings); slice fixture 247/247; headless WebGL 0 errors / 0 warnings (32.8 MB, from 28.4 MB: the masters); browser suite 547/547 at desktop density, with the seven shapes (+16: 2 at the opening, 14 at the shapes) and 463/463 at phone density (`DEVICE_SCALE=2 MOBILE=1`; the seven-shape pass runs at desktop density only). Captures: [`Evidence/bleed-masters-2026-10-02/`](Evidence/bleed-masters-2026-10-02/) (the Atrium and the Zodiac Wing at 9:16, 10:16 and 3:4, stop-gap then master).
+
 ## The Dial's wake-up: five steps by the Keys (APK Session 2, polish 1)
 
 The owner's rulings (Oct 1, the ruling comments on task 86bcbn6w6; Decisions Log, Sept 28 to Oct 4, Part 2):
