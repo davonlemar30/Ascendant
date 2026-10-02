@@ -31,6 +31,8 @@ IMAGES = [
     ("caspar-calm", 132, 236), ("caspar-explain", 132, 236), ("caspar-warm", 132, 236), ("caspar-wry", 132, 236), ("caspar-moved", 132, 236), ("caspar-solemn", 132, 236),
     ("akit-pennant-restored", 48, 132), ("akit-pennant-worn", 44, 132),  # Build Q: the domed Atrium's pennants
     ("dial-room", 180, 400), ("dial-room-light", 180, 400), ("dial-ring", 180, 180), ("dial-ring-light", 180, 180), ("kit-dial-worn-open", 188, 208), ("kit-dial-restored-open", 188, 208),  # Build Z: the Dial's room, its glow, the Wing Dial's open eye
+    ("dial-room-worn", 180, 400), ("dial-room-light-worn", 180, 400), ("dial-ring-worn", 180, 180), ("dial-ring-light-worn", 180, 180),  # the Dial's wake-up (Oct 2): its worn and bright looks
+    ("dial-room-bright", 180, 400), ("dial-room-light-bright", 180, 400), ("dial-ring-bright", 180, 180), ("dial-ring-light-bright", 180, 180), ("kit-dial-bright", 188, 208), ("kit-dial-bright-open", 188, 208),
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
@@ -87,7 +89,7 @@ def image(index, name, width, height):
     label, scale = text_pixels(name, width, height)
     corner = 3 if min(width, height) >= 16 else 0
     walk_band = name == "keeper-walk"
-    light = name.endswith("-light")  # Build H: a translucent amber wash, brighter at the top, with diagonal shafts; the name stays readable
+    light = name.endswith("-light") or "-light-" in name  # the wake-up's looks of a light layer (dial-room-light-worn) are overlays too; Build H: a translucent amber wash, brighter at the top, with diagonal shafts; the name stays readable
     def pixel(x, y):
         if light:
             if (x, y) in label:

@@ -14,11 +14,12 @@ namespace Ascendant.CelestialDial
         public Func<bool> Muted, Reduced; public Func<string> WalkSpeed;
         public Action ToggleSound, ToggleMotion, CycleWalk, StartOver, Changed;
         public Action<string> Jump; // Build W: DEV Mode's Jump to…, a checkpoint id (DevCheckpoints)
+        public Func<string> WakeLabel; public Action CycleWake; // the Dial's wake-up (86bcbn6w6): DEV Mode previews each step
         public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
         public Vector2 GearAt => gear != null && gear.GetComponent<SafeTop>() != null ? gear.GetComponent<SafeTop>().At : new Vector2(158, 22); // Part 2: where the gear sits (x from the column's centre, y down from its top)
         public bool GearShown { get => gear != null && gear.gameObject.activeSelf; set { if (gear != null) gear.gameObject.SetActive(value); if (!value) Close(); } }
-        Canvas canvas; RectTransform menu, mainPanel, jumpPanel; Button gear; Text sound, motion, walk; Font font;
+        Canvas canvas; RectTransform menu, mainPanel, jumpPanel; Button gear; Text sound, motion, walk, wakeRow; Font font;
         static readonly Color Gold = new Color(.84f, .69f, .38f), Bone = new Color(.93f, .89f, .8f), RowColor = new Color(.16f, .15f, .18f);
 
         public void Build(Font uiFont)
@@ -51,13 +52,14 @@ namespace Ascendant.CelestialDial
             var over = Row(panel, y, () => StartOver?.Invoke(), 40); over.text = "Start over"; y += 56;
             var close = Row(panel, y, Close); close.text = "Close"; close.color = Gold;
             // Build W: the checkpoint list, in place of the main box while it shows.
-            float jumpHeight = 62 + (DevCheckpoints.All.Length - 1) * 46 + 56 + 24 + 22;
+            float jumpHeight = 62 + DevCheckpoints.All.Length * 46 + 56 + 24 + 22; // the checkpoints, then the Dial's wake-up preview
             jumpPanel = Rect("Jump to box", menu, 0, 400, 280, jumpHeight);
             var jumpImage = jumpPanel.gameObject.AddComponent<Image>(); jumpImage.sprite = Slots.InstrumentBoxSprite(); jumpImage.type = Image.Type.Sliced; jumpImage.pixelsPerUnitMultiplier = 2;
             jumpPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
             var jumpTitle = Label(jumpPanel, "J U M P   T O", 0, 24, 240, 18, 12); jumpTitle.color = Gold; jumpTitle.fontStyle = FontStyle.Bold;
             float jy = 62;
             foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), 40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
+            wakeRow = Row(jumpPanel, jy, () => CycleWake?.Invoke(), 40); wakeRow.transform.parent.name = "Dial wake"; jy += 46; // DEV Mode: a tap steps the Dial's look (first visit, Key 1 to Key 4), then back to as earned
             var back = Row(jumpPanel, jy + 10, ShowMain); back.text = "Back"; back.color = Gold;
             jumpPanel.gameObject.SetActive(false);
             menu.gameObject.SetActive(false);
@@ -73,6 +75,7 @@ namespace Ascendant.CelestialDial
             sound.text = "Sound: " + (Muted != null && Muted() ? "off" : "on");
             motion.text = "Reduced motion: " + (Reduced != null && Reduced() ? "on" : "off");
             walk.text = "Walk: " + (WalkSpeed != null ? WalkSpeed() : "normal");
+            if (wakeRow != null) wakeRow.text = "Dial wake: " + (WakeLabel != null ? WakeLabel() : "as earned");
         }
         void Update() { if (canvas != null && canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f); }
 

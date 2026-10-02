@@ -114,6 +114,7 @@ namespace Ascendant.CelestialDial
             public string shelfEdge; // APK Session 2, bug 1: "halo" when the lit shelf's edge is drawn from its silhouette (no Outline copies)
             public bool settingsOpen, canQuit, jumpsShown; // Build W: the Jump to list shows // Build U: the Settings menu is open; the app (not a web page) can quit
             public float safeTop; // Platform fit, Part 1: the top row's move down from the safe area, in layout units (0 without a band)
+            public int dialWake; public string dialLook; public int wakePreview; // the Dial's wake-up (86bcbn6w6): the step it shows, the looks it blends, DEV Mode's preview (-1: as earned)
             public float[] gearAt, travelAt; // Part 2: where the gear and the mini-menu button sit (x from the column's centre, y down from its top; on a phone at the screen's safe corners)
             public bool travelShown, travelOpen; public string[] travelRows; // the room mini-menu (86bca07wv): its button in a room, its panel, its rows ("The Zodiac Wing, here", "Sealed")
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
@@ -191,6 +192,9 @@ namespace Ascendant.CelestialDial
                 ringLight.type = Image.Type.Filled; ringLight.fillMethod = Image.FillMethod.Radial360; ringLight.fillOrigin = (int)Image.Origin360.Top; ringLight.fillClockwise = true; ringLight.fillAmount = 0;
                 ringLayer.gameObject.SetActive(ringArt);
             }
+            // The wake-up (owner, Oct 1; 86bcbn6w6): each of the Dial's four layers can blend toward its next look (WakeStep)
+            if (roomArt) { WakeLayerFor(roomImage, "dial-room"); if (roomLight.gameObject.activeSelf) WakeLayerFor(roomLight, "dial-room-light"); }
+            if (ringArt) { WakeLayerFor(ringLayer.GetComponent<Image>(), "dial-ring"); if (ringLight.gameObject.activeSelf) WakeLayerFor(ringLight, "dial-ring-light"); }
             ring = Rect("Twelve-seat Dial", root, 0, 270, 332, 332);
             var hit = ring.gameObject.AddComponent<Image>(); hit.color = new Color(0,0,0,.001f);
             ring.gameObject.AddComponent<DialDrag>().View = this;
@@ -584,6 +588,7 @@ namespace Ascendant.CelestialDial
                 canBuilderName=Lesson.Phase==LessonPhase.BuilderName && !busy,canBuilderShare=Lesson.Phase==LessonPhase.BuilderShare && !busy,
                 speaker=panel.gameObject.activeInHierarchy?(DialSpeaking?DialLesson.DialSpeaker:DialLesson.CasparSpeaker):"",dialRoom=roomArt,dialLit=roomLight!=null && roomLight.gameObject.activeSelf ? roomLight.fillAmount : 0,revealing=revealNow,revealsPlayed=Lesson.RevealsPlayed.OrderBy(p=>p).ToArray(),eyeText=roomArt ? start.text : "",eyeSize=roomArt && start.text!="" ? Mathf.RoundToInt(start.cachedTextGenerator.fontSizeUsedForBestFit/Mathf.Max(.01f,canvas.scaleFactor)) : 0,signLabel=destination.text,dialVoice=panel.GetComponent<FitBox>()!=null && panel.GetComponent<FitBox>().DialVoiceShown && panel.gameObject.activeInHierarchy,dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
             state.dialRing=ringArt; state.ringTurn=ringLayer!=null ? ringLayer.localEulerAngles.z : 0; // Build AB
+            state.dialWake=wakeStep; state.dialLook=WakeLook; // the wake-up: its step (0 to 4) and the looks it blends
             if(seats[0]!=null){ var seatSize=((RectTransform)seats[0].transform).sizeDelta; state.seatRadius=SeatR; state.seatSize=new[]{seatSize.x,seatSize.y}; } // Build AC follow-up: read, not set
             state.seatNames=seatTexts.Select(t=>t!=null ? t.text : "").ToArray(); state.seatFacts=Enumerable.Range(0,12).Select(i=>ringArt ? seatFacts[i].text : "").ToArray();
             state.framedFacts=destinationFacts!=null ? System.Text.RegularExpressions.Regex.Replace(destinationFacts.text,"<[^>]+>","") : "";
@@ -612,7 +617,52 @@ namespace Ascendant.CelestialDial
         // Build V: the plate names the Dial when the line shown is its challenge, Caspar otherwise.
         bool DialSpeaking => Lesson.Speaker==DialLesson.DialSpeaker && FitBox.Whole(message)==Lesson.Message && Lesson.Message!="";
         void ShowSpeaker() { var fit=panel.GetComponent<FitBox>(); if(fit!=null) fit.SetSpeaker(DialSpeaking); }
-        void LateUpdate() { ShowSpeaker(); }
+        void LateUpdate() { ShowSpeaker(); SyncWake(); }
+        // ---- The Dial's wake-up (owner, Oct 1; 86bcbn6w6: 2a A, 2b B, 2c A to C) ----
+        // Five steps by the Keys earned, blended from three drawn looks: worn on the first visit, halfway to today's at Key 1, today's at Key 2,
+        // halfway to bright at Key 3, bright and new at Key 4. A look whose file is not in yet stands in with today's, so the final passes are a
+        // file drop. The eye is drawn the same in every look (2c D is excluded): it never changes.
+        public static readonly string[] WakeLooks = { "-worn", "", "-bright" }, WakeLookNames = { "worn", "today", "bright" };
+        public static (int from, int to, float t) WakeBlend(int step) => step <= 0 ? (0, 0, 0f) : step == 1 ? (0, 1, .5f) : step == 2 ? (1, 1, 0f) : step == 3 ? (1, 2, .5f) : (2, 2, 0f);
+        public int WakeStep { get => wakeStep; set { int v = Mathf.Clamp(value, 0, 4); if (v == wakeStep) return; wakeStep = v; ApplyWake(); } }
+        int wakeStep = -1;
+        sealed class WakeLayer { public Image Base, Over; public string Slot; }
+        readonly List<WakeLayer> wakeLayers = new List<WakeLayer>();
+        void WakeLayerFor(Image baseImage, string slot)
+        {
+            if (baseImage == null) return;
+            var r = new GameObject(slot + " (the next look)", typeof(RectTransform)).GetComponent<RectTransform>(); r.SetParent(baseImage.transform, false);
+            r.anchorMin = Vector2.zero; r.anchorMax = Vector2.one; r.offsetMin = r.offsetMax = Vector2.zero; r.SetAsFirstSibling(); // over its own layer, under the layers above it
+            var over = r.gameObject.AddComponent<Image>(); over.raycastTarget = false; over.type = baseImage.type; over.fillMethod = baseImage.fillMethod; over.fillOrigin = baseImage.fillOrigin; over.fillClockwise = baseImage.fillClockwise;
+            var bleed = baseImage.GetComponent<Bleed>(); if (bleed != null) Bleed.Add(over, bleed.Column, bleed.How, bleed.EdgeShade); // Part 2: it reaches the screen's edges as its layer does
+            r.gameObject.SetActive(false); wakeLayers.Add(new WakeLayer { Base = baseImage, Over = over, Slot = slot });
+        }
+        Sprite LookOf(string slot, int look) => Slots.Image(slot + WakeLooks[look]) ?? Slots.Image(slot); // a look without its file stands in with today's
+        void ApplyWake()
+        {
+            var (a, b, t) = WakeBlend(Mathf.Max(0, wakeStep));
+            foreach (var w in wakeLayers)
+            {
+                var sa = LookOf(w.Slot, a); var sb = LookOf(w.Slot, b); if (sa != null && w.Base.sprite != sa) w.Base.sprite = sa;
+                bool blend = t > 0 && sb != null && sb != sa; w.Over.gameObject.SetActive(blend); if (blend) w.Over.sprite = sb;
+            }
+            SyncWake();
+        }
+        void SyncWake()
+        {
+            if (wakeLayers.Count == 0) return; float t = WakeBlend(Mathf.Max(0, wakeStep)).t;
+            foreach (var w in wakeLayers) if (w.Over.gameObject.activeSelf) { w.Over.fillAmount = w.Base.fillAmount; var c = w.Base.color; w.Over.color = new Color(c.r, c.g, c.b, c.a * t); }
+        }
+        // For the web state: the looks the step blends ("worn", "worn + today", "today", "today + bright", "bright"), each marked when its files stand in.
+        public string WakeLook
+        {
+            get
+            {
+                if (wakeStep < 0 || wakeLayers.Count == 0) return "";
+                var (a, b, t) = WakeBlend(wakeStep); string Name(int look) => WakeLookNames[look] + (look != 1 && wakeLayers.Any(w => Slots.Image(w.Slot + WakeLooks[look]) == null) ? " (stand-in: today's)" : "");
+                return t > 0 ? Name(a) + " + " + Name(b) : Name(a);
+            }
+        }
         [Preserve] public void WebAction(string command)
         {
             if(Inert) { ExtraActions?.Invoke(command); return; }

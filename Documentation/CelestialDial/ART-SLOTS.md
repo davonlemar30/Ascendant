@@ -33,6 +33,14 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `dial-room-light` | 360 × 800 | 2048 | the Dial's fixed glow over `dial-room` (Build Z; Build AC): the rim, the diamonds, the hub ring, the ribbon's and the phoenix's bright brass; clear over the turning ring; off while the Dial sleeps, swept in by the reveal |
 | `dial-ring` | 360 × 360 | 1024 | the Cast Dial's turning ring (Build AC, owner Oct 1), centred on the wheel: twelve identical segments, each a cast name recess (faces r 136–155) and a seat window in its spoke (faces r 91–127), a rivet at each junction; clear outside r 156 and inside r 82; it turns with the seats |
 | `dial-ring-light` | 360 × 360 | 1024 | the turning ring's glow (Build AC): the recesses' and windows' bevels, the spokes' enamel lines; turns with the ring, off while the Dial sleeps |
+| `dial-room-worn` | 360 × 800 | 2048 | the Dial's room in its worn look: the dust and cobwebs, the tarnished bronze and a dull glow of the first visit (the wake-up, owner Oct 1; 86bcbn6w6 2a A, 2b B, 2c A to C): dial-room's exact canvas, centre and radii, the eye, the phoenix's outline, the room and the stand as today; until its file lands, today's dial-room stands in |
+| `dial-room-light-worn` | 360 × 800 | 2048 | dial-room-light for the worn look (the wake-up): registered to dial-room-worn; until its file lands, today's dial-room-light stands in |
+| `dial-ring-worn` | 360 × 360 | 1024 | the turning ring in the worn look (the wake-up): dial-ring's twelve identical segments and radii, cut from one segment so the twelve stay exact; until its file lands, today's dial-ring stands in |
+| `dial-ring-light-worn` | 360 × 360 | 1024 | dial-ring-light for the worn look (the wake-up): turns with the ring; until its file lands, today's dial-ring-light stands in |
+| `dial-room-bright` | 360 × 800 | 2048 | the Dial's room in its bright and new look: polished bronze catching light, the recesses and windows glowing stronger than today's, the outer glow held back (owner, Oct 1: polished bronze, not lit from inside) (the wake-up, owner Oct 1; 86bcbn6w6 2a A, 2b B, 2c A to C): dial-room's exact canvas, centre and radii, the eye, the phoenix's outline, the room and the stand as today; until its file lands, today's dial-room stands in |
+| `dial-room-light-bright` | 360 × 800 | 2048 | dial-room-light for the bright look (the wake-up): registered to dial-room-bright; until its file lands, today's dial-room-light stands in |
+| `dial-ring-bright` | 360 × 360 | 1024 | the turning ring in the bright look (the wake-up): dial-ring's twelve identical segments and radii, cut from one segment so the twelve stay exact; until its file lands, today's dial-ring stands in |
+| `dial-ring-light-bright` | 360 × 360 | 1024 | dial-ring-light for the bright look (the wake-up): turns with the ring; until its file lands, today's dial-ring-light stands in |
 | `seat` | 52 × 52 | 256 | one seat's cap, twelve times (Build Z): the greybox fallback, used only when the Dial has no turning ring (no `dial-ring` file, or no `dial-room` to hold it); with the Cast Dial's `dial-ring` each seat is its segment's name recess and window |
 | `bracket` | 72 × 88 | 256 | the fixed frame over the framed seat (Build AC: a gold wedge outline over the 9 o'clock recess and window, under the rim's diamond) |
 | `floor-markings` | 320 × 320 | 1024 | the faded floor pattern under the wheel; brightens as the wheel wakes |
@@ -110,6 +118,8 @@ Sizes on the 360 × 800 layout (draw at twice that), cap 1024 for every piece. T
 | `books` | 68 × 46 | 68 × 46 |
 | `chair` | 50 × 82 | 50 × 82 |
 | `plate` | 64 × 28 | 64 × 28 |
+
+The dial has a third state for the Dial's wake-up (owner, Oct 1; 86bcbn6w6 2d A): `kit-dial-bright` and `kit-dial-bright-open`, 188 × 206 like the restored pair. The small Dial follows the Dial screen's five steps: worn, half today's over it (Key 1), restored (Key 2), half bright over it (Key 3), bright (Key 4); until the bright files land, the restored pair stands in.
 
 Not slots, on purpose (except the story screens' chat box and plate, Build P): the Caspar panels, buttons, and text (interface, not placeholder art); the glows (doorway light, shelf and table glow, the Key's glow, the seam) and the fade, which are effects drawn over whatever is there; the Dial screen's charcoal backdrop; the table's board of cells and tiles, which is a control.
 
