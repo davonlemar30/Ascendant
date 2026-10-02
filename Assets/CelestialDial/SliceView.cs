@@ -1117,7 +1117,7 @@ namespace Ascendant.CelestialDial
         void BuildDialEyes()
         {
             dialEyes.Clear(); var piece = wingKit.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;
-            AddDialEye(piece.Worn, "kit-dial-worn-open", .446f); AddDialEye(piece.Restored, "kit-dial-restored-open", .434f); // the eye's centre, as a share of the file's height (measured)
+            AddDialEye(piece.Worn, "kit-dial-worn-open", .428f); AddDialEye(piece.Restored, "kit-dial-restored-open", .404f); // the eye's centre, as a share of the file's height (measured on the Cast Dial pieces, Build AC)
             SetDialEye(0);
         }
         void AddDialEye(CanvasGroup state, string slot, float eyeAt)

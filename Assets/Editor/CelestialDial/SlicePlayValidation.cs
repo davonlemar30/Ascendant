@@ -414,7 +414,7 @@ namespace Ascendant.Build
             if(d.RingArt)
             {
                 var nt=d.SeatNameTexts[0]; var ft=d.SeatFactTexts[0]; string sn=nt.text,sf=ft.text; int ns=nt.fontSize;
-                foreach(var z in Zodiac.Seats){ nt.fontSize=z.Name.Length>9 ? 13 : 14; nt.text=z.Name; if(nt.preferredWidth>DialView.NameRoom) misfits.Add(z.Name+" "+nt.preferredWidth.ToString("0")); }
+                foreach(var z in Zodiac.Seats){ nt.fontSize=z.Name.Length>=9 ? 13 : 14; nt.text=z.Name; if(nt.preferredWidth>DialView.NameRoom) misfits.Add(z.Name+" "+nt.preferredWidth.ToString("0")); }
                 foreach(var w in new[]{"Fire","Earth","Air","Water","Cardinal","Fixed","Mutable","Yang","Yin"}){ ft.text=w; if(ft.preferredWidth>DialView.TabletRoom) misfits.Add(w+" "+ft.preferredWidth.ToString("0")); }
                 nt.text=sn; nt.fontSize=ns; ft.text=sf;
             }
@@ -425,8 +425,8 @@ namespace Ascendant.Build
             for(int i=0;i<12;i++){ var seat=(RectTransform)d.SeatNameTexts[i].transform.parent; var wheel=(RectTransform)seat.parent;
                 float R(Transform t)=>((Vector2)wheel.InverseTransformPoint(t.position)).magnitude;
                 float n=R(d.SeatNameTexts[i].transform), f=R(d.SeatFactTexts[i].transform);
-                if(Mathf.Abs(n-DialView.NameRadius)>1.5f || Mathf.Abs(f-(DialView.TabletRadius-9.5f))>1.5f) off.Add(Zodiac.Seats[i].Name+" name "+n.ToString("0")+" fact "+f.ToString("0")); }
-            Check(off.Count==0,"Build AB, "+when+": every name sits on the name band (r "+DialView.NameRadius+") and every fact on its tablet (r "+(DialView.TabletRadius-9.5f)+")"+(off.Count>0?"; off: "+string.Join(", ",off):""));
+                if(Mathf.Abs(n-DialView.NameRadius)>1.5f || Mathf.Abs(f-(DialView.TabletRadius+DialView.FactLift))>1.5f) off.Add(Zodiac.Seats[i].Name+" name "+n.ToString("0")+" fact "+f.ToString("0")); }
+            Check(off.Count==0,"Build AB, "+when+": every name sits on the name band (r "+DialView.NameRadius+") and every fact on its window (r "+(DialView.TabletRadius+DialView.FactLift)+")"+(off.Count>0?"; off: "+string.Join(", ",off):""));
             Check(snap.seatFacts.Select((f,i)=>f==facts[i]).All(v=>v),"Build AB, "+when+": each seat shows one fact, the newest it has learned: "+string.Join(",",snap.seatFacts));
             Check(Mathf.Abs(Mathf.DeltaAngle(turn,want))<.5f && Vector2.Distance(framed,new Vector2(-DialView.AstroSeatRadius,0))<1 && snap.framedFacts.Contains(facts[sel]),"Build AB, "+when+": the ring has turned with the seats ("+turn.ToString("0.0")+" for "+want.ToString("0.0")+"), "+Zodiac.Seats[sel].Name+" sits under the pointer, and its facts read above the eye: "+snap.framedFacts);
             Capture("slice-390-astrolabe-"+when.Replace(" ","-")+".png");
@@ -444,7 +444,7 @@ namespace Ascendant.Build
                 for(int i=0;i<12;i++)
                 {
                     var seat=(RectTransform)d.SeatNameTexts[i].transform.parent; var wheel=(RectTransform)seat.parent; float segment=180+30*i-30*t;
-                    foreach(var (label,radius,what) in new[]{(d.SeatNameTexts[i].transform,DialView.NameRadius,"name"),(d.SeatFactTexts[i].transform,DialView.TabletRadius-9.5f,"fact")})
+                    foreach(var (label,radius,what) in new[]{(d.SeatNameTexts[i].transform,DialView.NameRadius,"name"),(d.SeatFactTexts[i].transform,DialView.TabletRadius+DialView.FactLift,"fact")})
                     {
                         var v=(Vector2)wheel.InverseTransformPoint(label.position); float r=v.magnitude, a=Mathf.Atan2(v.y,v.x)*Mathf.Rad2Deg;
                         // the ring's own segment for this seat sits at the same angle, turned with the ring: compare against the ring's rotation, not the seat's
@@ -461,21 +461,23 @@ namespace Ascendant.Build
             d.PoseTurns(keep);
             Check(poses==24 && off.Count==0,"Build AB: at all 24 half-turns of the wheel, every name sits on the name band and every fact on its tablet, centred on its own segment of the turned ring (within 1 degree and 1.5 px) and turned upright"+(off.Count>0?"; off: "+string.Join(" / ",off.Take(8)):""));
             Capture("slice-390-astrolabe-sweep-end.png");
-            // the centre's words, each on its own plaque or in the glass: every name, every set of facts, every count word fits inside its face
-            var nameT=d.NameText; var factT=d.FactsText; var countT=d.CountText; string sn=nameT.text,sf=factT.text,sc=countT.text; var misfits=new List<string>();
-            UnityEngine.Rect Box(UnityEngine.UI.Text t){ var r=t.rectTransform; var p=r.anchoredPosition; return new UnityEngine.Rect(180+p.x-r.sizeDelta.x/2,-p.y-r.sizeDelta.y/2,r.sizeDelta.x,r.sizeDelta.y); }
-            bool Inside(UnityEngine.Rect inner,UnityEngine.Rect outer)=>inner.xMin>=outer.xMin-.5f && inner.xMax<=outer.xMax+.5f && inner.yMin>=outer.yMin-.5f && inner.yMax<=outer.yMax+.5f;
-            foreach(var z in Zodiac.Seats){ nameT.text=z.Name; if(nameT.preferredWidth>nameT.rectTransform.sizeDelta.x) misfits.Add(z.Name+" "+nameT.preferredWidth.ToString("0")); }
-            foreach(var el in new[]{"Water","Earth"}) foreach(var mo in Zodiac.Modalities) foreach(var po in new[]{"Yang","Yin"}){ var line=el+" · "+mo+" · "+po; factT.text=line; if(factT.preferredWidth>factT.rectTransform.sizeDelta.x) misfits.Add(line+" "+factT.preferredWidth.ToString("0")); }
-            foreach(var w in new[]{"one","two","three","four","five","six"}){ countT.text=w; if(countT.preferredWidth>countT.rectTransform.sizeDelta.x) misfits.Add(w+" "+countT.preferredWidth.ToString("0")); }
+            // Build AC (owner, Oct 1): the centre's words: the framed sign's name and facts along the ribbon's arc, the challenge inside the eye's glass, a running count under it
+            var nameT=d.NameText; var factT=d.FactsText; var countT=d.CountText; string sn=nameT.text,sf=factT.text,sc=countT.text,se=d.EyeText.text; var misfits=new List<string>();
+            foreach(var z in Zodiac.Seats){ nameT.text=z.Name; if(nameT.preferredWidth>DialView.RibbonNameRoom) misfits.Add(z.Name+" "+nameT.preferredWidth.ToString("0")); }
+            foreach(var el in new[]{"Water","Earth"}) foreach(var mo in Zodiac.Modalities) foreach(var po in new[]{"Yang","Yin"}){ var line=el+" · "+mo+" · "+po; factT.text=line; if(factT.preferredWidth>DialView.RibbonFactsRoom) misfits.Add(line+" "+factT.preferredWidth.ToString("0")); }
+            foreach(var w in new[]{"one","two","three","four","five","six"}){ countT.text=w; if(countT.preferredWidth>DialView.CountBox.x) misfits.Add(w+" "+countT.preferredWidth.ToString("0")); }
             nameT.text=sn; factT.text=sf; countT.text=sc;
-            // nothing is cut off: a label taller than its box is dropped whole by Unity (the name was, on the first plaque pass)
-            foreach(var (t,what) in new[]{(nameT,"name"),(factT,"facts"),(countT,"count")}){ var held=t.text; t.text=what=="name"?"Sagittarius":what=="facts"?"Water · Cardinal · Yang":"three"; if(t.verticalOverflow!=VerticalWrapMode.Overflow && t.preferredHeight>t.rectTransform.sizeDelta.y) misfits.Add(what+" taller than its box "+t.preferredHeight.ToString("0")+" > "+t.rectTransform.sizeDelta.y); t.text=held; }
-            Check(nameT.gameObject.activeInHierarchy && nameT.text!="" && d.Snapshot().signLabel!="","Build AB: the framed sign's name is on the plaque: "+nameT.text);
+            Check(nameT.gameObject.activeInHierarchy && nameT.text!="" && d.Snapshot().signLabel!="","Build AC: the framed sign's name is on the ribbon: "+nameT.text);
             var geos=UnityEngine.Object.FindObjectsByType<DialGeometry>(FindObjectsSortMode.None); Check(geos.Length>0 && geos.All(g=>g.GetComponentsInChildren<UnityEngine.UI.Image>(false).Length==0),"Build AB: no family line crosses the medallion on the Astrolabe");
-            var plates=new List<string>(); if(!Inside(Box(nameT),DialView.NamePlate)) plates.Add("name"); if(!Inside(Box(factT),DialView.NamePlate)) plates.Add("facts"); if(!Inside(Box(countT),DialView.CountPlate)) plates.Add("count");
-            if(Mathf.Abs(-d.EyeText.rectTransform.anchoredPosition.y-DialView.EyeY)>.5f || d.EyeText.rectTransform.sizeDelta!=DialView.EyeBox) plates.Add("eye");
-            Check(misfits.Count==0 && plates.Count==0 && nameT.preferredHeight+factT.preferredHeight<=DialView.NamePlate.height,"Build AB (owner, Oct 1): the framed sign's name and facts sit inside the upper plaque, the challenge inside the eye's glass, the count inside the lower plaque; every name, fact line and count word fits its face"+(misfits.Count>0?"; too wide: "+string.Join(", ",misfits):"")+(plates.Count>0?"; outside its plaque: "+string.Join(", ",plates):""));
+            var places=new List<string>(); var nr=nameT.rectTransform; var fr=factT.rectTransform; var er=d.EyeText.rectTransform;
+            if(d.RibbonNameArc==null || Mathf.Abs(d.RibbonNameArc.Radius-DialView.RibbonRadius)>.01f || Mathf.Abs(-nr.anchoredPosition.y-DialView.RibbonY)>.5f || Mathf.Abs(nr.anchoredPosition.x)>.5f) places.Add("name");
+            if(d.RibbonFactsArc==null || Mathf.Abs(d.RibbonFactsArc.Radius-(DialView.RibbonRadius-(DialView.RibbonFactsY-DialView.RibbonY)))>.01f || Mathf.Abs(-fr.anchoredPosition.y-DialView.RibbonFactsY)>.5f) places.Add("facts");
+            if(Mathf.Abs(-er.anchoredPosition.y-DialView.EyeY)>.5f || er.sizeDelta!=DialView.EyeBox || d.EyeText.resizeTextMinSize!=DialView.EyeMin) places.Add("eye (y "+(-er.anchoredPosition.y).ToString("0.0")+", "+er.sizeDelta.x+" x "+er.sizeDelta.y+", min "+d.EyeText.resizeTextMinSize+")");
+            countT.text="three"; d.Publish(); // a running count: the challenge keeps the glass's upper part, the count word its lower line
+            if(Mathf.Abs(-er.anchoredPosition.y-DialView.EyeYCount)>.5f || er.sizeDelta!=DialView.EyeBoxCount || d.EyeText.resizeTextMinSize!=DialView.EyeMinCount || d.EyeText.resizeTextMaxSize!=DialView.EyeMaxCount || d.EyeText.text.Contains("\n") || Mathf.Abs(-countT.rectTransform.anchoredPosition.y-DialView.CountY)>.5f || countT.rectTransform.sizeDelta!=DialView.CountBox) places.Add("count");
+            countT.text=sc; d.Publish();
+            if(Mathf.Abs(-er.anchoredPosition.y-DialView.EyeY)>.5f || er.sizeDelta!=DialView.EyeBox || d.EyeText.resizeTextMaxSize!=DialView.EyeMax || d.EyeText.text!=se) places.Add("eye after the count");
+            Check(misfits.Count==0 && places.Count==0,"Build AC (owner, Oct 1): the framed sign's name and facts ride the ribbon's arc, the challenge sits inside the eye's glass and makes room for a running count under it, and every name, facts line and count word fits its place"+(misfits.Count>0?"; too wide: "+string.Join(", ",misfits):"")+(places.Count>0?"; out of place: "+string.Join(", ",places):""));
         }
         static float RibbonTop() { var r=GameObject.Find("Ribbon").GetComponent<RectTransform>();return r.anchoredPosition.y+r.sizeDelta.y/2; } // on the 360 x 800 layout: -40 is the page's head edge
     }

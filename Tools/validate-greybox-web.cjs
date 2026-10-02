@@ -77,8 +77,8 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-opening-wing.png')});
     check((await state()).dialEye===0,'Build Z: in the Zodiac Wing the Dial rests with its eye closed at '+viewport.width);
     // Build AB (owner, Oct 1: "the eye no longer blinks open once tapped"): read the eye off the screen, not the state. The Wing Dial's eye sits at
-    // (220, 325) on the 360 x 800 layout (measured on a capture); the shut lids are brass, the open glass indigo: count the glass.
-    const eyeGlass=async()=>{const scale=Math.min(viewport.width/360,viewport.height/800),ox=viewport.width/2+(220-180)*scale,oy=(viewport.height-800*scale)/2+325*scale;
+    // (219, 317) on the 360 x 800 layout (Build AC: measured on the Cast Dial piece); the shut lids are brass, the open glass indigo: count the glass.
+    const eyeGlass=async()=>{const scale=Math.min(viewport.width/360,viewport.height/800),ox=viewport.width/2+(219-180)*scale,oy=(viewport.height-800*scale)/2+317*scale;
       const shot=await page.screenshot({clip:{x:ox-15*scale,y:oy-3*scale,width:30*scale,height:6*scale}});
       return page.evaluate(async b64=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);const d=g.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+2]>d[i]+8)n++;return n/(d.length/4);},shot.toString('base64'));};
     const glassShut=await eyeGlass();

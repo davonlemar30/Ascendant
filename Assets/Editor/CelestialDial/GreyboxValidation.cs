@@ -209,10 +209,10 @@ namespace Ascendant.Build
                 && new[] { "kit-dial-worn", "kit-dial-restored", "kit-dial-worn-open", "kit-dial-restored-open" }.All(n => Slot(n).Width * 2 == (int)Art(n).rect.width && Slot(n).Height * 2 == (int)Art(n).rect.height),
                 "Build Z: each open Wing Dial is the same canvas as its closed piece, so the eye opens in place; the manifest gives each Wing Dial file at half size");
             // Build AB (owner, Sept 30: the Astrolabe): the room carries the fixed rim, pointer, phoenix and eye; the ring and its glow turn
-            Check(Slot("dial-ring") is Slots.ArtSlot ringSlot && ringSlot.Width == 360 && ringSlot.Height == 360 && Slot("dial-ring-light") != null && Slot("bracket") is Slots.ArtSlot frame && frame.Width == 64 && frame.Height == 88
-                && Art("dial-ring") != null && Art("dial-ring").rect.width == 720 && Art("dial-ring").rect.height == 720 && Art("dial-ring-light") != null && Art("dial-ring-light").rect.size == Art("dial-ring").rect.size && Art("bracket") != null && Art("bracket").rect.width == 128 && Art("bracket").rect.height == 176,
-                "Build AB: the Astrolabe's turning ring and its glow are 360 x 360 slots drawn at twice the size; the frame is a 64 x 88 wedge");
-            Check(typeof(ArcText).IsSubclassOf(typeof(UnityEngine.UI.BaseMeshEffect)) && DialView.NameRoom > 60 && DialView.TabletRoom > 40, "Build AB: the names bend along the band (ArcText); a name has about " + DialView.NameRoom.ToString("0") + " px of band, a fact " + DialView.TabletRoom.ToString("0") + " px of tablet");
+            Check(Slot("dial-ring") is Slots.ArtSlot ringSlot && ringSlot.Width == 360 && ringSlot.Height == 360 && Slot("dial-ring-light") != null && Slot("bracket") is Slots.ArtSlot frame && frame.Width == 72 && frame.Height == 88
+                && Art("dial-ring") != null && Art("dial-ring").rect.width == 720 && Art("dial-ring").rect.height == 720 && Art("dial-ring-light") != null && Art("dial-ring-light").rect.size == Art("dial-ring").rect.size && Art("bracket") != null && Art("bracket").rect.width == 144 && Art("bracket").rect.height == 176,
+                "Build AB: the turning ring and its glow are 360 x 360 slots drawn at twice the size; the frame is a 72 x 88 wedge (Build AC)");
+            Check(typeof(ArcText).IsSubclassOf(typeof(UnityEngine.UI.BaseMeshEffect)) && DialView.NameRoom > 60 && DialView.TabletRoom > 40, "Build AB: the names bend along the band (ArcText); a name has about " + DialView.NameRoom.ToString("0") + " px of recess, a fact " + DialView.TabletRoom.ToString("0") + " px of window (Build AC)");
             var voice = Resources.Load<Font>("Fonts/EBGaramond-Bold");
             Check(voice != null && File.Exists("Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt"), "Build Z: the Dial's serif, EB Garamond Bold, ships with its open licence");
             Check(EyeLines.All(l => l.All(c => c == '\n' || (c >= 32 && c <= 255))), "Build Z: every line the eye can show is Latin-1 (the web font rule)");
@@ -226,6 +226,23 @@ namespace Ascendant.Build
                 if (size < smallest) { smallest = size; tightest = line; }
             }
             Check(smallest >= DialView.EyeMin, "Build Z: the eye's smallest line is " + smallest + " px (\"" + tightest.Replace("\n", " / ") + "\")");
+            // Build AC (owner, Oct 1: the count word goes inside the eye, under the challenge line): while a count runs the challenge folds onto one line across the glass's widest rows, 10 to 12 px; the count word fits its own line under it
+            var countSettings = settings; countSettings.generationExtents = DialView.EyeBoxCount; countSettings.resizeTextMinSize = DialView.EyeMinCount; countSettings.resizeTextMaxSize = DialView.EyeMaxCount; countSettings.fontSize = DialView.EyeMaxCount; int smallestCount = 99; string tightestCount = ""; var countMisfits = new List<string>();
+            foreach (var raw in EyeLines)
+            {
+                var line = raw.Replace("\n", " "); generator.Populate(line, countSettings); int size = generator.fontSizeUsedForBestFit;
+                if (!(generator.lineCount == 1 && size >= DialView.EyeMinCount && generator.characterCountVisible >= line.Length)) countMisfits.Add(line + " (" + size + " px, " + generator.lineCount + " lines)");
+                if (size < smallestCount) { smallestCount = size; tightestCount = line; }
+            }
+            Check(countMisfits.Count == 0 && smallestCount >= DialView.EyeMinCount, "Build AC: while a count runs every challenge folds onto one line across the glass (" + DialView.EyeBoxCount.x + " x " + DialView.EyeBoxCount.y + ") at " + DialView.EyeMinCount + " px or more; the smallest is " + smallestCount + " px (\"" + tightestCount + "\")" + (countMisfits.Count > 0 ? "; too tight: " + string.Join(", ", countMisfits) : ""));
+            var wordSettings = settings; wordSettings.resizeTextForBestFit = false; wordSettings.fontSize = DialView.CountSize; wordSettings.horizontalOverflow = HorizontalWrapMode.Overflow; wordSettings.generationExtents = new Vector2(400, 40);
+            Check(new[] { "one", "two", "three", "four", "five", "six" }.All(w => generator.GetPreferredWidth(w, wordSettings) <= DialView.CountBox.x), "Build AC: every count word fits its line inside the eye (" + DialView.CountBox.x + " px)");
+            // Build AC: the framed sign's name and facts ride the ribbon's arc within its plain face
+            var ribbonName = wordSettings; ribbonName.fontSize = DialView.NameSize; var ribbonFacts = wordSettings; ribbonFacts.fontSize = DialView.FactSize;
+            float widestName = Zodiac.Seats.Max(z => generator.GetPreferredWidth(z.Name, ribbonName));
+            var factLines = (from el in new[] { "Water", "Earth", "Fire", "Air" } from mo in Zodiac.Modalities from po in new[] { "Yang", "Yin" } select el + " · " + mo + " · " + po).ToArray();
+            float widestFacts = factLines.Max(l => generator.GetPreferredWidth(l, ribbonFacts));
+            Check(widestName <= DialView.RibbonNameRoom && widestFacts <= DialView.RibbonFactsRoom, "Build AC: the longest name (" + widestName.ToString("0") + " px at " + DialView.NameSize + ") and the longest facts line (" + widestFacts.ToString("0") + " px at " + DialView.FactSize + ") ride the ribbon's arc within its plain face (" + DialView.RibbonNameRoom + " and " + DialView.RibbonFactsRoom + " px)");
             var zsave = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(new SaveData { revealsPlayed = new[] { "elements", "symbols" } }));
             Check(zsave.revealsPlayed.SequenceEqual(new[] { "elements", "symbols" }) && new SaveData().revealsPlayed.Length == 0, "Build Z: the save carries the patterns whose reveal has played; a new save has none");
             Check(DialView.RevealSweepSeconds + DialView.RevealNamesSeconds + DialView.RevealEyeSeconds <= 2.1f && SliceView.DialEyeSeconds <= .4f, "Build Z: the reveal is about two seconds of small built motions; the Wing Dial's eye opens in under half a second");
