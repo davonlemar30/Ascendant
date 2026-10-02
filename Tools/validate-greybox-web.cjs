@@ -115,6 +115,16 @@ const path=require('path');
     await waitActive('Taurus');check((await state()).start==='Start: Taurus'&&(await state()).active,'Build T: back at the Dial the same problem is waiting at '+viewport.width);
     const boxes=await page.locator('#seats button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,label:b.getAttribute('aria-label')})));
     check(boxes.length===12 && boxes.every(b=>b.width>=48 && b.height>=48 && b.label.includes('position')),'12 semantic seats and effective target floor at '+viewport.width);
+    // Build AC follow-up (Whitney, Oct 1): the seat boxes kept Build AB's radius 127 and 56 x 56 after the Dial moved its seats to 123 at 58 x 66, and no check failed.
+    // Read each box back onto the 360 x 800 layout and hold it to the seats as the Dial reports them (seatRadius, seatSize): centred on its seat at the seat's place
+    // in the turn (the framed seat at 9 o'clock), the seat's own size, upright, its long side (across the ring) on the axis the seat's radius runs nearer.
+    const seatBoxes=async()=>{const s=await state(),sel=Math.max(0,s.seats.findIndex(x=>x.includes(', selected'))),size=s.seatSize||[],scale=Math.min(viewport.width/360,viewport.height/800),left=(viewport.width-360*scale)/2,top=(viewport.height-800*scale)/2;
+      const rects=await page.locator('#seats button').evaluateAll(bs=>bs.map(b=>{const r=b.getBoundingClientRect();return [r.left,r.top,r.width,r.height];}));const off=[];
+      for(let i=0;i<12;i++){const a=(180+(i-sel)*30)*Math.PI/180,flat=s.dialRing&&Math.abs(Math.cos(a))>Math.abs(Math.sin(a)),[x,y,w,h]=rects[i];
+        const want=[Math.cos(a)*s.seatRadius,270-Math.sin(a)*s.seatRadius,size[flat?1:0],size[flat?0:1]],got=[(x+w/2-left)/scale-180,(y+h/2-top)/scale,w/scale,h/scale];
+        if(!got.every((g,k)=>Math.abs(g-want[k])<=.5))off.push(s.seats[i].split(',')[0]+' at '+got.map(v=>v.toFixed(1)).join(' ')+' for '+want.map(v=>Number(v).toFixed(1)).join(' '));}
+      check(s.seatRadius>0&&size.length===2&&off.length===0,'Build AC follow-up: the twelve semantic seat boxes sit on the seats the Dial draws (radius '+s.seatRadius+', '+size.join(' x ')+' along by across the ring, upright) with '+s.seats[sel].split(',')[0]+' framed at '+viewport.width+(off.length?': '+off.join('; '):''));};
+    await seatBoxes();
     check((await state()).challenge==='Next Earth after Taurus' && (await page.locator('#count').count())===0,'the wheel shows its own challenge and there is no Count button (Build I) at '+viewport.width);
     const scale=Math.min(viewport.width/360,viewport.height/800),cx=viewport.width/2,cy=(viewport.height-800*scale)/2+270*scale;
     await page.mouse.move(cx-100*scale,cy);await page.mouse.down();
@@ -125,6 +135,7 @@ const path=require('path');
     fs.writeFileSync(path.join(out,viewport.width+'-drag-state.json'),JSON.stringify({state:await state(),events},null,2));
     check((await state()).destination==='Selected: Virgo','actual pointer drag advances four detents at '+viewport.width);
     check(events.filter(e=>e.event_name==='answer_committed').length===0,'a drag does not submit at '+viewport.width);
+    await seatBoxes(); // the boxes follow the turn: Virgo framed after the drag
     await tap(0,654);await waitActive('Virgo');
     // Select a destination through the browser semantic path (assistive action simulation).
     await semantic('seat-9');check((await state()).destination==='Selected: Capricorn','semantic direct selection at '+viewport.width);
@@ -739,14 +750,15 @@ const path=require('path');
     await art.screenshot({path:path.join(out,viewport.width+'-art-dial-guided.png')});
     await artContext.close();
   }));
+  const ART_SLOTS=141,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert
   for(const [query,set] of [['style=test','test'],['style','']]){
     const styleContext=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
     const stylePage=await styleContext.newPage();await stylePage.goto(withQuery(query));
     await stylePage.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='style',{},{timeout:120000});await stylePage.locator('#loading').waitFor({state:'detached'});
     const s=await stylePage.evaluate(()=>window.ascendantDial.snapshot());const where=set?'the test set':'the Art folder';
-    check(s.style&&s.artSet===set&&s.styleSlots.length===141&&s.styleSounds.length===7&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with 138 art and 7 sound slots and no game controls');
+    check(s.style&&s.artSet===set&&s.styleSlots.length===ART_SLOTS&&s.styleSounds.length===SOUND_SLOTS&&!s.canSliceContinue&&!s.canName,'?'+query+' shows the style page on '+where+' with '+ART_SLOTS+' art and '+SOUND_SLOTS+' sound slots and no game controls');
     check(set?s.styleSlots.every(t=>t.endsWith(': test set'))&&s.styleSounds.every(t=>t.endsWith(': test set')):s.styleSlots.every(t=>/: (file|placeholder)$/.test(t))&&s.styleSounds.every(t=>/: (file|silent)$/.test(t)),'every slot lists its source on '+where);
-    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===141&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===7,'the semantic layer lists every art slot with its source and a button per sound slot');
+    const items=await stylePage.locator('#style-list li').allTextContents();check(items.length===ART_SLOTS&&items[0].startsWith('atrium:')&&(await stylePage.locator('#style-sounds button').count())===SOUND_SLOTS,'the semantic layer lists every art slot with its source and a button per sound slot');
     check(await stylePage.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the style page on '+where);
     await stylePage.screenshot({path:path.join(out,'390-style'+(set?'-'+set:'')+'.png')});
     if(set){await stylePage.locator('#sound-1').evaluate(b=>b.click());await stylePage.waitForFunction(()=>window.ascendantDial.snapshot().lastCue==='seal'&&window.ascendantDial.snapshot().cuesPlayed>=1);check(true,'a sound slot plays from the style page');
