@@ -7,7 +7,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=151,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=158,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
   const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()).filter(Boolean).map(w=>w==='360'?{width:360,height:800}:/^\d+x\d+$/.test(w)?{width:+w.split('x')[0],height:+w.split('x')[1]}:{width:390,height:844}); // Part 2: or any WxH
@@ -17,6 +17,10 @@ const path=require('path');
     page.on('pageerror',e=>errors.push(String(e)));
     page.on('console',msg=>{const text=msg.text(),mark=text.indexOf('[CelestialDial] ');if(mark>=0){try{events.push(JSON.parse(text.slice(mark+16)));}catch{}}});
     const state=()=>page.evaluate(()=>window.ascendantDial.snapshot());
+    // batch 2 (3b C, 3c C, 3d): the buttons on screen as the web state lists them, "words:look:width x height"
+    const looks=async()=>((await state()).buttons||[]).map(x=>{const p=x.split(':'),d=p[2].split('x').map(Number);return {w:p[0],k:p[1],W:d[0],H:d[1]};});
+    const lookOf=(b,w)=>{const x=b.find(y=>y.w===w);return x?x.k+' '+x.W+'x'+x.H:'missing';};
+    const small=b=>b.filter(x=>x.W<44||x.H<44).map(x=>x.w+' '+x.W+'x'+x.H); // 3d: every target 44 px or more
     const ready=async()=>page.waitForFunction(()=>window.ascendantDial?.snapshot()?.canContinue,{},{timeout:120000});
     // Unity ignores pointer input in the first frame after a phase transition (the button is activated in
     // that same frame), so settle briefly after the state flips. A person cannot tap that fast.
@@ -59,6 +63,7 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).atriumStage===1&&(await state()).caspar.startsWith('Our work begins in the Zodiac Wing. That door there.')&&(await state()).canEnterWing,'Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-opening-hub.png')});
+    { const b=await looks(); check(['THE ZODIAC WING'].every(w=>b.some(x=>x.w===w&&x.k==='room'&&x.H>=44))&&b.filter(x=>x.k==='room').length>0&&['Settings gear','Travel button'].every(w=>b.some(x=>x.w===w&&x.W>=44&&x.H>=44))&&small(b).length===0,'batch 2 (3c C, 3d): in the Atrium a door wears the room look (the Zodiac Wing: '+lookOf(b,'THE ZODIAC WING')+'), the gear and the mini-menu button take 44 x 44 ('+lookOf(b,'Settings gear')+', '+lookOf(b,'Travel button')+'), and every target is 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
     check((await state()).chatBoxHeight>0&&(await state()).chatBoxHeight<120,'Build X: the Atrium\'s chat box fits Caspar\'s two lines ('+(await state()).chatBoxHeight+' of 120) at '+viewport.width);
     check((await state()).lastCue==='page','Build E: the page hook fired on Caspar\'s pages, file or not, at '+viewport.width);
     // Build U (owner, APK playtest, Sept 29): the gear at the top right opens Settings; its rows work on the canvas; the web build has no Quit.
@@ -97,6 +102,7 @@ const path=require('path');
       await tap(-158,22);await page.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});
       await tap(-23,rowY(1));await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});s=await state();
       check(s.screen==='wingroom'&&!s.travelOpen&&s.travelShown,'the mini-menu: a tap on the Zodiac Wing row travels there at '+viewport.width);
+      { const b=await looks(); check(['THE DIAL','RETURN TO THE ATRIUM'].every(w=>b.some(x=>x.w===w&&x.k==='room'&&x.H>=44))&&small(b).length===0,'batch 2 (3c C, 3d): the Zodiac Wing\'s buttons wear the room look (The Dial: '+lookOf(b,'THE DIAL')+', Return to the Atrium: '+lookOf(b,'RETURN TO THE ATRIUM')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
       await semantic('travel');await page.waitForFunction(()=>window.ascendantDial.snapshot().travelOpen,{},{timeout:5000}).catch(()=>{});s=await state();
       const scale=Math.min(viewport.width/360,viewport.height/800),row=await page.locator('#travel-atrium').evaluate(b=>{const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2,b.hidden];});
       const at=s.travelAt||[-158,22]; // Part 2: the panel hangs under its button, which on a phone keeps to the screen's corner
@@ -171,6 +177,8 @@ const path=require('path');
     await tap(0,654);await waitActive('Virgo');
     // Select a destination through the browser semantic path (assistive action simulation).
     await semantic('seat-9');check((await state()).destination==='Selected: Capricorn','semantic direct selection at '+viewport.width);
+    { const b=await looks(); check(lookOf(b,'SEAL').startsWith('plate')&&lookOf(b,'Previous').startsWith('arrow-previous')&&lookOf(b,'Next').startsWith('arrow-next')&&lookOf(b,'Leave the Dial').startsWith('rule')&&small(b).length===0,'batch 2 (3b C): the Dial\'s buttons are bronze: SEAL '+lookOf(b,'SEAL')+', Previous '+lookOf(b,'Previous')+', Next '+lookOf(b,'Next')+', Leave the Dial '+lookOf(b,'Leave the Dial')+', every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-buttons-dial.png')}); }
     await semantic('seal');await page.waitForFunction(()=>window.ascendantDial.snapshot().canContinue);
     await semantic('continue');await waitActive('Aries');
     for(let n=0;n<5;n++)await tap(122,654);await tap(-122,654);
@@ -393,6 +401,7 @@ const path=require('path');
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
     check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'the book opens Part A: a symbol and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
+    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w).startsWith('plate'))&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'batch 2 (owner, Oct 2: bronze on the Book too): the Book of Symbols\' four names are plates ('+o.map(w=>lookOf(b,w)).join(', ')+') and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
       const s=await state();
@@ -532,6 +541,8 @@ const path=require('path');
     await semantic('enter-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='grid'&&window.ascendantDial.snapshot().canGridPick,{},{timeout:15000});
     { const g=await state(); check(g.avatarAt==='grid'&&g.gridStarted && g.gridTiles.length===12 && g.gridCells.length===12 && g.gridCells.every(c=>c.endsWith(': empty')) && g.gridTiles.every(t=>t.endsWith(', not placed')) && g.caspar.startsWith('Four elements and three modalities') && g.keys===2,'the room button walks to the table and opens it: twelve tiles, twelve empty cells, the intro line at '+viewport.width); }
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll at the table at '+viewport.width);
+    { const b=await looks(),signs=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces']; check(lookOf(b,'SEAL').startsWith('plate')&&lookOf(b,'Leave the Table').startsWith('rule')&&signs.every(w=>b.some(x=>x.w===w&&x.H>=44))&&small(b).length===0,'batch 2 (owner, Oct 2: bronze on the Table too; 3d: 44 px): the Table\'s SEAL is a plate ('+lookOf(b,'SEAL')+'), Leave the Table is on its rule ('+lookOf(b,'Leave the Table')+'), and its twelve sign tiles are 44 px tall, every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-buttons-table.png')}); }
     const cellBoxes=await page.locator('#grid-cells button').evaluateAll(bs=>bs.map(b=>({width:b.getBoundingClientRect().width,height:b.getBoundingClientRect().height,label:b.getAttribute('aria-label')})));
     check(cellBoxes.length===12 && cellBoxes.every(b=>b.width>=48 && b.height>=48) && cellBoxes[1].label==='Fire, fixed: empty' && cellBoxes[11].label==='Water, mutable: empty','twelve semantic cells at the target floor, labeled by element and kind, at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid.png')});

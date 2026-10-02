@@ -18,6 +18,7 @@ namespace Ascendant.CelestialDial
         public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
         public Vector2 GearAt => gear != null && gear.GetComponent<SafeTop>() != null ? gear.GetComponent<SafeTop>().At : new Vector2(158, 22); // Part 2: where the gear sits (x from the column's centre, y down from its top)
+        public Transform Gear => gear != null ? gear.transform : null; // batch 2: the gear's button, for the web state's list of buttons
         public bool GearShown { get => gear != null && gear.gameObject.activeSelf; set { if (gear != null) gear.gameObject.SetActive(value); if (!value) Close(); } }
         Canvas canvas; RectTransform menu, mainPanel, jumpPanel; Button gear; Text sound, motion, walk, wakeRow; Font font;
         static readonly Color Gold = new Color(.84f, .69f, .38f), Bone = new Color(.93f, .89f, .8f), RowColor = new Color(.16f, .15f, .18f);
@@ -33,6 +34,7 @@ namespace Ascendant.CelestialDial
             // The gear: drawn in code (the web font has no gear glyph), gold on a dark disc, at the top right.
             gear = MakeButton(root, "", 158, 22, 36, 36, Toggle); gear.name = "Settings gear"; SafeArea.Corner(gear, 1); // Platform fit: below the cutout's band (Part 1); on a phone, at the screen's safe top-right corner (Part 2)
             var gearImage = gear.GetComponent<Image>(); gearImage.sprite = GearSprite(); gearImage.color = Color.white;
+            ButtonLook.HitArea(gear); // batch 2 (3d): the gear takes taps over 44 x 44; it is drawn at 36
             // The menu: a dim veil (a tap on it closes) and the slim box in the middle.
             menu = Rect("Settings", root, 0, 400, 360, 800);
             var veil = menu.gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f); Bleed.Add(veil, root); // Part 2: the veil dims the whole screen

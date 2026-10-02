@@ -44,6 +44,7 @@ namespace Ascendant.CelestialDial
             rows.Add(MakeRow("sealed", SealedName, LockSprite()));
             button = MakeButton(root, "Travel", ButtonX, ButtonTop, ButtonSize, ButtonSize, Toggle); button.name = "Travel button"; // over the panel
             var face = button.GetComponent<Image>(); face.sprite = ButtonSprite(); face.color = Color.white; SafeArea.Corner(button, -1); panelTop.Follow = button.GetComponent<SafeTop>(); // the panel hangs under its button wherever the button sits
+            ButtonLook.HitArea(button); // batch 2 (3d): the button takes taps over 44 x 44; it is drawn at 36
             panel.gameObject.SetActive(false); button.gameObject.SetActive(false);
         }
         Row MakeRow(string id, string name, Sprite icon)

@@ -175,6 +175,15 @@ namespace Ascendant.CelestialDial
             // Build P (note 3; the owner's B2 ruling, Sept 28): the chat box on the story screens, and Caspar unframed behind it, one pose per page.
             new ArtSlot("chat-box", 324, 240, 1024, "the chat box (Build P): the dark see-through fill and the gold frame in one image, sliced to each panel; on the story screens (Build P), the Atrium hub and the Chamber (Build R); the instrument screens draw a slim box in code instead"),
             new ArtSlot("chat-plate", 170, 22, 512, "the speaker's plate on the chat box's top-left edge (Build P); blank, the game writes the name"),
+            // Batch 2: the button art by place (owner, Oct 1: 3b C, 3c C, 3d; Oct 2: "Buttons at 44 px, bronze on the Table and the Book too"; the art
+            // lane's board on 86bcbn6w6). The pieces are cut from the approved art so they fit any button; the game writes the words (ButtonLook).
+            new ArtSlot("btn-plate", 146, 56, 512, "the bronze plate: an action on an instrument (the Dial, the Elemental Table, the Book of Symbols, practice); its frame without its centre marks, nine-sliced (40 px in at 2x) to each button; the game engraves the word"),
+            new ArtSlot("btn-plate-notch", 12, 12, 256, "the plate's top notch, laid at its top centre so the slice never stretches it"),
+            new ArtSlot("btn-plate-diamond", 16, 18, 256, "the plate's bottom diamond, laid at its bottom centre, 1 px above its edge"),
+            new ArtSlot("btn-arrow", 64, 56, 512, "Previous on an instrument, a bronze arrow (3b C: engraved arrows); Next is it mirrored; no word"),
+            new ArtSlot("btn-rule-left", 100, 14, 512, "the way out of an instrument, gold lettering on a rule (3b C): the rule's left line; its tapered end (12 px) keeps its shape and the line stretches"),
+            new ArtSlot("btn-rule-right", 100, 14, 512, "the rule's right line, its tapered end at the right"),
+            new ArtSlot("btn-rule-centre", 16, 14, 256, "the rule's centre: its diamond and the gaps beside it, at the rule's centre"),
             new ArtSlot("caspar-calm", 264, 468, 1024, "Caspar from the waist up behind the chat box (Build P), calm: the default, short instructions; all six poses share one registration"),
             new ArtSlot("caspar-explain", 264, 468, 1024, "Caspar behind the chat box (Build P), explaining: teaching, the lessons, the history (the opening's fourth page, the return's second)"),
             new ArtSlot("caspar-warm", 264, 468, 1024, "Caspar behind the chat box (Build P), warm: welcomes, thanks, praise (the opening's second page)"),
@@ -361,6 +370,7 @@ namespace Ascendant.CelestialDial
             moreRect.anchorMin = moreRect.anchorMax = moreRect.pivot = new Vector2(1, 0); moreRect.anchoredPosition = new Vector2(-8, 4); moreRect.sizeDelta = new Vector2(96, 26);
             var hit = moreRect.gameObject.AddComponent<Image>(); hit.color = new Color(0, 0, 0, .001f); hit.canvasRenderer.cullTransparentMesh = false; // a see-through button still takes taps
             var more = moreRect.gameObject.AddComponent<Button>(); more.targetGraphic = hit; more.onClick.AddListener(fit.Turn);
+            ButtonLook.HitArea(more, 0, ButtonLook.MinTarget); // batch 2 (3d): the link takes taps over 44 px of height; it reads at 26
             var moreTextRect = new GameObject("Label", typeof(RectTransform)).GetComponent<RectTransform>(); moreTextRect.SetParent(moreRect, false);
             moreTextRect.anchorMin = Vector2.zero; moreTextRect.anchorMax = Vector2.one; moreTextRect.offsetMin = new Vector2(0, 0); moreTextRect.offsetMax = new Vector2(-6, 0);
             var moreText = moreTextRect.gameObject.AddComponent<Text>(); moreText.font = font; moreText.text = "Continue"; moreText.fontSize = 12; moreText.fontStyle = FontStyle.Bold;

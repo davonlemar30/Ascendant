@@ -117,6 +117,7 @@ namespace Ascendant.CelestialDial
             public int dialWake; public string dialLook; public int wakePreview; // the Dial's wake-up (86bcbn6w6): the step it shows, the looks it blends, DEV Mode's preview (-1: as earned)
             public float[] gearAt, travelAt; // Part 2: where the gear and the mini-menu button sit (x from the column's centre, y down from its top; on a phone at the screen's safe corners)
             public string[] masters; // batch 2 (the owner approved the bleed masters, Oct 2): the full-screen layers on screen drawing a 1200 x 1840 master whole, by file
+            public string[] buttons; // batch 2 (3b C, 3c C, 3d): the buttons on screen, "words:look:width x height" (the look: plate, arrow-previous, arrow-next, rule, room, plain)
             public bool travelShown, travelOpen; public string[] travelRows; // the room mini-menu (86bca07wv): its button in a room, its panel, its rows ("The Zodiac Wing, here", "Sealed")
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
@@ -260,6 +261,9 @@ namespace Ascendant.CelestialDial
             optional=MakeButton(root,"Try one more (optional)",0,714,244,48,()=> { Lesson.BeginOptional(); AlignStart(); });
             var motion = MakeButton(root,"Reduced motion: off",92,768,160,44,ToggleMotion);
             motionText=motion.GetComponentInChildren<Text>(); motionText.fontSize=13; motion.gameObject.SetActive(false); // Build U: Reduced motion lives in Settings now (owner, Sept 29); the web action stays
+            // Batch 2 (owner, Oct 1: 3b C, 3d; task 86bcbn6w6): the Dial's buttons in bronze: Previous and Next as arrows, SEAL on its plate, each action on a plate
+            ButtonLook.Arrow(back,false); ButtonLook.Arrow(forward,true); ButtonLook.Plate(seal,31); ButtonLook.Plate(countButton); ButtonLook.Plate(askButton); ButtonLook.Plate(next); ButtonLook.Plate(optional);
+            foreach(var b in builderNames) ButtonLook.Plate(b); foreach(var b in builderShares) ButtonLook.Plate(b);
             if (EventSystem.current == null)
             {
                 var events=new GameObject("Dial EventSystem",typeof(EventSystem),typeof(InputSystemUIInputModule));
