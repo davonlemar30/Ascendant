@@ -87,6 +87,13 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `chamber-light` | 360 × 800 | 2048 | the Crystal Book Chamber's golden-hour light, the same fade |
 | `chat-box` | 324 × 240 | 1024 | the chat box (Build P; since Build R also on the Atrium hub and the Chamber, while the Dial, the Book of Symbols and the Elemental Table draw a slim box in code): the dark see-through fill and the gold frame in one image, imported sliced (borders 56, 64, 56, 56 at the file's 2x) so each panel keeps the corner stars whole at its own height |
 | `chat-plate` | 170 × 22 | 512 | the speaker's plate on the chat box's top-left edge (Build P); blank, the game writes the name |
+| `btn-plate` | 146 × 56 | 512 | the bronze plate: an action on an instrument (the Dial, the Elemental Table, the Book of Symbols, practice); its frame without its centre marks, nine-sliced (40 px in at 2x) to each button; the game engraves the word |
+| `btn-plate-notch` | 12 × 12 | 256 | the plate's top notch, laid at its top centre so the slice never stretches it |
+| `btn-plate-diamond` | 16 × 18 | 256 | the plate's bottom diamond, laid at its bottom centre, 1 px above its edge |
+| `btn-arrow` | 64 × 56 | 512 | Previous on an instrument, a bronze arrow (3b C: engraved arrows); Next is it mirrored; no word |
+| `btn-rule-left` | 100 × 14 | 512 | the way out of an instrument, gold lettering on a rule (3b C): the rule's left line; its tapered end (12 px) keeps its shape and the line stretches |
+| `btn-rule-right` | 100 × 14 | 512 | the rule's right line, its tapered end at the right |
+| `btn-rule-centre` | 16 × 14 | 256 | the rule's centre: its diamond and the gaps beside it, at the rule's centre |
 | `caspar-calm` | 264 × 468 | 1024 | Caspar from the waist up behind the chat box (Build P), calm: the default, short instructions |
 | `caspar-explain` | 264 × 468 | 1024 | Caspar behind the chat box, explaining: teaching, the lessons, the history (the opening's fourth page, the return's second) |
 | `caspar-warm` | 264 × 468 | 1024 | Caspar behind the chat box, warm: welcomes, thanks, praise (the opening's second page) |
@@ -201,7 +208,7 @@ Applied by [`Assets/Editor/CelestialDial/SlotImport.cs`](../../Assets/Editor/Cel
 - **Images:** Sprite (2D and UI), single, full-rect mesh, no mipmaps, alpha is transparency, sRGB, not readable, clamp, bilinear, no power-of-two scaling; **max size per slot** (the cap above); **compressed with crunch at quality 50** (the download shrinks several times over; the on-device format follows the WebGL texture setting, DXT by default). A side that is not a multiple of 4 is warned about.
 - **Sounds:** Vorbis at quality 0.5, optimized sample rate, preloaded; cues forced to mono and decompressed on load (no latency), the ambient loop stereo and compressed in memory.
 
-Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (151). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
+Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (158). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
 
 ## The test set and the style page
 

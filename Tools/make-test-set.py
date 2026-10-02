@@ -28,6 +28,7 @@ IMAGES = [
     ("sign-aries", 200, 200), ("sign-taurus", 200, 200), ("sign-gemini", 200, 200), ("sign-cancer", 200, 200), ("sign-leo", 200, 200), ("sign-virgo", 200, 200),
     ("sign-libra", 200, 200), ("sign-scorpio", 200, 200), ("sign-sagittarius", 200, 200), ("sign-capricorn", 200, 200), ("sign-aquarius", 200, 200), ("sign-pisces", 200, 200),
     ("chat-box", 164, 120), ("chat-plate", 172, 24),  # Build P: the chat box on the story screens
+    ("btn-plate", 148, 56), ("btn-plate-notch", 12, 12), ("btn-plate-diamond", 16, 20), ("btn-arrow", 64, 56), ("btn-rule-left", 100, 16), ("btn-rule-right", 100, 16), ("btn-rule-centre", 16, 16),  # batch 2: the button pieces
     ("caspar-calm", 132, 236), ("caspar-explain", 132, 236), ("caspar-warm", 132, 236), ("caspar-wry", 132, 236), ("caspar-moved", 132, 236), ("caspar-solemn", 132, 236),
     ("akit-pennant-restored", 48, 132), ("akit-pennant-worn", 44, 132),  # Build Q: the domed Atrium's pennants
     ("dial-room", 180, 400), ("dial-room-light", 180, 400), ("dial-ring", 180, 180), ("dial-ring-light", 180, 180), ("kit-dial-worn-open", 188, 208), ("kit-dial-restored-open", 188, 208),  # Build Z: the Dial's room, its glow, the Wing Dial's open eye

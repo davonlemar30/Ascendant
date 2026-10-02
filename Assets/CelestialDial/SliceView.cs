@@ -262,7 +262,8 @@ namespace Ascendant.CelestialDial
             {
                 Slots.DressChatBox(panelImage, null, font); // Build R: the shared chat box, the same frame and plate as every Caspar panel
                 caspar = Label(panel, "", 0, 78, 276, 104, 14); caspar.alignment = TextAnchor.UpperLeft; caspar.resizeTextForBestFit = true; caspar.resizeTextMinSize = 10; caspar.resizeTextMaxSize = 14;
-                next = MakeButton(screen, "Continue", 0, 671, 150, 42, () => Continue());
+                next = MakeButton(screen, "Continue", 0, 671, 150, 44, () => Continue());
+                ButtonLook.Room(next, font); // batch 2 (3c C): a room's button in the chat box's language; 3d: 44 px
                 // Build X: the box fits the page; Continue rides at its bottom; the figure behind it is clipped at its bottom edge.
                 var fit = panel.gameObject.AddComponent<ChatFit>(); fit.Line = caspar; fit.Next = (RectTransform)next.transform; fit.Top = 480; fit.Max = 240; fit.Clip = ClipBehind(screen, poseRect); fit.Fitted = Publish;
                 if (name == "Atrium") atriumFit = fit; else returnFit = fit;
@@ -272,6 +273,7 @@ namespace Ascendant.CelestialDial
                 Label(panel, "CASPAR", 0, 16, 290, 22, 13);
                 caspar = Label(panel, "", 0, 86, 306, 110, 13);
                 next = MakeButton(screen, "Continue", 0, 690, 190, 56, () => Continue());
+                ButtonLook.Room(next, font); // batch 2 (3c C)
             }
             StyleAtriumButton(next);
             return screen;
@@ -337,7 +339,8 @@ namespace Ascendant.CelestialDial
             insert = MakeButton(chamber, "Insert Key", 0, 654, 190, 56, Insert); insert.GetComponent<Image>().color = Crimson; // owner (worksheet section 13)
             chamberContinue = MakeButton(chamber, "Continue", 0, 654, 190, 56, () => Continue()); chamberContinue.gameObject.SetActive(false);
             chamberBack = MakeButton(chamber, "Return to the Atrium", 0, 714, 300, 48, LeaveChamber); chamberBack.gameObject.SetActive(false); // Build D // owner (worksheet section 13)
-            journalChamber = MakeButton(chamber, "Your journal", 0, 774, 216, 40, OpenJournal); journalChamber.GetComponentInChildren<Text>().fontSize = 13; journalChamber.gameObject.SetActive(false); // Build F
+            journalChamber = MakeButton(chamber, "Your journal", 0, 774, 216, 44, OpenJournal); journalChamber.GetComponentInChildren<Text>().fontSize = 13; journalChamber.gameObject.SetActive(false); // Build F
+            ButtonLook.Room(chamberContinue, font); ButtonLook.Room(chamberBack, font); ButtonLook.Room(journalChamber, font); // batch 2 (3c C; 3d: Your journal at 44 px). Insert Key keeps its crimson (owner, worksheet section 13)
         }
         void BuildHub()
         {
@@ -349,6 +352,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 3; i++) { var book = Rect("Book", shelves, -16 + i * 16, 30 + (i % 2) * 40, 10, 26); shelfBooks[i] = book.gameObject.AddComponent<Image>(); shelfBooks[i].color = new Color(.3f, .28f, .3f); shelfBooks[i].raycastTarget = false; Slots.Dress(shelfBooks[i], "shelf-book"); book.gameObject.SetActive(false); } // Build D: the shelves take their books back at Stage 4
             var floor = Rect("Floor band", hub, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f, 0); floorImage.raycastTarget = false;
             var desk = Block(hub, "Desk, uncovered", -125, 426, 70, 30, "desk"); Tappable(desk, () => Walk("desk"));
+            ButtonLook.HitArea(desk, 0, ButtonLook.MinTarget); // batch 2 (3d): the desk takes taps over 44 px of height; it is drawn at 30
             var casparMark = Rect("Caspar", hub, 100, 418, 20, 80); var casparBody = casparMark.gameObject.AddComponent<Image>(); casparBody.color = Muted; casparBody.raycastTarget = false;
             var casparHead = Rect("Caspar head", hub, 100, 366, 18, 18); var casparHeadImage = casparHead.gameObject.AddComponent<Image>(); casparHeadImage.color = Muted; casparHeadImage.raycastTarget = false;
             Label(hub, "Caspar", 100, 452, 60, 14, 10).color = Muted;
@@ -382,6 +386,7 @@ namespace Ascendant.CelestialDial
             enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing); StyleAtriumButton(enterWing);
             enterChamber = MakeButton(hub, "The Crystal Book Chamber", 78, 624, 150, 52, EnterChamber); StyleAtriumButton(enterChamber); enterChamber.GetComponentInChildren<Text>().fontSize = 12; // Build D; owner (worksheet section 13)
             journalHub = MakeButton(hub, "Your journal", 0, 680, 300, 52, OpenJournal); StyleAtriumButton(journalHub); journalHub.gameObject.SetActive(false); // Build F: the journal takes the row Check the Seals held (retired Sept 15)
+            ButtonLook.Room(enterWing, font); ButtonLook.Room(enterChamber, font); ButtonLook.Room(journalHub, font); // batch 2 (3c C): the Atrium's doors and journal in the chat box's language
             hubNote = Label(hub, "", 0, 722, 330, 28, 10); hubNote.color = Muted; // two lines: the owner's sealed-door and desk lines are long
             endCard = Label(hub, "The whole wheel burns. The symbols await you next.", 0, 736, 330, 36, 11); endCard.gameObject.SetActive(false); // owner (worksheet section 1); two lines at 330 wide
             walkSpeed = TestButton(hub, "Walk: normal (test)", -118, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
@@ -403,6 +408,7 @@ namespace Ascendant.CelestialDial
             reviewNote = Label(review, "", 0, 440, 330, 50, 14);
             reviewSummary = Label(review, "", 0, 520, 330, 30, 16);
             leavePractice = MakeButton(review, "Leave the instrument", 0, 654, 190, 56, LeavePractice); // Build F: an exit at any point (the Sept 15 defect)
+            foreach (var b in elementButtons) ButtonLook.Plate(b); foreach (var b in modalityButtons) ButtonLook.Plate(b); foreach (var b in reviewGlyphButtons) ButtonLook.Plate(b); ButtonLook.Rule(leavePractice); // batch 2 (3b C, 3c C): practice is an instrument: bronze plates, and the way out on a rule
         }
         void BuildGlyphs()
         {
@@ -420,6 +426,7 @@ namespace Ascendant.CelestialDial
             Slots.DressInstrumentBox(panelImage, casparLabel, glyphCaspar, font); // Build R: the slim box fitted to the line on the Book of Symbols (owner, Sept 29)
             glyphNote = Label(glyphs, "", 0, 446, 330, 24, 14);
             closeBook = MakeButton(glyphs, "Close the Book", 0, 680, 300, 52, CloseBook); // owner (worksheet section 7) // between the name buttons (to 432) and the Caspar panel (from 460)
+            foreach (var b in glyphNameButtons) ButtonLook.Plate(b); ButtonLook.Rule(closeBook); // batch 2 (owner, Oct 2: "bronze on the Table and the Book too")
         }
         void BuildGrid()
         {
@@ -440,10 +447,10 @@ namespace Ascendant.CelestialDial
             for (int seat = 0; seat < 12; seat++)
             {
                 int index = seat;
-                gridTiles[seat] = MakeButton(gridScreen, Zodiac.Seats[seat].Name, -129 + (seat % 4) * 86, 344 + (seat / 4) * 44, 82, 40, () => PickSign(index));
+                gridTiles[seat] = MakeButton(gridScreen, Zodiac.Seats[seat].Name, -129 + (seat % 4) * 86, 342 + (seat / 4) * 46, 82, 44, () => PickSign(index));
                 var name = gridTiles[seat].GetComponentInChildren<Text>(); name.fontSize = 11; name.horizontalOverflow = HorizontalWrapMode.Overflow;
-                var nameRect = (RectTransform)name.transform; nameRect.anchoredPosition = new Vector2(10, -20); nameRect.sizeDelta = new Vector2(58, 36); gridTileNames[seat] = name;
-                gridTileGlyphs[seat] = Label(gridTiles[seat].transform, Zodiac.Seats[seat].Glyph, -28, 20, 24, 36, 16); gridTileGlyphs[seat].font = Dial.GlyphFont; gridTileGlyphs[seat].horizontalOverflow = HorizontalWrapMode.Overflow; gridTileGlyphs[seat].verticalOverflow = VerticalWrapMode.Overflow;
+                var nameRect = (RectTransform)name.transform; nameRect.anchoredPosition = new Vector2(10, -22); nameRect.sizeDelta = new Vector2(58, 36); gridTileNames[seat] = name;
+                gridTileGlyphs[seat] = Label(gridTiles[seat].transform, Zodiac.Seats[seat].Glyph, -28, 22, 24, 36, 16); gridTileGlyphs[seat].font = Dial.GlyphFont; gridTileGlyphs[seat].horizontalOverflow = HorizontalWrapMode.Overflow; gridTileGlyphs[seat].verticalOverflow = VerticalWrapMode.Overflow;
             }
             gridReadout = Label(gridScreen, "", 0, 470, 340, 20, 12);
             var panel = Rect("Caspar panel", gridScreen, 0, 540, 324, 112); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor;
@@ -454,6 +461,7 @@ namespace Ascendant.CelestialDial
             gridSeal = MakeButton(gridScreen, "SEAL", 0, 654, 146, 56, GridSeal); gridSeal.GetComponent<Image>().color = Crimson;
             leaveGrid = MakeButton(gridScreen, "Leave the Table", -72, 714, 128, 48, LeaveGrid); leaveGrid.GetComponentInChildren<Text>().fontSize = 13; // owner (worksheet section 11)
             gridAsk = MakeButton(gridScreen, "Ask Caspar", 78, 714, 164, 48, GridAsk); gridAsk.GetComponentInChildren<Text>().fontSize = 13; gridAsk.gameObject.SetActive(false); // owner (worksheet section 8)
+            ButtonLook.Plate(gridSeal, 31); ButtonLook.Rule(leaveGrid); ButtonLook.Plate(gridAsk); // batch 2 (owner, Oct 2: "bronze on the Table and the Book too"); 3d: its sign tiles are 44 px tall, on 46 px rows
             // Build I: the table's own Key rise, over the board, drawn like the Dial's
             var tableKeyGlow = Rect("Table key glow", gridScreen, 0, GridKeyTop, 140, 140); gridKeyGlow = tableKeyGlow.gameObject.AddComponent<Image>(); gridKeyGlow.sprite = SoftGlow(); gridKeyGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0); gridKeyGlow.raycastTarget = false;
             gridKey = Rect("Table Keeper Key", gridScreen, 0, GridKeyTop, 84, 40); var tableKeyImage = gridKey.gameObject.AddComponent<Image>(); tableKeyImage.raycastTarget = false; bool tableKeyArt = Slots.Dress(tableKeyImage, "keeper-key"); Slots.Paint(tableKeyImage, new Color(Bone.r, Bone.g, Bone.b, 0), 1f);
@@ -486,6 +494,7 @@ namespace Ascendant.CelestialDial
             forkLesson = MakeButton(r, "Continue the lesson", -78, 714, 150, 48, ContinueLesson); forkLesson.GetComponentInChildren<Text>().fontSize = 12; forkLesson.gameObject.SetActive(false);
             forkPractice = MakeButton(r, "Practice what you know", 78, 714, 150, 48, EnterPractice); forkPractice.GetComponentInChildren<Text>().fontSize = 12; forkPractice.gameObject.SetActive(false);
             leavePracticeDial = MakeButton(r, "Leave the instrument", -72, 714, 128, 48, LeavePractice); leavePracticeDial.GetComponentInChildren<Text>().fontSize = 12; leavePracticeDial.gameObject.SetActive(false);
+            ButtonLook.Plate(wingContinue); ButtonLook.Rule(leaveDial); ButtonLook.Plate(forkLesson); ButtonLook.Plate(forkPractice); ButtonLook.Rule(leavePracticeDial); // batch 2 (3b C): the Dial's own row in bronze; Leave the Dial on its rule
         }
 
         void BuildWingRoom()
@@ -550,7 +559,8 @@ namespace Ascendant.CelestialDial
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
             enterShelf = MakeButton(wingRoom, "The Bookshelf", 0, 568, 300, 52, () => Walk("shelf")); enterShelf.gameObject.SetActive(false); // owner (worksheet section 7)
             wingRoomBack = MakeButton(wingRoom, "Return to the Atrium", 0, 680, 300, 52, LeaveWing); // owner (worksheet section 6)
-            journalWing = MakeButton(wingRoom, "Your journal", 0, 774, 216, 40, OpenJournal); journalWing.GetComponentInChildren<Text>().fontSize = 13; journalWing.gameObject.SetActive(false); // Build F
+            journalWing = MakeButton(wingRoom, "Your journal", 0, 774, 216, 44, OpenJournal); journalWing.GetComponentInChildren<Text>().fontSize = 13; journalWing.gameObject.SetActive(false); // Build F
+            ButtonLook.Room(enterGrid, font); ButtonLook.Room(enterDial, font); ButtonLook.Room(enterShelf, font); ButtonLook.Room(wingRoomBack, font); ButtonLook.Room(journalWing, font); // batch 2 (3c C, as the board shows it); 3d: Your journal at 44 px
         }
         void BuildAvatar()
         {
@@ -1244,6 +1254,7 @@ namespace Ascendant.CelestialDial
             state.settingsOpen = Settings != null && Settings.Open; state.canQuit = SettingsMenu.CanQuit; // Build U
             state.safeTop = SafeArea.TopInset(canvas); // Platform fit, Part 1: how far the top row moves down, in layout units
             state.masters = Bleed.Masters(root, Dial != null ? Dial.Root : null); // batch 2: the layers on screen drawing a master whole
+            state.buttons = ButtonLook.OnScreen(root, Dial != null && Dial.Showing ? Dial.Root : null, Settings != null ? Settings.Gear : null); // batch 2: each button's look and target
             state.wakePreview = wakePreview; // the Dial's wake-up: DEV Mode's preview (-1: as earned)
             if (MiniMenu != null) { state.travelShown = MiniMenu.ButtonShown; state.travelOpen = MiniMenu.Open; state.travelRows = MiniMenu.Rows; var t = MiniMenu.ButtonAt; state.travelAt = new[] { t.x, t.y }; } // the room mini-menu (86bca07wv); Part 2: where its button sits
             if (Settings != null) { var g = Settings.GearAt; state.gearAt = new[] { g.x, g.y }; } // Part 2: where the gear sits
