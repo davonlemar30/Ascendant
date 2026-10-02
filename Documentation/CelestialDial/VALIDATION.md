@@ -2,6 +2,19 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The shelf's glow, without the smear (APK Session 2, bug 1)
+
+The owner's APK Session 2 report (Oct 1, page 2kyd583p-25354, bug 1; task 86bcbn6ct): "After activation, the bookshelf smears into a stretched, motion-blurred look." No new ruling: Build Y's stands (the shelf itself glows, a soft gold edge hugs its silhouette); only the edge's drawing changed.
+
+- **The cause.** Build Y's shelf light (`SliceView`, "Shelf light", PR #88) drew its edge with two `Outline` effects at 1.5 and 3.5 px. An `Outline` repeats the whole textured picture at each of its four offsets; it does not trace a silhouette. The two together laid eight shifted copies of the shelf at half strength over it, up to 3.5 px on the layout (about 10 px on a phone), and the breathing pulse moved the ghosts. Build AA met the same trap on the journal's panels.
+- **The fix.** The two `Outline`s are gone. The edge is a halo made once from the shelf file's own alpha (`SilhouetteHalo`): the file is read back through the GPU (slot files import unreadable), its alpha spread by 3 file pixels and softened twice by 4, then cleared wherever the shelf itself is opaque, so it lies only around the silhouette and no copy of the picture's detail is offset. It is a child of the shelf light, so Build Y's levels (full while the book waits, .3 after) and its breathing (still under reduced motion) carry it. The warm wash (the shelf's gold copy at 22%) stays: it is an exact overlay, not an offset copy.
+- **Checks.** The web state reports `shelfEdge` ("halo" when the edge comes from the silhouette); the suite holds it beside Build Y's check at both widths, and the fixture checks the shelf light has no `Outline` and a halo wider than the shelf.
+- **Evidence.** [Before and after at 3x](Evidence/shelf-glow-2026-10-02/shelf-before-after-3x.jpg): the waiting and faint states, production (Build Y) against the fix, captured at device scale 3. Before, the pillar, its bust and the orrery are ghosted; after, they are sharp, and the gold sits around the shelf's outline.
+
+Not changed: the shelf's file, its place, its levels and breathing, the state fields `shelfLight` and `shelfRing`, anything else drawn.
+
+Validation (local, worktree `greybox`, branch `codex/shelf-glow-silhouette` from main `2599659`): mechanical 584/584 (0 compiler warnings); slice fixture 240/240 (+1, the halo check), no runtime errors; headless WebGL 0 errors / 0 warnings (27.7 MB); browser suite 413/413 at desktop density (390 and 360; +2, the halo check at each width) and 413/413 at phone density (`DEVICE_SCALE=2 MOBILE=1`). Not tested: the phone itself; the next APK cut is on the owner's word.
+
 ## The Cast Dial: the phoenix holds the words (Build AC)
 
 The owner's rulings (Oct 1, Decisions Log week of Sept 28–Oct 4; task 86bcbhcj8): Build AB held unmerged as the backup; one more concept pass; direction A, cast and engraved; the ribbon hub; no count field; the look passes on the reference `Documentation/ConceptArt/DialRedesign-2026-10-01/dial-A3-ribbon.png` (main checkout, untracked); the count word goes inside the eye, under the challenge line.

@@ -350,7 +350,8 @@ const path=require('path');
     try{await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});}
     catch(e){console.error('wing button stalled: '+JSON.stringify(await state()));console.error('last events: '+JSON.stringify(events.slice(-14).map(x=>x.event_name+'@'+x.input_method)));throw e;}
     check((await state()).canEnterShelf && (await state()).pois.includes('shelf'),'the lit wheel wakes the bookshelf as a point of interest at '+viewport.width);
-    { const s=await state(); check(s.shelfLight===1&&!s.shelfRing,'Build Y: the waking shelf glows itself (its own file lit, edge hugging it), no portal ring, at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-shelf-glow.png')}); }
+    { const s=await state(); check(s.shelfLight===1&&!s.shelfRing,'Build Y: the waking shelf glows itself (its own file lit, edge hugging it), no portal ring, at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-shelf-glow.png')});
+      check(s.shelfEdge==='halo','APK Session 2, bug 1: the waking shelf\'s edge is a halo drawn from its silhouette, with no shifted copies of the picture (no smear), at '+viewport.width); }
     await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).glyphMode==='' && (await state()).message.includes('book upon the shelf'),'the Dial before the book only points at the shelf at '+viewport.width);
     await page.waitForFunction(()=>window.ascendantDial.snapshot().canLeaveDial,{},{timeout:15000}); // the wheel's Back button appears a frame after the screen
