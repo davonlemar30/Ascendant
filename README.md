@@ -2,72 +2,72 @@
 
 *A game about learning to read the sky, set in a library that only answers to you.*
 
-**Play it in your browser:** https://davonlemar30.github.io/Ascendant/ — nothing to install, works on a phone.
+**Play it now:** https://davonlemar30.github.io/Ascendant/ — nothing to install, and it works on a phone.
 
-Ascendant teaches Western astrology the way a patient tutor would: one pattern at a time, on an instrument you turn with your own hands, with a guide who never lets you fake it. You are the Keeper, the last of a bloodline that built the Celestial Library. Caspar, its caretaker, has kept the lights on for centuries and cannot touch a single instrument. You can.
+You are the Keeper, the last of a bloodline that built the Celestial Library. Caspar, its caretaker, has kept the lights on for centuries and cannot touch a single instrument. You can.
 
-## What you are playing right now
+Ascendant teaches Western astrology the way a patient tutor would: one pattern at a time, on an instrument you turn with your own hands, with a guide who never lets you fake it.
 
-This is an early, playable build — a **greybox** with its first art landing. The shapes, rooms, and instruments are real and the learning is real; the Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber now have illustrated art as restoring kits, with Caspar, the Keeper, and the journal illustrated too; the Celestial Dial's own instrument and the book on the shelf are still placeholder blocks, the sounds are not in yet, and Caspar speaks in the writer's own lines. Expect a museum at night rendered in charcoal and bone, not a finished painting.
+## Where the game is
 
-The current build is **the Zodiac Wing**, the first wing of the Library. It holds one curriculum: the twelve signs, and how to *derive* what a sign is instead of memorizing twelve personalities.
+The first wing of the Library, **the Zodiac Wing**, is playable from start to finish. It holds one lesson: the twelve signs, and how to *derive* what a sign is instead of memorizing twelve personalities. The target is to have the Wing finished, polished, and sounding like itself by **November 13, 2026**.
 
-**Your journey through the Wing:**
+The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are illustrated and wake up room by room as you earn Keys. Caspar, the Keeper, and the journal are illustrated too. The Celestial Dial has been redrawn and is being redrawn again, so expect it to change. The book on the shelf is still a plain block, and there is no sound yet.
 
-1. **Wake up.** You are asked your name and when you were born. From that the game finds your sun sign (or picks one for you if you don't know). Everything Caspar teaches starts from *your* sign.
-2. **The Grand Atrium.** Dust, covered furniture, sealed doors, one weak candle. Caspar explains what he can. Every Key you spend in the Chamber wakes it one more step.
-3. **The Celestial Dial.** A great brass astrolabe of twelve seats that wakes when you step close. Each sign's name is engraved around its rim, and each seat's tablet shows its symbol and the one thing the current lesson is about; turn it and the whole ring turns with you, and the sign under the pointer tells you everything you've learned about it. Caspar teaches the first pattern on it: the four elements, and how signs of one element sit evenly spaced around the wheel. You turn the wheel, count the seats, and press **Seal** when you're sure. Your first **Keeper Key** rises out of it.
-4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. You spend your Key on the first lock and the Library takes her first breath. From then on the Chamber is a room you can walk back into whenever you have a Key in hand.
-5. **Back to the Wing, on your own time.** The Wing keeps giving:
-   - **The symbols.** A book on the collapsed shelf teaches each sign's symbol; then the wheel hides its names and asks you to find each symbol by its shape. **Key 2.**
-   - **The modalities.** Every third sign shares a *modality* — cardinal, fixed, or mutable — taught on the same wheel, three seats at a time.
-   - **The table.** A board of four elements by three modalities wakes beside the wheel. Every sign has exactly one square on it. Place all twelve. **Key 3.**
-   - **Polarity and opposites.** Every sign has a *polarity* (Yang or Yin) and a partner straight across the wheel that shares its modality and its polarity but not its element. Then Caspar hands you parts — an element, a modality — and asks you to build the sign, find its partner, and say what the two share. Three signs built. **Key 4.**
-   - **Practice, and your journal.** Once the wheel has taught you anything, stepping up to it gives you a choice: **Continue the lesson** or **Practice what you know**. Practice asks a few of the things you have learned, spaced further apart each time you remember them. Three misses in one practice and the instrument closes for a moment; you are back in the room, free to read your **journal** (a button in every room) or step straight back up and try again. The journal is a black book written in gold and silver, its pages faintly ruled. It opens on **the Wheel**: the twelve signs in their seats, each one silver when you have only met it, ringed in gold while you practise it, and set in gold leaf once you have mastered it. As you learn more, the Wheel learns with you: a **Table** view lays the same signs out by element and modality, and tabs show them by element, modality, polarity, or as opposite pairs. Tap a sign to see what you know of it, then open its page: its element, symbol, modality, polarity and opposite, with the signs that share each one a tap away. Each sign's picture starts as a bare line drawing and fills with colour as you practise, and a ribbon hangs from its page, longer the further you have climbed and pulled up out of the book when that sign is ready for practice. Reading it proves nothing; the wheel does that.
-6. **Spend what you earn.** Every Key goes back to the Chamber. Keys 2 and 3 fill the first Book's remaining locks and it opens; Key 4 starts the second Book. Each Key spent wakes the Atrium one more step — lamps, the shelves taking their books back, light behind a sealed door — until the Wing is whole. That is the end of this build: **the Zodiac Wing, complete**, with two doors still sealed for another day.
+## Your journey through the Wing
+
+1. **Wake up.** Give your name and when you were born. The game finds your sun sign (or picks one if you don't know). Everything Caspar teaches starts from *your* sign.
+2. **The Grand Atrium.** Dust, covered furniture, sealed doors, one weak candle. Every Key you spend in the Chamber wakes it one more step.
+3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Your first **Keeper Key** rises out of it.
+4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. Spend your Key on the first lock and the Library takes her first breath.
+5. **Back to the Wing, on your own time.** It keeps giving:
+   - **The symbols.** The Book of Symbols teaches each sign's glyph, then the wheel hides its names and asks you to find each one by its shape. **Key 2.**
+   - **The modalities.** Every third sign shares a *modality* (cardinal, fixed, or mutable), taught on the same wheel, three seats at a time.
+   - **THE ELEMENTAL TABLE.** Four elements by three modalities. Every sign has exactly one square. Place all twelve. **Key 3.**
+   - **Polarity and opposites.** Every sign is Yang or Yin and has a partner straight across the wheel that shares its modality and polarity but not its element. Caspar hands you parts and you build the sign, find its partner, and say what the two share. **Key 4.**
+6. **Spend what you earn.** Every Key goes back to the Chamber. Each one wakes the Atrium another step (lamps, shelves taking their books back, light behind a sealed door) until the Wing is whole, with two doors still sealed for another day.
+
+## Practice and your journal
+
+Once the wheel has taught you anything, stepping up to it offers a choice: **Continue the lesson** or **Practice what you know**. Practice asks a few things you have learned, spaced further apart each time you remember them. Three misses in one practice and the instrument closes for a moment. Read your journal, or step back up and try again.
+
+The journal is a black book written in gold and silver. It opens on **the Wheel**: the twelve signs in their seats, silver when you have only met one, ringed in gold while you practise it, set in gold leaf once you have mastered it. A **Table** view lays the same signs out by element and modality, and tabs show them by element, modality, polarity, or as opposite pairs. Tap a sign for its page, with every sign that shares a fact one tap away. Each sign's picture starts as a bare line drawing and fills with colour as you practise. Reading the journal proves nothing; the wheel does that.
 
 ## How Caspar teaches
 
-- **You are never told the answer first.** You get one problem at a time. Get it wrong once and Caspar nudges. Wrong twice and he states the rule. Wrong three times and he shows you, then hands you a fresh one.
-- **Ask Caspar** appears after your first miss on any problem that has a rule. Asking is never counted against you — but an answer you get after asking doesn't count as *yours*.
+- **You are never told the answer first.** One problem at a time. Wrong once, Caspar nudges. Wrong twice, he states the rule. Wrong three times, he shows you and hands you a fresh one.
+- **Ask Caspar** appears after your first miss on any problem that has a rule. Asking is never held against you, but an answer you get after asking doesn't count as *yours*.
 - **Keys are earned, not given.** Each Key needs at least one problem you solved with no help at all. If Caspar did all the work, he says so, and you try again another time.
-- **Practice is optional and honest.** After you've earned a unit's Key, the book on the shelf will test you again — harder each clean run — and the wheel offers practice on what you know. Neither ever takes a Key away, and the journal is always there to read first.
+- **Practice is honest.** It never takes a Key away.
 
 ## Controls
 
-- **Phone:** tap and drag the wheel; tap a seat to jump to it; tap **Seal** to commit. In the rooms, tap a doorway, the desk, the table, the Books, or Caspar to walk there. Buttons under each room do the same thing as tapping. **Your journal** is a button in every room; **Leave the instrument** is on every practice item.
-- **Keyboard:** left and right arrows turn the wheel one seat; Tab moves between controls; Enter or Space activates. Only Seal submits — selecting a seat never counts as an answer.
+- **Phone:** tap and drag the wheel; tap a seat to jump to it; tap **Seal** to commit. In the rooms, tap a doorway, the desk, the table, the Books, or Caspar to walk there. The buttons under each room do the same.
+- **Keyboard:** left and right arrows turn the wheel one seat; Tab moves between controls; Enter or Space activates. Only Seal submits.
 - **Screen readers:** every seat, cell, and button is labeled, and Caspar's lines are announced as they change.
-- **Reduced motion:** honored from your system setting, and there's a toggle in Settings (the gear at the top right). With it on, the wheel cuts instead of spinning and the walks skip to the door.
+- **Reduced motion:** honored from your system setting, with a toggle in Settings (the gear at the top right).
 
 ## Saving
 
-Your progress saves on the device you're playing on, in the browser, the moment anything changes. Come back later and you'll be in the Atrium with your Keys and everything the wheel remembers. There is no account and nothing leaves your device. **Start over**, under Testing in Settings (the gear at the top right), wipes it. Testing also has **Jump to...**, which loads a saved checkpoint (After Key 1 up to the whole Zodiac Wing) so you can test any stage without replaying — those buttons are for testing and will go away.
+Your progress saves in your browser the moment anything changes. Come back later and you are in the Atrium with your Keys and everything the wheel remembers. No account, and nothing leaves your device. **Start over**, under Testing in Settings, wipes it. Testing also has **Jump to...**, which loads a saved checkpoint so you can test any stage without replaying. Those buttons are for testing and will go away.
 
-## What's placeholder, what's coming
+## What's next
 
-- **Art:** landing, room by room. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are now built as **kits** — a restored shell, a grime layer that fades away by Key, and every prop with a worn and a restored state — with Caspar, the Keeper, the Key, and the journal also illustrated. The Celestial Dial now has its own room, glow, seats, and an eye that speaks. The book on the shelf is still a placeholder block. Every grey box is a named slot that takes an image, so the art arrives one file at a time (see below).
-- **Sound:** none yet. One ambient loop and a few interface sounds are planned; the hooks are in, and each is a named slot that takes a sound file.
-- **Caspar's voice:** the Zodiac Wing's lines are now the writer's own, from the first return to the Chamber's end. The few stand-ins left are around practice and the journal (the fork, the gate, the journal's pages); they follow.
-- **Next up:** the book on the shelf, the game's sounds, Caspar's last few lines, then the rest of the Library — planets, houses, aspects, and the people who come to have their charts read.
+- The book on the shelf, getting the same treatment as the rest of the Wing.
+- The game's sounds: one ambient loop and a few interface sounds. The hooks are already in.
+- Caspar's last few lines, around practice and the journal.
+- Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.
 
-The full game teaches the whole of beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
-
-## How to drop art in
-
-For the owner, and anyone helping with the look. Every placeholder has a named slot: a file named after the slot, dropped into the project, replaces the grey box with no code change; a sound file does the same for an action. The full list of slots, their sizes, and where each is drawn is in [`Documentation/CelestialDial/ART-SLOTS.md`](Documentation/CelestialDial/ART-SLOTS.md).
-
-1. Name the file after the slot: `atrium.png`, `keeper-idle.png`, `door-open.png`; for sounds `step.wav`, `seal.wav`, `ambient.wav`.
-2. Put it in `Assets/CelestialDial/Resources/Art/` (images) or `Assets/CelestialDial/Resources/Audio/` (sounds). Unity imports it with the right settings on its own.
-3. The light: each room also takes a transparent **golden-hour overlay** (`atrium-light.png`, `wing-light.png`, `chamber-light.png`), drawn over the room and faded in as the Library wakes. Draw the room dormant; draw its light separately.
-4. Play. To see every slot at once with what is in it, open the **style page**: add `?style` to the game's address, or use the Editor menu *Ascendant › Greybox › Play the style page*. Add `?art=test` to the address to see the game with a test image in every slot, so you know where each one lands.
-
-Until real files arrive nothing changes: with no files the game looks and sounds exactly as it does today.
+The full game teaches beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
 
 ## Feedback
 
-If something feels wrong, confusing, or too easy, that is exactly what this build is for. The design notes and decisions live in the project's ClickUp workspace; the technical notes for anyone poking at the code are under [`Documentation/`](Documentation/README.md).
+If something feels wrong, confusing, or too easy, that is exactly what this build is for. Design notes and decisions live in the project's ClickUp workspace.
+
+## For the owner and anyone helping with the look
+
+Every placeholder is a named slot: a file named after the slot, dropped into the project, replaces the plain box with no code change (images into `Assets/CelestialDial/Resources/Art/`, sounds into `Assets/CelestialDial/Resources/Audio/`). The full list of slots, sizes, and where each is drawn is in [`Documentation/CelestialDial/ART-SLOTS.md`](Documentation/CelestialDial/ART-SLOTS.md). To see every slot at once, add `?style` to the game's address; add `?art=test` to see a test image in every slot. The technical notes for anyone poking at the code are under [`Documentation/`](Documentation/README.md).
 
 ## Credits
 
-Ascendant is designed and written by Davon G. The zodiac symbols are drawn with Noto Sans Symbols (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt`](Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt)), and the journal's titles are set in UnifrakturMaguntia (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt`](Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt)), and the Dial's words are set in EB Garamond (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt`](Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt)). Built with Unity.
+Ascendant is designed and written by Davon G. The zodiac symbols are drawn with Noto Sans Symbols (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt`](Assets/CelestialDial/Resources/Fonts/OFL-NotoSansSymbols.txt)), the journal's titles are set in UnifrakturMaguntia (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt`](Assets/CelestialDial/Resources/Fonts/OFL-UnifrakturMaguntia.txt)), and the Dial's words are set in EB Garamond (SIL Open Font License, see [`Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt`](Assets/CelestialDial/Resources/Fonts/OFL-EBGaramond.txt)). Built with Unity.
