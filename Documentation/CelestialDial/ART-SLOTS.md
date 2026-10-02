@@ -199,7 +199,7 @@ Applied by [`Assets/Editor/CelestialDial/SlotImport.cs`](../../Assets/Editor/Cel
 - **Images:** Sprite (2D and UI), single, full-rect mesh, no mipmaps, alpha is transparency, sRGB, not readable, clamp, bilinear, no power-of-two scaling; **max size per slot** (the cap above); **compressed with crunch at quality 50** (the download shrinks several times over; the on-device format follows the WebGL texture setting, DXT by default). A side that is not a multiple of 4 is warned about.
 - **Sounds:** Vorbis at quality 0.5, optimized sample rate, preloaded; cues forced to mono and decompressed on load (no latency), the ambient loop stereo and compressed in memory.
 
-Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (141). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
+Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (151). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
 
 ## The test set and the style page
 
