@@ -116,3 +116,6 @@ InitTestScene*.unity*
 # Claude Code: the shared agent definitions (.claude/agents) are tracked; local settings and session worktrees are not
 .claude/settings.local.json
 .claude/worktrees/
+
+# macOS
+.DS_Store
