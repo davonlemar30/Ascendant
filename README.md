@@ -12,7 +12,7 @@ Ascendant teaches Western astrology the way a patient tutor would: one pattern a
 
 The first wing of the Library, **the Zodiac Wing**, is playable from start to finish. It holds one lesson: the twelve signs, and how to *derive* what a sign is instead of memorizing twelve personalities. The target is to have the Wing finished, polished, and sounding like itself by **November 13, 2026**.
 
-The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are illustrated and wake up room by room as you earn Keys. Caspar, the Keeper, and the journal are illustrated too. The Celestial Dial has been redrawn and is being redrawn again, so expect it to change. The book on the shelf is still a plain block, and there is no sound yet.
+The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zodiac Wing, and the Crystal Book Chamber are illustrated and wake up room by room as you earn Keys. Caspar, the Keeper, and the journal are illustrated too. The Celestial Dial was just recast as one bronze wheel, and the small Dial in the Zodiac Wing was redrawn to match. The book on the shelf is still a plain block, and there is no sound yet.
 
 ## Your journey through the Wing
 
