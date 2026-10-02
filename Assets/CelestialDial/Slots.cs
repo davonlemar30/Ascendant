@@ -370,6 +370,7 @@ namespace Ascendant.CelestialDial
             moreRect.anchorMin = moreRect.anchorMax = moreRect.pivot = new Vector2(1, 0); moreRect.anchoredPosition = new Vector2(-8, 4); moreRect.sizeDelta = new Vector2(96, 26);
             var hit = moreRect.gameObject.AddComponent<Image>(); hit.color = new Color(0, 0, 0, .001f); hit.canvasRenderer.cullTransparentMesh = false; // a see-through button still takes taps
             var more = moreRect.gameObject.AddComponent<Button>(); more.targetGraphic = hit; more.onClick.AddListener(fit.Turn);
+            ButtonLook.HitArea(more, 0, ButtonLook.MinTarget); // batch 2 (3d): the link takes taps over 44 px of height; it reads at 26
             var moreTextRect = new GameObject("Label", typeof(RectTransform)).GetComponent<RectTransform>(); moreTextRect.SetParent(moreRect, false);
             moreTextRect.anchorMin = Vector2.zero; moreTextRect.anchorMax = Vector2.one; moreTextRect.offsetMin = new Vector2(0, 0); moreTextRect.offsetMax = new Vector2(-6, 0);
             var moreText = moreTextRect.gameObject.AddComponent<Text>(); moreText.font = font; moreText.text = "Continue"; moreText.fontSize = 12; moreText.fontStyle = FontStyle.Bold;
