@@ -16,7 +16,7 @@ The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zod
 
 ## Your journey through the Wing
 
-1. **Wake up.** Give your name and when you were born. The game finds your sun sign (or picks one if you don't know). Everything Caspar teaches starts from *your* sign.
+1. **Wake up.** Give your name, then when and where you were born: the date, the time (or say you don't know it) and your town or city. The game works out your sun, moon and rising signs from them, and shows "unknown" for any sign it can't know. If the Sun changed sign on the day you were born and you don't know your birth time, it asks which sign you go by. You can also tell it the signs you already know, or say you don't know and it picks a sun sign for you. Everything Caspar teaches starts from *your* sign.
 2. **The Grand Atrium.** Dust, covered furniture, sealed doors, one weak candle. Every Key you spend in the Chamber wakes it one more step.
 3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Your first **Keeper Key** rises out of it.
 4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. Spend your Key on the first lock and the Library takes her first breath.
@@ -31,7 +31,7 @@ The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zod
 
 Once the wheel has taught you anything, stepping up to it offers a choice: **Continue the lesson** or **Practice what you know**. Practice asks a few things you have learned, spaced further apart each time you remember them. Three misses in one practice and the instrument closes for a moment. Read your journal, or step back up and try again.
 
-The journal is a black book written in gold and silver. It opens on **the Wheel**: the twelve signs in their seats, silver when you have only met one, ringed in gold while you practise it, set in gold leaf once you have mastered it. A **Table** view lays the same signs out by element and modality, and tabs show them by element, modality, polarity, or as opposite pairs. Tap a sign for its page, with every sign that shares a fact one tap away. Each sign's picture starts as a bare line drawing and fills with colour as you practise. Reading the journal proves nothing; the wheel does that.
+The journal is a black book written in gold and silver. The first time you ever open it, a title page settles for a second and fades. After that, the first time you open it in a visit it lands on a page of your own: the Keeper's record, with your Keys and Books, your sun, moon and rising signs, and the journal's welcome in your name; later in the visit it opens where you left it. Two doors lead on: **Practice**, which is shown but not open yet, and **Contents**. Contents lists **the Wheel**, **the Library Map** (the Library's plan, with the rooms you have woken named in gold) and two chapters still sealed, and each chapter has a link back. **The Wheel** shows the twelve signs in their seats, silver when you have only met one, ringed in gold while you practise it, set in gold leaf once you have mastered it. A **Table** view lays the same signs out by element and modality, and tabs show them by element, modality, polarity, or as opposite pairs. Tap a sign for its page, with every sign that shares a fact one tap away. Each sign's picture starts as a bare line drawing and fills with colour as you practise. Reading the journal proves nothing; the wheel does that.
 
 ## How Caspar teaches
 
@@ -54,10 +54,13 @@ Your progress saves in your browser the moment anything changes. Come back later
 
 ## What's next
 
+- Practice in the journal. Its door is on the journal's first page but opens nothing yet; the plan for it is with the owner for approval.
+- The family triangles on the Dial, drawn over today's Dial. A picture of how they would look is with the owner to choose.
 - The book on the shelf, getting the same treatment as the rest of the Wing.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in.
 - Caspar's last few lines, around practice and the journal.
 - Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.
+- A new Android test build, cut only when the owner calls for it.
 
 The full game teaches beginner-to-intermediate natal astrology across eight stages and twenty-one Keys. The Zodiac Wing is stage one.
 
