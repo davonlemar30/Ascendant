@@ -139,6 +139,10 @@ The **v0.4 "tap-to-move"** build (branch `codex/v04-tap-to-move`, [task 86bbznax
   - Practice is an entry point only until its scope is approved.
   - Fonts: EB Garamond Italic and Noto Sans Symbols 2, both static, OFL. Eight new slots (166).
   - Validation: mechanical 630/630, slice fixture 262/262, browser suite 603/603 at desktop density (+29) and 512/512 at phone density; production 603/603 at phone density, the seven shapes included. Record: [VALIDATION.md](CelestialDial/VALIDATION.md).
+- **The Moon on a day it changed sign (Oct 3; PR #116; task 86bcbn6w6).** The owner's canon-flags ruling (Oct 3): with no birth time, a moon that changed sign that day shows both signs, "Pisces or Aries".
+  - The chart keeps the moon's sign at the day's start and end; the opening, the Keeper's record and the save carry both. A sun-only save is unchanged.
+  - A long Big Three line shrinks to fit the page's calm column (274 px), to 11 px at the least, so the doors stay put.
+  - Validation: mechanical 634/634, slice fixture 262/262, browser suite 604/604 at desktop density (+1) and 513/513 at phone density. Record: [VALIDATION.md](CelestialDial/VALIDATION.md).
 - **The family triangles (Oct 3; PR #115; task 86bcbn6w6).** The owner's step 5 ruling (Oct 3): the overlay approved, mixed strength.
   - The four element triangles lie on top of the Cast Dial as light (a screen blend), each joining its family's three seats, a star at each corner on the hub ring.
   - Resting at level A (34%), dusty on the worn Dial; while a lesson teaches a family, its triangle in its element's light (70%) and its seats' frames aglow; once, as the whole wheel lights, all four as ribbons of flame at level B (88%), then back to resting.

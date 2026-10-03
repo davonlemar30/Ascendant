@@ -131,6 +131,12 @@ namespace Ascendant.CelestialDial
         // "Enter what I already know" takes the sun, then the moon and the rising sign, each of those two with "I don't know"; "I don't
         // know" has the game choose the sun. The chart is fixed from Continue on, and the Keeper's record reads it from the save.
         public int MoonSign { get; private set; } = -1;   // -1: unknown
+        // owner, Oct 3 (the canon flags): on a day the moon changed sign and the birth time is unknown, the record shows both signs, "Pisces or
+        // Aries", the way astrologers write it; MoonSign stays -1 (not calculated), and a birth time added later settles it (batch 3)
+        public int MoonFrom { get; private set; } = -1;
+        public int MoonTo { get; private set; } = -1;
+        public bool MoonPair => MoonSign < 0 && MoonFrom >= 0 && MoonTo >= 0 && MoonFrom != MoonTo;
+        public string MoonWords => MoonSign >= 0 && MoonSign < 12 ? Zodiac.Seats[MoonSign].Name : MoonPair ? Zodiac.Seats[MoonFrom].Name + " or " + Zodiac.Seats[MoonTo].Name : "unknown";
         public int RisingSign { get; private set; } = -1;
         public string BirthStep { get; private set; } = ""; // the chart path: date, time, place; the known path: sun, moon, rising; then done
         public int BirthYear { get; private set; } public int BirthMonth { get; private set; } public int BirthDay { get; private set; }
@@ -156,7 +162,7 @@ namespace Ascendant.CelestialDial
         public void ChooseBirth(string choice)
         {
             if (Screen != SliceScreen.Birth) return;
-            BirthChoice = choice; SunSign = MoonSign = RisingSign = -1; BirthYear = BirthMonth = BirthDay = 0; BirthMinute = -1; BirthPlace = null; Note = ""; SunBasis = ""; CuspFrom = CuspTo = CuspNoon = CuspMinute = -1;
+            BirthChoice = choice; SunSign = MoonSign = RisingSign = MoonFrom = MoonTo = -1; BirthYear = BirthMonth = BirthDay = 0; BirthMinute = -1; BirthPlace = null; Note = ""; SunBasis = ""; CuspFrom = CuspTo = CuspNoon = CuspMinute = -1;
             BirthStep = choice == "chart" ? "date" : choice == "known" ? "sun" : choice == "unknown" ? "done" : ""; ChartFrom = choice == "unknown" ? "chosen" : choice;
             if (choice == "unknown") { SunSign = Zodiac.Wrap(random()); Note = "Then I will choose one for you.\nYour sun sign is " + Zodiac.Seats[SunSign].Name + "."; }
             Logged?.Invoke("birth_choice:" + choice);
@@ -178,10 +184,10 @@ namespace Ascendant.CelestialDial
             var chart = BirthChart.Work(BirthYear, BirthMonth, BirthDay, BirthMinute, place);
             if (chart.Sun < 0) // the canon's time-unknown state: the sun crossed a sign that day (Uncertain), so the player is asked (owner ruling, Oct 2)
             {
-                BirthPlace = place; MoonSign = chart.Moon; RisingSign = -1; CuspFrom = chart.SunFrom; CuspTo = chart.SunTo; CuspNoon = chart.SunNoon; CuspMinute = BirthChart.LocalMinuteOf(chart.Ingress, place.Zone);
+                BirthPlace = place; MoonSign = chart.Moon; MoonFrom = chart.Moon < 0 ? chart.MoonFrom : -1; MoonTo = chart.Moon < 0 ? chart.MoonTo : -1; RisingSign = -1; CuspFrom = chart.SunFrom; CuspTo = chart.SunTo; CuspNoon = chart.SunNoon; CuspMinute = BirthChart.LocalMinuteOf(chart.Ingress, place.Zone);
                 BirthStep = "cusp"; Note = ""; Logged?.Invoke("sun_cusp"); return true;
             }
-            BirthPlace = place; SunSign = chart.Sun; MoonSign = chart.Moon; RisingSign = chart.Rising; BirthStep = "done"; Note = ChartNote(); Logged?.Invoke("chart_worked_out"); return true;
+            BirthPlace = place; SunSign = chart.Sun; MoonSign = chart.Moon; MoonFrom = chart.Moon < 0 ? chart.MoonFrom : -1; MoonTo = chart.Moon < 0 ? chart.MoonTo : -1; RisingSign = chart.Rising; BirthStep = "done"; Note = ChartNote(); Logged?.Invoke("chart_worked_out"); return true;
         }
         // the known path: the sun, then the moon and the rising sign (-1 for "I don't know")
         public bool SetKnownSign(int seat)
@@ -197,6 +203,7 @@ namespace Ascendant.CelestialDial
         {
             string Sign(int seat) => Zodiac.Seats[seat].Name; bool noTime = BirthChoice == "chart" && BirthMinute < 0;
             var line = "Your sun sign is " + Sign(SunSign);
+            if (MoonPair) return line + " and your moon sign " + MoonWords + " (it changed sign that day)." + (RisingSign >= 0 ? " Your rising sign is " + Sign(RisingSign) + "." : noTime ? " Without a birth time, your rising sign stays unknown." : " Your rising sign stays unknown."); // a draft (owner writes)
             if (MoonSign >= 0 && RisingSign >= 0) return line + ", your moon sign " + Sign(MoonSign) + ", and your rising sign " + Sign(RisingSign) + ".";
             if (MoonSign >= 0) return line + " and your moon sign " + Sign(MoonSign) + "." + (noTime ? " Without a birth time, your rising sign stays unknown." : " Your rising sign stays unknown.");
             if (RisingSign >= 0) return line + " and your rising sign " + Sign(RisingSign) + ". Your moon sign stays unknown.";
@@ -204,7 +211,7 @@ namespace Ascendant.CelestialDial
         }
         // the Keeper's record's Big Three line, as words (the record draws each glyph in its own font); "unknown" where it can't be known (owner, A)
         public static string SignOrUnknown(int seat) => seat >= 0 && seat < 12 ? Zodiac.Seats[seat].Name : "unknown";
-        public string BigThreeLine => "\u2609 " + SignOrUnknown(SunSign) + " \u00b7 \u263d " + SignOrUnknown(MoonSign) + " \u00b7 \u2191 " + SignOrUnknown(RisingSign);
+        public string BigThreeLine => "\u2609 " + SignOrUnknown(SunSign) + " \u00b7 \u263d " + MoonWords + " \u00b7 \u2191 " + SignOrUnknown(RisingSign);
         public bool CanContinue =>
             Screen == SliceScreen.Identity || (Screen == SliceScreen.Birth && HasSunSign && BirthStep == "done") ||
             Screen == SliceScreen.Atrium || (Screen == SliceScreen.Wing && KeyRevealed && AtriumStage == 1) || Screen == SliceScreen.AtriumReturn ||
@@ -609,7 +616,7 @@ namespace Ascendant.CelestialDial
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
                 polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, moonSign = MoonSign, risingSign = RisingSign, chartFrom = ChartFrom, sunBasis = SunBasis,
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, moonSign = MoonSign, moonFrom = MoonFrom, moonTo = MoonTo, risingSign = RisingSign, chartFrom = ChartFrom, sunBasis = SunBasis,
                 birthDate = BirthYear > 0 ? BirthYear.ToString("0000") + "-" + BirthMonth.ToString("00") + "-" + BirthDay.ToString("00") : "", birthMinute = BirthMinute, birthPlace = BirthPlace != null ? BirthPlace.Name : "",
                 birthLatitude = BirthPlace != null ? BirthPlace.Latitude : 0, birthLongitude = BirthPlace != null ? BirthPlace.Longitude : 0, birthZone = BirthPlace != null ? Places.ZoneName(BirthPlace.Zone) : "", glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
         }
@@ -618,7 +625,7 @@ namespace Ascendant.CelestialDial
         {
             if (save == null || save.atriumStage < 2 || save.sunSign < 0) return false;
             PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved"; JournalTitled = save.journalTitled;
-            MoonSign = save.moonSign; RisingSign = save.risingSign; ChartFrom = save.chartFrom ?? ""; SunBasis = save.sunBasis ?? ""; BirthMinute = save.birthMinute; BirthStep = "done"; // fixed at the opening: read, never worked out again
+            MoonSign = save.moonSign; MoonFrom = save.moonFrom; MoonTo = save.moonTo; RisingSign = save.risingSign; ChartFrom = save.chartFrom ?? ""; SunBasis = save.sunBasis ?? ""; BirthMinute = save.birthMinute; BirthStep = "done"; // fixed at the opening: read, never worked out again
             if (!string.IsNullOrEmpty(save.birthDate) && save.birthDate.Length == 10) { BirthYear = int.Parse(save.birthDate.Substring(0, 4)); BirthMonth = int.Parse(save.birthDate.Substring(5, 2)); BirthDay = int.Parse(save.birthDate.Substring(8, 2)); }
             if (!string.IsNullOrEmpty(save.birthPlace)) BirthPlace = new Place { Name = save.birthPlace, Latitude = save.birthLatitude, Longitude = save.birthLongitude, Zone = Places.ZoneOf(save.birthZone ?? "") };
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = Math.Max(save.locksFilled, save.keyEarned ? 1 : 0); Ended = save.keyEarned;
