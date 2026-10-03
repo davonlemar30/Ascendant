@@ -139,6 +139,11 @@ The **v0.4 "tap-to-move"** build (branch `codex/v04-tap-to-move`, [task 86bbznax
   - Practice is an entry point only until its scope is approved.
   - Fonts: EB Garamond Italic and Noto Sans Symbols 2, both static, OFL. Eight new slots (166).
   - Validation: mechanical 630/630, slice fixture 262/262, browser suite 603/603 at desktop density (+29) and 512/512 at phone density; production 603/603 at phone density, the seven shapes included. Record: [VALIDATION.md](CelestialDial/VALIDATION.md).
+- **The family triangles (Oct 3; PR #115; task 86bcbn6w6).** The owner's step 5 ruling (Oct 3): the overlay approved, mixed strength.
+  - The four element triangles lie on top of the Cast Dial as light (a screen blend), each joining its family's three seats, a star at each corner on the hub ring.
+  - Resting at level A (34%), dusty on the worn Dial; while a lesson teaches a family, its triangle in its element's light (70%) and its seats' frames aglow; once, as the whole wheel lights, all four as ribbons of flame at level B (88%), then back to resting.
+  - Every side breaks round every word it would cross (the eye's, the ribbon's and the seats'), measured from the words themselves; the build checks that no light falls on a word.
+  - Validation: mechanical 636/636, slice fixture 264/264, browser suite 609/609 at desktop density (+6) and 518/518 at phone density. Record: [VALIDATION.md](CelestialDial/VALIDATION.md).
 - **Test variables.** Walk speed (test toggle: normal, fast, slow), floor band, fade length; sound on or off. The event log carries walk and room events with response times so the Chamber-to-Dial time can be compared with v0.2.
 
 Validation (Unity 6000.3.24f1, local): mechanical validation 182/182 (adds the room tables, the walker's legs, arrival, jump, speed toggle, and the flow through the Wing room); slice Play Mode fixture 49/49 with captures of the Atrium with the Keeper, the Wing room, and the rest; Dial-only fixture 25/25; headless WebGL build 0 errors / 0 warnings; browser suite 91/91 against the served build in both viewports plus the recovery path, including a sealed door, walking to Caspar, the doorway fade, the Dial from the room, and the walk back. iPhone VoiceOver and Android TalkBack remain untested (skipped by approval). The owner tests after this build.

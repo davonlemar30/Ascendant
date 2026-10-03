@@ -52,6 +52,8 @@ namespace Ascendant.CelestialDial
         // Build AB (owner, Sept 30: the Astrolabe): a ring that turns with the seats, a name band and twelve tablets; one fact per seat
         RectTransform ringLayer; Image ringLight; bool ringArt; Text destinationFacts; ArcText ribbonName, ribbonFacts; bool countShown, eyeLaidOut; string eyeLine=""; // Build AC: the ribbon's two arcs; the eye's layout with a running count, and its line as the lesson set it
         readonly Text[] seatFacts = new Text[12]; readonly ArcText[] seatArcs = new ArcText[12]; readonly bool[] seatLower = new bool[12];
+        FamilyTriangles triangles; // batch 2, step 5 (owner, Oct 3): the family triangles, as light on top of the Cast Dial
+        public FamilyTriangles Triangles => triangles;
         public const float SeatRadius = 136f, AstroSeatRadius = 123f, NameRadius = 146f, TabletRadius = 109f, FactLift = 9f; // Build AC (the Cast Dial, owner Oct 1): the recess band r 136-155 and the windows r 91-127 on the 360 x 800 layout; the fact rides the window's outer half, the symbol its inner
         public const float RecessSpan = 26.5f, WindowSpan = 23.5f; // degrees of plain face per segment, measured on the production ring
         public bool RingArt => ringArt;
@@ -114,6 +116,7 @@ namespace Ascendant.CelestialDial
             public string shelfEdge; // APK Session 2, bug 1: "halo" when the lit shelf's edge is drawn from its silhouette (no Outline copies)
             public bool settingsOpen, canQuit, jumpsShown; // Build W: the Jump to list shows // Build U: the Settings menu is open; the app (not a web page) can quit
             public float safeTop; // Platform fit, Part 1: the top row's move down from the safe area, in layout units (0 without a band)
+            public bool triangles, trianglesShader; public string trianglesMode = "", trianglesTaught = ""; public float trianglesShown; public int trianglesGaps, trianglesCrossing; public float[] trianglesCorners; // batch 2, step 5: the family triangles as drawn (corners: x and y on the layout)
             public int dialWake; public string dialLook; public int wakePreview; // the Dial's wake-up (86bcbn6w6): the step it shows, the looks it blends, DEV Mode's preview (-1: as earned)
             public float[] gearAt, travelAt; // Part 2: where the gear and the mini-menu button sit (x from the column's centre, y down from its top; on a phone at the screen's safe corners)
             public string[] masters; // batch 2 (the owner approved the bleed masters, Oct 2): the full-screen layers on screen drawing a 1200 x 1840 master whole, by file
@@ -169,6 +172,7 @@ namespace Ascendant.CelestialDial
             Application.runInBackground=true;
             gameObject.name = "CelestialDial";
             Lesson = new DialLesson(() => Time.realtimeSinceStartupAsDouble);
+            Lesson.WheelLit += () => { if (triangles != null) triangles.Payoff(Lesson.Dial.ReducedMotion); }; // the triangles' flames, once, as the whole wheel lights
             Lesson.Dial.Logged += e => Debug.Log("[CelestialDial] " + JsonUtility.ToJson(e));
             Sound.Ensure(); Lesson.Dial.Logged += e => Sound.Play(Sound.Cue(e.event_name, e.correctness, TapPhase)); // Build E: the model's events name the cues
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -247,6 +251,12 @@ namespace Ascendant.CelestialDial
             }
             count = ringArt ? Label(root,"",0,319,178,36,15) : Shade(Label(root,"",0,319,178,36,15));
             if (ringArt) { count.rectTransform.anchoredPosition = new Vector2(0, -CountY); count.rectTransform.sizeDelta = CountBox; count.fontSize = CountSize; count.font = voiceFont; count.verticalOverflow = VerticalWrapMode.Overflow; count.horizontalOverflow = HorizontalWrapMode.Overflow; count.color = EyeInk; var countGlow = count.gameObject.AddComponent<Outline>(); countGlow.effectColor = new Color(Slots.DialVoice.r, Slots.DialVoice.g, Slots.DialVoice.b, .5f); countGlow.effectDistance = new Vector2(1, -1); } // Build AC (owner, Oct 1): the worked count inside the eye, under the challenge line, in the eye's own voice
+            if (ringArt) // batch 2, step 5 (owner, Oct 3): the triangles over the Dial's art and words, under its controls; they break round every word
+            {
+                triangles = Rect("Family triangles", root, 0, 270, 360, 360).gameObject.AddComponent<FamilyTriangles>(); triangles.View = this; triangles.Changed = Publish;
+                triangles.HubWords = new[] { start, count, destination, destinationFacts };
+                for (int i = 0; i < 12; i++) triangles.SeatWords[i] = new[] { seatGlyphs[i], seatTexts[i], seatFacts[i] };
+            }
             Shade(Label(root,"Find the sign, seal it.",0,441,340,24,14)); // the step hint, now in the Library's voice (owner pick, APK playtest, Sept 29; was "Move > Inspect > Seal")
             panel = Rect("Caspar instruction panel",root,0,526,340,128);
             var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = new Color(.13f,.13f,.15f);
@@ -324,6 +334,7 @@ namespace Ascendant.CelestialDial
             if(ringLayer!=null) ringLayer.localRotation=Quaternion.Euler(0,0,-turns*30); // Build AB: the ring turns with the seats, live while dragging
             for(int i=0;i<12;i++){ var p=SeatPosition(i); ((RectTransform)seats[i].transform).anchoredPosition=p; if(ringArt) OrientSeat(i,p); }
             geometry.Redraw();
+            if (triangles != null) triangles.Redraw(); // the triangles turn with the ring, and their gaps follow the words
         }
         public void Step(int delta,DialInput method)
         {
@@ -548,6 +559,7 @@ namespace Ascendant.CelestialDial
             countButton.gameObject.SetActive(false); // Build I: the Count button is off (owner playtest, Sept 23)
             askButton.gameObject.SetActive(Lesson.CanAsk && !busy); askButton.interactable=active; // no count in the marks: the target is a symbol, not a distance (owner playtest v0.3)
             motionText.text="Reduced motion: "+(Lesson.Dial.ReducedMotion ? "on" : "off");
+            if (triangles != null) { triangles.Teaching = Lesson.TeachingFamily; triangles.Wake = Mathf.Clamp01(wakeStep / 2f); } // the taught triangle; the dust on the worn Dial
             RefreshSeats(); LayoutRing(); Publish();
         }
         void RefreshSeats()
@@ -599,6 +611,7 @@ namespace Ascendant.CelestialDial
                 speaker=panel.gameObject.activeInHierarchy?(DialSpeaking?DialLesson.DialSpeaker:DialLesson.CasparSpeaker):"",dialRoom=roomArt,dialLit=roomLight!=null && roomLight.gameObject.activeSelf ? roomLight.fillAmount : 0,revealing=revealNow,revealsPlayed=Lesson.RevealsPlayed.OrderBy(p=>p).ToArray(),eyeText=roomArt ? start.text : "",eyeSize=roomArt && start.text!="" ? Mathf.RoundToInt(start.cachedTextGenerator.fontSizeUsedForBestFit/Mathf.Max(.01f,canvas.scaleFactor)) : 0,signLabel=destination.text,dialVoice=panel.GetComponent<FitBox>()!=null && panel.GetComponent<FitBox>().DialVoiceShown && panel.gameObject.activeInHierarchy,dialBoxHeight=panel.gameObject.activeInHierarchy?panel.sizeDelta.y:0,artSet=Slots.Set,artFiles=Slots.ArtFiles,soundFiles=Slots.SoundFiles,muted=Sound.Muted,lastCue=Sound.LastCue,cuesPlayed=Sound.Played};
             state.dialRing=ringArt; state.ringTurn=ringLayer!=null ? ringLayer.localEulerAngles.z : 0; // Build AB
             state.dialWake=wakeStep; state.dialLook=WakeLook; // the wake-up: its step (0 to 4) and the looks it blends
+            if (triangles != null) { state.triangles = triangles.isActiveAndEnabled; state.trianglesShader = triangles.ShaderLoaded; state.trianglesMode = triangles.Mode; state.trianglesTaught = triangles.Teaching >= 0 ? FamilyTriangles.Families[triangles.Teaching] : ""; state.trianglesShown = triangles.Shown; state.trianglesGaps = triangles.Gaps; state.trianglesCrossing = triangles.Crossing; state.trianglesCorners = triangles.Corners.SelectMany(c => new[] { c.x, 270 - c.y }).ToArray(); }
             if(seats[0]!=null){ var seatSize=((RectTransform)seats[0].transform).sizeDelta; state.seatRadius=SeatR; state.seatSize=new[]{seatSize.x,seatSize.y}; } // Build AC follow-up: read, not set
             state.seatNames=seatTexts.Select(t=>t!=null ? t.text : "").ToArray(); state.seatFacts=Enumerable.Range(0,12).Select(i=>ringArt ? seatFacts[i].text : "").ToArray();
             state.framedFacts=destinationFacts!=null ? System.Text.RegularExpressions.Regex.Replace(destinationFacts.text,"<[^>]+>","") : "";
@@ -657,6 +670,7 @@ namespace Ascendant.CelestialDial
                 bool blend = t > 0 && sb != null && sb != sa; w.Over.gameObject.SetActive(blend); if (blend) w.Over.sprite = sb;
             }
             SyncWake();
+            if (triangles != null) { triangles.Wake = Mathf.Clamp01(wakeStep / 2f); triangles.Redraw(); } // dusty on the worn Dial, clean from today's look
         }
         void SyncWake()
         {
