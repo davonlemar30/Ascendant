@@ -651,6 +651,9 @@ namespace Ascendant.CelestialDial
             else if (command == "journal-next") JournalTurn(1);
             else if (command == "journal-prev") JournalTurn(-1);
             else if (command == "journal-wheel") JournalWheel(); // Build AA: the Wheel, its views and tabs, a seat's preview, a page's links
+            else if (command == "journal-contents") JournalContents(); // batch 2: the landing's Contents door, and "‹ Contents" on a chapter
+            else if (command == "journal-landing") JournalHome();      // "‹ Your Journal" on Contents
+            else if (command.StartsWith("journal-chapter:")) JournalChapter(command.Substring(16)); // a row on Contents: wheel or map
             else if (command.StartsWith("journal-view:")) JournalSetView(command.Substring(13) == "table");
             else if (command.StartsWith("journal-lens:") && int.TryParse(command.Substring(13), out int jlens) && jlens >= 0 && jlens < 4) JournalLensTap((JournalLens)jlens);
             else if (command.StartsWith("journal-seat:") && int.TryParse(command.Substring(13), out int jseat) && jseat >= 0 && jseat < 12) JournalSeatTap(jseat);
@@ -1271,8 +1274,16 @@ namespace Ascendant.CelestialDial
             state.journal = s == SliceScreen.Journal; state.canOpenJournal = Flow.CanOpenJournal && !busy; state.canCloseJournal = state.journal && !busy;
             state.canJournalNext = Flow.CanJournalNext && !busy; state.canJournalPrev = Flow.CanJournalPrev && !busy; state.canJournalWheel = Flow.CanJournalWheel && !busy;
             // Build AA: which view, the tabs, each seat's state and ribbon, the preview, a sign page's facts and links, its Illumination and ribbon; the text on screen as evidence
-            var at = Flow.JournalAt; bool onSign = state.journal && at == JournalView.Sign, onWheel = state.journal && !onSign; int signSeat = Flow.JournalSignSeat;
-            state.journalView = !state.journal ? "" : onSign ? "sign" : Flow.JournalTableView ? "table" : "wheel";
+            var at = Flow.JournalAt; bool onSign = state.journal && at == JournalView.Sign, onWheel = state.journal && at == JournalView.Wheel; int signSeat = Flow.JournalSignSeat;
+            state.journalView = !state.journal ? "" : onSign ? "sign" : onWheel ? (Flow.JournalTableView ? "table" : "wheel") : at.ToString().ToLowerInvariant(); // batch 2: title, landing, contents, map
+            bool front = state.journal && (at == JournalView.Title || at == JournalView.Landing);
+            state.journalKeeper = front ? new[] { journalKeeperHeading, journalKeys }.Concat(keeperLines).Where(t => t.gameObject.activeSelf && t.text != "").Select(t => t.text).ToArray() : new string[0];
+            state.canJournalContents = Flow.CanJournalContents && at != JournalView.Title && !busy; state.canJournalHome = Flow.CanJournalHome && !busy; state.canJournalPractice = state.journal && at == JournalView.Landing && SliceFlow.PracticeOpen && !busy;
+            state.journalDoors = state.journal && at == JournalView.Landing ? new[] { journalPracticeDoor, journalContentsDoor }.SelectMany(b => { var r = (RectTransform)b.transform; return new[] { r.anchoredPosition.x, -r.anchoredPosition.y, r.sizeDelta.x, r.sizeDelta.y }; }).ToArray() : new float[0];
+            state.journalChapters = state.journal && at == JournalView.Contents ? new[] { SliceFlow.WheelTitle, SliceFlow.MapTitle }.Concat(Enumerable.Repeat(SliceFlow.SealedChapter, SliceFlow.SealedChapters)).ToArray() : new string[0];
+            state.journalMapRooms = state.journal && at == JournalView.Map ? Enumerable.Range(0, journalMapNames.Length).Where(i => journalMapNames[i].gameObject.activeSelf).Select(i => TravelMenu.Rooms[i].name).ToArray() : new string[0];
+            state.journalLink = state.journal ? (at == JournalView.Contents ? SliceFlow.BackToJournal : at == JournalView.Wheel || at == JournalView.Map ? SliceFlow.BackToContents : "") : "";
+            state.journalScriptFont = journalItalic != null ? journalItalic.name : "";
             state.journalPage = Flow.JournalSign; state.journalCount = Flow.JournalSigns.Count;
             state.journalLenses = onWheel && Flow.JournalLenses.Count > 1 ? Flow.JournalLenses.Select(SliceFlow.LensTitle).ToArray() : new string[0]; state.journalLens = state.journal ? SliceFlow.LensTitle(Flow.Lens) : ""; state.canJournalTable = onWheel && Flow.CanJournalTable;
             state.journalSeats = state.journal ? Enumerable.Range(0, 12).Select(seat => SliceFlow.SeatStateNames[Flow.SeatState(seat)]).ToArray() : new string[0];
@@ -1458,9 +1469,9 @@ namespace Ascendant.CelestialDial
             journalTitle = SafeArea.Top(Label(journal, "", JournalX, 56, 250, 60, TitleSize), JournalTitleClearance); journalTitle.supportRichText = true; journalTitle.font = Resources.Load<Font>(TitleFont) ?? journalTitle.font; journalTitle.color = Gilt;
             journalSignGlyph = Label(journal, "", JournalX, 60, 40, 40, 22); journalSignGlyph.font = Dial.GlyphFont; journalSignGlyph.horizontalOverflow = HorizontalWrapMode.Overflow;
             // the Wheel / Table switch and the tabs
-            journalViewWheel = JournalChoice(journal, "Wheel", JournalX - 36, 96, 72, 24, () => JournalSetView(false)); // placeholder labels (owner writes)
-            journalViewTable = JournalChoice(journal, "Table", JournalX + 36, 96, 72, 24, () => JournalSetView(true));
-            for (int i = 0; i < journalLensButtons.Length; i++) { var lens = (JournalLens)i; journalLensButtons[i] = JournalChoice(journal, SliceFlow.LensTitle(lens), 0, 126, 62, 22, () => JournalLensTap(lens)); }
+            journalViewWheel = JournalChoice(journal, "Wheel", JournalX - 36, SwitchY, 72, 24, () => JournalSetView(false)); // placeholder labels (owner writes)
+            journalViewTable = JournalChoice(journal, "Table", JournalX + 36, SwitchY, 72, 24, () => JournalSetView(true));
+            for (int i = 0; i < journalLensButtons.Length; i++) { var lens = (JournalLens)i; journalLensButtons[i] = JournalChoice(journal, SliceFlow.LensTitle(lens), 0, TabsY, 62, 22, () => JournalLensTap(lens)); }
             // the Wheel: the gold wheel art, the pattern's lines, then the seats
             journalWheelLayer = Rect("Wheel view", journal, 0, 400, 360, 800);
             journalWheelArt = Rect("Wheel", journalWheelLayer, JournalX, WheelTop, WheelSize, WheelSize).gameObject.AddComponent<Image>(); journalWheelArt.raycastTarget = false; journalWheelArt.color = new Color(1, 1, 1, .1f);
@@ -1526,6 +1537,185 @@ namespace Ascendant.CelestialDial
             journalBack = MakeButton(journal, "Back to the Wheel", 0, JournalRowY, 146, 56, JournalWheel); StyleAtriumButton(journalBack); journalBack.GetComponentInChildren<Text>().fontSize = 14; // placeholder (owner writes)
             journalNext = MakeButton(journal, "", 122, JournalRowY, 64, 56, () => JournalTurn(1)); StyleAtriumButton(journalNext); journalChevrons[1] = Chevron(journalNext, 1);
             journalClose = MakeButton(journal, "Close the journal", 0, JournalCloseY, 190, 48, CloseJournal); StyleAtriumButton(journalClose);
+            BuildJournalFront();
+        }
+        // ---- Batch 2 (owner, Oct 1: the journal's architecture, polished on the approved board, 86bcbn6w6; Oct 2 evening: the owner's
+        // inscription and the fonts). The title page on the first-ever open (1e A) settles, then fades into the landing; the landing (the
+        // first open of each session, 1b C) holds the Keeper's record between two gold flourishes and the Practice and Contents doors;
+        // Contents lists the chapters (the Wheel, the Library Map, two Sealed); the Library Map is the parchment plan moved in from the
+        // mini-menu concept's Option C, the rooms you have woken named in gold. Every chapter links back to Contents, top left. The record's
+        // lines sit on the page's rules, as on the board; the script lines are EB Garamond Italic, the upright ones EB Garamond Bold. ----
+        public const string ItalicFont = "Fonts/EBGaramond-Italic", SunFont = "Fonts/NotoSansSymbols2-Regular"; // bundled (OFL): the script lines; ☉ (U+2609) for the Big Three, built once the owner approves step 2
+        public const float TitleSettle = 1f, TitleFade = .6f;           // 1e A: the title page settles for a second, then fades into the landing
+        public const float TitleRoom = 190f;                            // a page title's width between the page's corner flourishes (the art's moon and leaves)
+        public const float KeeperFirst = 96f, KeeperRule = 26f, KeeperWidth = 244f; // the opening flourish on the first rule; a line on each rule below, 3 px above it; no wider than the page's calm column inside its margin
+        public const float DoorWidth = 238f, DoorHeight = 120f, DoorStep = 150f, DoorBelow = 29f; // the board's doors: 238 x 120, 150 apart, the first 29 under the closing flourish
+        public const float LinkLeft = 88f, LinkBaseline = 89f, LinkWidth = 96f; // "‹ Your Journal" on Contents, "‹ Contents" on a chapter: the board's place, top left under the title
+        public const float SwitchY = 119f, TabsY = 143f;                 // the Wheel / Table switch and the tabs, a band lower than Build AA's 96 and 126: the link above keeps its 44 px target
+        public const float ContentsFlourish = 122f, ChapterRingX = -80f, ChapterNameLeft = 142f; // the ring's centre and the names' left edge, on the 360 layout (the board)
+        public static readonly float[] ChapterTop = { 148, 252, 356, 434 }, ChapterHeight = { 104, 104, 78, 78 }; // the board's rows: the two chapters, then two Sealed
+        public const float PlanTop = 106f, PlanWidth = 234f, PlanHeight = 350f; // the Library Map: the plan at its own 2x, centred on the page's column
+        // each room's name on the plan (layout px from the plan's top-left) and the width it wraps to, in TravelMenu.Rooms' order: in the hall
+        // under its star, in the Wing's lower half, in the Chamber under its crystal
+        public static readonly Vector3[] PlanNames = { new Vector3(116.5f, 262, 100), new Vector3(55.5f, 108, 52), new Vector3(178.5f, 113, 64) };
+        const float GaramondLift = .3545f, FrakLift = .267f;             // a line's baseline below its centre, per point: EB Garamond (ascender 1007, descender 298 of 1000) and UnifrakturMaguntia (1607 and 513 of 2048)
+        static readonly Color GiltInk = new Color32(0xe3, 0xa3, 0x4a, 0xff), GiltDown = new Color32(0xb4, 0x80, 0x3a, 0xff), SilverInk = new Color32(0xc9, 0xcf, 0xdb, 0xff), SealedInk = new Color32(0x7d, 0x81, 0x8c, 0xff), SealedRing = new Color32(0x6d, 0x71, 0x7c, 0xcc); // the board's gilt (and pressed), silver, and the sealed grey
+        RectTransform journalTitlePage, journalLanding, journalContents, journalMap, journalFlourishBottom; CanvasGroup journalTitlePageGroup, journalLandingGroup, journalTitleGroup;
+        Text journalKeeperHeading, journalKeys; readonly List<Text> keeperLines = new List<Text>(); readonly Text[] journalMapNames = new Text[3];
+        Button journalPracticeDoor, journalContentsDoor, journalHomeLink, journalContentsLink; readonly Button[] journalChapterRows = new Button[2];
+        Font journalItalic; Coroutine journalBeat;
+        string JournalPageTitle(JournalView at) => at == JournalView.Title || at == JournalView.Landing ? SliceFlow.JournalTitle : at == JournalView.Contents ? SliceFlow.ContentsTitle : at == JournalView.Map ? SliceFlow.MapTitle : SliceFlow.WheelTitle;
+        // A line of the page set on a baseline (layout y): its box is centred on the line, so the baseline falls where the board has it.
+        Text PageLine(Transform parent, string text, float x, float baseline, float width, int size, Font face, Color colour, TextAnchor align = TextAnchor.MiddleCenter, float lift = GaramondLift)
+        {
+            var line = Label(parent, text, x, baseline - lift * size, width, Mathf.Ceil(size * 1.6f), size); line.font = face; line.color = colour; line.alignment = align;
+            line.horizontalOverflow = HorizontalWrapMode.Overflow; line.verticalOverflow = VerticalWrapMode.Overflow; return line;
+        }
+        RectTransform Flourish(Transform parent, float y)
+        {
+            var r = Rect("Flourish", parent, JournalX, y, 220, 20); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false;
+            if (!Slots.Dress(image, "journal-flourish")) { image.color = new Color(GiltInk.r, GiltInk.g, GiltInk.b, .6f); r.sizeDelta = new Vector2(208, 1); } // no file: a gilt hairline
+            return r;
+        }
+        // A ring the engine draws (no file): the board's 1.5 px circle of radius 27 round a chapter's emblem, made once at 2x.
+        static Sprite chapterRing;
+        static Sprite ChapterRingSprite()
+        {
+            if (chapterRing != null) return chapterRing;
+            const int size = 112; const float radius = 54, half = 1.5f; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) { float d = Mathf.Sqrt((x + .5f - size / 2f) * (x + .5f - size / 2f) + (y + .5f - size / 2f) * (y + .5f - size / 2f)); texture.SetPixel(x, y, new Color(1, 1, 1, Mathf.Clamp01(half + .5f - Mathf.Abs(d - radius)))); }
+            texture.Apply(); chapterRing = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); return chapterRing;
+        }
+        Image Picture(Transform parent, string slot, float x, float top, float width, float height)
+        {
+            var image = Rect(slot, parent, x, top, width, height).gameObject.AddComponent<Image>(); image.raycastTarget = false;
+            if (!Slots.Dress(image, slot)) image.color = new Color(PanelColor.r, PanelColor.g, PanelColor.b, .5f); return image;
+        }
+        // A door on the landing: the game's vellum panel inside the fine gold frame (nine-sliced, its corners whole at any size), the emblem,
+        // the name in blackletter and its line in italic, as on the board. It keeps the 3d states (pressed darkens and sinks, unavailable half).
+        Button JournalDoor(Transform parent, string name, string line, string emblem, Vector2 emblemSize, UnityEngine.Events.UnityAction action)
+        {
+            var b = MakeButton(parent, name, JournalX, 0, DoorWidth, DoorHeight, action); b.name = name + " door"; var feel = ButtonLook.Custom(b, "door"); var look = feel.Look;
+            var panel = Rect("Panel", look, 0, DoorHeight / 2, DoorWidth - 10, DoorHeight - 10).gameObject.AddComponent<Image>(); panel.color = VellumPanel; panel.raycastTarget = false; panel.transform.SetAsFirstSibling();
+            var frame = Rect("Frame", look, 0, DoorHeight / 2, DoorWidth, DoorHeight).gameObject.AddComponent<Image>(); frame.raycastTarget = false;
+            if (Slots.Dress(frame, "journal-door-frame")) { var file = frame.sprite.rect; float border = Mathf.Round(file.height * 92f / 240f); frame.sprite = ButtonLook.SlicedArt("journal-door-frame", Vector4.one * border); frame.type = Image.Type.Sliced; frame.pixelsPerUnitMultiplier = file.height / DoorHeight; feel.Pieces.Add(frame); }
+            else { frame.color = new Color(0, 0, 0, 0); Frame(frame.rectTransform, new Color(GiltInk.r, GiltInk.g, GiltInk.b, .7f)); }
+            var art = Picture(look, emblem, -67, DoorHeight / 2, emblemSize.x, emblemSize.y); if (art.sprite != null) feel.Pieces.Add(art);
+            var title = feel.Label; title.text = name; title.font = journalTitle.font; title.fontSize = 28; title.alignment = TextAnchor.MiddleLeft; title.horizontalOverflow = HorizontalWrapMode.Overflow; title.verticalOverflow = VerticalWrapMode.Overflow;
+            var tr = title.rectTransform; tr.anchorMin = tr.anchorMax = new Vector2(.5f, 1); tr.sizeDelta = new Vector2(130, 46); tr.anchoredPosition = new Vector2(-DoorWidth / 2 + 100 + 65, -((line == "" ? 70 : 58) - FrakLift * 28));
+            if (line != "") PageLine(look, line, -DoorWidth / 2 + 101 + 65, 83, 130, 16, journalItalic, SilverInk, TextAnchor.MiddleLeft);
+            feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; return b;
+        }
+        // A link on the page, top left: gold words with a 44 px target, kept under the title when the safe band moves it.
+        Button JournalLink(string words, UnityEngine.Events.UnityAction action)
+        {
+            var b = MakeButton(journal, words, -180 + LinkLeft + LinkWidth / 2, LinkBaseline - GaramondLift * 14, LinkWidth, 22, action); b.name = words.Substring(2) + " link"; var feel = ButtonLook.Custom(b, "link");
+            var label = feel.Label; label.font = ButtonLook.EngravedFont ?? font; label.fontSize = 14; label.alignment = TextAnchor.MiddleLeft; label.horizontalOverflow = HorizontalWrapMode.Overflow;
+            var lr = label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = lr.offsetMax = Vector2.zero;
+            feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; ButtonLook.HitArea(b, ButtonLook.MinTarget, ButtonLook.MinTarget);
+            var follow = b.gameObject.AddComponent<SafeTop>(); follow.Follow = journalTitle.GetComponent<SafeTop>(); return b;
+        }
+        // A row on Contents: the emblem in its ring on a dark disc, the chapter's name and its line; a Sealed row is the same, dim, with a lock, and opens nothing.
+        void ChapterRow(int row, string name, string line, string emblem, Vector2 emblemSize, UnityEngine.Events.UnityAction action)
+        {
+            float top = ChapterTop[row], h = ChapterHeight[row], ringY = h / 2 + 2; bool sealedRow = action == null;
+            RectTransform look; ButtonFeel feel = null; Text title;
+            if (!sealedRow) { var b = MakeButton(journalContents, name, JournalX, top + h / 2, DoorWidth, h, action); b.name = name + " row"; feel = ButtonLook.Custom(b, "row"); look = feel.Look; title = feel.Label; journalChapterRows[row] = b; }
+            else { look = Rect(name + " (sealed)", journalContents, JournalX, top + h / 2, DoorWidth, h); title = Label(look, name, 0, 0, 10, 10, 20); }
+            float ringX = ChapterRingX - JournalX;
+            var disc = Rect("Disc", look, ringX, ringY, 52, 52).gameObject.AddComponent<Image>(); disc.sprite = Disc(); disc.color = VellumPanel; disc.raycastTarget = false;
+            var ring = Rect("Ring", look, ringX, ringY, 56, 56).gameObject.AddComponent<Image>(); ring.sprite = ChapterRingSprite(); ring.color = sealedRow ? SealedRing : GiltInk; ring.raycastTarget = false;
+            var art = Picture(look, emblem, ringX, ringY, emblemSize.x, emblemSize.y); if (feel != null && art.sprite != null) feel.Pieces.Add(art);
+            float left = ChapterNameLeft - 180 - JournalX; // the names' left edge, from the row's centre
+            title.text = name; title.font = ButtonLook.EngravedFont ?? font; title.fontSize = sealedRow ? 20 : 21; title.color = sealedRow ? SealedInk : GiltInk; title.alignment = TextAnchor.MiddleLeft; title.horizontalOverflow = HorizontalWrapMode.Overflow;
+            var tr = title.rectTransform; tr.anchorMin = tr.anchorMax = new Vector2(.5f, 1); tr.sizeDelta = new Vector2(170, 34); tr.anchoredPosition = new Vector2(left + 85, -(49 - GaramondLift * title.fontSize));
+            if (line != "") PageLine(look, line, left + 1 + 85, 75, 170, 15, journalItalic, SilverInk, TextAnchor.MiddleLeft);
+            if (feel != null) { feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; }
+            var rule = Rect("Rule", journalContents, JournalX, top + h, DoorWidth, 1).gameObject.AddComponent<Image>(); rule.color = new Color(Silver.r, Silver.g, Silver.b, .3f); rule.raycastTarget = false;
+        }
+        void BuildJournalFront()
+        {
+            journalItalic = Resources.Load<Font>(ItalicFont) ?? font; var serif = ButtonLook.EngravedFont ?? font;
+            journalTitleGroup = journalTitle.gameObject.AddComponent<CanvasGroup>(); journalTitleGroup.blocksRaycasts = false; journalTitleGroup.interactable = false;
+            // the title page: the first-ever open only
+            journalTitlePage = Rect("Title page", journal, 0, 400, 360, 800); journalTitlePageGroup = journalTitlePage.gameObject.AddComponent<CanvasGroup>(); journalTitlePageGroup.blocksRaycasts = false;
+            var big = PageLine(journalTitlePage, SliceFlow.JournalTitle, JournalX, 296, 300, 40, journalTitle.font, Gilt, TextAnchor.MiddleCenter, FrakLift); big.supportRichText = false;
+            Flourish(journalTitlePage, 331);
+            PageLine(journalTitlePage, SliceFlow.KeeperHeading, JournalX, 363, 200, 16, serif, GiltInk).gameObject.AddComponent<Tracking>().Spacing = 16 * .3f;
+            PageLine(journalTitlePage, SliceFlow.TitlePageLine, JournalX, 392, 280, 16, journalItalic, new Color(SilverInk.r, SilverInk.g, SilverInk.b, .86f));
+            // the landing: the Keeper's record, then the two doors (placed by ShowJournalLanding, under the record's lines)
+            journalLanding = Rect("Landing", journal, 0, 400, 360, 800); journalLandingGroup = journalLanding.gameObject.AddComponent<CanvasGroup>();
+            Flourish(journalLanding, KeeperFirst); journalFlourishBottom = Flourish(journalLanding, KeeperFirst + KeeperRule * 6);
+            journalKeeperHeading = PageLine(journalLanding, SliceFlow.KeeperHeading, JournalX, 0, 200, 16, serif, GiltInk); journalKeeperHeading.gameObject.AddComponent<Tracking>().Spacing = 16 * .3f; // the board: small capitals spaced .3 em
+            journalKeys = PageLine(journalLanding, "", JournalX, 0, KeeperWidth + 24, 17, journalItalic, SilverInk);
+            for (int i = 0; i < 4; i++) keeperLines.Add(PageLine(journalLanding, "", JournalX, 0, KeeperWidth + 24, 16, journalItalic, new Color(SilverInk.r, SilverInk.g, SilverInk.b, .86f)));
+            journalPracticeDoor = JournalDoor(journalLanding, SliceFlow.PracticeDoor, "", "journal-emblem-practice", new Vector2(56, 72), () => { }); // an entry point only, until the owner approves Practice (step 4)
+            journalContentsDoor = JournalDoor(journalLanding, SliceFlow.ContentsDoor, SliceFlow.ContentsDoorLine, "journal-emblem-contents", new Vector2(76, 60), JournalContents);
+            // Contents
+            journalContents = Rect("Contents", journal, 0, 400, 360, 800); Flourish(journalContents, ContentsFlourish);
+            ChapterRow(0, SliceFlow.WheelTitle, SliceFlow.WheelChapterLine, "journal-emblem-wheel", new Vector2(48, 48), () => JournalChapter("wheel"));
+            ChapterRow(1, SliceFlow.MapTitle, SliceFlow.MapChapterLine, "journal-emblem-map", new Vector2(40, 40), () => JournalChapter("map"));
+            for (int i = 0; i < SliceFlow.SealedChapters; i++) ChapterRow(2 + i, SliceFlow.SealedChapter, "", "journal-emblem-lock", new Vector2(24, 28), null);
+            // the Library Map
+            journalMap = Rect("Library Map", journal, 0, 400, 360, 800);
+            var plan = Picture(journalMap, "journal-library-plan", JournalX, PlanTop + PlanHeight / 2, PlanWidth, PlanHeight);
+            for (int i = 0; i < journalMapNames.Length; i++)
+            {
+                var at = PlanNames[i]; var name = Label(plan.transform, TravelMenu.Rooms[i].name, at.x - PlanWidth / 2, at.y, at.z, 30, 10); name.font = serif; name.color = GiltInk;
+                name.horizontalOverflow = HorizontalWrapMode.Wrap; name.verticalOverflow = VerticalWrapMode.Overflow; name.lineSpacing = .95f;
+                var edge = name.gameObject.AddComponent<Outline>(); edge.effectColor = new Color(.08f, .05f, .03f, .92f); edge.effectDistance = new Vector2(1, -1); journalMapNames[i] = name;
+            }
+            // the links, top left: back to the landing from Contents; back to Contents from a chapter
+            journalHomeLink = JournalLink(SliceFlow.BackToJournal, JournalHome); journalContentsLink = JournalLink(SliceFlow.BackToContents, JournalContents);
+            foreach (var page in new[] { journalTitlePage, journalLanding, journalContents, journalMap }) page.gameObject.SetActive(false);
+        }
+        // the words in lines of at most the width, broken between words: the owner's wording is kept, only its breaks flex (Oct 2 evening)
+        static List<string> WrapWords(Text probe, string words, float width)
+        {
+            var settings = probe.GetGenerationSettings(Vector2.zero); var gen = probe.cachedTextGeneratorForLayout; var lines = new List<string>(); string line = "";
+            foreach (var word in words.Split(' '))
+            {
+                string next = line == "" ? word : line + " " + word;
+                if (line != "" && gen.GetPreferredWidth(next, settings) / probe.pixelsPerUnit > width) { lines.Add(line); line = word; } else line = next;
+            }
+            if (line != "") lines.Add(line); return lines;
+        }
+        // The Keeper's record on the page's rules: KEEPER, the Keys and Books, then the inscription; the closing flourish and the doors follow.
+        // The Big Three's line goes between the Keys and the inscription once the owner approves step 2 (86bcbn6w6, Oct 2 evening).
+        void ShowJournalLanding()
+        {
+            int row = 1; void Place(Text line) { line.rectTransform.anchoredPosition = new Vector2(JournalX, -(KeeperFirst + KeeperRule * row++ - 3 - GaramondLift * line.fontSize)); }
+            journalKeeperHeading.text = SliceFlow.KeeperHeading; Place(journalKeeperHeading);
+            journalKeys.text = Flow.KeysLine; Place(journalKeys);
+            var inscription = WrapWords(keeperLines[0], SliceFlow.InscriptionGreeting(Flow.DisplayName), KeeperWidth);
+            foreach (var part in SliceFlow.InscriptionBreaks) inscription.AddRange(WrapWords(keeperLines[0], part, KeeperWidth)); // its own breaks, each wrapped only if a screen can't fit it
+            for (int i = 0; i < keeperLines.Count; i++) { bool show = i < inscription.Count; keeperLines[i].gameObject.SetActive(show); keeperLines[i].text = show ? inscription[i] : ""; if (show) Place(keeperLines[i]); }
+            if (inscription.Count > keeperLines.Count) Debug.LogWarning("[Journal] the inscription needs " + inscription.Count + " lines; the record holds " + keeperLines.Count);
+            float closing = KeeperFirst + KeeperRule * row; journalFlourishBottom.anchoredPosition = new Vector2(JournalX, -closing);
+            float door = closing + DoorBelow + DoorHeight / 2; journalPracticeDoor.GetComponent<RectTransform>().anchoredPosition = new Vector2(JournalX, -door); journalContentsDoor.GetComponent<RectTransform>().anchoredPosition = new Vector2(JournalX, -(door + DoorStep));
+            journalPracticeDoor.interactable = SliceFlow.PracticeOpen && !busy; journalContentsDoor.interactable = !busy && journalBeat == null;
+        }
+        void ShowJournalFront(JournalView at)
+        {
+            bool beat = journalBeat != null;
+            journalTitlePage.gameObject.SetActive(at == JournalView.Title); journalLanding.gameObject.SetActive(at == JournalView.Landing || at == JournalView.Title);
+            journalContents.gameObject.SetActive(at == JournalView.Contents); journalMap.gameObject.SetActive(at == JournalView.Map);
+            journalHomeLink.gameObject.SetActive(at == JournalView.Contents); journalContentsLink.gameObject.SetActive(at == JournalView.Wheel || at == JournalView.Map);
+            journalHomeLink.interactable = journalContentsLink.interactable = !busy;
+            if (at == JournalView.Landing || at == JournalView.Title) ShowJournalLanding();
+            foreach (var row in journalChapterRows) if (row != null) row.interactable = !busy;
+            for (int i = 0; i < journalMapNames.Length; i++) journalMapNames[i].gameObject.SetActive(TravelOpen(TravelMenu.Rooms[i].id)); // only the rooms you have woken are named
+            if (!beat) { journalTitlePageGroup.alpha = 1; journalLandingGroup.alpha = 1; journalTitleGroup.alpha = 1; journalLandingGroup.blocksRaycasts = true; }
+            if (at == JournalView.Title && !beat) journalBeat = StartCoroutine(JournalTitleBeat());
+        }
+        // 1e A: the title page settles for a second, then fades into the landing, which shows under it from the start
+        IEnumerator JournalTitleBeat()
+        {
+            journalTitlePageGroup.alpha = 1; journalLandingGroup.alpha = 0; journalTitleGroup.alpha = 0; journalLandingGroup.blocksRaycasts = false;
+            yield return new WaitForSecondsRealtime(TitleSettle);
+            yield return Tween(TitleFade, k => { journalTitlePageGroup.alpha = 1 - k; journalLandingGroup.alpha = k; journalTitleGroup.alpha = k; });
+            journalBeat = null; Flow.JournalLand();
+            if (Flow.AtJournal) { ShowJournal(); Publish(); }
         }
         // A seat's ring and picture from its state (SliceFlow.SeatState): met silver, practising gold, mastered gold leaf; the picture's ink and colour from the deck.
         void DressSeatPicture(Image picture, Material material, Image ring, int seat, int state)
@@ -1550,16 +1740,17 @@ namespace Ascendant.CelestialDial
         }
         void ShowJournal()
         {
-            bool sign = Flow.JournalAt == JournalView.Sign, wheel = !sign, table = wheel && Flow.JournalTableView;
+            var at = Flow.JournalAt; bool sign = at == JournalView.Sign, wheel = at == JournalView.Wheel, table = wheel && Flow.JournalTableView;
             var lenses = Flow.JournalLenses; var met = Flow.JournalSigns;
-            journalTitle.fontSize = TitleSize; journalTitle.text = SliceFlow.WheelTitle; journalSignGlyph.gameObject.SetActive(false);
+            journalTitle.fontSize = TitleSize; journalTitle.text = JournalPageTitle(at); journalSignGlyph.gameObject.SetActive(false);
+            if (at != JournalView.Sign && journalTitle.preferredWidth > TitleRoom) journalTitle.fontSize = Mathf.FloorToInt(TitleSize * TitleRoom / journalTitle.preferredWidth); // fits between the corner flourishes
             journalViewWheel.gameObject.SetActive(wheel && Flow.CanJournalTable); journalViewTable.gameObject.SetActive(wheel && Flow.CanJournalTable);
             PaintChoice(journalViewWheel, !table); PaintChoice(journalViewTable, table); journalViewWheel.interactable = journalViewTable.interactable = !busy;
             for (int i = 0; i < journalLensButtons.Length; i++)
             {
-                int at = lenses.IndexOf((JournalLens)i); bool show = wheel && lenses.Count > 1 && at >= 0; journalLensButtons[i].gameObject.SetActive(show);
+                int place = lenses.IndexOf((JournalLens)i); bool show = wheel && lenses.Count > 1 && place >= 0; journalLensButtons[i].gameObject.SetActive(show);
                 if (!show) continue;
-                journalLensButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(LensX(at, lenses.Count), -126); PaintChoice(journalLensButtons[i], Flow.Lens == (JournalLens)i); journalLensButtons[i].interactable = !busy;
+                journalLensButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(LensX(place, lenses.Count), -TabsY); PaintChoice(journalLensButtons[i], Flow.Lens == (JournalLens)i); journalLensButtons[i].interactable = !busy;
             }
             journalWheelLayer.gameObject.SetActive(wheel && !table); journalTableLayer.gameObject.SetActive(table);
             // the pattern's lines on the wheel: the element triangles, the modality crosses, or the six opposites across (Polarity draws none)
@@ -1610,6 +1801,7 @@ namespace Ascendant.CelestialDial
             journalPrev.interactable = Flow.CanJournalPrev && !busy; journalNext.interactable = Flow.CanJournalNext && !busy; journalBack.interactable = Flow.CanJournalWheel && !busy; journalClose.interactable = !busy;
             foreach (var bar in journalChevrons[0]) bar.color = journalPrev.interactable ? Bone : new Color(Muted.r, Muted.g, Muted.b, .4f);
             foreach (var bar in journalChevrons[1]) bar.color = journalNext.interactable ? Bone : new Color(Muted.r, Muted.g, Muted.b, .4f);
+            ShowJournalFront(at);
         }
         // The preview: the tapped seat's picture, name and symbol, its facts in one line (on the Opposites tab, what the pair shares), and Open the page.
         void ShowJournalCard(bool wheel)
@@ -1690,6 +1882,13 @@ namespace Ascendant.CelestialDial
         // What a screen reader hears: the page as words, and what the rings and ribbons mean, since they are only seen. placeholder (owner writes)
         string JournalSpoken()
         {
+            switch (Flow.JournalAt)
+            {
+                case JournalView.Title: return "Your journal. " + SliceFlow.KeeperHeading.Substring(0, 1) + SliceFlow.KeeperHeading.Substring(1).ToLowerInvariant() + ". " + SliceFlow.TitlePageLine;
+                case JournalView.Landing: return "Your journal. Keeper: " + Flow.KeysLine + ". " + SliceFlow.Inscription(Flow.DisplayName) + " " + SliceFlow.PracticeDoor + ", not open yet. " + SliceFlow.ContentsDoor + ": " + SliceFlow.ContentsDoorLine.ToLowerInvariant() + ".";
+                case JournalView.Contents: return "Your journal. " + SliceFlow.ContentsTitle + ". " + SliceFlow.WheelTitle + ": " + SliceFlow.WheelChapterLine.ToLowerInvariant() + ". " + SliceFlow.MapTitle + ": " + SliceFlow.MapChapterLine.ToLowerInvariant() + ". " + SliceFlow.SealedChapters + " chapters sealed.";
+                case JournalView.Map: return "Your journal. " + SliceFlow.MapTitle + ". " + SliceFlow.MapChapterLine + ": " + string.Join(", ", TravelMenu.Rooms.Where(r => TravelOpen(r.id)).Select(r => r.name)) + ".";
+            }
             if (Flow.JournalAt == JournalView.Wheel)
             {
                 var lead = "Your journal. " + SliceFlow.WheelTitle + (Flow.JournalTableView ? ", as the table" : "") + (Flow.JournalLenses.Count > 1 ? ", showing " + SliceFlow.LensTitle(Flow.Lens).ToLowerInvariant() : "") + ". ";
@@ -1702,7 +1901,10 @@ namespace Ascendant.CelestialDial
             return "Your journal. " + Zodiac.Seats[seat].Name + ", " + SliceFlow.SeatStateNames[Flow.SeatState(seat)] + ". " + string.Join(". ", facts) + (Flow.SignDue(seat) ? ". Ready for practice." : ".");
         }
         void OpenJournal() { if (busy || !Flow.OpenJournal()) return; Sound.Play("page"); Show(); Publish(); }
-        void CloseJournal() { if (busy || !Flow.CloseJournal()) return; Sound.Play("page"); Save(); Show(); Publish(); }
+        void CloseJournal() { if (busy || !Flow.CloseJournal()) return; if (journalBeat != null) { StopCoroutine(journalBeat); journalBeat = null; } Sound.Play("page"); Save(); Show(); Publish(); }
+        void JournalContents() { if (busy || !Flow.JournalToContents()) return; Sound.Play("page"); ShowJournal(); Publish(); } // the Contents door, and "‹ Contents" on a chapter
+        void JournalHome() { if (busy || !Flow.JournalToLanding()) return; Sound.Play("page"); ShowJournal(); Publish(); }   // "‹ Your Journal" on Contents
+        void JournalChapter(string chapter) { if (busy || !Flow.OpenChapter(chapter)) return; Sound.Play("page"); ShowJournal(); Publish(); }
         void JournalTurn(int direction) { if (busy || !(direction > 0 ? Flow.JournalNext() : Flow.JournalPrev())) return; Sound.Play("page"); ShowJournal(); Publish(); }
         void JournalWheel() { if (busy || !Flow.JournalToWheel()) return; Sound.Play("page"); ShowJournal(); Publish(); }
         void JournalSetView(bool table) { if (busy || !Flow.SetJournalTable(table)) return; ShowJournal(); Publish(); }

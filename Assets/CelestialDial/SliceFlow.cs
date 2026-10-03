@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal }
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
-    public enum JournalView { Wheel, Sign } // Build AA (owner, Sept 30): the Wheel is the index; a page per sign met
+    public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map
     public enum JournalLens { Element, Modality, Polarity, Opposites } // Build AA: the tabs that recolour the Wheel or the Table, each once learned
 
     [Serializable]
@@ -301,16 +301,53 @@ namespace Ascendant.CelestialDial
         public bool AtJournal => Screen == SliceScreen.Journal;
         public bool Knows(ItemKind kind) => Deck.Items.Any(i => i.Kind == kind && i.entered);
         public bool CanOpenJournal => (AtHub || AtWingRoom || AtChamberRoom) && JournalSigns.Count > 0;
+        // Batch 2 (owner, Oct 1: the journal's architecture; 1b C, 1e A): the first-ever open shows the title page, once (saved); the first open
+        // in each session shows the landing; after that the journal opens where it was left. A session is one run of the game.
+        public bool JournalTitled { get; private set; }
+        bool journalLanded;
         public bool OpenJournal()
         {
             if (!CanOpenJournal) return false;
-            JournalFrom = Screen; JournalAt = JournalView.Wheel; JournalSelected = -1; JournalSign = 0; if (!JournalLenses.Contains(Lens)) Lens = JournalLens.Element; if (!CanJournalTable) JournalTableView = false;
+            JournalFrom = Screen;
+            if (!JournalTitled) { JournalAt = JournalView.Title; JournalTitled = true; }
+            else if (!journalLanded || JournalAt == JournalView.Title) JournalAt = JournalView.Landing;
+            if (JournalAt == JournalView.Landing) journalLanded = true;
+            if (!JournalLenses.Contains(Lens)) Lens = JournalLens.Element; if (!CanJournalTable) JournalTableView = false;
             Screen = SliceScreen.Journal; Logged?.Invoke("journal_opened"); return true;
         }
         public bool CloseJournal()
         {
             if (!AtJournal) return false;
             Screen = JournalFrom; if (Note == "gated") Note = ""; Logged?.Invoke("journal_closed"); return true;
+        }
+        // The pages (the approved board, 86bcbn6w6, Oct 1-2): the title page's beat ends on the landing; the landing holds the Keeper's
+        // record and two doors, Practice and Contents; Contents lists the chapters (the Wheel, the Library Map, and Sealed rows for those
+        // to come) and links back to the landing; each chapter links back to Contents. The Practice door is an entry point only until the
+        // owner approves Practice's scope (Oct 2 evening, step 4): it shows, and opens nothing.
+        public const bool PracticeOpen = false;
+        public const string JournalTitle = "Your Journal", TitlePageLine = "These pages fill as you learn.", KeeperHeading = "KEEPER"; // 1e A (owner, Oct 1); the board's words
+        public const string PracticeDoor = "Practice", ContentsDoor = "Contents", ContentsDoorLine = "Every chapter", ContentsTitle = "Contents";
+        public const string WheelChapterLine = "Signs and patterns", MapTitle = "The Library Map", MapChapterLine = "The rooms you have woken", SealedChapter = "Sealed";
+        public const string BackToJournal = "\u2039 Your Journal", BackToContents = "\u2039 Contents"; // the board's links, top left
+        public const int SealedChapters = 2; // the board's two Sealed rows: the chapters to come, such as the Books
+        // The inscription, the owner's line (Oct 2 evening, 1c B): its line breaks may flex to fit the Keeper's record; its words may not.
+        public const string InscriptionRest = "I'm your journal, and I'll keep a record of what you learn from the Library.";
+        public static readonly string[] InscriptionBreaks = { "I'm your journal, and I'll keep a record", "of what you learn from the Library." }; // the breaks it takes wherever they fit, so every screen sets it alike
+        public static string InscriptionGreeting(string name) => "What's up, " + name + ".";
+        public static string Inscription(string name) => InscriptionGreeting(name) + " " + InscriptionRest;
+        // The Keys collected and the Books opened, one line (Oct 1, 1d): a Book counts once all its locks are filled.
+        public string KeysLine => Keys + (Keys == 1 ? " Key" : " Keys") + (BooksOpen > 0 ? " \u00b7 " + BooksOpen + (BooksOpen == 1 ? " Book" : " Books") : "");
+        public bool CanJournalLand => AtJournal && JournalAt == JournalView.Title;
+        public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; journalLanded = true; Logged?.Invoke("journal_landing"); return true; }
+        public bool CanJournalContents => AtJournal && (JournalAt == JournalView.Landing || JournalAt == JournalView.Wheel || JournalAt == JournalView.Map);
+        public bool JournalToContents() { if (!CanJournalContents) return false; JournalAt = JournalView.Contents; Logged?.Invoke("journal_contents"); return true; }
+        public bool CanJournalHome => AtJournal && JournalAt == JournalView.Contents;
+        public bool JournalToLanding() { if (!CanJournalHome) return false; JournalAt = JournalView.Landing; Logged?.Invoke("journal_landing"); return true; }
+        public static readonly string[] Chapters = { "wheel", "map" };
+        public bool OpenChapter(string chapter)
+        {
+            if (!CanJournalHome || !Chapters.Contains(chapter)) return false;
+            JournalAt = chapter == "wheel" ? JournalView.Wheel : JournalView.Map; Logged?.Invoke("journal_chapter:" + chapter); return true;
         }
         // The views and tabs learned so far: the Table once the table has entered the deck (Key 3); Element at Key 1, Modality with the
         // modalities, Polarity and Opposites with the opposites (Key 4).
@@ -512,13 +549,13 @@ namespace Ascendant.CelestialDial
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
                 polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
         public bool Restore(SaveData save)
         {
             if (save == null || save.atriumStage < 2 || save.sunSign < 0) return false;
-            PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
+            PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved"; JournalTitled = save.journalTitled;
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = Math.Max(save.locksFilled, save.keyEarned ? 1 : 0); Ended = save.keyEarned;
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; Sittings = Math.Max(save.sittings, save.reviewsChecked); // an older save's batches count as sittings
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; ModalitiesStarted = save.modalitiesStarted; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));

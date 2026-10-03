@@ -110,5 +110,6 @@ namespace Ascendant.CelestialDial
         public int built;
         public bool builderEvidence;
         public int locksFilled;                  // Build D: Keys spent in the Chamber (Book 1 has three locks; the fourth Key starts Book 2)
+        public bool journalTitled;               // batch 2 (owner, Oct 1, 1e A): the journal's title page has shown, on its first-ever open
     }
 }
