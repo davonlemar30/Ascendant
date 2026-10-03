@@ -1624,7 +1624,7 @@ namespace Ascendant.CelestialDial
         // Contents lists the chapters (the Wheel, the Library Map, two Sealed); the Library Map is the parchment plan moved in from the
         // mini-menu concept's Option C, the rooms you have woken named in gold. Every chapter links back to Contents, top left. The record's
         // lines sit on the page's rules, as on the board; the script lines are EB Garamond Italic, the upright ones EB Garamond Bold. ----
-        public const string ItalicFont = "Fonts/EBGaramond-Italic", SunFont = "Fonts/NotoSansSymbols2-Regular"; // bundled (OFL): the script lines; ☉ (U+2609) for the Big Three, built once the owner approves step 2
+        public const string ItalicFont = "Fonts/EBGaramond-Italic", SunFont = "Fonts/NotoSansSymbols2-Regular"; // bundled (OFL): the script lines; ☉ (U+2609) for the Big Three's line
         public const float TitleSettle = 1f, TitleFade = .6f;           // 1e A: the title page settles for a second, then fades into the landing
         public const float TitleRoom = 190f;                            // a page title's width between the page's corner flourishes (the art's moon and leaves)
         public const float KeeperFirst = 96f, KeeperRule = 26f, KeeperWidth = 244f; // the opening flourish on the first rule; a line on each rule below, 3 px above it; no wider than the page's calm column inside its margin
@@ -1774,7 +1774,7 @@ namespace Ascendant.CelestialDial
             if (line != "") lines.Add(line); return lines;
         }
         // The Keeper's record on the page's rules: KEEPER, the Keys and Books, then the inscription; the closing flourish and the doors follow.
-        // The Big Three's line goes between the Keys and the inscription once the owner approves step 2 (86bcbn6w6, Oct 2 evening).
+        // The Big Three's line sits between the Keys and the inscription (owner, Oct 2 late evening: approved, unknowns A).
         void ShowJournalLanding()
         {
             int row = 1; void Place(Text line) { line.rectTransform.anchoredPosition = new Vector2(JournalX, -(KeeperFirst + KeeperRule * row++ - 3 - GaramondLift * line.fontSize)); }

@@ -8,7 +8,7 @@ namespace Ascendant.CelestialDial
 {
     // Batch 2 (owner, Oct 2 evening: the Big Three approved as proposed, unknowns A; task 86bcbn6w6, comment 90140263824229). The opening's
     // birth chart: the sun, the moon and the rising sign, worked out once from the birth date, time and place, then fixed for the
-    // playthrough. The astronomy is Meeus (Astronomical Algorithms, 2nd ed.): the sun's apparent longitude (chapter 25, about 0.01°),
+    // playthrough. The astronomy is Meeus (Astronomical Algorithms, 2nd ed.): the sun's apparent longitude (chapters 25 and 32, VSOP87 truncated, about an arc-second),
     // the moon's (chapter 47, the full table, about 0.003°), sidereal time (chapter 12) and the ascendant; the mechanical checks hold it
     // to Meeus's worked examples, to JPL Horizons and to a published chart. Pure C#: no network, no library.
     public static class Sky
