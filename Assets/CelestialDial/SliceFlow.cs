@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal }
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
-    public enum JournalView { Wheel, Sign } // Build AA (owner, Sept 30): the Wheel is the index; a page per sign met
+    public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map
     public enum JournalLens { Element, Modality, Polarity, Opposites } // Build AA: the tabs that recolour the Wheel or the Table, each once learned
 
     [Serializable]
@@ -126,27 +126,87 @@ namespace Ascendant.CelestialDial
         public int Sitting => Sittings;
         public string DisplayName => string.IsNullOrEmpty(PlayerName) ? "Keeper" : PlayerName;
         public void SetName(string name) { PlayerName = (name ?? "").Trim(); }
+        // Batch 2 (owner, Oct 2 evening: the Big Three approved as proposed, unknowns A). "Enter birth date, time, place" takes the date,
+        // then the time (or "I don't know my birth time"), then the town or city from the bundled list, and works out the chart once;
+        // "Enter what I already know" takes the sun, then the moon and the rising sign, each of those two with "I don't know"; "I don't
+        // know" has the game choose the sun. The chart is fixed from Continue on, and the Keeper's record reads it from the save.
+        public int MoonSign { get; private set; } = -1;   // -1: unknown
+        public int RisingSign { get; private set; } = -1;
+        public string BirthStep { get; private set; } = ""; // the chart path: date, time, place; the known path: sun, moon, rising; then done
+        public int BirthYear { get; private set; } public int BirthMonth { get; private set; } public int BirthDay { get; private set; }
+        public int BirthMinute { get; private set; } = -1;  // minutes after local midnight; -1 unknown
+        public Place BirthPlace { get; private set; }
+        public string ChartFrom { get; private set; } = ""; // chart, known or chosen (the game chose the sun)
+        // The cusp day (owner ruling, Oct 2 evening): with no birth time, on a day the sun changed sign, the player is asked which sign they
+        // go by, and why; the answer is saved as the sun, flagged: picked (theirs), or noon ("I'm not sure": the sun at local noon, approximate,
+        // so a later screen can offer a fix). The record shows the sun the same either way; the moon and the rising sign keep rule A.
+        public string SunBasis { get; private set; } = ""; // "" worked out or given; picked; noon
+        public int CuspFrom { get; private set; } = -1; public int CuspTo { get; private set; } = -1; public int CuspNoon { get; private set; } = -1;
+        public int CuspMinute { get; private set; } = -1; // the minute the sun changed sign, on the birth place's clock that day (minutes after midnight)
+        public static string ClockTime(int minute) { int h = minute / 60, m = minute % 60; return (h % 12 == 0 ? 12 : h % 12) + ":" + m.ToString("00") + (h < 12 ? " am" : " pm"); }
+        public string CuspQuestion => CuspFrom < 0 ? "" : "The Sun moved from " + Zodiac.Seats[CuspFrom].Name + " into " + Zodiac.Seats[CuspTo].Name + " on the day you were born, at " + ClockTime(CuspMinute) + ". Your birth time decides which side of that line you landed on. Which sign do you go by?"; // the owner's draft (owner writes)
+        public const string CuspUnsure = "I'm not sure", CuspWhyLink = "Why?", CuspWhy = "The Sun reaches each sign at an exact minute, and that minute shifts a little every year. Birthdays near the change are called cusps."; // the owner's drafts
+        public bool PickCuspSun(int choice) // 0: the sign it left, 1: the sign it entered, -1: "I'm not sure"
+        {
+            if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < -1 || choice > 1) return false;
+            SunSign = choice == 0 ? CuspFrom : choice == 1 ? CuspTo : CuspNoon; SunBasis = choice < 0 ? "noon" : "picked"; BirthStep = "done"; Note = ChartNote();
+            Logged?.Invoke(choice < 0 ? "cusp_sun_noon" : "cusp_sun_picked"); return true;
+        }
+        public const int FirstBirthYear = 1900;             // the time zone table runs from 1900
         public void ChooseBirth(string choice)
         {
             if (Screen != SliceScreen.Birth) return;
-            BirthChoice = choice; SunSign = -1; Note = "";
+            BirthChoice = choice; SunSign = MoonSign = RisingSign = -1; BirthYear = BirthMonth = BirthDay = 0; BirthMinute = -1; BirthPlace = null; Note = ""; SunBasis = ""; CuspFrom = CuspTo = CuspNoon = CuspMinute = -1;
+            BirthStep = choice == "chart" ? "date" : choice == "known" ? "sun" : choice == "unknown" ? "done" : ""; ChartFrom = choice == "unknown" ? "chosen" : choice;
             if (choice == "unknown") { SunSign = Zodiac.Wrap(random()); Note = "Then I will choose one for you.\nYour sun sign is " + Zodiac.Seats[SunSign].Name + "."; }
             Logged?.Invoke("birth_choice:" + choice);
         }
-        public bool SetBirthDate(int month, int day)
+        public bool SetBirthDate(int year, int month, int day)
         {
-            if (Screen != SliceScreen.Birth || BirthChoice != "chart") return false;
-            int seat = Zodiac.SunSign(month, day);
-            if (seat < 0) return false;
-            SunSign = seat; Note = "Your sun sign is " + Zodiac.Seats[seat].Name + "."; Logged?.Invoke("sun_sign_derived"); return true;
+            if (Screen != SliceScreen.Birth || BirthChoice != "chart" || BirthStep != "date") return false;
+            if (year < FirstBirthYear || month < 1 || month > 12 || day < 1 || day > DateTime.DaysInMonth(year, month) || new DateTime(year, month, day) > DateTime.UtcNow.Date.AddDays(1)) return false;
+            BirthYear = year; BirthMonth = month; BirthDay = day; BirthStep = "time"; Note = ""; Logged?.Invoke("birth_date_entered"); return true;
         }
+        public bool SetBirthTime(int minuteOfDay) // -1: "I don't know my birth time"
+        {
+            if (Screen != SliceScreen.Birth || BirthStep != "time" || minuteOfDay < -1 || minuteOfDay >= 24 * 60) return false;
+            BirthMinute = minuteOfDay; BirthStep = "place"; Logged?.Invoke(minuteOfDay < 0 ? "birth_time_unknown" : "birth_time_entered"); return true;
+        }
+        public bool SetBirthPlace(Place place)
+        {
+            if (Screen != SliceScreen.Birth || BirthStep != "place" || place == null) return false;
+            var chart = BirthChart.Work(BirthYear, BirthMonth, BirthDay, BirthMinute, place);
+            if (chart.Sun < 0) // the canon's time-unknown state: the sun crossed a sign that day (Uncertain), so the player is asked (owner ruling, Oct 2)
+            {
+                BirthPlace = place; MoonSign = chart.Moon; RisingSign = -1; CuspFrom = chart.SunFrom; CuspTo = chart.SunTo; CuspNoon = chart.SunNoon; CuspMinute = BirthChart.LocalMinuteOf(chart.Ingress, place.Zone);
+                BirthStep = "cusp"; Note = ""; Logged?.Invoke("sun_cusp"); return true;
+            }
+            BirthPlace = place; SunSign = chart.Sun; MoonSign = chart.Moon; RisingSign = chart.Rising; BirthStep = "done"; Note = ChartNote(); Logged?.Invoke("chart_worked_out"); return true;
+        }
+        // the known path: the sun, then the moon and the rising sign (-1 for "I don't know")
         public bool SetKnownSign(int seat)
         {
-            if (Screen != SliceScreen.Birth || BirthChoice != "known" || seat < 0 || seat > 11) return false;
-            SunSign = seat; Note = "Your sun sign is " + Zodiac.Seats[seat].Name + "."; Logged?.Invoke("sun_sign_entered"); return true;
+            if (Screen != SliceScreen.Birth || BirthChoice != "known" || seat < -1 || seat > 11) return false;
+            if (BirthStep == "sun" && seat >= 0) { SunSign = seat; BirthStep = "moon"; Note = ""; Logged?.Invoke("sun_sign_entered"); return true; }
+            if (BirthStep == "moon") { MoonSign = seat; BirthStep = "rising"; Logged?.Invoke("moon_sign_entered"); return true; }
+            if (BirthStep == "rising") { RisingSign = seat; BirthStep = "done"; Note = ChartNote(); Logged?.Invoke("rising_sign_entered"); return true; }
+            return false;
         }
+        // what the birth screen says once the chart is known (placeholder, owner writes)
+        string ChartNote()
+        {
+            string Sign(int seat) => Zodiac.Seats[seat].Name; bool noTime = BirthChoice == "chart" && BirthMinute < 0;
+            var line = "Your sun sign is " + Sign(SunSign);
+            if (MoonSign >= 0 && RisingSign >= 0) return line + ", your moon sign " + Sign(MoonSign) + ", and your rising sign " + Sign(RisingSign) + ".";
+            if (MoonSign >= 0) return line + " and your moon sign " + Sign(MoonSign) + "." + (noTime ? " Without a birth time, your rising sign stays unknown." : " Your rising sign stays unknown.");
+            if (RisingSign >= 0) return line + " and your rising sign " + Sign(RisingSign) + ". Your moon sign stays unknown.";
+            return line + "." + (noTime ? " Without a birth time, your moon and rising signs stay unknown." : " Your moon and rising signs stay unknown.");
+        }
+        // the Keeper's record's Big Three line, as words (the record draws each glyph in its own font); "unknown" where it can't be known (owner, A)
+        public static string SignOrUnknown(int seat) => seat >= 0 && seat < 12 ? Zodiac.Seats[seat].Name : "unknown";
+        public string BigThreeLine => "\u2609 " + SignOrUnknown(SunSign) + " \u00b7 \u263d " + SignOrUnknown(MoonSign) + " \u00b7 \u2191 " + SignOrUnknown(RisingSign);
         public bool CanContinue =>
-            Screen == SliceScreen.Identity || (Screen == SliceScreen.Birth && HasSunSign) ||
+            Screen == SliceScreen.Identity || (Screen == SliceScreen.Birth && HasSunSign && BirthStep == "done") ||
             Screen == SliceScreen.Atrium || (Screen == SliceScreen.Wing && KeyRevealed && AtriumStage == 1) || Screen == SliceScreen.AtriumReturn ||
             (Screen == SliceScreen.Chamber && Ended);
         public bool Continue()
@@ -301,16 +361,53 @@ namespace Ascendant.CelestialDial
         public bool AtJournal => Screen == SliceScreen.Journal;
         public bool Knows(ItemKind kind) => Deck.Items.Any(i => i.Kind == kind && i.entered);
         public bool CanOpenJournal => (AtHub || AtWingRoom || AtChamberRoom) && JournalSigns.Count > 0;
+        // Batch 2 (owner, Oct 1: the journal's architecture; 1b C, 1e A): the first-ever open shows the title page, once (saved); the first open
+        // in each session shows the landing; after that the journal opens where it was left. A session is one run of the game.
+        public bool JournalTitled { get; private set; }
+        bool journalLanded;
         public bool OpenJournal()
         {
             if (!CanOpenJournal) return false;
-            JournalFrom = Screen; JournalAt = JournalView.Wheel; JournalSelected = -1; JournalSign = 0; if (!JournalLenses.Contains(Lens)) Lens = JournalLens.Element; if (!CanJournalTable) JournalTableView = false;
+            JournalFrom = Screen;
+            if (!JournalTitled) { JournalAt = JournalView.Title; JournalTitled = true; }
+            else if (!journalLanded || JournalAt == JournalView.Title) JournalAt = JournalView.Landing;
+            if (JournalAt == JournalView.Landing) journalLanded = true;
+            if (!JournalLenses.Contains(Lens)) Lens = JournalLens.Element; if (!CanJournalTable) JournalTableView = false;
             Screen = SliceScreen.Journal; Logged?.Invoke("journal_opened"); return true;
         }
         public bool CloseJournal()
         {
             if (!AtJournal) return false;
             Screen = JournalFrom; if (Note == "gated") Note = ""; Logged?.Invoke("journal_closed"); return true;
+        }
+        // The pages (the approved board, 86bcbn6w6, Oct 1-2): the title page's beat ends on the landing; the landing holds the Keeper's
+        // record and two doors, Practice and Contents; Contents lists the chapters (the Wheel, the Library Map, and Sealed rows for those
+        // to come) and links back to the landing; each chapter links back to Contents. The Practice door is an entry point only until the
+        // owner approves Practice's scope (Oct 2 evening, step 4): it shows, and opens nothing.
+        public const bool PracticeOpen = false;
+        public const string JournalTitle = "Your Journal", TitlePageLine = "These pages fill as you learn.", KeeperHeading = "KEEPER"; // 1e A (owner, Oct 1); the board's words
+        public const string PracticeDoor = "Practice", ContentsDoor = "Contents", ContentsDoorLine = "Every chapter", ContentsTitle = "Contents";
+        public const string WheelChapterLine = "Signs and patterns", MapTitle = "The Library Map", MapChapterLine = "The rooms you have woken", SealedChapter = "Sealed";
+        public const string BackToJournal = "\u2039 Your Journal", BackToContents = "\u2039 Contents"; // the board's links, top left
+        public const int SealedChapters = 2; // the board's two Sealed rows: the chapters to come, such as the Books
+        // The inscription, the owner's line (Oct 2 evening, 1c B): its line breaks may flex to fit the Keeper's record; its words may not.
+        public const string InscriptionRest = "I'm your journal, and I'll keep a record of what you learn from the Library.";
+        public static readonly string[] InscriptionBreaks = { "I'm your journal, and I'll keep a record", "of what you learn from the Library." }; // the breaks it takes wherever they fit, so every screen sets it alike
+        public static string InscriptionGreeting(string name) => "What's up, " + name + ".";
+        public static string Inscription(string name) => InscriptionGreeting(name) + " " + InscriptionRest;
+        // The Keys collected and the Books opened, one line (Oct 1, 1d): a Book counts once all its locks are filled.
+        public string KeysLine => Keys + (Keys == 1 ? " Key" : " Keys") + (BooksOpen > 0 ? " \u00b7 " + BooksOpen + (BooksOpen == 1 ? " Book" : " Books") : "");
+        public bool CanJournalLand => AtJournal && JournalAt == JournalView.Title;
+        public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; journalLanded = true; Logged?.Invoke("journal_landing"); return true; }
+        public bool CanJournalContents => AtJournal && (JournalAt == JournalView.Landing || JournalAt == JournalView.Wheel || JournalAt == JournalView.Map);
+        public bool JournalToContents() { if (!CanJournalContents) return false; JournalAt = JournalView.Contents; Logged?.Invoke("journal_contents"); return true; }
+        public bool CanJournalHome => AtJournal && JournalAt == JournalView.Contents;
+        public bool JournalToLanding() { if (!CanJournalHome) return false; JournalAt = JournalView.Landing; Logged?.Invoke("journal_landing"); return true; }
+        public static readonly string[] Chapters = { "wheel", "map" };
+        public bool OpenChapter(string chapter)
+        {
+            if (!CanJournalHome || !Chapters.Contains(chapter)) return false;
+            JournalAt = chapter == "wheel" ? JournalView.Wheel : JournalView.Map; Logged?.Invoke("journal_chapter:" + chapter); return true;
         }
         // The views and tabs learned so far: the Table once the table has entered the deck (Key 3); Element at Key 1, Modality with the
         // modalities, Polarity and Opposites with the opposites (Key 4).
@@ -512,13 +609,18 @@ namespace Ascendant.CelestialDial
             return new SaveData { playerName = PlayerName, sunSign = SunSign, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
                 polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, moonSign = MoonSign, risingSign = RisingSign, chartFrom = ChartFrom, sunBasis = SunBasis,
+                birthDate = BirthYear > 0 ? BirthYear.ToString("0000") + "-" + BirthMonth.ToString("00") + "-" + BirthDay.ToString("00") : "", birthMinute = BirthMinute, birthPlace = BirthPlace != null ? BirthPlace.Name : "",
+                birthLatitude = BirthPlace != null ? BirthPlace.Latitude : 0, birthLongitude = BirthPlace != null ? BirthPlace.Longitude : 0, birthZone = BirthPlace != null ? Places.ZoneName(BirthPlace.Zone) : "", glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
         public bool Restore(SaveData save)
         {
             if (save == null || save.atriumStage < 2 || save.sunSign < 0) return false;
-            PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved";
+            PlayerName = save.playerName ?? ""; SunSign = save.sunSign; BirthChoice = "saved"; JournalTitled = save.journalTitled;
+            MoonSign = save.moonSign; RisingSign = save.risingSign; ChartFrom = save.chartFrom ?? ""; SunBasis = save.sunBasis ?? ""; BirthMinute = save.birthMinute; BirthStep = "done"; // fixed at the opening: read, never worked out again
+            if (!string.IsNullOrEmpty(save.birthDate) && save.birthDate.Length == 10) { BirthYear = int.Parse(save.birthDate.Substring(0, 4)); BirthMonth = int.Parse(save.birthDate.Substring(5, 2)); BirthDay = int.Parse(save.birthDate.Substring(8, 2)); }
+            if (!string.IsNullOrEmpty(save.birthPlace)) BirthPlace = new Place { Name = save.birthPlace, Latitude = save.birthLatitude, Longitude = save.birthLongitude, Zone = Places.ZoneOf(save.birthZone ?? "") };
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = Math.Max(save.locksFilled, save.keyEarned ? 1 : 0); Ended = save.keyEarned;
             WheelComplete = save.wheelComplete; AtriumStage = save.atriumStage; Sittings = Math.Max(save.sittings, save.reviewsChecked); // an older save's batches count as sittings
             Keys = Math.Max(save.keys, save.keyEarned ? 1 : 0); GlyphStage = save.glyphStage; GlyphIndex = save.glyphIndex; CleanRuns = save.cleanRuns; ModalitiesStarted = save.modalitiesStarted; GlyphsStarted = save.glyphStage > 0 || save.glyphIndex > 0 || (save.deck != null && save.deck.Any(d => d.kind == (int)ItemKind.Glyph && d.entered));

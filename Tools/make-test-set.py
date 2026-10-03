@@ -25,6 +25,8 @@ IMAGES = [
     ("journal-page", 180, 400), ("journal-cover", 60, 60),  # Build F
     ("atrium-light", 180, 400), ("wing-light", 180, 400), ("chamber-light", 180, 400),  # Build H: translucent overlays
     ("journal-ribbon", 16, 120), ("journal-wheel", 300, 300), ("journal-seat-leaf", 56, 56), ("journal-seat-line", 56, 56),  # Build J; Build AA: the Wheel index
+    ("journal-door-frame", 240, 120), ("journal-emblem-practice", 56, 72), ("journal-emblem-contents", 76, 60), ("journal-emblem-wheel", 48, 48), ("journal-emblem-map", 40, 40), ("journal-emblem-lock", 24, 28),
+    ("journal-flourish", 220, 20), ("journal-library-plan", 236, 352),  # batch 2: the journal's landing, Contents and the Library Map
     ("sign-aries", 200, 200), ("sign-taurus", 200, 200), ("sign-gemini", 200, 200), ("sign-cancer", 200, 200), ("sign-leo", 200, 200), ("sign-virgo", 200, 200),
     ("sign-libra", 200, 200), ("sign-scorpio", 200, 200), ("sign-sagittarius", 200, 200), ("sign-capricorn", 200, 200), ("sign-aquarius", 200, 200), ("sign-pisces", 200, 200),
     ("chat-box", 164, 120), ("chat-plate", 172, 24),  # Build P: the chat box on the story screens

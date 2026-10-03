@@ -2,6 +2,131 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The journal's landing and the Big Three: the title page, the Keeper's record, Contents, the Library Map and the birth chart (batch 2)
+
+The owner's rulings: Oct 1 (task 86bcbn6w6: the journal's architecture, with 1b C, the landing on the first open of each session, and 1e A, the title page once on the first-ever open) and Oct 2 evening (comment 90140263811408 and the owner's message the same evening: the inscription in the owner's words, the fonts Claude sources with open licenses only, the Practice door an entry point only until Practice's scope is approved, and the Big Three held for the step 2 proposal). The look is the art lane's board on 86bcbn6w6 (Oct 2).
+
+**The pages** (`SliceFlow.JournalView` gains Title, Landing, Contents and Map beside the Wheel and a sign's page):
+- **The title page (1e A).** On the journal's first-ever open, "Your Journal", a gold flourish, KEEPER and "These pages fill as you learn." settle for a second, then fade into the landing over 0.6 s. The save keeps `journalTitled`, so it never shows again; a save from before this build shows it once.
+- **The landing (1b C).** The first open in each session lands here; later opens in the session go back where the journal was left.
+  - The Keeper's record sits between two gold flourishes, each line on the page's rules as on the board: KEEPER (EB Garamond Bold, spaced 0.3 em), the Keys and Books ("1 Key"; "4 Keys · 1 Book": a Book counts once its three locks are filled), and the owner's inscription in EB Garamond Italic.
+  - The inscription, word for word: "What's up, [Player Name]. I'm your journal, and I'll keep a record of what you learn from the Library.", with the saved name. It takes its own line breaks on every screen: the greeting on its own line, then "I'm your journal, and I'll keep a record" and "of what you learn from the Library." A line wraps between words only if a screen can't fit it in 244 px. (Breaking greedily put "of" at a line's end at some sizes, since Unity rounds each glyph's advance.)
+  - The Big Three's line sits between the Keys and the inscription (below).
+  - Two doors, 238 x 120, in the board's fine gold frame on the vellum panel: Practice (the closed book with its ribbon) and Contents ("Every chapter"). Practice is an entry point only (owner, Oct 2 evening): it shows at half, opens nothing, and has no count until Practice is approved.
+- **Contents.** The Wheel ("Signs and patterns") and The Library Map ("The rooms you have woken"), each emblem in a gold ring, then two Sealed rows with a lock, as on the board. "‹ Your Journal" at the top left goes back to the landing.
+- **The Library Map.** The parchment plan moved in from the mini-menu concept's Option C, with the rooms woken so far named in gold on their floors (all three, by the time the journal opens). The page's layout is Claude's working choice, offered in the batch 2 report. "‹ Contents" at the top left.
+- **The Wheel** is now a chapter: today's Wheel, with "‹ Contents" at its top left. Its Wheel / Table switch and its tabs move down a band (y 119 and 143, were 96 and 126), so the link keeps its 44 px target. A sign's page keeps Back to the Wheel.
+
+**The Big Three** (owner, Oct 2 evening: "Big Three approved, A, download OK", on the proposal at 86bcbn6w6, comment 90140263824229; folded into this build at the owner's word):
+- **The opening.**
+  - "Enter birth date, time, place" asks three things in turn:
+    - the date: day, month and year, from the Web's date picker or typed as DD/MM/YYYY;
+    - the time: hour and minute, 24-hour or am/pm, or "I don't know my birth time";
+    - the town or city: typed, then picked from up to four matches in the bundled list, the biggest first.
+  - On the pick the game works out the chart once, and Continue fixes it.
+  - "Enter what I already know" takes the sun, then the moon and the rising sign from the twelve, each of those two with "I don't know".
+  - "I don't know" still has the game choose the sun.
+  - The new lines are Claude's drafts, which the owner accepted for now.
+- **The chart** (`BirthChart`, `Sky`) uses Meeus, *Astronomical Algorithms* (2nd ed.):
+  - the sun's apparent longitude (chapter 25);
+  - the moon's (chapter 47, the full sixty-term table);
+  - Greenwich sidereal time (chapter 12);
+  - the ascendant;
+  - ΔT from Espenak and Meeus.
+
+  It is checked against:
+  - Meeus's worked examples: 25.a; 47.a's sum of -1127527 and its 133.162655°; 12.a and 12.b;
+  - JPL Horizons at twelve moments from 1901 to 2026: the sun within 0.0001° and the moon within 0.0022°;
+  - a search of the eastern horizon, to 0.005°;
+  - a published chart: Honolulu, Aug 4 1961, 19:24, a Leo sun, Gemini moon and Aquarius rising.
+- **The places and their clocks** (`Places`):
+  - 34,152 places from GeoNames' cities15000 (CC BY 4.0; downloaded with the owner's OK), each with one of 356 time zones.
+  - Each zone's UTC offsets from 1900 to 2040 come from the IANA time zone database on this Mac (2026c, public domain), through Python's zoneinfo. `Tools/make-places.py` rebuilds both files, and `Resources/Places/SOURCES.txt` records the sources and the credit.
+  - A birth's local time becomes UT with that year's clocks. A time the clocks skipped takes the offset before the change; an hour they repeated takes its first pass.
+  - 21 cases are checked against zoneinfo.
+- **Unknowns** (owner, A; the canon's time-unknown state, Curriculum Revision 2).
+  - With no birth time, the sun and the moon are worked out every hour across the whole local birth date. A sign that holds all day shows; one that changes is unknown. There is no rising sign without a time.
+  - On a day the sun itself changed sign (about twelve days a year), the sun is Uncertain, and the player is asked (the cusp day, below).
+- **The save** keeps the chart (`moonSign`, `risingSign`, `chartFrom`) with the birth data it came from (`birthDate`, `birthMinute`, `birthPlace`, `birthZone`, the latitude and longitude), and reads it back without working it out again. A save from before this build keeps its sun; its moon and rising read "unknown".
+- **The Keeper's record** gains its Big Three line, on its rule between the Keys and the inscription: "☉ Taurus · ☽ Pisces · ↑ Leo", with "unknown" where a sign can't be known (a sun-only save: "☉ Taurus · ☽ unknown · ↑ unknown").
+  - ☉ is drawn in Noto Sans Symbols 2.
+  - ☽ is drawn in the zodiac font. Its baked character set gains ☽ through Unity's importer (`FontSetup`).
+  - ↑ is drawn in EB Garamond, and the words in the italic.
+- **DEV Mode**: each Jump to... checkpoint carries a sample chart, a real chart worked out for a 1990 birth mid-sign at noon in London, with the player's sun sign kept.
+- **The credits**: the README's Credits gain GeoNames' line and the two new fonts.
+- **The web state** publishes `birthStep`, `canBirthTime`, `canBirthPlace`, `placeMatches`, `canSignUnknown`, `moonSign`, `risingSign` and `bigThree`. The template gains the time and place inputs (the browser's own pickers), four match buttons and "I don't know".
+- **The cusp day** (owner ruling, Oct 2 evening; it answers the canon's time-unknown state for the sun, which is Uncertain on that day).
+  - With no birth time, on a day the sun changed sign, the opening asks: "The Sun moved from Aries into Taurus on the day you were born, at 9:27 am. Your birth time decides which side of that line you landed on. Which sign do you go by?"
+  - The answers are the two signs and "I'm not sure". A small "Why?" opens its reason: "The Sun reaches each sign at an exact minute, and that minute shifts a little every year. Birthdays near the change are called cusps."
+  - The time is the minute the sun entered the sign, on the birth place's clock that day, from the bundled zone table.
+  - A pick is saved as the sun, flagged `picked`. "I'm not sure" saves the sun at local noon, flagged `noon` (approximate), so a later screen can offer a fix (`sunBasis`).
+  - The record shows the sun the same either way; the moon and the rising sign keep rule A.
+  - The lines are the owner's drafts.
+  - DEV Mode's Jump to... gains "A cusp day (the opening)": a fresh opening at the question (London, Apr 20 1990, no birth time), the name kept.
+  - Noted as a future idea only, not built: a cusp page, or a Practice question on cusps.
+- **The sun, with higher accuracy.** To give the change's minute right, the sun uses Meeus's higher-accuracy method (VSOP87 for the Earth, truncated; Appendix III). Meeus 25.b's distance comes out exactly (0.99760775), and JPL Horizons agrees within 0.0001° at the twelve moments. The Taurus ingress of Apr 20 1990 falls at 08:27 UT, JPL's minute.
+
+**3d.** The doors, rows and links press like the other buttons (darker, 1 px down), and Practice shows unavailable (half). Every new target is 44 px or more: the doors 238 x 120, Contents' rows 238 x 104, the links 96 x 44.
+
+**The art.** Eight new slots, 166 in all, cut from the approved board's own sources (`Documentation/ConceptArt/BatchRun1-2026-10-02/1-journal/`):
+- the door frame (the round-2 art's hairline frame, nine-sliced);
+- five emblems: Practice, Contents, the Wheel (the game's own `journal-wheel`), the folded plan and the lock;
+- the flourish;
+- the Library plan.
+
+The ring round each Contents emblem is drawn in code.
+
+**The fonts** (owner, Oct 2 evening: "Claude sources them"; open licenses only):
+- `Resources/Fonts/EBGaramond-Italic.ttf`, Version 1.001, 602,136 bytes, from github.com/octaviopardo/EBGaramond12 (`fonts/ttf/`). It is the static Italic of the release the shipped `EBGaramond-Bold.ttf` comes from (byte for byte). SIL Open Font License 1.1, covered by the existing `OFL-EBGaramond.txt`, which is identical to the upstream `OFL.txt`.
+- `Resources/Fonts/NotoSansSymbols2-Regular.ttf`, Version 2.008, 671,568 bytes, from github.com/notofonts/notofonts.github.io (`fonts/NotoSansSymbols2/unhinted/ttf/`). SIL Open Font License 1.1, with `OFL-NotoSansSymbols2.txt` (the notofonts/symbols license and a note). It carries ☉ (U+2609), which the shipped Noto Sans Symbols lacks.
+- Both are static fonts with no variation table (a variable font drew blank on the Web on Sept 12), imported dynamic. The batch 2 report had proposed google/fonts' variable `EBGaramond-Italic[wght].ttf`; the static file replaces it for that reason.
+
+**The web state** publishes:
+- `journalView`: title, landing, contents, map, wheel, table or sign;
+- `journalKeeper`: the Keeper's record as drawn;
+- `journalDoors`: the doors' boxes;
+- `journalChapters`: Contents' rows;
+- `journalMapRooms`: the rooms named on the plan;
+- `journalLink`: the link at the top left;
+- `journalScriptFont`;
+- `canJournalContents`, `canJournalHome` and `canJournalPractice`.
+
+The web template gains the matching semantic buttons and boxes.
+
+**Checks**
+- Mechanical (+40):
+  - the first-ever open, the title page's beat, the landing, Contents both ways, both chapters and their links back, a sign's page still back to the Wheel;
+  - opening where it was left in a session; a new session from the save; a save from before;
+  - the inscription word for word; the Keys line;
+  - both fonts with their characters and licenses, both static; the eight files at their sizes;
+  - the links' targets clear of the switch, and the doors clear of Close the journal;
+  - the chart: Meeus's worked examples, JPL Horizons, the horizon search and the published chart; the places and the 21 clock cases; the opening's three paths and the cusp day; the save both ways; DEV Mode's samples; the glyphs' fonts.
+- The fixture:
+  - the cusp day in the opening: the question, Why?, a pick; then "Enter what I already know" with I don't know for the moon and the rising sign;
+  - the title page, then the landing's record as drawn (KEEPER, 1 Key, the Big Three as given, the inscription for the fixture's name), the two doors and the script font;
+  - Contents' rows and their targets, and the Library Map;
+  - the Wheel through Contents;
+  - with the test set, a new session on the landing and every new file dressed.
+- The suite:
+  - the known path's moon and rising steps; the chart path in the browser (London, May 1 1990, 14:30: ☉ Taurus · ☽ Leo · ↑ Virgo); the cusp day (Aries or Taurus at 9:27 am, Why?, I'm not sure at noon); DEV Mode's cusp-day sample;
+  - the title page, then the landing, with the Big Three's line, the inscription and the Keys line;
+  - the inscription's ink in the Web build;
+  - Practice opening nothing, on the canvas;
+  - the Contents door, the Library Map's row, ‹ Contents and ‹ Your Journal, and the Wheel's row, all on the canvas;
+  - the targets on Contents;
+  - "4 Keys · 1 Book" and DEV Mode's sample chart at the Wing's end;
+  - the moved switch and tabs.
+
+Not changed: the Wheel, a sign's page and their actions; Close the journal; the journal's own buttons (Close the journal, the arrows, Back to the Wheel, Open the page) keep their look.
+
+Validation (local, worktree `mini-menu`, branch `codex/journal-landing` on main `1c33acb`):
+- mechanical checks 630/630 (+40), 0 compiler warnings;
+- slice fixture 262/262 (+15);
+- headless WebGL 0 errors and 0 warnings (36.1 MB; the place list and time zones add about 0.8 MB);
+- browser suite 603/603 at desktop density, with the seven shapes (+29), and 512/512 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
+
+Captures: [`Evidence/journal-landing-2026-10-02/`](Evidence/journal-landing-2026-10-02/), with the approved board beside the game and the opening's birth steps, the cusp question included.
+
 ## The buttons: bronze on the instruments, the chat box's language in the rooms (batch 2)
 
 The owner's rulings (Oct 1, task 86bcbn6w6: 3b C, two tiers with engraved arrows for Previous and Next; 3c C, by place, bronze on the instruments and the chat box's gold on dark in the rooms; 3d, pressed darkens and sinks a pixel, unavailable dims to half, every target at least 44 px) and answers (Oct 2, batch run 2: "Buttons at 44 px, bronze on the Table and the Book too"). The look is the art lane's board on 86bcbn6w6 (Oct 2).

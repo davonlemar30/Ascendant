@@ -93,6 +93,9 @@ namespace Ascendant.CelestialDial
                     var size = Target(b); list.Add(words.Replace(":", " ") + ":" + kind + ":" + Mathf.RoundToInt(size.x) + "x" + Mathf.RoundToInt(size.y)); } }
             return list.ToArray();
         }
+        // The journal's front pages (batch 2, owner Oct 1): a door, a chapter row or a link draws its own pieces into the look and keeps the 3d states.
+        public static ButtonFeel Custom(Button button, string kind) => Begin(button, kind);
+        public static Sprite SlicedArt(string slot, Vector4 border) => Sliced(slot, border);
         public static string KindOf(Button button) { var feel = button.GetComponent<ButtonFeel>(); return feel != null ? feel.Kind : "plain"; } // not ??: the Editor's fake null
 
         // ---- the parts ----

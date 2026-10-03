@@ -127,6 +127,9 @@ namespace Ascendant.CelestialDial
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
             public string casparShown = ""; // Build S: that page's words, colour tags and all
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
+            // batch 2 (owner, Oct 2 evening: the Big Three approved): the birth screen's step, the time and place steps, the places matching what is typed, the chart
+            public bool canBirthTime, canBirthPlace, canSignUnknown; public string birthStep = "", moonSign = "", risingSign = "", bigThree = ""; public string[] placeMatches;
+            public bool canCusp, cuspWhy; public string cuspTime = "", cuspQuestion = "", sunBasis = ""; public string[] cuspSigns; // the cusp day (owner ruling, Oct 2 evening)
             public int atriumStage, dueCount;
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
             public string hubNote = "";
@@ -138,6 +141,8 @@ namespace Ascendant.CelestialDial
             public string journalView = "", journalSign = "", journalGlyph = "", journalArt = "", journalText = "", journalTitleFont = "", journalLens = "", journalSelected = "", journalPreview = "", journalSeatState = "";
             public string[] journalLenses, journalSeats, journalFacts, journalChips; public bool[] journalDue; public float[] journalChipBoxes;
             public float journalInk, journalColour; public int journalRibbon; public bool journalRibbonOut, journalGilt, journalShader, canJournalWheel, canJournalTable, canJournalOpen;
+            // batch 2 (owner, Oct 1: the journal's architecture): the Keeper's record as drawn, the landing's doors (x, top, width, height each), the chapters on Contents, the rooms named on the Library Map, the link at the top left
+            public string[] journalKeeper, journalChapters, journalMapRooms; public float[] journalDoors; public string journalLink = "", journalScriptFont = ""; public bool canJournalContents, canJournalHome, canJournalPractice;
             public string sunSign = "";
             public int locksFilled;
             // v0.4 tap-to-move
