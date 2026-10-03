@@ -113,6 +113,7 @@ namespace Ascendant.CelestialDial
         public bool journalTitled;               // batch 2 (owner, Oct 1, 1e A): the journal's title page has shown, on its first-ever open
         // batch 2 (owner, Oct 2 evening: the Big Three approved): the chart fixed at the opening, and the birth data it came from
         public int moonSign = -1, risingSign = -1; // -1 unknown; a save from before has neither
+        public int moonFrom = -1, moonTo = -1;     // with no birth time, on a day the moon changed sign: the sign it left and the one it entered (owner, Oct 3); -1 otherwise
         public string chartFrom = "";             // chart (worked out), known (entered) or chosen (the game chose the sun)
         public string sunBasis = "";              // the cusp day (owner, Oct 2): picked (the player's), noon (approximate: "I'm not sure"), or "" (worked out or given)
         public string birthDate = "";             // YYYY-MM-DD, on the chart path

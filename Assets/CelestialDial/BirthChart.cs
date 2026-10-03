@@ -185,6 +185,7 @@ namespace Ascendant.CelestialDial
     {
         public int Sun = -1, Moon = -1, Rising = -1;
         public int SunFrom = -1, SunTo = -1, SunNoon = -1; // with no birth time: the sun's sign at the day's start, end and local noon (start and end differ on a cusp day)
+        public int MoonFrom = -1, MoonTo = -1; // with no birth time: the moon's sign at the day's start and end (they differ on a day it changed sign: owner, Oct 3, "Pisces or Aries")
         public long Ingress = -1; // on a cusp day, the UT minute (since 1900) the sun entered SunTo
         static double Jd(DateTime ut) => Sky.JulianDay(ut.Year, ut.Month, ut.Day, ut.Hour + ut.Minute / 60.0 + ut.Second / 3600.0);
         // the chart from the birth date, the local time (minutes after midnight, or -1 when unknown) and the place
@@ -207,6 +208,7 @@ namespace Ascendant.CelestialDial
             {
                 var ut = Places.UtOf(minute); double jd = Jd(ut), jde = Sky.Ephemeris(jd, ut.Year, ut.Month); int s = Sky.SignOf(Sky.SunLongitude(jde)), m = Sky.SignOf(Sky.MoonLongitude(jde));
                 if (chart.SunFrom < 0) chart.SunFrom = s; chart.SunTo = s;
+                if (chart.MoonFrom < 0) chart.MoonFrom = m; chart.MoonTo = m;
                 sun = sun == -2 || sun == s ? s : -1; moon = moon == -2 || moon == m ? m : -1;
                 if (minute >= end) break;
             }

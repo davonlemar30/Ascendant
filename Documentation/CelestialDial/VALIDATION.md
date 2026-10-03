@@ -2,6 +2,26 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The Moon on a day it changed sign: "Pisces or Aries" (the canon flags, Oct 3)
+
+The owner's ruling (Oct 3, comment 90140263873037 on 86bcbn6w6, the canon flags): "Upgrade to option A for the Moon: on a day the Moon changed sign and the birth time is unknown, the record shows both signs instead of 'unknown', e.g. '☽ Pisces or Aries', the way astrologers write it. The rising stays '↑ unknown'. A sun-only save is unchanged."
+
+- **The chart** (`BirthChart`): with no birth time, the moon's sign at the local birth day's start and end are kept (`MoonFrom`, `MoonTo`). They differ on a day it changed sign; the moon itself stays not worked out (`Moon` -1), as the canon's time-unknown state has it.
+- **The opening** (`SliceFlow`): the chart path keeps both (`MoonPair`), and the screen says so in a draft line, "Your sun sign is Taurus and your moon sign Cancer or Leo (it changed sign that day). Without a birth time, your rising sign stays unknown." The known path and "I don't know" are unchanged.
+- **The Keeper's record:** "☉ Taurus · ☽ Cancer or Leo · ↑ unknown" (`MoonWords`). A sun-only save still reads "☉ Taurus · ☽ unknown · ↑ unknown".
+- **The save** keeps both moons (`moonFrom`, `moonTo`), read back as they were. A save from before this build has neither and reads its moon as unknown, as before.
+- **The line's fit** (working choice): a long Big Three line may use the page's calm column (x 50 to 325, 274 px) and shrinks to fit it, so the record keeps its rows and the doors stay where they are. Every Big Three line from before fits at its 17 px; "☉ Taurus · ☽ Cancer or Leo · ↑ unknown" (296 px at 17) takes 16. The floor is 11 px, where the longest possible, "☉ Sagittarius · ☽ Sagittarius or Capricorn · ↑ unknown" (386 px at 17), fits; at 12 px it measured 296, the font's advances not scaling evenly at small sizes.
+- **Later** (batch 3, the owner's rising ruling): a birth time added from the journal settles the moon.
+
+**Checks**
+- Mechanical (+4): the day's two moons kept (London, May 1 1990: Cancer into Leo at 01:09 BST; May 2 holds Leo; a known time works out one); the opening and the record's line; the save both ways, and a save from before; the longest line's fit.
+- The suite (+1): the chart path in the browser with no birth time on May 1 1990: "☉ Taurus · ☽ Cancer or Leo · ↑ unknown".
+
+Validation (local, worktree `mini-menu`, branch `codex/moon-or` on main `53c9933`):
+- mechanical checks 634/634 (+4), 0 compiler warnings;
+- slice fixture 262/262;
+- headless WebGL 0 errors and 0 warnings (36.1 MB); its first run stalled after the initial asset refresh (the known batch stall), was killed and run again;
+- browser suite 604/604 at desktop density, with the seven shapes (+1), and 513/513 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
 ## The family triangles: light on top of the Cast Dial, resting, teaching and the flame payoff (batch 2, step 5)
 
 The owner's ruling (Oct 3, comment 90140263872877 on 86bcbn6w6): the overlay is approved at mixed strength. Resting and teaching use level A (resting lines 34%, the taught triangle 70%: "The resting look shows every time the Dial opens, so it stays calm"). The flame payoff uses level B (88%: "It plays once, so it hits hard"). Everything else is as boarded: the lines on top as light (a screen blend), the corners on the hub ring under each window, the sides breaking round every word, and the teaching glow lighting the seats' frames and stopping short of their words. Reading 2 is not needed. The values are the board's (`triangles-overlay/REPORT.md` and `tools/looks.cjs`).

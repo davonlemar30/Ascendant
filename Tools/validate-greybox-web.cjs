@@ -822,6 +822,12 @@ const path=require('path');
   { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.canCusp && r.cuspSigns.join()==='Aries,Taurus' && r.cuspTime==='9:27 am' && r.cuspQuestion.startsWith('The Sun moved from Aries into Taurus on the day you were born, at 9:27 am.') && !r.canSliceContinue,'the cusp question in the browser: Aries or Taurus, the change at 9:27 am London time'); }
   await action('cusp-why');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().cuspWhy);await action('cusp-unsure');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
   { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.sunBasis==='noon' && r.bigThree.startsWith('\u2609 '+r.sunSign+' \u00b7 ') && r.bigThree.endsWith('\u2191 unknown'),'I\'m not sure takes the sun at local noon, flagged approximate: '+r.bigThree); }
+  // owner, Oct 3 (the canon flags): no birth time on a day the moon changed sign (London, May 1 1990: Cancer into Leo at 01:09) shows both moons
+  await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
+  await recovery.locator('#birthdate').fill('1990-05-01');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
+  await action('time-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);await recovery.locator('#birthplace').fill('London');
+  await recovery.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);await action('place-match-0');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.bigThree==='\u2609 Taurus \u00b7 \u263d Cancer or Leo \u00b7 \u2191 unknown' && r.note.includes('Cancer or Leo') && r.canSliceContinue,'no birth time on a day the moon changed sign shows both moons in the browser: '+r.bigThree); }
   await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   await recovery.locator('#birthdate').fill('1990-05-01');await recovery.locator('#birthdate').dispatchEvent('change');
   // batch 2: the date, then the time, then the town picked from the bundled list; the chart is worked out once (Meeus; the mechanical checks hold it to JPL Horizons)

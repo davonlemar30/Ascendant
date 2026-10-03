@@ -1790,10 +1790,17 @@ namespace Ascendant.CelestialDial
             journalPracticeDoor.interactable = SliceFlow.PracticeOpen && !busy; journalContentsDoor.interactable = !busy && journalBeat == null;
         }
         // the line's six pieces set side by side, centred on the page, every piece on the same baseline
+        public const float BigThreeRoom = 274f, BigThreeSmallest = 11f; // a long line (a moon that changed sign: "Pisces or Aries") may use the page's calm column, x 50 to 325, and shrinks to fit it, to 11 px at the least (the longest of all, a Sagittarius sun with a Sagittarius-or-Capricorn moon); "Cancer or Leo" with a Taurus sun takes 16
         void PlaceBigThree(float baseline)
         {
-            bigThreeLine.anchoredPosition = new Vector2(JournalX, -baseline); int[] signs = { Flow.SunSign, Flow.MoonSign, Flow.RisingSign }; float total = 0;
-            for (int i = 0; i < 3; i++) { bigThreeWords[i].text = " " + SliceFlow.SignOrUnknown(signs[i]) + (i < 2 ? " \u00b7 " : ""); total += bigThreeGlyphs[i].preferredWidth + bigThreeWords[i].preferredWidth; }
+            bigThreeLine.anchoredPosition = new Vector2(JournalX, -baseline); string[] words = { SliceFlow.SignOrUnknown(Flow.SunSign), Flow.MoonWords, SliceFlow.SignOrUnknown(Flow.RisingSign) }; float total = 0, scale = 1;
+            for (int pass = 0; pass < 3; pass++)
+            {
+                total = 0;
+                for (int i = 0; i < 3; i++) { bigThreeGlyphs[i].fontSize = Mathf.RoundToInt(BigThreeMarkSizes[i] * scale); bigThreeWords[i].fontSize = Mathf.RoundToInt(17 * scale); bigThreeWords[i].text = " " + words[i] + (i < 2 ? " \u00b7 " : ""); total += bigThreeGlyphs[i].preferredWidth + bigThreeWords[i].preferredWidth; }
+                if (total <= BigThreeRoom || scale <= BigThreeSmallest / 17f + .001f) break;
+                scale = Mathf.Max(BigThreeSmallest / 17f, scale * BigThreeRoom / total * .99f);
+            }
             float x = -total / 2;
             for (int i = 0; i < 3; i++)
                 foreach (var piece in new[] { bigThreeGlyphs[i], bigThreeWords[i] })
