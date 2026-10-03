@@ -378,6 +378,22 @@ namespace Ascendant.Build
             Check(linkBottom <= SliceView.SwitchY - 12 && SliceView.SwitchY + 12 <= SliceView.TabsY - 11 && SliceView.TabsY + 11 <= SliceView.WheelTop - SliceView.WheelSize / 2, "the links' 44 px target ends above the Wheel / Table switch, the switch above the tabs, the tabs above the wheel");
             Check(lastDoor <= SliceView.JournalCloseY - 24 - 8 && lastDoor <= SliceView.PageOrnamentTop, "with KEEPER, the Keys, the Big Three and three lines of inscription, the Contents door ends at " + lastDoor + ", clear of the page's lower ornaments and of Close the journal");
         }
+        static void ValidateTriangles()
+        {
+            // ---- the family triangles (owner, Oct 3: the overlay approved, mixed strength; the board on 86bcbn6w6, Oct 2) ----
+            Check(FamilyTriangles.Rest == .34f && FamilyTriangles.RestGlow == .10f && FamilyTriangles.Star == .55f && FamilyTriangles.Teach == .70f && FamilyTriangles.TeachGlow == .55f && FamilyTriangles.TeachBloom == .20f && FamilyTriangles.Seat == .80f && FamilyTriangles.Flame == .88f && FamilyTriangles.Dust == .65f,
+                "the owner's mixed strength: resting and teaching at level A (lines 34%, glow 10%, stars 55%; the taught triangle 70%, glow 55%, bloom 20%; its seats 80%), the flame payoff at level B (88%); dust 65% of resting on the worn Dial");
+            var shader = Resources.Load<Shader>("Shaders/LightLines");
+            Check(shader != null && shader.isSupported, "the light's shader (a screen blend: nothing under a line darkens) ships under Resources and compiles");
+            Check(Enumerable.Range(0, 4).All(f => FamilyTriangles.Families[f] == Zodiac.Seats[f].Element && FamilyTriangles.Sides(f).All(side => side.All(seat => Zodiac.Seats[Zodiac.Wrap(seat)].Element == Zodiac.Seats[f].Element))) && FamilyTriangles.Sides(0).Select(x => Zodiac.Seats[Zodiac.Wrap(x[0])].Name).SequenceEqual(new[] { "Aries", "Leo", "Sagittarius" }),
+                "each triangle joins its own family's three seats (Fire: Aries, Leo, Sagittarius; Earth, Air and Water the same)");
+            Check(new[] { new Vector2(-30, 4), new Vector2(12, -3), new Vector2(55, 6) }.All(p => new[] { 117.5f, 112f, -146f }.All(r => (FamilyTriangles.Unbend(FamilyTriangles.Bend(p, r), r) - p).magnitude < .001f)), "a curved word's box is tested on its own arc: the ribbon's bend undone exactly");
+            var l = new DialLesson(() => 0); l.SetSunSign(1); int lit = 0; l.WheelLit += () => lit++; var taught = new List<int>(); void Note() => taught.Add(l.TeachingFamily);
+            EnterGuided(l); Note(); Answer(l); Note(); Answer(l); Note(); l.Continue(); Note(); Answer(l); Note(); Answer(l); Note(); l.BeginContinuation(); Note(); Answer(l); Answer(l); Note(); Answer(l); Answer(l); Note();
+            Check(taught.SequenceEqual(new[] { 1, 1, -1, 0, 0, -1, 2, 3, -1 }) && l.Phase == LessonPhase.AllLit && lit == 1, "the taught triangle follows the lesson for a Taurus player: Earth while it is guided, none between, Fire, none at Key 1, then Air and Water in the continuation; the payoff fires once, as the whole wheel lights (" + string.Join(", ", taught) + ")");
+            var restored = new DialLesson(() => 0); int litLater = 0; restored.WheelLit += () => litLater++; restored.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
+            Check(restored.Phase == LessonPhase.AllLit && litLater == 0 && restored.TeachingFamily == -1, "a save already past it never plays the payoff again, and teaches no family");
+        }
         static void ValidateBuildJ()
         {
             // ---- Build J (owner, Sept 23): Illumination plus Ribbons. Build AA (owner, Sept 30; Sept 26 notes 7 and 14): the Wheel index with a
@@ -968,6 +984,7 @@ namespace Ascendant.Build
             ValidateEvidenceRouting();
             ValidateBuildF();
             ValidateBuildJ();
+            ValidateTriangles();
             ValidateJournalFront();
             ValidateBirthChart();
             ValidateBuildW();

@@ -18,7 +18,7 @@ The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zod
 
 1. **Wake up.** Give your name, then when and where you were born: the date, the time (or say you don't know it) and your town or city. The game works out your sun, moon and rising signs from them, and shows "unknown" for any sign it can't know. If the Sun changed sign on the day you were born and you don't know your birth time, it asks which sign you go by. You can also tell it the signs you already know, or say you don't know and it picks a sun sign for you. Everything Caspar teaches starts from *your* sign.
 2. **The Grand Atrium.** Dust, covered furniture, sealed doors, one weak candle. Every Key you spend in the Chamber wakes it one more step.
-3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Your first **Keeper Key** rises out of it.
+3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Fine lines of light join each element's three seats; the family you are learning glows in its element's colour, and when the whole wheel is lit, all four burn for a moment. Your first **Keeper Key** rises out of it.
 4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. Spend your Key on the first lock and the Library takes her first breath.
 5. **Back to the Wing, on your own time.** It keeps giving:
    - **The symbols.** The Book of Symbols teaches each sign's glyph, then the wheel hides its names and asks you to find each one by its shape. **Key 2.**
@@ -55,7 +55,6 @@ Your progress saves in your browser the moment anything changes. Come back later
 ## What's next
 
 - Practice in the journal. Its door is on the journal's first page but opens nothing yet; the plan for it is with the owner for approval.
-- The family triangles on the Dial, drawn over today's Dial. A picture of how they would look is with the owner to choose.
 - The book on the shelf, getting the same treatment as the rest of the Wing.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in.
 - Caspar's last few lines, around practice and the journal.

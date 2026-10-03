@@ -28,6 +28,10 @@ namespace Ascendant.CelestialDial
         public int Sun { get; private set; } = 1;
         public int GuidedFamily => Sun % 4;
         public int SecondFamily => (GuidedFamily + 3) % 4;
+        // batch 2, step 5 (owner, Oct 3): the family a lesson teaches now, whose triangle fills with light: the guided one, the second, then the
+        // continuation's two; -1 between them and once each is complete
+        public int TeachingFamily => (Phase == LessonPhase.Guided || Phase == LessonPhase.Independent || Phase == LessonPhase.Continuation) && family >= 0 && family < 4 && !Kin[family] ? family : -1;
+        public event Action WheelLit; // the moment the whole wheel lights, live (never on a load): the triangles' payoff
         public int OptionalFamily => (GuidedFamily + 1) % 4;
         // Zodiac Wing entrance (Sept 11 decision): dormant Dial wakes to the player, Caspar reacts,
         // a simulated hesitation, disbelief, composure, then teaching. Linear; no branching.
@@ -660,7 +664,7 @@ namespace Ascendant.CelestialDial
             {
                 Dial.Home();
                 int next = NextUnlitFamily();
-                if (next < 0) { Phase = LessonPhase.AllLit; Message = "The whole wheel burns, acolyte, Fire, Earth, Air, and Water, all twelve signs in their place. I confess the room feels different for it, alive in a way I had almost forgotten.\nCome, let us return to the Atrium and see what the Library has made of your work."; Dial.Log("wheel_completed"); } // owner (worksheet section 3)
+                if (next < 0) { Phase = LessonPhase.AllLit; WheelLit?.Invoke(); Message = "The whole wheel burns, acolyte, Fire, Earth, Air, and Water, all twelve signs in their place. I confess the room feels different for it, alive in a way I had almost forgotten.\nCome, let us return to the Atrium and see what the Library has made of your work."; Dial.Log("wheel_completed"); } // owner (worksheet section 3)
                 else { Phase = LessonPhase.Complete; BeginContinuation(); }
                 return;
             }

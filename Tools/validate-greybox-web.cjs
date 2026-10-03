@@ -150,6 +150,8 @@ const path=require('path');
     { const z=await state(); await page.screenshot({path:path.join(out,viewport.width+'-eye-challenge.png')});
       check(z.eyeText==='Next Earth after Taurus'&&z.eyeSize>=13&&z.eyeSize<=16&&z.signLabel==='Taurus','Build Z: the Dial poses its challenge in the eye ('+z.eyeSize+' px) and names the framed sign above it at '+viewport.width);
       check((z.speaker==='dial')===z.dialVoice,'Build Z: the box wears the Dial\'s blue exactly when the Dial speaks ('+z.speaker+') at '+viewport.width); }
+    { const t=await state(),c=t.trianglesCorners||[]; check(t.triangles && t.trianglesShader && t.trianglesMode==='teaching' && t.trianglesTaught==='Earth' && t.trianglesCrossing===0 && t.trianglesGaps>0 && t.trianglesShown>.5 && c.length===24 && [...Array(12).keys()].every(i=>Math.abs(Math.hypot(c[2*i],c[2*i+1]-270)-80.5)<.6),'batch 2, step 5: the family triangles on the worn Dial in the Web build: Earth taught, its triangle lit, every side breaking round the words ('+t.trianglesGaps+' gaps, '+Math.round(t.trianglesShown*100)+'% shown, no light on a word), the corners on the hub ring at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-triangles-teaching.png')}); }
     // Build T: mid-challenge, a tap on the canvas's Leave the Dial goes to the Zodiac Wing; the Dial, tapped again, resumes the same problem.
     await tap(0,768);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});
     check((await state()).screen==='wingroom'&&(await state()).atriumStage===1,'Build T: Leave the Dial, tapped mid-challenge in the first lesson, lands in the Zodiac Wing at '+viewport.width);
@@ -419,7 +421,10 @@ const path=require('path');
     check((await state()).avatarAt==='dial' && (await state()).fork==='none','the lesson continues from the fork at '+viewport.width);
     check((await state()).hintLevel===0 && !(await state()).phase.includes('Help level'),'Unit 1.1 continues on the player\'s own, no level numbers on screen, at '+viewport.width);
     for(const [from,to] of [[2,6],[6,10],[3,7],[7,11]]){await waitActive(SIGNS[from]);await semantic('seat-'+to);await semantic('seal');}
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().trianglesMode==='payoff',{},{timeout:8000}).catch(()=>{}); // batch 2, step 5: the payoff, once, as the whole wheel lights
+    { const t=await state(); check(t.trianglesMode==='payoff' && t.trianglesCrossing===0,'the moment the whole wheel lights, all four triangles burn as flame (level B) at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+'-triangles-payoff.png')}); }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().wheelComplete&&window.ascendantDial.snapshot().canLeaveDial,{},{timeout:20000});
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().trianglesMode==='resting',{},{timeout:8000}).catch(()=>{}); check((await state()).trianglesMode==='resting','then the flames burn down into the resting lines at '+viewport.width);
     check((await state()).seats.every(x=>!x.includes('dormant')) && events.filter(e=>e.event_name==='key1_earned').length===1,'twelve seats lit with no second Key at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-wing-lit.png')});
     await leaveToHub();await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===3&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});

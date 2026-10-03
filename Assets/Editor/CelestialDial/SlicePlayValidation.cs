@@ -91,7 +91,10 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{var root=View.Dial.Root; bool Live(string n)=>root.GetComponentsInChildren<Transform>(true).Any(t=>t.name==n && t.gameObject.activeInHierarchy); // Build Z (owner, Sept 30)
                 Check(View.Dial.RoomArt && Live("Dial room") && Live("Dial room light") && !Live("Candle") && !Live("Floor markings") && !Live("Collapsed bookshelf") && !Live("Covered chair") && !Live("Dial face"),"Build Z: the Dial stands in its room; the candle is cut and the floor, shelf, chair and flat face are retired from the Dial screen");});
             for(int i=0;i<7;i++) Steps.Enqueue(()=>Act("continue"));
-            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Guided && !View.Dial.Lesson.DialDormant,"seven intro beats reach the guided problem");Capture("slice-390-wing-guided.png");});
+            Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Guided && !View.Dial.Lesson.DialDormant,"seven intro beats reach the guided problem");
+                var t=View.Dial.Snapshot();int family=View.Dial.Lesson.TeachingFamily;var c=t.trianglesCorners??new float[0]; // batch 2, step 5 (owner, Oct 3): the family triangles
+                Check(t.triangles && t.trianglesShader && t.trianglesMode=="teaching" && family>=0 && t.trianglesTaught==Zodiac.Seats[View.Dial.Lesson.Sun].Element && t.trianglesCrossing==0 && t.trianglesGaps>0 && t.trianglesShown>.5f && c.Length==24 && Enumerable.Range(0,12).All(i=>Mathf.Abs(Mathf.Sqrt(c[2*i]*c[2*i]+(c[2*i+1]-270)*(c[2*i+1]-270))-FamilyTriangles.CornerRadius)<.6f),"the family triangles lie on the Dial as light: "+t.trianglesTaught+" taught (the sun's family, guided), its triangle lit; every side breaks round the words ("+t.trianglesGaps+" gaps, "+Mathf.RoundToInt(t.trianglesShown*100)+"% shown, no light on a word); the corners on the hub ring");
+                Capture("slice-390-wing-guided.png");});
             Steps.Enqueue(()=>{Act("seat:5");Act("seal");});
             Steps.Enqueue(()=>{Act("seat:9");Act("seal");});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.Transfer,"guided family completes inside the slice");Act("continue");for(int i=0;i<4;i++)Act("keyboard-forward");Act("seal");});
@@ -177,6 +180,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Dial.Snapshot().fork=="both" && View.Dial.Lesson.Phase!=LessonPhase.Continuation,"the fork waits before the third family");Act("continue-lesson");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Wing && View.Flow.Walk.At=="dial" && View.Dial.Lesson.Phase==LessonPhase.Continuation && View.Dial.Lesson.Dial.Start==2 && View.Dial.Lesson.Dial.HintLevel==0,"the Wing continues with the third family on the player's own");Capture("slice-390-wing-unit11.png");});
             for(int i=0;i<4;i++) Steps.Enqueue(()=>{Act("seat:"+Zodiac.Destination(View.Dial.Lesson.Dial.Start));Act("seal");});
+            Steps.Enqueue(()=>{var t=View.Dial.Snapshot();Check(t.trianglesMode=="payoff" && t.trianglesCrossing==0,"the moment the whole wheel lights, all four triangles burn as ribbons of flame, the payoff at level B (mode: "+t.trianglesMode+")");Capture("slice-390-triangles-payoff.png");});
             Steps.Enqueue(()=>{Check(View.Dial.Lesson.Phase==LessonPhase.AllLit && View.Flow.WheelComplete && View.Dial.Lesson.Lit.All(v=>v) && View.Dial.Lesson.KeyEarned && !View.Dial.Lesson.Key2Earned && View.Flow.Keys==1,"twelve seats lit with no second Key");Capture("slice-390-wing-lit.png");});
             Steps.Enqueue(()=>AstrolabeCheck(Zodiac.Seats.Select(z=>z.Element).ToArray(),"the wheel lit"));
             Steps.Enqueue(()=>Act("leave-dial")); // note 10: the Dial's exit lands in the room; the capture lands at the end of its frame, so the action waits its own step

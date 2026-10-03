@@ -2,6 +2,45 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The family triangles: light on top of the Cast Dial, resting, teaching and the flame payoff (batch 2, step 5)
+
+The owner's ruling (Oct 3, comment 90140263872877 on 86bcbn6w6): the overlay is approved at mixed strength. Resting and teaching use level A (resting lines 34%, the taught triangle 70%: "The resting look shows every time the Dial opens, so it stays calm"). The flame payoff uses level B (88%: "It plays once, so it hits hard"). Everything else is as boarded: the lines on top as light (a screen blend), the corners on the hub ring under each window, the sides breaking round every word, and the teaching glow lighting the seats' frames and stopping short of their words. Reading 2 is not needed. The values are the board's (`triangles-overlay/REPORT.md` and `tools/looks.cjs`).
+
+**What it draws** (`FamilyTriangles`, a UI graphic over the Dial's art and words and under its controls; one screen-blended draw, `Shaders/LightLines`):
+- **Resting, every time the Dial shows.** The four element triangles (each joins its own three seats: Fire Aries, Leo, Sagittarius; Earth, Air and Water the same), thin lines in the resting light (RGB 255, 238, 202) with a faint glow, and a small four-point star at each corner.
+  - Level A: lines 34%, glow 10%, stars 55%.
+  - On the worn Dial the lines are dusty (RGB 176, 166, 148, at 65% of resting, no glow); they clear with the wake-up step (halfway at Key 1, clean from today's look on).
+  - The shine on the bright Dial isn't boarded, so the bright look keeps today's strength.
+- **Teaching, while a lesson teaches a family.** That family's triangle fills with its element's light: the core 70% in its element's pale core colour, a glow (55%) and a bloom (20%) in its glow colour (batch 1's ember orange, moss green, pale gold, cool blue). Its three seats' frames (the window and the name's recess) glow at 80%, the glow stopping short of their words.
+  - The taught family: the guided one (the player's sun's family), then the second, then the continuation's two; none between them or once a family is complete (`DialLesson.TeachingFamily`).
+- **The payoff, once.** At the moment the whole wheel lights (`DialLesson.WheelLit`, raised only when the lesson reaches it live, never on a load), all four triangles burn as ribbons of flame in their element's colours at level B (88%). They burn for 2.2 s, then down into the resting lines over 1.2 s. The flames' noise, tongues and thinning ends are the board's; with reduced motion they hold still.
+- **The corners** sit on the hub ring just under each seat's window (r 80.5), and the lines turn with the ring, so a lit triangle follows its seats.
+
+**Words stay clear.** Every side breaks round every word it would cross, like a label on a map:
+- the eye's challenge and count, the ribbon's name and facts, and each seat's symbol, name and fact;
+- each word's box comes from a layout of the text's own, and a curved word (the ribbon's, a seat's name) is tested on its own arc (`ArcText`'s bend, undone exactly);
+- the light stops 2.5 px short of a word's box (the bloom 9.5, a flame 5, the seats' glow 3), and a corner's star is left out if a word comes within its reach;
+- the gaps follow the words as they change and the ring as it turns.
+
+The build checks every drawn side for light inside a word's box (`trianglesCrossing`, always 0).
+
+**The light.** The board's values are screened in the browser's sRGB; the game blends in linear colour. The shader carries the board's sRGB light and turns it into linear colour with a gentler curve (power 1.7), measured against the board on today's look: 49.6 levels of line contrast, the board's 50.9.
+
+**The web state** publishes `triangles`, `trianglesShader`, `trianglesMode` (resting, teaching or payoff), `trianglesTaught`, `trianglesShown` (the share of the twelve sides drawn), `trianglesGaps`, `trianglesCrossing` and `trianglesCorners`.
+
+**Checks**
+- Mechanical (+6): the owner's mixed strength; the shader ships and compiles; each triangle joins its family; the arc's bend undone exactly; the taught family through the element lesson for a Taurus player (Earth while guided, none between, Fire, none at Key 1, then Air and Water), the payoff raised once, as the whole wheel lights; a restored save already past it never raising it.
+- The fixture and the suite: the triangles on the worn first visit (the sun's family taught, every side breaking round the words, no light on a word, the corners on the hub ring), the payoff the moment the whole wheel lights, and in the Web build its burn back down to resting.
+
+Validation (local, worktree `platform-fit-2`, branch `codex/family-triangles` on main `53c9933`):
+- mechanical checks 636/636 (+6), 0 compiler warnings;
+- slice fixture 264/264 (+2);
+- headless WebGL 0 errors and 0 warnings (36.1 MB);
+- browser suite 609/609 at desktop density, with the seven shapes (+6). The first run failed one older timing check (the symbols' mid-placement reload) while a board was rendering beside it; run again alone, all passed;
+- browser suite 518/518 at phone density (`DEVICE_SCALE=2 MOBILE=1`, +6).
+
+Captures: [`Evidence/triangles-2026-10-03/`](Evidence/triangles-2026-10-03/), with the approved board beside the game in the three states and the hub at 3x.
+
 ## The journal's landing and the Big Three: the title page, the Keeper's record, Contents, the Library Map and the birth chart (batch 2)
 
 The owner's rulings: Oct 1 (task 86bcbn6w6: the journal's architecture, with 1b C, the landing on the first open of each session, and 1e A, the title page once on the first-ever open) and Oct 2 evening (comment 90140263811408 and the owner's message the same evening: the inscription in the owner's words, the fonts Claude sources with open licenses only, the Practice door an entry point only until Practice's scope is approved, and the Big Three held for the step 2 proposal). The look is the art lane's board on 86bcbn6w6 (Oct 2).
