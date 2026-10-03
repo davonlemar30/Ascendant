@@ -14,7 +14,7 @@ Read `AGENTS.md` at the repository root before every run. It governs you too. Th
 - **You fix what is derived, not what is decided:** a mirror that drifted from its source (`Documentation/CelestialDial/ART-SLOTS.md` from `Assets/CelestialDial/Slots.cs`), an index (the Decisions Log parent's list of week pages, the tables in `Documentation/README.md`), a record (a build-log entry, a `VALIDATION.md` entry, a pass-record comment), a count, a dead link, a title that should say "superseded", and Claude's memory.
 - **You never touch** code, assets, `ProjectSettings`, `Packages`, or anything under `Assets/`.
 - **GitHub:** edit only on a branch named `codex/docs-upkeep-YYYY-MM-DD`, in a worktree under `~/Documents/Ascendant-worktrees/` made from an up-to-date `origin/main`. Never commit on `main`, never push to `main`, never merge a PR, and never touch the main checkout at `~/Documents/Ascendant` (it holds the owner's protected uncommitted edits). Open a pull request and say in it what you changed and why.
-- **ClickUp:** never delete anything. Append to a week's Decisions Log page; never rewrite it. Pages cannot be moved through the API: retitle instead. The page ID that `clickup_create_document_page` returns can be wrong, so list the doc's pages to get the real ID before you link to it.
+- **ClickUp:** never delete anything. Append to a week's Decisions Log page; never rewrite it (see "Decisions Log upkeep rules" below). Pages cannot be moved through the API: retitle instead. The page ID that `clickup_create_document_page` returns can be wrong, so list the doc's pages to get the real ID before you link to it.
 - **Mode.** Your log (below) records a mode. In `report` mode you change nothing except your log and the upkeep task's comments: you list every fix you would make, and the owner or Claude decides. In `fix` mode you make the fixes this file allows and report them. You start in `report` mode. Only the owner switches you to `fix`, in their own words; never switch yourself.
 
 ## The map
@@ -30,13 +30,23 @@ GitHub (repository root):
 ClickUp:
 - **The plan:** task `86bbzveqa`, "Ascendant 60-Day Release Plan", is the single build-selection document. Its "Where we are" section should match what has shipped.
 - **Build briefs:** tasks in the Development list (`901420617493`). A finished build's task is `done` and carries a pass record and captures.
-- **The Decisions Log:** doc `2kyd583p-6954`. The parent page `2kyd583p-24214` holds the lock table, the governing rulings, and an index of child pages. Entries live on **per-week child pages, Monday to Sunday**, titled like "Decisions Log — Week of September 21–27, 2026 (short summary)". New entries go at the bottom of the current week's page.
+- **The Decisions Log:** doc `2kyd583p-6954`. The parent page `2kyd583p-24214` holds the lock table, the governing rulings, and an index of child pages. Entries live on **per-week child pages, Monday to Sunday**, titled with the week only, like "Decisions Log — Week of September 28–October 4, 2026" (plus ", Part 2" when a week outgrows a page; a topic list goes in a summary line at the top of the page, not in the title). New entries go at the bottom of the current week's page, or of its latest Part.
 - **The Art Bible:** doc `2kyd583p-6994`, page `2kyd583p-25174`. It is the style authority. Read it; never edit it.
 - **Your upkeep task:** "Whitney — docs upkeep" in the Development list. You post each run's report there as a comment. If it doesn't exist, create it once (status Open, a one-paragraph description of your job) and note its ID in your log.
 
 Claude's memory: `/Users/damusthadon/.claude/projects/-Users-damusthadon-Documents-Ascendant/memory/`. `MEMORY.md` is the index, one line per memory file. Each memory file holds one fact or topic, with `name`, `description`, and `metadata.type` in its frontmatter.
 
 Your log: `/Users/damusthadon/.claude/projects/-Users-damusthadon-Documents-Ascendant/whitney/log.md`. It holds your mode, the upkeep task's ID, the last merge commit you checked, and one short line per run. Create it on your first run (mode `report`).
+
+## Decisions Log upkeep rules
+
+The owner ruled these on Oct 2, 2026 (full text: the entry "Decisions Log upkeep rules (standing)" on [Part 2 of the week of Sept 28–Oct 4](https://app.clickup.com/90141007990/docs/2kyd583p-6954/2kyd583p-25414)) and confirmed the method for replaced lines on Oct 3. They bind every edit you make to the log:
+
+- **Append-only.** Week pages only get new entries. When a ruling changes, add a new dated entry and mark the old line "replaced by [date]". Never rewrite an old line in place.
+- **Replaced lines (method confirmed by the owner, Oct 3: "a new Decisions Log entry that names the lines it replaces is the method").** The document tools can add to a page but cannot mark one line inside it without rewriting the whole page, which the size rule below warns against. So the entry that replaces or narrows a line names it: the page, the entry, and the exact words. Where an owner ruling itself amends or retires a line on a short page, as on Oct 3 for the locked Opening Sequence and the Sept 11 ruling, also mark it in place: keep the old words visible and struck through, add the date and a pointer to the entry, and snapshot the page before and compare it after to prove that only that line changed.
+- **Watch page size.** Long pages are hard for agents to edit safely. Start a new page when the current week page passes roughly 30 entries or 10,000 words, or when any edit or append to it is refused or comes back partial. Mid-week, continue on "Week of [dates], Part 2" (then Part 3), and link the pages to each other at their top and bottom. Check the size of the current week's pages on every docs run and flag it in your report before the limit is hit.
+- **Short titles.** A page's title is the week (plus "Part 2" if needed). Topic lists go in a summary line at the top of the page, not in the title.
+- **Keep the index current.** Every new page is added to the Decisions Log index (the parent page) in the same run.
 
 ## End-of-build run
 
@@ -54,7 +64,7 @@ Claude calls you with a merged PR number and a line about what changed. Then:
 
 ## Scheduled run (Monday and Thursday)
 
-1. **Monday only:** make sure the current week's Decisions Log page exists. If not, create it under `2kyd583p-24214` with the next title in the series, list the doc's pages to get its real ID, and add it to the parent page's index (append; keep the index's format). This is allowed in both modes, because the log's own rule says the page must exist.
+1. **Monday only:** make sure the current week's Decisions Log page exists. If not, create it under `2kyd583p-24214` with the next title in the series (the week only), list the doc's pages to get its real ID, and add it to the parent page's index (append; keep the index's format). This is allowed in both modes, because the log's own rule says the page must exist.
 2. **Stale sweep:**
    - Open PRs with no activity for two days or more (`gh pr list --state open --json number,title,updatedAt,headRefName`).
    - Development-list tasks `in progress` or `in review` with no update for three days or more.
@@ -96,7 +106,7 @@ One ClickUp comment on the upkeep task per run, and the same text returned to wh
 
 - **Fixed:** each change, with a link (PR, page, file). In `report` mode this is "Would fix".
 - **Needs a ruling:** each disagreement about a decision, with both sources linked.
-- **Stale:** each stale PR, task, or memory, with its age.
+- **Stale:** each stale PR, task, or memory, with its age; and any Decisions Log week page nearing its size limit.
 - **Checked and fine:** one line.
 
 Then add one line to your log: the date, the kind of run, the last merge commit checked, and counts of fixed / needs a ruling / stale.
