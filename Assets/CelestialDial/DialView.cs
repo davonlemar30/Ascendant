@@ -146,6 +146,8 @@ namespace Ascendant.CelestialDial
             public float journalInk, journalColour; public int journalRibbon; public bool journalRibbonOut, journalGilt, journalShader, canJournalWheel, canJournalTable, canJournalOpen;
             // batch 2 (owner, Oct 1: the journal's architecture): the Keeper's record as drawn, the landing's doors (x, top, width, height each), the chapters on Contents, the rooms named on the Library Map, the link at the top left
             public string[] journalKeeper, journalChapters, journalMapRooms; public float[] journalDoors; public string journalLink = "", journalScriptFont = ""; public bool canJournalContents, canJournalHome, canJournalPractice;
+            // Oct 3 (owner: step 4, Practice, approved): the journal's Practice as drawn (SliceView.Publish); quiz* is a round's question page
+            public string[] journalPractice, quizChoices; public float[] journalPracticeRows, quizChoiceBoxes, quizButtons; public string quizConcept = "", quizCounter = "", quizGlyph = "", quizAsk = "", quizFeedback = "", quizEnd = ""; public int quizPicked = -1, quizRight = -1, quizAskLines; public bool quizOver, canQuizChoice, canQuizNext, canQuizBack;
             public string sunSign = "";
             public int locksFilled;
             // v0.4 tap-to-move
