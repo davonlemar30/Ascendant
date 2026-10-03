@@ -688,6 +688,11 @@ namespace Ascendant.CelestialDial
             else if (command == "journal-contents") JournalContents(); // batch 2: the landing's Contents door, and "‹ Contents" on a chapter
             else if (command == "journal-landing") JournalHome();      // "‹ Your Journal" on Contents
             else if (command.StartsWith("journal-chapter:")) JournalChapter(command.Substring(16)); // a row on Contents: wheel or map
+            else if (command == "journal-practice") JournalPracticeOpen(); // Oct 3, Practice: the landing's door, a concept's row, a choice, Next, and back to the list
+            else if (command.StartsWith("practice-row:") && int.TryParse(command.Substring(13), out int practiceRow)) StartPracticeRound(practiceRow);
+            else if (command.StartsWith("quiz-choice:") && int.TryParse(command.Substring(12), out int quizPick)) PickQuizChoice(quizPick);
+            else if (command == "quiz-next") QuizNext();
+            else if (command == "quiz-back") QuizBack();
             else if (command.StartsWith("journal-view:")) JournalSetView(command.Substring(13) == "table");
             else if (command.StartsWith("journal-lens:") && int.TryParse(command.Substring(13), out int jlens) && jlens >= 0 && jlens < 4) JournalLensTap((JournalLens)jlens);
             else if (command.StartsWith("journal-seat:") && int.TryParse(command.Substring(13), out int jseat) && jseat >= 0 && jseat < 12) JournalSeatTap(jseat);
@@ -1357,12 +1362,23 @@ namespace Ascendant.CelestialDial
             state.journalView = !state.journal ? "" : onSign ? "sign" : onWheel ? (Flow.JournalTableView ? "table" : "wheel") : at.ToString().ToLowerInvariant(); // batch 2: title, landing, contents, map
             bool front = state.journal && (at == JournalView.Title || at == JournalView.Landing);
             state.journalKeeper = front ? new[] { journalKeeperHeading.text, journalKeys.text }.Concat(bigThreeLine.gameObject.activeSelf ? new[] { string.Concat(Enumerable.Range(0, 3).Select(i => bigThreeGlyphs[i].text + bigThreeWords[i].text)) } : new string[0]).Concat(keeperLines.Where(t => t.gameObject.activeSelf && t.text != "").Select(t => t.text)).ToArray() : new string[0];
-            state.canJournalContents = Flow.CanJournalContents && at != JournalView.Title && !busy; state.canJournalHome = Flow.CanJournalHome && !busy; state.canJournalPractice = state.journal && at == JournalView.Landing && SliceFlow.PracticeOpen && !busy;
+            state.canJournalContents = Flow.CanJournalContents && at != JournalView.Title && !busy; state.canJournalHome = Flow.CanJournalHome && !busy; state.canJournalPractice = Flow.CanJournalPractice && !busy && journalBeat == null;
             state.journalDoors = state.journal && at == JournalView.Landing ? new[] { journalPracticeDoor, journalContentsDoor }.SelectMany(b => { var r = (RectTransform)b.transform; return new[] { r.anchoredPosition.x, -r.anchoredPosition.y, r.sizeDelta.x, r.sizeDelta.y }; }).ToArray() : new float[0];
             state.journalChapters = state.journal && at == JournalView.Contents ? new[] { SliceFlow.WheelTitle, SliceFlow.MapTitle }.Concat(Enumerable.Repeat(SliceFlow.SealedChapter, SliceFlow.SealedChapters)).ToArray() : new string[0];
             state.journalMapRooms = state.journal && at == JournalView.Map ? Enumerable.Range(0, journalMapNames.Length).Where(i => journalMapNames[i].gameObject.activeSelf).Select(i => TravelMenu.Rooms[i].name).ToArray() : new string[0];
-            state.journalLink = state.journal ? (at == JournalView.Contents ? SliceFlow.BackToJournal : at == JournalView.Wheel || at == JournalView.Map ? SliceFlow.BackToContents : "") : "";
+            state.journalLink = state.journal ? (at == JournalView.Contents || at == JournalView.Practice ? SliceFlow.BackToJournal : at == JournalView.Wheel || at == JournalView.Map ? SliceFlow.BackToContents : at == JournalView.Quiz ? SliceFlow.BackToPractice : "") : "";
             state.journalScriptFont = journalItalic != null ? journalItalic.name : "";
+            // Oct 3, Practice as drawn: the concepts listed, the question, the choices in the order shown, the pick and the right one, the why, the round's end, and the targets
+            bool onPractice = state.journal && at == JournalView.Practice, onQuiz = state.journal && at == JournalView.Quiz && Flow.OnQuiz;
+            state.journalPractice = onPractice ? Flow.PracticeConcepts.Select(c => c.name).ToArray() : new string[0];
+            state.journalPracticeRows = onPractice ? practiceRows.Where(b => b.gameObject.activeSelf).SelectMany(b => PageBox(b)).ToArray() : new float[0];
+            state.quizConcept = onQuiz ? Flow.QuizConcept.id : ""; state.quizCounter = onQuiz ? quizCounter.text : ""; state.quizGlyph = onQuiz && quizGlyph.gameObject.activeSelf ? quizGlyph.text : "";
+            state.quizAsk = onQuiz ? string.Join(" ", quizAsk.Where(t => t.gameObject.activeSelf).Select(t => t.text)) : ""; state.quizAskLines = onQuiz ? quizAsk.Count(t => t.gameObject.activeSelf) : 0;
+            state.quizChoices = onQuiz ? Flow.QuizChoices : new string[0]; state.quizChoiceBoxes = onQuiz ? quizChoices.Where(b => b.gameObject.activeSelf).SelectMany(b => PageBox(b)).ToArray() : new float[0];
+            state.quizPicked = onQuiz ? Flow.QuizPicked : -1; state.quizRight = onQuiz ? Flow.QuizRight : -1; state.quizOver = onQuiz && Flow.QuizOver;
+            state.quizFeedback = onQuiz ? string.Join(" ", quizFeedback.Where(t => t.gameObject.activeSelf).Select(t => t.text)) : ""; state.quizEnd = onQuiz ? string.Join(" ", quizEnd.Where(t => t.gameObject.activeSelf).Select(t => t.text)) : "";
+            state.quizButtons = onQuiz ? new[] { quizNext, quizBack }.SelectMany(b => b.gameObject.activeSelf ? PageBox(b) : new float[4]).ToArray() : new float[0];
+            state.canQuizChoice = onQuiz && Flow.CanQuizAnswer && !busy; state.canQuizNext = onQuiz && Flow.CanQuizNext && !busy; state.canQuizBack = onQuiz && Flow.CanQuizBack && !busy;
             state.journalPage = Flow.JournalSign; state.journalCount = Flow.JournalSigns.Count;
             state.journalLenses = onWheel && Flow.JournalLenses.Count > 1 ? Flow.JournalLenses.Select(SliceFlow.LensTitle).ToArray() : new string[0]; state.journalLens = state.journal ? SliceFlow.LensTitle(Flow.Lens) : ""; state.canJournalTable = onWheel && Flow.CanJournalTable;
             state.journalSeats = state.journal ? Enumerable.Range(0, 12).Select(seat => SliceFlow.SeatStateNames[Flow.SeatState(seat)]).ToArray() : new string[0];
@@ -1649,7 +1665,64 @@ namespace Ascendant.CelestialDial
         public static readonly string[] BigThreeMarks = { "\u2609", "\u263d", "\u2191" }; // ☉ (Noto Sans Symbols 2), ☽ (Noto Sans Symbols), ↑ (EB Garamond)
         public static readonly int[] BigThreeMarkSizes = { 15, 19, 17 };                      // each drawn about the words' cap height
         static readonly float[] BigThreeMarkLift = { .2195f, .455f, .3545f };                 // each font's baseline below its line's centre, per point (its ascender and descender)
-        string JournalPageTitle(JournalView at) => at == JournalView.Title || at == JournalView.Landing ? SliceFlow.JournalTitle : at == JournalView.Contents ? SliceFlow.ContentsTitle : at == JournalView.Map ? SliceFlow.MapTitle : SliceFlow.WheelTitle;
+        string JournalPageTitle(JournalView at) => at == JournalView.Title || at == JournalView.Landing ? SliceFlow.JournalTitle : at == JournalView.Contents ? SliceFlow.ContentsTitle : at == JournalView.Map ? SliceFlow.MapTitle : at == JournalView.Practice ? SliceFlow.PracticeTitle : at == JournalView.Quiz ? (Flow.QuizConcept != null ? Flow.QuizConcept.name : SliceFlow.PracticeTitle) : SliceFlow.WheelTitle;
+        // ---- Practice (owner, Oct 3: step 4 approved; the board on 86bcbn6w6, Oct 2). The list of concepts learned, each row a gilt star, its
+        // name and its line; a question page: the counter, the ask (a sign's mark drawn large above it, for the Symbols), up to four choices in
+        // the board's hairline frames, then right or wrong (the right one gilded with its star, a wrong pick in muted crimson with ×, the rest
+        // at half), the why and Next; the round's end, its line and Back to Practice. The frames and the star are drawn by the engine (no file). ----
+        public const float PracticeRowTop = 148f, PracticeRowHeight = 78f, PracticeStarX = 80f, PracticeNameLeft = 96f;     // the board's list: rows 78 tall from 148, the star at x 80, the names from x 96
+        public const float QuizCounterY = 145f, QuizAskY = 197f, QuizGlyphY = 180f, QuizLineStep = 26f, QuizAskWidth = 256f; // the counter's and the ask's baselines; a sign's mark centred above a one-line ask
+        public const float ChoiceWidth = 238f, ChoiceHeight = 44f, ChoiceStep = 52f, QuizNextWidth = 120f, QuizBackWidth = 180f; // the board's choices, 52 apart, and its two buttons: every target 44 px tall
+        public const float QuizBottom = 595f; // the page's inner border runs at about y 607: a question's Next ends 12 above it
+        // where a question's pieces go (x: the ask's first baseline, y: the choices' top, z: their step, w: Next's top). The why's lines are
+        // counted before the pick (the longer of right and wrong), so nothing moves when the answer shows; the choices close up, to 46 apart
+        // at most, when the page would run past its border (a symbol, a two-line ask and a two-line why)
+        public static Vector4 QuizLayout(bool mark, int askLines, int choices, int whyLines)
+        {
+            float first = mark ? QuizAskY + QuizLineStep : QuizAskY, top = first + QuizLineStep * (Mathf.Max(1, askLines) - 1) + 27, step = ChoiceStep;
+            float Next(float s) => top + s * (Mathf.Max(1, choices) - 1) + ChoiceHeight + 37 + QuizLineStep * (Mathf.Max(1, whyLines) - 1) + 27;
+            if (choices > 1 && Next(step) + ChoiceHeight > QuizBottom) step = Mathf.Max(ChoiceHeight + 2, step - (Next(step) + ChoiceHeight - QuizBottom) / (choices - 1));
+            return new Vector4(first, top, step, Next(step));
+        }
+        static readonly Color CrimsonEdge = new Color32(176, 64, 70, 242), CrimsonInk = new Color32(0xc9, 0x88, 0x8a, 0xff), GiltWash = new Color(227 / 255f, 163 / 255f, 74 / 255f, .05f); // the board's wrong pick, and the right answer's wash (the board's .16 in a browser's blend; the game blends in linear colour, where .05 looks the same)
+        RectTransform journalPractice, journalQuiz; Button journalPracticeLink, quizNext, quizBack; Text quizCounter, quizGlyph; CanvasGroup quizChoicesGroup;
+        readonly Button[] practiceRows = new Button[5]; readonly Text[] practiceRowLines = new Text[5]; readonly Image[] practiceRowRules = new Image[5];
+        readonly Text[] quizAsk = new Text[3], quizFeedback = new Text[3], quizEnd = new Text[3], quizCrosses = new Text[4];
+        readonly Button[] quizChoices = new Button[4]; readonly Image[] quizChoicePanels = new Image[4], quizStars = new Image[4]; readonly RectTransform[] quizThin = new RectTransform[4], quizThick = new RectTransform[4]; readonly CanvasGroup[] quizChoiceGroups = new CanvasGroup[4];
+        // the board's four-point star (14 px, drawn at 4x and sampled 16 times a pixel): Practice's row marks and the right answer's
+        static Sprite practiceStar;
+        public static Sprite StarSprite()
+        {
+            if (practiceStar != null) return practiceStar;
+            const int size = 56; const float scale = size / 14f; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            var points = new[] { new Vector2(0, -6.5f), new Vector2(1.1f, -1.1f), new Vector2(6.5f, 0), new Vector2(1.1f, 1.1f), new Vector2(0, 6.5f), new Vector2(-1.1f, 1.1f), new Vector2(-6.5f, 0), new Vector2(-1.1f, -1.1f) };
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+                {
+                    int inside = 0;
+                    for (int sy = 0; sy < 4; sy++) for (int sx = 0; sx < 4; sx++) if (InPolygon(points, new Vector2((x + (sx + .5f) / 4) / scale - 7, (y + (sy + .5f) / 4) / scale - 7))) inside++;
+                    texture.SetPixel(x, y, new Color(1, 1, 1, inside / 16f));
+                }
+            texture.Apply(); practiceStar = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(.5f, .5f)); practiceStar.name = "practice-star"; return practiceStar;
+        }
+        static bool InPolygon(Vector2[] polygon, Vector2 p)
+        {
+            bool inside = false;
+            for (int i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
+                if ((polygon[i].y > p.y) != (polygon[j].y > p.y) && p.x < (polygon[j].x - polygon[i].x) * (p.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x) inside = !inside;
+            return inside;
+        }
+        // a border inside the rect's edges, drawn as four edges: the board's inset 2 px mark on a right or a wrong choice
+        static void InsetFrame(RectTransform r, Color colour, float width)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                var edge = new GameObject("Edge", typeof(RectTransform)).GetComponent<RectTransform>(); edge.SetParent(r, false);
+                edge.anchorMin = new Vector2(k == 3 ? 1 : 0, k == 0 ? 1 : 0); edge.anchorMax = new Vector2(k == 2 ? 0 : 1, k == 1 ? 0 : 1);
+                edge.pivot = new Vector2(k == 2 ? 0 : k == 3 ? 1 : .5f, k == 0 ? 1 : k == 1 ? 0 : .5f); edge.sizeDelta = k < 2 ? new Vector2(0, width) : new Vector2(width, 0); edge.anchoredPosition = Vector2.zero;
+                var line = edge.gameObject.AddComponent<Image>(); line.color = colour; line.raycastTarget = false;
+            }
+        }
+        static float[] PageBox(Button b) { var r = (RectTransform)b.transform; return new[] { r.anchoredPosition.x, -r.anchoredPosition.y, r.sizeDelta.x, r.sizeDelta.y }; } // a target on the page: x, centre y, width, height
         // A line of the page set on a baseline (layout y): its box is centred on the line, so the baseline falls where the board has it.
         Text PageLine(Transform parent, string text, float x, float baseline, float width, int size, Font face, Color colour, TextAnchor align = TextAnchor.MiddleCenter, float lift = GaramondLift)
         {
@@ -1718,6 +1791,44 @@ namespace Ascendant.CelestialDial
             if (feel != null) { feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; }
             var rule = Rect("Rule", journalContents, JournalX, top + h, DoorWidth, 1).gameObject.AddComponent<Image>(); rule.color = new Color(Silver.r, Silver.g, Silver.b, .3f); rule.raycastTarget = false;
         }
+        // A row on Practice's list: the gilt star, the concept's name and its line, and a rule under it; ShowJournalPractice sets the words
+        void PracticeRow(int row)
+        {
+            float top = PracticeRowTop + PracticeRowHeight * row, h = PracticeRowHeight, left = PracticeNameLeft - 180 - JournalX; // the names' left edge, from the row's centre
+            var b = MakeButton(journalPractice, "Concept " + row, JournalX, top + h / 2, ChoiceWidth, h, () => StartPracticeRound(row)); b.name = "Concept row " + row; var feel = ButtonLook.Custom(b, "row");
+            var star = Rect("Star", feel.Look, PracticeStarX - 180 - JournalX, 31, 14, 14).gameObject.AddComponent<Image>(); star.sprite = StarSprite(); star.color = GiltInk; star.raycastTarget = false;
+            var title = feel.Label; title.font = ButtonLook.EngravedFont ?? font; title.fontSize = 21; title.color = GiltInk; title.alignment = TextAnchor.MiddleLeft; title.horizontalOverflow = HorizontalWrapMode.Overflow;
+            var tr = title.rectTransform; tr.anchorMin = tr.anchorMax = new Vector2(.5f, 1); tr.sizeDelta = new Vector2(210, 34); tr.anchoredPosition = new Vector2(left + 105, -(37 - GaramondLift * title.fontSize));
+            practiceRowLines[row] = PageLine(feel.Look, "", left + 1 + 105, 61, 210, 15, journalItalic, SilverInk, TextAnchor.MiddleLeft);
+            feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; practiceRows[row] = b;
+            var rule = Rect("Rule", journalPractice, JournalX, top + h, ChoiceWidth, 1).gameObject.AddComponent<Image>(); rule.color = new Color(Silver.r, Silver.g, Silver.b, .3f); rule.raycastTarget = false; practiceRowRules[row] = rule;
+        }
+        // A choice on the question page: the board's hairline frame on the vellum, the words in EB Garamond Bold; once answered, ShowJournalQuiz
+        // gilds the right one (its 2 px mark, the wash and the star), marks a wrong pick in muted crimson with ×, and sets the rest at half
+        void QuizChoice(RectTransform parent, int i)
+        {
+            var b = MakeButton(parent, "Choice " + i, JournalX, 0, ChoiceWidth, ChoiceHeight, () => PickQuizChoice(i)); b.name = "Choice " + i; var feel = ButtonLook.Custom(b, "choice");
+            quizChoiceGroups[i] = feel.Look.gameObject.AddComponent<CanvasGroup>();
+            var panel = Rect("Panel", feel.Look, 0, ChoiceHeight / 2, ChoiceWidth, ChoiceHeight).gameObject.AddComponent<Image>(); panel.color = VellumPanel; panel.raycastTarget = false; panel.transform.SetAsFirstSibling(); quizChoicePanels[i] = panel;
+            var thin = Rect("Hairline", feel.Look, 0, ChoiceHeight / 2, ChoiceWidth, ChoiceHeight); Frame(thin, new Color(GiltInk.r, GiltInk.g, GiltInk.b, .7f)); quizThin[i] = thin;
+            var mark = Rect("Mark", feel.Look, 0, ChoiceHeight / 2, ChoiceWidth, ChoiceHeight); InsetFrame(mark, GiltInk, 2); quizThick[i] = mark;
+            var label = feel.Label; label.font = ButtonLook.EngravedFont ?? font; label.fontSize = 18; label.alignment = TextAnchor.MiddleCenter; label.horizontalOverflow = HorizontalWrapMode.Overflow; label.transform.SetAsLastSibling();
+            var lr = label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = new Vector2(30, 0); lr.offsetMax = new Vector2(-30, 0);
+            feel.LabelUp = GiltInk; feel.LabelDown = GiltDown;
+            var star = Rect("Star", feel.Look, 99, ChoiceHeight / 2, 14, 14).gameObject.AddComponent<Image>(); star.sprite = StarSprite(); star.color = GiltInk; star.raycastTarget = false; quizStars[i] = star;
+            var cross = Label(feel.Look, "\u00d7", 97, ChoiceHeight / 2, 20, 30, 20); cross.font = ButtonLook.EngravedFont ?? font; cross.color = CrimsonInk; quizCrosses[i] = cross;
+            quizChoices[i] = b;
+        }
+        // Next and Back to Practice: the board's small framed buttons (the vellum, a gilt hairline, the words in EB Garamond Bold), 44 px tall
+        Button JournalFrameButton(Transform parent, string words, float width, UnityEngine.Events.UnityAction action)
+        {
+            var b = MakeButton(parent, words, JournalX, 0, width, ChoiceHeight, action); b.name = words + " button"; var feel = ButtonLook.Custom(b, "frame");
+            var panel = Rect("Panel", feel.Look, 0, ChoiceHeight / 2, width, ChoiceHeight).gameObject.AddComponent<Image>(); panel.color = VellumPanel; panel.raycastTarget = false; panel.transform.SetAsFirstSibling();
+            Frame(Rect("Hairline", feel.Look, 0, ChoiceHeight / 2, width, ChoiceHeight), new Color(GiltInk.r, GiltInk.g, GiltInk.b, .7f));
+            var label = feel.Label; label.font = ButtonLook.EngravedFont ?? font; label.fontSize = 16; label.alignment = TextAnchor.MiddleCenter; label.horizontalOverflow = HorizontalWrapMode.Overflow; label.transform.SetAsLastSibling();
+            var lr = label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = lr.offsetMax = Vector2.zero;
+            feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; return b;
+        }
         void BuildJournalFront()
         {
             journalItalic = Resources.Load<Font>(ItalicFont) ?? font; var serif = ButtonLook.EngravedFont ?? font;
@@ -1742,7 +1853,7 @@ namespace Ascendant.CelestialDial
                 bigThreeWords[i] = PageLine(bigThreeLine, "", 0, 0, 120, 17, journalItalic, SilverInk);
                 foreach (var piece in new[] { bigThreeGlyphs[i], bigThreeWords[i] }) piece.rectTransform.anchorMin = piece.rectTransform.anchorMax = new Vector2(.5f, .5f); // placed about the line's centre, its baseline
             }
-            journalPracticeDoor = JournalDoor(journalLanding, SliceFlow.PracticeDoor, "", "journal-emblem-practice", new Vector2(56, 72), () => { }); // an entry point only, until the owner approves Practice (step 4)
+            journalPracticeDoor = JournalDoor(journalLanding, SliceFlow.PracticeDoor, SliceFlow.PracticeDoorLine, "journal-emblem-practice", new Vector2(56, 72), JournalPracticeOpen); // owner, Oct 3: it opens Practice, with no count
             journalContentsDoor = JournalDoor(journalLanding, SliceFlow.ContentsDoor, SliceFlow.ContentsDoorLine, "journal-emblem-contents", new Vector2(76, 60), JournalContents);
             // Contents
             journalContents = Rect("Contents", journal, 0, 400, 360, 800); Flourish(journalContents, ContentsFlourish);
@@ -1758,12 +1869,45 @@ namespace Ascendant.CelestialDial
                 name.horizontalOverflow = HorizontalWrapMode.Wrap; name.verticalOverflow = VerticalWrapMode.Overflow; name.lineSpacing = .95f;
                 var edge = name.gameObject.AddComponent<Outline>(); edge.effectColor = new Color(.08f, .05f, .03f, .92f); edge.effectDistance = new Vector2(1, -1); journalMapNames[i] = name;
             }
-            // the links, top left: back to the landing from Contents; back to Contents from a chapter
-            journalHomeLink = JournalLink(SliceFlow.BackToJournal, JournalHome); journalContentsLink = JournalLink(SliceFlow.BackToContents, JournalContents);
-            foreach (var page in new[] { journalTitlePage, journalLanding, journalContents, journalMap }) page.gameObject.SetActive(false);
+            // Practice (owner, Oct 3): its list, then a question page
+            journalPractice = Rect("Practice", journal, 0, 400, 360, 800); Flourish(journalPractice, ContentsFlourish);
+            for (int i = 0; i < practiceRows.Length; i++) PracticeRow(i);
+            journalQuiz = Rect("Practice question", journal, 0, 400, 360, 800); Flourish(journalQuiz, ContentsFlourish);
+            quizCounter = PageLine(journalQuiz, "", JournalX, QuizCounterY, 200, 14, journalItalic, new Color(SilverInk.r, SilverInk.g, SilverInk.b, .8f));
+            quizGlyph = Label(journalQuiz, "", JournalX, QuizGlyphY, 80, 56, 36); quizGlyph.font = Dial.GlyphFont ?? font; quizGlyph.color = GiltInk; quizGlyph.horizontalOverflow = HorizontalWrapMode.Overflow; quizGlyph.verticalOverflow = VerticalWrapMode.Overflow;
+            for (int i = 0; i < quizAsk.Length; i++)
+            {
+                quizAsk[i] = PageLine(journalQuiz, "", JournalX, 0, QuizAskWidth + 24, 19, journalItalic, SilverInk);
+                quizFeedback[i] = PageLine(journalQuiz, "", JournalX, 0, QuizAskWidth + 24, 16, journalItalic, SilverInk);
+                quizEnd[i] = PageLine(journalQuiz, "", JournalX, 0, QuizAskWidth + 24, 17, journalItalic, SilverInk);
+            }
+            var choices = Rect("Choices", journalQuiz, 0, 400, 360, 800); quizChoicesGroup = choices.gameObject.AddComponent<CanvasGroup>();
+            for (int i = 0; i < quizChoices.Length; i++) QuizChoice(choices, i);
+            quizNext = JournalFrameButton(journalQuiz, SliceFlow.QuizNextWords, QuizNextWidth, QuizNext); quizBack = JournalFrameButton(journalQuiz, SliceFlow.QuizBackWords, QuizBackWidth, QuizBack);
+            // the links, top left: back to the landing from Contents and from Practice; back to Contents from a chapter; back to Practice from a question
+            journalHomeLink = JournalLink(SliceFlow.BackToJournal, JournalHome); journalContentsLink = JournalLink(SliceFlow.BackToContents, JournalContents); journalPracticeLink = JournalLink(SliceFlow.BackToPractice, QuizBack);
+            foreach (var page in new[] { journalTitlePage, journalLanding, journalContents, journalMap, journalPractice, journalQuiz }) page.gameObject.SetActive(false);
         }
         // the words in lines of at most the width, broken between words: the owner's wording is kept, only its breaks flex (Oct 2 evening)
-        static List<string> WrapWords(Text probe, string words, float width)
+        // the words in the lines WrapWords needs, with a two-line break moved so the lines come out even (a break after a comma or a full
+        // stop is favoured a little), so no word is left alone on a line: Practice's asks, whys and round ends
+        static readonly HashSet<string> SmallWords = new HashSet<string> { "a", "an", "the", "of", "to", "for", "and", "or", "in", "on", "at", "with", "from", "is", "its", "this", "that", "which" };
+        public static List<string> BalancedWords(Text probe, string words, float width)
+        {
+            var lines = WrapWords(probe, words, width); if (lines.Count != 2) return lines;
+            var settings = probe.GetGenerationSettings(Vector2.zero); var gen = probe.cachedTextGeneratorForLayout; var parts = words.Split(' ');
+            float Width(string t) => gen.GetPreferredWidth(t, settings) / probe.pixelsPerUnit;
+            var best = lines; float bestScore = float.MaxValue;
+            for (int k = 1; k < parts.Length; k++)
+            {
+                string a = string.Join(" ", parts, 0, k), b = string.Join(" ", parts, k, parts.Length - k); float w = Mathf.Max(Width(a), Width(b));
+                if (w > width) continue;
+                char end = a[a.Length - 1]; string last = parts[k - 1].ToLowerInvariant(); float score = w - (end == '.' || end == '?' || end == '!' ? 60 : end == ',' || end == ';' ? 36 : 0) + (SmallWords.Contains(last) ? 24 : 0);
+                if (score < bestScore) { bestScore = score; best = new List<string> { a, b }; }
+            }
+            return best;
+        }
+        public static List<string> WrapWords(Text probe, string words, float width)
         {
             var settings = probe.GetGenerationSettings(Vector2.zero); var gen = probe.cachedTextGeneratorForLayout; var lines = new List<string>(); string line = "";
             foreach (var word in words.Split(' '))
@@ -1787,7 +1931,7 @@ namespace Ascendant.CelestialDial
             if (inscription.Count > keeperLines.Count) Debug.LogWarning("[Journal] the inscription needs " + inscription.Count + " lines; the record holds " + keeperLines.Count);
             float closing = KeeperFirst + KeeperRule * row; journalFlourishBottom.anchoredPosition = new Vector2(JournalX, -closing);
             float door = closing + DoorBelow + DoorHeight / 2; journalPracticeDoor.GetComponent<RectTransform>().anchoredPosition = new Vector2(JournalX, -door); journalContentsDoor.GetComponent<RectTransform>().anchoredPosition = new Vector2(JournalX, -(door + DoorStep));
-            journalPracticeDoor.interactable = SliceFlow.PracticeOpen && !busy; journalContentsDoor.interactable = !busy && journalBeat == null;
+            journalPracticeDoor.interactable = Flow.CanJournalPractice && !busy && journalBeat == null; journalContentsDoor.interactable = !busy && journalBeat == null; // Practice is unavailable (half) until a concept is learned
         }
         // the line's six pieces set side by side, centred on the page, every piece on the same baseline
         public const float BigThreeRoom = 274f, BigThreeSmallest = 11f; // a long line (a moon that changed sign: "Pisces or Aries") may use the page's calm column, x 50 to 325, and shrinks to fit it, to 11 px at the least (the longest of all, a Sagittarius sun with a Sagittarius-or-Capricorn moon); "Cancer or Leo" with a Taurus sun takes 16
@@ -1814,13 +1958,65 @@ namespace Ascendant.CelestialDial
             bool beat = journalBeat != null;
             journalTitlePage.gameObject.SetActive(at == JournalView.Title); journalLanding.gameObject.SetActive(at == JournalView.Landing || at == JournalView.Title);
             journalContents.gameObject.SetActive(at == JournalView.Contents); journalMap.gameObject.SetActive(at == JournalView.Map);
-            journalHomeLink.gameObject.SetActive(at == JournalView.Contents); journalContentsLink.gameObject.SetActive(at == JournalView.Wheel || at == JournalView.Map);
-            journalHomeLink.interactable = journalContentsLink.interactable = !busy;
+            journalPractice.gameObject.SetActive(at == JournalView.Practice); journalQuiz.gameObject.SetActive(at == JournalView.Quiz);
+            journalHomeLink.gameObject.SetActive(at == JournalView.Contents || at == JournalView.Practice); journalContentsLink.gameObject.SetActive(at == JournalView.Wheel || at == JournalView.Map); journalPracticeLink.gameObject.SetActive(at == JournalView.Quiz);
+            journalHomeLink.interactable = journalContentsLink.interactable = journalPracticeLink.interactable = !busy;
             if (at == JournalView.Landing || at == JournalView.Title) ShowJournalLanding();
+            if (at == JournalView.Practice) ShowJournalPractice();
+            if (at == JournalView.Quiz) ShowJournalQuiz();
             foreach (var row in journalChapterRows) if (row != null) row.interactable = !busy;
             for (int i = 0; i < journalMapNames.Length; i++) journalMapNames[i].gameObject.SetActive(TravelOpen(TravelMenu.Rooms[i].id)); // only the rooms you have woken are named
             if (!beat) { journalTitlePageGroup.alpha = 1; journalLandingGroup.alpha = 1; journalTitleGroup.alpha = 1; journalLandingGroup.blocksRaycasts = true; }
             if (at == JournalView.Title && !beat) journalBeat = StartCoroutine(JournalTitleBeat());
+        }
+        // Practice's list: a row for each concept learned, in the data's order; the rest hidden
+        void ShowJournalPractice()
+        {
+            var learned = Flow.PracticeConcepts;
+            for (int i = 0; i < practiceRows.Length; i++)
+            {
+                bool show = i < learned.Count; practiceRows[i].gameObject.SetActive(show); practiceRowRules[i].gameObject.SetActive(show);
+                if (!show) continue;
+                practiceRows[i].GetComponent<ButtonFeel>().Label.text = learned[i].name; practiceRowLines[i].text = learned[i].line; practiceRows[i].interactable = !busy;
+            }
+        }
+        void SetLine(Text line, float baseline) { line.rectTransform.anchoredPosition = new Vector2(JournalX, -(baseline - GaramondLift * line.fontSize)); }
+        // A question as the board sets it: the counter, a sign's mark for the Symbols, the ask in lines 26 apart, the choices 52 apart below it,
+        // then (once answered) the marks, the why and Next; at the round's end, the journal's line and Back to Practice under it
+        void ShowJournalQuiz()
+        {
+            var q = Flow.QuizQuestion; bool over = Flow.QuizOver, answered = !over && Flow.QuizPicked >= 0;
+            quizCounter.text = Flow.QuizCounter; quizCounter.gameObject.SetActive(!over);
+            bool mark = !over && q != null && q.glyph >= 0 && q.glyph < 12; quizGlyph.gameObject.SetActive(mark); quizGlyph.text = mark ? Zodiac.Seats[q.glyph].Glyph : "";
+            var ask = over || q == null ? new List<string>() : BalancedWords(quizAsk[0], q.ask, QuizAskWidth);
+            int whyLines = over || q == null ? 1 : Mathf.Max(BalancedWords(quizFeedback[0], PracticeBook.Data.right + " " + q.why, QuizAskWidth).Count, BalancedWords(quizFeedback[0], PracticeBook.Data.wrong + " " + q.why, QuizAskWidth).Count);
+            var layout = QuizLayout(mark, ask.Count, Flow.QuizChoices.Length, whyLines); float first = layout.x, step = layout.z; // the ask's first baseline: 197, or 223 under a sign's symbol
+            for (int i = 0; i < quizAsk.Length; i++) { bool show = i < ask.Count; quizAsk[i].gameObject.SetActive(show); quizAsk[i].text = show ? ask[i] : ""; if (show) SetLine(quizAsk[i], first + QuizLineStep * i); }
+            float top = layout.y; var choices = Flow.QuizChoices; int right = Flow.QuizRight, picked = Flow.QuizPicked;
+            quizChoicesGroup.blocksRaycasts = !answered && !busy;
+            for (int i = 0; i < quizChoices.Length; i++)
+            {
+                bool show = i < choices.Length; quizChoices[i].gameObject.SetActive(show);
+                if (!show) continue;
+                ((RectTransform)quizChoices[i].transform).anchoredPosition = new Vector2(JournalX, -(top + step * i + ChoiceHeight / 2));
+                var feel = quizChoices[i].GetComponent<ButtonFeel>(); feel.Label.text = choices[i];
+                bool isRight = answered && i == right, isWrong = answered && i == picked && i != right;
+                quizChoicePanels[i].color = isRight ? GiltWash : VellumPanel; quizThin[i].gameObject.SetActive(!isRight && !isWrong); quizThick[i].gameObject.SetActive(isRight || isWrong);
+                foreach (var edge in quizThick[i].GetComponentsInChildren<Image>(true)) edge.color = isWrong ? CrimsonEdge : GiltInk;
+                quizStars[i].gameObject.SetActive(isRight); quizCrosses[i].gameObject.SetActive(isWrong);
+                feel.LabelUp = isWrong ? CrimsonInk : GiltInk; feel.Label.color = feel.LabelUp; quizChoiceGroups[i].alpha = answered && !isRight && !isWrong ? .5f : 1;
+                quizChoices[i].interactable = !busy;
+            }
+            float below = top + step * (choices.Length - 1) + ChoiceHeight; // the last choice's bottom
+            var why = answered ? BalancedWords(quizFeedback[0], Flow.QuizFeedback, QuizAskWidth) : new List<string>();
+            for (int i = 0; i < quizFeedback.Length; i++) { bool show = i < why.Count; quizFeedback[i].gameObject.SetActive(show); quizFeedback[i].text = show ? why[i] : ""; if (show) SetLine(quizFeedback[i], below + 37 + QuizLineStep * i); }
+            quizNext.gameObject.SetActive(answered); quizNext.interactable = Flow.CanQuizNext && !busy;
+            if (answered) ((RectTransform)quizNext.transform).anchoredPosition = new Vector2(JournalX, -(layout.w + ChoiceHeight / 2));
+            var end = over ? BalancedWords(quizEnd[0], Flow.QuizEnd, QuizAskWidth + 10) : new List<string>();
+            for (int i = 0; i < quizEnd.Length; i++) { bool show = i < end.Count; quizEnd[i].gameObject.SetActive(show); quizEnd[i].text = show ? end[i] : ""; if (show) SetLine(quizEnd[i], QuizAskY + QuizLineStep * i); }
+            quizBack.gameObject.SetActive(over); quizBack.interactable = Flow.CanQuizBack && !busy;
+            if (over) ((RectTransform)quizBack.transform).anchoredPosition = new Vector2(JournalX, -(QuizAskY + QuizLineStep * (Mathf.Max(1, end.Count) - 1) + 39 + ChoiceHeight / 2));
+            if (ask.Count > quizAsk.Length || why.Count > quizFeedback.Length || end.Count > quizEnd.Length) Debug.LogWarning("[Practice] a line runs past the page's lines: " + (q != null ? q.ask : Flow.QuizEnd));
         }
         // 1e A: the title page settles for a second, then fades into the landing, which shows under it from the start
         IEnumerator JournalTitleBeat()
@@ -1993,15 +2189,26 @@ namespace Ascendant.CelestialDial
                 journalPanels[i].sizeDelta = new Vector2(JournalWidth, height); journalPanels[i].anchoredPosition = new Vector2(JournalX, -(y + height / 2)); y += height + 6;
             }
         }
+        // Practice's question page as words: the counter, the ask and the choices, then the why; a sign's symbol is only said to be there
+        // (a screen reader would read the symbol's name aloud, which is the answer)
+        string QuizSpoken()
+        {
+            if (!Flow.OnQuiz) return "Your journal. " + SliceFlow.PracticeTitle + ".";
+            var lead = "Your journal. " + Flow.QuizConcept.name + ". "; if (Flow.QuizOver) return lead + Flow.QuizEnd;
+            var q = Flow.QuizQuestion; var mark = q.glyph >= 0 && q.glyph < 12 ? "A sign's symbol is drawn. " : "";
+            return lead + Flow.QuizCounter + ". " + mark + q.ask + " Choices: " + string.Join(", ", Flow.QuizChoices) + "." + (Flow.QuizPicked >= 0 ? " " + Flow.QuizFeedback : "");
+        }
         // What a screen reader hears: the page as words, and what the rings and ribbons mean, since they are only seen. placeholder (owner writes)
         string JournalSpoken()
         {
             switch (Flow.JournalAt)
             {
                 case JournalView.Title: return "Your journal. " + SliceFlow.KeeperHeading.Substring(0, 1) + SliceFlow.KeeperHeading.Substring(1).ToLowerInvariant() + ". " + SliceFlow.TitlePageLine;
-                case JournalView.Landing: return "Your journal. Keeper: " + Flow.KeysLine + ". " + SliceFlow.Inscription(Flow.DisplayName) + " " + SliceFlow.PracticeDoor + ", not open yet. " + SliceFlow.ContentsDoor + ": " + SliceFlow.ContentsDoorLine.ToLowerInvariant() + ".";
+                case JournalView.Landing: return "Your journal. Keeper: " + Flow.KeysLine + ". " + SliceFlow.Inscription(Flow.DisplayName) + " " + SliceFlow.PracticeDoor + (SliceFlow.PracticeDoorLine != "" ? ": " + SliceFlow.PracticeDoorLine.ToLowerInvariant() : "") + (Flow.PracticeConcepts.Count > 0 ? ". " : ", not open yet. ") + SliceFlow.ContentsDoor + ": " + SliceFlow.ContentsDoorLine.ToLowerInvariant() + ".";
                 case JournalView.Contents: return "Your journal. " + SliceFlow.ContentsTitle + ". " + SliceFlow.WheelTitle + ": " + SliceFlow.WheelChapterLine.ToLowerInvariant() + ". " + SliceFlow.MapTitle + ": " + SliceFlow.MapChapterLine.ToLowerInvariant() + ". " + SliceFlow.SealedChapters + " chapters sealed.";
                 case JournalView.Map: return "Your journal. " + SliceFlow.MapTitle + ". " + SliceFlow.MapChapterLine + ": " + string.Join(", ", TravelMenu.Rooms.Where(r => TravelOpen(r.id)).Select(r => r.name)) + ".";
+                case JournalView.Practice: return "Your journal. " + SliceFlow.PracticeTitle + ". " + string.Join(" ", Flow.PracticeConcepts.Select(c => c.name + ": " + c.line + "."));
+                case JournalView.Quiz: return QuizSpoken();
             }
             if (Flow.JournalAt == JournalView.Wheel)
             {
@@ -2019,6 +2226,11 @@ namespace Ascendant.CelestialDial
         void JournalContents() { if (busy || !Flow.JournalToContents()) return; Sound.Play("page"); ShowJournal(); Publish(); } // the Contents door, and "‹ Contents" on a chapter
         void JournalHome() { if (busy || !Flow.JournalToLanding()) return; Sound.Play("page"); ShowJournal(); Publish(); }   // "‹ Your Journal" on Contents
         void JournalChapter(string chapter) { if (busy || !Flow.OpenChapter(chapter)) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void JournalPracticeOpen() { if (busy || journalBeat != null || !Flow.OpenPractice()) return; Sound.Play("page"); ShowJournal(); Publish(); } // the landing's Practice door (owner, Oct 3)
+        void StartPracticeRound(int row) { if (busy || !Flow.StartQuiz(row)) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void PickQuizChoice(int choice) { if (busy || !Flow.AnswerQuiz(choice)) return; ShowJournal(); Publish(); }
+        void QuizNext() { if (busy || !Flow.NextQuiz()) return; Sound.Play("page"); ShowJournal(); Publish(); }
+        void QuizBack() { if (busy || !Flow.QuizToPractice()) return; Sound.Play("page"); ShowJournal(); Publish(); } // "‹ Practice", and Back to Practice at the round's end
         void JournalTurn(int direction) { if (busy || !(direction > 0 ? Flow.JournalNext() : Flow.JournalPrev())) return; Sound.Play("page"); ShowJournal(); Publish(); }
         void JournalWheel() { if (busy || !Flow.JournalToWheel()) return; Sound.Play("page"); ShowJournal(); Publish(); }
         void JournalSetView(bool table) { if (busy || !Flow.SetJournalTable(table)) return; ShowJournal(); Publish(); }

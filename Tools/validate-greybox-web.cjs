@@ -257,7 +257,7 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='landing',{},{timeout:5000});
     { const j=await state(),k=j.journalKeeper||[],name=j.playerName,line="What's up, "+name+". I'm your journal, and I'll keep a record of what you learn from the Library.";
       check(k.length===6 && k[0]==='KEEPER' && k[1]==='1 Key' && k[2]==='\u2609 Taurus \u00b7 \u263d unknown \u00b7 \u2191 unknown' && k[3]==="What's up, "+name+"." && k[4]==="I'm your journal, and I'll keep a record" && k[5]==="of what you learn from the Library." && k.slice(3).join(' ')===line && j.journalScriptFont==='EBGaramond-Italic','the landing\'s Keeper\'s record: KEEPER, '+k[1]+', '+k[2]+' (the sun as given), and the owner\'s inscription with the saved name ('+k.slice(3).join(' / ')+') at '+viewport.width);
-      check(j.journalDoors.length===8 && !j.canJournalPractice && j.canJournalContents && j.caspar.includes('Practice, not open yet'),'two doors: Practice, an entry point only until the owner approves it, and Contents, at '+viewport.width); }
+      check(j.journalDoors.length===8 && j.canJournalPractice && j.canJournalContents && j.caspar.includes('Contents: every chapter.') && !j.caspar.includes('not open yet'),'two doors: Practice (it opens Practice, owner Oct 3) and Contents, at '+viewport.width); }
     await page.waitForTimeout(700); // the fade has settled
     await page.screenshot({path:path.join(out,viewport.width+'-journal-landing.png')});
     // the inscription really draws in the Web build, in the new italic (a font can draw blank on the Web: the symbols, Sept 12): count the light ink on its lines
@@ -265,8 +265,33 @@ const path=require('path');
       const shot=await page.screenshot({clip:{x:ox+(7-118)*scale,y:oy+158*scale,width:236*scale,height:70*scale}});
       const ink=await page.evaluate(async b64=>{const img=new Image();img.src='data:image/png;base64,'+b64;await img.decode();const c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);const d=g.getImageData(0,0,c.width,c.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i]>120&&d[i+1]>120&&d[i+2]>130)n++;return n/(d.length/4);},shot.toString('base64'));
       check(ink>.015,'the inscription draws in EB Garamond Italic in the Web build: '+(ink*100).toFixed(1)+'% light ink on its lines at '+viewport.width); }
-    { const d=(await state()).journalDoors; await tap(d[0],d[1]); } // the Practice door, on the canvas: it opens nothing yet
-    await page.waitForTimeout(400); check((await state()).journalView==='landing','a tap on the Practice door opens nothing yet (step 4 waits on the owner) at '+viewport.width);
+    // Oct 3 (owner: step 4, Practice, approved): the Practice door opens the list; a whole round on the canvas (a row, the picks, Next), its end and Back to Practice
+    { const d=(await state()).journalDoors; await tap(d[0],d[1]); } // the Practice door, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='practice',{},{timeout:5000});
+    { const j=await state(); check(j.journalPractice.join()==='The Elements' && j.journalLink==='\u2039 Your Journal' && j.canJournalHome && j.caspar.includes('The Elements: '),'the Practice door on the canvas opens the list of concepts learned: The Elements, \u2039 Your Journal at the top left, at '+viewport.width); }
+    { const t=(await looks()).filter(x=>x.k==='row'||x.k==='link'); check(t.length===2 && small(t).length===0,'its row and its link each take 44 px or more ('+t.map(x=>x.w+' '+x.W+'x'+x.H).join(', ')+') at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-journal-practice.png')});
+    { const r=(await state()).journalPracticeRows; await tap(r[0],r[1]); } // The Elements' row, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='quiz',{},{timeout:5000});
+    { const j=await state(); check(j.quizConcept==='elements' && j.quizCounter==='1 of 6' && j.quizChoices.length>=2 && j.quizChoiceBoxes.length===4*j.quizChoices.length && j.canQuizChoice && !j.canQuizNext && j.journalLink==='\u2039 Practice','a row starts its round: question 1 of 6, its choices in their frames, \u2039 Practice at the top left, at '+viewport.width); }
+    { const t=(await looks()).filter(x=>x.k==='choice'); check(t.length>=2 && small(t).length===0,'every choice takes 44 px or more ('+t.map(x=>x.W+'x'+x.H).join(', ')+') at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-practice-question.png')});
+    for(let n=0;n<6;n++){ // the right answer first, a wrong one second, then right to the end, all on the canvas
+      const j=await state(), b=j.quizChoiceBoxes, pick=n===1?(j.quizRight+1)%j.quizChoices.length:j.quizRight;
+      await tap(b[4*pick],b[4*pick+1]);
+      await page.waitForFunction(()=>window.ascendantDial.snapshot().canQuizNext,{},{timeout:5000});
+      const a=await state();
+      if(n<2){ check(a.quizPicked===pick && a.quizFeedback.startsWith(n===0?"That's it. ":"Not quite. ") && a.quizFeedback.length>12,(n===0?'a right pick on the canvas':'a wrong pick on the canvas')+': "'+a.quizFeedback+'", at '+viewport.width); await page.screenshot({path:path.join(out,viewport.width+(n===0?'-practice-right.png':'-practice-wrong.png'))}); }
+      const q=a.quizButtons; await tap(q[0],q[1]); // Next, on the canvas
+      await page.waitForFunction(k=>{const s=window.ascendantDial.snapshot();return s.quizOver||s.quizCounter===(k+2)+' of 6';},n,{timeout:5000});
+    }
+    { const j=await state(); check(j.quizOver && j.quizEnd.length>0 && j.quizChoices.length===0 && j.canQuizBack && j.caspar.includes(j.quizEnd.split(' ')[0]),'after six, the round ends with the journal\'s line ("'+j.quizEnd+'") and Back to Practice, at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-practice-end.png')});
+    { const q=(await state()).quizButtons; await tap(q[4],q[5]); } // Back to Practice, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='practice',{},{timeout:5000});
+    await page.waitForTimeout(300); await tap(-44,84); // \u2039 Your Journal, on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='landing',{},{timeout:5000});
+    check(true,'Back to Practice and \u2039 Your Journal on the canvas lead back, at '+viewport.width);
     { const d=(await state()).journalDoors; await tap(d[4],d[5]); } // the Contents door, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='contents',{},{timeout:5000});
     { const j=await state(); check(j.journalChapters.join()==='The Wheel,The Library Map,Sealed,Sealed' && j.journalLink==='\u2039 Your Journal' && j.canJournalHome,'the Contents door on the canvas: The Wheel, The Library Map, two Sealed rows, \u2039 Your Journal at the top left, at '+viewport.width); }

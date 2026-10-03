@@ -60,6 +60,42 @@ Validation (local, worktree `platform-fit-2`, branch `codex/family-triangles` on
 - browser suite 518/518 at phone density (`DEVICE_SCALE=2 MOBILE=1`, +6).
 
 Captures: [`Evidence/triangles-2026-10-03/`](Evidence/triangles-2026-10-03/), with the approved board beside the game in the three states and the hub at 3x.
+## Practice in the journal: the concepts learned, a round of questions in the journal's voice (batch 2, step 4)
+
+The owner's ruling (Oct 3, comment 90140263872651 on 86bcbn6w6): step 4 approved as scoped, with the door's count removed completely. Claude drafts the 30 questions, and the owner rewrites or approves them before they ship; the board's other copy is approved as a draft on the same terms. The art is built with the code. The look is the board on 86bcbn6w6 (Oct 2).
+
+**The pages** (`SliceFlow.JournalView` gains Practice and Quiz):
+- **The door.** The landing's Practice door opens Practice, with no count. Its line, "What you know", is a draft beside Contents' "Every chapter" (the ruling's working choice: a short line for the owner's rewrite, or blank). It shows unavailable (half) until a concept is learned.
+- **The list.** The concepts learned, in the data's order: each row a gilt four-point star, the concept's name (EB Garamond Bold, 21 px) and its line (the italic, 15 px), with a rule under it, the board's rows 78 apart from y 148. A concept joins when its lesson finishes: the Elements at Key 1, the Symbols at Key 2, the Modalities with their lesson, the Elemental Table at Key 3, the Opposites at Key 4 (the scope's Keys), so no question asks about anything not yet taught. "‹ Your Journal" goes back.
+- **A round.** All six of a concept's questions, in a fresh order each round, the choices shuffled; "1 of 6" under the flourish; the ask in the italic, with a sign's symbol drawn above it for the Symbols; the choices in the board's hairline frames on the vellum, 238 x 44, 52 apart.
+  - An answer: the right one gilded (a 2 px gilt mark, a wash and its star); a wrong pick in muted crimson with ×; the rest at half; then "That's it." or "Not quite." and the question's why, and Next.
+  - After the sixth, the concept's line ("That's all I have on the elements for now. Come back whenever you like.") and Back to Practice. "‹ Practice" leaves a round at any time.
+- **Nothing is saved.** No score, streak or spaced review: the save and the deck are the same before and after a round. The Dial's own practice (the fork) is unchanged.
+
+**The data** (`Resources/Practice/questions.json`, read by `PracticeBook`): one entry per concept, with its name, its line, the lesson that unlocks it, its round's end line and its questions (the ask, a sign's symbol or none, the choices, the right one, the why). A concept is added by adding an entry. The 30 questions are Claude's drafts from the game's own facts (the signs' data and Caspar's lines; their sources are on the step 4 comment). The mechanical checks hold 28 of them to the game's data (the signs' elements, modalities, polarities, opposites and symbols); the other two are Caspar's words for Cardinal and Fixed, read by hand.
+
+**The page's layout.**
+- The lines break between words, evened so no word is left alone; a break after a full stop or a comma is favoured.
+- A question's layout is worked out before the pick, from its why's longer form, so nothing moves when the answer shows. With a symbol, a two-line ask and a two-line why, the choices close up (to 46 apart at most) so Next ends inside the page's border (y 595, the border at about 607).
+- The game blends in linear colour, so the right answer's wash is .05 (the board's .16 in a browser).
+
+**The art.** No new file. The choices' frames, their 2 px marks and the star are drawn by the engine; the page, the flourish and the door's frame and emblem are the journal's own.
+
+**The web state** publishes `journalPractice` and `journalPracticeRows`, and for a round `quizConcept`, `quizCounter`, `quizAsk`, `quizGlyph`, `quizChoices`, `quizChoiceBoxes`, `quizPicked`, `quizRight`, `quizFeedback`, `quizEnd`, `quizButtons`, `canQuizChoice`, `canQuizNext` and `canQuizBack`. The template gains the rows', the choices', Next's and the links' semantic buttons; the screen reader hears each page (a Symbols question only says a symbol is drawn, since its name is the answer).
+
+**Checks**
+- Mechanical (+19): the data's shape (five concepts, six questions each, two to four different choices, the right one among them); the facts against the game's data; the list growing lesson by lesson, and empty before the first; a whole round (each question once, each answer marked once, the right and wrong lines, the end); a fresh order each round; "‹ Practice" mid-round; the save and the deck unchanged; every line fitting its place at the fonts' own widths; every target 44 px or more.
+- The fixture (+7) and the suite (+14): the door opens the list at Key 1; a round on the canvas (a right pick, a wrong one, Next, at both widths the whole round to its end and Back to Practice); the targets; the spoken page.
+
+Validation (local, worktree `dial-wake`, branch `codex/journal-practice` rebased on main `6d7b61b`, so with the triangles and the Moon):
+- mechanical checks 659/659 (+19), 0 compiler warnings;
+- slice fixture 271/271 (+7);
+- headless WebGL 0 errors and 0 warnings (36.1 MB);
+- browser suite 624/624 at desktop density, with the seven shapes (+14), and 533/533 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
+
+Captures: [`Evidence/practice-2026-10-03/`](Evidence/practice-2026-10-03/), with the approved board beside the game at Key 1 and at Key 4.
+
+Held off production until the owner approves the questions (the ruling: "I rewrite or approve them before it ships"); the APK for the owner's playtest carries it.
 
 ## The journal's landing and the Big Three: the title page, the Keeper's record, Contents, the Library Map and the birth chart (batch 2)
 
