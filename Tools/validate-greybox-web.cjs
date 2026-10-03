@@ -50,6 +50,11 @@ const path=require('path');
     check(await page.evaluate(()=>window.ascendantDial.snapshot().canSliceContinue===false),'birth prompt waits for a choice at '+viewport.width);
     await semantic('birth-known');await page.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);
     await semantic('sign-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');
+    // batch 2 (owner, Oct 2 evening: the Big Three approved): what I already know asks the moon, then the rising sign, each with I don't know
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='moon');check(!(await state()).canSliceContinue && (await state()).canSignUnknown,'after the sun, the moon is asked, with I don\'t know, at '+viewport.width);
+    await semantic('sign-unknown');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='rising');await semantic('sign-unknown');
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done'&&window.ascendantDial.snapshot().canSliceContinue);
+    check((await state()).bigThree==='\u2609 Taurus \u00b7 \u263d unknown \u00b7 \u2191 unknown','the sun given, the moon and the rising sign unknown: '+(await state()).bigThree+' at '+viewport.width);
     await semantic('next-screen');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await page.screenshot({path:path.join(out,viewport.width+'-atrium.png')});
@@ -249,7 +254,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-journal-title.png')});
     await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='landing',{},{timeout:5000});
     { const j=await state(),k=j.journalKeeper||[],name=j.playerName,line="What's up, "+name+". I'm your journal, and I'll keep a record of what you learn from the Library.";
-      check(k.length===5 && k[0]==='KEEPER' && k[1]==='1 Key' && k[2]==="What's up, "+name+"." && k[3]==="I'm your journal, and I'll keep a record" && k[4]==="of what you learn from the Library." && k.slice(2).join(' ')===line && j.journalScriptFont==='EBGaramond-Italic','the landing\'s Keeper\'s record: KEEPER, '+k[1]+', and the owner\'s inscription with the saved name ('+k.slice(2).join(' / ')+') at '+viewport.width);
+      check(k.length===6 && k[0]==='KEEPER' && k[1]==='1 Key' && k[2]==='\u2609 Taurus \u00b7 \u263d unknown \u00b7 \u2191 unknown' && k[3]==="What's up, "+name+"." && k[4]==="I'm your journal, and I'll keep a record" && k[5]==="of what you learn from the Library." && k.slice(3).join(' ')===line && j.journalScriptFont==='EBGaramond-Italic','the landing\'s Keeper\'s record: KEEPER, '+k[1]+', '+k[2]+' (the sun as given), and the owner\'s inscription with the saved name ('+k.slice(3).join(' / ')+') at '+viewport.width);
       check(j.journalDoors.length===8 && !j.canJournalPractice && j.canJournalContents && j.caspar.includes('Practice, not open yet'),'two doors: Practice, an entry point only until the owner approves it, and Contents, at '+viewport.width); }
     await page.waitForTimeout(700); // the fade has settled
     await page.screenshot({path:path.join(out,viewport.width+'-journal-landing.png')});
@@ -729,7 +734,7 @@ const path=require('path');
     await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await dev.locator('#loading').waitFor({state:'detached'});
     await dev.locator('#name').fill('Tester');await dev.locator('#name').dispatchEvent('change');await dev.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
-    await act('birth-known');await dev.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-4');await dev.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Leo');
+    await act('birth-known');await dev.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-4');await dev.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Leo');await act('sign-unknown');await act('sign-unknown');await dev.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
     await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await dev.waitForTimeout(150);}
     await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -737,7 +742,7 @@ const path=require('path');
     await tap(0,449);await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
     check((await snap()).settingsOpen&&(await snap()).jumpsShown,'Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at '+viewport.width);
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-jump.png')});
-    await tap(0,426);await resumed(); // the fifth row: After Key 4 (the list is a row taller since the Dial's wake-up preview: its top 23 px higher)
+    await tap(0,403);await resumed(); // the fifth row: After Key 4 (the list is two rows taller since the Dial's wake-up preview and the cusp-day sample: its top 46 px higher)
     { const s=await snap(); check(s.keys===4&&s.keysInHand===3&&s.locksFilled===1&&s.atriumStage===3&&s.playerName==='Tester'&&s.sunSign==='Leo','Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-key4.png')});
     const expect={key1:s=>s.keys===1&&s.keysInHand===0&&s.locksFilled===1&&s.atriumStage===2&&!s.wheelComplete,
@@ -749,7 +754,7 @@ const path=require('path');
       { const w=await snap(); check(w.dialWake===Math.min(4,w.keys)&&w.wakePreview===-1,'the Dial\'s wake-up (86bcbn6w6 2a A): after the checkpoint '+id+' the Dial shows step '+w.dialWake+' for '+w.keys+' Keys earned ('+w.dialLook+') at '+viewport.width); }
       if(id==='whole'){ // Build AA: at the Wing's end the journal has the Table and all four tabs; each works on the canvas
         await act('open-journal');await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,{},{timeout:8000}); // a new session: the landing (after the title page, the first time)
-        { const s=await snap(); check(s.journalKeeper[1]==='4 Keys \u00b7 1 Book','batch 2: at the Wing\'s end the Keeper\'s record reads 4 Keys \u00b7 1 Book at '+viewport.width); }
+        { const s=await snap(); check(s.journalKeeper[1]==='4 Keys \u00b7 1 Book' && s.journalKeeper[2].startsWith('\u2609 Leo \u00b7 \u263d ') && !s.journalKeeper[2].includes('unknown'),'batch 2: at the Wing\'s end the Keeper\'s record reads 4 Keys \u00b7 1 Book, and DEV Mode\'s sample chart: '+s.journalKeeper[2]+' at '+viewport.width); }
         await act('journal-contents');await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='contents',{},{timeout:5000});await act('journal-chapter-wheel');await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='wheel'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});await dev.waitForTimeout(400);
         { const s=await snap(); check(s.journalView==='wheel'&&s.canJournalTable&&s.journalLenses.join()==='Element,Modality,Polarity,Opposites'&&s.journalLens==='Element','Build AA: at the Wing\'s end the journal shows the Table switch and all four tabs at '+viewport.width); }
         await tap(7+36,119);await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='table',{},{timeout:5000});check(true,'Build AA: the Table switch on the canvas lays the seats out as the Table at '+viewport.width);
@@ -789,7 +794,11 @@ const path=require('path');
         await act('leave-dial');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}).catch(()=>{});}
       await dev.evaluate(()=>window.ascendantDial.act('wake:-1'));await dev.waitForFunction(()=>window.ascendantDial.snapshot().wakePreview===-1,{},{timeout:5000}).catch(()=>{});
       check((await snap()).dialWake===Math.min(4,(await snap()).keys),'the Dial\'s wake-up: back to as earned, the Dial shows the Keys\' step at '+viewport.width); }
-    await act('restart');await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    // batch 2: DEV Mode's cusp-day sample (owner ruling, Oct 2 evening): a fresh opening at the cusp question, the name kept
+    await act('jump-cusp');await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep==='cusp',{},{timeout:120000});
+    { const c=await snap(); check(c.playerName==='Tester' && c.cuspSigns.join()==='Aries,Taurus' && c.cuspTime==='9:27 am' && !c.resumed,'DEV Mode\'s cusp-day sample: the opening at the cusp question (London, Apr 20 1990), the name kept, at '+viewport.width); }
+    await dev.screenshot({path:path.join(out,viewport.width+'-dev-cusp.png')});
+    await dev.evaluate(()=>window.ascendantDial.act('restart'));await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000}); // Settings' Start over (the page's own button waits for the Atrium)
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
     await devContext.close();
   }));
@@ -801,8 +810,21 @@ const path=require('path');
   await action('next-screen');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
   await action('birth-unknown');check(await recovery.evaluate(()=>window.ascendantDial.snapshot().note.includes('Your sun sign is')&&window.ascendantDial.snapshot().sunSign!==''),'I don\'t know assigns a sun sign');
   await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
+  // the cusp day (owner ruling, Oct 2 evening): no birth time on the day the sun changed sign asks the player, with the minute on the place's clock; then the answer is changed
+  await recovery.locator('#birthdate').fill('1990-04-20');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
+  await action('time-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);await recovery.locator('#birthplace').fill('London');
+  await recovery.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);await action('place-match-0');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='cusp');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.canCusp && r.cuspSigns.join()==='Aries,Taurus' && r.cuspTime==='9:27 am' && r.cuspQuestion.startsWith('The Sun moved from Aries into Taurus on the day you were born, at 9:27 am.') && !r.canSliceContinue,'the cusp question in the browser: Aries or Taurus, the change at 9:27 am London time'); }
+  await action('cusp-why');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().cuspWhy);await action('cusp-unsure');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.sunBasis==='noon' && r.bigThree.startsWith('\u2609 '+r.sunSign+' \u00b7 ') && r.bigThree.endsWith('\u2191 unknown'),'I\'m not sure takes the sun at local noon, flagged approximate: '+r.bigThree); }
+  await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   await recovery.locator('#birthdate').fill('1990-05-01');await recovery.locator('#birthdate').dispatchEvent('change');
-  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');check(true,'a birth date derives the sun sign in the browser');
+  // batch 2: the date, then the time, then the town picked from the bundled list; the chart is worked out once (Meeus; the mechanical checks hold it to JPL Horizons)
+  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);await recovery.locator('#birthtime').fill('14:30');await recovery.locator('#birthtime').dispatchEvent('change');
+  await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);await recovery.locator('#birthplace').fill('Londo');
+  await recovery.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);check((await recovery.evaluate(()=>window.ascendantDial.snapshot().placeMatches))[0]==='London, Britain (UK)','typing a town lists the matches from the bundled list, the biggest first (London)');
+  await action('place-match-0');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.sunSign==='Taurus' && r.moonSign==='Leo' && r.risingSign==='Virgo' && r.bigThree==='\u2609 Taurus \u00b7 \u263d Leo \u00b7 \u2191 Virgo' && r.canSliceContinue,'a birth date, time and place work out the chart in the browser: '+r.bigThree+' (London, May 1 1990, 14:30)'); }
   await action('next-screen');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
   for(let n=0;n<8&&(await recovery.evaluate(()=>window.ascendantDial.snapshot().screen))==='atrium';n++){await action('next-screen');await recovery.waitForTimeout(150);}
   await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // Build T: the walk to the Dial
@@ -842,7 +864,7 @@ const path=require('path');
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
-    await act('birth-known');await art.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await art.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');
+    await act('birth-known');await art.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await art.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');await act('sign-unknown');await act('sign-unknown');await art.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await art.screenshot({path:path.join(out,viewport.width+'-art-atrium.png')});
     check(await art.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll with the test set at '+viewport.width);
@@ -894,7 +916,7 @@ const path=require('path');
       const filled=(res,label)=>{const bar=Object.entries(res).filter(([,v])=>v.bg>.5||(v.sd<2.5&&v.bg>.1));check(bar.length===0,'Part 2: at '+name+' ('+w+' x '+h+') the '+label+'\'s art reaches every edge, with no bar of the canvas\'s own colour in any margin ('+(Object.keys(res).length?Object.entries(res).map(([k,v])=>k+' spread '+v.sd.toFixed(1)+', bar '+Math.round(v.bg*100)+'%').join('; '):'none: the column fills the screen')+')');}; // a bar is the canvas's own charcoal (19, 19, 23); an art edge that is dark and even (the journal's desk) carries on and passes
       await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await pg.locator('#loading').waitFor({state:'detached'});
       await pg.locator('#name').fill('Tester');await pg.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
-      await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');await act('birth-known');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');
+      await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');await act('birth-known');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await act('sign-unknown');await act('sign-unknown');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
       await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue);
       for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await pg.waitForTimeout(150);}
       await until(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy);

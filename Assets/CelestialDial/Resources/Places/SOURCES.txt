@@ -1,0 +1,16 @@
+The opening's place list and time zones (batch 2, owner Oct 2: the Big Three approved; "Download OK: cities15000.zip from
+download.geonames.org (CC BY 4.0) ... Use the IANA tz data already on the Mac").
+
+places.txt: every place in GeoNames' cities15000 (places of 15,000 people or more), 34,152 of them, biggest first. Each line:
+the name as listed (a United States place carries its state; two places of the same name in a country carry their coordinates),
+its search key when its ASCII name differs from the name, latitude, longitude, and its time zone's line in zones.txt.
+Source: https://download.geonames.org/export/dump/cities15000.zip, fetched Oct 2, 2026 (3,359,956 bytes, SHA-256
+c2fc384e708978317413a86d36886f226a1203dcbf54796416443691f8bba897). Country names from the IANA time zone database's iso3166.tab.
+GeoNames data is licensed under the Creative Commons Attribution 4.0 License: https://creativecommons.org/licenses/by/4.0/
+Credit: place data from GeoNames (https://www.geonames.org/), CC BY 4.0. Changes: fields trimmed, rows sorted and labelled.
+
+zones.txt: each of the 356 time zones those places use, with its UTC offset in seconds on Jan 1, 1900, then every change to 2040
+(minutes since 1900-01-01 00:00 UTC, the new offset in seconds). Worked out with Python's zoneinfo from the IANA time zone database
+on this Mac (version 2026c), which is in the public domain.
+
+Rebuild both with Tools/make-places.py from the unzipped cities15000.txt.

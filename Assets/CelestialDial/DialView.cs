@@ -127,6 +127,9 @@ namespace Ascendant.CelestialDial
             public int casparPage, casparPages; // Build S: the page of Caspar's line shown in the slim box on screen, and how many (0 when none shows)
             public string casparShown = ""; // Build S: that page's words, colour tags and all
             public bool keyRevealed, keyInserted, ended, canInsert, canSliceContinue, canName, canBirth, canBirthDate, canSignPick, canChangeBirth;
+            // batch 2 (owner, Oct 2 evening: the Big Three approved): the birth screen's step, the time and place steps, the places matching what is typed, the chart
+            public bool canBirthTime, canBirthPlace, canSignUnknown; public string birthStep = "", moonSign = "", risingSign = "", bigThree = ""; public string[] placeMatches;
+            public bool canCusp, cuspWhy; public string cuspTime = "", cuspQuestion = "", sunBasis = ""; public string[] cuspSigns; // the cusp day (owner ruling, Oct 2 evening)
             public int atriumStage, dueCount;
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
             public string hubNote = "";

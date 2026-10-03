@@ -111,5 +111,12 @@ namespace Ascendant.CelestialDial
         public bool builderEvidence;
         public int locksFilled;                  // Build D: Keys spent in the Chamber (Book 1 has three locks; the fourth Key starts Book 2)
         public bool journalTitled;               // batch 2 (owner, Oct 1, 1e A): the journal's title page has shown, on its first-ever open
+        // batch 2 (owner, Oct 2 evening: the Big Three approved): the chart fixed at the opening, and the birth data it came from
+        public int moonSign = -1, risingSign = -1; // -1 unknown; a save from before has neither
+        public string chartFrom = "";             // chart (worked out), known (entered) or chosen (the game chose the sun)
+        public string sunBasis = "";              // the cusp day (owner, Oct 2): picked (the player's), noon (approximate: "I'm not sure"), or "" (worked out or given)
+        public string birthDate = "";             // YYYY-MM-DD, on the chart path
+        public int birthMinute = -1;              // minutes after local midnight; -1 unknown
+        public string birthPlace = "", birthZone = ""; public float birthLatitude, birthLongitude;
     }
 }
