@@ -87,11 +87,11 @@ The owner's ruling (Oct 3, comment 90140263872651 on 86bcbn6w6): step 4 approved
 - Mechanical (+19): the data's shape (five concepts, six questions each, two to four different choices, the right one among them); the facts against the game's data; the list growing lesson by lesson, and empty before the first; a whole round (each question once, each answer marked once, the right and wrong lines, the end); a fresh order each round; "‹ Practice" mid-round; the save and the deck unchanged; every line fitting its place at the fonts' own widths; every target 44 px or more.
 - The fixture (+7) and the suite (+14): the door opens the list at Key 1; a round on the canvas (a right pick, a wrong one, Next, at both widths the whole round to its end and Back to Practice); the targets; the spoken page.
 
-Validation (local, worktree `dial-wake`, branch `codex/journal-practice` on main `53c9933`):
-- mechanical checks 649/649 (+19), 0 compiler warnings;
-- slice fixture 269/269 (+7);
+Validation (local, worktree `dial-wake`, branch `codex/journal-practice` rebased on main `6d7b61b`, so with the triangles and the Moon):
+- mechanical checks 659/659 (+19), 0 compiler warnings;
+- slice fixture 271/271 (+7);
 - headless WebGL 0 errors and 0 warnings (36.1 MB);
-- browser suite 617/617 at desktop density, with the seven shapes (+14), and 526/526 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
+- browser suite 624/624 at desktop density, with the seven shapes (+14), and 533/533 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
 
 Captures: [`Evidence/practice-2026-10-03/`](Evidence/practice-2026-10-03/), with the approved board beside the game at Key 1 and at Key 4.
 
