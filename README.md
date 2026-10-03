@@ -54,7 +54,7 @@ Your progress saves in your browser the moment anything changes. Come back later
 
 ## What's next
 
-- Practice in the journal. Its door is on the journal's first page but opens nothing yet; the plan for it is with the owner for approval.
+- Practice in the journal. Its door is on the journal's first page but opens nothing yet; the questions are written and are with the owner for approval.
 - The book on the shelf, getting the same treatment as the rest of the Wing.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in.
 - Caspar's last few lines, around practice and the journal.
