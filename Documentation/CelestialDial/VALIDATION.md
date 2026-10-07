@@ -101,7 +101,9 @@ Validation (local, worktree `dial-wake`, branch `codex/journal-practice` rebased
 
 Captures: [`Evidence/practice-2026-10-03/`](Evidence/practice-2026-10-03/), with the approved board beside the game at Key 1 and at Key 4.
 
-Held off production until the owner approves the questions (the ruling: "I rewrite or approve them before it ships"); the APK for the owner's playtest carries it.
+Held off production until the owner approved the questions (the ruling: "I rewrite or approve them before it ships"); the APK carried it for the owner's playtest. The owner played all 30 and approved them as written on Oct 7.
+
+Merged as PR #114 (main `4a9a845`, Oct 7 at 09:39 UTC; a merge commit of main `35bf695` and the head `808e1f1`; the head is itself a merge of main `35bf695` into the branch's `7023b5f`, which resolved the build-log conflict and recorded the owner's approval). The PR's validation record is the combined-code ladder above (659/659, 271/271, 624/624 and 533/533). The main run (`37602121981`: Web) passed. Production recheck after the Pages deploy (passed): browser suite 624/624 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against `https://davonlemar30.github.io/Ascendant/`, the seven shapes and the Practice checks included, no runtime errors.
 
 ## The journal's landing and the Big Three: the title page, the Keeper's record, Contents, the Library Map and the birth chart (batch 2)
 
