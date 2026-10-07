@@ -17,7 +17,7 @@ Validation (local, Unity 6000.3.24f1, final head `99c9ebb`):
 - headless WebGL 0 errors and 0 warnings;
 - browser suite 665/665 at desktop density and 665/665 at phone density;
 - GitHub Actions Web build green on `99c9ebb`;
-- production: checked by Claude after the Pages deploy and posted on the task.
+- production, after the Pages deploy of b71821d (Build Web player and Deploy to GitHub Pages both green): 665/665 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against https://davonlemar30.github.io/Ascendant/, main's own suite, no failures and no runtime errors (Claude's comment 90140265736971 on 86bced0tc).
 
 Reviews: Jeffrey's B1 (the fourth DEV sample) and B2 (the record) fixed or closed; his notes 1 to 4 applied in `99c9ebb`. Not tested: "Starting sign: Aries" on the Dial in a browser (no new game reaches it; the mechanical check covers the older save), older saves played through the opening's screens by hand, the rising asked during an Add in the fixture or the browser, a phone or the APK (no cut; the phone-density suite stands in).
 
