@@ -1722,7 +1722,7 @@ namespace Ascendant.CelestialDial
         // the Big Three's line (owner, Oct 2 evening: approved, unknowns A): each glyph in the font that carries it, gilt; the words in the italic
         RectTransform bigThreeLine; readonly Text[] bigThreeGlyphs = new Text[3], bigThreeWords = new Text[3]; Button journalBigThree; // Oct 7: the line opens "Your Birth" for every player
         // "Your Birth" (owner, Oct 7): three rows (Date, Time, Place: the value or unknown, with Add), the journal's lines under them, and its buttons
-        public const float BirthRowTop = 148f, BirthRowHeight = 46f, BirthNameLeft = 64f, BirthValueLeft = 124f, BirthAddX = 290f, BirthAddWidth = 72f, BirthLineWidth = 256f, BirthButtonWidth = 214f;
+        public const float BirthRowTop = 148f, BirthRowHeight = 46f, BirthNameLeft = 64f, BirthValueLeft = 124f, BirthAddX = 280f, BirthAddWidth = 72f, BirthLineWidth = 256f, BirthButtonWidth = 214f;
         RectTransform journalBirth; readonly Text[] birthRowNames = new Text[3], birthRowValues = new Text[3]; readonly Button[] birthAddButtons = new Button[3]; readonly List<Text> birthPageLines = new List<Text>(); Button birthRisingButton, birthTimeButton;
         public static readonly string[] BigThreeMarks = { "\u2609", "\u263d", "\u2191" }; // ☉ (Noto Sans Symbols 2), ☽ (Noto Sans Symbols), ↑ (EB Garamond)
         public static readonly int[] BigThreeMarkSizes = { 15, 19, 17 };                      // each drawn about the words' cap height

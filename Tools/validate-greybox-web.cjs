@@ -965,7 +965,7 @@ const path=require('path');
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
     await art.locator('#name').fill('Tester');await art.locator('#name').dispatchEvent('change');await art.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
-    await act('birth-known');await art.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await art.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');await act('sign-unknown');await act('sign-unknown');await art.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+    await act('birth-skip');await art.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await art.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus'&&window.ascendantDial.snapshot().birthStep==='done');
     await act('next-screen');await art.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await art.screenshot({path:path.join(out,viewport.width+'-art-atrium.png')});
     check(await art.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll with the test set at '+viewport.width);
@@ -1017,7 +1017,7 @@ const path=require('path');
       const filled=(res,label)=>{const bar=Object.entries(res).filter(([,v])=>v.bg>.5||(v.sd<2.5&&v.bg>.1));check(bar.length===0,'Part 2: at '+name+' ('+w+' x '+h+') the '+label+'\'s art reaches every edge, with no bar of the canvas\'s own colour in any margin ('+(Object.keys(res).length?Object.entries(res).map(([k,v])=>k+' spread '+v.sd.toFixed(1)+', bar '+Math.round(v.bg*100)+'%').join('; '):'none: the column fills the screen')+')');}; // a bar is the canvas's own charcoal (19, 19, 23); an art edge that is dark and even (the journal's desk) carries on and passes
       await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await pg.locator('#loading').waitFor({state:'detached'});
       await pg.locator('#name').fill('Tester');await pg.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
-      await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');await act('birth-known');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await act('sign-unknown');await act('sign-unknown');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
+      await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');await act('birth-skip');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
       await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue);
       for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await pg.waitForTimeout(150);}
       await until(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy);
