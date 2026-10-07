@@ -16,16 +16,16 @@
 <p id="instructions" class="sr"></p>
 <div id="seats" role="group" aria-label="Zodiac seats in order"></div>
 <button id="back">Previous</button><button id="seal">Seal</button><button id="forward">Next</button>
-<button id="settings">Settings</button><button id="travel" aria-expanded="false">Travel</button><span id="travel-rows"><button id="travel-atrium">The Grand Atrium</button><button id="travel-wing">The Zodiac Wing</button><button id="travel-chamber">The Crystal Book Chamber</button></span><span id="jumps"><button id="jump-key1">Jump to after Key 1 (test)</button><button id="jump-wheel">Jump to the whole wheel lit (test)</button><button id="jump-key2">Jump to after Key 2 (test)</button><button id="jump-key3">Jump to after Key 3 (test)</button><button id="jump-key4">Jump to after Key 4 (test)</button><button id="jump-whole">Jump to the Zodiac Wing whole (test)</button><button id="jump-cusp">Jump to a cusp day, the opening's question (test)</button></span><button id="ask-caspar">Ask Caspar</button><button id="caspar-page">Continue Caspar's line</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
+<button id="settings">Settings</button><button id="travel" aria-expanded="false">Travel</button><span id="travel-rows"><button id="travel-atrium">The Grand Atrium</button><button id="travel-wing">The Zodiac Wing</button><button id="travel-chamber">The Crystal Book Chamber</button></span><span id="jumps"><button id="jump-key1">Jump to after Key 1 (test)</button><button id="jump-wheel">Jump to the whole wheel lit (test)</button><button id="jump-key2">Jump to after Key 2 (test)</button><button id="jump-key3">Jump to after Key 3 (test)</button><button id="jump-key4">Jump to after Key 4 (test)</button><button id="jump-whole">Jump to the Zodiac Wing whole (test)</button><button id="jump-cusp">Jump to a cusp day, the opening's question (test)</button><button id="jump-birth-skip">Jump to I'll skip it, the opening's first question (test)</button><button id="jump-birth-no-time">Jump to no birth time, the opening's first question (test)</button><button id="jump-birth-no-place">Jump to no birth place, the opening's first question (test)</button></span><button id="ask-caspar">Ask Caspar</button><button id="caspar-page">Continue Caspar's line</button><button id="continue">Continue</button><button id="optional">Try one more, optional</button><button id="motion">Reduced motion</button>
 <label id="name-label" for="name" class="sr">Your name</label><input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Your name" hidden>
 <label id="birthdate-label" for="birthdate" class="sr">Your birth date</label><input id="birthdate" type="date" hidden>
 <button id="use-date">Use this date</button><button id="change-birth">Change my answer</button>
 <label id="birthtime-label" for="birthtime" class="sr">Your birth time</label><input id="birthtime" type="time" hidden><button id="use-time">Use this time</button><button id="time-unknown">I don't know my birth time</button>
 <label id="birthplace-label" for="birthplace" class="sr">Your birth town or city</label><input id="birthplace" type="text" maxlength="60" autocomplete="off" placeholder="Town or city" hidden>
 <div id="place-matches" role="group" aria-label="Places that match"><button id="place-match-0"></button><button id="place-match-1"></button><button id="place-match-2"></button><button id="place-match-3"></button></div>
-<div id="signs" role="group" aria-label="Choose your sign"></div><button id="sign-unknown">I'm not sure</button><button id="place-unknown">I don't know where</button><button id="birth-cancel">Back to Your Journal</button>
-<div id="cusp" role="group" aria-label="Which sign do you go by?"><button id="cusp-0"></button><button id="cusp-1"></button><button id="cusp-unsure">I'm not sure</button><button id="cusp-why" aria-expanded="false">Why?</button></div>
-<div id="moon" role="group" aria-label="Which Moon do you go by?"><button id="moon-0"></button><button id="moon-1"></button><button id="moon-2"></button><button id="moon-unsure">I'm not sure</button></div>
+<div id="signs" role="group" aria-label="Choose your sign"></div><button id="place-unknown">I don't know where</button><button id="birth-cancel">Back to Your Journal</button>
+<div id="cusp" role="group" aria-label="Which sign do you go by?"><button id="cusp-0"></button><button id="cusp-1"></button><button id="cusp-why" aria-expanded="false">Why?</button></div>
+<div id="moon" role="group" aria-label="Which Moon do you go by?"><button id="moon-0"></button><button id="moon-1"></button><button id="moon-2"></button></div>
 <button id="birth-chart">Yes, I know my birthday</button><button id="birth-skip">I'll skip it</button>
 <button id="next-screen">Continue</button><button id="insert">Insert Key</button><button id="restart">Start over, test only</button>
 <button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="leave-dial">Leave the Dial</button><button id="leave-wing">Return to the Atrium</button><button id="leave-chamber">Return to the Atrium</button>
@@ -70,6 +70,7 @@
   byId('travel').onclick=()=>send('travel');for(const r of ['atrium','wing','chamber'])byId('travel-'+r).onclick=()=>send('travel:'+r); // the room mini-menu (86bca07wv)
   for(const c of ['key1','wheel','key2','key3','key4','whole'])byId('jump-'+c).onclick=()=>send('jump:'+c); // Build W: DEV Mode
   byId('jump-cusp').onclick=()=>send('jump-cusp'); // batch 2: DEV Mode's cusp-day sample, the opening's question
+  for(const b of ['skip','no-time','no-place'])byId('jump-birth-'+b).onclick=()=>send('jump-birth:'+b); // Oct 7 (86bced0tc): each other path's sample
   for(let i=0;i<4;i++){byId('element-'+i).onclick=()=>send('element:'+i);byId('glyph-name-'+i).onclick=()=>send('glyph-name:'+i);byId('builder-name-'+i).onclick=()=>send('builder-name:'+i);}
   for(let i=0;i<3;i++)byId('builder-share-'+i).onclick=()=>send('builder-share:'+i);
   // Build AA: the journal's Wheel: its seats, the Wheel / Table switch, the tabs, a sign page's links
@@ -86,10 +87,10 @@
   // batch 2 (owner, Oct 2 evening: the Big Three approved): the time, the place's search and pick, I don't know for the moon and the rising sign
   byId('birthtime').addEventListener('change',e=>send('birthtime:'+e.target.value));byId('use-time').onclick=()=>send('birthtime:'+byId('birthtime').value);byId('time-unknown').onclick=()=>send('birthtime-unknown');
   byId('birthplace').addEventListener('input',e=>send('birthplace-search:'+e.target.value));for(let i=0;i<4;i++)byId('place-match-'+i).onclick=()=>send('birthplace:'+i);
-  byId('sign-unknown').onclick=()=>send('sign:-1');byId('place-unknown').onclick=()=>send('birthplace-unknown');byId('birth-cancel').onclick=()=>send('birth-cancel'); // Oct 7: I'm not sure, I don't know where, and back to "Your Birth"
+  byId('place-unknown').onclick=()=>send('birthplace-unknown');byId('birth-cancel').onclick=()=>send('birth-cancel'); // Oct 7: I'm not sure, I don't know where, and back to "Your Birth"
   byId('journal-bigthree').onclick=()=>send('journal-birth');for(let i=0;i<3;i++)byId('birth-add-'+i).onclick=()=>send('birth-add');byId('birth-rising').onclick=()=>send('birth-rising');byId('birth-add-time').onclick=()=>send('birth-add-time'); // Oct 7: "Your Birth"
-  byId('cusp-0').onclick=()=>send('cusp:0');byId('cusp-1').onclick=()=>send('cusp:1');byId('cusp-unsure').onclick=()=>send('cusp:-1');byId('cusp-why').onclick=()=>send('cusp-why'); // the cusp day (owner ruling, Oct 2 evening)
-  for(let i=0;i<3;i++)byId('moon-'+i).onclick=()=>send('moon:'+i);byId('moon-unsure').onclick=()=>send('moon:-1'); // Oct 7: the Moon's options and I'm not sure
+  byId('cusp-0').onclick=()=>send('cusp:0');byId('cusp-1').onclick=()=>send('cusp:1');byId('cusp-why').onclick=()=>send('cusp-why'); // the cusp day (owner ruling, Oct 2 evening)
+  for(let i=0;i<3;i++)byId('moon-'+i).onclick=()=>send('moon:'+i); // Oct 7: the Moon's options (no "I'm not sure" since 86bced0tc)
   function box(id,x,y,w,h){
     const scale=Math.min(innerWidth/360,innerHeight/800), left=(innerWidth-360*scale)/2, top=(innerHeight-800*scale)/2;
     Object.assign(byId(id).style,{left:(left+(180+x-w/2)*scale)+'px',top:(top+(y-h/2)*scale)+'px',width:(w*scale)+'px',height:(h*scale)+'px'});
@@ -103,10 +104,10 @@
     box('name',0,300,260,48);for(let i=0;i<2;i++)box(['birth-chart','birth-skip'][i],0,300+i*64,300,52);
     box('next-screen',0,654,190,56);box('insert',0,654,190,56);box('restart',0,768,216,48);
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
-    box('birthtime',0,338,200,48);box('use-time',0,420,200,52);box('time-unknown',0,482,260,52);box('birthplace',0,338,260,48);for(let i=0;i<4;i++)box('place-match-'+i,0,422+i*44,300,42);box('sign-unknown',0,580,300,44); // batch 2; Oct 7: the matches 10 lower and 44 apart (SliceView.PlaceMatchTop, PlaceMatchStep)
+    box('birthtime',0,338,200,48);box('use-time',0,420,200,52);box('time-unknown',0,482,260,52);box('birthplace',0,338,260,48);for(let i=0;i<4;i++)box('place-match-'+i,0,422+i*44,300,42);// batch 2; Oct 7: the matches 10 lower and 44 apart (SliceView.PlaceMatchTop, PlaceMatchStep)
     box('place-unknown',0,600,260,44);box('birth-cancel',0,250,200,48); // Oct 7: under the matches (SliceView.PlaceUnknownY); back to "Your Birth" where Change my answer sits
-    box('cusp-0',0,400,300,44);box('cusp-1',0,452,300,44);box('cusp-unsure',0,504,300,44);box('cusp-why',0,546,96,44); // the cusp question's answers and its Why?
-    {const n=((state&&state.moonOptions)||[]).length;for(let i=0;i<3;i++)box('moon-'+i,0,400+i*52,300,44);box('moon-unsure',0,400+n*52,300,44);} // Oct 7: the Moon's options, then I'm not sure under them
+    box('cusp-0',0,400,300,44);box('cusp-1',0,452,300,44);box('cusp-why',0,546,96,44); // the cusp question's answers and its Why?
+    {const n=((state&&state.moonOptions)||[]).length;for(let i=0;i<3;i++)box('moon-'+i,0,400+i*52,300,44);} // Oct 7: the Moon's options, then I'm not sure under them
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
     box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
     box('leave-dial',0,768,216,44);{const g=(state&&state.gearAt)||[158,22+(state&&state.safeTop||0)];box('settings',g[0],g[1],44,44);}box('leave-wing',0,680,300,52); // note 10: the Dial's exit and the room's are two buttons; Platform fit, Part 1: the gear sits below the safe area's top band (state.safeTop)
@@ -165,9 +166,9 @@
       {const b=state.journalBirthBoxes||[],on=journal&&state.journalView==='birth';byId('journal-bigthree').disabled=!(journal&&state.journalView==='landing'&&state.canBirthPage);for(let i=0;i<3;i++)byId('birth-add-'+i).disabled=!(on&&state.canBirthAdd&&b[4*i+2]>0);byId('birth-rising').disabled=!(on&&state.canBirthRising);byId('birth-rising').textContent=state.birthRisingWords||'Choose my rising';byId('birth-add-time').disabled=!(on&&state.canBirthAddTime);} // Oct 7
       byId('birthdate').hidden=!state.canBirthDate;byId('use-date').disabled=!state.canBirthDate;byId('change-birth').disabled=!state.canChangeBirth;
       byId('birthtime').hidden=!state.canBirthTime;byId('use-time').disabled=!state.canBirthTime;byId('time-unknown').disabled=!state.canBirthTime;byId('birthplace').hidden=!state.canBirthPlace;
-      {const m=state.placeMatches||[];for(let i=0;i<4;i++){const b=byId('place-match-'+i);b.textContent=m[i]||'';b.disabled=!(state.canBirthPlace&&m[i]);}}byId('sign-unknown').disabled=!state.canSignUnknown;
-      {const c=state.cuspSigns||[];byId('cusp-0').textContent=c[0]||'';byId('cusp-1').textContent=c[1]||'';for(const id of ['cusp-0','cusp-1','cusp-unsure','cusp-why'])byId(id).disabled=!state.canCusp;byId('cusp-why').setAttribute('aria-expanded',String(!!state.cuspWhy));}
-      {const m=state.moonOptions||[];for(let i=0;i<3;i++){const b=byId('moon-'+i);b.textContent=m[i]||'';b.disabled=!(state.canMoon&&m[i]);}byId('moon-unsure').disabled=!state.canMoon;} // Oct 7
+      {const m=state.placeMatches||[];for(let i=0;i<4;i++){const b=byId('place-match-'+i);b.textContent=m[i]||'';b.disabled=!(state.canBirthPlace&&m[i]);}}
+      {const c=state.cuspSigns||[];byId('cusp-0').textContent=c[0]||'';byId('cusp-1').textContent=c[1]||'';for(const id of ['cusp-0','cusp-1','cusp-why'])byId(id).disabled=!state.canCusp;byId('cusp-why').setAttribute('aria-expanded',String(!!state.cuspWhy));}
+      {const m=state.moonOptions||[];for(let i=0;i<3;i++){const b=byId('moon-'+i);b.textContent=m[i]||'';b.disabled=!(state.canMoon&&m[i]);}} // Oct 7
       if(!state.canBirthPlace&&byId('birthplace').value!=='')byId('birthplace').value=''; // a fresh search each time the step opens
       for(let i=0;i<12;i++)byId('sign-'+i).disabled=!state.canSignPick;
       byId('signs').hidden=!state.canSignPick;

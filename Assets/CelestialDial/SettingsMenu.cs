@@ -15,6 +15,7 @@ namespace Ascendant.CelestialDial
         public Action ToggleSound, ToggleMotion, CycleWalk, StartOver, Changed;
         public Action<string> Jump; // Build W: DEV Mode's Jump to…, a checkpoint id (DevCheckpoints)
         public Action CuspDay; // batch 2: DEV Mode's cusp-day sample (owner, Oct 2 evening): a fresh opening at the cusp question
+        public Action<string> BirthOpening; // Oct 7 (86bced0tc): a fresh opening at each other path's first question: skip, no-time, no-place
         public Func<string> WakeLabel; public Action CycleWake; // the Dial's wake-up (86bcbn6w6): DEV Mode previews each step
         public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
@@ -55,7 +56,7 @@ namespace Ascendant.CelestialDial
             var over = Row(panel, y, () => StartOver?.Invoke(), 40); over.text = "Start over"; y += 56;
             var close = Row(panel, y, Close); close.text = "Close"; close.color = Gold;
             // Build W: the checkpoint list, in place of the main box while it shows.
-            float jumpHeight = 62 + DevCheckpoints.All.Length * 46 + 46 + 56 + 24 + 22; // the checkpoints, the cusp-day sample, then the Dial's wake-up preview
+            float jumpHeight = 62 + DevCheckpoints.All.Length * 46 + 46 * (1 + BirthSamples.Length) + 56 + 24 + 22; // the checkpoints, the opening's samples (the cusp day first), then the Dial's wake-up preview
             jumpPanel = Rect("Jump to box", menu, 0, 400, 280, jumpHeight);
             var jumpImage = jumpPanel.gameObject.AddComponent<Image>(); jumpImage.sprite = Slots.InstrumentBoxSprite(); jumpImage.type = Image.Type.Sliced; jumpImage.pixelsPerUnitMultiplier = 2;
             jumpPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
@@ -63,6 +64,7 @@ namespace Ascendant.CelestialDial
             float jy = 62;
             foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), 40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
             var cusp = Row(jumpPanel, jy, () => CuspDay?.Invoke(), 40); cusp.text = "A cusp day (the opening)"; cusp.transform.parent.name = "Jump cusp"; jy += 46; // the cusp-day sample (owner, Oct 2 evening): the opening's question
+            foreach (var (id, label) in BirthSamples) { string sample = id; var row = Row(jumpPanel, jy, () => BirthOpening?.Invoke(sample), 40); row.text = label; row.transform.parent.name = "Jump birth " + id; jy += 46; } // Oct 7: each path's first question
             wakeRow = Row(jumpPanel, jy, () => CycleWake?.Invoke(), 40); wakeRow.transform.parent.name = "Dial wake"; jy += 46; // DEV Mode: a tap steps the Dial's look (first visit, Key 1 to Key 4), then back to as earned
             var back = Row(jumpPanel, jy + 10, ShowMain); back.text = "Back"; back.color = Gold;
             jumpPanel.gameObject.SetActive(false);
@@ -84,6 +86,7 @@ namespace Ascendant.CelestialDial
         void Update() { if (canvas != null && canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f); }
 
         // ---- building ----
+        public static readonly (string id, string label)[] BirthSamples = { ("skip", "I'll skip it (the opening)"), ("no-time", "No birth time (the opening)"), ("no-place", "No birth place (the opening)") };
         Text Row(RectTransform panel, float top, UnityEngine.Events.UnityAction action, float height = 48)
         {
             var b = MakeButton(panel, "", 0, top, 232, height, () => { action(); Refresh(); Changed?.Invoke(); });

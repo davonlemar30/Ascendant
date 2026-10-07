@@ -168,9 +168,19 @@ namespace Ascendant.CelestialDial
         // screen can offer a fix; with no place, the window's middle). A birth time added later settles it (Oct 7: worked out beats chosen).
         public int CuspFrom { get; private set; } = -1; public int CuspTo { get; private set; } = -1; public int CuspNoon { get; private set; } = -1;
         public int CuspMinute { get; private set; } = -1; // the minute the sun changed sign, on the birth place's clock that day; -1 with no place
-        void ClearCusp() { CuspFrom = CuspTo = CuspNoon = CuspMinute = -1; MoonAsk = new int[0]; heldSun = heldMoon = null; }
+        void ClearCusp() { CuspFrom = CuspTo = CuspNoon = CuspMinute = -1; MoonAsk = new int[0]; heldSun = heldMoon = heldRising = null; }
         // the cusp's and the Moon's answers are held until the steps finish, so going back from "Your Birth" changes nothing (Jeffrey, #123 B1)
-        ChoiceRecord heldSun, heldMoon;
+        ChoiceRecord heldSun, heldMoon, heldRising;
+        // No unknown Big Three (owner, Oct 7, task 86bced0tc: "i dont want the player to have an unknown big three or sign during there play
+        // thru"; "Yes, at the opening"): whatever the facts can't settle is asked, in the record's order (the sun, the moon, the rising), with
+        // no "I'm not sure"; each pick is the player's choice, flagged picked. Older saves keep what they hold (owner: "Leave them; I'll start fresh").
+        bool AskNext() => AskMoon() || AskRising();
+        bool AskRising()
+        {
+            var rising = pending?.Worked.Point("rising"); var chosen = ChoiceFor("rising");
+            if ((rising != null && rising.Settled) || (chosen != null && chosen.sign >= 0)) return false;
+            BirthStep = "rising-pick"; Note = ""; Logged?.Invoke("rising_asked"); return true;
+        }
         // The Moon pick (owner, Oct 7: "Ask, like the cusp Sun"): when the Moon could be in more than one sign (no birth time, or no place), the
         // opening asks which the player goes by, after the cusp question if there is one. A pick is the player's choice, shown like any other
         // sign and flagged picked; "I'm not sure" keeps the options ("Pisces or Aries", Oct 3), flagged declined; a fact added later settles it.
@@ -182,26 +192,28 @@ namespace Ascendant.CelestialDial
             if (moon == null || moon.Settled || (chosen != null && moon.signs.Contains(chosen.sign))) return false;
             MoonAsk = moon.signs; BirthStep = "moon"; Note = ""; Logged?.Invoke("moon_uncertain"); return true;
         }
-        public bool PickMoon(int choice) // an index into MoonAsk, or -1: "I'm not sure"
+        public bool PickMoon(int choice) // an index into MoonAsk (no "I'm not sure" since Oct 7, 86bced0tc)
         {
-            if (Screen != SliceScreen.Birth || BirthStep != "moon" || choice < -1 || choice >= MoonAsk.Length) return false;
-            heldMoon = new ChoiceRecord { point = "moon", sign = choice < 0 ? -1 : MoonAsk[choice], how = choice < 0 ? "declined" : "picked" };
-            Logged?.Invoke(choice < 0 ? "moon_declined" : "moon_picked"); Commit(); return true;
+            if (Screen != SliceScreen.Birth || BirthStep != "moon" || choice < 0 || choice >= MoonAsk.Length) return false;
+            heldMoon = new ChoiceRecord { point = "moon", sign = MoonAsk[choice], how = "picked" };
+            Logged?.Invoke("moon_picked"); if (!AskRising()) Commit(); return true;
         }
         public static string ClockTime(int minute) { int h = minute / 60, m = minute % 60; return (h % 12 == 0 ? 12 : h % 12) + ":" + m.ToString("00") + (h < 12 ? " am" : " pm"); }
         public string CuspQuestion => CuspFrom < 0 ? "" : CuspMinute >= 0
             ? "The Sun moved from " + Zodiac.Seats[CuspFrom].Name + " into " + Zodiac.Seats[CuspTo].Name + " on the day you were born, at " + ClockTime(CuspMinute) + ". Your birth time decides which side of that line you landed on. Which sign do you go by?" // the owner's draft (owner writes)
             : "The Sun moved from " + Zodiac.Seats[CuspFrom].Name + " into " + Zodiac.Seats[CuspTo].Name + " on the day you were born. Your birth time and place decide which side of that line you landed on. Which sign do you go by?"; // with no place there is no clock to give the minute on: Claude's draft from the owner's (owner writes)
         public const string CuspUnsure = "I'm not sure", CuspWhyLink = "Why?", CuspWhy = "The Sun reaches each sign at an exact minute, and that minute shifts a little every year. Birthdays near the change are called cusps."; // the owner's drafts
-        public bool PickCuspSun(int choice) // 0: the sign it left, 1: the sign it entered, -1: "I'm not sure"
+        public bool PickCuspSun(int choice) // 0: the sign it left, 1: the sign it entered (the cusp's "I'm not sure" is removed: owner, Oct 7, 86bced0tc)
         {
-            if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < -1 || choice > 1) return false;
-            heldSun = new ChoiceRecord { point = "sun", sign = choice == 0 ? CuspFrom : choice == 1 ? CuspTo : CuspNoon, how = choice < 0 ? "noon" : "picked" };
-            Logged?.Invoke(choice < 0 ? "cusp_sun_noon" : "cusp_sun_picked"); if (!AskMoon()) Commit(); return true;
+            if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < 0 || choice > 1) return false;
+            heldSun = new ChoiceRecord { point = "sun", sign = choice == 0 ? CuspFrom : CuspTo, how = "picked" };
+            Logged?.Invoke("cusp_sun_picked"); if (!AskNext()) Commit(); return true;
         }
         // The opening's words and "Your Birth"'s (Oct 7): Claude's drafts from the approved recommendation, checked by Dante; the owner rewrites them
         public const string BirthQuestion = "Do you know when you were born?", KnowBirthday = "Yes, I know my birthday", SkipBirthday = "I'll skip it";
         public const string SkipAsk = "Which sign do you go by?", SkipUnsure = "I'm not sure";
+        public const string SkipMoonAsk = "Which moon sign do you go by?", SkipRisingAsk = "Which rising sign do you go by?"; // Oct 7, 86bced0tc: the owner-approved questions, drafts (owner writes)
+        public const string RisingKept = "Until then, I'll keep the one you chose."; // "Your Birth" with a chosen rising (86bced0tc): Claude's draft (owner writes)
         public const string StartFromAries = "Then we'll start from Aries, the first sign on the wheel. Your journal keeps a place for your birthday."; // after "I'm not sure", in the note where the retired random sun's line was
         public const string NearestCity = "The nearest city you know works well.", PlaceUnknown = "I don't know where";
         public const string BirthPageTitle = "Your Birth", DateRow = "Date", TimeRow = "Time", PlaceRow = "Place", AddWords = "Add", Unknown = "unknown";
@@ -259,7 +271,7 @@ namespace Ascendant.CelestialDial
                 BirthStep = "cusp"; Note = ""; Logged?.Invoke("sun_cusp"); return;
             }
             if (!Amending) Logged?.Invoke("chart_worked_out");
-            if (!AskMoon()) Commit();
+            if (!AskNext()) Commit();
         }
         struct Shown { public int sun, moon, rising; public bool sunChosen, risingChosen; }
         Shown Snapshot() => new Shown { sun = SunSign, moon = MoonSign, rising = RisingSign, sunChosen = FromChoice("sun"), risingChosen = RisingChosen };
@@ -267,8 +279,8 @@ namespace Ascendant.CelestialDial
         // way to a sign the facts now decide.
         void Commit()
         {
-            var before = Snapshot(); bool timeAdded = !Facts.HasTime && draft.HasTime;
-            foreach (var held in new[] { heldSun, heldMoon }) if (held != null) Choose(held.point, held.sign, held.how);
+            var before = Snapshot(); bool timeAdded = !Facts.HasTime && draft.HasTime, dateAdded = !Facts.HasDate && draft.HasDate;
+            foreach (var held in new[] { heldSun, heldMoon, heldRising }) if (held != null) Choose(held.point, held.sign, held.how);
             if (pending != null)
             {
                 var fresh = pending.Worked; var merged = new List<ChartPoint>();
@@ -286,20 +298,26 @@ namespace Ascendant.CelestialDial
             if (!Amending) { Note = ChartNote(); return; }
             var lines = new List<string>();
             if (RisingSign >= 0 && !RisingChosen && (before.rising < 0 || before.risingChosen)) { lines.Add(RisingIs(RisingSign)); if (before.risingChosen && before.rising != RisingSign) lines.Add(TakesThePlace); }
+            else if (RisingChosen && before.rising != RisingSign) lines.Add(ItIs(RisingSign)); // a rising asked during an Add (an older save had none)
             if (MoonSign >= 0 && before.moon != MoonSign) lines.Add(MoonIs(MoonSign));
-            if (HasSunSign && before.sun != SunSign) lines.Add(before.sunChosen && timeAdded && !FromChoice("sun") ? SunAtThatMinute(SunSign) : SunIs(SunSign)); // a sun worked out, or picked again on a cusp day
+            if (HasSunSign && before.sun != SunSign) lines.Add(before.sunChosen && timeAdded && !dateAdded && !FromChoice("sun") ? SunAtThatMinute(SunSign) : SunIs(SunSign)); // "at that minute" only for a time added to a known day (a cusp settled)
             if (lines.Count > 0) lines.Add(StaysLearned);
             Logged?.Invoke("birth_added"); FinishAmending(lines);
         }
         // the skip path's question (and nothing else asks the sun this way): a sign, or -1 for "I'm not sure"
+        // the skip path (Oct 7, 86bced0tc): "Which sign do you go by?", then the moon's and the rising's questions, each from the twelve
         public bool PickSkipSun(int seat)
         {
-            if (Screen != SliceScreen.Birth || Amending || BirthStep != "sun-pick" || seat < -1 || seat > 11) return false;
-            Choose("sun", seat, seat < 0 ? "declined" : "picked"); Chart = new WorkedChart { maths = BirthChart.Maths }; BirthStep = "done";
-            Note = seat < 0 ? StartFromAries : ChartNote(); Logged?.Invoke(seat < 0 ? "sun_declined" : "sun_picked"); return true;
+            if (Screen != SliceScreen.Birth || Amending || BirthStep != "sun-pick" || seat < 0 || seat > 11) return false;
+            Choose("sun", seat, "picked"); Chart = new WorkedChart { maths = BirthChart.Maths }; BirthStep = "moon-pick"; Logged?.Invoke("sun_picked"); return true;
         }
-        // the sign grid answers whichever question it is showing (the Moon's has its own buttons, its options)
-        public bool PickSign(int seat) => BirthStep == "rising-pick" ? PickRising(seat) : PickSkipSun(seat);
+        public bool PickSkipMoon(int seat)
+        {
+            if (Screen != SliceScreen.Birth || Amending || BirthStep != "moon-pick" || seat < 0 || seat > 11) return false;
+            Choose("moon", seat, "picked"); BirthStep = "rising-pick"; Logged?.Invoke("moon_picked"); return true;
+        }
+        // the sign grid answers whichever question it is showing (the cusp's and the Moon's options have their own buttons)
+        public bool PickSign(int seat) => BirthStep == "rising-pick" ? PickRising(seat) : BirthStep == "moon-pick" ? PickSkipMoon(seat) : PickSkipSun(seat);
         // what the birth screen says once the chart is known (Claude's drafts, owner writes)
         string ChartNote()
         {
@@ -340,10 +358,15 @@ namespace Ascendant.CelestialDial
             choiceBefore = BirthChoice; Amending = true; BirthChoice = "rising"; Note = ""; Screen = SliceScreen.Birth; BirthStep = "rising-pick";
             Logged?.Invoke("rising_choose"); return true;
         }
+        // the rising, picked: as the last of the facts' questions (held until the steps finish), as the skip path's last, or changed on "Your Birth"
         public bool PickRising(int seat)
         {
-            if (Screen != SliceScreen.Birth || !Amending || BirthStep != "rising-pick" || seat < 0 || seat > 11 || Worked("rising")) return false;
-            Choose("rising", seat, "picked"); BirthStep = "done"; Logged?.Invoke("rising_chosen"); FinishAmending(new List<string> { ItIs(seat) }); return true;
+            if (Screen != SliceScreen.Birth || BirthStep != "rising-pick" || seat < 0 || seat > 11 || Worked("rising")) return false;
+            Logged?.Invoke("rising_chosen");
+            if (pending != null) { heldRising = new ChoiceRecord { point = "rising", sign = seat, how = "picked" }; Commit(); return true; }
+            Choose("rising", seat, "picked"); BirthStep = "done";
+            if (!Amending) { Note = ChartNote(); return true; }
+            FinishAmending(new List<string> { ItIs(seat) }); return true;
         }
         public bool CanCancelAmending => Screen == SliceScreen.Birth && Amending;
         public bool CancelAmending() { if (!CanCancelAmending) return false; Logged?.Invoke("birth_add_cancelled"); FinishAmending(new List<string>()); return true; }

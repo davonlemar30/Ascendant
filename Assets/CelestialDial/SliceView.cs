@@ -62,6 +62,7 @@ namespace Ascendant.CelestialDial
         RectTransform birthCusp; Text cuspQuestion, cuspWhy; Button cuspWhyLink; readonly Button[] cuspButtons = new Button[3]; bool cuspWhyOpen;
         RectTransform birthMoon; Text moonQuestion; readonly Button[] moonButtons = new Button[4]; // Oct 7: the Moon's options (two, rarely three) and "I'm not sure", where the cusp question sits
         static string cuspDayFor; // DEV Mode's cusp-day sample: the name to carry into the opening's question across the reload
+        static string birthSampleFor, birthSampleId; // Oct 7: the same for each other path's sample
         Button leaveDial; // Build T
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
         Button enterWing, hubRestart, leavePractice;
@@ -170,7 +171,7 @@ namespace Ascendant.CelestialDial
             Settings = gameObject.AddComponent<SettingsMenu>();
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
             Settings.WakeLabel = () => WakeLabel; Settings.CycleWake = CycleWake; // the Dial's wake-up preview
-            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo; Settings.CuspDay = CuspDay;
+            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo; Settings.CuspDay = CuspDay; Settings.BirthOpening = BirthOpening;
             Settings.Build(font);
             SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
             SafeArea.Moved = Publish; // Part 2: the gear and the mini-menu button keep the web page's boxes on them
@@ -178,6 +179,7 @@ namespace Ascendant.CelestialDial
             if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
             TryRestore();
             if (cuspDayFor != null) OpenCuspDay(); // DEV Mode's cusp-day sample
+            if (birthSampleFor != null) OpenBirthOpening(); // Oct 7: DEV Mode's sample for each other path
             Show(); Publish();
         }
         void Update()
@@ -756,6 +758,7 @@ namespace Ascendant.CelestialDial
             try { save = DevCheckpoints.Play("key1", Flow.PlayerName, 1); } catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return; }
             save.version = 4; save.birth = new BirthFacts(); save.choices = new ChoiceRecord[0]; save.chart = new WorkedChart();
             save.moonSign = save.risingSign = save.moonFrom = save.moonTo = -1; save.sunBasis = save.birthDate = save.birthPlace = save.birthZone = ""; save.birthMinute = -1; save.birthLatitude = save.birthLongitude = 0;
+            if (SettingsMenu.BirthSamples.Any(b => b.id == id)) { BirthOpening(id); return; }
             switch (id)
             {
                 case "v4-chart":
@@ -768,6 +771,18 @@ namespace Ascendant.CelestialDial
                 default: return;
             }
             PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(save)); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        // DEV Mode (Oct 7, 86bced0tc): a fresh opening at a path's first question, the name kept: skip (Which sign do you go by?), no-time
+        // (London, May 2 1990, no birth time: the rising asked), no-place (May 10 1990, 2:30 pm, I don't know where: the moon asked, then the rising)
+        void BirthOpening(string id) { if (busy || !SettingsMenu.BirthSamples.Any(b => b.id == id)) return; birthSampleFor = Flow.PlayerName; birthSampleId = id; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+        void OpenBirthOpening()
+        {
+            var name = birthSampleFor; var id = birthSampleId; birthSampleFor = birthSampleId = null; Flow.SetName(name);
+            if (!(Flow.Continue() && Flow.Screen == SliceScreen.Birth)) return;
+            if (id == "skip") Flow.ChooseBirth("skip");
+            else if (id == "no-time") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 5, 2); Flow.SetBirthTime(-1); Flow.SetBirthPlace(Places.Find("London, Britain (UK)")); }
+            else if (id == "no-place") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 5, 10); Flow.SetBirthTime(14 * 60 + 30); Flow.SetBirthPlace(null); }
+            if (nameField != null) nameField.SetTextWithoutNotify(Flow.PlayerName); ShowBirth();
         }
         void CuspDay() { if (busy) return; cuspDayFor = Flow.PlayerName; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
         void OpenCuspDay()
@@ -792,7 +807,8 @@ namespace Ascendant.CelestialDial
                 case "time": return " Enter your birth time, if you know it.";
                 case "place": return " Enter your birth town or city, then pick it. " + SliceFlow.NearestCity;
                 case "sun-pick": return " " + SliceFlow.SkipAsk;
-                case "rising-pick": return " Choose your rising sign.";
+                case "moon-pick": return " " + SliceFlow.SkipMoonAsk;
+                case "rising-pick": return Flow.BirthChoice == "rising" ? " Choose your rising sign." : " " + SliceFlow.SkipRisingAsk;
                 case "cusp": return " " + Flow.CuspQuestion + (cuspWhyOpen ? " " + SliceFlow.CuspWhy : "");
                 case "moon": return " " + Flow.MoonQuestion;
             }
@@ -800,16 +816,16 @@ namespace Ascendant.CelestialDial
         }
         void ShowBirth()
         {
-            bool chosen = Flow.BirthChoice != ""; string step = Flow.BirthStep; bool chart = Flow.BirthChoice == "chart", signs = step == "sun-pick" || step == "rising-pick", amending = Flow.Amending;
+            bool chosen = Flow.BirthChoice != ""; string step = Flow.BirthStep; bool chart = Flow.BirthChoice == "chart", signs = step == "sun-pick" || step == "moon-pick" || step == "rising-pick", amending = Flow.Amending;
             birthHeading.text = amending ? SliceFlow.BirthPageTitle : SliceFlow.BirthQuestion;
             birthChoices.gameObject.SetActive(!chosen);
             birthDate.gameObject.SetActive(chart && step == "date"); birthTimeEntry.gameObject.SetActive(chart && step == "time"); birthPlaceEntry.gameObject.SetActive(chart && step == "place");
-            birthSigns.gameObject.SetActive(signs); signsLabel.gameObject.SetActive(signs); signUnknown.gameObject.SetActive(step == "sun-pick");
+            birthSigns.gameObject.SetActive(signs); signsLabel.gameObject.SetActive(signs); signUnknown.gameObject.SetActive(false); // no "I'm not sure" since Oct 7 (86bced0tc): every missing sign is picked
             bool cusp = chart && step == "cusp"; birthCusp.gameObject.SetActive(cusp); cuspWhy.gameObject.SetActive(cusp && cuspWhyOpen);
             bool moon = chart && step == "moon"; birthMoon.gameObject.SetActive(moon);
-            if (moon) { moonQuestion.text = Flow.MoonQuestion; for (int i = 0; i < moonButtons.Length; i++) { bool unsure = i == moonButtons.Length - 1, show = unsure || i < Flow.MoonAsk.Length; moonButtons[i].gameObject.SetActive(show); if (show) { moonButtons[i].GetComponentInChildren<Text>().text = unsure ? SliceFlow.CuspUnsure : Zodiac.Seats[Flow.MoonAsk[i]].Name; ((RectTransform)moonButtons[i].transform).anchoredPosition = new Vector2(0, -(110 + (unsure ? Flow.MoonAsk.Length : i) * 52)); } } }
-            if (cusp) { cuspQuestion.text = Flow.CuspQuestion; cuspButtons[0].GetComponentInChildren<Text>().text = Zodiac.Seats[Flow.CuspFrom].Name; cuspButtons[1].GetComponentInChildren<Text>().text = Zodiac.Seats[Flow.CuspTo].Name; cuspButtons[2].GetComponentInChildren<Text>().text = SliceFlow.CuspUnsure; }
-            signsLabel.text = step == "sun-pick" ? SliceFlow.SkipAsk : step == "rising-pick" ? SliceFlow.RisingAsk : ""; // Claude's drafts (owner writes)
+            if (moon) { moonQuestion.text = Flow.MoonQuestion; for (int i = 0; i < moonButtons.Length; i++) { bool unsure = i == moonButtons.Length - 1, show = !unsure && i < Flow.MoonAsk.Length; /* Oct 7 (86bced0tc): no "I'm not sure" */ moonButtons[i].gameObject.SetActive(show); if (show) { moonButtons[i].GetComponentInChildren<Text>().text = unsure ? SliceFlow.CuspUnsure : Zodiac.Seats[Flow.MoonAsk[i]].Name; ((RectTransform)moonButtons[i].transform).anchoredPosition = new Vector2(0, -(110 + (unsure ? Flow.MoonAsk.Length : i) * 52)); } } }
+            if (cusp) { cuspQuestion.text = Flow.CuspQuestion; cuspButtons[0].GetComponentInChildren<Text>().text = Zodiac.Seats[Flow.CuspFrom].Name; cuspButtons[1].GetComponentInChildren<Text>().text = Zodiac.Seats[Flow.CuspTo].Name; cuspButtons[2].GetComponentInChildren<Text>().text = SliceFlow.CuspUnsure; cuspButtons[2].gameObject.SetActive(false); } // the cusp's "I'm not sure" is removed (owner, Oct 7, 86bced0tc)
+            signsLabel.text = step == "sun-pick" ? SliceFlow.SkipAsk : step == "moon-pick" ? SliceFlow.SkipMoonAsk : step == "rising-pick" ? (Flow.BirthChoice == "rising" ? SliceFlow.RisingAsk : SliceFlow.SkipRisingAsk) : ""; // drafts (owner writes); "Your rising sign" when it is changed on "Your Birth"
             for (int i = 0; i < placeMatchButtons.Length; i++) { bool show = i < placeMatches.Count; placeMatchButtons[i].gameObject.SetActive(show); if (show) placeMatchButtons[i].GetComponentInChildren<Text>().text = placeMatches[i].Name; }
             placeUnknown.gameObject.SetActive(chart && step == "place"); placeUnknown.interactable = !busy;
             changeChoice.gameObject.SetActive(chosen && !amending); birthCancel.gameObject.SetActive(amending); birthCancel.interactable = !busy;
@@ -1383,7 +1399,7 @@ namespace Ascendant.CelestialDial
             bool birthNow = s == SliceScreen.Birth && !busy; string birthStep = Flow.BirthStep; state.birthStep = s == SliceScreen.Birth ? birthStep : "";
             state.canBirthDate = birthNow && Flow.BirthChoice == "chart" && birthStep == "date"; state.canBirthTime = birthNow && Flow.BirthChoice == "chart" && birthStep == "time"; state.canBirthPlace = birthNow && Flow.BirthChoice == "chart" && birthStep == "place";
             state.placeMatches = state.canBirthPlace ? placeMatches.Select(p => p.Name).ToArray() : new string[0];
-            state.canSignPick = birthNow && (birthStep == "sun-pick" || birthStep == "rising-pick"); state.canSignUnknown = birthNow && birthStep == "sun-pick"; // Oct 7: the skip path's sun, or the rising from "Your Birth"
+            state.canSignPick = birthNow && (birthStep == "sun-pick" || birthStep == "moon-pick" || birthStep == "rising-pick"); state.canSignUnknown = false; // Oct 7 (86bced0tc): no "I'm not sure" // Oct 7: the skip path's sun, or the rising from "Your Birth"
             state.canPlaceUnknown = state.canBirthPlace; state.canBirthCancel = birthNow && Flow.CanCancelAmending; state.amending = Flow.Amending; state.birthHeading = s == SliceScreen.Birth ? birthHeading.text : "";
             state.birthChoices = s == SliceScreen.Birth && Flow.BirthChoice == "" ? new[] { SliceFlow.KnowBirthday, SliceFlow.SkipBirthday } : new string[0];
             state.canMoon = birthNow && birthStep == "moon"; state.moonOptions = state.canMoon ? Flow.MoonAsk.Select(m => Zodiac.Seats[m].Name).ToArray() : new string[0]; state.moonQuestion = s == SliceScreen.Birth ? Flow.MoonQuestion : ""; state.moonBasis = Flow.FromChoice("moon") ? "picked" : Flow.ChoiceFor("moon") != null ? Flow.ChoiceFor("moon").how : "";
@@ -2075,7 +2091,7 @@ namespace Ascendant.CelestialDial
                 while (value.preferredWidth > room && value.fontSize > 11) value.fontSize--; // a long place name shrinks to fit, like the Big Three's line
                 birthAddButtons[i].gameObject.SetActive(missing[i]); birthAddButtons[i].interactable = Flow.CanAddFacts && !busy;
             }
-            var words = Flow.BirthLines.Count > 0 ? Flow.BirthLines : Flow.ShowsRisingWhy ? new List<string> { SliceFlow.RisingWhy, SliceFlow.RisingMeanwhile } : new List<string>();
+            var words = Flow.BirthLines.Count > 0 ? Flow.BirthLines : Flow.ShowsRisingWhy ? new List<string> { SliceFlow.RisingWhy, Flow.RisingChosen ? SliceFlow.RisingKept : SliceFlow.RisingMeanwhile } : new List<string>();
             var lines = new List<string>(); foreach (var w in words) lines.AddRange(BalancedWords(birthPageLines[0], w, BirthLineWidth));
             float baseline = BirthRowTop + BirthRowHeight * 3 + 36;
             for (int i = 0; i < birthPageLines.Count; i++) { bool show = i < lines.Count; birthPageLines[i].gameObject.SetActive(show); birthPageLines[i].text = show ? lines[i] : ""; if (show) SetLine(birthPageLines[i], baseline + QuizLineStep * i); }
@@ -2332,7 +2348,7 @@ namespace Ascendant.CelestialDial
                 case JournalView.Birth:
                     {
                         var f = Flow.Facts; var heard = "Your journal. " + SliceFlow.BirthPageTitle + ". " + SliceFlow.DateRow + ": " + BirthDateWords(f) + ". " + SliceFlow.TimeRow + ": " + BirthTimeWords(f) + ". " + SliceFlow.PlaceRow + ": " + BirthPlaceWords(f) + ".";
-                        var said = Flow.BirthLines.Count > 0 ? Flow.BirthLines : Flow.ShowsRisingWhy ? new List<string> { SliceFlow.RisingWhy, SliceFlow.RisingMeanwhile } : new List<string>();
+                        var said = Flow.BirthLines.Count > 0 ? Flow.BirthLines : Flow.ShowsRisingWhy ? new List<string> { SliceFlow.RisingWhy, Flow.RisingChosen ? SliceFlow.RisingKept : SliceFlow.RisingMeanwhile } : new List<string>();
                         return heard + (said.Count > 0 ? " " + string.Join(" ", said) : "");
                     }
             }
