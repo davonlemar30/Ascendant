@@ -55,7 +55,9 @@ Your progress saves in your browser the moment anything changes. Come back later
 ## What's next
 
 - The book on the shelf, getting the same treatment as the rest of the Wing.
-- The game's sounds: one ambient loop and a few interface sounds. The hooks are already in.
+- A journal inscription that writes itself and changes between visits. It's approved and not built yet.
+- A settled plan for players who don't know their birth time, covering the rising sign and everything later that needs it. It waits on the owner.
+- The game's sounds: one ambient loop and a few interface sounds. The hooks are already in; the work is on hold until the owner says.
 - Caspar's last few lines, around practice and the journal.
 - Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.
 - A new Android test build, cut only when the owner calls for it.
