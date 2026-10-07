@@ -127,8 +127,8 @@ namespace Ascendant.CelestialDial
         // worked out (exact or stable) beats chosen, and chosen beats unknown; an uncertain point shows its options ("Pisces or Aries", Oct 3).
         // The opening's question has two answers. "Yes, I know my birthday": the date, then the time (or "I don't know my birth time"), then the
         // place (or "I don't know where"), the chart worked out from whatever is known, and on a cusp day the sun asked (Oct 2). "I'll skip it":
-        // "Which sign do you go by?", a sign or "I'm not sure", which leaves the sun unknown and starts the lessons from Aries. "Enter what I
-        // already know" and the random sun are retired (Oct 7). Later, "Your Birth" in the journal adds a missing fact (the opening's boxes, in
+        // "Which sign do you go by?", then the moon's and the rising's questions (Oct 7, 86bced0tc: no unknowns). "Enter what I already know"
+        // and the random sun are retired (Oct 7). Whatever the facts leave open (the cusp, the moon, the rising) is picked, never "I'm not sure". Later, "Your Birth" in the journal adds a missing fact (the opening's boxes, in
         // order: date, time, place) or chooses the rising (Oct 3: no label, a hidden flag). Adding facts only narrows the window, so a point
         // already worked out keeps its sign; a choice gives way to a sign the facts decide; nothing already played changes.
         public BirthFacts Facts { get; private set; } = new BirthFacts();
@@ -164,8 +164,8 @@ namespace Ascendant.CelestialDial
         public bool Amending { get; private set; }          // on the birth screen from "Your Birth": adding a missing fact, or choosing the rising
         BirthFacts draft = new BirthFacts(); BirthChart pending; string choiceBefore = "";
         // The cusp day (owner ruling, Oct 2 evening): with no birth time, on a day the sun changed sign, the player is asked which sign they
-        // go by, and why; the answer is the player's choice: picked, or noon ("I'm not sure": the sun at local noon, approximate, so a later
-        // screen can offer a fix; with no place, the window's middle). A birth time added later settles it (Oct 7: worked out beats chosen).
+        // go by, and why; the answer is the player's choice, flagged picked (Oct 7, 86bced0tc: its "I'm not sure", the noon sign, is removed; an
+        // older save's "noon" still reads). A birth time added later settles it (Oct 7: worked out beats chosen).
         public int CuspFrom { get; private set; } = -1; public int CuspTo { get; private set; } = -1; public int CuspNoon { get; private set; } = -1;
         public int CuspMinute { get; private set; } = -1; // the minute the sun changed sign, on the birth place's clock that day; -1 with no place
         void ClearCusp() { CuspFrom = CuspTo = CuspNoon = CuspMinute = -1; MoonAsk = new int[0]; heldSun = heldMoon = heldRising = null; }
@@ -183,7 +183,8 @@ namespace Ascendant.CelestialDial
         }
         // The Moon pick (owner, Oct 7: "Ask, like the cusp Sun"): when the Moon could be in more than one sign (no birth time, or no place), the
         // opening asks which the player goes by, after the cusp question if there is one. A pick is the player's choice, shown like any other
-        // sign and flagged picked; "I'm not sure" keeps the options ("Pisces or Aries", Oct 3), flagged declined; a fact added later settles it.
+        // sign and flagged picked; a fact added later settles it. (#123's "I'm not sure", flagged declined, kept the options; 86bced0tc removes it,
+        // and an older save that holds it still shows "Pisces or Aries", Oct 3.)
         public int[] MoonAsk { get; private set; } = new int[0];
         public string MoonQuestion => MoonAsk.Length < 2 ? "" : "Your Moon was in " + Options(MoonAsk) + " that day. Which do you go by?"; // the owner's chosen wording (Oct 7), a draft (owner writes)
         bool AskMoon()
@@ -202,7 +203,7 @@ namespace Ascendant.CelestialDial
         public string CuspQuestion => CuspFrom < 0 ? "" : CuspMinute >= 0
             ? "The Sun moved from " + Zodiac.Seats[CuspFrom].Name + " into " + Zodiac.Seats[CuspTo].Name + " on the day you were born, at " + ClockTime(CuspMinute) + ". Your birth time decides which side of that line you landed on. Which sign do you go by?" // the owner's draft (owner writes)
             : "The Sun moved from " + Zodiac.Seats[CuspFrom].Name + " into " + Zodiac.Seats[CuspTo].Name + " on the day you were born. Your birth time and place decide which side of that line you landed on. Which sign do you go by?"; // with no place there is no clock to give the minute on: Claude's draft from the owner's (owner writes)
-        public const string CuspUnsure = "I'm not sure", CuspWhyLink = "Why?", CuspWhy = "The Sun reaches each sign at an exact minute, and that minute shifts a little every year. Birthdays near the change are called cusps."; // the owner's drafts
+        public const string CuspWhyLink = "Why?", CuspWhy = "The Sun reaches each sign at an exact minute, and that minute shifts a little every year. Birthdays near the change are called cusps."; // the owner's drafts
         public bool PickCuspSun(int choice) // 0: the sign it left, 1: the sign it entered (the cusp's "I'm not sure" is removed: owner, Oct 7, 86bced0tc)
         {
             if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < 0 || choice > 1) return false;
@@ -211,7 +212,7 @@ namespace Ascendant.CelestialDial
         }
         // The opening's words and "Your Birth"'s (Oct 7): Claude's drafts from the approved recommendation, checked by Dante; the owner rewrites them
         public const string BirthQuestion = "Do you know when you were born?", KnowBirthday = "Yes, I know my birthday", SkipBirthday = "I'll skip it";
-        public const string SkipAsk = "Which sign do you go by?", SkipUnsure = "I'm not sure";
+        public const string SkipAsk = "Which sign do you go by?";
         public const string SkipMoonAsk = "Which moon sign do you go by?", SkipRisingAsk = "Which rising sign do you go by?"; // Oct 7, 86bced0tc: the owner-approved questions, drafts (owner writes)
         public const string RisingKept = "Until then, I'll keep the one you chose."; // "Your Birth" with a chosen rising (86bced0tc): Claude's draft (owner writes)
         public const string StartFromAries = "Then we'll start from Aries, the first sign on the wheel. Your journal keeps a place for your birthday."; // after "I'm not sure", in the note where the retired random sun's line was
@@ -304,7 +305,6 @@ namespace Ascendant.CelestialDial
             if (lines.Count > 0) lines.Add(StaysLearned);
             Logged?.Invoke("birth_added"); FinishAmending(lines);
         }
-        // the skip path's question (and nothing else asks the sun this way): a sign, or -1 for "I'm not sure"
         // the skip path (Oct 7, 86bced0tc): "Which sign do you go by?", then the moon's and the rising's questions, each from the twelve
         public bool PickSkipSun(int seat)
         {

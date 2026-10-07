@@ -460,6 +460,18 @@ namespace Ascendant.Build
             // a time with no place: Add asks only the place
             var w = BirthPlayer(o => { o.ChooseBirth("chart"); o.SetBirthDate(1990, 5, 10); o.SetBirthTime(14 * 60 + 30); o.SetBirthPlace(null); o.PickMoon(0); o.PickRising(4); o.Continue(); }, out _);
             Check(w.CanAddFacts && !w.CanAddTime && w.StartAddFacts() && w.BirthStep == "place" && w.SetBirthPlace(london) && w.RisingSign >= 0 && w.Facts.HasPlace, "a time with no place: Add asks only the place, and the rising follows");
+            // Jeffrey, #125: older saves still read as they were (owner, Oct 7: "Leave them; I'll start fresh"), and an Add on one asks what it lacks
+            var declined = JsonUtility.FromJson<SaveData>("{\"version\":5,\"playerName\":\"Old\",\"atriumStage\":2,\"keyEarned\":true,\"sunSign\":-1,\"chartFrom\":\"skip\",\"choices\":[{\"point\":\"sun\",\"sign\":-1,\"how\":\"declined\"}]}"); var dFlow = new SliceFlow();
+            Check(dFlow.Restore(declined) && !dFlow.HasSunSign && dFlow.LessonSun == 0 && dFlow.SunBasis == "" && dFlow.BigThreeLine == "☉ unknown · ☽ unknown · ↑ unknown", "a #123 save with a declined sun still reads: no sun, the lessons from Aries, the record as it was");
+            var oldSave = DevCheckpoints.Play("key1", "Tester", 1); oldSave.version = 4; oldSave.birth = new BirthFacts(); oldSave.choices = new ChoiceRecord[0]; oldSave.chart = new WorkedChart(); oldSave.chartFrom = "chart"; oldSave.sunSign = 1; oldSave.sunBasis = "picked"; oldSave.moonSign = oldSave.risingSign = oldSave.moonFrom = oldSave.moonTo = -1;
+            oldSave.birthDate = "1990-04-20"; oldSave.birthMinute = -1; oldSave.birthPlace = london.Name; oldSave.birthZone = "Europe/London"; oldSave.birthLatitude = london.Latitude; oldSave.birthLongitude = london.Longitude; var oldJson = JsonUtility.ToJson(oldSave);
+            SliceFlow Old() { var f = new SliceFlow(); f.Restore(JsonUtility.FromJson<SaveData>(oldJson)); f.OpenJournal(); f.JournalLand(); f.OpenBirthPage(); return f; }
+            var o1 = Old();
+            Check(o1.RisingSign == -1 && o1.MoonPair && o1.CanChooseRising && o1.StartAddFacts() && o1.BirthStep == "time" && o1.SetBirthTime(-1) && o1.BirthStep == "moon" && o1.PickMoon(0) && o1.BirthStep == "rising-pick" && o1.CancelAmending() && o1.RisingSign == -1 && o1.MoonPair && o1.BirthLines.Count == 0 && !o1.Facts.HasTime,
+                "an older save with an \"or\" moon and no rising: an Add asks the moon, then the rising; going back at the rising changes nothing");
+            var o2 = Old();
+            Check(o2.StartAddFacts() && o2.SetBirthTime(-1) && o2.PickMoon(1) && o2.PickRising(4) && o2.OnBirthPage && o2.RisingSign == 4 && o2.RisingChosen && o2.BirthLines.Contains("Leo it is.") && o2.BirthLines.Contains(SliceFlow.MoonIs(o2.MoonSign)) && !o2.BigThreeLine.Contains("unknown"),
+                "the same Add, answered: the moon and the rising picked, a line for each, and no unknown left: " + string.Join(" / ", o2.BirthLines));
             // the lessons: with no sun they start from Aries and call it the starting sign, never the player's sun
             var lesson = new DialLesson(() => 0); lesson.SetSunSign(0, false); string intro = (string)typeof(DialLesson).GetMethod("IntroLine", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(lesson, new object[] { 99 });
             Check(lesson.Sun == 0 && !lesson.SunKnown && intro.StartsWith("We shall start from Aries, the first sign on the wheel.") && !intro.Contains("Your sun sign"), "with no sun, Caspar names Aries as the starting sign: " + intro);

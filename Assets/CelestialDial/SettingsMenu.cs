@@ -15,7 +15,7 @@ namespace Ascendant.CelestialDial
         public Action ToggleSound, ToggleMotion, CycleWalk, StartOver, Changed;
         public Action<string> Jump; // Build W: DEV Mode's Jump to…, a checkpoint id (DevCheckpoints)
         public Action CuspDay; // batch 2: DEV Mode's cusp-day sample (owner, Oct 2 evening): a fresh opening at the cusp question
-        public Action<string> BirthOpening; // Oct 7 (86bced0tc): a fresh opening at each other path's first question: skip, no-time, no-place
+        public Action<string> BirthOpening; // Oct 7 (86bced0tc): a fresh opening at each other path's first question: skip, no-time, no-place, neither
         public Func<string> WakeLabel; public Action CycleWake; // the Dial's wake-up (86bcbn6w6): DEV Mode previews each step
         public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
@@ -86,7 +86,7 @@ namespace Ascendant.CelestialDial
         void Update() { if (canvas != null && canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f); }
 
         // ---- building ----
-        public static readonly (string id, string label)[] BirthSamples = { ("skip", "I'll skip it (the opening)"), ("no-time", "No birth time (the opening)"), ("no-place", "No birth place (the opening)") };
+        public static readonly (string id, string label)[] BirthSamples = { ("skip", "I'll skip it (the opening)"), ("no-time", "No birth time (the opening)"), ("no-place", "No birth place (the opening)"), ("neither", "No birth time or place (the opening)") };
         Text Row(RectTransform panel, float top, UnityEngine.Events.UnityAction action, float height = 48)
         {
             var b = MakeButton(panel, "", 0, top, 232, height, () => { action(); Refresh(); Changed?.Invoke(); });

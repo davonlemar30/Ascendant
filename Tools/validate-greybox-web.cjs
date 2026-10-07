@@ -774,7 +774,7 @@ const path=require('path');
     await tap(0,449);await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
     check((await snap()).settingsOpen&&(await snap()).jumpsShown,'Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at '+viewport.width);
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-jump.png')});
-    await tap(0,334);await resumed(); // the fifth row: After Key 4 (Oct 7: the list is three rows taller with the opening's samples, its top 69 px higher)
+    await tap(0,311);await resumed(); // the fifth row: After Key 4 (Oct 7: the list is four rows taller with the opening's samples, its top 92 px higher)
     { const s=await snap(); check(s.keys===4&&s.keysInHand===3&&s.locksFilled===1&&s.atriumStage===3&&s.playerName==='Tester'&&s.sunSign==='Leo','Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-key4.png')});
     const expect={key1:s=>s.keys===1&&s.keysInHand===0&&s.locksFilled===1&&s.atriumStage===2&&!s.wheelComplete,
@@ -831,9 +831,9 @@ const path=require('path');
     { const c=await snap(); check(c.playerName==='Tester' && c.cuspSigns.join()==='Aries,Taurus' && c.cuspTime==='9:27 am' && !c.resumed,'DEV Mode\'s cusp-day sample: the opening at the cusp question (London, Apr 20 1990), the name kept, at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-cusp.png')});
     // Oct 7 (86bced0tc): DEV Mode's sample for each other path, a fresh opening at its first question, the name kept
-    for(const [id,step] of [['no-time','rising-pick'],['no-place','moon'],['skip','sun-pick']]){
+    for(const [id,step] of [['no-time','rising-pick'],['no-place','moon'],['neither','cusp'],['skip','sun-pick']]){
       await act('jump-birth-'+id);await dev.waitForFunction(k=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep===k,step,{timeout:120000});
-      const c=await snap(); check(c.playerName==='Tester' && !c.resumed && !c.canSliceContinue && (step==='moon'?c.canMoon:c.canSignPick),'DEV Mode\'s '+id+' sample: the opening at its first question ('+step+'), the name kept, at '+viewport.width); }
+      const c=await snap(); check(c.playerName==='Tester' && !c.resumed && !c.canSliceContinue && (step==='moon'?c.canMoon:step==='cusp'?(c.canCusp&&c.cuspTime===''):c.canSignPick),'DEV Mode\'s '+id+' sample: the opening at its first question ('+step+'), the name kept, at '+viewport.width); }
     await dev.evaluate(()=>window.ascendantDial.act('restart'));await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000}); // Settings' Start over (the page's own button waits for the Atrium)
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
     await devContext.close();
@@ -961,7 +961,7 @@ const path=require('path');
       await send('jump-birth:v4-'+id);await bp.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();await landing();
       const s=await snap(),r=JSON.parse(s.birthRecord||'{}'); check(s.journalKeeper[2]===expect && (r.choices||[]).some(c=>c.point==='sun'&&c.how===(id==='known'?'entered':id==='chosen'?'assigned':'legacy')),'an old '+id+' save converts once, its signs kept as the player\'s choices: '+s.journalKeeper[2]+' at '+viewport.width); }
     await send('jump-birth:v4-chart');await bp.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();await landing();
-    { const s=await snap(),r=JSON.parse(s.birthRecord||'{}'); check(s.journalKeeper[2].startsWith('☉ Taurus · ☽ ') && s.journalKeeper[2].endsWith('↑ unknown') && r.birth.date==='1990-04-20' && r.choices.some(c=>c.point==='sun'&&c.how==='picked'),'an old chart-path save moves its facts over and works the chart out again, the cusp\'s pick kept: '+s.journalKeeper[2]+' at '+viewport.width); }
+    { const s=await snap(),r=JSON.parse(s.birthRecord||'{}'); check(s.journalKeeper[2].startsWith('☉ Taurus · ☽ ') && s.journalKeeper[2].includes(' or ') && s.journalKeeper[2].endsWith('↑ unknown') && r.birth.date==='1990-04-20' && r.choices.some(c=>c.point==='sun'&&c.how==='picked'),'an old chart-path save moves its facts over and works the chart out again, the cusp\'s pick kept: '+s.journalKeeper[2]+' at '+viewport.width); }
     check(birthErrors.length===0,'Oct 7: no runtime exceptions through "Your Birth" and the conversions at '+viewport.width+(birthErrors.length?': '+birthErrors[0]:''));
     await birthContext.close();
   }));
