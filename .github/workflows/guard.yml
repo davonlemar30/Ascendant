@@ -12,7 +12,10 @@
 # never runs would stall every merge. On pull_request, a fork's run waits for the owner's approval
 # (Settings → Actions → "Require approval for all external contributors"), so until he approves, the
 # required check never reports and the pull request can't merge. A fork could edit this file, so the
-# rule is: never approve a fork's run on a pull request that touches .github/.
+# rule is: never approve a fork's run on a pull request that touches .github/ or lists more than
+# 3,000 changed files (Jeffrey, #126 N12), and check that by command, not by eye. This holds only with
+# the approval setting at "all external contributors"; "first-time contributors" lets a returning
+# outsider's edited guard run unapproved (N13).
 #
 # It never checks out or runs the pull request's code: it only reads the list of changed files, with
 # a read-only token.
@@ -49,8 +52,10 @@ jobs:
           set -euo pipefail
           trusted=no
           if [ "$AUTHOR" = "$OWNER" ] && [ "$HEAD_REPO" = "$REPO" ]; then trusted=yes; fi
-          # one listing, then confirm it was read from the head this run is for (Jeffrey, #126 N10)
-          list=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | "F " + .filename, (.previous_filename // empty | "P " + .)')
+          # One listing, kept as JSON so every name stays one value, whatever characters it holds (Jeffrey,
+          # #126 B4), then confirm it was read from the head this run is for (N10).
+          gh api --paginate "repos/$REPO/pulls/$PR/files" > "$RUNNER_TEMP/pages.json"
+          jq -s 'add // []' "$RUNNER_TEMP/pages.json" > "$RUNNER_TEMP/files.json"
           now=$(gh api "repos/$REPO/pulls/$PR" --jq '.head.sha')
           if [ "$now" != "$HEAD_SHA" ] && [ "$trusted" != yes ]; then
             echo "::error::The pull request moved while the guard read it. The run for its new head checks it."
@@ -58,13 +63,19 @@ jobs:
           fi
           # GitHub lists at most 3,000 files. A list that comes back short can't be checked, so it fails
           # unless the owner opened the pull request (Jeffrey, #126 B1).
-          listed=$(printf '%s\n' "$list" | grep -c '^F ' || true)
+          listed=$(jq 'length' "$RUNNER_TEMP/files.json")
           if [ "$listed" != "$CHANGED" ] && [ "$trusted" != yes ]; then
             echo "::error::GitHub listed $listed of this pull request's $CHANGED changed files, so the guard can't check them all."
             exit 1
           fi
+          # A name with a control character in it (a newline, say) fails outright from anyone but the owner.
+          odd=$(jq '[.[] | .filename, (.previous_filename // empty) | select(explode | any(. < 32 or . == 127))] | length' "$RUNNER_TEMP/files.json")
+          if [ "$odd" != 0 ] && [ "$trusted" != yes ]; then
+            echo "::error::$odd changed file names hold control characters, so the guard can't check them."
+            exit 1
+          fi
           # renames count from both ends; the match ignores case, since macOS checkouts do
-          hits=$(printf '%s\n' "$list" | cut -c3- | grep -iE '(^|/)\.claude(/|$)|(^|/)(agents|claude|claude\.local)\.md$|^\.github/|^\.mcp\.json$' || true)
+          hits=$(jq -r '.[] | .filename, (.previous_filename // empty) | select(test("(^|/)\\.claude(/|$)|(^|/)(agents|claude|claude\\.local)\\.md$|^\\.github/|^\\.mcp\\.json$"; "i")) | @json' "$RUNNER_TEMP/files.json")
           if [ -z "$hits" ]; then
             echo "No agent or automation files changed."
             exit 0
