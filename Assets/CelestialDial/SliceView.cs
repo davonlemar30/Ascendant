@@ -60,6 +60,7 @@ namespace Ascendant.CelestialDial
         RectTransform birthTimeEntry, birthPlaceEntry; Text signsLabel, birthHeading; Button timeUnknown, signUnknown, placeUnknown, birthCancel; readonly Button[] placeMatchButtons = new Button[4]; List<Place> placeMatches = new List<Place>();
         // the cusp day (owner ruling, Oct 2 evening): the question, the two signs and "I'm not sure", and "Why?" with its reason
         RectTransform birthCusp; Text cuspQuestion, cuspWhy; Button cuspWhyLink; readonly Button[] cuspButtons = new Button[3]; bool cuspWhyOpen;
+        RectTransform birthMoon; Text moonQuestion; readonly Button[] moonButtons = new Button[4]; // Oct 7: the Moon's options (two, rarely three) and "I'm not sure", where the cusp question sits
         static string cuspDayFor; // DEV Mode's cusp-day sample: the name to carry into the opening's question across the reload
         Button leaveDial; // Build T
         Button birthContinue, wingContinue, insert, chamberContinue, atriumContinue, returnContinue, changeChoice;
@@ -264,6 +265,9 @@ namespace Ascendant.CelestialDial
             cuspWhyLink = MakeButton(birthCusp, SliceFlow.CuspWhyLink, 0, 256, 96, 24, ToggleCuspWhy); cuspWhyLink.GetComponent<Image>().color = new Color(0, 0, 0, 0); cuspWhyLink.GetComponent<Image>().canvasRenderer.cullTransparentMesh = false;
             var whyLabel = cuspWhyLink.GetComponentInChildren<Text>(); whyLabel.fontSize = 13; whyLabel.color = Muted; whyLabel.fontStyle = FontStyle.Italic; ButtonLook.HitArea(cuspWhyLink, ButtonLook.MinTarget, ButtonLook.MinTarget); // a small link, 44 px to tap
             cuspWhy = Label(birthCusp, SliceFlow.CuspWhy, 0, 296, 320, 46, 12); cuspWhy.color = Muted;
+            birthMoon = Rect("Moon question", birth, 0, 400, 360, 220);
+            moonQuestion = Label(birthMoon, "", 0, 40, 320, 88, 14);
+            for (int i = 0; i < moonButtons.Length; i++) { int choice = i == moonButtons.Length - 1 ? -1 : i; moonButtons[i] = MakeButton(birthMoon, "", 0, 110 + i * 52, 300, 44, () => PickMoonSign(choice)); }
             signsLabel = Label(birth, "", 0, 290, 320, 22, 14);
             birthSigns = Rect("Sign choices", birth, 0, 430, 360, 240);
             for (int i = 0; i < 12; i++) { int seat = i; MakeButton(birthSigns, Zodiac.Seats[i].Name, -110 + (i % 3) * 110, 26 + (i / 3) * 58, 100, 52, () => PickBirthSign(seat)); }
@@ -665,6 +669,7 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("jump-birth:")) BirthSample(command.Substring(11)); // test-only: a fresh opening at a path's last step, or a version 4 save to convert
             else if (command.StartsWith("cusp:") && int.TryParse(command.Substring(5), out int cuspChoice)) PickCusp(cuspChoice); // the cusp day: 0, 1, or -1 (I'm not sure)
             else if (command == "cusp-why") ToggleCuspWhy();
+            else if (command.StartsWith("moon:") && int.TryParse(command.Substring(5), out int moonChoice)) PickMoonSign(moonChoice); // Oct 7: the Moon's options by index, or -1 (I'm not sure)
             else if (command == "jump-cusp") CuspDay(); // DEV Mode's cusp-day sample
             else if (command.StartsWith("name:")) { Flow.SetName(command.Substring(5)); if (nameField != null) nameField.text = Flow.PlayerName; Publish(); }
             else if (command == "insert") Insert();
@@ -739,6 +744,7 @@ namespace Ascendant.CelestialDial
         void PickBirthSign(int seat) { if (busy || !Flow.PickSign(seat)) return; AfterBirthEntry(); } // the skip path's sun, or the rising chosen on "Your Birth"
         void CancelBirthAmend() { if (busy || !Flow.CancelAmending()) return; AfterBirthEntry(); }
         void PickCusp(int choice) { if (busy || !Flow.PickCuspSun(choice)) return; cuspWhyOpen = false; AfterBirthEntry(); }
+        void PickMoonSign(int choice) { if (busy || !Flow.PickMoon(choice)) return; AfterBirthEntry(); }
         void ToggleCuspWhy() { if (busy || Flow.BirthStep != "cusp") return; cuspWhyOpen = !cuspWhyOpen; ShowBirth(); Publish(); }
         // DEV Mode's cusp-day sample (owner, Oct 2 evening): a fresh opening at the cusp question (London, Apr 20 1990, no birth time), the name kept
         // test-only (Oct 7): a version 4 save from each retired or older path, written over the After Key 1 checkpoint and reloaded, so the
@@ -788,6 +794,7 @@ namespace Ascendant.CelestialDial
                 case "sun-pick": return " " + SliceFlow.SkipAsk;
                 case "rising-pick": return " Choose your rising sign.";
                 case "cusp": return " " + Flow.CuspQuestion + (cuspWhyOpen ? " " + SliceFlow.CuspWhy : "");
+                case "moon": return " " + Flow.MoonQuestion;
             }
             return "";
         }
@@ -799,6 +806,8 @@ namespace Ascendant.CelestialDial
             birthDate.gameObject.SetActive(chart && step == "date"); birthTimeEntry.gameObject.SetActive(chart && step == "time"); birthPlaceEntry.gameObject.SetActive(chart && step == "place");
             birthSigns.gameObject.SetActive(signs); signsLabel.gameObject.SetActive(signs); signUnknown.gameObject.SetActive(step == "sun-pick");
             bool cusp = chart && step == "cusp"; birthCusp.gameObject.SetActive(cusp); cuspWhy.gameObject.SetActive(cusp && cuspWhyOpen);
+            bool moon = chart && step == "moon"; birthMoon.gameObject.SetActive(moon);
+            if (moon) { moonQuestion.text = Flow.MoonQuestion; for (int i = 0; i < moonButtons.Length; i++) { bool unsure = i == moonButtons.Length - 1, show = unsure || i < Flow.MoonAsk.Length; moonButtons[i].gameObject.SetActive(show); if (show) { moonButtons[i].GetComponentInChildren<Text>().text = unsure ? SliceFlow.CuspUnsure : Zodiac.Seats[Flow.MoonAsk[i]].Name; ((RectTransform)moonButtons[i].transform).anchoredPosition = new Vector2(0, -(110 + (unsure ? Flow.MoonAsk.Length : i) * 52)); } } }
             if (cusp) { cuspQuestion.text = Flow.CuspQuestion; cuspButtons[0].GetComponentInChildren<Text>().text = Zodiac.Seats[Flow.CuspFrom].Name; cuspButtons[1].GetComponentInChildren<Text>().text = Zodiac.Seats[Flow.CuspTo].Name; cuspButtons[2].GetComponentInChildren<Text>().text = SliceFlow.CuspUnsure; }
             signsLabel.text = step == "sun-pick" ? SliceFlow.SkipAsk : step == "rising-pick" ? SliceFlow.RisingAsk : ""; // Claude's drafts (owner writes)
             for (int i = 0; i < placeMatchButtons.Length; i++) { bool show = i < placeMatches.Count; placeMatchButtons[i].gameObject.SetActive(show); if (show) placeMatchButtons[i].GetComponentInChildren<Text>().text = placeMatches[i].Name; }
@@ -1377,6 +1386,7 @@ namespace Ascendant.CelestialDial
             state.canSignPick = birthNow && (birthStep == "sun-pick" || birthStep == "rising-pick"); state.canSignUnknown = birthNow && birthStep == "sun-pick"; // Oct 7: the skip path's sun, or the rising from "Your Birth"
             state.canPlaceUnknown = state.canBirthPlace; state.canBirthCancel = birthNow && Flow.CanCancelAmending; state.amending = Flow.Amending; state.birthHeading = s == SliceScreen.Birth ? birthHeading.text : "";
             state.birthChoices = s == SliceScreen.Birth && Flow.BirthChoice == "" ? new[] { SliceFlow.KnowBirthday, SliceFlow.SkipBirthday } : new string[0];
+            state.canMoon = birthNow && birthStep == "moon"; state.moonOptions = state.canMoon ? Flow.MoonAsk.Select(m => Zodiac.Seats[m].Name).ToArray() : new string[0]; state.moonQuestion = s == SliceScreen.Birth ? Flow.MoonQuestion : ""; state.moonBasis = Flow.FromChoice("moon") ? "picked" : Flow.ChoiceFor("moon") != null ? Flow.ChoiceFor("moon").how : "";
             state.canCusp = birthNow && birthStep == "cusp"; state.cuspSigns = Flow.CuspFrom >= 0 ? new[] { Zodiac.Seats[Flow.CuspFrom].Name, Zodiac.Seats[Flow.CuspTo].Name } : new string[0];
             state.cuspTime = Flow.CuspMinute >= 0 ? SliceFlow.ClockTime(Flow.CuspMinute) : ""; state.cuspQuestion = s == SliceScreen.Birth ? Flow.CuspQuestion : ""; state.cuspWhy = state.canCusp && cuspWhyOpen; state.sunBasis = Flow.SunBasis;
             state.moonSign = Flow.MoonSign >= 0 ? Zodiac.Seats[Flow.MoonSign].Name : ""; state.risingSign = Flow.RisingSign >= 0 ? Zodiac.Seats[Flow.RisingSign].Name : ""; state.bigThree = Flow.BirthDone ? Flow.BigThreeLine : "";
@@ -2012,16 +2022,18 @@ namespace Ascendant.CelestialDial
             journalPracticeDoor.interactable = Flow.CanJournalPractice && !busy && journalBeat == null; journalContentsDoor.interactable = !busy && journalBeat == null; // Practice is unavailable (half) until a concept is learned
         }
         // the line's six pieces set side by side, centred on the page, every piece on the same baseline
+        public const float BigThreeSmallestThree = 9f; // the owner, Oct 7: a moon with three options ("I'm not sure" with no time and no place) shrinks further, to fit; 9 px is the whole size that fits 274
         public const float BigThreeRoom = 274f, BigThreeSmallest = 11f; // a long line (a moon that changed sign: "Pisces or Aries") may use the page's calm column, x 50 to 325, and shrinks to fit it, to 11 px at the least (the longest of all, a Sagittarius sun with a Sagittarius-or-Capricorn moon); "Cancer or Leo" with a Taurus sun takes 16
         void PlaceBigThree(float baseline)
         {
             bigThreeLine.anchoredPosition = new Vector2(JournalX, -baseline); string[] words = { SliceFlow.SignOrUnknown(Flow.SunSign), Flow.MoonWords, SliceFlow.SignOrUnknown(Flow.RisingSign) }; float total = 0, scale = 1;
+            float floor = Flow.MoonOptions.Length >= 3 ? BigThreeSmallestThree : BigThreeSmallest; // Oct 7: only the rare three-option moon goes below 11 px, to fit inside the page's border
             for (int pass = 0; pass < 3; pass++)
             {
                 total = 0;
                 for (int i = 0; i < 3; i++) { bigThreeGlyphs[i].fontSize = Mathf.RoundToInt(BigThreeMarkSizes[i] * scale); bigThreeWords[i].fontSize = Mathf.RoundToInt(17 * scale); bigThreeWords[i].text = " " + words[i] + (i < 2 ? " \u00b7 " : ""); total += bigThreeGlyphs[i].preferredWidth + bigThreeWords[i].preferredWidth; }
-                if (total <= BigThreeRoom || scale <= BigThreeSmallest / 17f + .001f) break;
-                scale = Mathf.Max(BigThreeSmallest / 17f, scale * BigThreeRoom / total * .99f);
+                if (total <= BigThreeRoom || scale <= floor / 17f + .001f) break;
+                scale = Mathf.Max(floor / 17f, scale * BigThreeRoom / total * .99f);
             }
             float x = -total / 2;
             for (int i = 0; i < 3; i++)

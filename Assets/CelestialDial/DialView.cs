@@ -135,6 +135,7 @@ namespace Ascendant.CelestialDial
             public bool canCusp, cuspWhy; public string cuspTime = "", cuspQuestion = "", sunBasis = ""; public string[] cuspSigns; // the cusp day (owner ruling, Oct 2 evening)
             // the birth-time build (owner, Oct 7): the opening's two paths, "Your Birth" in the journal, and the record's three parts (test evidence)
             public bool canPlaceUnknown, canBirthCancel, amending, canBirthPage, canBirthAdd, canBirthAddTime, canBirthRising, risingChosen, sunKnown = true; public string birthHeading = "", birthRisingWords = "", openingPath = "", dialStart = "", lessonSun = "";
+            public bool canMoon; public string moonQuestion = "", moonBasis = ""; public string[] moonOptions;
             public string[] journalBirthRows, journalBirthLines, birthChoices; public float[] journalBigThreeBox, journalBirthBoxes; public string birthRecord = ""; public int saveVersion;
             public int atriumStage, dueCount;
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
