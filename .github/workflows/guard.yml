@@ -1,0 +1,48 @@
+# Guards the files that steer Claude and its agents, and this repository's automation (owner, Oct 7:
+# prompt injection). A pull request that changes any of them fails this check unless the repository
+# owner opened it from a branch in this repository. Branch protection on main requires the check.
+#
+# pull_request_target runs this file as it is on main, so a pull request can't edit the guard to pass
+# it. It never checks out or runs the pull request's code: it only reads the list of changed files.
+name: Guard
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    name: Guard agent files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check who changed the agent files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          OWNER: ${{ github.repository_owner }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          # renames count from both ends; the match ignores case, since macOS checkouts do
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | .filename, (.previous_filename // empty)')
+          hits=$(printf '%s\n' "$files" | grep -iE '^(\.claude/|\.github/|agents\.md$|claude\.md$)' || true)
+          if [ -z "$hits" ]; then
+            echo "No agent or automation files changed."
+            exit 0
+          fi
+          if [ "$AUTHOR" = "$OWNER" ] && [ "$HEAD_REPO" = "$REPO" ]; then
+            echo "Agent or automation files changed by $OWNER, from this repository:"
+            printf '%s\n' "$hits"
+            exit 0
+          fi
+          echo "::error::Only $OWNER may change these files, from a branch in this repository. This pull request is from $AUTHOR ($HEAD_REPO):"
+          printf '%s\n' "$hits"
+          exit 1
