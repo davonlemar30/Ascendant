@@ -22,6 +22,9 @@ Validation (local, worktree `mini-menu`, branch `codex/moon-or` on main `53c9933
 - slice fixture 262/262;
 - headless WebGL 0 errors and 0 warnings (36.1 MB); its first run stalled after the initial asset refresh (the known batch stall), was killed and run again;
 - browser suite 604/604 at desktop density, with the seven shapes (+1), and 513/513 at phone density (`DEVICE_SCALE=2 MOBILE=1`).
+
+Merged as PR #116 (main `6d7b61b`, Oct 3 at 04:19 local, which is 12:19 UTC; a merge commit of main `61e9a90` and the head `b643b2c`; main's tree is the head's tree, checked with `git diff`). The head is one commit (Oct 3, 04:07 local), rebased onto main `61e9a90`, the triangles (#115), before the merge; only the docs conflicted. The validation above ran on main `53c9933`; after the rebase the PR reports the mechanical checks on the combined code, 640/640 (634 and the triangles' 6). The PR's GitHub Actions Web run on `b643b2c` (`37121920382`) passed (Build Web player succeeded; Deploy to GitHub Pages was skipped, as it is for a pull request); the main run (`37122477052`: Build Web player and Deploy to GitHub Pages) passed, and production served the merged build from 04:26 local (12:26 UTC). Production recheck after the Pages deploy (passed): browser suite 610/610 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass included) against `https://davonlemar30.github.io/Ascendant/`, using `6d7b61b`'s own suite file; it includes the opening on London, May 1 1990 with no birth time, showing "☉ Taurus · ☽ Cancer or Leo · ↑ unknown".
+
 ## The family triangles: light on top of the Cast Dial, resting, teaching and the flame payoff (batch 2, step 5)
 
 The owner's ruling (Oct 3, comment 90140263872877 on 86bcbn6w6): the overlay is approved at mixed strength. Resting and teaching use level A (resting lines 34%, the taught triangle 70%: "The resting look shows every time the Dial opens, so it stays calm"). The flame payoff uses level B (88%: "It plays once, so it hits hard"). Everything else is as boarded: the lines on top as light (a screen blend), the corners on the hub ring under each window, the sides breaking round every word, and the teaching glow lighting the seats' frames and stopping short of their words. Reading 2 is not needed. The values are the board's (`triangles-overlay/REPORT.md` and `tools/looks.cjs`).
@@ -56,10 +59,13 @@ Validation (local, worktree `platform-fit-2`, branch `codex/family-triangles` on
 - mechanical checks 636/636 (+6), 0 compiler warnings;
 - slice fixture 264/264 (+2);
 - headless WebGL 0 errors and 0 warnings (36.1 MB);
-- browser suite 609/609 at desktop density, with the seven shapes (+6). The first run failed one older timing check (the symbols' mid-placement reload) while a board was rendering beside it; run again alone, all passed;
+- browser suite 609/609 at desktop density, with the seven shapes (+6). The first runs failed one older timing check (the symbols' mid-placement reload) twice, because the triangles redrew their gaps and republished the page's state every frame while the ring turned (Claude's pass record, comment 90140263882330); the evidence now tests the lines against the hub's words only, and the state is published at most every 0.3 s (`FamilyTriangles.Crossing` and `Changed`), and every run since passed;
 - browser suite 518/518 at phone density (`DEVICE_SCALE=2 MOBILE=1`, +6).
 
+Merged as PR #115 (main `61e9a90`, Oct 3 at 03:43 local, which is 11:43 UTC; a merge commit of main `b5f9d06` and the head `2fe0d7f`; main's tree is the head's tree plus the one file PR #113 changed (`.claude/agents/whitney.md`, merged first), checked with `git diff`). The head is one commit on main `53c9933` (Oct 3, 03:28 local), so the code on main is the validated code. The PR's GitHub Actions Web run on `2fe0d7f` (`37119763712`) passed (Build Web player succeeded; Deploy to GitHub Pages was skipped, as it is for a pull request); the main run (`37120567535`: Build Web player and Deploy to GitHub Pages) passed, and production served the merged build from 03:51 local (11:51 UTC). Production recheck after the Pages deploy (passed): browser suite 609/609 at phone density (`DEVICE_SCALE=2 MOBILE=1`, the seven-shape pass included) against `https://davonlemar30.github.io/Ascendant/`, using `61e9a90`'s own suite file.
+
 Captures: [`Evidence/triangles-2026-10-03/`](Evidence/triangles-2026-10-03/), with the approved board beside the game in the three states and the hub at 3x.
+
 ## Practice in the journal: the concepts learned, a round of questions in the journal's voice (batch 2, step 4)
 
 The owner's ruling (Oct 3, comment 90140263872651 on 86bcbn6w6): step 4 approved as scoped, with the door's count removed completely. Claude drafts the 30 questions, and the owner rewrites or approves them before they ship; the board's other copy is approved as a draft on the same terms. The art is built with the code. The look is the board on 86bcbn6w6 (Oct 2).
