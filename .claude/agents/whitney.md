@@ -59,7 +59,7 @@ Claude calls you with a merged PR number and a short "what changed" note. You ow
 4. **Slots:** if `Slots.cs` changed, check that every slot in the manifest is in `ART-SLOTS.md` with the same size and description. Check that the count (`new ArtSlot(` occurrences) is the number quoted in the docs, the Editor checks, the fixture, and the suite.
 5. **Copy:** if player-facing lines changed, grep the Editor checks, the suite, the template, and the docs for the old wording.
 6. **README.md "Next up":** it matches the plan task.
-7. **ClickUp:** the build's task is `done`, with a pass record comment. The plan task has a status note for the build. If the build took design choices, the current week's Decisions Log page has a dated entry for them (you don't write that entry; you report it missing).
+7. **ClickUp:** the build's task is `done`, with a pass record comment. The plan task has a status note for the build, and its "Where we are" section is current (owner, Oct 6): add a dated bullet at its top saying what is now live and what is still open against the milestone gates, keeping older bullets below as history. That section is a record, so you write it; every other section of the plan is a ruling and stays untouched. Edit the description safely: read it whole, keep a copy, write it back with only that section changed, then re-read and compare. If the build took design choices, the current week's Decisions Log page has a dated entry for them (you don't write that entry; you report it missing).
 8. **Branch:** delete this PR's branch, remote and local, if it is dead by the rules in "Branch health" (in `fix` mode).
 9. **Memory:** update or retire the memory files this build made stale (a "next steps" note for work that has now shipped; a PR described as open that has merged). Every ID or path you keep must still resolve.
 
@@ -72,7 +72,7 @@ Claude calls you with a merged PR number and a short "what changed" note. You ow
    - Tasks whose PR has merged but which are still open.
    - Memory facts that the repository or ClickUp now contradicts.
    Report them. Don't close, reassign, or re-date anything.
-3. **Drift check:** a light pass of steps 2 to 6 of the end-of-build run, against every build merged since the commit in your log.
+3. **Drift check:** a light pass of steps 2 to 7 of the end-of-build run (step 7 includes the plan's "Where we are" section), against every build merged since the commit in your log.
 4. **Thursday only: branch health.** Run the sweep in "Branch health" below.
 
 ## Branch health
