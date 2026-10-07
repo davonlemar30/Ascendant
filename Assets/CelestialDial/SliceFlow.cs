@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal }
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
-    public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map
+    public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map, Practice, Quiz } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map; Oct 3: Practice's list and its question page
     public enum JournalLens { Element, Modality, Polarity, Opposites } // Build AA: the tabs that recolour the Wheel or the Table, each once learned
 
     [Serializable]
@@ -389,9 +389,7 @@ namespace Ascendant.CelestialDial
         }
         // The pages (the approved board, 86bcbn6w6, Oct 1-2): the title page's beat ends on the landing; the landing holds the Keeper's
         // record and two doors, Practice and Contents; Contents lists the chapters (the Wheel, the Library Map, and Sealed rows for those
-        // to come) and links back to the landing; each chapter links back to Contents. The Practice door is an entry point only until the
-        // owner approves Practice's scope (Oct 2 evening, step 4): it shows, and opens nothing.
-        public const bool PracticeOpen = false;
+        // to come) and links back to the landing; each chapter links back to Contents. The Practice door opens Practice (owner, Oct 3, below).
         public const string JournalTitle = "Your Journal", TitlePageLine = "These pages fill as you learn.", KeeperHeading = "KEEPER"; // 1e A (owner, Oct 1); the board's words
         public const string PracticeDoor = "Practice", ContentsDoor = "Contents", ContentsDoorLine = "Every chapter", ContentsTitle = "Contents";
         public const string WheelChapterLine = "Signs and patterns", MapTitle = "The Library Map", MapChapterLine = "The rooms you have woken", SealedChapter = "Sealed";
@@ -408,7 +406,7 @@ namespace Ascendant.CelestialDial
         public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; journalLanded = true; Logged?.Invoke("journal_landing"); return true; }
         public bool CanJournalContents => AtJournal && (JournalAt == JournalView.Landing || JournalAt == JournalView.Wheel || JournalAt == JournalView.Map);
         public bool JournalToContents() { if (!CanJournalContents) return false; JournalAt = JournalView.Contents; Logged?.Invoke("journal_contents"); return true; }
-        public bool CanJournalHome => AtJournal && JournalAt == JournalView.Contents;
+        public bool CanJournalHome => AtJournal && (JournalAt == JournalView.Contents || JournalAt == JournalView.Practice); // "‹ Your Journal" on Contents and on Practice's list
         public bool JournalToLanding() { if (!CanJournalHome) return false; JournalAt = JournalView.Landing; Logged?.Invoke("journal_landing"); return true; }
         public static readonly string[] Chapters = { "wheel", "map" };
         public bool OpenChapter(string chapter)
@@ -416,6 +414,58 @@ namespace Ascendant.CelestialDial
             if (!CanJournalHome || !Chapters.Contains(chapter)) return false;
             JournalAt = chapter == "wheel" ? JournalView.Wheel : JournalView.Map; Logged?.Invoke("journal_chapter:" + chapter); return true;
         }
+        // Practice (owner, Oct 3: step 4 approved as scoped; the board on 86bcbn6w6). The door opens the list of concepts learned, and only
+        // those: a concept joins when its lesson finishes (the Elements at Key 1, the Symbols at Key 2, the Modalities with their lesson, the
+        // Elemental Table at Key 3, the Opposites at Key 4), so nothing is asked before it is taught. A round asks all of a concept's questions
+        // in a fresh order, the choices shuffled; an answer shows right or wrong and its why, then Next; the round ends with the journal's line
+        // and Back to Practice; "‹ Practice" leaves at any time. No score, streaks or spaced review: none of it is saved and the deck is untouched.
+        public const string PracticeTitle = "Practice", PracticeDoorLine = "What you know", BackToPractice = "\u2039 Practice", QuizNextWords = "Next", QuizBackWords = "Back to Practice"; // the board's words, Claude's drafts (owner, Oct 3: rewritten or approved before they ship); the door's count is removed, and its line is a draft beside Contents' "Every chapter"
+        public bool ConceptLearned(PracticeConcept concept)
+        {
+            switch (concept.unlock) { case "key1": return Keys >= 1; case "key2": return Keys >= 2; case "modalities": return ModalitiesComplete; case "key3": return Keys >= 3; case "key4": return Keys >= 4; default: return false; }
+        }
+        public List<PracticeConcept> PracticeConcepts => PracticeBook.Data.concepts.Where(ConceptLearned).ToList();
+        public bool CanJournalPractice => AtJournal && JournalAt == JournalView.Landing && PracticeConcepts.Count > 0;
+        public bool OpenPractice() { if (!CanJournalPractice) return false; JournalAt = JournalView.Practice; Logged?.Invoke("journal_practice"); return true; }
+        Random practiceDice = new Random();
+        public void SeedPractice(int seed) { practiceDice = new Random(seed); } // the checks' rounds come out the same on every run
+        int[] Shuffled(int count) { var order = Enumerable.Range(0, count).ToArray(); for (int i = count - 1; i > 0; i--) { int j = practiceDice.Next(i + 1); int t = order[i]; order[i] = order[j]; order[j] = t; } return order; }
+        int[] quizOrder = new int[0], choiceOrder = new int[0];
+        public PracticeConcept QuizConcept { get; private set; }
+        public int QuizAt { get; private set; }
+        public int QuizPicked { get; private set; } = -1; // the choice picked, in the order shown, or -1
+        public bool QuizOver { get; private set; }
+        public bool OnQuiz => AtJournal && JournalAt == JournalView.Quiz && QuizConcept != null;
+        public bool StartQuiz(int row)
+        {
+            var learned = PracticeConcepts;
+            if (!AtJournal || JournalAt != JournalView.Practice || row < 0 || row >= learned.Count || learned[row].questions.Length == 0) return false;
+            QuizConcept = learned[row]; quizOrder = Shuffled(QuizConcept.questions.Length); QuizAt = 0; QuizOver = false; NewQuestion();
+            JournalAt = JournalView.Quiz; Logged?.Invoke("practice_round:" + QuizConcept.id); return true;
+        }
+        void NewQuestion() { QuizPicked = -1; choiceOrder = Shuffled(QuizQuestion.choices.Length); }
+        public PracticeQuestion QuizQuestion => QuizConcept != null && QuizAt < quizOrder.Length ? QuizConcept.questions[quizOrder[QuizAt]] : null;
+        public int QuizCount => QuizConcept != null ? QuizConcept.questions.Length : 0;
+        public string QuizCounter => !OnQuiz || QuizOver ? "" : (QuizAt + 1) + " of " + QuizCount;
+        public string[] QuizChoices => !OnQuiz || QuizOver ? new string[0] : choiceOrder.Select(i => QuizQuestion.choices[i]).ToArray();
+        public int QuizRight => !OnQuiz || QuizOver ? -1 : Array.IndexOf(choiceOrder, QuizQuestion.answer); // the right choice, in the order shown
+        public bool CanQuizAnswer => OnQuiz && !QuizOver && QuizPicked < 0;
+        public bool AnswerQuiz(int choice)
+        {
+            if (!CanQuizAnswer || choice < 0 || choice >= choiceOrder.Length) return false;
+            QuizPicked = choice; Logged?.Invoke(choice == QuizRight ? "practice_right" : "practice_wrong"); return true;
+        }
+        public string QuizFeedback => !OnQuiz || QuizOver || QuizPicked < 0 ? "" : (QuizPicked == QuizRight ? PracticeBook.Data.right : PracticeBook.Data.wrong) + " " + QuizQuestion.why;
+        public bool CanQuizNext => OnQuiz && !QuizOver && QuizPicked >= 0;
+        public bool NextQuiz()
+        {
+            if (!CanQuizNext) return false;
+            if (QuizAt + 1 >= quizOrder.Length) { QuizOver = true; Logged?.Invoke("practice_end:" + QuizConcept.id); return true; }
+            QuizAt++; NewQuestion(); Logged?.Invoke("practice_next"); return true;
+        }
+        public string QuizEnd => OnQuiz && QuizOver ? QuizConcept.end : "";
+        public bool CanQuizBack => OnQuiz; // "‹ Practice" at any time, and Back to Practice at the round's end
+        public bool QuizToPractice() { if (!CanQuizBack) return false; QuizConcept = null; QuizOver = false; QuizPicked = -1; JournalAt = JournalView.Practice; Logged?.Invoke("practice_list"); return true; }
         // The views and tabs learned so far: the Table once the table has entered the deck (Key 3); Element at Key 1, Modality with the
         // modalities, Polarity and Opposites with the opposites (Key 4).
         public bool CanJournalTable => Knows(ItemKind.Grid);

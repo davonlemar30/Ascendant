@@ -1,0 +1,400 @@
+{
+ "right": "That's it.",
+ "wrong": "Not quite.",
+ "concepts": [
+  {
+   "id": "elements",
+   "name": "The Elements",
+   "line": "Fire, Earth, Air and Water",
+   "unlock": "key1",
+   "end": "That's all I have on the elements for now. Come back whenever you like.",
+   "questions": [
+    {
+     "ask": "Leo. Which element does it belong to?",
+     "glyph": -1,
+     "choices": [
+      "Fire",
+      "Earth",
+      "Air",
+      "Water"
+     ],
+     "answer": 0,
+     "why": "Leo is Fire, with Aries and Sagittarius."
+    },
+    {
+     "ask": "Which element does Pisces belong to?",
+     "glyph": -1,
+     "choices": [
+      "Fire",
+      "Earth",
+      "Air",
+      "Water"
+     ],
+     "answer": 3,
+     "why": "Pisces is Water, with Cancer and Scorpio."
+    },
+    {
+     "ask": "Which of these is a Fire sign?",
+     "glyph": -1,
+     "choices": [
+      "Taurus",
+      "Gemini",
+      "Cancer",
+      "Sagittarius"
+     ],
+     "answer": 3,
+     "why": "Sagittarius is Fire, with Aries and Leo."
+    },
+    {
+     "ask": "Gemini and Libra are Air. Which sign makes three?",
+     "glyph": -1,
+     "choices": [
+      "Aries",
+      "Scorpio",
+      "Capricorn",
+      "Aquarius"
+     ],
+     "answer": 3,
+     "why": "Aquarius is Air, with Gemini and Libra."
+    },
+    {
+     "ask": "What's the next Earth sign after Virgo?",
+     "glyph": -1,
+     "choices": [
+      "Libra",
+      "Scorpio",
+      "Sagittarius",
+      "Capricorn"
+     ],
+     "answer": 3,
+     "why": "Capricorn is the next Earth sign, four signs after Virgo."
+    },
+    {
+     "ask": "Which of these is an Earth sign?",
+     "glyph": -1,
+     "choices": [
+      "Aries",
+      "Taurus",
+      "Libra",
+      "Pisces"
+     ],
+     "answer": 1,
+     "why": "Taurus is Earth, with Virgo and Capricorn."
+    }
+   ]
+  },
+  {
+   "id": "symbols",
+   "name": "The Symbols",
+   "line": "Each sign's symbol",
+   "unlock": "key2",
+   "end": "That's all I have on the symbols for now. Come back whenever you like.",
+   "questions": [
+    {
+     "ask": "This symbol belongs to which sign?",
+     "glyph": 1,
+     "choices": [
+      "Taurus",
+      "Leo",
+      "Scorpio",
+      "Aquarius"
+     ],
+     "answer": 0,
+     "why": "This is the symbol of Taurus, an Earth sign."
+    },
+    {
+     "ask": "Whose symbol is this?",
+     "glyph": 2,
+     "choices": [
+      "Gemini",
+      "Cancer",
+      "Virgo",
+      "Sagittarius"
+     ],
+     "answer": 0,
+     "why": "This is the symbol of Gemini, an Air sign."
+    },
+    {
+     "ask": "Which sign does this symbol belong to?",
+     "glyph": 8,
+     "choices": [
+      "Gemini",
+      "Virgo",
+      "Sagittarius",
+      "Pisces"
+     ],
+     "answer": 2,
+     "why": "This is the symbol of Sagittarius, a Fire sign."
+    },
+    {
+     "ask": "Here's a symbol from the wheel. Whose is it?",
+     "glyph": 7,
+     "choices": [
+      "Aries",
+      "Cancer",
+      "Scorpio",
+      "Capricorn"
+     ],
+     "answer": 2,
+     "why": "This is the symbol of Scorpio, a Water sign."
+    },
+    {
+     "ask": "Do you remember this one? Which sign is it?",
+     "glyph": 9,
+     "choices": [
+      "Taurus",
+      "Leo",
+      "Libra",
+      "Capricorn"
+     ],
+     "answer": 3,
+     "why": "This is the symbol of Capricorn, an Earth sign."
+    },
+    {
+     "ask": "Which sign carries this symbol?",
+     "glyph": 3,
+     "choices": [
+      "Aries",
+      "Cancer",
+      "Libra",
+      "Pisces"
+     ],
+     "answer": 1,
+     "why": "This is the symbol of Cancer, a Water sign."
+    }
+   ]
+  },
+  {
+   "id": "modalities",
+   "name": "The Modalities",
+   "line": "Cardinal, Fixed and Mutable",
+   "unlock": "modalities",
+   "end": "That's all I have on the modalities for now. Come back whenever you like.",
+   "questions": [
+    {
+     "ask": "Scorpio. Which modality does it belong to?",
+     "glyph": -1,
+     "choices": [
+      "Cardinal",
+      "Fixed",
+      "Mutable"
+     ],
+     "answer": 1,
+     "why": "Scorpio is Fixed, with Taurus, Leo and Aquarius."
+    },
+    {
+     "ask": "Which modality does Gemini belong to?",
+     "glyph": -1,
+     "choices": [
+      "Cardinal",
+      "Fixed",
+      "Mutable"
+     ],
+     "answer": 2,
+     "why": "Gemini is Mutable, with Virgo, Sagittarius and Pisces."
+    },
+    {
+     "ask": "Which modality begins each season?",
+     "glyph": -1,
+     "choices": [
+      "Cardinal",
+      "Fixed",
+      "Mutable"
+     ],
+     "answer": 0,
+     "why": "Cardinal signs are the initiators, setting things in motion."
+    },
+    {
+     "ask": "Which modality holds steady and does not waver?",
+     "glyph": -1,
+     "choices": [
+      "Cardinal",
+      "Fixed",
+      "Mutable"
+     ],
+     "answer": 1,
+     "why": "Fixed signs are the anchors, holding steady in the middle."
+    },
+    {
+     "ask": "What's the next Cardinal sign after Cancer?",
+     "glyph": -1,
+     "choices": [
+      "Leo",
+      "Virgo",
+      "Libra",
+      "Scorpio"
+     ],
+     "answer": 2,
+     "why": "Libra is the next Cardinal sign, three signs after Cancer."
+    },
+    {
+     "ask": "Which of these is a Mutable sign?",
+     "glyph": -1,
+     "choices": [
+      "Aries",
+      "Leo",
+      "Capricorn",
+      "Pisces"
+     ],
+     "answer": 3,
+     "why": "Pisces is Mutable, with Gemini, Virgo and Sagittarius."
+    }
+   ]
+  },
+  {
+   "id": "table",
+   "name": "The Elemental Table",
+   "line": "Each sign by element and modality",
+   "unlock": "key3",
+   "end": "That's all I have on the table for now. Come back whenever you like.",
+   "questions": [
+    {
+     "ask": "Fire and Cardinal. Which sign sits in that square?",
+     "glyph": -1,
+     "choices": [
+      "Aries",
+      "Leo",
+      "Libra",
+      "Sagittarius"
+     ],
+     "answer": 0,
+     "why": "Aries sits where the Fire row meets the Cardinal column."
+    },
+    {
+     "ask": "Earth and Mutable. Which sign is that?",
+     "glyph": -1,
+     "choices": [
+      "Taurus",
+      "Virgo",
+      "Capricorn",
+      "Pisces"
+     ],
+     "answer": 1,
+     "why": "Virgo is the Earth sign that is Mutable."
+    },
+    {
+     "ask": "Picture the table. Where does Scorpio sit?",
+     "glyph": -1,
+     "choices": [
+      "Water, Cardinal",
+      "Water, Fixed",
+      "Water, Mutable",
+      "Earth, Fixed"
+     ],
+     "answer": 1,
+     "why": "Scorpio sits in the Water row, in the Fixed column."
+    },
+    {
+     "ask": "Which column does Cancer sit in?",
+     "glyph": -1,
+     "choices": [
+      "Cardinal",
+      "Fixed",
+      "Mutable"
+     ],
+     "answer": 0,
+     "why": "Cancer sits in the Cardinal column, in the Water row."
+    },
+    {
+     "ask": "Which row does Gemini sit in?",
+     "glyph": -1,
+     "choices": [
+      "Fire",
+      "Earth",
+      "Air",
+      "Water"
+     ],
+     "answer": 2,
+     "why": "Gemini sits in the Air row, in the Mutable column."
+    },
+    {
+     "ask": "Air and Fixed. Which sign sits there?",
+     "glyph": -1,
+     "choices": [
+      "Taurus",
+      "Gemini",
+      "Libra",
+      "Aquarius"
+     ],
+     "answer": 3,
+     "why": "Aquarius is the Air sign that is Fixed."
+    }
+   ]
+  },
+  {
+   "id": "opposites",
+   "name": "The Opposites",
+   "line": "The six pairs, Yang and Yin",
+   "unlock": "key4",
+   "end": "That's all I have on the opposites for now. Come back whenever you like.",
+   "questions": [
+    {
+     "ask": "Virgo. Which polarity does it carry?",
+     "glyph": -1,
+     "choices": [
+      "Yang",
+      "Yin"
+     ],
+     "answer": 1,
+     "why": "Virgo is Earth, and Earth signs are Yin."
+    },
+    {
+     "ask": "Which polarity is outward and active?",
+     "glyph": -1,
+     "choices": [
+      "Yang",
+      "Yin"
+     ],
+     "answer": 0,
+     "why": "Fire and Air signs are Yang, outward and active."
+    },
+    {
+     "ask": "Look across the wheel from Aries. Which sign sits there?",
+     "glyph": -1,
+     "choices": [
+      "Leo",
+      "Virgo",
+      "Libra",
+      "Scorpio"
+     ],
+     "answer": 2,
+     "why": "Libra sits six signs after Aries, straight across the wheel."
+    },
+    {
+     "ask": "Which sign is Capricorn's partner across the wheel?",
+     "glyph": -1,
+     "choices": [
+      "Taurus",
+      "Gemini",
+      "Cancer",
+      "Leo"
+     ],
+     "answer": 2,
+     "why": "Cancer sits straight across the wheel from Capricorn."
+    },
+    {
+     "ask": "What differs between a sign and its opposite?",
+     "glyph": -1,
+     "choices": [
+      "Modality",
+      "Polarity",
+      "Element"
+     ],
+     "answer": 2,
+     "why": "Opposites share modality and polarity, never the element."
+    },
+    {
+     "ask": "Which modality do Taurus and Scorpio share?",
+     "glyph": -1,
+     "choices": [
+      "Cardinal",
+      "Fixed",
+      "Mutable"
+     ],
+     "answer": 1,
+     "why": "Taurus and Scorpio are opposites, and both are Fixed."
+    }
+   ]
+  }
+ ]
+}

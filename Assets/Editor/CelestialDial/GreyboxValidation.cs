@@ -366,7 +366,7 @@ namespace Ascendant.Build
         {
             var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.SetKnownSign(-1); f.SetKnownSign(-1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, the journal in hand
             Check(!f.JournalTitled && f.OpenJournal() && f.JournalAt == JournalView.Title && f.JournalTitled && f.CanJournalLand && !f.CanJournalContents && !f.CanJournalHome, "1e A: the journal's first-ever open shows the title page, once (it is saved), and nothing on it leads anywhere");
-            Check(f.JournalLand() && f.JournalAt == JournalView.Landing && !f.CanJournalLand && f.CanJournalContents && !f.CanJournalHome && !SliceFlow.PracticeOpen, "its beat ends on the landing: the Contents door opens; the Practice door is an entry point only, until the owner approves Practice (step 4)");
+            Check(f.JournalLand() && f.JournalAt == JournalView.Landing && !f.CanJournalLand && f.CanJournalContents && !f.CanJournalHome && f.CanJournalPractice && !SliceFlow.PracticeDoorLine.Any(char.IsDigit), "its beat ends on the landing: the Contents door opens, and the Practice door opens Practice (owner, Oct 3), with no count (its line, a draft: \"" + SliceFlow.PracticeDoorLine + "\")");
             Check(f.JournalToContents() && f.JournalAt == JournalView.Contents && f.CanJournalHome && !f.CanJournalContents && f.JournalToLanding() && f.JournalAt == JournalView.Landing && f.JournalToContents(), "Contents, and ‹ Your Journal back to the landing");
             Check(!f.OpenChapter("books") && f.OpenChapter("map") && f.JournalAt == JournalView.Map && f.CanJournalContents && f.JournalToContents() && f.OpenChapter("wheel") && f.JournalAt == JournalView.Wheel && f.CanJournalContents, "a row per chapter (the Wheel, the Library Map; a Sealed row opens nothing); each chapter links back to Contents");
             Check(f.SelectSeat(0) && f.OpenSelected() && f.JournalAt == JournalView.Sign && !f.CanJournalContents && f.JournalToWheel(), "a sign's page goes back to the Wheel, as before, not to Contents");
@@ -381,7 +381,7 @@ namespace Ascendant.Build
             // the fonts (owner, Oct 2 evening: "Claude sources them", open licenses only)
             var italic = Resources.Load<Font>(SliceView.ItalicFont); var sun = Resources.Load<Font>(SliceView.SunFont); var bold = ButtonLook.EngravedFont;
             var notoLicense = Resources.Load<TextAsset>("Fonts/OFL-NotoSansSymbols2"); var garamondLicense = Resources.Load<TextAsset>("Fonts/OFL-EBGaramond");
-            string script = SliceFlow.Inscription("Keeper") + SliceFlow.TitlePageLine + SliceFlow.ContentsDoorLine + SliceFlow.WheelChapterLine + SliceFlow.MapChapterLine + "0123456789 Keys Books ·";
+            string script = SliceFlow.Inscription("Keeper") + SliceFlow.TitlePageLine + SliceFlow.PracticeDoorLine + SliceFlow.ContentsDoorLine + SliceFlow.WheelChapterLine + SliceFlow.MapChapterLine + "0123456789 Keys Books ·";
             string upright = SliceFlow.KeeperHeading + SliceFlow.BackToJournal + SliceFlow.BackToContents + SliceFlow.WheelTitle + SliceFlow.MapTitle + SliceFlow.SealedChapter + string.Concat(TravelMenu.Rooms.Select(r => r.name));
             Check(italic != null && italic.name == "EBGaramond-Italic" && script.All(c => c == ' ' || italic.HasCharacter(c)) && bold != null && upright.All(c => c == ' ' || bold.HasCharacter(c)), "EB Garamond Italic ships under Resources and carries every script line; EB Garamond Bold carries the upright ones, ‹ included");
             Check(sun != null && sun.HasCharacter('☉') && notoLicense != null && notoLicense.text.Contains("SIL Open Font License") && notoLicense.text.Contains("Noto Project Authors") && garamondLicense != null && garamondLicense.text.Contains("EB Garamond Project Authors"), "Noto Sans Symbols 2 ships with the sun (U+2609) for the Keeper's record; each font has its SIL Open Font License beside it");
@@ -409,6 +409,87 @@ namespace Ascendant.Build
             Check(taught.SequenceEqual(new[] { 1, 1, -1, 0, 0, -1, 2, 3, -1 }) && l.Phase == LessonPhase.AllLit && lit == 1, "the taught triangle follows the lesson for a Taurus player: Earth while it is guided, none between, Fire, none at Key 1, then Air and Water in the continuation; the payoff fires once, as the whole wheel lights (" + string.Join(", ", taught) + ")");
             var restored = new DialLesson(() => 0); int litLater = 0; restored.WheelLit += () => litLater++; restored.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
             Check(restored.Phase == LessonPhase.AllLit && litLater == 0 && restored.TeachingFamily == -1, "a save already past it never plays the payoff again, and teaches no family");
+        }
+        static void ValidatePractice()
+        {
+            // ---- Practice in the journal (owner, Oct 3: step 4 approved as scoped, the door's count removed; the board on 86bcbn6w6, Oct 2) ----
+            var book = PracticeBook.Data; string[] ids = { "elements", "symbols", "modalities", "table", "opposites" }, unlocks = { "key1", "key2", "modalities", "key3", "key4" };
+            Check(book.concepts.Select(c => c.id).SequenceEqual(ids) && book.concepts.Select(c => c.unlock).SequenceEqual(unlocks) && book.concepts.All(c => c.name != "" && c.line != "" && c.end != ""), "Practice's data (Resources/Practice/questions.json): the Elements, the Symbols, the Modalities, the Elemental Table and the Opposites, each with its name, its line on the list, the lesson that unlocks it and the line that ends its round");
+            Check(book.right == "That's it." && book.wrong == "Not quite.", "an answer is followed by \"That's it.\" or \"Not quite.\", then its why (the board's drafts)");
+            var all = book.concepts.SelectMany(c => c.questions.Select(q => new { c, q })).ToList();
+            Check(book.concepts.All(c => c.questions.Length == 6) && all.All(x => x.q.ask.Trim() != "" && x.q.why.Trim() != "" && x.q.choices.Length >= 2 && x.q.choices.Length <= 4 && x.q.choices.Distinct().Count() == x.q.choices.Length && x.q.answer >= 0 && x.q.answer < x.q.choices.Length), "six questions a concept, " + all.Count + " in all: each with an ask, two to four different choices, the right one among them, and its why");
+            Check(all.All(x => x.q.glyph == -1 || (x.c.id == "symbols" && x.q.glyph >= 0 && x.q.glyph < 12)), "only the Symbols draw a sign's symbol above a question");
+            // the facts, against the game's own data wherever a question names its sign (or shows its mark) and asks one of its facts
+            var signs = Zodiac.Seats.Select(z => z.Name).ToArray(); string[] elements = { "Fire", "Earth", "Air", "Water" }, polarities = { "Yang", "Yin" };
+            int checkedFacts = 0; var wrongFacts = new List<string>(); var byHand = new List<string>();
+            foreach (var x in all)
+            {
+                var named = Enumerable.Range(0, 12).Where(i => System.Text.RegularExpressions.Regex.IsMatch(x.q.ask, @"\b" + signs[i] + @"\b")).ToList(); int subject = x.q.glyph >= 0 ? x.q.glyph : named.Count == 1 ? named[0] : -1;
+                string right = x.q.choices[x.q.answer], expected = null; bool allIn(string[] set) => x.q.choices.All(set.Contains);
+                string ask = x.q.ask.ToLowerInvariant(); var el = elements.Where(e => x.q.ask.Contains(e)).ToList(); var mo = Zodiac.Modalities.Where(m => x.q.ask.Contains(m)).ToList();
+                string ElementModality(int i) => Zodiac.Seats[i].Element + ", " + Zodiac.ModalityAt(i);
+                if (x.q.glyph >= 0 && allIn(signs)) expected = signs[x.q.glyph];
+                else if (named.Count == 1 && allIn(signs) && (ask.Contains("opposite") || ask.Contains("across"))) expected = signs[Zodiac.Opposite(subject)];
+                else if (named.Count == 1 && allIn(signs) && ask.Contains("next") && el.Count + mo.Count == 1) { int step = el.Count == 1 ? 4 : 3; expected = signs[Zodiac.Wrap(subject + step)]; }
+                else if (named.Count == 1 && x.q.choices.All(c => Enumerable.Range(0, 12).Any(i => ElementModality(i) == c))) expected = ElementModality(subject);
+                else if (subject >= 0 && named.Count <= 1 && allIn(elements)) expected = Zodiac.Seats[subject].Element;
+                else if (subject >= 0 && named.Count <= 1 && allIn(Zodiac.Modalities)) expected = Zodiac.ModalityAt(subject);
+                else if (subject >= 0 && named.Count <= 1 && allIn(polarities)) expected = Zodiac.PolarityAt(subject);
+                else if (named.Count == 2 && allIn(Zodiac.Modalities) && Zodiac.ModalityAt(named[0]) == Zodiac.ModalityAt(named[1])) expected = Zodiac.ModalityAt(named[0]);
+                else if (named.Count == 2 && allIn(signs) && el.Count == 1) expected = signs.Where((n, i) => Zodiac.Seats[i].Element == el[0] && !named.Contains(i)).SingleOrDefault();
+                else if (named.Count == 0 && allIn(signs) && el.Count == 1 && mo.Count == 1) expected = signs.Where((n, i) => Zodiac.Seats[i].Element == el[0] && Zodiac.ModalityAt(i) == mo[0]).SingleOrDefault();
+                else if (named.Count == 0 && allIn(signs) && el.Count + mo.Count == 1) { var fits = x.q.choices.Where(c => { int i = Array.IndexOf(signs, c); return el.Count == 1 ? Zodiac.Seats[i].Element == el[0] : Zodiac.ModalityAt(i) == mo[0]; }).ToList(); expected = fits.Count == 1 ? fits[0] : "(" + fits.Count + " choices fit)"; }
+                else if (named.Count == 0 && allIn(polarities) && (ask.Contains("outward") || ask.Contains("inward"))) expected = ask.Contains("outward") ? "Yang" : "Yin"; // Caspar's words (SliceFlow.PolarityWords)
+                else if (ask.Contains("opposite") && ask.Contains("differ") && x.q.choices.Contains("Element")) expected = "Element"; // opposites share a modality and a polarity; only the element differs
+                if (expected == null) { byHand.Add(x.q.ask); continue; }
+                checkedFacts++; if (right != expected) wrongFacts.Add(x.q.ask + " -> " + right + " (the game's data: " + expected + ")");
+            }
+            Check(wrongFacts.Count == 0 && checkedFacts * 2 >= all.Count, "the right answers agree with the game's own data: " + checkedFacts + " of " + all.Count + " questions checked against the signs' elements, modalities, polarities, opposites and symbols" + (wrongFacts.Count > 0 ? "; WRONG: " + string.Join("; ", wrongFacts) : "") + (byHand.Count > 0 ? "; read by hand: " + string.Join(" | ", byHand) : ""));
+            // the flow: the list grows with the lessons; a round asks each of its questions once, the choices shuffled; right, wrong and the why
+            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.SetKnownSign(-1); f.SetKnownSign(-1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); f.SeedPractice(7);
+            Check(f.OpenJournal() && f.JournalLand() && f.CanJournalPractice && f.PracticeConcepts.Select(c => c.id).SequenceEqual(new[] { "elements" }) && f.OpenPractice() && f.JournalAt == JournalView.Practice && f.CanJournalHome && !f.CanJournalContents, "at Key 1 the Practice door opens the list: the Elements only; ‹ Your Journal leads back");
+            Check(!f.StartQuiz(1) && f.StartQuiz(0) && f.JournalAt == JournalView.Quiz && f.OnQuiz && f.QuizCount == 6 && f.QuizCounter == "1 of 6" && f.CanQuizAnswer && !f.CanQuizNext && f.QuizFeedback == "", "a concept's row starts its round: question 1 of 6, waiting for a pick (no row past the list)");
+            var save = UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true)); string Deck() => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
+            var deckBefore = Deck(); var asked = new List<PracticeQuestion>(); bool shuffled = true, marks = true;
+            for (int n = 0; n < 6; n++)
+            {
+                var q = f.QuizQuestion; asked.Add(q); var shown = f.QuizChoices; int right = f.QuizRight;
+                shuffled &= shown.OrderBy(c => c).SequenceEqual(q.choices.OrderBy(c => c)) && shown[right] == q.choices[q.answer];
+                int pick = n % 2 == 0 ? right : (right + 1) % shown.Length;
+                marks &= f.AnswerQuiz(pick) && f.QuizPicked == pick && !f.AnswerQuiz(right) && f.QuizFeedback == (pick == right ? "That's it. " : "Not quite. ") + q.why && f.CanQuizNext && f.NextQuiz();
+            }
+            Check(shuffled && marks, "each answer is marked once: right reads \"That's it.\" and a wrong pick \"Not quite.\", each with its why; the choices are the question's own, the right one where the game says");
+            Check(asked.Distinct().Count() == 6 && f.QuizOver && f.QuizEnd == book.concepts[0].end && f.CanQuizBack && !f.CanQuizNext && !f.CanQuizAnswer && f.QuizCounter == "", "the round asks each of the six once, then ends with the journal's line: \"" + book.concepts[0].end + "\"");
+            Check(f.QuizToPractice() && f.JournalAt == JournalView.Practice && !f.OnQuiz && f.JournalToLanding() && f.JournalAt == JournalView.Landing, "Back to Practice returns to the list, and ‹ Your Journal to the landing");
+            Check(UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true)) == save && Deck() == deckBefore, "practising changes nothing in the save or the deck: no score, no streak, no spaced review");
+            var orders = new List<string>();
+            for (int seed = 1; seed <= 4; seed++) { f.SeedPractice(seed); f.OpenPractice(); f.StartQuiz(0); orders.Add(f.QuizQuestion.ask + "|" + string.Join(",", f.QuizChoices)); f.QuizToPractice(); f.JournalToLanding(); }
+            Check(orders.Distinct().Count() > 1, "each round comes in a fresh order, the choices shuffled (" + orders.Distinct().Count() + " different openings in 4 rounds)");
+            Check(f.OpenPractice() && f.StartQuiz(0) && f.AnswerQuiz(0) && f.QuizToPractice() && f.JournalAt == JournalView.Practice && f.StartQuiz(0) && f.QuizAt == 0 && f.QuizPicked == -1, "‹ Practice leaves a round at any time; the next round starts afresh");
+            f.QuizToPractice(); f.JournalToLanding(); f.CloseJournal();
+            var grown = new List<int>(); f.MarkKey2(); grown.Add(f.PracticeConcepts.Count); f.MarkModalitiesComplete(); grown.Add(f.PracticeConcepts.Count); f.MarkKey3(); grown.Add(f.PracticeConcepts.Count); f.MarkKey4(); grown.Add(f.PracticeConcepts.Count);
+            Check(grown.SequenceEqual(new[] { 2, 3, 4, 5 }) && f.PracticeConcepts.Select(c => c.id).SequenceEqual(ids), "the list grows as each lesson finishes: the Symbols at Key 2, the Modalities with their lesson, the Table at Key 3, the Opposites at Key 4 (" + string.Join(", ", grown) + ")");
+            var early = new SliceFlow(() => 1); early.SetName("Davon"); early.Continue(); early.ChooseBirth("known"); early.SetKnownSign(1); early.SetKnownSign(-1); early.SetKnownSign(-1); early.Continue(); early.Continue(); early.EnterWing(); early.EnterDial();
+            Check(early.PracticeConcepts.Count == 0 && !early.CanJournalPractice, "before the first lesson finishes, nothing is listed and the door is unavailable");
+            // the page: every line fits its place, at the fonts' own widths; every question ends above Close the journal
+            var italic = Resources.Load<Font>(SliceView.ItalicFont); var bold = ButtonLook.EngravedFont; var probeObject = new GameObject("Practice probe", typeof(RectTransform)); var probe = probeObject.AddComponent<UnityEngine.UI.Text>(); probe.horizontalOverflow = HorizontalWrapMode.Overflow;
+            float Width(string text, Font face, int size) { probe.font = face; probe.fontSize = size; return probe.cachedTextGeneratorForLayout.GetPreferredWidth(text, probe.GetGenerationSettings(Vector2.zero)) / probe.pixelsPerUnit; }
+            int Lines(string text, Font face, int size, float width) { probe.font = face; probe.fontSize = size; return SliceView.WrapWords(probe, text, width).Count; }
+            string copy = string.Concat(all.Select(x => x.q.ask + x.q.why)) + string.Concat(book.concepts.Select(c => c.line + c.end)) + book.right + book.wrong + "0123456789 of", upright = string.Concat(all.SelectMany(x => x.q.choices)) + string.Concat(book.concepts.Select(c => c.name)) + SliceFlow.PracticeTitle + SliceFlow.BackToPractice + SliceFlow.QuizNextWords + SliceFlow.QuizBackWords + "×";
+            Check(copy.All(c => c == ' ' || italic.HasCharacter(c)) && upright.All(c => c == ' ' || bold.HasCharacter(c)), "every line of Practice's copy draws in the journal's fonts (the italic for the asks, the whys and the lines; EB Garamond Bold for the names and the choices)");
+            float worstName = book.concepts.Max(c => Width(c.name, bold, 21)), worstLine = book.concepts.Max(c => Width(c.line, italic, 15)), worstChoice = all.SelectMany(x => x.q.choices).Max(c => Width(c, bold, 18));
+            Check(worstName <= 210 && worstLine <= 210 && worstChoice <= SliceView.ChoiceWidth - 60, "the list's names and lines fit their 210 px (widest " + worstName.ToString("0") + " and " + worstLine.ToString("0") + "), and every choice its frame (widest " + worstChoice.ToString("0") + " of " + (SliceView.ChoiceWidth - 60) + ")");
+            float worstBottom = 0, closest = SliceView.ChoiceStep; string tallest = ""; int worstAsk = 0, worstWhy = 0, worstEnd = book.concepts.Max(c => Lines(c.end, italic, 17, SliceView.QuizAskWidth + 10));
+            foreach (var x in all)
+            {
+                int ask = Lines(x.q.ask, italic, 19, SliceView.QuizAskWidth), why = Math.Max(Lines(book.right + " " + x.q.why, italic, 16, SliceView.QuizAskWidth), Lines(book.wrong + " " + x.q.why, italic, 16, SliceView.QuizAskWidth));
+                worstAsk = Math.Max(worstAsk, ask); worstWhy = Math.Max(worstWhy, why);
+                var layout = SliceView.QuizLayout(x.q.glyph >= 0, ask, x.q.choices.Length, why); float bottom = layout.w + SliceView.ChoiceHeight; closest = Math.Min(closest, layout.z);
+                if (bottom > worstBottom) { worstBottom = bottom; tallest = x.q.ask; }
+            }
+            UnityEngine.Object.DestroyImmediate(probeObject);
+            Check(worstAsk <= 2 && worstWhy <= 3 && worstEnd <= 3 && worstBottom <= SliceView.QuizBottom + .01f && closest >= SliceView.ChoiceHeight + 2, "every ask takes two lines or fewer, every why three, every round's end three; the tallest question (\"" + tallest + "\") ends its Next at " + worstBottom.ToString("0") + ", inside the page's border (" + SliceView.QuizBottom + "), its choices " + closest.ToString("0.#") + " apart at the closest");
+            Check(SliceView.PracticeRowTop + SliceView.PracticeRowHeight * 5 <= SliceView.PageOrnamentTop && SliceView.PracticeRowHeight >= ButtonLook.MinTarget && SliceView.ChoiceHeight >= ButtonLook.MinTarget && SliceView.QuizNextWidth >= ButtonLook.MinTarget, "five rows end at " + (SliceView.PracticeRowTop + SliceView.PracticeRowHeight * 5) + ", above the page's lower ornaments; the rows, the choices and Next take 44 px or more");
         }
         static void ValidateBuildJ()
         {
@@ -1002,6 +1083,7 @@ namespace Ascendant.Build
             ValidateBuildJ();
             ValidateTriangles();
             ValidateJournalFront();
+            ValidatePractice();
             ValidateBirthChart();
             ValidateBuildW();
             ValidateBuildZ();
