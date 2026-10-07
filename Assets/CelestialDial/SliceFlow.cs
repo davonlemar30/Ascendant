@@ -160,6 +160,7 @@ namespace Ascendant.CelestialDial
         public Place BirthPlace => Facts.AsPlace;
         public string BirthStep { get; private set; } = ""; // the chart path: date, time, place (cusp on a cusp day); the skip path: sun-pick; on "Your Birth" also rising-pick; then done
         public bool BirthDone => BirthStep == "done";
+        public bool HasBirthRecord => BirthDone || Amending; // a record exists (and is unchanged) while "Your Birth" has the opening's boxes open
         public bool Amending { get; private set; }          // on the birth screen from "Your Birth": adding a missing fact, or choosing the rising
         BirthFacts draft = new BirthFacts(); BirthChart pending; string choiceBefore = "";
         // The cusp day (owner ruling, Oct 2 evening): with no birth time, on a day the sun changed sign, the player is asked which sign they
@@ -167,12 +168,14 @@ namespace Ascendant.CelestialDial
         // screen can offer a fix; with no place, the window's middle). A birth time added later settles it (Oct 7: worked out beats chosen).
         public int CuspFrom { get; private set; } = -1; public int CuspTo { get; private set; } = -1; public int CuspNoon { get; private set; } = -1;
         public int CuspMinute { get; private set; } = -1; // the minute the sun changed sign, on the birth place's clock that day; -1 with no place
-        void ClearCusp() { CuspFrom = CuspTo = CuspNoon = CuspMinute = -1; MoonAsk = new int[0]; }
+        void ClearCusp() { CuspFrom = CuspTo = CuspNoon = CuspMinute = -1; MoonAsk = new int[0]; heldSun = heldMoon = null; }
+        // the cusp's and the Moon's answers are held until the steps finish, so going back from "Your Birth" changes nothing (Jeffrey, #123 B1)
+        ChoiceRecord heldSun, heldMoon;
         // The Moon pick (owner, Oct 7: "Ask, like the cusp Sun"): when the Moon could be in more than one sign (no birth time, or no place), the
         // opening asks which the player goes by, after the cusp question if there is one. A pick is the player's choice, shown like any other
         // sign and flagged picked; "I'm not sure" keeps the options ("Pisces or Aries", Oct 3), flagged declined; a fact added later settles it.
         public int[] MoonAsk { get; private set; } = new int[0];
-        public string MoonQuestion => MoonAsk.Length < 2 ? "" : "The Moon was in " + Options(MoonAsk) + " on the day you were born. Which do you go by?"; // Claude's draft from the cusp question (owner writes)
+        public string MoonQuestion => MoonAsk.Length < 2 ? "" : "Your Moon was in " + Options(MoonAsk) + " that day. Which do you go by?"; // the owner's chosen wording (Oct 7), a draft (owner writes)
         bool AskMoon()
         {
             var moon = pending?.Worked.Point("moon"); var chosen = ChoiceFor("moon");
@@ -182,7 +185,7 @@ namespace Ascendant.CelestialDial
         public bool PickMoon(int choice) // an index into MoonAsk, or -1: "I'm not sure"
         {
             if (Screen != SliceScreen.Birth || BirthStep != "moon" || choice < -1 || choice >= MoonAsk.Length) return false;
-            Choose("moon", choice < 0 ? -1 : MoonAsk[choice], choice < 0 ? "declined" : "picked");
+            heldMoon = new ChoiceRecord { point = "moon", sign = choice < 0 ? -1 : MoonAsk[choice], how = choice < 0 ? "declined" : "picked" };
             Logged?.Invoke(choice < 0 ? "moon_declined" : "moon_picked"); Commit(); return true;
         }
         public static string ClockTime(int minute) { int h = minute / 60, m = minute % 60; return (h % 12 == 0 ? 12 : h % 12) + ":" + m.ToString("00") + (h < 12 ? " am" : " pm"); }
@@ -193,7 +196,7 @@ namespace Ascendant.CelestialDial
         public bool PickCuspSun(int choice) // 0: the sign it left, 1: the sign it entered, -1: "I'm not sure"
         {
             if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < -1 || choice > 1) return false;
-            Choose("sun", choice == 0 ? CuspFrom : choice == 1 ? CuspTo : CuspNoon, choice < 0 ? "noon" : "picked");
+            heldSun = new ChoiceRecord { point = "sun", sign = choice == 0 ? CuspFrom : choice == 1 ? CuspTo : CuspNoon, how = choice < 0 ? "noon" : "picked" };
             Logged?.Invoke(choice < 0 ? "cusp_sun_noon" : "cusp_sun_picked"); if (!AskMoon()) Commit(); return true;
         }
         // The opening's words and "Your Birth"'s (Oct 7): Claude's drafts from the approved recommendation, checked by Dante; the owner rewrites them
@@ -265,6 +268,7 @@ namespace Ascendant.CelestialDial
         void Commit()
         {
             var before = Snapshot(); bool timeAdded = !Facts.HasTime && draft.HasTime;
+            foreach (var held in new[] { heldSun, heldMoon }) if (held != null) Choose(held.point, held.sign, held.how);
             if (pending != null)
             {
                 var fresh = pending.Worked; var merged = new List<ChartPoint>();
@@ -283,8 +287,7 @@ namespace Ascendant.CelestialDial
             var lines = new List<string>();
             if (RisingSign >= 0 && !RisingChosen && (before.rising < 0 || before.risingChosen)) { lines.Add(RisingIs(RisingSign)); if (before.risingChosen && before.rising != RisingSign) lines.Add(TakesThePlace); }
             if (MoonSign >= 0 && before.moon != MoonSign) lines.Add(MoonIs(MoonSign));
-            if (before.sun < 0 && HasSunSign) lines.Add(SunIs(SunSign));
-            else if (before.sunChosen && HasSunSign && !FromChoice("sun") && before.sun != SunSign) lines.Add(timeAdded ? SunAtThatMinute(SunSign) : SunIs(SunSign));
+            if (HasSunSign && before.sun != SunSign) lines.Add(before.sunChosen && timeAdded && !FromChoice("sun") ? SunAtThatMinute(SunSign) : SunIs(SunSign)); // a sun worked out, or picked again on a cusp day
             if (lines.Count > 0) lines.Add(StaysLearned);
             Logged?.Invoke("birth_added"); FinishAmending(lines);
         }

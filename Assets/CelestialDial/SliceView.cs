@@ -890,9 +890,9 @@ namespace Ascendant.CelestialDial
         {
             if (busy || !DevCheckpoints.Known(id)) return;
             SaveData save;
-            try { save = DevCheckpoints.Play(id, Flow.PlayerName, Flow.BirthDone ? Flow.LessonSun : 1); }
+            try { save = DevCheckpoints.Play(id, Flow.PlayerName, Flow.HasBirthRecord ? Flow.LessonSun : 1); }
             catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return; }
-            if (Flow.BirthDone) Flow.WriteBirth(save); // Oct 7: the jump keeps the player's birth record; the London sample only stands in when there is none
+            if (Flow.HasBirthRecord) Flow.WriteBirth(save); // Oct 7: the jump keeps the player's birth record; the London sample only stands in when there is none
             PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(save)); PlayerPrefs.Save();
             Debug.Log("[CelestialDial] jumped to checkpoint " + id);
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

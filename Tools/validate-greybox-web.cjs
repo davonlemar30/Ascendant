@@ -863,7 +863,7 @@ const path=require('path');
   await action('time-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);await recovery.locator('#birthplace').fill('London');
   await recovery.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);await action('place-match-0');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='moon');
   // the owner, Oct 7 ("Ask, like the cusp Sun"): the moon's two signs are asked; a pick is the player's moon, I'm not sure keeps both
-  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.canMoon && JSON.stringify(r.moonOptions)==='["Cancer","Leo"]' && r.moonQuestion==='The Moon was in Cancer or Leo on the day you were born. Which do you go by?' && !r.canSliceContinue,'Oct 7: the moon asked like the cusp sun: '+r.moonQuestion); }
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.canMoon && JSON.stringify(r.moonOptions)==='["Cancer","Leo"]' && r.moonQuestion==='Your Moon was in Cancer or Leo that day. Which do you go by?' && !r.canSliceContinue,'Oct 7: the moon asked like the cusp sun: '+r.moonQuestion); }
   await recovery.screenshot({path:path.join(out,'390-birth-moon.png')});
   await action('moon-1');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
   { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.bigThree==='\u2609 Taurus \u00b7 \u263d Leo \u00b7 \u2191 unknown' && r.moonBasis==='picked' && r.canSliceContinue,'a pick is the player\'s moon, shown like any other: '+r.bigThree); }
