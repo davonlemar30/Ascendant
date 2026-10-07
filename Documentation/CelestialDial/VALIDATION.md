@@ -2,6 +2,27 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## No unknown Big Three: every missing sign picked at the opening (task 86bced0tc, Oct 7)
+
+The owner's ruling (Oct 7): no new game shows "unknown" in the Big Three. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #125's body and its validation comment.
+
+**Checks**
+- Mechanical (+2, 698 against 696): the skip path's three picks (−1 refused at each), the cusp without "I'm not sure", the rising asked after the Moon on a day with no time or no place, the notes in full, "Your Birth" with a chosen rising, an older save's "or" Moon read as before, a #123 save with a declined Sun (the lessons start from Aries), an older save's Add (the Moon, then the rising, answered and cancelled at the rising), and Jeffrey's #123 B1 case still held.
+- Fixture (+3, 284 against 281).
+- Suite (+8, 665 against 657): the skip path's three screens, the no-place path, the cusp then Moon then rising, the Moon question's two signs only, each of the four DEV samples landing on its first question, "Your Birth" with Change my rising, no "unknown" or " or " in any new opening's record, and the `v4-chart` conversion keeping its " or " Moon.
+
+Validation (local, Unity 6000.3.24f1, final head `99c9ebb`):
+- mechanical checks 698/698, 0 compiler errors;
+- slice fixture 284/284, no runtime errors (the log has one Editor-internal `UIR.RenderChainCommand` exception, the same as in five earlier builds);
+- headless WebGL 0 errors and 0 warnings;
+- browser suite 665/665 at desktop density and 665/665 at phone density;
+- GitHub Actions Web build green on `99c9ebb`;
+- production: checked by Claude after the Pages deploy and posted on the task.
+
+Reviews: Jeffrey's B1 (the fourth DEV sample) and B2 (the record) fixed or closed; his notes 1 to 4 applied in `99c9ebb`. Not tested: "Starting sign: Aries" on the Dial in a browser (no new game reaches it; the mechanical check covers the older save), older saves played through the opening's screens by hand, the rising asked during an Add in the fixture or the browser, a phone or the APK (no cut; the phone-density suite stands in).
+
+Merged as PR #125 (main `b71821d`, Oct 7); the head is `99c9ebb`.
+
 ## The birth record: facts, choices and the worked-out chart; "Your Birth" (task 86bceb6fq, Oct 7)
 
 The owner's birth-time design (Oct 7): the game never invents a birth time, a place or a sun. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #123's body and comments.
