@@ -46,12 +46,13 @@ These instructions apply to the entire repository.
 
 ## The studio team (owner, 2026-10-06)
 
-Claude builds and orchestrates. Four agents, each defined in `.claude/agents/`, check the work at fixed points. None of them rules on design; every ruling stays with the owner.
+Claude builds and orchestrates. Five agents, each defined in `.claude/agents/`, check the work at fixed points or answer questions. None of them rules on design; every ruling stays with the owner.
 
 | Agent | Job | Claude calls them | Model |
 | --- | --- | --- | --- |
 | Ashantis | Task prep: settles obvious calls, lists the real decisions | Before building a ClickUp task | Opus |
 | Dante | Copywriter: the owner's writing rules and Caspar's voice | On every PR that adds or changes player-facing text | Sonnet |
+| Imani | Researcher, read-only: what the rulings, canon, and code already say; deep reports from outside sources | Whenever a design, build, or task prep needs what's already known (owner, 2026-10-07) | Sonnet |
 | Jeffrey | Reviewer: brief, AGENTS.md, sweeps, correctness | On every PR, before asking the owner to merge | Opus |
 | Whitney | Docs and continuity: build log, `VALIDATION.md`, mirrors, indexes, memory | After every merge, and Monday and Thursday | Sonnet |
 
