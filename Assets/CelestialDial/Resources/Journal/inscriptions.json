@@ -3,7 +3,7 @@
  "lines": [
   { "id": "any-hello-again", "group": "any", "unlock": "", "draft": true, "text": "Hello again, {name}. I was just reading myself over. Everything's still here." },
   { "id": "any-fair-trade", "group": "any", "unlock": "", "draft": true, "text": "You learn from the Library, and I learn from you. I think that's a fair trade." },
-  { "id": "any-not-blank", "group": "any", "unlock": "", "draft": true, "text": "Some journals stay blank forever. Not me, {name}. Not with you around." },
+  { "id": "any-not-blank", "group": "any", "unlock": "", "draft": true, "text": "Some journals stay blank forever. I got lucky, {name}." },
   { "id": "any-every-page", "group": "any", "unlock": "", "draft": true, "text": "Every page I fill tells me a little more about you. I like what I'm reading." },
   { "id": "any-fuller", "group": "any", "unlock": "", "draft": true, "text": "I'm a little fuller than when we met, {name}. That's your doing." },
   { "id": "any-being-read", "group": "any", "unlock": "", "draft": true, "text": "I don't mind being read, {name}. Especially by you." },
