@@ -1,0 +1,11 @@
+# The files that steer Claude and its agents, and the repository's automation (owner, Oct 7).
+# Unanchored names match at any depth. The "Guard agent files" check (.github/workflows/guard.yml)
+# fails a pull request that touches any of them unless the owner's account opened it from this
+# repository. Branch protection on main makes that check required once the owner turns it on.
+.claude/         @davonlemar30
+.claude          @davonlemar30
+AGENTS.md        @davonlemar30
+CLAUDE.md        @davonlemar30
+CLAUDE.local.md  @davonlemar30
+/.github/        @davonlemar30
+/.mcp.json       @davonlemar30

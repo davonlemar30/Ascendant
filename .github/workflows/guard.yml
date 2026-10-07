@@ -1,0 +1,90 @@
+# Guards the files that steer Claude and its agents, and this repository's automation (owner, Oct 7:
+# prompt injection). A pull request that changes any of them fails this check unless the repository
+# owner's account opened it from a branch in this repository. Once the owner's branch ruleset on main
+# lists this check as required, nothing that fails it can merge.
+#
+# The protected files, at any depth: .claude (a folder, or anything else by that name), CLAUDE.md,
+# CLAUDE.local.md, AGENTS.md (Claude and Codex both read nested copies); at the root: .github/ and
+# .mcp.json.
+#
+# Why pull_request and not pull_request_target (Jeffrey, #126 B3): GitHub blocks pull_request_target
+# in public repositories from Nov 2, 2026 unless an event policy allows it, and a required check that
+# never runs would stall every merge. On pull_request, a fork's run waits for the owner's approval
+# (Settings → Actions → "Require approval for all external contributors"), so until he approves, the
+# required check never reports and the pull request can't merge. A fork could edit this file, so the
+# rule is: never approve a fork's run on a pull request that touches .github/ or lists more than
+# 3,000 changed files (Jeffrey, #126 N12), and check that by command, not by eye. This holds only with
+# the approval setting at "all external contributors"; "first-time contributors" lets a returning
+# outsider's edited guard run unapproved (N13).
+#
+# It never checks out or runs the pull request's code: it only reads the list of changed files, with
+# a read-only token.
+#
+# The trust test is the account, not the person. It assumes davonlemar30 is the only account that can
+# push here. Adding a collaborator, or a GitHub App with write access, means revisiting this check.
+name: Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    name: Guard agent files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check who changed the agent files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          OWNER: ${{ github.repository_owner }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          CHANGED: ${{ github.event.pull_request.changed_files }}
+        run: |
+          set -euo pipefail
+          trusted=no
+          if [ "$AUTHOR" = "$OWNER" ] && [ "$HEAD_REPO" = "$REPO" ]; then trusted=yes; fi
+          # One listing, kept as JSON so every name stays one value, whatever characters it holds (Jeffrey,
+          # #126 B4), then confirm it was read from the head this run is for (N10).
+          gh api --paginate "repos/$REPO/pulls/$PR/files" > "$RUNNER_TEMP/pages.json"
+          jq -s 'add // []' "$RUNNER_TEMP/pages.json" > "$RUNNER_TEMP/files.json"
+          now=$(gh api "repos/$REPO/pulls/$PR" --jq '.head.sha')
+          if [ "$now" != "$HEAD_SHA" ] && [ "$trusted" != yes ]; then
+            echo "::error::The pull request moved while the guard read it. The run for its new head checks it."
+            exit 1
+          fi
+          # GitHub lists at most 3,000 files. A list that comes back short can't be checked, so it fails
+          # unless the owner opened the pull request (Jeffrey, #126 B1).
+          listed=$(jq 'length' "$RUNNER_TEMP/files.json")
+          if [ "$listed" != "$CHANGED" ] && [ "$trusted" != yes ]; then
+            echo "::error::GitHub listed $listed of this pull request's $CHANGED changed files, so the guard can't check them all."
+            exit 1
+          fi
+          # A name with a control character in it (a newline, say) fails outright from anyone but the owner.
+          odd=$(jq '[.[] | .filename, (.previous_filename // empty) | select(explode | any(. < 32 or . == 127))] | length' "$RUNNER_TEMP/files.json")
+          if [ "$odd" != 0 ] && [ "$trusted" != yes ]; then
+            echo "::error::$odd changed file names hold control characters, so the guard can't check them."
+            exit 1
+          fi
+          # renames count from both ends; the match ignores case, since macOS checkouts do
+          hits=$(jq -r '.[] | .filename, (.previous_filename // empty) | select(test("(^|/)\\.claude(/|$)|(^|/)(agents|claude|claude\\.local)\\.md$|^\\.github/|^\\.mcp\\.json$"; "i")) | @json' "$RUNNER_TEMP/files.json")
+          if [ -z "$hits" ]; then
+            echo "No agent or automation files changed."
+            exit 0
+          fi
+          if [ "$trusted" = yes ]; then
+            echo "Agent or automation files changed by $OWNER's account, from this repository:"
+            printf '%s\n' "$hits"
+            exit 0
+          fi
+          echo "::error::Only $OWNER's account may change these files, from a branch in this repository. This pull request is from $AUTHOR ($HEAD_REPO):"
+          printf '%s\n' "$hits"
+          exit 1
