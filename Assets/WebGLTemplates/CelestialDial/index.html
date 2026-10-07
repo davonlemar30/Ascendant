@@ -23,7 +23,7 @@
 <label id="birthtime-label" for="birthtime" class="sr">Your birth time</label><input id="birthtime" type="time" hidden><button id="use-time">Use this time</button><button id="time-unknown">I don't know my birth time</button>
 <label id="birthplace-label" for="birthplace" class="sr">Your birth town or city</label><input id="birthplace" type="text" maxlength="60" autocomplete="off" placeholder="Town or city" hidden>
 <div id="place-matches" role="group" aria-label="Places that match"><button id="place-match-0"></button><button id="place-match-1"></button><button id="place-match-2"></button><button id="place-match-3"></button></div>
-<div id="signs" role="group" aria-label="Choose your sign"></div><button id="place-unknown">I don't know where</button><button id="birth-cancel">Back to Your Journal</button>
+<div id="signs" role="group" aria-label="Choose a sign"></div><button id="place-unknown">I don't know where</button><button id="birth-cancel">Back to Your Journal</button>
 <div id="cusp" role="group" aria-label="Which sign do you go by?"><button id="cusp-0"></button><button id="cusp-1"></button><button id="cusp-why" aria-expanded="false">Why?</button></div>
 <div id="moon" role="group" aria-label="Which Moon do you go by?"><button id="moon-0"></button><button id="moon-1"></button><button id="moon-2"></button></div>
 <button id="birth-chart">Yes, I know my birthday</button><button id="birth-skip">I'll skip it</button>
@@ -84,7 +84,7 @@
   byId('birthdate').addEventListener('change',e=>send('birthdate:'+e.target.value));
   byId('use-date').onclick=()=>send('birthdate:'+byId('birthdate').value);
   byId('change-birth').onclick=()=>send('birth:');
-  // batch 2 (owner, Oct 2 evening: the Big Three approved): the time, the place's search and pick, I don't know for the moon and the rising sign
+  // batch 2 (owner, Oct 2 evening: the Big Three approved): the time, the place's search and pick; Oct 7: I don't know where (86bced0tc: no other "I don't know")
   byId('birthtime').addEventListener('change',e=>send('birthtime:'+e.target.value));byId('use-time').onclick=()=>send('birthtime:'+byId('birthtime').value);byId('time-unknown').onclick=()=>send('birthtime-unknown');
   byId('birthplace').addEventListener('input',e=>send('birthplace-search:'+e.target.value));for(let i=0;i<4;i++)byId('place-match-'+i).onclick=()=>send('birthplace:'+i);
   byId('place-unknown').onclick=()=>send('birthplace-unknown');byId('birth-cancel').onclick=()=>send('birth-cancel'); // Oct 7: I'm not sure, I don't know where, and back to "Your Birth"
@@ -171,7 +171,7 @@
       {const m=state.moonOptions||[];for(let i=0;i<3;i++){const b=byId('moon-'+i);b.textContent=m[i]||'';b.disabled=!(state.canMoon&&m[i]);}} // Oct 7
       if(!state.canBirthPlace&&byId('birthplace').value!=='')byId('birthplace').value=''; // a fresh search each time the step opens
       for(let i=0;i<12;i++)byId('sign-'+i).disabled=!state.canSignPick;
-      byId('signs').hidden=!state.canSignPick;
+      byId('signs').hidden=!state.canSignPick;byId('signs').setAttribute('aria-label',state.signsAsk||'Choose a sign'); // Oct 7: the grid is named by the question it answers
       byId('enter-wing').disabled=!state.canEnterWing;byId('enter-chamber').disabled=!state.canEnterChamber;byId('leave-chamber').disabled=!state.canLeaveChamber;
       byId('leave-wing').disabled=!state.canLeaveWing;byId('leave-dial').disabled=!state.canLeaveDial;
       // The room mini-menu (owner, Oct 1; 86bca07wv): its button in the rooms, a row per room open to travel, the one here marked current; Sealed is not a control
