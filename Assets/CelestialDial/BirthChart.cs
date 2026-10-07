@@ -178,6 +178,79 @@ namespace Ascendant.CelestialDial
             return local - (long)Math.Floor(OffsetAt(zone, local - 26 * 60) / 60.0); // skipped: the offset before the change
         }
         public static DateTime UtOf(long minute) => Epoch.AddMinutes(minute);
+        public static long MinuteOf(int year, int month, int day) => (long)(new DateTime(year, month, day, 0, 0, 0, DateTimeKind.Utc) - Epoch).TotalMinutes;
+        // the westmost and eastmost UTC offsets anywhere in the bundled table, in minutes: a birth with no place could be in any of them
+        static int westmost = int.MaxValue, eastmost = int.MinValue;
+        public static void OffsetRange(out int west, out int east)
+        {
+            Load();
+            if (westmost == int.MaxValue)
+                for (int z = 0; z < zoneNames.Length; z++)
+                {
+                    westmost = Math.Min(westmost, offsetFrom[z]); eastmost = Math.Max(eastmost, offsetFrom[z]);
+                    foreach (var o in offsetAfter[z]) { westmost = Math.Min(westmost, o); eastmost = Math.Max(eastmost, o); }
+                }
+            west = (int)Math.Floor(westmost / 60.0); east = (int)Math.Ceiling(eastmost / 60.0);
+        }
+    }
+
+    // The birth-time build (owner, Oct 7: the recommendation on 86bceb6fq approved, comment 90140265369479). The save keeps three things
+    // apart, so a later system can weigh them differently with no migration (owner, Oct 7): what the player told the game (BirthFacts), what
+    // the player chose where the facts can't decide (ChoiceRecord), and what the game worked out from the facts (WorkedChart). The signs on
+    // screen are read from them each time: worked out (exact or stable) beats chosen, and chosen beats unknown.
+    [Serializable]
+    public sealed class BirthFacts
+    {
+        public string date = "";                     // YYYY-MM-DD; "" not given
+        public int timeFrom = -1, timeTo = -1;       // minutes after local midnight: equal for an exact time; -1 not given, so the whole local day
+        public string place = "", zone = "";         // the bundled place's name and its IANA zone; "" not given
+        public float latitude, longitude;
+        public bool HasDate => date != null && date.Length == 10;
+        public bool HasTime => timeFrom >= 0 && timeTo >= timeFrom;
+        public bool ExactTime => HasTime && timeFrom == timeTo;
+        public bool HasPlace => !string.IsNullOrEmpty(place);
+        public bool Any => HasDate || HasTime || HasPlace;
+        public int Year => HasDate ? int.Parse(date.Substring(0, 4), CultureInfo.InvariantCulture) : 0;
+        public int Month => HasDate ? int.Parse(date.Substring(5, 2), CultureInfo.InvariantCulture) : 0;
+        public int Day => HasDate ? int.Parse(date.Substring(8, 2), CultureInfo.InvariantCulture) : 0;
+        public int Minute => ExactTime ? timeFrom : -1;
+        public void SetDate(int year, int month, int day) { date = year.ToString("0000") + "-" + month.ToString("00") + "-" + day.ToString("00"); }
+        public void SetTime(int minuteOfDay) { timeFrom = timeTo = minuteOfDay < 0 ? -1 : minuteOfDay; }
+        public void SetPlace(Place p)
+        {
+            if (p == null) { place = zone = ""; latitude = longitude = 0; return; }
+            place = p.Name; zone = Places.ZoneName(p.Zone); latitude = p.Latitude; longitude = p.Longitude;
+        }
+        public Place AsPlace => HasPlace ? new Place { Name = place, Key = "", Latitude = latitude, Longitude = longitude, Zone = Places.ZoneOf(zone ?? "") } : null;
+        public BirthFacts Clone() => (BirthFacts)MemberwiseClone();
+        public static BirthFacts From(int year, int month, int day, int minuteOfDay, Place place)
+        {
+            var f = new BirthFacts(); if (year > 0) f.SetDate(year, month, day); f.SetTime(minuteOfDay); f.SetPlace(place); return f;
+        }
+    }
+
+    // A sign the player chose for a point the facts can't decide, and how: picked (a cusp day, the skip path, the rising), noon (the cusp's
+    // "I'm not sure": the sign at the window's middle, flagged so a later screen can offer a fix), declined (the skip path's "I'm not sure": no
+    // sign, but the player was asked); and from older saves, converted once: entered ("Enter what I already know"), assigned (the random sun
+    // retired Oct 7), legacy (a sun-only save from before #110).
+    [Serializable]
+    public sealed class ChoiceRecord { public string point = ""; public int sign = -1; public string how = ""; }
+
+    // A point the game worked out from the facts: every sign it could be in, its ecliptic longitude across the window, and how sure it is:
+    // exact (an exact time and a place), stable (one sign across the whole window), uncertain (more than one).
+    [Serializable]
+    public sealed class ChartPoint { public string point = ""; public int[] signs = new int[0]; public float from, to; public string status = ""; public bool Settled => status == "exact" || status == "stable"; }
+
+    // the record's three parts in one object, for the web state's test evidence
+    [Serializable]
+    public sealed class BirthRecordState { public BirthFacts birth; public ChoiceRecord[] choices; public WorkedChart chart; }
+
+    // The worked-out chart, and the version of the maths that wrote it. Written at the opening and rewritten only when a fact is added.
+    [Serializable]
+    public sealed class WorkedChart
+    {
+        public int maths; public ChartPoint[] points = new ChartPoint[0];
+        public ChartPoint Point(string name) => points == null ? null : points.FirstOrDefault(p => p.point == name);
     }
 
     // The Big Three, as the opening fixes it: a sign per body, or -1 when it can't be known.
@@ -187,41 +260,53 @@ namespace Ascendant.CelestialDial
         public int SunFrom = -1, SunTo = -1, SunNoon = -1; // with no birth time: the sun's sign at the day's start, end and local noon (start and end differ on a cusp day)
         public int MoonFrom = -1, MoonTo = -1; // with no birth time: the moon's sign at the day's start and end (they differ on a day it changed sign: owner, Oct 3, "Pisces or Aries")
         public long Ingress = -1; // on a cusp day, the UT minute (since 1900) the sun entered SunTo
+        public int[] MoonSigns = new int[0]; // every sign the moon could be in across the window, in order (one when it is known)
+        public WorkedChart Worked = new WorkedChart(); // the save's record of it (owner, Oct 7)
+        public const int Maths = 1; // the version of the maths that writes a WorkedChart; a later fix bumps it and never moves a settled sign
         static double Jd(DateTime ut) => Sky.JulianDay(ut.Year, ut.Month, ut.Day, ut.Hour + ut.Minute / 60.0 + ut.Second / 3600.0);
-        // the chart from the birth date, the local time (minutes after midnight, or -1 when unknown) and the place
-        public static BirthChart Work(int year, int month, int day, int minuteOfDay, Place place)
+        static double SunAt(long minute) { var ut = Places.UtOf(minute); return Sky.SunLongitude(Sky.Ephemeris(Jd(ut), ut.Year, ut.Month)); }
+        static double MoonAt(long minute) { var ut = Places.UtOf(minute); return Sky.MoonLongitude(Sky.Ephemeris(Jd(ut), ut.Year, ut.Month)); }
+        // The birth-time build (owner, Oct 7): the chart from the facts, whatever is known. The game never invents a time or a place: with one
+        // missing it works across every UT minute the birth could have been, and keeps only what holds across all of them. No date, nothing
+        // worked out. With no time, the window is the whole local day; with no place, that local time in every zone of the bundled table.
+        // The sun and the moon only move one way, so the signs between the window's ends are every sign they could be in (sampled every hour
+        // as #110 did, and both ends read); the rising sign is worked out only from an exact time and a place (owner, Oct 3: no invented angles).
+        public static BirthChart Work(BirthFacts facts)
         {
-            var chart = new BirthChart(); if (place == null) return chart;
-            if (minuteOfDay >= 0)
+            var chart = new BirthChart { Worked = new WorkedChart { maths = Maths } };
+            if (facts == null || !facts.HasDate) return chart;
+            int year = facts.Year, month = facts.Month, day = facts.Day, tFrom = facts.HasTime ? facts.timeFrom : 0, tTo = facts.HasTime ? facts.timeTo : 24 * 60 - 1;
+            var place = facts.AsPlace; bool placed = place != null && place.Zone >= 0; long start, end;
+            if (placed) { start = Places.LocalToUt(place.Zone, year, month, day, tFrom); end = Places.LocalToUt(place.Zone, year, month, day, tTo); }
+            else { Places.OffsetRange(out int west, out int east); long local = Places.MinuteOf(year, month, day); start = local + tFrom - east; end = local + tTo - west; }
+            var points = new List<ChartPoint>();
+            ChartPoint Body(string name, Func<long, double> at, out int[] signs)
             {
-                var ut = Places.UtOf(Places.LocalToUt(place.Zone, year, month, day, minuteOfDay)); double jd = Jd(ut), jde = Sky.Ephemeris(jd, ut.Year, ut.Month);
-                chart.Sun = Sky.SignOf(Sky.SunLongitude(jde)); chart.Moon = Sky.SignOf(Sky.MoonLongitude(jde)); chart.Rising = Sky.SignOf(Sky.Ascendant(jd, place.Latitude, place.Longitude));
-                return chart;
+                var seen = new List<int>();
+                for (long minute = start; ; minute = Math.Min(minute + 60, end)) { int s = Sky.SignOf(at(minute)); if (seen.Count == 0 || seen[seen.Count - 1] != s) seen.Add(s); if (minute >= end) break; }
+                signs = seen.ToArray();
+                return new ChartPoint { point = name, signs = signs, from = (float)at(start), to = (float)at(end), status = start == end ? "exact" : signs.Length == 1 ? "stable" : "uncertain" };
             }
-            // no birth time (canon, Curriculum Revision 2, the time-unknown state): every body is worked out across the whole local birth
-            // date, with the place's clocks that year; a sign is Stable only if it holds the whole day, otherwise Uncertain (-1). The sun and
-            // the moon are sampled every hour (the moon moves about half a degree an hour, the sun far less, both one way), and both ends are
-            // read. No rising sign without a time (owner, A; canon: no invented angles).
-            var start = Places.LocalToUt(place.Zone, year, month, day, 0); var end = Places.LocalToUt(place.Zone, year, month, day, 24 * 60 - 1);
-            int sun = -2, moon = -2; chart.SunFrom = chart.SunTo = -1;
-            for (long minute = start; ; minute = Math.Min(minute + 60, end))
+            var sun = Body("sun", SunAt, out int[] sunSigns); var moon = Body("moon", MoonAt, out int[] moonSigns); points.Add(sun); points.Add(moon);
+            chart.Sun = sun.Settled ? sunSigns[0] : -1; chart.Moon = moon.Settled ? moonSigns[0] : -1; chart.MoonSigns = moonSigns;
+            if (start != end) { chart.SunFrom = sunSigns[0]; chart.SunTo = sunSigns[sunSigns.Length - 1]; chart.MoonFrom = moonSigns[0]; chart.MoonTo = moonSigns[moonSigns.Length - 1]; } // a window: the signs at its two ends (#110, #116)
+            if (placed && facts.ExactTime)
             {
-                var ut = Places.UtOf(minute); double jd = Jd(ut), jde = Sky.Ephemeris(jd, ut.Year, ut.Month); int s = Sky.SignOf(Sky.SunLongitude(jde)), m = Sky.SignOf(Sky.MoonLongitude(jde));
-                if (chart.SunFrom < 0) chart.SunFrom = s; chart.SunTo = s;
-                if (chart.MoonFrom < 0) chart.MoonFrom = m; chart.MoonTo = m;
-                sun = sun == -2 || sun == s ? s : -1; moon = moon == -2 || moon == m ? m : -1;
-                if (minute >= end) break;
+                var ut = Places.UtOf(start); double asc = Sky.Ascendant(Jd(ut), place.Latitude, place.Longitude); chart.Rising = Sky.SignOf(asc);
+                points.Add(new ChartPoint { point = "rising", signs = new[] { chart.Rising }, from = (float)asc, to = (float)asc, status = "exact" });
             }
-            chart.Sun = sun; chart.Moon = moon;
-            var noon = Places.UtOf(Places.LocalToUt(place.Zone, year, month, day, 12 * 60)); chart.SunNoon = Sky.SignOf(Sky.SunLongitude(Sky.Ephemeris(Jd(noon), noon.Year, noon.Month)));
-            if (sun < 0) // the minute it changed: the sun moves one way, so the first minute in the new sign is found by halving
+            // "I'm not sure" on a cusp day takes the sign at the window's middle: local noon with a place (owner, Oct 2), the middle without one
+            long middle = placed && !facts.HasTime ? Places.LocalToUt(place.Zone, year, month, day, 12 * 60) : start + (end - start) / 2; chart.SunNoon = Sky.SignOf(SunAt(middle));
+            if (!sun.Settled) // the minute it changed: the sun moves one way, so the first minute in the new sign is found by halving
             {
                 long lo = start, hi = end;
-                while (hi - lo > 1) { long mid = (lo + hi) / 2; var ut = Places.UtOf(mid); if (Sky.SignOf(Sky.SunLongitude(Sky.Ephemeris(Jd(ut), ut.Year, ut.Month))) == chart.SunFrom) lo = mid; else hi = mid; }
+                while (hi - lo > 1) { long mid = (lo + hi) / 2; if (Sky.SignOf(SunAt(mid)) == chart.SunFrom) lo = mid; else hi = mid; }
                 chart.Ingress = hi;
             }
-            return chart;
+            chart.Worked.points = points.ToArray(); return chart;
         }
+        // the chart from the birth date, the local time (minutes after midnight, or -1 when unknown) and the place (#110's call, kept for its checks)
+        public static BirthChart Work(int year, int month, int day, int minuteOfDay, Place place) => place == null ? new BirthChart() : Work(BirthFacts.From(year, month, day, minuteOfDay, place));
         // a UT minute as the local clock time at the zone (minutes after local midnight), for the cusp question
         public static int LocalMinuteOf(long ut, int zone) { long local = ut + (long)Math.Floor(Places.OffsetAt(zone, ut) / 60.0); return (int)(((local % 1440) + 1440) % 1440); }
         // DEV Mode's cusp-day sample (owner, Oct 2 evening): London, Apr 20 1990, no birth time; the sun entered Taurus at 9:27 am local time

@@ -133,6 +133,10 @@ namespace Ascendant.CelestialDial
             // batch 2 (owner, Oct 2 evening: the Big Three approved): the birth screen's step, the time and place steps, the places matching what is typed, the chart
             public bool canBirthTime, canBirthPlace, canSignUnknown; public string birthStep = "", moonSign = "", risingSign = "", bigThree = ""; public string[] placeMatches;
             public bool canCusp, cuspWhy; public string cuspTime = "", cuspQuestion = "", sunBasis = ""; public string[] cuspSigns; // the cusp day (owner ruling, Oct 2 evening)
+            // the birth-time build (owner, Oct 7): the opening's two paths, "Your Birth" in the journal, and the record's three parts (test evidence)
+            public bool canPlaceUnknown, canBirthCancel, amending, canBirthPage, canBirthAdd, canBirthAddTime, canBirthRising, risingChosen, sunKnown = true; public string birthHeading = "", birthRisingWords = "", openingPath = "", dialStart = "", lessonSun = "";
+            public bool canMoon; public string moonQuestion = "", moonBasis = ""; public string[] moonOptions;
+            public string[] journalBirthRows, journalBirthLines, birthChoices; public float[] journalBigThreeBox, journalBirthBoxes; public string birthRecord = ""; public int saveVersion;
             public int atriumStage, dueCount;
             public bool canEnterWing, canLeaveWing, canLeaveDial, v02Complete, resumed;
             public string hubNote = "";
@@ -530,7 +534,7 @@ namespace Ascendant.CelestialDial
             destination.text=marks ? (roomArt ? "" : challenge) : Zodiac.Seats[Lesson.Dial.Selected].Name; // Build Z: with the eye, the symbols' target is posed in the eye and the label above it stays empty (a name there would give the answer away)
             destination.font=ringArt ? voiceFont : font; // Build AB: the Astrolabe's lettering is the Dial's serif
             if(destinationFacts!=null) destinationFacts.text=marks ? "" : FramedFacts(Lesson.Dial.Selected);
-            start.text=marks ? (challenge=="" ? "" : roomArt ? "Find the symbol of\n"+challenge : "Find the symbol of") : challenge!="" ? challenge : Lesson.IsProblem ? "" : (Lesson.DialDormant ? "" : "Your sign: "+Zodiac.Seats[Lesson.Sun].Name);
+            start.text=marks ? (challenge=="" ? "" : roomArt ? "Find the symbol of\n"+challenge : "Find the symbol of") : challenge!="" ? challenge : Lesson.IsProblem ? "" : (Lesson.DialDormant ? "" : (Lesson.SunKnown ? "Your sign: " : "Starting sign: ")+Zodiac.Seats[Lesson.Sun].Name); // no sun (Oct 7): the starting sign, never "your sign"
             eyeLine=start.text; if(countShown) start.text=eyeLine.Replace("\n"," "); // Build AC: the line as set; folded onto one line while a count runs under it
             count.text=""; // Build I: no Count button, no running count (owner playtest, Sept 23); the worked demonstration still counts aloud
             phase.text=Lesson.Phase==LessonPhase.Complete ? "Two families complete. Two remain." :

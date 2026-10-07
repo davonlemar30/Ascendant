@@ -128,7 +128,7 @@ namespace Ascendant.Build
                     "table seating " + (i + 1) + " restores placement and deck evidence");
             }
             Check(saved.keys == 3, "the final seating checkpoints Key 3 before presentation polling");
-            var keyFlow = new SliceFlow(() => 1); keyFlow.Continue(); keyFlow.ChooseBirth("known"); keyFlow.SetKnownSign(1); keyFlow.SetKnownSign(-1); keyFlow.SetKnownSign(-1); keyFlow.Continue(); keyFlow.Continue(); keyFlow.EnterWing(); keyFlow.EnterDial(); // Build T: the walk to the Dial
+            var keyFlow = new SliceFlow(() => 1); keyFlow.Continue(); keyFlow.ChooseBirth("skip"); keyFlow.PickSkipSun(1); keyFlow.Continue(); keyFlow.Continue(); keyFlow.EnterWing(); keyFlow.EnterDial(); // Build T: the walk to the Dial
             Check(keyFlow.RevealKey() && keyFlow.Keys == 1 && keyFlow.KeysInHand == 1, "the first Key reveal immediately records one earned Key");
         }
         static void ValidateEvidenceRouting()
@@ -324,8 +324,8 @@ namespace Ascendant.Build
             var asked = Cusp(); var picked = Cusp(); var unsure = Cusp();
             Check(asked.BirthStep == "cusp" && !asked.CanContinue && !asked.HasSunSign && asked.CuspQuestion == "The Sun moved from Aries into Taurus on the day you were born, at 9:27 am. Your birth time decides which side of that line you landed on. Which sign do you go by?" && SliceFlow.CuspWhy.StartsWith("The Sun reaches each sign") && !asked.PickCuspSun(2),
                 "the owner's question, with the two signs and the local time: " + asked.CuspQuestion);
-            Check(picked.PickCuspSun(1) && picked.SunSign == 1 && picked.SunBasis == "picked" && picked.CanContinue && picked.RisingSign == -1 && picked.BigThreeLine.StartsWith("☉ Taurus · ☽ ") && picked.BigThreeLine.EndsWith("↑ unknown"), "a pick is saved as the sun, flagged the player's; the record shows it as any sun; the moon and rising keep rule A (" + picked.BigThreeLine + ")");
-            Check(unsure.PickCuspSun(-1) && unsure.SunSign == cusp.SunNoon && unsure.SunBasis == "noon" && unsure.CanContinue, "I'm not sure: the sun at local noon (" + Zodiac.Seats[Math.Max(0, unsure.SunSign)].Name + "), flagged approximate so a later screen can offer a fix");
+            Check(picked.PickCuspSun(1) && picked.BirthStep == "moon" && !picked.CanContinue && picked.PickMoon(-1) && picked.SunSign == 1 && picked.SunBasis == "picked" && picked.CanContinue && picked.RisingSign == -1 && picked.BigThreeLine.StartsWith("☉ Taurus · ☽ ") && picked.BigThreeLine.EndsWith("↑ unknown"), "a pick is saved as the sun, flagged the player's; the record shows it as any sun; the moon and rising keep rule A (" + picked.BigThreeLine + ")");
+            Check(unsure.PickCuspSun(-1) && unsure.PickMoon(-1) && unsure.SunSign == cusp.SunNoon && unsure.SunBasis == "noon" && unsure.CanContinue, "I'm not sure: the sun at local noon (" + Zodiac.Seats[Math.Max(0, unsure.SunSign)].Name + "), flagged approximate so a later screen can offer a fix");
             var cuspSave = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(picked.ToSave(new bool[12], new bool[12], true))); cuspSave.atriumStage = 2; var cuspBack = new SliceFlow(() => 1);
             Check(cuspSave.sunBasis == "picked" && cuspBack.Restore(cuspSave) && cuspBack.SunBasis == "picked" && cuspBack.SunSign == 1, "the save keeps the pick's flag both ways");
             BirthChart.CuspSample(out int sy, out int sm, out int sd, out var samplePlace); var sample = new SliceFlow(() => 1); sample.Continue(); sample.ChooseBirth("chart"); sample.SetBirthDate(sy, sm, sd); sample.SetBirthTime(-1); sample.SetBirthPlace(samplePlace);
@@ -344,10 +344,14 @@ namespace Ascendant.Build
             // owner, Oct 3 (the canon flags): on a day the moon changed sign, with no birth time, the record shows both signs, "the way astrologers write it"
             Check(changed.MoonFrom == 3 && changed.MoonTo == 4 && kept.MoonFrom == 4 && kept.MoonTo == 4 && full.MoonFrom == -1 && full.MoonTo == -1, "the day's two moons are kept: London, May 1 1990 runs from Cancer into Leo; May 2 holds Leo all day; a known time works out one moon");
             var pair = new SliceFlow(() => 1); pair.Continue(); pair.ChooseBirth("chart"); pair.SetBirthDate(1990, 5, 1); pair.SetBirthTime(-1); pair.SetBirthPlace(london);
-            Check(pair.MoonSign == -1 && pair.MoonPair && pair.MoonWords == "Cancer or Leo" && pair.BigThreeLine == "☉ Taurus · ☽ Cancer or Leo · ↑ unknown" && pair.Note.Contains("Cancer or Leo") && pair.CanContinue, "owner, Oct 3: on a day the moon changed sign, with no birth time, the record shows both: " + pair.BigThreeLine + " (the opening says: \"" + pair.Note + "\")");
+            // the owner, Oct 7 ("Ask, like the cusp Sun"): an uncertain moon is asked; a pick is the player's moon, "I'm not sure" keeps both
+            var moonPick = new SliceFlow(() => 1); moonPick.Continue(); moonPick.ChooseBirth("chart"); moonPick.SetBirthDate(1990, 5, 1); moonPick.SetBirthTime(-1); moonPick.SetBirthPlace(london);
+            Check(moonPick.BirthStep == "moon" && !moonPick.CanContinue && moonPick.MoonQuestion == "Your Moon was in Cancer or Leo that day. Which do you go by?" && !moonPick.PickMoon(2) && moonPick.PickMoon(1) && moonPick.MoonSign == 4 && moonPick.ChoiceFor("moon").how == "picked" && moonPick.BigThreeLine == "☉ Taurus · ☽ Leo · ↑ unknown" && moonPick.Note == "Your sun sign is Taurus and your moon sign Leo. Without a birth time, your rising sign stays unknown." && moonPick.CanContinue,
+                "Oct 7: the moon asked like the cusp sun (" + moonPick.MoonQuestion + "); a pick shows like any moon, flagged picked: " + moonPick.BigThreeLine);
+            Check(pair.BirthStep == "moon" && pair.PickMoon(-1) && pair.ChoiceFor("moon").how == "declined" && pair.MoonSign == -1 && pair.MoonPair && pair.MoonWords == "Cancer or Leo" && pair.BigThreeLine == "☉ Taurus · ☽ Cancer or Leo · ↑ unknown" && pair.Note.Contains("Cancer or Leo") && pair.CanContinue, "owner, Oct 3: on a day the moon changed sign, with no birth time, the record shows both: " + pair.BigThreeLine + " (the opening says: \"" + pair.Note + "\")");
             var pairSave = UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(pair.ToSave(new bool[12], new bool[12], true))); pairSave.atriumStage = 2; pairSave.sunSign = pair.SunSign; var pairBack = new SliceFlow(() => 1);
-            var olderJson = System.Text.RegularExpressions.Regex.Replace(UnityEngine.JsonUtility.ToJson(pairSave), "\"moon(From|To)\":-?\\d+,?", ""); var olderPair = new SliceFlow(() => 1);
-            Check(pairBack.Restore(pairSave) && pairBack.MoonWords == "Cancer or Leo" && pairBack.BigThreeLine == pair.BigThreeLine && olderPair.Restore(UnityEngine.JsonUtility.FromJson<SaveData>(olderJson)) && olderPair.MoonWords == "unknown", "the save keeps both moons and reads them back; a save from before this build reads its moon as unknown, as before (a sun-only save is unchanged)");
+            var olderJson = System.Text.RegularExpressions.Regex.Replace(UnityEngine.JsonUtility.ToJson(pairSave), "\"moon(From|To)\":-?\\d+,?", "").Replace("\"version\":5", "\"version\":4"); var olderPair = new SliceFlow(() => 1);
+            Check(pairBack.Restore(pairSave) && pairBack.MoonWords == "Cancer or Leo" && pairBack.BigThreeLine == pair.BigThreeLine && olderPair.Restore(UnityEngine.JsonUtility.FromJson<SaveData>(olderJson)) && olderPair.MoonWords == "Cancer or Leo", "the save keeps both moons and reads them back; a version 4 save from before #116 is converted once and its chart worked out again from its facts (Oct 7), so its moon now shows both signs");
             // the record's line: a long one shrinks to fit the page's calm column (274 px), never below 12 px
             var probeObject = new GameObject("Big Three probe", typeof(RectTransform)); var probe = probeObject.AddComponent<UnityEngine.UI.Text>(); probe.horizontalOverflow = HorizontalWrapMode.Overflow; var italic = Resources.Load<Font>(SliceView.ItalicFont);
             float Width(string words, float k) { float w = 0; var fonts = new[] { Resources.Load<Font>(SliceView.SunFont), Resources.Load<Font>("Fonts/NotoSansSymbols"), ButtonLook.EngravedFont }; var parts = words.Split(new[] { " \u00b7 " }, StringSplitOptions.None);
@@ -355,16 +359,112 @@ namespace Ascendant.Build
                     probe.font = italic; probe.fontSize = Mathf.RoundToInt(17 * k); w += probe.cachedTextGeneratorForLayout.GetPreferredWidth(" " + parts[i].Substring(2) + (i < 2 ? " \u00b7 " : ""), probe.GetGenerationSettings(Vector2.zero)) / probe.pixelsPerUnit; }
                 return w; }
             string longest = "☉ Sagittarius · ☽ Sagittarius or Capricorn · ↑ unknown"; float atFull = Width(longest, 1), atSmallest = Width(longest, SliceView.BigThreeSmallest / 17f), usual = Width(pair.BigThreeLine, 1);
+            string three = "☉ Sagittarius · ☽ Sagittarius, Capricorn or Aquarius · ↑ unknown"; float threeSmallest = Width(three, SliceView.BigThreeSmallestThree / 17f), threeAtFloor = Width(three, SliceView.BigThreeSmallest / 17f); // Oct 7: a moon with three options, rarely (no time, no place)
             UnityEngine.Object.DestroyImmediate(probeObject);
+            Check(threeAtFloor > SliceView.BigThreeRoom && threeSmallest <= SliceView.BigThreeRoom, "owner, Oct 7: the longest three-option moon (\"" + three + "\", " + threeAtFloor.ToString("0") + " px at 11) fits inside the page's border at its own 9 px floor: " + threeSmallest.ToString("0") + " px of " + SliceView.BigThreeRoom);
             Check(atSmallest <= SliceView.BigThreeRoom && atFull > SliceView.BigThreeRoom, "the longest such line (\"" + longest + "\", " + atFull.ToString("0") + " px at 17) fits the page's calm column at " + SliceView.BigThreeSmallest + " px (" + atSmallest.ToString("0") + " of " + SliceView.BigThreeRoom + "); this one is " + usual.ToString("0") + " px at 17");
             // the record's glyphs, each in a font that carries it (the zodiac font bakes its set: ☽ joins it, FontSetup)
             var symbols = Resources.Load<Font>("Fonts/NotoSansSymbols"); var sunFont = Resources.Load<Font>(SliceView.SunFont);
             Check(sunFont != null && sunFont.HasCharacter('☉') && symbols != null && symbols.HasCharacter('☽') && symbols.HasCharacter('♈') && ButtonLook.EngravedFont.HasCharacter('↑') && FontSetup.SymbolSet.Contains('☽'), "the Big Three's glyphs: ☉ in Noto Sans Symbols 2, ☽ in the zodiac font's set (with the twelve signs), ↑ in EB Garamond");
         }
         static bool HasTable(string path, string tag) { var b = System.IO.File.ReadAllBytes(path); int n = (b[4] << 8) | b[5]; for (int i = 0; i < n; i++) if (System.Text.Encoding.ASCII.GetString(b, 12 + i * 16, 4) == tag) return true; return false; }
+        // The birth-time build (owner, Oct 7: the recommendation on 86bceb6fq approved). The save keeps the facts, the player's choices and the
+        // worked-out chart apart; the record reads worked out over chosen over unknown; the game never invents a time or a place; adding a fact
+        // only narrows what was worked out; nothing played changes; a version 4 save converts once.
+        static SliceFlow BirthPlayer(Action<SliceFlow> opening, out SaveData save)
+        {
+            // the opening as a player gives it, the After Key 1 checkpoint's progress under it, restored as a second sitting, the journal on "Your Birth"
+            var o = new SliceFlow(); o.Continue(); opening(o);
+            save = DevCheckpoints.Play("key1", "Tester", o.LessonSun); o.WriteBirth(save); save = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(save));
+            var f = new SliceFlow(); Check(f.Restore(save), "a version 5 save restores (" + save.chartFrom + ")"); f.OpenJournal(); f.JournalLand(); f.OpenBirthPage(); return f;
+        }
+        static void ValidateBirthRecord()
+        {
+            var london = Places.Find("London, Britain (UK)");
+            bool Within(ChartPoint inner, ChartPoint outer) => inner.signs.All(x => outer.signs.Contains(x));
+            // the window: with no place, every zone in the bundled table; what holds across all of it, and nothing invented
+            Places.OffsetRange(out int west, out int east);
+            Check(west <= -11 * 60 && east >= 14 * 60, "the bundled zones run from UTC" + (west / 60.0).ToString("+0.#;-0.#") + " to UTC+" + (east / 60.0).ToString("0.#") + ": a birth with no place could be in any of them");
+            var timed = BirthChart.Work(BirthFacts.From(1990, 5, 10, 14 * 60 + 30, london)).Worked; var noPlace = BirthChart.Work(BirthFacts.From(1990, 5, 10, 14 * 60 + 30, null)).Worked;
+            var day = BirthChart.Work(BirthFacts.From(1990, 5, 10, -1, london)).Worked; var nothing = BirthChart.Work(BirthFacts.From(1990, 5, 10, -1, null)).Worked;
+            Check(timed.maths == BirthChart.Maths && timed.Point("sun").status == "exact" && timed.Point("moon").status == "exact" && timed.Point("rising").status == "exact" && timed.Point("sun").from == timed.Point("sun").to,
+                "an exact time and a place: every point exact, one degree each");
+            Check(noPlace.Point("rising") == null && noPlace.Point("sun").status == "stable" && noPlace.Point("sun").signs.Single() == 1 && Within(timed.Point("moon"), noPlace.Point("moon")) && noPlace.Point("moon").status != "exact",
+                "a time with no place: no rising (never invented), the sun stable in Taurus across every zone, the moon's options include London's (" + SliceFlow.Options(noPlace.Point("moon").signs.Length > 1 ? noPlace.Point("moon").signs : new[] { noPlace.Point("moon").signs[0], noPlace.Point("moon").signs[0] }) + ")");
+            Check(day.Point("rising") == null && nothing.Point("rising") == null && Within(day.Point("moon"), nothing.Point("moon")) && Within(day.Point("sun"), nothing.Point("sun")) && BirthChart.Work(new BirthFacts()).Worked.points.Length == 0,
+                "no time: the whole local day; no time and no place: the day in every zone, a wider window that keeps every sign the narrower one could be; no date: nothing worked out at all");
+            Check(SliceFlow.Options(new[] { 11, 0 }) == "Pisces or Aries" && SliceFlow.Options(new[] { 8, 9, 10 }) == "Sagittarius, Capricorn or Aquarius", "an uncertain point reads as its options, \"or\" before the last");
+            // the opening: "I don't know where", and a cusp day with no place (no clock to give the minute on)
+            var where = new SliceFlow(); where.Continue(); where.ChooseBirth("chart"); where.SetBirthDate(1990, 5, 10); where.SetBirthTime(14 * 60 + 30);
+            Check(where.SetBirthPlace(null) && (where.BirthStep != "moon" || where.PickMoon(-1)) && where.BirthDone && where.RisingSign == -1 && where.Facts.ExactTime && !where.Facts.HasPlace && where.Note.EndsWith("Without a birth place, your rising sign stays unknown.") && where.CanContinue,
+                "Oct 7: I don't know where keeps the time, works out what holds in every zone, and says why the rising is unknown: " + where.Note);
+            var cuspNoPlace = new SliceFlow(); cuspNoPlace.Continue(); cuspNoPlace.ChooseBirth("chart"); cuspNoPlace.SetBirthDate(1990, 4, 20); cuspNoPlace.SetBirthTime(-1); cuspNoPlace.SetBirthPlace(null);
+            Check(cuspNoPlace.BirthStep == "cusp" && cuspNoPlace.CuspMinute == -1 && !cuspNoPlace.CuspQuestion.Contains(" at ") && cuspNoPlace.CuspQuestion.Contains("birth time and place decide") && cuspNoPlace.PickCuspSun(-1) && (cuspNoPlace.BirthStep != "moon" || cuspNoPlace.PickMoon(-1)) && cuspNoPlace.SunBasis == "noon" && cuspNoPlace.HasSunSign,
+                "a cusp day with no place asks without a clock time; I'm not sure takes the window's middle: " + cuspNoPlace.CuspQuestion);
+            // the save: three parts that round-trip, the record read from them, and the flat copies an older build reads
+            var full = new SliceFlow(); full.Continue(); full.ChooseBirth("chart"); full.SetBirthDate(1990, 4, 20); full.SetBirthTime(-1); full.SetBirthPlace(london); full.PickCuspSun(0); full.PickMoon(0);
+            var fullSave = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(full.ToSave(new bool[12], new bool[12], true))); fullSave.atriumStage = 2; var fullBack = new SliceFlow();
+            Check(fullSave.version == 5 && fullSave.birth.date == "1990-04-20" && fullSave.birth.timeFrom == -1 && fullSave.birth.place == london.Name && fullSave.choices.Length == 2 && fullSave.choices.First(c => c.point == "sun").how == "picked" && fullSave.choices.First(c => c.point == "moon").how == "picked" && fullSave.chart.Point("sun").status == "uncertain" && fullSave.chart.Point("moon").status == "uncertain"
+                && fullSave.sunSign == 0 && fullSave.sunBasis == "picked" && fullBack.Restore(fullSave) && fullBack.SunSign == 0 && fullBack.SunBasis == "picked" && fullBack.BigThreeLine == full.BigThreeLine,
+                "version 5 keeps the facts, the choices and the chart apart (the cusp's Aries and the first moon picked, both points uncertain), writes the flat copies, and reads the record back: " + fullBack.BigThreeLine);
+            // a version 4 save converts once: each old path
+            SaveData V4(string json) { var v = JsonUtility.FromJson<SaveData>("{\"version\":4,\"playerName\":\"Old\",\"atriumStage\":2,\"keyEarned\":true," + json + "}"); return v; }
+            var known = new SliceFlow(); var chosen = new SliceFlow(); var legacy = new SliceFlow(); var chart = new SliceFlow(); var moved = new SliceFlow();
+            Check(known.Restore(V4("\"chartFrom\":\"known\",\"sunSign\":4,\"moonSign\":7,\"risingSign\":-1")) && known.ChoiceFor("sun").how == "entered" && known.ChoiceFor("moon").sign == 7 && known.ChoiceFor("rising") == null && known.BigThreeLine == "☉ Leo · ☽ Scorpio · ↑ unknown" && !known.Facts.Any,
+                "a version 4 known-path save keeps its signs as the player's choices, entered: " + known.BigThreeLine);
+            Check(chosen.Restore(V4("\"chartFrom\":\"chosen\",\"sunSign\":9")) && chosen.ChoiceFor("sun").how == "assigned" && chosen.SunSign == 9 && legacy.Restore(V4("\"sunSign\":2")) && legacy.ChoiceFor("sun").how == "legacy" && legacy.SunSign == 2,
+                "the random sun's save keeps its sun, tagged assigned; a save from before #110, legacy");
+            Check(chart.Restore(V4("\"chartFrom\":\"chart\",\"sunSign\":1,\"sunBasis\":\"picked\",\"moonSign\":-1,\"birthDate\":\"1990-04-20\",\"birthMinute\":-1,\"birthPlace\":\"London, Britain (UK)\",\"birthZone\":\"Europe/London\",\"birthLatitude\":51.5085,\"birthLongitude\":-0.1257"))
+                && chart.Facts.date == "1990-04-20" && chart.Chart.Point("sun").status == "uncertain" && chart.ChoiceFor("sun").how == "picked" && chart.SunSign == 1 && (chart.MoonSign >= 0 || chart.MoonPair),
+                "a version 4 chart-path save moves its facts over and works the chart out again; the cusp's pick stays a choice: " + chart.BigThreeLine);
+            Check(moved.Restore(V4("\"chartFrom\":\"chart\",\"sunSign\":5,\"birthDate\":\"1990-05-10\",\"birthMinute\":870,\"birthPlace\":\"London, Britain (UK)\",\"birthZone\":\"Europe/London\",\"birthLatitude\":51.5085,\"birthLongitude\":-0.1257")) && moved.SunSign == 5,
+                "where the saved sign and the maths disagree, the saved sign wins (Oct 3: never change data already calculated)");
+            // "Your Birth": the skip path's "I'm not sure", then a rising chosen and changed, then the facts added
+            var p = BirthPlayer(o => { o.ChooseBirth("skip"); o.PickSkipSun(-1); o.Continue(); }, out var unsureSave);
+            Check(unsureSave.sunSign == -1 && unsureSave.choices.Single().how == "declined" && !p.HasSunSign && p.LessonSun == 0 && p.OnBirthPage && p.CanAddFacts && p.CanAddTime && p.CanChooseRising && p.ShowsRisingWhy && p.BigThreeLine == "☉ unknown · ☽ unknown · ↑ unknown",
+                "no sun survives the save (never Aries), the lessons start from Aries, and \"Your Birth\" offers Add, Add my birth time and Choose my rising");
+            int keys = p.Keys, sittings = p.Sittings; string deck = string.Join("|", p.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
+            Check(p.StartChooseRising() && p.Screen == SliceScreen.Birth && p.Amending && p.BirthStep == "rising-pick" && !p.CanContinue && p.PickSign(4) && p.OnBirthPage && p.BirthLines.SequenceEqual(new[] { "Leo it is." }) && p.RisingSign == 4 && p.RisingChosen && p.BigThreeLine == "☉ unknown · ☽ unknown · ↑ Leo",
+                "Choose my rising: the twelve signs, then back on the page with \"Leo it is.\"; the record shows ↑ Leo with no label, the flag hidden");
+            Check(p.StartChooseRising() && p.PickSign(6) && p.RisingSign == 6 && p.ChoiceFor("rising").how == "picked", "a chosen rising can be changed at any time, with no birth time (open call 1)");
+            Check(p.StartAddFacts(true) && p.BirthStep == "date" && p.Note == SliceFlow.NeedDayAndPlace && p.CancelAmending() && p.OnBirthPage && !p.Facts.Any && p.BirthLines.Count == 0 && p.RisingSign == 6, "Add my birth time with no birthday asks the day first, with the journal's line; going back changes nothing");
+            Check(p.StartAddFacts(true) && p.SetBirthDate(1990, 4, 25) && p.BirthStep == "time" && p.SetBirthTime(14 * 60 + 30) && p.BirthStep == "place" && p.SetBirthPlace(london) && p.OnBirthPage && !p.Amending,
+                "Add: the opening's boxes for whatever is missing, in order (open call 2), then back to the page");
+            Check(p.BirthLines.SequenceEqual(new[] { "Your rising is Virgo.", "It takes the place of the one you chose.", "Your moon is Taurus.", "Your sun is Taurus.", "Everything you've learned stays as it is." }) && p.RisingSign == 5 && !p.RisingChosen && p.ChoiceFor("rising") == null && p.ChoiceFor("sun") == null && p.LessonSun == 1,
+                "the facts decide: the worked-out rising takes the chosen one's place, the moon and the sun arrive, a line for each: " + string.Join(" / ", p.BirthLines));
+            Check(p.Keys == keys && p.Sittings == sittings && deck == string.Join("|", p.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered)) && !p.CanAddFacts && !p.CanChooseRising && !p.ShowsRisingWhy,
+                "nothing played changes: the Keys, the sittings and every deck item are as they were; with every fact in, Add and the rising choice are gone");
+            // a time added to a cusp day settles the sun (open call 3): worked out beats chosen
+            var c = BirthPlayer(o => { o.ChooseBirth("chart"); o.SetBirthDate(1990, 4, 20); o.SetBirthTime(-1); o.SetBirthPlace(london); o.PickCuspSun(0); o.PickMoon(-1); o.Continue(); }, out _);
+            Check(c.SunSign == 0 && c.SunBasis == "picked" && c.StartAddFacts(true) && c.BirthStep == "time" && c.SetBirthTime(10 * 60) && c.OnBirthPage && c.SunSign == 1 && c.SunBasis == "" && c.BirthLines.Contains("At that minute, your sun was in Taurus.") && c.RisingSign >= 0 && c.BirthLines[0] == SliceFlow.RisingIs(c.RisingSign),
+                "a birth time added to a cusp day settles the sun (10 am, after 9:27: Taurus) and works out the rising: " + string.Join(" / ", c.BirthLines));
+            // Jeffrey, #123 B1: going back after the cusp question changes nothing; the picks are held until the steps finish
+            var back = BirthPlayer(o => { o.ChooseBirth("skip"); o.PickSkipSun(4); o.Continue(); }, out _); var backChoices = string.Join("|", back.Choices.Select(x => x.point + x.sign + x.how));
+            Check(back.StartAddFacts() && back.SetBirthDate(1990, 4, 20) && back.SetBirthTime(-1) && back.SetBirthPlace(london) && back.BirthStep == "cusp" && back.PickCuspSun(0) && back.BirthStep == "moon" && back.SunSign == 4 && back.CancelAmending()
+                && back.SunSign == 4 && back.SunBasis == "picked" && !back.Facts.Any && string.Join("|", back.Choices.Select(x => x.point + x.sign + x.how)) == backChoices && back.BirthLines.Count == 0,
+                "going back from the Moon's question after a cusp pick leaves the record as it was: Leo picked, no facts");
+            Check(back.StartAddFacts() && back.SetBirthDate(1990, 4, 20) && back.SetBirthTime(-1) && back.SetBirthPlace(london) && back.PickCuspSun(0) && back.PickMoon(0) && back.SunSign == 0 && back.BirthLines.Contains("Your sun is Aries.") && back.BirthLines.Contains(SliceFlow.MoonIs(back.MoonSign)),
+                "a picked sun moved by the cusp question gets its line too: " + string.Join(" / ", back.BirthLines));
+            // a moon picked at the opening gives way to the one a birth time works out (worked out beats chosen)
+            var mp = BirthPlayer(o => { o.ChooseBirth("chart"); o.SetBirthDate(1990, 5, 1); o.SetBirthTime(-1); o.SetBirthPlace(london); o.PickMoon(0); o.Continue(); }, out var mpSave);
+            Check(mpSave.choices.Any(x => x.point == "moon" && x.sign == 3 && x.how == "picked") && mp.MoonSign == 3 && mp.StartAddFacts(true) && mp.SetBirthTime(14 * 60 + 30) && mp.MoonSign == 4 && mp.ChoiceFor("moon") == null && mp.BirthLines.Contains("Your moon is Leo."),
+                "a moon picked as Cancer gives way to the Leo a birth time works out, with its line: " + string.Join(" / ", mp.BirthLines));
+            // a fact added never moves a sign already worked out, only narrows it
+            var n = BirthPlayer(o => { o.ChooseBirth("chart"); o.SetBirthDate(1990, 5, 2); o.SetBirthTime(-1); o.SetBirthPlace(london); o.Continue(); }, out _);
+            var sunBefore = n.Chart.Point("sun"); var moonBefore = n.Chart.Point("moon");
+            Check(n.StartAddFacts() && n.SetBirthTime(23 * 60) && n.SunSign == 1 && n.MoonSign == 4 && n.Chart.Point("sun").status == "exact" && n.Chart.Point("sun").signs[0] == sunBefore.signs[0] && n.Chart.Point("moon").signs[0] == moonBefore.signs[0] && n.BirthLines.SequenceEqual(new[] { SliceFlow.RisingIs(n.RisingSign), SliceFlow.StaysLearned }),
+                "a time added keeps the sun and moon already worked out (now exact), adds the rising, and says only what changed");
+            // a time with no place: Add asks only the place
+            var w = BirthPlayer(o => { o.ChooseBirth("chart"); o.SetBirthDate(1990, 5, 10); o.SetBirthTime(14 * 60 + 30); o.SetBirthPlace(null); o.PickMoon(-1); o.Continue(); }, out _);
+            Check(w.CanAddFacts && !w.CanAddTime && w.StartAddFacts() && w.BirthStep == "place" && w.SetBirthPlace(london) && w.RisingSign >= 0 && w.Facts.HasPlace, "a time with no place: Add asks only the place, and the rising follows");
+            // the lessons: with no sun they start from Aries and call it the starting sign, never the player's sun
+            var lesson = new DialLesson(() => 0); lesson.SetSunSign(0, false); string intro = (string)typeof(DialLesson).GetMethod("IntroLine", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(lesson, new object[] { 99 });
+            Check(lesson.Sun == 0 && !lesson.SunKnown && intro.StartsWith("We shall start from Aries, the first sign on the wheel.") && !intro.Contains("Your sun sign"), "with no sun, Caspar names Aries as the starting sign: " + intro);
+            lesson.UpdateSun(4, true); Check(lesson.Sun == 4 && lesson.SunKnown, "a sun that arrives later is the start for lessons not yet played");
+        }
         static void ValidateJournalFront()
         {
-            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.SetKnownSign(-1); f.SetKnownSign(-1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, the journal in hand
+            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("skip"); f.PickSkipSun(1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, the journal in hand
             Check(!f.JournalTitled && f.OpenJournal() && f.JournalAt == JournalView.Title && f.JournalTitled && f.CanJournalLand && !f.CanJournalContents && !f.CanJournalHome, "1e A: the journal's first-ever open shows the title page, once (it is saved), and nothing on it leads anywhere");
             Check(f.JournalLand() && f.JournalAt == JournalView.Landing && !f.CanJournalLand && f.CanJournalContents && !f.CanJournalHome && f.CanJournalPractice && !SliceFlow.PracticeDoorLine.Any(char.IsDigit), "its beat ends on the landing: the Contents door opens, and the Practice door opens Practice (owner, Oct 3), with no count (its line, a draft: \"" + SliceFlow.PracticeDoorLine + "\")");
             Check(f.JournalToContents() && f.JournalAt == JournalView.Contents && f.CanJournalHome && !f.CanJournalContents && f.JournalToLanding() && f.JournalAt == JournalView.Landing && f.JournalToContents(), "Contents, and ‹ Your Journal back to the landing");
@@ -446,7 +546,7 @@ namespace Ascendant.Build
             }
             Check(wrongFacts.Count == 0 && checkedFacts * 2 >= all.Count, "the right answers agree with the game's own data: " + checkedFacts + " of " + all.Count + " questions checked against the signs' elements, modalities, polarities, opposites and symbols" + (wrongFacts.Count > 0 ? "; WRONG: " + string.Join("; ", wrongFacts) : "") + (byHand.Count > 0 ? "; read by hand: " + string.Join(" | ", byHand) : ""));
             // the flow: the list grows with the lessons; a round asks each of its questions once, the choices shuffled; right, wrong and the why
-            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.SetKnownSign(-1); f.SetKnownSign(-1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); f.SeedPractice(7);
+            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("skip"); f.PickSkipSun(1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); f.SeedPractice(7);
             Check(f.OpenJournal() && f.JournalLand() && f.CanJournalPractice && f.PracticeConcepts.Select(c => c.id).SequenceEqual(new[] { "elements" }) && f.OpenPractice() && f.JournalAt == JournalView.Practice && f.CanJournalHome && !f.CanJournalContents, "at Key 1 the Practice door opens the list: the Elements only; ‹ Your Journal leads back");
             Check(!f.StartQuiz(1) && f.StartQuiz(0) && f.JournalAt == JournalView.Quiz && f.OnQuiz && f.QuizCount == 6 && f.QuizCounter == "1 of 6" && f.CanQuizAnswer && !f.CanQuizNext && f.QuizFeedback == "", "a concept's row starts its round: question 1 of 6, waiting for a pick (no row past the list)");
             var save = UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true)); string Deck() => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
@@ -469,7 +569,7 @@ namespace Ascendant.Build
             f.QuizToPractice(); f.JournalToLanding(); f.CloseJournal();
             var grown = new List<int>(); f.MarkKey2(); grown.Add(f.PracticeConcepts.Count); f.MarkModalitiesComplete(); grown.Add(f.PracticeConcepts.Count); f.MarkKey3(); grown.Add(f.PracticeConcepts.Count); f.MarkKey4(); grown.Add(f.PracticeConcepts.Count);
             Check(grown.SequenceEqual(new[] { 2, 3, 4, 5 }) && f.PracticeConcepts.Select(c => c.id).SequenceEqual(ids), "the list grows as each lesson finishes: the Symbols at Key 2, the Modalities with their lesson, the Table at Key 3, the Opposites at Key 4 (" + string.Join(", ", grown) + ")");
-            var early = new SliceFlow(() => 1); early.SetName("Davon"); early.Continue(); early.ChooseBirth("known"); early.SetKnownSign(1); early.SetKnownSign(-1); early.SetKnownSign(-1); early.Continue(); early.Continue(); early.EnterWing(); early.EnterDial();
+            var early = new SliceFlow(() => 1); early.SetName("Davon"); early.Continue(); early.ChooseBirth("skip"); early.PickSkipSun(1); early.Continue(); early.Continue(); early.EnterWing(); early.EnterDial();
             Check(early.PracticeConcepts.Count == 0 && !early.CanJournalPractice, "before the first lesson finishes, nothing is listed and the door is unavailable");
             // the page: every line fits its place, at the fonts' own widths; every question ends above Close the journal
             var italic = Resources.Load<Font>(SliceView.ItalicFont); var bold = ButtonLook.EngravedFont; var probeObject = new GameObject("Practice probe", typeof(RectTransform)); var probe = probeObject.AddComponent<UnityEngine.UI.Text>(); probe.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -495,7 +595,7 @@ namespace Ascendant.Build
         {
             // ---- Build J (owner, Sept 23): Illumination plus Ribbons. Build AA (owner, Sept 30; Sept 26 notes 7 and 14): the Wheel index with a
             // Wheel / Table switch and tabs as each pattern is learned; a seat's preview, then its page, which links the signs sharing each fact ----
-            var f = new SliceFlow(() => 1); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.SetKnownSign(-1); f.SetKnownSign(-1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, twelve element items entered
+            var f = new SliceFlow(() => 1); f.Continue(); f.ChooseBirth("skip"); f.PickSkipSun(1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, twelve element items entered
             string DeckKey() => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
             string Facts(int seat) => string.Join(", ", f.SignFacts(seat).Select(x => x[0] + ": " + x[1]));
             Check(f.OpenJournal() && f.JournalAt == JournalView.Title && f.JournalLand() && f.JournalToContents() && f.OpenChapter("wheel") && f.JournalAt == JournalView.Wheel, "batch 2: the journal's first-ever open is the title page, then the landing; the Wheel is a chapter, reached through Contents");
@@ -569,10 +669,10 @@ namespace Ascendant.Build
         static void ValidateBuildF()
         {
             // ---- Build F: the practice fork on the Dial (Sept 15 ruling), the sitting rule (Sept 17), the three-strikes gate, the journal in the inventory ----
-            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.Continue(); f.ChooseBirth("known"); f.SetKnownSign(1); f.SetKnownSign(-1); f.SetKnownSign(-1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; } // at the Hub, Stage 2, twelve element items entered
+            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.Continue(); f.ChooseBirth("skip"); f.PickSkipSun(1); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; } // at the Hub, Stage 2, twelve element items entered
             string DeckKey(SliceFlow f) => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
             void AnswerAll(SliceFlow f) { int guard = 0; while (!f.PracticeDone && guard++ < 12) { var t = f.CurrentReview; if (t.Mode == ReviewMode.Tap) f.AnswerTap(Zodiac.Seats[t.seat].Element); else if (t.Mode == ReviewMode.TapModality) f.AnswerModalityTap(Zodiac.ModalityAt(t.seat)); else if (t.Mode == ReviewMode.Glyph) f.AnswerGlyph(t.seat); else f.FinishReview(true, true); } }
-            var first = new SliceFlow(() => 1); first.Continue(); first.ChooseBirth("known"); first.SetKnownSign(1); first.SetKnownSign(-1); first.SetKnownSign(-1); first.Continue(); first.Continue(); first.EnterWing(); first.EnterDial();
+            var first = new SliceFlow(() => 1); first.Continue(); first.ChooseBirth("skip"); first.PickSkipSun(1); first.Continue(); first.Continue(); first.EnterWing(); first.EnterDial();
             Check(first.Screen == SliceScreen.Wing && !first.PracticeAvailable && !first.CanEnterPractice && !first.CanOpenJournal, "on the first visit nothing has entered the deck: no fork, no journal");
             var lit = new DialLesson(() => 0); lit.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
             var midB = new DialLesson(() => 0); midB.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true); midB.RestoreGlyphs(1, 3, false);
@@ -608,7 +708,7 @@ namespace Ascendant.Build
             Check(f.JournalLenses.SequenceEqual(new[] { JournalLens.Element, JournalLens.Polarity, JournalLens.Opposites }) && f.CanJournalTable, "the table and the opposites show in the journal as data: the Table view, the Polarity and Opposites tabs (the modalities were skipped here, so no Modality tab)");
             Check(f.LeaveChamber() && f.ApproachDesk() && f.Note == SliceFlow.DeskLine && f.Screen == SliceScreen.Hub, "the desk is dressing: it only speaks");
             var save = UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true))); var back = new SliceFlow(() => 1);
-            Check(save.version == 4 && save.sittings == 5 && save.reviewsChecked == 5 && back.Restore(save) && back.Sittings == 5, "the save carries the sitting count both ways");
+            Check(save.version == SaveData.Current && save.sittings == 5 && save.reviewsChecked == 5 && back.Restore(save) && back.Sittings == 5, "the save carries the sitting count both ways (version " + save.version + ")");
             var older = new SliceFlow(() => 1);
             Check(older.Restore(new SaveData { atriumStage = 3, sunSign = 1, keyEarned = true, reviewsChecked = 2 }) && older.Sittings == 2, "an older save's completed batches count as sittings");
             // Liveness (folded from the audit's deadlock task 86bc2338q): twelve items answered correctly every time; every item reaches the last interval; no entry ever stalls the clock.
@@ -685,8 +785,10 @@ namespace Ascendant.Build
             Check(!flow.Continue() && flow.RevealKey() && !flow.RevealKey() && !flow.LeaveDial() && flow.Continue() && flow.Screen==SliceScreen.AtriumReturn,"wing needs the key reveal once before continuing; once Key 1 shows, Continue (not the exit) carries the opening on");
             Check(flow.Continue() && flow.Screen==SliceScreen.Chamber && !flow.Continue(),"chamber is the last screen");
             Check(flow.InsertKey() && flow.LocksFilled==1 && !flow.InsertKey() && flow.End() && flow.Ended && !flow.End(),"one key fills one lock of three and ends the prototype once");
-            var unknown=new SliceFlow(()=>4);unknown.Continue();unknown.ChooseBirth("unknown");Check(unknown.SunSign==4 && unknown.Note.Contains("choose one for you") && unknown.Note.Contains("Leo") && unknown.CanContinue,"I don't know assigns a sun sign and Caspar says so");
-            var known=new SliceFlow();known.Continue();known.ChooseBirth("known");Check(!known.CanContinue && !known.SetKnownSign(-1) && known.SetKnownSign(7) && known.SunSign==7 && !known.CanContinue && known.SetKnownSign(-1) && known.MoonSign==-1 && known.SetKnownSign(3) && known.RisingSign==3 && known.CanContinue && known.BigThreeLine=="\u2609 Scorpio \u00b7 \u263d unknown \u00b7 \u2191 Cancer","batch 2: what I already know takes the sun, then the moon and the rising sign, each of those two with I don't know");
+            // the birth-time build (owner, Oct 7): the opening has two answers; "Enter what I already know" and the random sun are retired
+            var unsure=new SliceFlow(()=>4);unsure.Continue();unsure.ChooseBirth("skip");Check(!unsure.CanContinue && unsure.BirthStep=="sun-pick" && !unsure.PickSkipSun(12) && unsure.PickSkipSun(-1) && !unsure.HasSunSign && unsure.LessonSun==0 && unsure.ChoiceFor("sun").how=="declined" && unsure.Note==SliceFlow.StartFromAries && unsure.CanContinue && unsure.BigThreeLine=="\u2609 unknown \u00b7 \u263d unknown \u00b7 \u2191 unknown","Oct 7: I'll skip it, then I'm not sure: no sun (never a random one), the lessons start from Aries, and the note says so");
+            var pickedSun=new SliceFlow();pickedSun.Continue();pickedSun.ChooseBirth("skip");Check(pickedSun.PickSkipSun(7) && pickedSun.SunSign==7 && pickedSun.SunBasis=="picked" && pickedSun.LessonSun==7 && pickedSun.CanContinue && pickedSun.Note=="Your sun sign is Scorpio. Your moon and rising signs stay unknown." && pickedSun.BigThreeLine=="\u2609 Scorpio \u00b7 \u263d unknown \u00b7 \u2191 unknown" && !pickedSun.Facts.Any,"Oct 7: I'll skip it, then a sign: the player's sun, shown like any other, flagged as picked; nothing else is asked or invented");
+            var retired=new SliceFlow();retired.Continue();retired.ChooseBirth("known");Check(retired.BirthChoice=="" && retired.BirthStep=="" && !retired.CanContinue && !retired.PickSign(4),"Oct 7: the known path is retired: choosing it opens nothing");retired.ChooseBirth("unknown");Check(retired.BirthChoice=="" && !retired.HasSunSign,"Oct 7: the random sun is retired");
             Check(Zodiac.SunSign(3,21)==0 && Zodiac.SunSign(3,20)==11 && Zodiac.SunSign(1,19)==9 && Zodiac.SunSign(1,20)==10 && Zodiac.SunSign(12,22)==9 && Zodiac.SunSign(12,21)==8 && Zodiac.SunSign(8,23)==5 && Zodiac.SunSign(2,30)==11 && Zodiac.SunSign(0,5)==-1 && Zodiac.SunSign(5,32)==-1,"sun sign date table covers every boundary and rejects bad input");
             var leo=new DialLesson(()=>0);leo.SetSunSign(4);Check(leo.Sun==4 && leo.GuidedFamily==0 && leo.SecondFamily==3 && leo.OptionalFamily==1,"sun sign picks the guided, second, and optional families");
             Check(leo.IntroStep==0 && leo.DialDormant && !leo.IntroAuto && leo.Message=="","wing entrance starts with a dormant Dial and Caspar silent (the owner cut the repeated Wing line, Sept 29)");
@@ -715,7 +817,7 @@ namespace Ascendant.Build
             deck.RecordReview(9,false,false,1);Check(deck.Items[9].interval==0 && deck.Items[9].streak==0 && deck.Items[9].dueDay==2,"a miss at the first interval stays at one sitting with streak floor zero");
             for(int n=0;n<6;n++)deck.RecordReview(2,true,true,n*30);Check(deck.Items[2].interval==4,"the ladder caps at 30 sittings");
             deck.RecordReview(3,true,false,1);Check(deck.Items[3].State==ItemState.Introduced && deck.Items[3].interval==0,"an assisted correct review neither advances nor sets back");
-            var loop=new SliceFlow(()=>1);loop.Continue();loop.ChooseBirth("known");loop.SetKnownSign(1); loop.SetKnownSign(-1); loop.SetKnownSign(-1);loop.Continue();loop.Continue();loop.EnterWing();loop.EnterDial();loop.RevealKey();loop.Continue();loop.Continue();loop.InsertKey();loop.End();
+            var loop=new SliceFlow(()=>1);loop.Continue();loop.ChooseBirth("skip"); loop.PickSkipSun(1);loop.Continue();loop.Continue();loop.EnterWing();loop.EnterDial();loop.RevealKey();loop.Continue();loop.Continue();loop.InsertKey();loop.End();
             Check(loop.Screen==SliceScreen.Chamber && loop.CanContinue && loop.Continue() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2 && loop.Deck.Items.Where(i=>i.Kind==ItemKind.Element).All(i=>i.entered),"after the ending, Continue reaches the Hub in Stage 2 and the deck opens");
             Check(loop.Sitting==0 && loop.DueCount==12 && loop.EnterWing() && loop.EnterDial() && loop.CanEnterPractice && loop.EnterPractice() && loop.Sitting==1 && loop.Screen==SliceScreen.Practice && loop.ReviewQueue.Count==ReviewDeck.BatchSize,"no in-game time: the first practice already has items ready; the entry is the first sitting and a batch of six begins");
             Check(loop.ReviewQueue[0].Mode==ReviewMode.Dial && loop.ReviewQueue[1].Mode==ReviewMode.Tap,"review alternates compressed Dial and direct tap");
@@ -772,13 +874,13 @@ namespace Ascendant.Build
             Check(!noEvidence.Key2Earned && noEvidence.Phase==LessonPhase.Paused && noEvidence.Keys==1,"twelve assisted placements pause cleanly without Key 2");
             var gd=new ReviewDeck();gd.IntroduceAll(0);gd.IntroduceAll(0,ItemKind.Glyph);Check(gd.Items.Length==60 && gd.Due(1).Count==24 && gd.Item(3,ItemKind.Glyph).Kind==ItemKind.Glyph && gd.Item(3,ItemKind.Modality).Kind==ItemKind.Modality && !gd.Item(3,ItemKind.Modality).entered && !gd.Item(3,ItemKind.Grid).entered,"the deck holds twelve element, glyph, modality, and grid items; the modality and grid items wait");
             gd.RecordLesson(4,true,0,ItemKind.Glyph);Check(gd.Item(4,ItemKind.Glyph).State==ItemState.Practicing && gd.Item(4,ItemKind.Element).State==ItemState.Introduced,"glyph evidence advances only the glyph item");
-            var gflow=new SliceFlow(()=>1);gflow.Continue();gflow.ChooseBirth("known");gflow.SetKnownSign(1); gflow.SetKnownSign(-1); gflow.SetKnownSign(-1);gflow.Continue();gflow.Continue();gflow.EnterWing();gflow.EnterDial();gflow.RevealKey();gflow.Continue();gflow.Continue();gflow.InsertKey();gflow.End();gflow.Continue();
+            var gflow=new SliceFlow(()=>1);gflow.Continue();gflow.ChooseBirth("skip"); gflow.PickSkipSun(1);gflow.Continue();gflow.Continue();gflow.EnterWing();gflow.EnterDial();gflow.RevealKey();gflow.Continue();gflow.Continue();gflow.InsertKey();gflow.End();gflow.Continue();
             gflow.MarkWheelComplete();gflow.EnterWing();gflow.LeaveWing();gflow.StartGlyphs();Check(gflow.GlyphsStarted && gflow.Deck.Due(gflow.Sitting).Count(i=>i.Kind==ItemKind.Glyph)==12,"starting the glyph unit introduces twelve glyph items");
             gflow.MarkKey2();gflow.EnterWing();gflow.LeaveWing();Check(gflow.Keys==2 && gflow.AtriumStage==3 && gflow.KeysInHand==1,"Key 2 earned: in hand, the Atrium waits for it to be spent (Build D)");
             Check(gflow.EnterChamber() && gflow.SpendKey() && gflow.LocksFilled==2 && gflow.LeaveChamber() && gflow.AtriumStage==4 && gflow.V03Complete,"spent in the Chamber, the return completes v0.3 at Stage 4");
             Check(gflow.EnterWing() && gflow.EnterDial() && gflow.EnterPractice() && gflow.ReviewQueue.Count==6 && gflow.ReviewQueue.All(t=>t.Mode!=ReviewMode.Glyph),"element items are due before glyph items in the practice order");
             var gsave=gflow.ToSave(new bool[12],new bool[12],true);var gres=new SliceFlow(()=>1);Check(gres.Restore(gsave) && gres.Keys==2 && gres.GlyphStage==2 && gres.V03Complete && gres.Deck.Item(0,ItemKind.Glyph).entered,"a save carries Keys, glyph stage, and glyph items");
-            var greview=new SliceFlow(()=>1);greview.Continue();greview.ChooseBirth("known");greview.SetKnownSign(1); greview.SetKnownSign(-1); greview.SetKnownSign(-1);greview.Continue();greview.Continue();greview.EnterWing();greview.EnterDial();greview.RevealKey();greview.Continue();greview.Continue();greview.InsertKey();greview.End();greview.Continue();
+            var greview=new SliceFlow(()=>1);greview.Continue();greview.ChooseBirth("skip"); greview.PickSkipSun(1);greview.Continue();greview.Continue();greview.EnterWing();greview.EnterDial();greview.RevealKey();greview.Continue();greview.Continue();greview.InsertKey();greview.End();greview.Continue();
             foreach(var it in greview.Deck.Items) if(it.Kind==ItemKind.Element){it.dueDay=99;} greview.StartGlyphs();
             Check(greview.EnterWing() && greview.EnterDial() && greview.EnterPractice() && greview.ReviewQueue.All(t=>t.Mode==ReviewMode.Glyph),"glyph items practice in the glyph form");
             var gt=greview.CurrentReview;var gopts=greview.GlyphReviewOptions(gt.seat);int wrongSeat=gopts.First(o=>o!=gt.seat);
@@ -798,7 +900,7 @@ namespace Ascendant.Build
             Check(walker.Jump() && walker.X==76 && walker.At=="caspar" && !walker.Walking,"reduced motion jumps to the point of interest");
             walker.CycleSpeed();Check(walker.SpeedName=="fast" && walker.Speed==Walker.FastSpeed,"the test speed toggle cycles normal to fast");walker.CycleSpeed();Check(walker.SpeedName=="slow","then slow");walker.CycleSpeed();Check(walker.SpeedName=="normal","then normal again");
             var wflow=new SliceFlow(()=>4);var wlog=new List<string>();wflow.Logged+=wlog.Add;
-            wflow.Continue();wflow.ChooseBirth("known");wflow.SetKnownSign(1); wflow.SetKnownSign(-1); wflow.SetKnownSign(-1);wflow.Continue();wflow.Continue();wflow.EnterWing();wflow.EnterDial();wflow.RevealKey();wflow.Continue();wflow.Continue();wflow.InsertKey();wflow.End();wflow.Continue();
+            wflow.Continue();wflow.ChooseBirth("skip"); wflow.PickSkipSun(1);wflow.Continue();wflow.Continue();wflow.EnterWing();wflow.EnterDial();wflow.RevealKey();wflow.Continue();wflow.Continue();wflow.InsertKey();wflow.End();wflow.Continue();
             Check(wflow.Screen==SliceScreen.Hub && wflow.Walk.Room==Room.Atrium && wflow.Walk.At=="entry","the Chamber ending leads to the Atrium with the marker where you came in");
             Check(wflow.TouchSealedDoor() && wflow.Note.StartsWith("Sealed") && wlog.Last()=="sealed_door_touched","a sealed door only says it is sealed");
             Check(wflow.ApproachCaspar() && wflow.Note.Contains("Caspar") && wlog.Last()=="caspar_approached","approaching Caspar logs the approach");
@@ -843,7 +945,7 @@ namespace Ascendant.Build
             Check(rampFlow.CleanRuns==1 && rampFlow.GlyphReviewOptions(5).Contains(Zodiac.Wrap(5+4)) && rampFlow.GlyphReviewOptions(5).Contains(5),"after a clean run the review names harden and still include the answer");
             var rampSave=rampFlow.ToSave(new bool[12],new bool[12],true);var rampBack=new SliceFlow(()=>1);rampSave.atriumStage=4;rampSave.sunSign=1;Check(rampBack.Restore(rampSave) && rampBack.CleanRuns==1,"the clean-run count survives a save");
             // ---- Sept 14 hotfix: the deck must survive the JSON save; Part B never starts on or beside the answer ----
-            var jflow=new SliceFlow(()=>1);jflow.Continue();jflow.ChooseBirth("known");jflow.SetKnownSign(1); jflow.SetKnownSign(-1); jflow.SetKnownSign(-1);jflow.Continue();jflow.Continue();jflow.EnterWing();jflow.EnterDial();jflow.RevealKey();jflow.Continue();jflow.Continue();jflow.InsertKey();jflow.End();jflow.Continue();
+            var jflow=new SliceFlow(()=>1);jflow.Continue();jflow.ChooseBirth("skip"); jflow.PickSkipSun(1);jflow.Continue();jflow.Continue();jflow.EnterWing();jflow.EnterDial();jflow.RevealKey();jflow.Continue();jflow.Continue();jflow.InsertKey();jflow.End();jflow.Continue();
             jflow.RecordLessonAnswer(5,true);var jsave=UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(jflow.ToSave(new bool[12],new bool[12],true)));var jback=new SliceFlow(()=>1);
             Check(jsave.deck!=null && jsave.deck.Length==60 && jback.Restore(jsave) && jback.DueCount==jflow.DueCount && jback.Deck.Practicing==1,"the review deck survives the JSON save and reload with its due count and practicing items");
             var starts=new DialLesson(()=>0);starts.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);starts.BeginGlyphs();for(int i=0;i<12;i++)starts.AnswerGlyphName(starts.CurrentGlyph);
@@ -861,7 +963,7 @@ namespace Ascendant.Build
             for(int i=0;i<8 && !mod.ModalitiesComplete;i++){if(!mod.Dial.Active)break;mod.Dial.Select(Zodiac.Destination(mod.Dial.Start,3),DialInput.DirectSeat);var r=mod.Seal();mod.AfterCorrect(r);}
             Check(mod.ModalitiesComplete && mod.Phase==LessonPhase.ModalityComplete && mod.KinMod.All(v=>v) && !mod.Key2Earned==false && mod.Dial.Events.Count(e=>e.event_name=="modalities_completed")==1 && mod.Dial.Events.Count(e=>e.event_name.StartsWith("key"))==0,"three families of four complete the unit with no new Key");
             Check(mod.SeatLabel(4).Contains("fixed"),"lit modality seats say their kind to the screen reader");
-            var mflow=new SliceFlow(()=>1);mflow.Continue();mflow.ChooseBirth("known");mflow.SetKnownSign(1); mflow.SetKnownSign(-1); mflow.SetKnownSign(-1);mflow.Continue();mflow.Continue();mflow.EnterWing();mflow.EnterDial();mflow.RevealKey();mflow.Continue();mflow.Continue();mflow.InsertKey();mflow.End();mflow.Continue();
+            var mflow=new SliceFlow(()=>1);mflow.Continue();mflow.ChooseBirth("skip"); mflow.PickSkipSun(1);mflow.Continue();mflow.Continue();mflow.EnterWing();mflow.EnterDial();mflow.RevealKey();mflow.Continue();mflow.Continue();mflow.InsertKey();mflow.End();mflow.Continue();
             mflow.StartModalities();Check(mflow.ModalitiesStarted && mflow.Deck.Items.Count(i=>i.Kind==ItemKind.Modality && i.entered)==12 && mflow.DueCount>=12,"starting the unit introduces twelve modality items, ready at the next check");
             foreach(var it in mflow.Deck.Items) if(it.Kind!=ItemKind.Modality) it.dueDay=99;
             Check(mflow.EnterWing() && mflow.EnterDial() && mflow.EnterPractice() && mflow.ReviewQueue.All(t=>t.Mode==ReviewMode.DialModality||t.Mode==ReviewMode.TapModality),"modality items practice as a three-step Dial item or a which-kind tap");
@@ -907,7 +1009,7 @@ namespace Ascendant.Build
             var fullBack=new GridModel(()=>0);fullBack.Restore(grid.Placed,true,true,true);Check(fullBack.Key3Earned && fullBack.Complete && fullBack.Phase==GridPhase.Complete && fullBack.Message==GridModel.FullLine,"a restored full table with Key 3 shows itself full");
             var half=new GridModel(()=>0);half.Restore(Enumerable.Range(0,12).Select(i=>i<5).ToArray(),true,true,false);
             Check(half.PlacedCount==5 && half.Evidence && half.Started && !half.Active && half.Begin() && half.Active && half.CanPick(5) && !half.CanPick(4) && half.Message.Contains("5 of twelve"),"a restored half table resumes with its seated signs");
-            var tflow=new SliceFlow(()=>1);tflow.Continue();tflow.ChooseBirth("known");tflow.SetKnownSign(1); tflow.SetKnownSign(-1); tflow.SetKnownSign(-1);tflow.Continue();tflow.Continue();tflow.EnterWing();tflow.EnterDial();tflow.RevealKey();tflow.Continue();tflow.Continue();tflow.InsertKey();tflow.End();tflow.Continue();
+            var tflow=new SliceFlow(()=>1);tflow.Continue();tflow.ChooseBirth("skip"); tflow.PickSkipSun(1);tflow.Continue();tflow.Continue();tflow.EnterWing();tflow.EnterDial();tflow.RevealKey();tflow.Continue();tflow.Continue();tflow.InsertKey();tflow.End();tflow.Continue();
             tflow.MarkWheelComplete();tflow.MarkKey2();
             Check(tflow.EnterWing() && !tflow.CanOpenGrid && !tflow.EnterGrid() && tflow.TouchDarkGrid() && tflow.Note=="grid-dark" && tflow.Screen==SliceScreen.WingRoom,"before the modality unit is complete the table is dark: a note, no screen");
             Check(tflow.EnterDial() && tflow.Note=="" && tflow.LeaveDial(),"entering the Dial clears the dark-object note");
@@ -971,7 +1073,7 @@ namespace Ascendant.Build
             Check(halfPairs.BeginOpposites() && halfPairs.Phase==LessonPhase.OppositeOwn && halfPairs.Dial.Start==2 && halfPairs.PairsKnown==2 && halfPairs.PolarityShown && halfPairs.SeatLabel(4).Contains(", Yang"),"a restored half-known pattern resumes at the next pair with the sides shown");
             var mid=AfterKey3(1);mid.SetKey3(true);mid.RestoreOpposites(true,Enumerable.Repeat(true,6).ToArray(),true,2,true,false);
             Check(mid.BeginOpposites() && mid.Phase==LessonPhase.BuilderName && mid.Built==2 && mid.BuilderTarget==8,"a restored builder resumes at the third sign");
-            var cflow=new SliceFlow(()=>1);cflow.Continue();cflow.ChooseBirth("known");cflow.SetKnownSign(1); cflow.SetKnownSign(-1); cflow.SetKnownSign(-1);cflow.Continue();cflow.Continue();cflow.EnterWing();cflow.EnterDial();cflow.RevealKey();cflow.Continue();cflow.Continue();cflow.InsertKey();cflow.End();cflow.Continue();
+            var cflow=new SliceFlow(()=>1);cflow.Continue();cflow.ChooseBirth("skip"); cflow.PickSkipSun(1);cflow.Continue();cflow.Continue();cflow.EnterWing();cflow.EnterDial();cflow.RevealKey();cflow.Continue();cflow.Continue();cflow.InsertKey();cflow.End();cflow.Continue();
             cflow.MarkWheelComplete();cflow.MarkKey2();cflow.MarkModalitiesComplete();cflow.MarkKey3();
             cflow.StartOpposites();Check(cflow.OppositesStarted && cflow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && cflow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite)==12 && cflow.Deck.DueForReview(cflow.Sitting).All(i=>i.Kind!=ItemKind.Opposite) && !ReviewDeck.Reviewable(ItemKind.Opposite),"starting the last pattern introduces six opposite-pair items as data, never in a batch");
             cflow.RecordOppositeAnswer(7,true);Check(cflow.Deck.Item(1,ItemKind.Opposite).State==ItemState.Practicing && !cflow.Deck.Item(7,ItemKind.Opposite).entered,"a pair answer from either seat advances the pair's one item");
@@ -982,7 +1084,7 @@ namespace Ascendant.Build
             Check(clesson.Key4Earned && clesson.Phase==LessonPhase.Key4 && !clesson.CanBeginOpposites && clesson.PolarityShown && clesson.PairsKnown==3,"and the lesson restores it with Key 4 held");
             // ---- Build D: the finished loop (Keys spent, the Books, the Atrium by Keys spent, the Wing whole) ----
             Check(Rooms.Visible(Room.Chamber).Count()==2 && Rooms.Visible(Room.Chamber).All(p=>p.Walkable) && Rooms.Find(Room.Chamber,"books").X==0 && Rooms.Find(Room.Chamber,"atrium-door").X==-140 && Rooms.Find(Room.Atrium,"chamber-door").Walkable && Rooms.Find(Room.Atrium,"sealed-right")==null,"the Chamber is a room with the doorway back and the Books; the Atrium's right door is its doorway");
-            var dflow=new SliceFlow(()=>1);var dlog=new List<string>();dflow.Logged+=dlog.Add;dflow.Continue();dflow.ChooseBirth("known");dflow.SetKnownSign(1); dflow.SetKnownSign(-1); dflow.SetKnownSign(-1);dflow.Continue();dflow.Continue();dflow.EnterWing();dflow.EnterDial();dflow.RevealKey();dflow.Continue();dflow.Continue();dflow.InsertKey();dflow.End();dflow.Continue();
+            var dflow=new SliceFlow(()=>1);var dlog=new List<string>();dflow.Logged+=dlog.Add;dflow.Continue();dflow.ChooseBirth("skip"); dflow.PickSkipSun(1);dflow.Continue();dflow.Continue();dflow.EnterWing();dflow.EnterDial();dflow.RevealKey();dflow.Continue();dflow.Continue();dflow.InsertKey();dflow.End();dflow.Continue();
             Check(dflow.LocksFilled==1 && dflow.KeysSpent==1 && dflow.KeysInHand==0 && dflow.BooksOpen==0 && dflow.CanEnterChamber && !dflow.CanSpend,"after the opening one lock is filled and no Key is in hand");
             Check(dflow.EnterChamber() && dflow.AtChamberRoom && dflow.Walk.Room==Room.Chamber && dflow.Walk.At=="atrium-door" && !dflow.SpendKey() && dflow.LocksFilled==1,"the Chamber opens as a room; nothing accepts a Key the player does not have");
             Check(dflow.LeaveChamber() && dflow.Screen==SliceScreen.Hub && dflow.AtriumStage==2 && dflow.Walk.At=="chamber-door","leaving the Chamber places the marker at its doorway; no stage without a Key spent");
@@ -1085,6 +1187,7 @@ namespace Ascendant.Build
             ValidateJournalFront();
             ValidatePractice();
             ValidateBirthChart();
+            ValidateBirthRecord();
             ValidateBuildW();
             ValidateBuildZ();
             ValidateNoSwallowedCode();
