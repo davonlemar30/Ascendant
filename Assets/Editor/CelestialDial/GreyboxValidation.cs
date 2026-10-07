@@ -444,7 +444,7 @@ namespace Ascendant.Build
             Check(w.CanAddFacts && !w.CanAddTime && w.StartAddFacts() && w.BirthStep == "place" && w.SetBirthPlace(london) && w.RisingSign >= 0 && w.Facts.HasPlace, "a time with no place: Add asks only the place, and the rising follows");
             // the lessons: with no sun they start from Aries and call it the starting sign, never the player's sun
             var lesson = new DialLesson(() => 0); lesson.SetSunSign(0, false); string intro = (string)typeof(DialLesson).GetMethod("IntroLine", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(lesson, new object[] { 99 });
-            Check(lesson.Sun == 0 && !lesson.SunKnown && intro.StartsWith("We'll start from Aries, the first sign on the wheel.") && !intro.Contains("Your sun sign"), "with no sun, Caspar names Aries as the starting sign: " + intro);
+            Check(lesson.Sun == 0 && !lesson.SunKnown && intro.StartsWith("We shall start from Aries, the first sign on the wheel.") && !intro.Contains("Your sun sign"), "with no sun, Caspar names Aries as the starting sign: " + intro);
             lesson.UpdateSun(4, true); Check(lesson.Sun == 4 && lesson.SunKnown, "a sun that arrives later is the start for lessons not yet played");
         }
         static void ValidateJournalFront()

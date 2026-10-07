@@ -504,7 +504,7 @@ namespace Ascendant.CelestialDial
                 case 6: return "No matter. I cannot touch the wheel. It must be you.\nBut I can teach you. Look here.";
                 default: return SunKnown
                     ? "Your sun sign is " + SignName(Sun) + ". " + SignName(Sun) + " is " + Zodiac.Article(Element(Sun)) + " " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. There is much more to a chart than that, but this is where we start."
-                    : "We'll start from " + SignName(Sun) + ", the first sign on the wheel. " + SignName(Sun) + " is " + Zodiac.Article(Element(Sun)) + " " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. Your birthday would tell us yours, and your journal keeps a place for it."; // no sun (Oct 7): Claude's draft (owner writes)
+                    : "We shall start from " + SignName(Sun) + ", the first sign on the wheel. " + SignName(Sun) + " is " + Zodiac.Article(Element(Sun)) + " " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. Your birthday would tell us yours, and your journal keeps a place for it."; // no sun (Oct 7): Claude's draft (owner writes)
             }
         }
         public string TeachingLine =>
