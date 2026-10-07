@@ -48,13 +48,14 @@ const path=require('path');
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
     await page.screenshot({path:path.join(out,viewport.width+'-birth.png')});
     check(await page.evaluate(()=>window.ascendantDial.snapshot().canSliceContinue===false),'birth prompt waits for a choice at '+viewport.width);
-    await semantic('birth-known');await page.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);
+    check(JSON.stringify((await state()).birthChoices)==='["Yes, I know my birthday","I\'ll skip it"]','Oct 7: the opening\'s question has two answers (the known path and the random sun retired) at '+viewport.width);
+    // the birth-time build (owner, Oct 7): I'll skip it asks which sign the player goes by, a sign or I'm not sure; nothing else is asked
+    await semantic('birth-skip');await page.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);
+    check((await state()).birthStep==='sun-pick'&&(await state()).canSignUnknown&&!(await state()).canSliceContinue,'I\'ll skip it: which sign do you go by, with I\'m not sure, at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-birth-skip.png')});
     await semantic('sign-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Taurus');
-    // batch 2 (owner, Oct 2 evening: the Big Three approved): what I already know asks the moon, then the rising sign, each with I don't know
-    await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='moon');check(!(await state()).canSliceContinue && (await state()).canSignUnknown,'after the sun, the moon is asked, with I don\'t know, at '+viewport.width);
-    await semantic('sign-unknown');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='rising');await semantic('sign-unknown');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done'&&window.ascendantDial.snapshot().canSliceContinue);
-    check((await state()).bigThree==='\u2609 Taurus \u00b7 \u263d unknown \u00b7 \u2191 unknown','the sun given, the moon and the rising sign unknown: '+(await state()).bigThree+' at '+viewport.width);
+    check((await state()).bigThree==='\u2609 Taurus \u00b7 \u263d unknown \u00b7 \u2191 unknown'&&(await state()).sunBasis==='picked','the sun picked, the moon and the rising sign unknown: '+(await state()).bigThree+' at '+viewport.width);
     await semantic('next-screen');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await page.screenshot({path:path.join(out,viewport.width+'-atrium.png')});
@@ -764,7 +765,7 @@ const path=require('path');
     await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await dev.locator('#loading').waitFor({state:'detached'});
     await dev.locator('#name').fill('Tester');await dev.locator('#name').dispatchEvent('change');await dev.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
-    await act('birth-known');await dev.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-4');await dev.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Leo');await act('sign-unknown');await act('sign-unknown');await dev.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+    await act('birth-skip');await dev.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-4');await dev.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Leo'&&window.ascendantDial.snapshot().birthStep==='done');
     await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await dev.waitForTimeout(150);}
     await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -784,7 +785,7 @@ const path=require('path');
       { const w=await snap(); check(w.dialWake===Math.min(4,w.keys)&&w.wakePreview===-1,'the Dial\'s wake-up (86bcbn6w6 2a A): after the checkpoint '+id+' the Dial shows step '+w.dialWake+' for '+w.keys+' Keys earned ('+w.dialLook+') at '+viewport.width); }
       if(id==='whole'){ // Build AA: at the Wing's end the journal has the Table and all four tabs; each works on the canvas
         await act('open-journal');await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,{},{timeout:8000}); // a new session: the landing (after the title page, the first time)
-        { const s=await snap(); check(s.journalKeeper[1]==='4 Keys \u00b7 1 Book' && s.journalKeeper[2].startsWith('\u2609 Leo \u00b7 \u263d ') && !s.journalKeeper[2].includes('unknown'),'batch 2: at the Wing\'s end the Keeper\'s record reads 4 Keys \u00b7 1 Book, and DEV Mode\'s sample chart: '+s.journalKeeper[2]+' at '+viewport.width); }
+        { const s=await snap(); check(s.journalKeeper[1]==='4 Keys \u00b7 1 Book' && s.journalKeeper[2]==='\u2609 Leo \u00b7 \u263d unknown \u00b7 \u2191 unknown','batch 2: at the Wing\'s end the Keeper\'s record reads 4 Keys \u00b7 1 Book; Oct 7: the jumps keep the player\'s own birth record (Leo picked, the rest unknown), the sample only stands in for none: '+s.journalKeeper[2]+' at '+viewport.width); }
         await act('journal-contents');await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='contents',{},{timeout:5000});await act('journal-chapter-wheel');await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='wheel'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000});await dev.waitForTimeout(400);
         { const s=await snap(); check(s.journalView==='wheel'&&s.canJournalTable&&s.journalLenses.join()==='Element,Modality,Polarity,Opposites'&&s.journalLens==='Element','Build AA: at the Wing\'s end the journal shows the Table switch and all four tabs at '+viewport.width); }
         await tap(7+36,119);await dev.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='table',{},{timeout:5000});check(true,'Build AA: the Table switch on the canvas lays the seats out as the Table at '+viewport.width);
@@ -838,7 +839,16 @@ const path=require('path');
   await recovery.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});
   const action=async(id)=>recovery.locator('#'+id).evaluate(b=>b.click());
   await action('next-screen');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
-  await action('birth-unknown');check(await recovery.evaluate(()=>window.ascendantDial.snapshot().note.includes('Your sun sign is')&&window.ascendantDial.snapshot().sunSign!==''),'I don\'t know assigns a sun sign');
+  // the birth-time build (owner, Oct 7): I'll skip it, then I'm not sure: no sun (the random sun is retired), the lessons start from Aries
+  await action('birth-skip');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canSignUnknown);await action('sign-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.sunSign==='' && !r.sunKnown && r.note==="Then we'll start from Aries, the first sign on the wheel. Your journal keeps a place for your birthday." && r.bigThree==='\u2609 unknown \u00b7 \u263d unknown \u00b7 \u2191 unknown' && r.canSliceContinue,'Oct 7: I\'ll skip it, then I\'m not sure: no sun, never a random one, and the Aries start said: '+r.note); }
+  // Oct 7: I don't know where keeps the time and works out what holds in every zone; the rising stays unknown, and the screen says why
+  await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
+  await recovery.locator('#birthdate').fill('1990-05-10');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
+  await recovery.locator('#birthtime').fill('14:30');await recovery.locator('#birthtime').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace&&window.ascendantDial.snapshot().canPlaceUnknown);
+  await recovery.screenshot({path:path.join(out,'390-birth-place-step.png')});
+  await action('place-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.risingSign==='' && r.sunSign==='Taurus' && r.note.endsWith('Without a birth place, your rising sign stays unknown.') && r.bigThree.endsWith('\u2191 unknown') && JSON.parse(r.birthRecord).birth.timeFrom===870 && JSON.parse(r.birthRecord).birth.place==='','I don\'t know where: the time kept, no place invented, the rising unknown and why: '+r.note); }
   await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   // the cusp day (owner ruling, Oct 2 evening): no birth time on the day the sun changed sign asks the player, with the minute on the place's clock; then the answer is changed
   await recovery.locator('#birthdate').fill('1990-04-20');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
@@ -888,6 +898,61 @@ const path=require('path');
   await recovery.waitForFunction(()=>window.ascendantDial.snapshot().phase.includes('Paused for now'),{},{timeout:30000});
   check(await recovery.evaluate(()=>!window.ascendantDial.snapshot().active && !window.ascendantDial.snapshot().keyEarned),'browser recovery cap pauses without awarding Key');
   await recovery.screenshot({path:path.join(out,'390-recovery-cap.png')});await recoveryContext.close();
+  // ---- the birth-time build (owner, Oct 7): a player with no sun, the Aries start, "Your Birth" (a rising chosen, then the facts added),
+  // the record saved and read back after a reload, and an old version 4 save converted once ----
+  await Promise.all(VIEWPORTS.map(async viewport=>{
+    const birthContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
+    const bp=await birthContext.newPage();const birthErrors=[];bp.on('pageerror',e=>birthErrors.push(e.message));bp.on('console',m=>{if(m.type()==='error'&&/Exception/.test(m.text()))birthErrors.push(m.text());});
+    const snap=()=>bp.evaluate(()=>window.ascendantDial.snapshot());const act=async id=>bp.locator('#'+id).evaluate(b=>b.click());const send=c=>bp.evaluate(k=>window.ascendantDial.act(k),c);
+    const frames=n=>bp.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
+    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await bp.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await bp.mouse.down();await frames(2);await bp.mouse.up();await frames(2);};
+    const until=(f,t=15000)=>bp.waitForFunction(f,{},{timeout:t});
+    const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);
+    const landing=async()=>{await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,8000);};
+    await bp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await bp.locator('#loading').waitFor({state:'detached'});
+    await bp.locator('#name').fill('Tester');await bp.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
+    await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');
+    await act('birth-skip');await until(()=>window.ascendantDial.snapshot().canSignUnknown);await act('sign-unknown');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
+    await act('jump-key1');await resumed(); // the After Key 1 checkpoint under this player's own record (the jump keeps it)
+    { const s=await snap(); check(s.bigThree==='☉ unknown · ☽ unknown · ↑ unknown' && !s.sunKnown && s.lessonSun==='Aries (starting sign)','Oct 7: a player with no sun keeps it across the jump; the lessons start from Aries, named as the starting sign, at '+viewport.width); }
+    await act('enter-wing');await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy);await act('poi-dial');await until(()=>window.ascendantDial.snapshot().screen==='wing'&&!window.ascendantDial.snapshot().busy);await bp.waitForTimeout(600);
+    { const s=await snap(); check(s.start==='Starting sign: Aries','the Dial\'s idle face reads "Starting sign: Aries", never "Your sign": '+s.start+' at '+viewport.width); }
+    await bp.screenshot({path:path.join(out,viewport.width+'-dial-starting-sign.png')});
+    await act('leave-dial');await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy);await act('leave-wing');await until(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy);
+    await landing();
+    { const s=await snap(); const g=s.journalBigThreeBox||[]; check(g.length===4 && g[3]>=44 && s.journalKeeper[2]==='☉ unknown · ☽ unknown · ↑ unknown','the record shows every player\'s Big Three, "☉ unknown" included, its line a 44 px target, at '+viewport.width);
+      await tap(g[0],g[1]); }
+    await until(()=>window.ascendantDial.snapshot().journalView==='birth'&&!window.ascendantDial.snapshot().busy,5000);
+    { const s=await snap(); check(JSON.stringify(s.journalBirthRows)==='["Date: unknown","Time: unknown","Place: unknown"]' && s.journalBirthLines.join(' ').startsWith('Your rising is the sign that was coming up over the eastern horizon') && s.birthRisingWords==='Choose my rising' && s.canBirthAdd && s.canBirthAddTime && s.journalLink==='‹ Your Journal','a canvas tap on the line opens "Your Birth": each fact unknown with Add, the journal\'s paragraph, Choose my rising, Add my birth time, at '+viewport.width);
+      check(s.buttons.filter(b=>b.includes(':frame:')).every(b=>{const wh=b.slice(b.lastIndexOf(':')+1).split('x');return +wh[1]>=44;}),'"Your Birth"\'s buttons each take a 44 px target at '+viewport.width); }
+    await bp.screenshot({path:path.join(out,viewport.width+'-your-birth.png')});
+    { const b=(await snap()).journalBirthBoxes; await tap(b[12],b[13]); } // Choose my rising
+    await until(()=>window.ascendantDial.snapshot().screen==='birth'&&window.ascendantDial.snapshot().canSignPick);
+    { const s=await snap(); check(s.amending && s.birthHeading==='Your Birth' && !s.canSignUnknown && s.canBirthCancel,'Choose my rising: the opening\'s twelve signs under "Your Birth", with the way back, at '+viewport.width); }
+    await bp.screenshot({path:path.join(out,viewport.width+'-choose-rising.png')});
+    await tap(0,394); // Leo, on the canvas (the grid's middle column, second row)
+    await until(()=>window.ascendantDial.snapshot().journalView==='birth'&&!window.ascendantDial.snapshot().busy,5000);
+    { const s=await snap(); check(JSON.stringify(s.journalBirthLines)==='["Leo it is."]' && s.risingChosen && s.bigThree==='☉ unknown · ☽ unknown · ↑ Leo' && s.birthRisingWords==='Change my rising','back on the page: "Leo it is."; the record shows ↑ Leo with no label (the flag hidden), at '+viewport.width); }
+    { const b=(await snap()).journalBirthBoxes; await tap(b[0],b[1]); } // Add, on the date's row
+    await until(()=>window.ascendantDial.snapshot().canBirthDate);
+    await bp.locator('#birthdate').fill('1990-04-25');await bp.locator('#birthdate').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().canBirthTime);
+    await bp.locator('#birthtime').fill('14:30');await bp.locator('#birthtime').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().canBirthPlace);
+    await bp.locator('#birthplace').fill('London');await until(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);await act('place-match-0');
+    await until(()=>window.ascendantDial.snapshot().journalView==='birth'&&!window.ascendantDial.snapshot().busy,5000);
+    { const s=await snap(); check(JSON.stringify(s.journalBirthLines)==='["Your rising is Virgo.","It takes the place of the one you chose.","Your moon is Taurus.","Your sun is Taurus.","Everything you\'ve learned stays as it is."]' && JSON.stringify(s.journalBirthRows)==='["Date: 25 April 1990","Time: 2:30 pm","Place: London, Britain (UK)"]' && !s.canBirthAdd && !s.canBirthRising && s.lessonSun==='Taurus' && s.keys===1,
+      'the facts added in the opening\'s boxes decide: a line for each change, the Key kept, the lessons now from Taurus: '+s.journalBirthLines.join(' / ')+' at '+viewport.width); }
+    await bp.screenshot({path:path.join(out,viewport.width+'-your-birth-added.png')});
+    await bp.reload();await resumed();await landing();
+    { const s=await snap(); check(s.journalKeeper[2]==='☉ Taurus · ☽ Taurus · ↑ Virgo' && !s.risingChosen,'after a reload the record reads the saved chart: '+s.journalKeeper[2]+' at '+viewport.width); }
+    // an old version 4 save from each path, converted once on load
+    for(const [id,expect] of [['known','☉ Leo · ☽ Scorpio · ↑ unknown'],['chosen','☉ Capricorn · ☽ unknown · ↑ unknown'],['legacy','☉ Gemini · ☽ unknown · ↑ unknown']]){
+      await send('jump-birth:v4-'+id);await bp.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();await landing();
+      const s=await snap(),r=JSON.parse(s.birthRecord||'{}'); check(s.journalKeeper[2]===expect && (r.choices||[]).some(c=>c.point==='sun'&&c.how===(id==='known'?'entered':id==='chosen'?'assigned':'legacy')),'an old '+id+' save converts once, its signs kept as the player\'s choices: '+s.journalKeeper[2]+' at '+viewport.width); }
+    await send('jump-birth:v4-chart');await bp.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();await landing();
+    { const s=await snap(),r=JSON.parse(s.birthRecord||'{}'); check(s.journalKeeper[2].startsWith('☉ Taurus · ☽ ') && s.journalKeeper[2].endsWith('↑ unknown') && r.birth.date==='1990-04-20' && r.choices.some(c=>c.point==='sun'&&c.how==='picked'),'an old chart-path save moves its facts over and works the chart out again, the cusp\'s pick kept: '+s.journalKeeper[2]+' at '+viewport.width); }
+    check(birthErrors.length===0,'Oct 7: no runtime exceptions through "Your Birth" and the conversions at '+viewport.width+(birthErrors.length?': '+birthErrors[0]:''));
+    await birthContext.close();
+  }));
   // ---- Build E: the test set from the URL at both viewports (the opening and the Dial), the cues, the style page on both sets ----
   const base=process.env.GREYBOX_URL || 'http://127.0.0.1:8000';const withQuery=q=>base+(base.includes('?')?'&':'?')+q;
   await Promise.all(VIEWPORTS.map(async viewport=>{

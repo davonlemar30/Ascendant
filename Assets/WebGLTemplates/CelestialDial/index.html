@@ -23,14 +23,14 @@
 <label id="birthtime-label" for="birthtime" class="sr">Your birth time</label><input id="birthtime" type="time" hidden><button id="use-time">Use this time</button><button id="time-unknown">I don't know my birth time</button>
 <label id="birthplace-label" for="birthplace" class="sr">Your birth town or city</label><input id="birthplace" type="text" maxlength="60" autocomplete="off" placeholder="Town or city" hidden>
 <div id="place-matches" role="group" aria-label="Places that match"><button id="place-match-0"></button><button id="place-match-1"></button><button id="place-match-2"></button><button id="place-match-3"></button></div>
-<div id="signs" role="group" aria-label="Choose your sign"></div><button id="sign-unknown">I don't know</button>
+<div id="signs" role="group" aria-label="Choose your sign"></div><button id="sign-unknown">I'm not sure</button><button id="place-unknown">I don't know where</button><button id="birth-cancel">Back to Your Journal</button>
 <div id="cusp" role="group" aria-label="Which sign do you go by?"><button id="cusp-0"></button><button id="cusp-1"></button><button id="cusp-unsure">I'm not sure</button><button id="cusp-why" aria-expanded="false">Why?</button></div>
-<button id="birth-chart">Enter birth date, time, place</button><button id="birth-known">Enter what I already know</button><button id="birth-unknown">I don't know</button>
+<button id="birth-chart">Yes, I know my birthday</button><button id="birth-skip">I'll skip it</button>
 <button id="next-screen">Continue</button><button id="insert">Insert Key</button><button id="restart">Start over, test only</button>
 <button id="enter-wing">The Zodiac Wing</button><button id="enter-chamber">The Crystal Book Chamber</button><button id="leave-dial">Leave the Dial</button><button id="leave-wing">Return to the Atrium</button><button id="leave-chamber">Return to the Atrium</button>
 <button id="continue-lesson">Continue the lesson</button><button id="enter-practice">Practice what you know</button><button id="leave-practice">Leave the instrument</button>
 <button id="open-journal">Your journal</button><button id="close-journal">Close the journal</button><button id="journal-prev">Previous page</button><button id="journal-next">Next page</button>
-<button id="journal-wheel">Back to the Wheel</button><button id="journal-practice" disabled>Practice</button><button id="journal-contents">Contents, every chapter</button><button id="journal-landing">Back to Your Journal</button><button id="journal-chapter-wheel">The Wheel, signs and patterns</button><button id="journal-chapter-map">The Library Map, the rooms you have woken</button><button id="journal-to-contents">Back to Contents</button><div id="practice-rows" role="group" aria-label="Concepts to practise"><button id="practice-row-0"></button><button id="practice-row-1"></button><button id="practice-row-2"></button><button id="practice-row-3"></button><button id="practice-row-4"></button></div><div id="quiz-choices" role="group" aria-label="Choices"><button id="quiz-choice-0"></button><button id="quiz-choice-1"></button><button id="quiz-choice-2"></button><button id="quiz-choice-3"></button></div><button id="quiz-next">Next</button><button id="quiz-back">Back to Practice</button><button id="journal-to-practice">Back to Practice, any time</button><button id="journal-view-wheel">Show as the Wheel</button><button id="journal-view-table">Show as the Table</button>
+<button id="journal-wheel">Back to the Wheel</button><button id="journal-practice" disabled>Practice</button><button id="journal-contents">Contents, every chapter</button><button id="journal-landing">Back to Your Journal</button><button id="journal-bigthree">Your Birth</button><button id="birth-add-0">Add the date</button><button id="birth-add-1">Add the time</button><button id="birth-add-2">Add the place</button><button id="birth-rising">Choose my rising</button><button id="birth-add-time">Add my birth time</button><button id="journal-chapter-wheel">The Wheel, signs and patterns</button><button id="journal-chapter-map">The Library Map, the rooms you have woken</button><button id="journal-to-contents">Back to Contents</button><div id="practice-rows" role="group" aria-label="Concepts to practise"><button id="practice-row-0"></button><button id="practice-row-1"></button><button id="practice-row-2"></button><button id="practice-row-3"></button><button id="practice-row-4"></button></div><div id="quiz-choices" role="group" aria-label="Choices"><button id="quiz-choice-0"></button><button id="quiz-choice-1"></button><button id="quiz-choice-2"></button><button id="quiz-choice-3"></button></div><button id="quiz-next">Next</button><button id="quiz-back">Back to Practice</button><button id="journal-to-practice">Back to Practice, any time</button><button id="journal-view-wheel">Show as the Wheel</button><button id="journal-view-table">Show as the Table</button>
 <div id="journal-lenses" role="group" aria-label="Show the wheel by"><button id="journal-lens-0">Element</button><button id="journal-lens-1">Modality</button><button id="journal-lens-2">Polarity</button><button id="journal-lens-3">Opposites</button></div>
 <div id="journal-seats" role="group" aria-label="The signs in your journal"></div><button id="journal-open">Open the page</button>
 <div id="journal-chips" role="group" aria-label="Signs that share these facts"><button id="journal-chip-0"></button><button id="journal-chip-1"></button><button id="journal-chip-2"></button><button id="journal-chip-3"></button><button id="journal-chip-4"></button><button id="journal-chip-5"></button></div>
@@ -77,7 +77,7 @@
   for(let i=0;i<4;i++)byId('journal-lens-'+i).onclick=()=>send('journal-lens:'+i);
   for(let i=0;i<6;i++)byId('journal-chip-'+i).onclick=()=>send('journal-chip:'+i);
   byId('next-screen').onclick=()=>send('next-screen');byId('mute').onclick=()=>send('mute');
-  for(const c of ['chart','known','unknown'])byId('birth-'+c).onclick=()=>send('birth:'+c);
+  for(const c of ['chart','skip'])byId('birth-'+c).onclick=()=>send('birth:'+c); // Oct 7: two answers; the known path and the random sun are retired
   byId('name').addEventListener('change',e=>send('name:'+e.target.value));
   byId('birthdate').addEventListener('change',e=>send('birthdate:'+e.target.value));
   byId('use-date').onclick=()=>send('birthdate:'+byId('birthdate').value);
@@ -85,7 +85,8 @@
   // batch 2 (owner, Oct 2 evening: the Big Three approved): the time, the place's search and pick, I don't know for the moon and the rising sign
   byId('birthtime').addEventListener('change',e=>send('birthtime:'+e.target.value));byId('use-time').onclick=()=>send('birthtime:'+byId('birthtime').value);byId('time-unknown').onclick=()=>send('birthtime-unknown');
   byId('birthplace').addEventListener('input',e=>send('birthplace-search:'+e.target.value));for(let i=0;i<4;i++)byId('place-match-'+i).onclick=()=>send('birthplace:'+i);
-  byId('sign-unknown').onclick=()=>send('sign:-1');
+  byId('sign-unknown').onclick=()=>send('sign:-1');byId('place-unknown').onclick=()=>send('birthplace-unknown');byId('birth-cancel').onclick=()=>send('birth-cancel'); // Oct 7: I'm not sure, I don't know where, and back to "Your Birth"
+  byId('journal-bigthree').onclick=()=>send('journal-birth');for(let i=0;i<3;i++)byId('birth-add-'+i).onclick=()=>send('birth-add');byId('birth-rising').onclick=()=>send('birth-rising');byId('birth-add-time').onclick=()=>send('birth-add-time'); // Oct 7: "Your Birth"
   byId('cusp-0').onclick=()=>send('cusp:0');byId('cusp-1').onclick=()=>send('cusp:1');byId('cusp-unsure').onclick=()=>send('cusp:-1');byId('cusp-why').onclick=()=>send('cusp-why'); // the cusp day (owner ruling, Oct 2 evening)
   function box(id,x,y,w,h){
     const scale=Math.min(innerWidth/360,innerHeight/800), left=(innerWidth-360*scale)/2, top=(innerHeight-800*scale)/2;
@@ -97,10 +98,11 @@
     for(let i=0;i<12;i++){const angle=(180+i*30-Math.max(0,selected)*30)*Math.PI/180;const ring=!!(state&&state.dialRing),r=ring?123:136,along=ring?58:52,across=ring?66:52,flat=Math.abs(Math.cos(angle))>Math.abs(Math.sin(angle));box('seat-'+i,Math.cos(angle)*r,270-Math.sin(angle)*r,flat?across:along,flat?along:across);} // Build AC: the Cast Dial's seats sit on radius 123, each 58 along the ring by 66 across it (DialView.AstroSeatRadius, BuildAstrolabeSeat); a box stays upright, its 66 side on the axis its seat's radius runs nearer
     box('back',-122,654,64,56);box('seal',0,654,146,56);box('forward',122,654,64,56);
     box('ask-caspar',78,714,164,48);box('caspar-page',118,590,96,26);box('continue',0,654,190,56);box('optional',0,714,244,48);box('motion',92,768,160,44);
-    box('name',0,300,260,48);for(let i=0;i<3;i++)box(['birth-chart','birth-known','birth-unknown'][i],0,300+i*64,300,52);
+    box('name',0,300,260,48);for(let i=0;i<2;i++)box(['birth-chart','birth-skip'][i],0,300+i*64,300,52);
     box('next-screen',0,654,190,56);box('insert',0,654,190,56);box('restart',0,768,216,48);
     box('birthdate',0,338,200,48);box('use-date',0,420,200,52);box('change-birth',0,250,200,48);
-    box('birthtime',0,338,200,48);box('use-time',0,420,200,52);box('time-unknown',0,482,260,52);box('birthplace',0,338,260,48);for(let i=0;i<4;i++)box('place-match-'+i,0,412+i*46,300,42);box('sign-unknown',0,580,300,44); // batch 2
+    box('birthtime',0,338,200,48);box('use-time',0,420,200,52);box('time-unknown',0,482,260,52);box('birthplace',0,338,260,48);for(let i=0;i<4;i++)box('place-match-'+i,0,422+i*44,300,42);box('sign-unknown',0,580,300,44); // batch 2; Oct 7: the matches 10 lower and 44 apart (SliceView.PlaceMatchTop, PlaceMatchStep)
+    box('place-unknown',0,600,260,44);box('birth-cancel',0,250,200,48); // Oct 7: under the matches (SliceView.PlaceUnknownY); back to "Your Birth" where Change my answer sits
     box('cusp-0',0,400,300,44);box('cusp-1',0,452,300,44);box('cusp-unsure',0,504,300,44);box('cusp-why',0,546,96,44); // the cusp question's answers and its Why?
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
     box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
@@ -117,6 +119,7 @@
     // batch 2 (SliceView): the landing's doors where the game reports them; Contents' rows; the link at the top left (88 from the left, 96 x 44)
     {const d=(state&&state.journalDoors)||[];if(d.length===8){box('journal-practice',d[0],d[1],d[2],d[3]);box('journal-contents',d[4],d[5],d[6],d[7]);}}
     box('journal-chapter-wheel',J,200,238,104);box('journal-chapter-map',J,304,238,104);box('journal-landing',-44,84,96,44);box('journal-to-contents',-44,84,96,44);
+    {const g=(state&&state.journalBigThreeBox)||[];if(g.length===4)box('journal-bigthree',g[0],g[1],g[2],g[3]);const b=(state&&state.journalBirthBoxes)||[];['birth-add-0','birth-add-1','birth-add-2','birth-rising','birth-add-time'].forEach((id,i)=>{if(b.length>=4*(i+1)&&b[4*i+2]>0)box(id,b[4*i],b[4*i+1],b[4*i+2],b[4*i+3]);});} // Oct 7: the Big Three's line and "Your Birth" where the game reports them
     {const r=(state&&state.journalPracticeRows)||[];for(let i=0;i<5;i++)if(r.length>=4*(i+1))box('practice-row-'+i,r[4*i],r[4*i+1],r[4*i+2],r[4*i+3]);const c=(state&&state.quizChoiceBoxes)||[];for(let i=0;i<4;i++)if(c.length>=4*(i+1))box('quiz-choice-'+i,c[4*i],c[4*i+1],c[4*i+2],c[4*i+3]);const q=(state&&state.quizButtons)||[];if(q.length===8){box('quiz-next',q[0],q[1],q[2],q[3]);box('quiz-back',q[4],q[5],q[6],q[7]);}}box('journal-to-practice',-44,84,96,44); // Oct 3: Practice's targets where the game reports them
     const lenses=(state&&state.journalLenses)||[],LENSES=['Element','Modality','Polarity','Opposites'];
     for(let i=0;i<4;i++){const at=lenses.indexOf(LENSES[i]);box('journal-lens-'+i,J+(Math.max(0,at)-(lenses.length-1)/2)*66,143,62,22);}
@@ -155,7 +158,8 @@
       byId('continue').disabled=!(wing&&state.canContinue);byId('optional').disabled=!(wing&&state.canOptional);
       byId('motion').disabled=false;
       byId('next-screen').disabled=!state.canSliceContinue;byId('insert').disabled=!state.canInsert;byId('restart').disabled=!(state.ended||state.screen==='hub');
-      for(const c of ['chart','known','unknown'])byId('birth-'+c).disabled=!state.canBirth;
+      for(const c of ['chart','skip'])byId('birth-'+c).disabled=!state.canBirth;byId('place-unknown').disabled=!state.canPlaceUnknown;byId('birth-cancel').disabled=!state.canBirthCancel;
+      {const b=state.journalBirthBoxes||[],on=journal&&state.journalView==='birth';byId('journal-bigthree').disabled=!(journal&&state.journalView==='landing'&&state.canBirthPage);for(let i=0;i<3;i++)byId('birth-add-'+i).disabled=!(on&&state.canBirthAdd&&b[4*i+2]>0);byId('birth-rising').disabled=!(on&&state.canBirthRising);byId('birth-rising').textContent=state.birthRisingWords||'Choose my rising';byId('birth-add-time').disabled=!(on&&state.canBirthAddTime);} // Oct 7
       byId('birthdate').hidden=!state.canBirthDate;byId('use-date').disabled=!state.canBirthDate;byId('change-birth').disabled=!state.canChangeBirth;
       byId('birthtime').hidden=!state.canBirthTime;byId('use-time').disabled=!state.canBirthTime;byId('time-unknown').disabled=!state.canBirthTime;byId('birthplace').hidden=!state.canBirthPlace;
       {const m=state.placeMatches||[];for(let i=0;i<4;i++){const b=byId('place-match-'+i);b.textContent=m[i]||'';b.disabled=!(state.canBirthPlace&&m[i]);}}byId('sign-unknown').disabled=!state.canSignUnknown;

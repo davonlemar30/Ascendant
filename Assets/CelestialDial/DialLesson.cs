@@ -26,6 +26,9 @@ namespace Ascendant.CelestialDial
         int lastStart;
         // The player's sun sign (Sept 11 copy session: derived or assigned at the birth prompt; no chart).
         public int Sun { get; private set; } = 1;
+        // the birth-time build (owner, Oct 7): a player who skips their birthday and isn't sure of their sign has no sun; the lessons start from
+        // Aries, the first sign on the wheel, and the lines name it as the starting sign, never as the player's sun
+        public bool SunKnown { get; private set; } = true;
         public int GuidedFamily => Sun % 4;
         public int SecondFamily => (GuidedFamily + 3) % 4;
         // batch 2, step 5 (owner, Oct 3): the family a lesson teaches now, whose triangle fills with light: the guided one, the second, then the
@@ -281,7 +284,7 @@ namespace Ascendant.CelestialDial
             if (!LitMod[start]) LitMod[start] = true;
             StartModalityProblem(start, guided ? 2 : 0);
             Message = guided
-                ? "The wheel holds a second pattern, acolyte. Every third sign shares a modality: cardinal, fixed, or mutable.\nYour sign, " + SignName(Sun) + ", is " + ModalityName(Sun) + ", and so are " + ModalityMembers(f) + ".\nNow find the next " + ModalityName(Sun) + " sign after " + SignName(Sun) + " upon the wheel. Count each sign forward: one, two, three. When the sign is selected, press Seal." // owner (worksheet section 10)
+                ? "The wheel holds a second pattern, acolyte. Every third sign shares a modality: cardinal, fixed, or mutable.\n" + (SunKnown ? "Your sign, " : "Our starting sign, ") + SignName(Sun) + ", is " + ModalityName(Sun) + ", and so are " + ModalityMembers(f) + ".\nNow find the next " + ModalityName(Sun) + " sign after " + SignName(Sun) + " upon the wheel. Count each sign forward: one, two, three. When the sign is selected, press Seal." // owner (worksheet section 10)
                 : "Now the " + ModalityName(f).ToLowerInvariant() + " signs: " + ModalityMembers(f) + ".\nStart at " + SignName(start) + ". Three forward each time. I will only watch."; // placeholder (owner writes)
             Dial.Log(first ? "modality_unit_started" : "modality_family_started");
             return true;
@@ -461,9 +464,10 @@ namespace Ascendant.CelestialDial
         }
         public void EndReview() { if (Phase != LessonPhase.Review) return; Dial.Home(); Phase = phaseBeforeReview; }
         // Second sitting (Q05 decision 5): rebuild lesson state from the local save. The intro is already behind the player.
-        public void RestoreProgress(int sun, bool[] lit, bool[] kin, bool keyEarned)
+        public void RestoreProgress(int sun, bool[] lit, bool[] kin, bool keyEarned) => RestoreProgress(sun, true, lit, kin, keyEarned);
+        public void RestoreProgress(int sun, bool sunKnown, bool[] lit, bool[] kin, bool keyEarned)
         {
-            Sun = Zodiac.Wrap(sun); family = GuidedFamily;
+            Sun = Zodiac.Wrap(sun); SunKnown = sunKnown; family = GuidedFamily;
             for (int i = 0; i < 12; i++) { Lit[i] = lit != null && i < lit.Length && lit[i]; Kin[i] = kin != null && i < kin.Length && kin[i]; }
             KeyEarned = keyEarned; IndependentEvidence = keyEarned; IntroStep = IntroTeaching;
             Phase = !keyEarned ? LessonPhase.Rule : WheelComplete ? LessonPhase.AllLit : LessonPhase.Complete;
@@ -475,10 +479,17 @@ namespace Ascendant.CelestialDial
         static string SignName(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Name;
         static string Element(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Element;
         static string FamilyMembers(int f) => SignName(f) + ", " + SignName(f + 4) + ", and " + SignName(f + 8);
-        public void SetSunSign(int seat)
+        public void SetSunSign(int seat) => SetSunSign(seat, true);
+        public void SetSunSign(int seat, bool known)
         {
             if (Phase != LessonPhase.Encounter || IntroStep != 0) return;
-            Sun = Zodiac.Wrap(seat); family = GuidedFamily;
+            Sun = Zodiac.Wrap(seat); SunKnown = known; family = GuidedFamily;
+        }
+        // a sun that arrives or changes on "Your Birth" (Oct 7): only lessons not yet played start from it; nothing lit or earned moves
+        public void UpdateSun(int seat, bool known)
+        {
+            if (Phase == LessonPhase.Encounter && IntroStep == 0) { SetSunSign(seat, known); return; }
+            Sun = Zodiac.Wrap(seat); SunKnown = known;
         }
         string IntroLine(int step)
         {
@@ -491,7 +502,9 @@ namespace Ascendant.CelestialDial
                 case 4: return "...";
                 case 5: return "You... do not know astrology.\nThe Keeper of this Library does not know astrology. How is that possible?";
                 case 6: return "No matter. I cannot touch the wheel. It must be you.\nBut I can teach you. Look here.";
-                default: return "Your sun sign is " + SignName(Sun) + ". " + SignName(Sun) + " is " + Zodiac.Article(Element(Sun)) + " " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. There is much more to a chart than that, but this is where we start.";
+                default: return SunKnown
+                    ? "Your sun sign is " + SignName(Sun) + ". " + SignName(Sun) + " is " + Zodiac.Article(Element(Sun)) + " " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. There is much more to a chart than that, but this is where we start."
+                    : "We'll start from " + SignName(Sun) + ", the first sign on the wheel. " + SignName(Sun) + " is " + Zodiac.Article(Element(Sun)) + " " + Element(Sun) + " sign.\nIn your world, the sun sign is the one most people know. Your birthday would tell us yours, and your journal keeps a place for it."; // no sun (Oct 7): Claude's draft (owner writes)
             }
         }
         public string TeachingLine =>
@@ -581,7 +594,7 @@ namespace Ascendant.CelestialDial
         public string CorrectLine(DialEvent result) =>
             (InOppositeProblem ? "Yes, " + SignName(result.selected_destination) + " sits across from " + SignName(Dial.Start) + ". Both are " + Kind(Dial.Start) + ", both are " + Side(Dial.Start) + ", only the element differs: " + Element(Dial.Start) + " against " + Element(result.selected_destination) + "." // owner (worksheet section 12)
                 : InModalities ? "Yes, " + SignName(result.selected_destination) + " is " + ModalityName(result.selected_destination).ToLowerInvariant() + ", just as " + SignName(Dial.Start) + " is." // owner (worksheet section 10)
-                : "Yes. " + SignName(result.selected_destination) + " is " + Zodiac.Article(Element(result.selected_destination)) + " " + Element(result.selected_destination) + " sign, like your sun sign.") + "\n" +
+                : "Yes. " + SignName(result.selected_destination) + " is " + Zodiac.Article(Element(result.selected_destination)) + " " + Element(result.selected_destination) + " sign" + (SunKnown ? ", like your sun sign" : Element(result.selected_destination) == Element(Sun) ? ", like " + SignName(Sun) : "") + ".") + "\n" + // no sun (Oct 7): the start named only where it is true
             (result.evidence_eligible ? (InOppositeProblem || InModalities ? "You found that one on your own, acolyte." : "You found that one on your own.") : "We found that one together.");
         public void AfterCorrect(DialEvent result)
         {
