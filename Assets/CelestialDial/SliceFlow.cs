@@ -158,7 +158,7 @@ namespace Ascendant.CelestialDial
         public int BirthYear => Facts.Year; public int BirthMonth => Facts.Month; public int BirthDay => Facts.Day;
         public int BirthMinute => Facts.Minute;   // minutes after local midnight; -1 unknown
         public Place BirthPlace => Facts.AsPlace;
-        public string BirthStep { get; private set; } = ""; // the chart path: date, time, place (cusp on a cusp day); the skip path: sun-pick; on "Your Birth" also rising-pick; then done
+        public string BirthStep { get; private set; } = ""; // the chart path: date, time, place, then whatever the facts can't settle (cusp, moon, rising-pick); the skip path: sun-pick, moon-pick, rising-pick; then done
         public bool BirthDone => BirthStep == "done";
         public bool HasBirthRecord => BirthDone || Amending; // a record exists (and is unchanged) while "Your Birth" has the opening's boxes open
         public bool Amending { get; private set; }          // on the birth screen from "Your Birth": adding a missing fact, or choosing the rising
@@ -576,9 +576,9 @@ namespace Ascendant.CelestialDial
         {
             if (!CanOpenJournal) return false;
             JournalFrom = Screen;
-            if (!JournalTitled) { JournalAt = JournalView.Title; JournalTitled = true; }
+            if (!JournalTitled) { JournalAt = JournalView.Title; JournalTitled = true; titledThisVisit = true; }
             else if (!journalLanded || JournalAt == JournalView.Title) JournalAt = JournalView.Landing;
-            if (JournalAt == JournalView.Landing) journalLanded = true;
+            if (JournalAt == JournalView.Landing) Landed();
             if (!JournalLenses.Contains(Lens)) Lens = JournalLens.Element; if (!CanJournalTable) JournalTableView = false;
             Screen = SliceScreen.Journal; Logged?.Invoke("journal_opened"); return true;
         }
@@ -603,7 +603,57 @@ namespace Ascendant.CelestialDial
         // The Keys collected and the Books opened, one line (Oct 1, 1d): a Book counts once all its locks are filled.
         public string KeysLine => Keys + (Keys == 1 ? " Key" : " Keys") + (BooksOpen > 0 ? " \u00b7 " + BooksOpen + (BooksOpen == 1 ? " Book" : " Books") : "");
         public bool CanJournalLand => AtJournal && JournalAt == JournalView.Title;
-        public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; journalLanded = true; Logged?.Invoke("journal_landing"); return true; }
+        public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; Landed(); Logged?.Invoke("journal_landing"); return true; }
+        void Landed() { if (journalLanded) return; journalLanded = true; PickInscription(); } // the first landing of a visit picks the line (1b C), and it holds for the visit
+        // The living inscription (owner, Oct 7: approved as scoped, all drafts; 86bceba0a). The first-ever open writes the Oct 2 line above;
+        // every later visit's first landing picks a line from the groups unlocked so far (Resources/Journal/inscriptions.json):
+        // - a group that has just unlocked goes first, once: the Wing's line on the first landing after the Wing turns whole, else a Key line
+        //   on the first after the Key count rises;
+        // - else, 3 sittings or more since the last landing (AbsenceSittings), an absence line. The owner, Oct 7: no clock; "trigger off
+        //   sittings, the same way the review ladder already counts them". 3 matches the ladder's first step, a working choice;
+        // - else any unlocked line but the absence lines.
+        // It never repeats the last line shown, nor one of the last five while others remain. A line that would take a fourth line on the
+        // record for this player's name sits out (InscriptionFits, which the view measures). Nothing on screen counts sittings.
+        public const string FirstLineId = "first";
+        public const int AbsenceSittings = 3, RecentLines = 5, InscriptionMostLines = 3;
+        public string InscriptionId { get; private set; } = "";
+        public string InscriptionGroup { get; private set; } = "";
+        public string InscriptionText { get; private set; } = ""; // the words as written, the name and the sun filled in; "" before the landing
+        public Func<string, bool> InscriptionFits = text => true;  // the view: three lines at the record's width
+        bool titledThisVisit;
+        string[] recentLines = new string[0];
+        int keysAtLanding = -1, sittingsAtLanding = -1; bool wingAtLanding; // -1: no landing recorded yet (an older save, or the first-ever open)
+        Random inscriptionDice = new Random();
+        public void SeedInscription(int seed) { inscriptionDice = new Random(seed); }
+        public string FillInscription(string text)
+        {
+            text = text.Replace("{name}", DisplayName);
+            if (!HasSunSign) return text;
+            var sun = Zodiac.Seats[SunSign];
+            return text.Replace("{sun}", sun.Name).Replace("{element}", sun.Element).Replace("{modality}", sun.Modality).Replace("{opposite}", Zodiac.Seats[Zodiac.Opposite(SunSign)].Name);
+        }
+        public bool InscriptionUnlocked(InscriptionLine line) => Learned(line.unlock) && (line.group != "sun" || HasSunSign); // an older save with no sun has no sun lines
+        void PickInscription()
+        {
+            if (titledThisVisit) { InscriptionId = FirstLineId; InscriptionGroup = "first"; InscriptionText = Inscription(DisplayName); }
+            else
+            {
+                bool counted = keysAtLanding >= 0; // an older save's first landing starts the count, so nothing is announced as new that might not be
+                string lead = counted && WingWhole && !wingAtLanding ? "wing" : counted && Keys > keysAtLanding && Keys >= 1 ? "key" : sittingsAtLanding >= 0 && Sittings - sittingsAtLanding >= AbsenceSittings ? "absence" : "";
+                var open = InscriptionBook.Data.lines.Where(l => InscriptionUnlocked(l) && InscriptionFits(FillInscription(l.text))).ToList();
+                var pool = open.Where(l => l.group == lead).ToList();
+                if (pool.Count == 0) pool = open.Where(l => l.group != "absence").ToList();
+                var fresh = pool.Where(l => !recentLines.Contains(l.id)).ToList();
+                if (fresh.Count == 0) fresh = pool.Where(l => recentLines.Length == 0 || l.id != recentLines[recentLines.Length - 1]).ToList();
+                if (fresh.Count == 0) fresh = pool;
+                if (fresh.Count == 0) { InscriptionId = FirstLineId; InscriptionGroup = "first"; InscriptionText = Inscription(DisplayName); } // no data file: the Oct 2 line
+                else { var line = fresh[inscriptionDice.Next(fresh.Count)]; InscriptionId = line.id; InscriptionGroup = line.group; InscriptionText = FillInscription(line.text); }
+            }
+            if (InscriptionId != FirstLineId) recentLines = recentLines.Concat(new[] { InscriptionId }).Skip(Math.Max(0, recentLines.Length + 1 - RecentLines)).ToArray();
+            keysAtLanding = Keys; wingAtLanding = WingWhole; sittingsAtLanding = Sittings;
+            Logged?.Invoke("inscription:" + InscriptionId);
+        }
+        public IReadOnlyList<string> RecentInscriptions => recentLines;
         public bool CanJournalContents => AtJournal && (JournalAt == JournalView.Landing || JournalAt == JournalView.Wheel || JournalAt == JournalView.Map);
         public bool JournalToContents() { if (!CanJournalContents) return false; JournalAt = JournalView.Contents; Logged?.Invoke("journal_contents"); return true; }
         public bool CanJournalHome => AtJournal && (JournalAt == JournalView.Contents || JournalAt == JournalView.Practice || JournalAt == JournalView.Birth); // "‹ Your Journal" on Contents, on Practice's list and on "Your Birth"
@@ -620,9 +670,10 @@ namespace Ascendant.CelestialDial
         // in a fresh order, the choices shuffled; an answer shows right or wrong and its why, then Next; the round ends with the journal's line
         // and Back to Practice; "‹ Practice" leaves at any time. No score, streaks or spaced review: none of it is saved and the deck is untouched.
         public const string PracticeTitle = "Practice", PracticeDoorLine = "What you know", BackToPractice = "\u2039 Practice", QuizNextWords = "Next", QuizBackWords = "Back to Practice"; // the board's words, Claude's drafts (owner, Oct 3: rewritten or approved before they ship); the door's count is removed, and its line is a draft beside Contents' "Every chapter"
-        public bool ConceptLearned(PracticeConcept concept)
+        public bool ConceptLearned(PracticeConcept concept) => concept.unlock != "" && Learned(concept.unlock);
+        public bool Learned(string unlock) // the lessons' order, shared by Practice and the inscription: "" is open from the start
         {
-            switch (concept.unlock) { case "key1": return Keys >= 1; case "key2": return Keys >= 2; case "modalities": return ModalitiesComplete; case "key3": return Keys >= 3; case "key4": return Keys >= 4; default: return false; }
+            switch (unlock) { case "": return true; case "key1": return Keys >= 1; case "key2": return Keys >= 2; case "modalities": return ModalitiesComplete; case "key3": return Keys >= 3; case "key4": return Keys >= 4; case "wing": return WingWhole; default: return false; }
         }
         public List<PracticeConcept> PracticeConcepts => PracticeBook.Data.concepts.Where(ConceptLearned).ToList();
         public bool CanJournalPractice => AtJournal && JournalAt == JournalView.Landing && PracticeConcepts.Count > 0;
@@ -866,7 +917,8 @@ namespace Ascendant.CelestialDial
             var save = new SaveData { playerName = PlayerName, lit = (bool[])lit.Clone(), kin = (bool[])kin.Clone(), keyEarned = keyEarned, litMod = litMod != null ? (bool[])litMod.Clone() : new bool[12], kinMod = kinMod != null ? (bool[])kinMod.Clone() : new bool[3], modalitiesStarted = ModalitiesStarted,
                 gridPlaced = gridPlaced != null ? (bool[])gridPlaced.Clone() : new bool[12], gridEvidence = gridEvidence, gridStarted = GridStarted,
                 polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
-                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings };
+                wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings,
+                inscriptionsRecent = recentLines.ToArray(), inscriptionKeys = keysAtLanding, inscriptionWing = wingAtLanding, inscriptionSittings = sittingsAtLanding };
             WriteBirth(save); return save;
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
@@ -881,6 +933,7 @@ namespace Ascendant.CelestialDial
             ModalitiesComplete = save.litMod != null && save.litMod.Length == 12 && save.litMod.All(v => v); GridStarted = save.gridStarted || save.keys >= 3;
             OppositesStarted = save.oppositesStarted || save.polarityShown || save.keys >= 4;
             if (save.deck != null) foreach (var d in save.deck) if (d.seat >= 0 && d.seat < 12 && d.kind >= 0 && d.kind < ReviewDeck.Kinds) { var i = Deck.Item(d.seat, (ItemKind)d.kind); i.state = d.state; i.streak = d.streak; i.interval = d.interval; i.dueDay = d.dueDay; i.entered = d.entered; }
+            recentLines = (save.inscriptionsRecent ?? new string[0]).Where(id => !string.IsNullOrEmpty(id)).ToArray(); keysAtLanding = save.inscriptionKeys; wingAtLanding = save.inscriptionWing; sittingsAtLanding = save.inscriptionSittings; // the inscription's history (Oct 7); an older save has none
             Screen = SliceScreen.Hub; Walk.Enter(Room.Atrium, "entry"); Logged?.Invoke("session_resumed"); return true;
         }
     }

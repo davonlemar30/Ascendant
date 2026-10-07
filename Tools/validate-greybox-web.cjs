@@ -260,7 +260,9 @@ const path=require('path');
     { const j=await state(),k=j.journalKeeper||[],name=j.playerName,line="What's up, "+name+". I'm your journal, and I'll keep a record of what you learn from the Library.";
       check(k.length===6 && k[0]==='KEEPER' && k[1]==='1 Key' && k[2]==='\u2609 Taurus \u00b7 \u263d Cancer \u00b7 \u2191 Leo' && k[3]==="What's up, "+name+"." && k[4]==="I'm your journal, and I'll keep a record" && k[5]==="of what you learn from the Library." && k.slice(3).join(' ')===line && j.journalScriptFont==='EBGaramond-Italic','the landing\'s Keeper\'s record: KEEPER, '+k[1]+', '+k[2]+' (the sun as given), and the owner\'s inscription with the saved name ('+k.slice(3).join(' / ')+') at '+viewport.width);
       check(j.journalDoors.length===8 && j.canJournalPractice && j.canJournalContents && j.caspar.includes('Contents: every chapter.') && !j.caspar.includes('not open yet'),'two doors: Practice (it opens Practice, owner Oct 3) and Contents, at '+viewport.width); }
-    await page.waitForTimeout(700); // the fade has settled
+    { const j=await state(); check(j.inscriptionId==='first' && j.inscriptionWriting && j.canJournalPractice,'the living inscription (Oct 7): the Oct 2 line writes itself as the title page finishes fading, and the doors work while it writes, at '+viewport.width); }
+    await page.waitForFunction(()=>!window.ascendantDial.snapshot().inscriptionWriting,{},{timeout:8000}); // a line takes 2 to 3.5 s
+    await page.waitForTimeout(300); // the fade has settled
     await page.screenshot({path:path.join(out,viewport.width+'-journal-landing.png')});
     // the inscription really draws in the Web build, in the new italic (a font can draw blank on the Web: the symbols, Sept 12): count the light ink on its lines
     { const scale=Math.min(viewport.width/360,viewport.height/800),ox=viewport.width/2,oy=(viewport.height-800*scale)/2;
@@ -964,6 +966,43 @@ const path=require('path');
     { const s=await snap(),r=JSON.parse(s.birthRecord||'{}'); check(s.journalKeeper[2].startsWith('☉ Taurus · ☽ ') && s.journalKeeper[2].includes(' or ') && s.journalKeeper[2].endsWith('↑ unknown') && r.birth.date==='1990-04-20' && r.choices.some(c=>c.point==='sun'&&c.how==='picked'),'an old chart-path save moves its facts over and works the chart out again, the cusp\'s pick kept: '+s.journalKeeper[2]+' at '+viewport.width); }
     check(birthErrors.length===0,'Oct 7: no runtime exceptions through "Your Birth" and the conversions at '+viewport.width+(birthErrors.length?': '+birthErrors[0]:''));
     await birthContext.close();
+  }));
+  // ---- the living inscription (owner, Oct 7: approved as scoped, all drafts; 86bceba0a): a new line on each visit after the first, written
+  // in ink; a tap on the page finishes it; it holds for the visit; Reduced motion shows it whole ----
+  await Promise.all(VIEWPORTS.map(async viewport=>{
+    const inkContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
+    const ip=await inkContext.newPage();const inkErrors=[];ip.on('pageerror',e=>inkErrors.push(e.message));ip.on('console',m=>{if(m.type()==='error'&&/Exception/.test(m.text()))inkErrors.push(m.text());});
+    const snap=()=>ip.evaluate(()=>window.ascendantDial.snapshot());const act=async id=>ip.locator('#'+id).evaluate(b=>b.click());const send=c=>ip.evaluate(k=>window.ascendantDial.act(k),c);
+    const frames=n=>ip.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
+    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await ip.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await ip.mouse.down();await frames(2);await ip.mouse.up();await frames(2);};
+    const until=(f,t=15000)=>ip.waitForFunction(f,{},{timeout:t});
+    const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);
+    const visit=async()=>{await send('reload');await ip.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();};
+    const landing=async()=>{await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,8000);};
+    const inscription=s=>(s.journalKeeper||[]).slice(3);
+    await ip.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await ip.locator('#loading').waitFor({state:'detached'});
+    await ip.locator('#name').fill('Tester');await ip.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
+    await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');
+    await act('birth-skip');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await until(()=>window.ascendantDial.snapshot().birthStep==='moon-pick');await act('sign-3');await until(()=>window.ascendantDial.snapshot().birthStep==='rising-pick');await act('sign-4');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
+    await act('jump-key1');await resumed();
+    await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().inscriptionWriting,10000);
+    { const s=await snap(); check(s.inscriptionId==='first' && inscription(s).join(' ')==="What's up, Tester. I'm your journal, and I'll keep a record of what you learn from the Library.",'a fresh save\'s first-ever open writes the Oct 2 line, word for word, at '+viewport.width); }
+    // the next visit: a line from the groups unlocked so far, written letter by letter; a tap on the page finishes it
+    await visit();await landing();
+    const second=await snap(), secondLine=inscription(second).join(' ');
+    check(second.inscriptionId!=='first' && ['any','key','sun'].includes(second.inscriptionGroup) && second.inscriptionWriting && inscription(second).length>=1 && inscription(second).length<=3 && !/[0-9]/.test(secondLine) && !secondLine.includes('{') && second.inscriptionRecent.join()===second.inscriptionId && second.caspar.includes(secondLine),
+      'the next visit lands on a new line ('+second.inscriptionId+': '+secondLine+'), three lines at most, no number; the screen reader hears it whole while it writes, at '+viewport.width);
+    await ip.screenshot({path:path.join(out,viewport.width+'-inscription-writing.png')});
+    await tap(-150,700); // the page's margin, clear of the doors
+    { const s=await snap(); check(!s.inscriptionWriting && s.journalView==='landing' && inscription(s).join(' ')===secondLine,'a tap on the page finishes the line at once, at '+viewport.width); }
+    await ip.screenshot({path:path.join(out,viewport.width+'-inscription-written.png')});
+    await act('journal-contents');await until(()=>window.ascendantDial.snapshot().journalView==='contents');await act('journal-landing');await until(()=>window.ascendantDial.snapshot().journalView==='landing');
+    { const s=await snap(); check(s.inscriptionId===second.inscriptionId && !s.inscriptionWriting && s.inscriptionRecent.length===1,'back from Contents the same line shows, already written; the line holds for the visit, at '+viewport.width); }
+    // another visit, with Reduced motion: a different line, shown whole at once
+    await visit();await send('motion-on');await landing();
+    { const s=await snap(); check(s.inscriptionId!==second.inscriptionId && s.inscriptionId!=='first' && !s.inscriptionWriting && inscription(s).length>=1 && s.inscriptionRecent.join()===second.inscriptionId+','+s.inscriptionId,'the visit after brings a different line ('+s.inscriptionId+'); with Reduced motion it shows whole at once, at '+viewport.width); }
+    check(inkErrors.length===0,'Oct 7: no runtime exceptions through the inscription\'s visits at '+viewport.width+(inkErrors.length?': '+inkErrors[0]:''));
+    await inkContext.close();
   }));
   // ---- Build E: the test set from the URL at both viewports (the opening and the Dial), the cues, the style page on both sets ----
   const base=process.env.GREYBOX_URL || 'http://127.0.0.1:8000';const withQuery=q=>base+(base.includes('?')?'&':'?')+q;

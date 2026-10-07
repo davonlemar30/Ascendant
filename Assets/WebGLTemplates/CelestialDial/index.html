@@ -107,7 +107,7 @@
     box('birthtime',0,338,200,48);box('use-time',0,420,200,52);box('time-unknown',0,482,260,52);box('birthplace',0,338,260,48);for(let i=0;i<4;i++)box('place-match-'+i,0,422+i*44,300,42);// batch 2; Oct 7: the matches 10 lower and 44 apart (SliceView.PlaceMatchTop, PlaceMatchStep)
     box('place-unknown',0,600,260,44);box('birth-cancel',0,250,200,48); // Oct 7: under the matches (SliceView.PlaceUnknownY); back to "Your Birth" where Change my answer sits
     box('cusp-0',0,400,300,44);box('cusp-1',0,452,300,44);box('cusp-why',0,546,96,44); // the cusp question's answers and its Why?
-    {const n=((state&&state.moonOptions)||[]).length;for(let i=0;i<3;i++)box('moon-'+i,0,400+i*52,300,44);} // Oct 7: the Moon's options (two, rarely three)
+    for(let i=0;i<3;i++)box('moon-'+i,0,400+i*52,300,44); // Oct 7: the Moon's options (two, rarely three)
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
     box('enter-wing',-78,624,150,52);box('enter-chamber',78,624,150,52);box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);box('leave-chamber',0,714,300,48);
     box('leave-dial',0,768,216,44);{const g=(state&&state.gearAt)||[158,22+(state&&state.safeTop||0)];box('settings',g[0],g[1],44,44);}box('leave-wing',0,680,300,52); // note 10: the Dial's exit and the room's are two buttons; Platform fit, Part 1: the gear sits below the safe area's top band (state.safeTop)
