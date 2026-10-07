@@ -2,6 +2,30 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The birth record: facts, choices and the worked-out chart; "Your Birth" (task 86bceb6fq, Oct 7)
+
+The owner's birth-time design (Oct 7): the game never invents a birth time, a place or a sun. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #123's body and comments.
+
+- **The save** (version 5): `BirthFacts`, `ChoiceRecord`, `WorkedChart`; version 4 saves convert once (chart, known, chosen and pre-#110 paths); the record reads worked out over chosen over unknown.
+- **The maths** works over a UT window; no time means the local day, no place means every zone in the table, and no rising without an exact time and a place.
+- **The opening, "Your Birth", the Dial's no-sun lines** and the DEV jumps are as the build log says. The test-only command `jump-birth:v4-*` writes an old save from each path.
+
+**Checks**
+- Mechanical (+37, 696 against 659): the save's round trip and conversions, the window maths, the opening's two answers, the Moon pick, "Your Birth" and its change lines, and Jeffrey's B1 case (a cusp pick, then "‹ Your Journal" at the Moon's question, leaves the record unchanged).
+- Fixture (+10, 281 against 271) and suite (+33, 657 against 624).
+
+Validation (local, Unity 6000.3.24f1, final head `12e699d`):
+- mechanical checks 696/696, 0 compiler errors or warnings;
+- slice fixture 281/281, no runtime errors;
+- headless WebGL 0 errors and 0 warnings (36.2 MB);
+- browser suite 657/657 at desktop density and 657/657 at phone density (`DEVICE_SCALE=2 MOBILE=1`);
+- GitHub Actions Web build green on `12e699d`;
+- production, after the Pages deploy: 657/657 at phone density against https://davonlemar30.github.io/Ascendant/.
+
+Reviews: Dante's two edits applied (`579dfdc`); Jeffrey's B1 fixed, B2 waived by the owner, B3 closed by the validation record above. Not tested: the per-path DEV samples (not built).
+
+Merged as PR #123 (main `cdb4170`, Oct 7); the head is `12e699d`.
+
 ## The Moon on a day it changed sign: "Pisces or Aries" (the canon flags, Oct 3)
 
 The owner's ruling (Oct 3, comment 90140263873037 on 86bcbn6w6, the canon flags): "Upgrade to option A for the Moon: on a day the Moon changed sign and the birth time is unknown, the record shows both signs instead of 'unknown', e.g. '☽ Pisces or Aries', the way astrologers write it. The rising stays '↑ unknown'. A sun-only save is unchanged."

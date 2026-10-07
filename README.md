@@ -16,7 +16,7 @@ The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zod
 
 ## Your journey through the Wing
 
-1. **Wake up.** Give your name, then when and where you were born: the date, the time (or say you don't know it) and your town or city. The game works out your sun, moon and rising signs from them, and shows "unknown" for any sign it can't know. If you don't know your birth time and the Moon changed sign that day, it shows both, like "Pisces or Aries". If the Sun changed sign on the day you were born and you don't know your birth time, it asks which sign you go by. You can also tell it the signs you already know, or say you don't know and it picks a sun sign for you. Everything Caspar teaches starts from *your* sign.
+1. **Wake up.** Give your name, then when and where you were born: the date, the time (or say you don't know it) and your town or city. The game works out your sun, moon and rising signs from them, and shows "unknown" for any sign it can't know. If you don't know your birth time and the Moon changed sign that day, it shows both, like "Pisces or Aries". If the Sun changed sign on the day you were born and you don't know your birth time, it asks which sign you go by. If you'd rather skip it, it asks which sign you go by, and if you aren't sure, the lessons start from Aries. The game never makes up a birth time, a place or a sun sign. Later, tapping the Big Three line in your journal opens "Your Birth", where you can add what's missing or choose a rising sign. Everything Caspar teaches starts from *your* sign.
 2. **The Grand Atrium.** Dust, covered furniture, sealed doors, one weak candle. Every Key you spend in the Chamber wakes it one more step.
 3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Fine lines of light join each element's three seats; the family you are learning glows in its element's colour, and when the whole wheel is lit, all four burn for a moment. Your first **Keeper Key** rises out of it.
 4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. Spend your Key on the first lock and the Library takes her first breath.
@@ -56,7 +56,7 @@ Your progress saves in your browser the moment anything changes. Come back later
 
 - The book on the shelf, getting the same treatment as the rest of the Wing.
 - A journal inscription that writes itself and changes between visits. It's approved and not built yet.
-- A settled plan for players who don't know their birth time, covering the rising sign and everything later that needs it. It waits on the owner.
+- No unknown Big Three: every missing sign is picked at the opening, so no sign stays unknown. The birth-time record shipped (the opening's two answers, "Your Birth" in the journal); this follows it.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in; the work is on hold until the owner says.
 - Caspar's last few lines, around practice and the journal.
 - Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.
