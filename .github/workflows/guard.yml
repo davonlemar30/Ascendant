@@ -3,20 +3,26 @@
 # owner's account opened it from a branch in this repository. Once the owner's branch ruleset on main
 # lists this check as required, nothing that fails it can merge.
 #
-# The protected files, at any depth: .claude/, CLAUDE.md, CLAUDE.local.md, AGENTS.md (Claude and Codex
-# both read nested copies); at the root: .github/ and .mcp.json.
+# The protected files, at any depth: .claude (a folder, or anything else by that name), CLAUDE.md,
+# CLAUDE.local.md, AGENTS.md (Claude and Codex both read nested copies); at the root: .github/ and
+# .mcp.json.
 #
-# pull_request_target runs this file as it is on the default branch, so a pull request can't edit the
-# guard to pass it. It never checks out or runs the pull request's code: it only reads the list of
-# changed files. It runs for pull requests into any branch, so an outside change can't reach main by
-# way of one of the owner's feature branches.
+# Why pull_request and not pull_request_target (Jeffrey, #126 B3): GitHub blocks pull_request_target
+# in public repositories from Nov 2, 2026 unless an event policy allows it, and a required check that
+# never runs would stall every merge. On pull_request, a fork's run waits for the owner's approval
+# (Settings → Actions → "Require approval for all external contributors"), so until he approves, the
+# required check never reports and the pull request can't merge. A fork could edit this file, so the
+# rule is: never approve a fork's run on a pull request that touches .github/.
+#
+# It never checks out or runs the pull request's code: it only reads the list of changed files, with
+# a read-only token.
 #
 # The trust test is the account, not the person. It assumes davonlemar30 is the only account that can
 # push here. Adding a collaborator, or a GitHub App with write access, means revisiting this check.
 name: Guard
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, synchronize, reopened, edited]
 
 permissions:
@@ -35,6 +41,7 @@ jobs:
           AUTHOR: ${{ github.event.pull_request.user.login }}
           OWNER: ${{ github.repository_owner }}
           HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
           CHANGED: ${{ github.event.pull_request.changed_files }}
@@ -42,17 +49,22 @@ jobs:
           set -euo pipefail
           trusted=no
           if [ "$AUTHOR" = "$OWNER" ] && [ "$HEAD_REPO" = "$REPO" ]; then trusted=yes; fi
+          # one listing, then confirm it was read from the head this run is for (Jeffrey, #126 N10)
+          list=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | "F " + .filename, (.previous_filename // empty | "P " + .)')
+          now=$(gh api "repos/$REPO/pulls/$PR" --jq '.head.sha')
+          if [ "$now" != "$HEAD_SHA" ] && [ "$trusted" != yes ]; then
+            echo "::error::The pull request moved while the guard read it. The run for its new head checks it."
+            exit 1
+          fi
           # GitHub lists at most 3,000 files. A list that comes back short can't be checked, so it fails
           # unless the owner opened the pull request (Jeffrey, #126 B1).
-          names=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
-          listed=$(printf '%s\n' "$names" | grep -c . || true)
+          listed=$(printf '%s\n' "$list" | grep -c '^F ' || true)
           if [ "$listed" != "$CHANGED" ] && [ "$trusted" != yes ]; then
             echo "::error::GitHub listed $listed of this pull request's $CHANGED changed files, so the guard can't check them all."
             exit 1
           fi
           # renames count from both ends; the match ignores case, since macOS checkouts do
-          files=$(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[] | .filename, (.previous_filename // empty)')
-          hits=$(printf '%s\n' "$files" | grep -iE '(^|/)\.claude/|(^|/)(agents|claude|claude\.local)\.md$|^\.github/|^\.mcp\.json$' || true)
+          hits=$(printf '%s\n' "$list" | cut -c3- | grep -iE '(^|/)\.claude(/|$)|(^|/)(agents|claude|claude\.local)\.md$|^\.github/|^\.mcp\.json$' || true)
           if [ -z "$hits" ]; then
             echo "No agent or automation files changed."
             exit 0
