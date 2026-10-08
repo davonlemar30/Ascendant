@@ -83,8 +83,11 @@ namespace Ascendant.CelestialDial
         int goldSeat = -1, dragSeat = -1, hoverCell = -1; bool gridPlates;
         public const float GoldSeconds = .5f, LiftScale = 1.06f;
         public static readonly Color BurnedInk = new Color(.23f, .14f, .09f);
-        // a live name's colour: its element's, deep enough to read on gold and on wood (Build S's hues, darkened)
+        // a live name's colour: its element's (Build S's hues, darkened), deep enough to read: 4.5:1 or better on the gold plate, and on the darker
+        // wood as legible as the burned-in lettering beside it (about 2.5:1; even black reaches only 3.6:1 there), measured from the plate art
         public static Color DeepElement(int seat) { switch (Zodiac.Seats[Zodiac.Wrap(seat)].Element) { case "Fire": return new Color(.62f, .16f, .07f); case "Earth": return new Color(.19f, .36f, .12f); case "Air": return new Color(.42f, .30f, .08f); default: return new Color(.08f, .24f, .48f); } }
+        public const float LiveOnGold = .8f, LiveOnWood = .5f;
+        public static Color LiveName(int seat, bool gold) { var c = DeepElement(seat) * (gold ? LiveOnGold : LiveOnWood); c.a = 1; return c; }
         public static string LetterSlot(int seat) => "letter-" + Zodiac.Seats[Zodiac.Wrap(seat)].Element.ToLowerInvariant();
         public static Vector2 LetterDrift(int seat) { switch (Zodiac.Seats[Zodiac.Wrap(seat)].Element) { case "Fire": return new Vector2(0, .25f); case "Water": return new Vector2(.18f, 0); case "Air": return new Vector2(.12f, .06f); default: return Vector2.zero; } }
         // a placed sign is the player's own when the deck holds it as practising (Level 0/1 at the Seal), as the journal reads it
@@ -1461,7 +1464,7 @@ namespace Ascendant.CelestialDial
                 gridCellNames[i].material = null; gridCellGlyphs[i].material = live ? gridCellGlyphLive[i] : null; // the symbol takes its element's material; the name, its element's deep colour, crisp at its size
                 foreach (var label in new[] { gridCellNames[i], gridCellGlyphs[i] }) { var line = label.GetComponent<Outline>(); if (line != null) line.enabled = live && label == gridCellGlyphs[i]; }
                 gridCellGlyphs[i].color = live && gridCellGlyphLive[i] != null ? Color.white : BurnedInk;
-                gridCellNames[i].color = live ? DeepElement(seat) : i == g.Rejected && !shows ? Bone : BurnedInk;
+                gridCellNames[i].color = live ? LiveName(seat, gold) : i == g.Rejected && !shows ? Bone : BurnedInk;
                 var drift = ReducedMotion ? Vector2.zero : LetterDrift(seat); if (gridCellNameLive[i] != null) { gridCellNameLive[i].SetVector("_Drift", drift); gridCellGlyphLive[i].SetVector("_Drift", drift); }
             }
             gridSeal.interactable = active && g.CanSeal;
