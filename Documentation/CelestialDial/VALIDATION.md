@@ -20,9 +20,9 @@ Validation (local, Unity 6000.3.24f1, final head `c1d9dac`):
 - headless WebGL 0 errors and 0 warnings;
 - browser suite 689/689 at desktop density and 689/689 at phone density;
 - GitHub Actions Web build green;
-- production: still to come (the network was slow; Claude posts the number on the task after the Pages deploy).
+- production: still to come (the check is in progress; Claude posts the number on the task).
 
-Captures on the task: the eye at Key 1 before and after, and Key 2 for comparison (the first after-capture shows the too-wide band Jeffrey caught). Reviews: Jeffrey's B1 (the lifted opening covers the eye only) fixed; N1 (a swallowed statement restored), N2 (stale comments) and N3 (Chamber checks) applied; N5 as above. Not tested: the doorway glow on a real phone. Open tidy-up: a whitespace-only line at `index.html:175`, left in to keep the reviewed head.
+Captures on the task: the eye at Key 1 before and after, and Key 2 for comparison (the first after-capture shows the too-wide band Jeffrey caught). Reviews: Jeffrey's B1 (the lifted opening covers the eye only) fixed; N1 (a swallowed statement restored), N2 (stale comments) and N3 (Chamber checks) applied; N5 as above; N4 (no capture of the doorway glow) was accepted, since the glow is not tested on a phone; N6 (wording slips) closed. Not tested: the doorway glow on a real phone. Open tidy-up: a whitespace-only line at `index.html:175`, left in to keep the reviewed head.
 
 Merged as PR #131 (main `fcbaa9d`, Oct 7); the head is `c1d9dac`.
 
