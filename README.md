@@ -54,7 +54,7 @@ Your progress saves in your browser the moment anything changes. Come back later
 
 ## What's next
 
-- An art pass: the Book of Symbols and the Elemental Table get their art, the doors in all three rooms (the Atrium, the Wing and the Chamber) are tapped instead of using buttons, and the Dial's eye at Key 1 is fixed. The book on the shelf gets the same treatment as the rest of the Wing.
+- The Elemental Table and the Book of Symbols coming alive: the Table's squares become carved wells with wooden plates you drag or tap into place, the Book's questions rise out of the open book, and sign names are lettered in their element. Concept boards come first.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in; the work is on hold until the owner says.
 - Caspar's last few lines, around practice and the journal.
 - Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.

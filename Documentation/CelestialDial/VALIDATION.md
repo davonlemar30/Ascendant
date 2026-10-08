@@ -2,6 +2,30 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Art pass: the Dial's eye at Key 1, and tap the doors (task 86bcex5kc, Oct 7)
+
+The owner's Oct 3 playtest notes 2 to 6, answered "all recommended" (Oct 7). What shipped is in the [build log](../README.md); this is the validation record, taken from PR #131's body and comments. The Book and the Table art were split out (task 86bcf0x71) and are not in this build.
+
+- **The eye:** the cause was found by capture. At Key 1 two dial layers show, with their eyes about 8 px apart. Showing the Key 1 look in a Key 2 room (less dust) still read half-shut, which ruled the dust out. The worn eye's opening is drawn above the half layer, 0.42 of the Dial's width by 0.14 of its height, with soft 6 px and 4 px edges, measured from where the worn file's open and closed art differ (0.37 by 0.11).
+- **The doors:** the travel buttons are removed in all three rooms; their hidden screen-reader copies go with them; the first keyboard focus is the Wing's door. The doorway glows reuse the Atrium doors' values (about 15 levels of change at the peak against the Wing's lighter stone).
+
+**Checks**
+- Mechanical (+1, 721 against 720): the title page closed mid-beat shows again, then lands on the Oct 2 line (Jeffrey's #131 N5).
+- Fixture 286/286, unchanged from main.
+- Suite (+4, 689 against 685): the Atrium on the opening walk has no Zodiac Wing button and its door is a tap target; the Wing has no "Return to the Atrium"; the Chamber has no "Return to the Atrium", and from Stage 2 the Atrium has no Wing or Chamber button, with both doors taking the tap (Jeffrey's #131 N3). Every room trip in the suite now goes through the doors' own buttons.
+
+Validation (local, Unity 6000.3.24f1, final head `c1d9dac`):
+- mechanical checks 721/721, 0 compiler errors;
+- slice fixture 286/286, no runtime errors (from a rerun after a Unity startup hang);
+- headless WebGL 0 errors and 0 warnings;
+- browser suite 689/689 at desktop density and 689/689 at phone density;
+- GitHub Actions Web build green;
+- production: still to come (the check is in progress; Claude posts the number on the task).
+
+Captures on the task: the eye at Key 1 before and after, and Key 2 for comparison (the first after-capture shows the too-wide band Jeffrey caught). Reviews: Jeffrey's B1 (the lifted opening covers the eye only) fixed; N1 (a swallowed statement restored), N2 (stale comments) and N3 (Chamber checks) applied; N5 as above; N4 (no capture of the doorway glow) was accepted, since the glow is not tested on a phone; N6 (wording slips) closed. Not tested: the doorway glow on a real phone. Open tidy-up: a whitespace-only line at `index.html:175`, left in to keep the reviewed head.
+
+Merged as PR #131 (main `fcbaa9d`, Oct 7); the head is `c1d9dac`.
+
 ## The living inscription (task 86bceba0a, Oct 7)
 
 The owner approved it as scoped (Oct 7), with the clock option withdrawn. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #128's body and comments.
