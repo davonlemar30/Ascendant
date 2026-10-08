@@ -576,7 +576,7 @@ namespace Ascendant.CelestialDial
         {
             if (!CanOpenJournal) return false;
             JournalFrom = Screen;
-            if (!JournalTitled) { JournalAt = JournalView.Title; JournalTitled = true; titledThisVisit = true; }
+            if (!JournalTitled) { JournalAt = JournalView.Title; titledThisVisit = true; } // the title page counts as shown once it lands (Jeffrey, #128 N6): closed mid-beat, it shows again
             else if (!journalLanded || JournalAt == JournalView.Title) JournalAt = JournalView.Landing;
             if (JournalAt == JournalView.Landing) Landed();
             if (!JournalLenses.Contains(Lens)) Lens = JournalLens.Element; if (!CanJournalTable) JournalTableView = false;
@@ -603,7 +603,7 @@ namespace Ascendant.CelestialDial
         // The Keys collected and the Books opened, one line (Oct 1, 1d): a Book counts once all its locks are filled.
         public string KeysLine => Keys + (Keys == 1 ? " Key" : " Keys") + (BooksOpen > 0 ? " \u00b7 " + BooksOpen + (BooksOpen == 1 ? " Book" : " Books") : "");
         public bool CanJournalLand => AtJournal && JournalAt == JournalView.Title;
-        public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; Landed(); Logged?.Invoke("journal_landing"); return true; }
+        public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; JournalTitled = true; Landed(); Logged?.Invoke("journal_landing"); return true; }
         void Landed() { if (journalLanded) return; journalLanded = true; PickInscription(); } // the first landing of a visit picks the line (1b C), and it holds for the visit
         // The living inscription (owner, Oct 7: approved as scoped, all drafts; 86bceba0a). The first-ever open writes the Oct 2 line above;
         // every later visit's first landing picks a line from the groups unlocked so far (Resources/Journal/inscriptions.json):
