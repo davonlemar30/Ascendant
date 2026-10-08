@@ -2,6 +2,30 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The living inscription (task 86bceba0a, Oct 7)
+
+The owner approved it as scoped (Oct 7), with the clock option withdrawn. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #128's body and comments.
+
+- **The data:** `Resources/Journal/inscriptions.json`, 24 lines with stable ids, a group and an unlocking lesson, each marked a draft (8 any time, 4 Key, 3 Wing, 3 absence, 6 sun).
+- **The ink:** each letter fades over 0.15 s, 35 ms apart, with rests at commas and full stops; 2.0 to 3.5 s a line, starting 0.3 s after the landing shows. The first-ever open writes the Oct 2 line as the title page finishes fading.
+
+**Checks**
+- Mechanical (+22, 720 against 698): the data (24 lines, unique ids, groups, unlocks, drafts, no digit), every line filled and drawn for all twelve suns and at most three lines for a long name, the ink's timing, the first-ever open, a line held for the visit, thirty visits with no repeat of the last five, the Key and Wing lines first, absence at 3 sittings and never otherwise, an older save, no sun lines with no sun, a line that cannot fit sitting out, a name filled in last, and the tap layer ending above Close the journal.
+- Fixture (+2, 286 against 284): the Oct 2 line writes itself as the title page fades, with the doors working, then is written in full.
+- Suite (+20, 685 against 665): the first landing's Oct 2 line writing then written, a fresh save's first-ever open word for word, the next visit's new line written letter by letter with the screen reader's text whole, a tap on the margin finishing it, back from Contents keeping the same line, Reduced motion showing it whole, Close the journal tapped from the landing, and a reload in the middle of the first-ever title page.
+
+Validation (local, Unity 6000.3.24f1, final head `881bd80`):
+- mechanical checks 720/720, 0 compiler errors;
+- slice fixture 286/286, no runtime errors;
+- headless WebGL 0 errors and 0 warnings;
+- browser suite 685/685 at desktop density and 685/685 at phone density;
+- GitHub Actions Web build green;
+- production: still to come. Claude posts the number on the task after the Pages deploy.
+
+Reviews: Jeffrey's B1 (the tap layer ends above Close the journal) and B2 (the first-ever open saves after its title beat) fixed; N1 to N3 applied; N5 is this record and the pointers below; N6 is an open bug (closing the journal by hand during the first-ever title page, then quitting before reopening, loses the Oct 2 line), folded into the art pass (task 86bcex5kc). Dante's flags: the owner changed one line ("Some journals stay blank forever. I got lucky, [Name]." in place of "...Not me, [Name]. Not with you around.") and kept the other two. Not tested: a real absence between real sittings in a browser (the mechanical checks fake the count), a name with "<" on screen, a phone or the APK (no cut).
+
+Merged as PR #128 (main `9b94eea`, Oct 7); the head is `881bd80`. The inscription entries further down record the landing as of Oct 2: since #128 the line there is the first-ever open's only.
+
 ## No unknown Big Three: every missing sign picked at the opening (task 86bced0tc, Oct 7)
 
 The owner's ruling (Oct 7): no new game shows "unknown" in the Big Three. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #125's body and its validation comment.
