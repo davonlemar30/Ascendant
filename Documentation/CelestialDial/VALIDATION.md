@@ -18,7 +18,8 @@ Validation (local, Unity 6000.3.24f1):
 - final head `0d89910` (a comment-only change, Jeffrey's N2): mechanical 721/721, 0 errors, 0 warnings;
 - the superseded grey version `7cdb2bb`: the same ladder, all green (mechanical 721/721, fixture 286/286, suite 689/689 at both densities); production baseline on main `3a49339`, 689/689 at desktop;
 - GitHub Actions: "Build Web player" and "Guard agent files" green on `0d89910`;
-- production, after the Pages deploy of main `0dca10e`: to follow (Claude runs the suite at phone density and posts it on the task).
+- "Build Web player" and "Deploy to GitHub Pages" succeeded on main `0dca10e`; Pages served the new build at 14:22:38 GMT, Oct 8;
+- production, after that deploy: 689/689 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against https://davonlemar30.github.io/Ascendant/, main's own suite run from the scratchpad, 0 failures (Claude, comment 90140265991182 on 86bcf3paf).
 
 Reviews: Jeffrey, no BLOCKING. N1 (the swallowed-code check misses plain assignments) is a follow-up outside this brief; N2 applied; N3 is the PR's record; N4 squash merge. Not tested: the no-kit fallback, the only place the label's new grey shows (the shipped art has the kit, and `?art=test` fills every slot).
 
