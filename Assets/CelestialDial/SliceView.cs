@@ -1336,11 +1336,23 @@ namespace Ascendant.CelestialDial
         // ---- Build Z (owner, Sept 30): the Wing room's Dial rests with its eye closed, worn and restored alike, and opens it when the player taps the Dial.
         // The open art is identical to the closed piece outside the eye, so the opening is a mask at the eye that grows from the seam: the lids part.
         readonly List<(RectTransform box, float height)> dialEyes = new List<(RectTransform, float)>(); float dialEyeOpen;
+        CanvasGroup wornEyeAbove, wornEyeOf; RectTransform wornEyeBox; // the worn Dial's eye, drawn above the layers over it (owner's Oct 3 playtest, 86bcex5kc)
         public const float DialEyeSeconds = .35f; public const float DialEyeHold = .25f; SliceScreen shownScreen = SliceScreen.Identity; // Build AB: the open eye's beat; the screen last shown
         void BuildDialEyes()
         {
-            dialEyes.Clear(); var piece = wingKit.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;
-            AddDialEye(piece.Worn, "kit-dial-worn-open", .428f); AddDialEye(piece.Restored, "kit-dial-restored-open", .404f); // the eye's centre, as a share of the file's height (measured on the Cast Dial pieces, Build AC)
+            dialEyes.Clear(); wornEyeBox = null; wornEyeAbove = wornEyeOf = null; var piece = wingKit.FirstOrDefault(p => p.P.Name == "dial"); if (piece == null) return;
+            AddDialEye(piece.Worn, "kit-dial-worn-open", .428f); AddDialEye(piece.Restored, "kit-dial-restored-open", .404f);
+            // The owner's Oct 3 playtest (86bcex5kc): at Key 1 today's Dial sits at half over the worn one (the wake-up, 2b B), and their eyes
+            // sit 8 px apart (the files' canvases differ), so the worn eye opened under today's half-closed lids and read as shut. The worn
+            // eye's opening is drawn just above the layers over it, at the worn layer's own strength and only over the eye, so the eye reads
+            // open at every Key and the look around it is unchanged.
+            if (piece.Worn != null && wornEyeBox != null)
+            {
+                var worn = (RectTransform)piece.Worn.transform; var above = new GameObject("Worn eye (above)", typeof(RectTransform)).GetComponent<RectTransform>(); above.SetParent(worn.parent, false);
+                above.anchorMin = worn.anchorMin; above.anchorMax = worn.anchorMax; above.pivot = worn.pivot; above.anchoredPosition = worn.anchoredPosition; above.sizeDelta = worn.sizeDelta;
+                int top = new[] { piece.Worn, piece.Restored, piece.Bright }.Where(g => g != null).Max(g => g.transform.GetSiblingIndex());
+                above.SetSiblingIndex(top + 1); wornEyeBox.SetParent(above, false); wornEyeAbove = above.gameObject.AddComponent<CanvasGroup>(); wornEyeAbove.blocksRaycasts = false; wornEyeOf = piece.Worn;
+            } // the eye's centre, as a share of the file's height (measured on the Cast Dial pieces, Build AC)
             if (piece.Bright != null) AddDialEye(piece.Bright, "kit-dial-bright-open", .404f); // the wake-up's bright dial opens its eye too (its file: kit-dial-restored's canvas)
             SetDialEye(0);
         }
@@ -1353,9 +1365,13 @@ namespace Ascendant.CelestialDial
             var open = new GameObject("Open", typeof(RectTransform)).GetComponent<RectTransform>(); open.SetParent(box, false);
             open.anchorMin = open.anchorMax = open.pivot = new Vector2(.5f, .5f); open.anchoredPosition = new Vector2(0, -y); open.sizeDelta = new Vector2(w, h);
             var image = open.gameObject.AddComponent<Image>(); image.raycastTarget = false; Slots.Dress(image, slot);
-            dialEyes.Add((box, h));
+            dialEyes.Add((box, h)); if (slot == "kit-dial-worn-open") wornEyeBox = box;
         }
-        void SetDialEye(float k) { dialEyeOpen = k; foreach (var (box, h) in dialEyes) box.sizeDelta = new Vector2(box.sizeDelta.x, k >= 1 ? h * 2 : Mathf.Lerp(0, h * .2f, k)); }
+        void SetDialEye(float k)
+        {
+            dialEyeOpen = k; if (wornEyeAbove != null) wornEyeAbove.alpha = wornEyeOf.alpha; // it follows the worn layer: full at the first visit and Key 1, gone from Key 2
+            foreach (var (box, h) in dialEyes) box.sizeDelta = new Vector2(box.sizeDelta.x, k >= 1 && box != wornEyeBox ? h * 2 : Mathf.Lerp(0, h * .2f, Mathf.Min(k, 1))); // the worn eye stays the eye's band, so the half-and-half look around it holds
+        }
         IEnumerator OpenDialEye()
         {
             if (dialEyes.Count == 0) yield break;
