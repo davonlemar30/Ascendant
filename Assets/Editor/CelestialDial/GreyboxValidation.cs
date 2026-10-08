@@ -509,6 +509,70 @@ namespace Ascendant.Build
             Check(linkBottom <= SliceView.SwitchY - 12 && SliceView.SwitchY + 12 <= SliceView.TabsY - 11 && SliceView.TabsY + 11 <= SliceView.WheelTop - SliceView.WheelSize / 2, "the links' 44 px target ends above the Wheel / Table switch, the switch above the tabs, the tabs above the wheel");
             Check(lastDoor <= SliceView.JournalCloseY - 24 - 8 && lastDoor <= SliceView.PageOrnamentTop, "with KEEPER, the Keys, the Big Three and three lines of inscription, the Contents door ends at " + lastDoor + ", clear of the page's lower ornaments and of Close the journal");
         }
+        static void ValidateInscription()
+        {
+            // ---- the living inscription (owner, Oct 7: approved as scoped, all drafts, 86bcbn6w6 comment 90140263883109; the absence line counts
+            // sittings, no clock, comment 90140265375051; task 86bceba0a) ----
+            var lines = InscriptionBook.Data.lines; string[] groups = { "any", "key", "wing", "absence", "sun" }; int[] counts = { 8, 4, 3, 3, 6 };
+            Check(lines.Length == 24 && lines.Select(l => l.id).Distinct().Count() == 24 && lines.All(l => l.draft && l.id != SliceFlow.FirstLineId && l.text != "") && Enumerable.Range(0, groups.Length).All(i => lines.Count(l => l.group == groups[i]) == counts[i]),
+                "the inscription's 24 lines live in data (Resources/Journal/inscriptions.json), each with a stable id and marked a draft: 8 any time, 4 after the first Key, 3 once the Wing is whole, 3 for an absence, 6 on the sun");
+            Check(lines.Where(l => l.group == "key").All(l => l.unlock == "key1") && lines.Where(l => l.group == "wing").All(l => l.unlock == "wing") && lines.Where(l => l.group == "any" || l.group == "absence").All(l => l.unlock == "")
+                && lines.Where(l => l.group == "sun").Select(l => l.unlock).OrderBy(u => u).SequenceEqual(new[] { "", "key1", "key2", "key3", "key4", "modalities" }.OrderBy(u => u)),
+                "each group opens with its lesson: the Key lines at Key 1, the Wing's once it is whole; the sun lines with the Elements, the Symbols, the Modalities, the Table and the Opposites, and one any time (Practice's order)");
+            Check(lines.All(l => !l.text.Any(char.IsDigit)) && !SliceFlow.Inscription("Keeper").Any(char.IsDigit), "nothing on screen counts: no inscription line has a digit, so no number, date or \"since\" (Oct 7, no clock)");
+            // every line fits the record's three lines, for every sun, at the shipped italic's own widths
+            var italic = Resources.Load<Font>(SliceView.ItalicFont); var probeObject = new GameObject("Inscription probe", typeof(RectTransform)); var probe = probeObject.AddComponent<UnityEngine.UI.Text>(); probe.font = italic; probe.fontSize = 16; probe.horizontalOverflow = HorizontalWrapMode.Overflow;
+            string Fill(string text, string name, int sun) { var z = Zodiac.Seats[sun]; return text.Replace("{name}", name).Replace("{sun}", z.Name).Replace("{element}", z.Element).Replace("{modality}", z.Modality).Replace("{opposite}", Zodiac.Seats[Zodiac.Opposite(sun)].Name); }
+            int Rows(string text) => SliceView.WrapWords(probe, text, SliceView.KeeperWidth).Count;
+            var filled = new[] { "Davon", "Keeper" }.SelectMany(n => Enumerable.Range(0, 12).SelectMany(z => lines.Select(l => Fill(l.text, n, z)))).Distinct().ToList();
+            Check(filled.All(t => !t.Contains("{") && !t.Contains("}")) && filled.All(t => t.All(c => c == ' ' || italic.HasCharacter(c))), "every line fills in the name and the sun's element, modality and opposite for all twelve signs, and draws in EB Garamond Italic");
+            int tallest = filled.Max(Rows);
+            Check(tallest <= SliceFlow.InscriptionMostLines, "every line takes three lines at most at 244 px, for Davon and for Keeper and every sun (the tallest takes " + tallest + "), so the doors stay where #110 put them");
+            const string longest = "Maximilian Wolfensteiner"; // the 24 characters the name box allows
+            var sitOut = lines.Where(l => Enumerable.Range(0, 12).Any(z => Rows(Fill(l.text, longest, z)) > SliceFlow.InscriptionMostLines)).Select(l => l.id).ToList();
+            Check(groups.All(g => lines.Any(l => l.group == g && !sitOut.Contains(l.id))), "with a 24-character name every group keeps lines; those that would take a fourth line sit out for that name (" + (sitOut.Count == 0 ? "none" : string.Join(", ", sitOut)) + ")");
+            var seconds = filled.Select(t => SliceView.InkSeconds(SliceView.WrapWords(probe, t, SliceView.KeeperWidth))).ToList();
+            Check(seconds.Min() >= 2f && seconds.Max() <= 3.6f && SliceView.InkFade == .15f && SliceView.InkStep == .035f && SliceView.InkDelay == .3f, "the ink: each letter fades over 0.15 s, 35 ms apart, with a rest at a comma or a full stop; a line takes " + seconds.Min().ToString("0.0") + " to " + seconds.Max().ToString("0.0") + " s, starting 0.3 s after the landing");
+            UnityEngine.Object.DestroyImmediate(probeObject);
+            // how a line is picked
+            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("skip"); f.PickSkipSun(1); f.PickSkipMoon(3); f.PickRising(4); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; }
+            string Saved(SliceFlow f) => JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true));
+            int seed = 0;
+            SliceFlow Visit(string json, Action<SaveData> change = null) { var save = JsonUtility.FromJson<SaveData>(json); change?.Invoke(save); var f = new SliceFlow(() => 1); f.SeedInscription(++seed); return f.Restore(save) && f.OpenJournal() && f.JournalAt == JournalView.Landing ? f : null; }
+            var first = Fresh();
+            Check(first.OpenJournal() && first.JournalAt == JournalView.Title && first.InscriptionText == "" && first.JournalLand() && first.InscriptionId == SliceFlow.FirstLineId && first.InscriptionText == SliceFlow.Inscription("Davon") && first.RecentInscriptions.Count == 0,
+                "the first-ever open: the line stays blank under the title page, then the Oct 2 line, word for word, as the journal's first words; it is never counted among the recent lines");
+            var firstSave = JsonUtility.FromJson<SaveData>(Saved(first));
+            Check(firstSave.inscriptionKeys == 1 && firstSave.inscriptionSittings == first.Sittings && !firstSave.inscriptionWing && firstSave.inscriptionsRecent.Length == 0, "the save keeps only the last five lines' ids and the Keys, the sittings and the Wing at the last landing; no date");
+            var second = Visit(Saved(first));
+            Check(second != null && second.InscriptionId != SliceFlow.FirstLineId && new[] { "any", "key", "sun" }.Contains(second.InscriptionGroup) && second.InscriptionText == second.FillInscription(lines.First(l => l.id == second.InscriptionId).text) && second.RecentInscriptions.SequenceEqual(new[] { second.InscriptionId }),
+                "the next visit lands on a line from the groups unlocked so far (" + second?.InscriptionId + "), never the Oct 2 line again");
+            string held = second.InscriptionId;
+            Check(second.JournalToContents() && second.JournalToLanding() && second.InscriptionId == held && second.CloseJournal() && second.OpenJournal() && second.JournalAt == JournalView.Landing && second.InscriptionId == held && second.RecentInscriptions.Count == 1, "a line holds for the whole visit: back from Contents, or the journal closed and opened again, shows the same line");
+            var seen = new List<string> { held }; string json = Saved(second); bool fresh = true, groupsOk = true, sunOk = true;
+            for (int i = 0; i < 30; i++) { var v = Visit(json); if (v == null) { fresh = false; break; } fresh &= !seen.Skip(Math.Max(0, seen.Count - SliceFlow.RecentLines)).Contains(v.InscriptionId); groupsOk &= new[] { "any", "key", "sun" }.Contains(v.InscriptionGroup); sunOk &= v.InscriptionGroup != "sun" || v.InscriptionId == "sun-element" || v.InscriptionId == "sun-saving-room"; seen.Add(v.InscriptionId); json = Saved(v); }
+            Check(fresh && groupsOk && sunOk && seen.Distinct().Count() >= 10, "over thirty visits it never repeats one of the last five lines; at one Key only the Key lines, the any-time lines and the Elements' and any-time sun lines come round (" + seen.Distinct().Count() + " different)");
+            var after = Saved(second);
+            var keyed = Visit(after, s => s.keys = 2); var whole = Visit(after, s => { s.keys = 4; s.locksFilled = 4; });
+            Check(keyed?.InscriptionGroup == "key" && whole?.InscriptionGroup == "wing", "a group that has just unlocked goes first: a Key line after the Key count rises, the Wing's line once it turns whole (the later milestone, when both happened)");
+            var away = Visit(after, s => { s.sittings += SliceFlow.AbsenceSittings; s.reviewsChecked = s.sittings; }); var near = Visit(after, s => { s.sittings += SliceFlow.AbsenceSittings - 1; s.reviewsChecked = s.sittings; }); var awayKeyed = Visit(after, s => { s.sittings += 5; s.reviewsChecked = s.sittings; s.keys = 2; });
+            Check(away?.InscriptionGroup == "absence" && near?.InscriptionGroup != "absence" && awayKeyed?.InscriptionGroup == "key", "after 3 sittings or more since the last landing an absence line leads (a working choice for \"a few\"); after 2 it does not; a just-unlocked line takes the slot first");
+            bool neverAway = true; string run = after; for (int i = 0; i < 20; i++) { var v = Visit(run); neverAway &= v != null && v.InscriptionGroup != "absence"; run = Saved(v); }
+            Check(neverAway, "absence lines are never drawn otherwise: twenty visits with no sittings between show none");
+            var older = JsonUtility.FromJson<SaveData>(after); older.inscriptionKeys = -1; older.inscriptionSittings = -1; older.inscriptionWing = false; older.inscriptionsRecent = new string[0]; older.keys = 3; older.sittings = older.reviewsChecked = 12; string olderJson = JsonUtility.ToJson(older);
+            var olderGroups = Enumerable.Range(0, 12).Select(i => Visit(olderJson)?.InscriptionGroup).ToList(); var olderOnce = Visit(olderJson); var olderSaved = JsonUtility.FromJson<SaveData>(Saved(olderOnce));
+            Check(olderGroups.All(g => g != null && g != "absence") && olderGroups.Any(g => g != "key") && olderSaved.inscriptionKeys == 3 && olderSaved.inscriptionSittings == 12,
+                "a save from before this build announces nothing on its first landing (no absence, no Key line first: " + string.Join(" ", olderGroups.Distinct()) + "); today's Keys and sittings become the starting point");
+            Check(JsonUtility.FromJson<SaveData>("{\"version\":5}").inscriptionKeys == -1 && JsonUtility.FromJson<SaveData>("{\"version\":5}").inscriptionSittings == -1, "a save with no inscription fields reads as no landing yet");
+            var unSun = JsonUtility.FromJson<SaveData>(after); unSun.sunSign = -1; unSun.choices = unSun.choices.Select(c => c.point == "sun" ? new ChoiceRecord { point = "sun", sign = -1, how = "declined" } : c).ToArray(); string unSunJson = JsonUtility.ToJson(unSun);
+            var unSunFlows = Enumerable.Range(0, 20).Select(i => Visit(unSunJson)).ToList();
+            Check(unSunFlows.All(v => v != null && !v.HasSunSign && v.InscriptionGroup != "sun"), "an older save with no sun (a #123 declined sun) never gets a sun line");
+            var narrow = JsonUtility.FromJson<SaveData>(after); var fits = new List<string>(); for (int i = 0; i < 20; i++) { var v = new SliceFlow(() => 1); v.SeedInscription(100 + i); v.InscriptionFits = t => !t.Contains("Davon"); v.Restore(JsonUtility.FromJson<SaveData>(after)); v.OpenJournal(); fits.Add(v.InscriptionText); }
+            Check(fits.All(t => !t.Contains("Davon")), "a line the record can't fit in three lines for this name sits out of this player's pool");
+            var keeper = new SliceFlow(() => 1); Check(keeper.FillInscription("Hello again, {name}.") == "Hello again, Keeper.", "with no saved name the line says Keeper");
+            var odd = Fresh(); odd.SetName("{sun}"); Check(odd.FillInscription("Hello again, {name}.") == "Hello again, {sun}.", "a name goes in last, as typed, so it never pulls in the sun's words (Jeffrey, #128 N1)");
+            Check(SliceView.InkTapBottom <= SliceView.JournalCloseY - 24, "the tap that finishes the line ends at " + SliceView.InkTapBottom + ", above Close the journal (Jeffrey, #128 B1)");
+        }
         static void ValidateTriangles()
         {
             // ---- the family triangles (owner, Oct 3: the overlay approved, mixed strength; the board on 86bcbn6w6, Oct 2) ----
@@ -1201,6 +1265,7 @@ namespace Ascendant.Build
             ValidateBuildJ();
             ValidateTriangles();
             ValidateJournalFront();
+            ValidateInscription();
             ValidatePractice();
             ValidateBirthChart();
             ValidateBirthRecord();

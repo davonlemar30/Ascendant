@@ -112,6 +112,8 @@ namespace Ascendant.CelestialDial
         public bool builderEvidence;
         public int locksFilled;                  // Build D: Keys spent in the Chamber (Book 1 has three locks; the fourth Key starts Book 2)
         public bool journalTitled;               // batch 2 (owner, Oct 1, 1e A): the journal's title page has shown, on its first-ever open
+        public string[] inscriptionsRecent = new string[0]; // the living inscription (owner, Oct 7): the last five lines' ids, the latest last
+        public int inscriptionKeys = -1, inscriptionSittings = -1; public bool inscriptionWing; // the Keys, the sittings and the Wing at the last landing; -1: none yet
         // the birth-time build (owner, Oct 7), version 5: the birth record in three parts, kept apart (BirthChart.cs). The signs on screen are
         // read from them; the flat fields below are still written as copies, so an older build can open the save, and read only to convert
         // a version 4 save once.

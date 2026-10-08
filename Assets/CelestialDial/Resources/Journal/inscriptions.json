@@ -1,0 +1,29 @@
+{
+ "about": "The living inscription (owner, Oct 7: approved as scoped, all drafts). Each line has a stable id, a group and the lesson that unlocks it. {name} is the saved name or Keeper; {sun}, {element}, {modality} and {opposite} come from the player's sun. Every line is a draft for the owner's rewrite.",
+ "lines": [
+  { "id": "any-hello-again", "group": "any", "unlock": "", "draft": true, "text": "Hello again, {name}. I was just reading myself over. Everything's still here." },
+  { "id": "any-fair-trade", "group": "any", "unlock": "", "draft": true, "text": "You learn from the Library, and I learn from you. I think that's a fair trade." },
+  { "id": "any-not-blank", "group": "any", "unlock": "", "draft": true, "text": "Some journals stay blank forever. I got lucky, {name}." },
+  { "id": "any-every-page", "group": "any", "unlock": "", "draft": true, "text": "Every page I fill tells me a little more about you. I like what I'm reading." },
+  { "id": "any-fuller", "group": "any", "unlock": "", "draft": true, "text": "I'm a little fuller than when we met, {name}. That's your doing." },
+  { "id": "any-being-read", "group": "any", "unlock": "", "draft": true, "text": "I don't mind being read, {name}. Especially by you." },
+  { "id": "any-its-you", "group": "any", "unlock": "", "draft": true, "text": "Oh, good, it's you. I can always tell by the way you turn my pages." },
+  { "id": "any-read-twice", "group": "any", "unlock": "", "draft": true, "text": "I've read every one of my pages twice since you were last here. They're very good." },
+  { "id": "key-a-page-or-two", "group": "key", "unlock": "key1", "draft": true, "text": "You earn a Key, I gain a page or two. I'm not complaining." },
+  { "id": "key-best-hand", "group": "key", "unlock": "key1", "draft": true, "text": "I wrote your Keys down in my best hand. My ink is quietly proud of you." },
+  { "id": "key-a-door-opened", "group": "key", "unlock": "key1", "draft": true, "text": "A door opened because of you. I wrote down which one, in case you forget." },
+  { "id": "key-answers-to-you", "group": "key", "unlock": "key1", "draft": true, "text": "The Library answers to you now, a little more with every Key. I've been keeping notes." },
+  { "id": "wing-still-come", "group": "wing", "unlock": "wing", "draft": true, "text": "The Zodiac Wing is whole, and you still come to see me. I'm flattered, {name}." },
+  { "id": "wing-every-pattern", "group": "wing", "unlock": "wing", "draft": true, "text": "Every pattern the wheel held is in my pages now. Not bad for a book that started blank." },
+  { "id": "wing-kept-my-word", "group": "wing", "unlock": "wing", "draft": true, "text": "I said I'd keep a record of what you learn from the Library. I kept my word, {name}." },
+  { "id": "absence-there-you-are", "group": "absence", "unlock": "", "draft": true, "text": "There you are, {name}. I kept every page just as you left it." },
+  { "id": "absence-welcome-back", "group": "absence", "unlock": "", "draft": true, "text": "Welcome back. I read myself over while you were away. You learned a lot, you know." },
+  { "id": "absence-quiet", "group": "absence", "unlock": "", "draft": true, "text": "It's been quiet in here. I like quiet. I like this better." },
+  { "id": "sun-element", "group": "sun", "unlock": "key1", "draft": true, "text": "{sun}, {element}. That's the page I check the most. Don't tell the others." },
+  { "id": "sun-saving-room", "group": "sun", "unlock": "", "draft": true, "text": "Your sun is {sun}. There's more to a chart than the sun, I'm told. I'm saving room." },
+  { "id": "sun-symbol", "group": "sun", "unlock": "key2", "draft": true, "text": "I know your sign's symbol by heart. I'd doodle it in my margins, if I were that sort of book." },
+  { "id": "sun-modality", "group": "sun", "unlock": "modalities", "draft": true, "text": "{sun}, {element} and {modality}. I'm learning your sign right alongside you." },
+  { "id": "sun-table", "group": "sun", "unlock": "key3", "draft": true, "text": "{sun} has one square on the table and no other. I like a sign that knows where it belongs." },
+  { "id": "sun-opposite", "group": "sun", "unlock": "key4", "draft": true, "text": "{sun} sits across from {opposite}. I think about that more than a book probably should." }
+ ]
+}
