@@ -1355,7 +1355,7 @@ namespace Ascendant.CelestialDial
                 var worn = (RectTransform)piece.Worn.transform; var above = new GameObject("Worn eye (above)", typeof(RectTransform)).GetComponent<RectTransform>(); above.SetParent(worn.parent, false);
                 above.anchorMin = worn.anchorMin; above.anchorMax = worn.anchorMax; above.pivot = worn.pivot; above.anchoredPosition = worn.anchoredPosition; above.sizeDelta = worn.sizeDelta;
                 int top = new[] { piece.Worn, piece.Restored, piece.Bright }.Where(g => g != null).Max(g => g.transform.GetSiblingIndex());
-                above.SetSiblingIndex(top + 1); wornEyeBox.SetParent(above, false); wornEyeBox.sizeDelta = new Vector2(worn.sizeDelta.x * WornEyeWidth, 0); wornEyeBox.GetComponent<RectMask2D>().softness = new Vector2Int(6, 4); // the eye only, soft at its edges (Jeffrey, #131 B1) wornEyeAbove = above.gameObject.AddComponent<CanvasGroup>(); wornEyeAbove.blocksRaycasts = false; wornEyeOf = piece.Worn;
+                above.SetSiblingIndex(top + 1); wornEyeBox.SetParent(above, false); wornEyeBox.sizeDelta = new Vector2(worn.sizeDelta.x * WornEyeWidth, 0); wornEyeBox.GetComponent<RectMask2D>().softness = new Vector2Int(6, 4); wornEyeAbove = above.gameObject.AddComponent<CanvasGroup>(); wornEyeAbove.blocksRaycasts = false; wornEyeOf = piece.Worn; // the eye only, soft at its edges (Jeffrey, #131 B1)
             } // the eye's centre, as a share of the file's height (measured on the Cast Dial pieces, Build AC)
             if (piece.Bright != null) AddDialEye(piece.Bright, "kit-dial-bright-open", .404f); // the wake-up's bright dial opens its eye too (its file: kit-dial-restored's canvas)
             SetDialEye(0);
