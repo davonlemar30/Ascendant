@@ -2,6 +2,25 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The swallowed-code check catches a hidden assignment or a lone call (task 86bcf5j8k, Oct 8)
+
+Editor-only: `Assets/Editor/CelestialDial/GreyboxValidation.cs`. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #136's body and comments. No player-facing change, no Dante pass.
+
+- **Fixtures** (Unity, and a .NET 6 harness built from the file's own regex block): main's `SliceView.cs` at 3a49339 fails with exactly `SliceView.cs:585, SliceView.cs:598`; the merged tree passes with zero hits; past swallowed lines 8/8 caught (the old check missed 21f09d8, 91d0885 and both 7cdb2bb lines); synthetic 20 swallowed shapes and 16 prose lines, 36/36; `CommentStart` agrees with a full C# tokenizer on all 33 `.cs` files (0 mismatches).
+- **Not covered:** a swallowed `i++;`, `return;`, `break;` or `yield`; an assignment to a cast-wrapped target; `x is Foo f` right sides. A comment in the scanned folders that quotes a full statement with its `;` now fails and must be reworded.
+
+**Checks:** no check added; the counts are unchanged (mechanical 721, fixture 286, suite 689).
+
+Validation (local, Unity 6000.3.24f1):
+- on 93bbb05 (the merged tree): compile 0 errors and 0 warnings; mechanical 721/721; slice fixture 286/286;
+- on 9e4de2c with #134's `SliceView.cs` copied in: headless WebGL succeeded (36,154,769 bytes, 0 errors, 0 warnings); browser suite 689/689 at desktop density and 689/689 at phone density. Not rerun after the B1 fix (Editor-only regex constants, identical player code); Jeffrey accepted that;
+- GitHub Actions "Build Web player" green on 93bbb05;
+- production: not checked (an Editor-only change cannot change the player; the Pages deploy for fc41242 was still queued at hand-off).
+
+Reviews: Jeffrey, B1 BLOCKING (hidden `?.` calls passed) fixed in 93bbb05; N1 partly taken (a number and its unit read as prose); N2 left (cast-wrapped target); N3 closed. Re-review at 93bbb05 clear.
+
+Merged as PR #136 (squash, main `fc41242`, Oct 8); the head is `93bbb05`.
+
 ## Two lines a comment hid in the Zodiac Wing room (task 86bcf3paf, Oct 8)
 
 Two statements in `SliceView.cs` that a `//` earlier on their line had turned into comment text (lines 585 and 598). What shipped is in the [build log](../README.md); this is the validation record, taken from PR #134's body and comments. The owner chose to keep the caption Bone, so only the Dial label's line now runs.
