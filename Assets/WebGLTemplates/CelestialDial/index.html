@@ -110,7 +110,7 @@
     for(let i=0;i<3;i++)box('moon-'+i,0,400+i*52,300,44); // Oct 7: the Moon's options (two, rarely three)
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
     box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);
-    box('leave-dial',0,768,216,44);{const g=(state&&state.gearAt)||[158,22+(state&&state.safeTop||0)];box('settings',g[0],g[1],44,44);} // note 10: the Dial's exit and the room's are two buttons; Platform fit, Part 1: the gear sits below the safe area's top band (state.safeTop)
+    box('leave-dial',0,768,216,44);{const g=(state&&state.gearAt)||[158,22+(state&&state.safeTop||0)];box('settings',g[0],g[1],44,44);} // note 10: the Dial's exit is its own button, and since the art pass (86bcex5kc 1A) the room's doorway back takes the tap; Platform fit, Part 1: the gear sits below the safe area's top band (state.safeTop)
     {const b=(state&&state.travelAt)||[-158,22+(state&&state.safeTop||0)];box('travel',b[0],b[1],44,44);const rows=(state&&state.travelRows)||[],ids={'The Grand Atrium':'atrium','The Zodiac Wing':'wing','The Crystal Book Chamber':'chamber'};rows.forEach((r,i)=>{const id=ids[r.split(',')[0]];if(id)box('travel-'+id,b[0]+135,b[1]+25+52+44*i,264,44);});} // the mini-menu (TravelMenu: the button mirrors the gear; the panel from 47, rows 44 apart from 52 into it)
     // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
     const practiceDial=state&&state.screen==='practice'&&state.practiceMode==='dial';
