@@ -2,6 +2,28 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## Two lines a comment hid in the Zodiac Wing room (task 86bcf3paf, Oct 8)
+
+Two statements in `SliceView.cs` that a `//` earlier on their line had turned into comment text (lines 585 and 598). What shipped is in the [build log](../README.md); this is the validation record, taken from PR #134's body and comments. The owner chose to keep the caption Bone, so only the Dial label's line now runs.
+
+- **Line 585** (`dialLabel.color = Muted;`) runs; the label shows only without the Wing kit art.
+- **Line 598** (`wingRoomCaption.color = Muted;`) is deleted. The caption's measured text colour in the checked head equals production's, rgb(236, 228, 215), on first arrival and at stage 6.
+- **Scan:** every `.cs` under `Assets/`, string-aware, a strict pass (assignments, calls, `var`/`if`/`for`/`return`/`new` up to a `;`) and a loose pass; only these two lines hid code.
+- **Contrast** (390 x 844 production captures, median of the caption band / its brightest 10%): Bone 4.78 / 2.36 (first arrival), 3.36 / 1.85 (Dial glow), 3.38 / 1.85 (table awake), 4.12 / 1.49 (stage 6); Muted 1.90 / 1.07, 1.33 / 1.36, 1.34 / 1.36, 1.63 / 1.69.
+
+**Checks:** no check added; the counts are unchanged (mechanical 721, fixture 286, suite 689).
+
+Validation (local, Unity 6000.3.24f1):
+- full ladder on `6f375d7`: compile 0 errors and 0 warnings; mechanical 721/721; slice fixture 286/286; headless WebGL succeeded (36,154,794 bytes, 0 errors, 0 warnings); browser suite 689/689 at desktop density and 689/689 at phone density;
+- final head `0d89910` (a comment-only change, Jeffrey's N2): mechanical 721/721, 0 errors, 0 warnings;
+- the superseded grey version `7cdb2bb`: the same ladder, all green (mechanical 721/721, fixture 286/286, suite 689/689 at both densities); production baseline on main `3a49339`, 689/689 at desktop;
+- GitHub Actions: "Build Web player" and "Guard agent files" green on `0d89910`;
+- production, after the Pages deploy of main `0dca10e`: to follow (Claude runs the suite at phone density and posts it on the task).
+
+Reviews: Jeffrey, no BLOCKING. N1 (the swallowed-code check misses plain assignments) is a follow-up outside this brief; N2 applied; N3 is the PR's record; N4 squash merge. Not tested: the no-kit fallback, the only place the label's new grey shows (the shipped art has the kit, and `?art=test` fills every slot).
+
+Merged as PR #134 (squash, main `0dca10e`, Oct 8); the head is `0d89910`.
+
 ## Art pass: the Dial's eye at Key 1, and tap the doors (task 86bcex5kc, Oct 7)
 
 The owner's Oct 3 playtest notes 2 to 6, answered "all recommended" (Oct 7). What shipped is in the [build log](../README.md); this is the validation record, taken from PR #131's body and comments. The Book and the Table art were split out (task 86bcf0x71) and are not in this build.
