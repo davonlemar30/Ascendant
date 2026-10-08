@@ -365,6 +365,7 @@ namespace Ascendant.CelestialDial
             }
             // Build D: the Chamber as a room. A doorway back, the Books as a point of interest, a floor band; all hidden on the first (Continue) visit.
             chamberBand = Rect("Floor band", chamber, 0, ChamberBandY, 340, 30); var chamberBandImage = chamberBand.gameObject.AddComponent<Image>(); chamberBandImage.color = new Color(.16f, .16f, .19f, ChamberKitted ? 0 : 1); chamberBandImage.raycastTarget = false; chamberBand.gameObject.SetActive(false); // before the doorway, so its label draws over the band; Build O: the painted floor carries it
+            chamberDoorGlow = DoorwayGlow(chamber, ChamberKitted ? -145 : -150, ChamberKitted ? 287 : 347, ChamberKitted ? 40 : 30, ChamberKitted ? 165 : 124); // the art pass (86bcex5kc 2A)
             chamberDoor = Block(chamber, "Doorway back", ChamberKitted ? -145 : -150, ChamberKitted ? 287 : 347, ChamberKitted ? 40 : 30, ChamberKitted ? 165 : 124, ChamberKitted ? null : "door-open"); if (ChamberKitted) RetireProps(chamberDoor, true); HitArea(chamberDoor, 48); Tappable(chamberDoor, () => Walk("atrium-door")); chamberDoor.gameObject.SetActive(false); // Build K: the painted doorway
             chamberBooksTap = Rect("The Books, tap to walk", chamber, 0, 300, ChamberKitted ? 236 : 330, 90); var booksTapImage = chamberBooksTap.gameObject.AddComponent<Image>(); booksTapImage.color = new Color(0, 0, 0, 0); Tappable(chamberBooksTap, () => Walk("books")); chamberBooksTap.gameObject.SetActive(false); // kitted, as wide as the painted Books (x -116 to 116), clear of the doorway at the far left
             var chamberPoseRect = Rect("Caspar pose", chamber, 5, 363, 264, 468); chamberPose = chamberPoseRect.gameObject.AddComponent<Image>(); chamberPose.raycastTarget = false; chamberPose.enabled = false; // Build R: his waist at the box's top edge (435)
@@ -424,7 +425,8 @@ namespace Ascendant.CelestialDial
             enterWing = MakeButton(hub, "The Zodiac Wing", -78, 624, 150, 52, EnterWing); StyleAtriumButton(enterWing);
             enterChamber = MakeButton(hub, "The Crystal Book Chamber", 78, 624, 150, 52, EnterChamber); StyleAtriumButton(enterChamber); enterChamber.GetComponentInChildren<Text>().fontSize = 12; // Build D; owner (worksheet section 13)
             journalHub = MakeButton(hub, "Your journal", 0, 680, 300, 52, OpenJournal); StyleAtriumButton(journalHub); journalHub.gameObject.SetActive(false); // Build F: the journal takes the row Check the Seals held (retired Sept 15)
-            ButtonLook.Room(enterWing, font); ButtonLook.Room(enterChamber, font); ButtonLook.Room(journalHub, font); // batch 2 (3c C): the Atrium's doors and journal in the chat box's language
+            ButtonLook.Room(enterWing, font); ButtonLook.Room(enterChamber, font); ButtonLook.Room(journalHub, font);
+            enterWing.gameObject.SetActive(false); enterChamber.gameObject.SetActive(false); // the art pass (owner, Oct 7, 86bcex5kc, 1A): the player taps the doors themselves; the buttons go, and nothing moves into their place // batch 2 (3c C): the Atrium's doors and journal in the chat box's language
             hubNote = Label(hub, "", 0, 722, 330, 28, 10); hubNote.color = Muted; // two lines: the owner's sealed-door and desk lines are long
             endCard = Label(hub, "The whole wheel burns. The symbols await you next.", 0, 736, 330, 36, 11); endCard.gameObject.SetActive(false); // owner (worksheet section 1); two lines at 330 wide
             walkSpeed = TestButton(hub, "Walk: normal (test)", -118, 774, CycleWalkSpeed); walkSpeedLabel = walkSpeed.GetComponentInChildren<Text>();
@@ -588,6 +590,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 12; i++) { var square = Rect("Square", board, -20 + (i % 3) * 20, 5 + (i / 3) * 7, 16, 5); var squareImage = square.gameObject.AddComponent<Image>(); squareImage.color = new Color(.3f, .28f, .3f); squareImage.raycastTarget = false; }
             var tableGlow = Rect("Table glow", table, 0, 45, 120, 120); gridGlow = tableGlow.gameObject.AddComponent<Image>(); gridGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); gridGlow.color = new Color(.95f, .8f, .5f, 0); gridGlow.raycastTarget = false; tableGlow.SetAsFirstSibling();
             Tappable(table, () => Walk("grid"));
+            wingDoorGlow = DoorwayGlow(wingRoom, -138, 292, 42, 145); // the art pass (86bcex5kc 2A): it breathes light at its edges like the Atrium's open doors
             var door = Block(wingRoom, "Doorway back", -138, 292, 42, 145, "door-open"); Tappable(door, () => Walk("atrium-door")); HitArea(door, 48); // Build K: the painted doorway
             if (wingKit.Count > 0) foreach (var block in new[] { shelf, table, door }) foreach (var t in block.GetComponentsInChildren<Text>(true)) t.gameObject.SetActive(false); // Build M: the plates name the doors now
             var light = Rect("Doorway light", door, 0, 72, 30, 118); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
@@ -596,7 +599,7 @@ namespace Ascendant.CelestialDial
             enterGrid = MakeButton(wingRoom, "The Table", 0, 512, 300, 52, () => Walk("grid")); enterGrid.gameObject.SetActive(false); // Build B: shown once the table has woken // owner (worksheet section 11)
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
             enterShelf = MakeButton(wingRoom, "The Bookshelf", 0, 568, 300, 52, () => Walk("shelf")); enterShelf.gameObject.SetActive(false); // owner (worksheet section 7)
-            wingRoomBack = MakeButton(wingRoom, "Return to the Atrium", 0, 680, 300, 52, LeaveWing); // owner (worksheet section 6)
+            wingRoomBack = MakeButton(wingRoom, "Return to the Atrium", 0, 680, 300, 52, LeaveWing); wingRoomBack.gameObject.SetActive(false); // owner (worksheet section 6); since the art pass (86bcex5kc 1A) the doorway back takes the tap
             journalWing = MakeButton(wingRoom, "Your journal", 0, 774, 216, 44, OpenJournal); journalWing.GetComponentInChildren<Text>().fontSize = 13; journalWing.gameObject.SetActive(false); // Build F
             ButtonLook.Room(enterGrid, font); ButtonLook.Room(enterDial, font); ButtonLook.Room(enterShelf, font); ButtonLook.Room(wingRoomBack, font); ButtonLook.Room(journalWing, font); // batch 2 (3c C, as the board shows it); 3d: Your journal at 44 px
         }
@@ -885,7 +888,7 @@ namespace Ascendant.CelestialDial
         {
             bool room = Flow.AtChamberRoom; bool atBooks = Flow.Walk.At == "books";
             chamberDoor.gameObject.SetActive(room); chamberBooksTap.gameObject.SetActive(room); chamberBand.gameObject.SetActive(room); chamberBooksLabel.gameObject.SetActive(!room);
-            chamberBack.gameObject.SetActive(room); chamberBack.interactable = !busy; chamberContinue.gameObject.SetActive(!room && chamberContinue.gameObject.activeSelf);
+            chamberBack.gameObject.SetActive(false); chamberBack.interactable = !busy; // the doorway back takes the tap (86bcex5kc 1A) chamberContinue.gameObject.SetActive(!room && chamberContinue.gameObject.activeSelf);
             journalChamber.gameObject.SetActive(room && Flow.CanOpenJournal); journalChamber.interactable = !busy; // Build F
             if (!room) return;
             for (int l = 0; l < locks.Length; l++) Slots.Paint(locks[l], l < Flow.LocksFilled ? Bone : LockDark, l < Flow.LocksFilled ? 1f : LockDarkArt);
@@ -1291,7 +1294,7 @@ namespace Ascendant.CelestialDial
             // The caption is said once: on the first return, while the Atrium is at Stage 2. After that the room shows its own state (owner, Sept 26 playtest, note 9).
             hubCaption.text = stage == 2 ? "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open." : ""; // owner (worksheet section 1, kept as written, marked X)
             hubText.text = stage == 1 ? HubOpeningLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine;
-            enterChamber.interactable = !busy && Flow.CanEnterChamber; enterChamber.gameObject.SetActive(stage >= 2); // Build T: no dead button on the opening walk; the sealed door itself answers a tap
+            enterChamber.interactable = !busy && Flow.CanEnterChamber; enterChamber.gameObject.SetActive(false); // the doors take the tap (86bcex5kc 1A); Build T: the sealed door itself answers a tap
             { var wingRect = (RectTransform)enterWing.transform; wingRect.anchoredPosition = new Vector2(stage >= 2 ? -78 : 0, wingRect.anchoredPosition.y); } // Build U: alone on the opening walk, the Zodiac Wing button sits centred
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
@@ -2828,8 +2831,17 @@ namespace Ascendant.CelestialDial
             var image = block.GetComponent<Image>(); if (image != null) { image.sprite = null; image.color = new Color(0, 0, 0, 0); }
             foreach (Transform child in block) child.gameObject.SetActive(false);
         }
+        // The doorways back (the art pass, owner Oct 7, 86bcex5kc 2A): the same soft glow and breath as the Atrium's open doors, behind the doorway.
+        Image wingDoorGlow, chamberDoorGlow;
+        Image DoorwayGlow(RectTransform parent, float x, float y, float w, float h)
+        {
+            var glow = Rect("Doorway glow", parent, x, y, w * 1.55f + 20, h * 1.25f + 20).gameObject.AddComponent<Image>(); glow.sprite = SoftGlow(); glow.raycastTarget = false; glow.color = new Color(1, .82f, .5f, 0); return glow;
+        }
         void PulseDoors()
         {
+            float breath = ReducedMotion ? .4f : .28f + .24f * Mathf.PingPong(Time.unscaledTime / 1.1f, 1f);
+            if (wingDoorGlow != null) wingDoorGlow.color = new Color(1, .82f, .5f, Flow.Screen == SliceScreen.WingRoom ? breath : 0);
+            if (chamberDoorGlow != null) chamberDoorGlow.color = new Color(1, .82f, .5f, Flow.Screen == SliceScreen.ChamberRoom ? breath : 0);
             foreach (var k in atriumKits)
             {
                 if (k.Fade != null || !k.Container.gameObject.activeInHierarchy) continue;
