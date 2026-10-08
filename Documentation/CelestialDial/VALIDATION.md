@@ -6,16 +6,16 @@ This is an interaction test, not production art or a gameplay-validation result.
 
 Editor-only: `Assets/Editor/CelestialDial/GreyboxValidation.cs`. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #136's body and comments. No player-facing change, no Dante pass.
 
-- **Fixtures** (Unity, and a .NET 6 harness built from the file's own regex block): main's `SliceView.cs` at 3a49339 fails with exactly `SliceView.cs:585, SliceView.cs:598`; the merged tree passes with zero hits; past swallowed lines 8/8 caught (the old check missed 21f09d8, 91d0885 and both 7cdb2bb lines); synthetic 20 swallowed shapes and 16 prose lines, 36/36; `CommentStart` agrees with a full C# tokenizer on all 33 `.cs` files (0 mismatches).
-- **Not covered:** a swallowed `i++;`, `return;`, `break;` or `yield`; an assignment to a cast-wrapped target; `x is Foo f` right sides. A comment in the scanned folders that quotes a full statement with its `;` now fails and must be reworded.
+- **Fixtures:** on 9e4de2c in Unity (a temporary Editor probe calling the real `CommentStart` and `HidesStatement`, deleted, never committed): fixture A (3a49339's `SliceView.cs` fails with exactly `SliceView.cs:585, SliceView.cs:598`), fixture B (721/721, zero hits), synthetic 24/24 (14 swallowed, 10 prose), past swallowed lines 8/8. On 93bbb05 in a .NET 6 harness (Unity's bundled runtime, built from the file's own regex block), not in Unity: synthetic 36/36 (20 swallowed, 16 prose, including the `?.` and `?[` shapes) and history 9/9 lines (8 swallowed, 1 prose); the old check missed 21f09d8, 91d0885 and both 7cdb2bb lines. `CommentStart` agrees with a full C# tokenizer on all 33 `.cs` files (0 mismatches).
+- **Not covered:** a swallowed `i++;`, `return;`, `break;` or `yield`; a swallowed `}` (breaks the compile anyway); an assignment to a cast-wrapped target; a shift-assign (`<<=`, `>>=`, `>>>=`; none in the tree today); `x is Foo f` right sides. The scan reads only `Assets/CelestialDial` and `Assets/Editor/CelestialDial`; the two `Assets/Editor/Build` scripts are not scanned and are clean today. A comment in the scanned folders that quotes a full statement with its `;` now fails and must be reworded.
 
 **Checks:** no check added; the counts are unchanged (mechanical 721, fixture 286, suite 689).
 
 Validation (local, Unity 6000.3.24f1):
-- on 93bbb05 (the merged tree): compile 0 errors and 0 warnings; mechanical 721/721; slice fixture 286/286;
+- on 93bbb05 (the merged tree), in Unity: compile 0 errors and 0 warnings; fixture A again (exactly :585, :598); mechanical 721/721 (zero hits); slice fixture 286/286;
 - on 9e4de2c with #134's `SliceView.cs` copied in: headless WebGL succeeded (36,154,769 bytes, 0 errors, 0 warnings); browser suite 689/689 at desktop density and 689/689 at phone density. Not rerun after the B1 fix (Editor-only regex constants, identical player code); Jeffrey accepted that;
 - GitHub Actions "Build Web player" green on 93bbb05;
-- production: not checked (an Editor-only change cannot change the player; the Pages deploy for fc41242 was still queued at hand-off).
+- production: owed; the Pages deploy for main fc41242 (run 37835042917) was queued at hand-off behind d382830's run. An Editor-only change cannot change the player. The result is to be appended in a follow-up docs PR (count, density, served time, main SHA served).
 
 Reviews: Jeffrey, B1 BLOCKING (hidden `?.` calls passed) fixed in 93bbb05; N1 partly taken (a number and its unit read as prose); N2 left (cast-wrapped target); N3 closed. Re-review at 93bbb05 clear.
 
