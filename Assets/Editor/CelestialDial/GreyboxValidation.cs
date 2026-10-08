@@ -718,9 +718,10 @@ namespace Ascendant.Build
         }
         // Sept 25: a `//` inserted before the rest of a statement had made code dead for days (the Atrium doors' and the Chamber doorway's
         // taps, the Chamber floor band); it compiles and every other check passes. No line of the game's C# may carry statements after a comment.
+        // Oct 8 (Jeffrey, #134 N1): the first form wanted a `);` and then a statement after a `;`, so a lone swallowed assignment (Build M's
+        // grey on the Wing room's Dial label, Build W's jumpsShown) or a lone call (the Chamber's Continue hide, #131) passed it.
         static void ValidateNoSwallowedCode()
         {
-            var statement = new System.Text.RegularExpressions.Regex(@";\s*(?:var |string |int |float |bool )?[A-Za-z_][\w\.\[\]]*\s*(?:\(|=[^=>])");
             var swallowed = new List<string>();
             foreach (var file in Directory.GetFiles("Assets/CelestialDial", "*.cs").Concat(Directory.GetFiles("Assets/Editor/CelestialDial", "*.cs")))
             {
@@ -728,11 +729,29 @@ namespace Ascendant.Build
                 for (int n = 0; n < lines.Length; n++)
                 {
                     int c = CommentStart(lines[n]); if (c < 0) continue;
-                    var tail = lines[n].Substring(c + 2);
-                    if (System.Text.RegularExpressions.Regex.IsMatch(tail, @"\)\s*;") && statement.IsMatch(tail)) swallowed.Add(Path.GetFileName(file) + ":" + (n + 1));
+                    if (HidesStatement(lines[n].Substring(c + 2))) swallowed.Add(Path.GetFileName(file) + ":" + (n + 1));
                 }
             }
             Check(swallowed.Count == 0, "no line of the game's C# hides statements behind a // comment" + (swallowed.Count > 0 ? ": " + string.Join(", ", swallowed) : ""));
+        }
+        // A comment's tail hides code if it has the first form's shape, a call (a name right against its `(`, closed by `);`), or an
+        // assignment (`=`, `+=`, `-=` and the like) whose right side reads as code; a name runs through `.`, `?.`, indexers, type arguments and calls.
+        // Prose like "owner (worksheet section 13);" puts a space before its `(`. Prose like "dialVoice = the box wears the Dial's blue;"
+        // or "size = 340 wide;" has two plain words (or a number and a word) side by side, which code has only around a keyword
+        // ("new Color", "is not null"). String and char literals are blanked first, so quoted words count as neither.
+        static readonly System.Text.RegularExpressions.Regex FirstFormClose = new System.Text.RegularExpressions.Regex(@"\)\s*;");
+        static readonly System.Text.RegularExpressions.Regex FirstFormStatement = new System.Text.RegularExpressions.Regex(@";\s*(?:var |string |int |float |bool )?[A-Za-z_][\w\.\[\]]*\s*(?:\(|=[^=>])");
+        static readonly System.Text.RegularExpressions.Regex Literal = new System.Text.RegularExpressions.Regex(@"""(?:[^""\\]|\\.)*""|'(?:[^'\\]|\\.)'");
+        const string CodeName = @"(?<![\w.])[A-Za-z_]\w*(?:\??\.[A-Za-z_]\w*|\??\[[^\]\[;]*\]|<[^<>;]*>|\([^();]*\))*";
+        static readonly System.Text.RegularExpressions.Regex Call = new System.Text.RegularExpressions.Regex(CodeName + @"\((?:(?!//)[^;])*\)\s*;");
+        static readonly System.Text.RegularExpressions.Regex Assignment = new System.Text.RegularExpressions.Regex(CodeName + @"\s*(?:[-+*/%&|^]|\?\?)?=(?![=>])(?<rhs>(?:(?!//)[^;])+);");
+        const string Keyword = @"(?:new|is|as|not|and|or|in|out|ref|await|typeof|nameof|default|null|true|false|this|base|var|stackalloc|checked|unchecked|when|with|switch)(?![\w.])";
+        static readonly System.Text.RegularExpressions.Regex PlainWords = new System.Text.RegularExpressions.Regex(@"(?<![\w.])(?!" + Keyword + @")\w[\w.]*\s+(?!" + Keyword + @")[A-Za-z_]");
+        static bool HidesStatement(string tail)
+        {
+            if (FirstFormClose.IsMatch(tail) && FirstFormStatement.IsMatch(tail)) return true;
+            var code = Literal.Replace(tail, "\"\"");
+            return Call.IsMatch(code) || Assignment.Matches(code).Cast<System.Text.RegularExpressions.Match>().Any(m => !PlainWords.IsMatch(m.Groups["rhs"].Value));
         }
         static int CommentStart(string line) // the first // outside a string or char literal
         {
