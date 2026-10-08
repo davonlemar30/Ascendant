@@ -588,8 +588,9 @@ namespace Ascendant.Build
             var shader = Resources.Load<Shader>("Shaders/LetterFill");
             Check(shader != null && shader.name == "Ascendant/LetterFill" && shader.isSupported, "the live lettering's shader ships under Resources (so the Web build carries it) and compiles");
             Check(SliceView.InkPlace.OrderBy(x => x).SequenceEqual(Enumerable.Range(0, 12)) && !SliceView.InkPlace.SequenceEqual(Enumerable.Range(0, 12)) && SliceView.InkSpots.Length == 12 && SliceView.InkSpots.Distinct().Count() == 12
-                && SliceView.InkSpots.All(p => Mathf.Abs(p.x) <= 130 && Mathf.Abs(p.x) >= 30 && p.y >= 300 && p.y <= 410),
-                "the Book's ink: twelve places on its open pages, six to a page, and a sign's place is not its wheel order (owner, Oct 7, 2A)");
+                && SliceView.InkSpots.Take(6).All(p => p.x <= -24) && SliceView.InkSpots.Skip(6).All(p => p.x >= 24) && SliceView.InkSpots.All(p => Mathf.Abs(p.x) <= 126 && p.y >= 308 && p.y <= 388)
+                && new[] { SliceView.InkSpots.Take(6), SliceView.InkSpots.Skip(6) }.All(page => page.All(p => page.Where(q => q != p).Min(q => Vector2.Distance(p, q)) >= SliceView.InkSize + 2)),
+                "the Book's ink: twelve places on its open pages, six to a page clear of the gutter and of each other, and a sign's place is not its wheel order (owner, Oct 7, 2A)");
             Check(SliceView.InkFull > SliceView.InkFaint && SliceView.InkFaint > 0 && SliceView.DarkPlate.r < .4f && SliceView.EmblemY < SliceView.RiseFrom && SliceView.RiseFrom < 420,
                 "a symbol learned alone inks fully, one shown with help faintly (1A); the answer plates are near-black (owner, Oct 8); a question rises from the pages to its place");
             var grid = new GridModel(() => 0); Check(grid.InputMethod == "DirectCell", "a tapped well logs DirectCell, and a dragged plate logs Drag; grading is the same either way (owner, Oct 7: drag and tap)");

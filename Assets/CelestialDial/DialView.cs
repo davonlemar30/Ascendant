@@ -109,7 +109,7 @@ namespace Ascendant.CelestialDial
             public bool namesHidden, glyphWheel, key2, v03Complete;
             public string glyphMode = "", glyphChar = "", glyphTarget = "";
             public string[] glyphOptions;
-            public string bookEmblem = ""; public int[] bookInk = new int[0]; public bool bookPages, bookRising, bookArt; public string bookPicked = ""; // the Book comes alive (owner, Oct 7-8): the emblem shown, each seat's ink (0, 1 faint, 2 full), the pages' look, the rise, the right plate
+            public string bookEmblem = ""; public int[] bookInk = new int[0]; public bool bookPages, bookRising, bookArt; public int bookInkDrawn; public string bookPicked = ""; public float[] bookInkBox = new float[0]; // the Book comes alive (owner, Oct 7-8): the emblem shown, each seat's ink (0, 1 faint, 2 full), the pages' look, the rise, the right plate
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public float chatBoxHeight;

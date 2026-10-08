@@ -483,14 +483,22 @@ const path=require('path');
       const slot=s.glyphOptions.indexOf(SIGNS[target]);
       await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
       if(n===0){ // the Book comes alive (owner, Oct 7-8; 86bcf0x71): the answered symbol becomes its element's emblem, the right plate floats, then it inks the page
-        const a=await state(); check(a.bookArt && a.bookEmblem==='emblem-'+SIGNS[target].toLowerCase() && a.bookPicked===SIGNS[target],'a right answer raises '+SIGNS[target]+'\'s emblem from the Book, its plate floating, at '+viewport.width);
+        await page.waitForFunction(()=>window.ascendantDial.snapshot().bookEmblem!=='',{},{timeout:2000}).catch(()=>{});
+        const a=await state(); check(a.bookArt && a.bookEmblem==='emblem-'+SIGNS[target].toLowerCase() && a.bookPicked===SIGNS[target],'a right answer raises '+SIGNS[target]+'\'s emblem from the Book, its plate floating ('+a.bookEmblem+', '+a.bookPicked+'), at '+viewport.width);
         await page.screenshot({path:path.join(out,viewport.width+'-book-emblem.png')});
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         const b=await state(); check(b.bookEmblem==='' && b.bookInk[target]===2 && b.bookInk.filter(x=>x>0).length===1,'then it sinks into the pages as ink, in full (answered on its own), and no other symbol is inked, at '+viewport.width);
       }
       if(n===11){await page.waitForFunction(()=>window.ascendantDial.snapshot().bookPages,{},{timeout:15000});
         const p=await state(); check(p.bookPages && p.bookInk.every(x=>x>0),'the twelfth answer shows the full pages a moment, every symbol inked, before the room at '+viewport.width);
-        await page.screenshot({path:path.join(out,viewport.width+'-book-pages.png')}); }
+        await page.screenshot({path:path.join(out,viewport.width+'-book-pages.png')});
+        check(p.bookInkDrawn===12,'all twelve inked symbols are really drawn on the pages ('+p.bookInkDrawn+' laid out) at '+viewport.width);
+        // each laid-out symbol against the Book's own art (720x1600, two art px to a layout px): its whole box is parchment, not the gutter, the page's edge, or the cover
+        const art='data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'..','Assets','CelestialDial','Resources','Art','book-room.png')).toString('base64');
+        const share=await page.evaluate(async({src,box})=>{const i=new Image();i.src=src;await i.decode();const c=document.createElement('canvas');c.width=i.width;c.height=i.height;const g=c.getContext('2d');g.drawImage(i,0,0);const d=g.getImageData(0,0,c.width,c.height).data;
+          const parch=(x,y)=>{const k=(y*c.width+x)*4,R=d[k],G=d[k+1],B=d[k+2];return R>150&&G>105&&B>55&&R-B>30&&R+G+B>400;};
+          const out=[];for(let s=0;s<12;s++){const [x0,y0,x1,y1]=box.slice(s*4,s*4+4);let n=0,on=0;for(let y=Math.floor(y0*2);y<Math.ceil(y1*2);y++)for(let x=Math.floor((x0+180)*2);x<Math.ceil((x1+180)*2);x++){n++;if(x>=0&&y>=0&&x<c.width&&y<c.height&&parch(x,y))on++;}out.push(n?on/n:0);}return out;},{src:art,box:p.bookInkBox});
+        check(p.bookInkBox.length===48 && share.every(x=>x>=.97),'every inked symbol sits wholly on the parchment (least '+Math.round(Math.min(...share)*100)+'% parchment under a symbol) at '+viewport.width); }
       if(n===4){
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
         await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});

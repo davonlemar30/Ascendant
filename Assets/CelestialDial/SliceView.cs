@@ -38,15 +38,24 @@ namespace Ascendant.CelestialDial
         int revealSeat = -1, revealSlot = -1, shownGlyph = -2; bool revealOwn, bookPagesShown, glyphRising; string[] revealNames = new string[4];
         public const float EmblemY = 186, EmblemSize = 185, CardY = 200, RiseFrom = 372, RiseSeconds = .45f, BookPagesSeconds = 2.2f;
         public static readonly Color DarkPlate = new Color(.34f, .32f, .32f), BookInk = new Color(.23f, .14f, .09f);
-        public const float InkFull = .78f, InkFaint = .3f;
-        // twelve places on the open pages, six to a page; a sign's place is not its wheel order (owner, Oct 7, answer 2A)
-        public static readonly Vector2[] InkSpots = { new Vector2(-104, 310), new Vector2(-58, 326), new Vector2(-120, 352), new Vector2(-74, 368), new Vector2(-40, 394), new Vector2(-108, 400),
-            new Vector2(46, 312), new Vector2(96, 330), new Vector2(62, 356), new Vector2(118, 372), new Vector2(40, 398), new Vector2(92, 404) };
+        public const float InkFull = .78f, InkFaint = .3f; public const int InkSize = 30;
+        // twelve places on the open pages, six to a page; a sign's place is not its wheel order (owner, Oct 7, answer 2A). Measured from book-room's parchment (Oct 8):
+        // each symbol's laid-out box lies wholly on the parchment (the web suite holds it there against the art), 24 px or more off the gutter, and places on a page sit 32 px apart or more (left page 0-5, right 6-11)
+        public static readonly Vector2[] InkSpots = { new Vector2(-70, 352), new Vector2(-110, 386), new Vector2(-38, 326), new Vector2(-40, 378), new Vector2(-90, 320), new Vector2(-102, 354),
+            new Vector2(68, 352), new Vector2(108, 386), new Vector2(40, 374), new Vector2(62, 312), new Vector2(32, 338), new Vector2(94, 328) };
         public static readonly int[] InkPlace = { 7, 2, 10, 4, 0, 11, 5, 8, 1, 9, 3, 6 };
         static Color Clear(Color c) => new Color(c.r, c.g, c.b, 0);
         public static string EmblemSlot(int seat) => "emblem-" + Zodiac.Seats[Zodiac.Wrap(seat)].Name.ToLowerInvariant();
         // a symbol's ink: 2 learned on the player's own (Practicing in the deck), 1 named with Caspar's help, 0 not yet (owner, Oct 7, answer 1A)
         public int InkOf(int seat) => !Dial.Lesson.GlyphNamed[seat] ? 0 : Flow.Deck.Item(seat, ItemKind.Glyph).State == ItemState.Practicing ? 2 : 1;
+        // where a symbol's ink really lands, in layout px (x from the centre, y down from the top): its laid-out glyph, so the web check can hold it to the parchment
+        static float[] InkBox(Text ink)
+        {
+            var verts = ink != null ? ink.cachedTextGenerator.verts : null; if (verts == null || verts.Count < 4) return new float[4];
+            var r = ink.rectTransform; float unit = 1 / ink.pixelsPerUnit, x0 = float.MaxValue, y0 = float.MaxValue, x1 = float.MinValue, y1 = float.MinValue;
+            foreach (var v in verts) { float x = r.anchoredPosition.x + v.position.x * unit, y = -(r.anchoredPosition.y + v.position.y * unit); x0 = Mathf.Min(x0, x); x1 = Mathf.Max(x1, x); y0 = Mathf.Min(y0, y); y1 = Mathf.Max(y1, y); }
+            return new[] { x0, y0, x1, y1 };
+        }
         // v0.4 tap-to-move (Q06 phase 2): two walkable rooms, a placeholder marker, fades at doorways.
         RectTransform wingRoom, avatar, avatarHead; Image fadeImage; Text wingRoomCaption, walkSpeedLabel;
         Button enterDial, enterShelf, wingRoomBack, walkSpeed, closeBook; Image shelfGlow;
@@ -74,6 +83,8 @@ namespace Ascendant.CelestialDial
         int goldSeat = -1, dragSeat = -1, hoverCell = -1; bool gridPlates;
         public const float GoldSeconds = .5f, LiftScale = 1.06f;
         public static readonly Color BurnedInk = new Color(.23f, .14f, .09f);
+        // a live name's colour: its element's, deep enough to read on gold and on wood (Build S's hues, darkened)
+        public static Color DeepElement(int seat) { switch (Zodiac.Seats[Zodiac.Wrap(seat)].Element) { case "Fire": return new Color(.62f, .16f, .07f); case "Earth": return new Color(.19f, .36f, .12f); case "Air": return new Color(.42f, .30f, .08f); default: return new Color(.08f, .24f, .48f); } }
         public static string LetterSlot(int seat) => "letter-" + Zodiac.Seats[Zodiac.Wrap(seat)].Element.ToLowerInvariant();
         public static Vector2 LetterDrift(int seat) { switch (Zodiac.Seats[Zodiac.Wrap(seat)].Element) { case "Fire": return new Vector2(0, .25f); case "Water": return new Vector2(.18f, 0); case "Air": return new Vector2(.12f, .06f); default: return Vector2.zero; } }
         // a placed sign is the player's own when the deck holds it as practising (Level 0/1 at the Seal), as the journal reads it
@@ -482,7 +493,7 @@ namespace Ascendant.CelestialDial
             // v0.3 Part A: name the glyph by direct tap. Same layout as a review item so the two read as one family.
             glyphs = ScreenPanel("Glyphs", "book-room"); Bleed.Add(glyphs.GetComponent<Image>(), root, Bleed.Mode.Clamp, .35f); // the Book open on its lectern behind the layout (owner, Oct 7, 86bcex5kc 4A; 86bcf0x71)
             // the symbols learned, inked on the open pages: symbols only, scattered rather than in wheel order (owner, Oct 7, answer 2A)
-            for (int seat = 0; seat < 12; seat++) { var spot = InkSpots[InkPlace[seat]]; bookInk[seat] = Label(glyphs, Zodiac.Seats[seat].Glyph, spot.x, spot.y, 48, 48, 34); bookInk[seat].font = Dial.GlyphFont; bookInk[seat].color = Clear(BookInk); bookInk[seat].raycastTarget = false; }
+            for (int seat = 0; seat < 12; seat++) { var spot = InkSpots[InkPlace[seat]]; bookInk[seat] = Label(glyphs, Zodiac.Seats[seat].Glyph, spot.x, spot.y, 48, 48, InkSize); bookInk[seat].font = Dial.GlyphFont; bookInk[seat].color = Clear(BookInk); bookInk[seat].raycastTarget = false; bookInk[seat].horizontalOverflow = HorizontalWrapMode.Overflow; bookInk[seat].verticalOverflow = VerticalWrapMode.Overflow; } // the symbol font's line is taller than its box: truncated, it drew nothing
             SafeArea.Top(Label(glyphs, "THE BOOK OF SYMBOLS", 0, 32, 340, 24, 18)); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
             glyphProgress = SafeArea.Top(Label(glyphs, "", 0, 62, 300, 20, 12), SafeArea.UnderTitle); glyphProgress.color = Muted;
             var card = Rect("Glyph card", glyphs, 0, 200, 140, 140); bookCard = card.gameObject.AddComponent<Image>(); bookCard.color = PanelColor; // Build E: book-cover shut, book-page open
@@ -502,7 +513,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 4; i++) // the owner, Oct 8: near-black plates, the words kept simple and floating over them
             {
                 var feel = glyphNameButtons[i].GetComponent<ButtonFeel>(); glyphPlateHome[i] = ((RectTransform)glyphNameButtons[i].transform).anchoredPosition;
-                if (feel == null) continue; feel.Tone = DarkPlate; feel.Repaint();
+                if (feel == null) continue; feel.Tone = DarkPlate; feel.Unavailable = 1; feel.Repaint(); // solid through the answer's pause: half-strength dark plates read as glass
                 if (feel.Label != null) { var lift = feel.Label.GetComponent<Shadow>(); if (lift != null) { lift.effectColor = new Color(0, 0, 0, .85f); lift.effectDistance = new Vector2(0, -4); } }
             }
         }
@@ -1014,7 +1025,8 @@ namespace Ascendant.CelestialDial
             var mask = new GameObject("Gold", typeof(RectTransform)).GetComponent<RectTransform>(); mask.SetParent(wood.rectTransform, false); Centre(mask, 0, 42); mask.gameObject.AddComponent<RectMask2D>(); gridGoldMask[cell] = mask;
             var gold = new GameObject("Gold plate", typeof(RectTransform)).AddComponent<Image>(); gold.rectTransform.SetParent(mask, false); Centre(gold.rectTransform, 78, 42); gold.raycastTarget = false; Slots.Dress(gold, "table-plate-gold"); gridCellGold[cell] = gold;
             light.rectTransform.SetSiblingIndex(0); wood.rectTransform.SetSiblingIndex(1); // under the cell's symbol and name
-            BurnIn(gridCellNames[cell]); BurnIn(gridCellGlyphs[cell]);
+            BurnIn(gridCellNames[cell]); BurnIn(gridCellGlyphs[cell]); gridCellGlyphs[cell].fontSize = 18;
+            foreach (var label in new[] { gridCellNames[cell], gridCellGlyphs[cell] }) { var line = label.gameObject.AddComponent<Outline>(); line.effectColor = new Color(.17f, .11f, .09f, .95f); line.effectDistance = new Vector2(1, -1); line.enabled = false; } // live lettering keeps the Art Bible's dark-brown line, so every element reads on gold
             int seat = GridModel.SeatOf(cell); var fill = Slots.Image(LetterSlot(seat)); var shader = Resources.Load<Shader>("Shaders/LetterFill");
             if (fill != null && shader != null) { gridCellGlyphLive[cell] = LiveLetters(shader, fill, gridCellGlyphs[cell]); gridCellNameLive[cell] = LiveLetters(shader, fill, gridCellNames[cell]); }
         }
@@ -1031,7 +1043,7 @@ namespace Ascendant.CelestialDial
             if (dragSeat < 0) return; var tile = (RectTransform)gridTiles[dragSeat].transform;
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(gridScreen, screen, eye, out var local)) tile.anchoredPosition = new Vector2(local.x, local.y - 400); // the tile is placed from the screen's top centre, gridScreen's pivot is its middle
             int over = -1; for (int i = 0; i < 12; i++) if (Grid.CanChoose(i) && RectTransformUtility.RectangleContainsScreenPoint((RectTransform)gridCells[i].transform, screen, eye)) over = i;
-            if (over != hoverCell) { hoverCell = over; ShowGrid(); }
+            if (over != hoverCell) { hoverCell = over; ShowGrid(); Publish(); }
         }
         public void PlateDragEnd()
         {
@@ -1202,7 +1214,7 @@ namespace Ascendant.CelestialDial
         IEnumerator EmblemComesAlive(int seat, float hold)
         {
             var art = Slots.Image(EmblemSlot(seat)); var rect = (RectTransform)glyphEmblem.transform; var ink = InkSpots[InkPlace[seat]];
-            glyphEmblem.sprite = art; glyphEmblem.gameObject.SetActive(art != null); glyphCard.enabled = art == null;
+            glyphEmblem.sprite = art; glyphEmblem.gameObject.SetActive(art != null); glyphCard.enabled = art == null; Publish(); // the web state sees the emblem from its first frame
             if (art == null || ReducedMotion) { rect.anchoredPosition = new Vector2(0, -EmblemY); rect.localScale = Vector3.one; glyphEmblem.color = Color.white; ShowGlyphs(); yield return new WaitForSecondsRealtime(hold); }
             else
             {
@@ -1230,7 +1242,7 @@ namespace Ascendant.CelestialDial
             }
             EndRise();
         }
-        void EndRise() { glyphRising = false; bookCardRect.anchoredPosition = new Vector2(0, -CardY); glyphCard.color = Bone; for (int i = 0; i < 4; i++) ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i]; }
+        void EndRise() { glyphRising = false; Publish(); bookCardRect.anchoredPosition = new Vector2(0, -CardY); glyphCard.color = Bone; for (int i = 0; i < 4; i++) ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i]; }
         void AnswerGlyphReview(int slot)
         {
             if (busy) return;
@@ -1387,6 +1399,9 @@ namespace Ascendant.CelestialDial
             var lesson = Dial.Lesson; int target = lesson.CurrentGlyph;
             bool naming = lesson.Phase == LessonPhase.GlyphNames;
             closeBook.interactable = !busy;
+            for (int seat = 0; seat < 12; seat++) { int ink = InkOf(seat); bool sinking = revealSeat == seat; bookInk[seat].color = new Color(BookInk.r, BookInk.g, BookInk.b, sinking || ink == 0 ? 0 : ink == 2 ? InkFull : InkFaint); }
+            bool chrome = !bookPagesShown; glyphQuestion.gameObject.SetActive(chrome); glyphPanel.gameObject.SetActive(chrome); bookCardRect.gameObject.SetActive(chrome); glyphProgress.gameObject.SetActive(chrome); glyphNote.gameObject.SetActive(chrome);
+            foreach (var b in glyphNameButtons) b.gameObject.SetActive(chrome);
             var page = Slots.Image(naming ? "book-page" : "book-cover"); bookCard.sprite = page; bookCard.color = page != null ? Color.white : PanelColor; // Build E
             if (!naming) { glyphProgress.text = ""; glyphCard.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].GetComponentInChildren<Text>().text = ""; glyphCaspar.text = lesson.Message; glyphNote.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = false; return; } // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
             int shown = revealSeat >= 0 ? revealSeat : target; // during the answer's pause the answered symbol and its plates stay
@@ -1405,9 +1420,6 @@ namespace Ascendant.CelestialDial
                 warm.effectColor = new Color(1, .66f, .3f, picked ? .8f : 0); label.rectTransform.anchoredPosition = new Vector2(0, picked ? 3 : 0);
             }
             glyphCaspar.text = DialLesson.GlyphIntro; glyphNote.text = busy ? glyphNote.text : "";
-            for (int seat = 0; seat < 12; seat++) { int ink = InkOf(seat); bool sinking = revealSeat == seat; bookInk[seat].color = new Color(BookInk.r, BookInk.g, BookInk.b, sinking || ink == 0 ? 0 : ink == 2 ? InkFull : InkFaint); }
-            bool chrome = !bookPagesShown; glyphQuestion.gameObject.SetActive(chrome); glyphPanel.gameObject.SetActive(chrome); bookCardRect.gameObject.SetActive(chrome); glyphProgress.gameObject.SetActive(chrome); glyphNote.gameObject.SetActive(chrome);
-            foreach (var b in glyphNameButtons) b.gameObject.SetActive(chrome);
             if (naming && revealSeat < 0 && target >= 0 && target != shownGlyph && !busy) { shownGlyph = target; if (glyphRising) EndRise(); if (!ReducedMotion && Flow.Screen == SliceScreen.Book && isActiveAndEnabled) StartCoroutine(RiseQuestion()); }
         }
         int inHandCell(int cell) => Grid.Sign >= 0 && Grid.Cell == cell && !Grid.Placed[GridModel.SeatOf(cell)] ? Grid.Sign : -1; // the plate in hand, sitting in the well it was put in, until the Seal
@@ -1446,8 +1458,10 @@ namespace Ascendant.CelestialDial
                 if (gold && goldSeat != seat) gridGoldMask[i].sizeDelta = new Vector2(78, 42); else if (!gold) gridGoldMask[i].sizeDelta = new Vector2(0, 42);
                 bool live = filled; // the lettering comes alive once the sign is placed, on its own or with help (answer 1A)
                 gridCellNames[i].text = shows ? Zodiac.Seats[sign].Name : i == g.Rejected ? "×" : ""; gridCellGlyphs[i].text = shows ? Zodiac.Seats[sign].Glyph : "";
-                gridCellNames[i].material = live ? gridCellNameLive[i] : null; gridCellGlyphs[i].material = live ? gridCellGlyphLive[i] : null;
-                gridCellNames[i].color = gridCellGlyphs[i].color = live && gridCellNameLive[i] != null ? Color.white : i == g.Rejected && !shows ? Bone : BurnedInk;
+                gridCellNames[i].material = null; gridCellGlyphs[i].material = live ? gridCellGlyphLive[i] : null; // the symbol takes its element's material; the name, its element's deep colour, crisp at its size
+                foreach (var label in new[] { gridCellNames[i], gridCellGlyphs[i] }) { var line = label.GetComponent<Outline>(); if (line != null) line.enabled = live && label == gridCellGlyphs[i]; }
+                gridCellGlyphs[i].color = live && gridCellGlyphLive[i] != null ? Color.white : BurnedInk;
+                gridCellNames[i].color = live ? DeepElement(seat) : i == g.Rejected && !shows ? Bone : BurnedInk;
                 var drift = ReducedMotion ? Vector2.zero : LetterDrift(seat); if (gridCellNameLive[i] != null) { gridCellNameLive[i].SetVector("_Drift", drift); gridCellGlyphLive[i].SetVector("_Drift", drift); }
             }
             gridSeal.interactable = active && g.CanSeal;
@@ -1682,7 +1696,8 @@ namespace Ascendant.CelestialDial
             }
             {
                 state.bookEmblem = glyphEmblem != null && glyphEmblem.gameObject.activeInHierarchy && glyphEmblem.sprite != null ? glyphEmblem.sprite.name : ""; state.bookPages = bookPagesShown; state.bookRising = glyphRising;
-                state.bookInk = Enumerable.Range(0, 12).Select(InkOf).ToArray(); state.bookArt = Slots.Image("book-room") != null; state.bookPicked = revealSeat >= 0 && revealOwn && revealSlot >= 0 ? revealNames[revealSlot] : "";
+                state.bookInk = Enumerable.Range(0, 12).Select(InkOf).ToArray(); state.bookInkDrawn = bookInk.Count(t => t != null && t.isActiveAndEnabled && t.color.a > 0 && t.cachedTextGenerator.characterCountVisible > 0); state.bookArt = Slots.Image("book-room") != null; state.bookPicked = revealSeat >= 0 && revealOwn && revealSlot >= 0 ? revealNames[revealSlot] : ""; // the ink: inked and really laid out (a cut-off line draws nothing)
+                state.bookInkBox = bookInk.SelectMany(InkBox).ToArray();
                 if (partA) state.caspar = "This symbol belongs to which sign? " + (glyphNote.text ?? "") + " " + DialLesson.GlyphIntro;
             }
             if (glyphItem) state.practiceMode = "glyph";
@@ -1725,7 +1740,7 @@ namespace Ascendant.CelestialDial
                 state.gridTiles = Enumerable.Range(0, 12).Select(i => Grid.TileLabel(i)).ToArray(); state.gridCells = Enumerable.Range(0, 12).Select(i => Grid.CellLabel(i)).ToArray();
                 state.gridArt = gridPlates; state.gridDrag = dragSeat >= 0 ? Zodiac.Seats[dragSeat].Name : ""; state.gridHover = hoverCell;
                 state.gridPlates = Enumerable.Range(0, 12).Select(i => { int seat = GridModel.SeatOf(i); return Grid.Placed[seat] ? (PlacedOwn(seat) ? "gold" : "wood") : inHandCell(i) >= 0 ? "pending" : ""; }).ToArray();
-                state.gridLive = Enumerable.Range(0, 12).Select(i => gridPlates && gridCellNames[i].material == gridCellNameLive[i] && gridCellNameLive[i] != null).ToArray();
+                state.gridLive = Enumerable.Range(0, 12).Select(i => gridPlates && gridCellGlyphLive[i] != null && gridCellGlyphs[i].material == gridCellGlyphLive[i]).ToArray();
                 state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
             }
         }
