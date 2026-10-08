@@ -162,11 +162,12 @@ namespace Ascendant.CelestialDial
     // Unavailable: the whole button at half. Keyboard focus keeps today's warm tint; a tap leaves no focus behind (no lingering tint).
     public sealed class ButtonFeel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
     {
-        public string Kind; public RectTransform Look; public Text Label; public Color LabelUp = Color.white, LabelDown = Color.white; public bool Upper; // Upper: a room's capitals, kept when the words change
+        public string Kind; public RectTransform Look; public Text Label; public Color LabelUp = Color.white, LabelDown = Color.white; public bool Upper; public Color Tone = Color.white; // Tone: a shade over every state's tint (the Book's near-black plates, owner Oct 8) // Upper: a room's capitals, kept when the words change
         public readonly List<Image> Pieces = new List<Image>();
         static readonly Color Pressed = new Color(.78f, .78f, .78f), Focus = new Color(.85f, .7f, .55f); // the art lane's pressed tint; today's selected tint
         Selectable selectable; CanvasGroup group; bool down; int shown = -1; string seen;
         public bool Down => down;
+        public void Repaint() { shown = -1; Show(); }
         void Init() { if (selectable == null) selectable = GetComponent<Selectable>(); if (group == null) { group = GetComponent<CanvasGroup>(); if (group == null) group = gameObject.AddComponent<CanvasGroup>(); } }
         void Awake() => Init();
         public void OnPointerDown(PointerEventData e) { Init(); if (selectable == null || selectable.interactable) down = true; }
@@ -182,7 +183,7 @@ namespace Ascendant.CelestialDial
             bool focused = EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject;
             int state = !available ? 0 : down ? 2 : focused ? 3 : 1; if (state == shown) return; shown = state;
             if (group != null) group.alpha = available ? 1 : .5f;
-            var tint = state == 2 ? Pressed : state == 3 ? Focus : Color.white; foreach (var p in Pieces) if (p != null) p.color = tint;
+            var tint = (state == 2 ? Pressed : state == 3 ? Focus : Color.white) * Tone; tint.a = 1; foreach (var p in Pieces) if (p != null) p.color = tint;
             if (Label != null) Label.color = state == 2 ? LabelDown : LabelUp;
             if (Look != null) Look.anchoredPosition = state == 2 ? new Vector2(0, -1) : Vector2.zero;
         }

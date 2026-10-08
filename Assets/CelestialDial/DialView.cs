@@ -109,6 +109,7 @@ namespace Ascendant.CelestialDial
             public bool namesHidden, glyphWheel, key2, v03Complete;
             public string glyphMode = "", glyphChar = "", glyphTarget = "";
             public string[] glyphOptions;
+            public string bookEmblem = ""; public int[] bookInk = new int[0]; public bool bookPages, bookRising, bookArt; public string bookPicked = ""; // the Book comes alive (owner, Oct 7-8): the emblem shown, each seat's ink (0, 1 faint, 2 full), the pages' look, the rise, the right plate
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public float chatBoxHeight;
@@ -162,6 +163,7 @@ namespace Ascendant.CelestialDial
             public string[] pois, poiLabels;
             // Build B: the table
             public string gridReadout = "", gridStatus = "", gridSign = "";
+            public string[] gridPlates = new string[0]; public bool[] gridLive = new bool[0]; public string gridDrag = ""; public int gridHover = -1; public bool gridArt; // the Table comes alive (Oct 7-8): each well's plate (gold, wood, pending or none), its live lettering, the plate being dragged, the well under it
             public string[] gridTiles, gridCells;
             public int gridPlaced, gridCell = -1, gridHintLevel; // the level is test evidence only, never shown
             public bool gridOpen, gridStarted, gridComplete, gridPaused, gridLocked, key3, canEnterGrid, canGridPick, canGridSeal, canGridAsk, canLeaveGrid;

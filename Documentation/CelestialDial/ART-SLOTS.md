@@ -52,6 +52,27 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `shelf-book` | 10 × 26 | 64 | a book on a shelf: three on the Wing's, three that return to the Atrium's at Stage 4 |
 | `book-cover` | 140 × 140 | 512 | the book on the shelf, closed |
 | `book-page` | 140 × 140 | 512 | the book's open page behind each symbol |
+| `book-room` | 360 × 800 | 2048 | the Book of Symbols' screen: the Book open on a carved lectern in the Zodiac Wing's moonlight, two candles; behind today's layout (owner, Oct 7, 86bcex5kc 4A; 86bcf0x71) |
+| `table-room` | 360 × 800 | 2048 | the Elemental Table's screen: the table's dark-wood top from above, a brass border, moonlight and a warm lamp; the wells and plates draw over it (86bcf0x71) |
+| `table-well` | 86 × 48 | 256 | one well carved into the Table's top, drawn at each of its twelve squares; empty |
+| `table-plate` | 82 × 44 | 256 | a plain wooden plate, one per sign; the game burns its symbol and name in |
+| `table-plate-gold` | 82 × 44 | 256 | the same plate turned gold, when a sign is placed on the player's own (owner, Oct 7) |
+| `letter-fire` | 128 × 128 | 512 | a tileable fill of drawn flames and embers for the Table's live lettering (Shaders/LetterFill) |
+| `letter-earth` | 128 × 128 | 512 | a tileable fill of drawn moss and stone for the Table's live lettering |
+| `letter-air` | 128 × 128 | 512 | a tileable fill of drawn wind and cloud for the Table's live lettering |
+| `letter-water` | 128 × 128 | 512 | a tileable fill of drawn deep water for the Table's live lettering |
+| `emblem-aries` | 180 × 180 | 512 | the Aries symbol as a living emblem of fire, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-taurus` | 180 × 180 | 512 | the Taurus symbol as a living emblem of earth, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-gemini` | 180 × 180 | 512 | the Gemini symbol as a living emblem of air, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-cancer` | 180 × 180 | 512 | the Cancer symbol as a living emblem of water, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-leo` | 180 × 180 | 512 | the Leo symbol as a living emblem of fire, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-virgo` | 180 × 180 | 512 | the Virgo symbol as a living emblem of earth, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-libra` | 180 × 180 | 512 | the Libra symbol as a living emblem of air, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-scorpio` | 180 × 180 | 512 | the Scorpio symbol as a living emblem of water, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-sagittarius` | 180 × 180 | 512 | the Sagittarius symbol as a living emblem of fire, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-capricorn` | 180 × 180 | 512 | the Capricorn symbol as a living emblem of earth, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-aquarius` | 180 × 180 | 512 | the Aquarius symbol as a living emblem of air, raised by the Book once it is answered (owner, Oct 8: the set approved) |
+| `emblem-pisces` | 180 × 180 | 512 | the Pisces symbol as a living emblem of water, raised by the Book once it is answered (owner, Oct 8: the set approved) |
 | `journal-page` | 360 × 800 | 2048 | the journal's page (Build F; Build AA, Sept 30: the Black Hours: one tall black-blue vellum page in the black book, gold corner flourishes, a calm field; painterly by the owner's journal-only exception; no rules, the engine draws the silver rules and the margin) |
 | `journal-cover` | 60 × 60 | 256 | the journal's closed cover: black leather, the gold wheel inlay (Build F; Build AA) |
 | `journal-ribbon` | 16 × 120 | 256 | a faded vermilion silk ribbon bookmark, forked tail at the bottom; nine-sliced to the ladder's length on a sign page, a short tab on a seat when due |

@@ -7,7 +7,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=166,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=187,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
   const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()).filter(Boolean).map(w=>w==='360'?{width:360,height:800}:/^\d+x\d+$/.test(w)?{width:+w.split('x')[0],height:+w.split('x')[1]}:{width:390,height:844}); // Part 2: or any WxH
@@ -482,6 +482,15 @@ const path=require('path');
       const target=SIGNS.findIndex(name=>s.glyphChar===['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'][SIGNS.indexOf(name)]);
       const slot=s.glyphOptions.indexOf(SIGNS[target]);
       await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
+      if(n===0){ // the Book comes alive (owner, Oct 7-8; 86bcf0x71): the answered symbol becomes its element's emblem, the right plate floats, then it inks the page
+        const a=await state(); check(a.bookArt && a.bookEmblem==='emblem-'+SIGNS[target].toLowerCase() && a.bookPicked===SIGNS[target],'a right answer raises '+SIGNS[target]+'\'s emblem from the Book, its plate floating, at '+viewport.width);
+        await page.screenshot({path:path.join(out,viewport.width+'-book-emblem.png')});
+        await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000});
+        const b=await state(); check(b.bookEmblem==='' && b.bookInk[target]===2 && b.bookInk.filter(x=>x>0).length===1,'then it sinks into the pages as ink, in full (answered on its own), and no other symbol is inked, at '+viewport.width);
+      }
+      if(n===11){await page.waitForFunction(()=>window.ascendantDial.snapshot().bookPages,{},{timeout:15000});
+        const p=await state(); check(p.bookPages && p.bookInk.every(x=>x>0),'the twelfth answer shows the full pages a moment, every symbol inked, before the room at '+viewport.width);
+        await page.screenshot({path:path.join(out,viewport.width+'-book-pages.png')}); }
       if(n===4){
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
         await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
@@ -641,7 +650,19 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-grid-ask.png')});
     await semantic('grid-cell-'+CELL(2));await semantic('grid-seal');await settled();
     check((await state()).gridPlaced===3 && !events.filter(e=>e.event_name==='grid_placed')[2].evidence_eligible,'a seating after asking earns no evidence at '+viewport.width);
-    for(const seat of [3,4])await seatSign(seat);
+    // the Table comes alive (owner, Oct 7-8; 86bcf0x71): gold for a sign placed on the player's own, wood for one Caspar's rule placed; the lettering alive on both
+    { const g=await state(); check(g.gridArt && g.gridPlates[CELL(0)]==='gold' && g.gridPlates[CELL(1)]==='gold' && g.gridPlates[CELL(2)]==='wood' && [0,1,2].every(k=>g.gridLive[CELL(k)]) && g.gridPlates.filter(x=>x).length===3,'the Table comes alive: Aries and Taurus (on their own) gold, Gemini (after asking) wood, all three with live lettering, at '+viewport.width); }
+    // drag (owner, Oct 7: drag and tap): the Cancer plate dragged on the canvas from the tray into its well, then Seal
+    { const scale=Math.min(viewport.width/360,viewport.height/800),X=x=>viewport.width/2+x*scale,Y=y=>(viewport.height-800*scale)/2+y*scale;
+      await page.mouse.move(X(129),Y(342));await page.mouse.down();for(let k=1;k<=12;k++){await page.mouse.move(X(129+(-72-129)*k/12),Y(342+(284-342)*k/12));await page.waitForTimeout(16);}
+      { const g=await state(); check(g.gridDrag==='Cancer' && g.gridHover===CELL(3),'a plate dragged over a well lights it: Cancer over Water, cardinal, at '+viewport.width); }
+      await page.mouse.up();await page.waitForTimeout(150); }
+    { const g=await state(); check(g.gridSign==='Cancer' && g.gridCell===CELL(3) && g.gridPlates[CELL(3)]==='pending' && g.gridDrag==='' && events.some(e=>e.event_name==='cell_chosen'&&e.input_method==='Drag'),'let go over the well, the plate sits in it until Seal, and the choice is logged as a drag, at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-grid-drag.png')});
+    await semantic('grid-seal');await page.waitForTimeout(250);
+    await page.screenshot({path:path.join(out,viewport.width+'-grid-gold.png')});await settled();
+    check((await state()).gridPlaced===4 && (await state()).gridPlates[CELL(3)]==='gold' && events.filter(e=>e.event_name==='grid_placed')[3].evidence_eligible,'the dragged plate seals like a tapped one and turns gold at '+viewport.width);
+    await seatSign(4);
     check((await state()).gridPlaced===5,'five seated at '+viewport.width);
     await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
     check((await state()).gridStarted && (await state()).gridPlaced===5 && (await state()).keys===2,'a reload mid-table keeps the five seated signs at '+viewport.width);
@@ -649,10 +670,12 @@ const path=require('path');
     check((await state()).caspar.includes('already placed'),'the room says the table waits, part seated, at '+viewport.width);
     await semantic('poi-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='grid'&&window.ascendantDial.snapshot().canGridPick,{},{timeout:15000});
     check((await state()).avatarAt==='grid'&&(await state()).gridPlaced===5 && (await state()).caspar.includes('5 of twelve') && (await state()).gridCells[CELL(4)]==='Fire, fixed: Leo','tapping the table resumes it with its five seated signs at '+viewport.width);
+    { const g=await state(); check(g.gridPlates[CELL(0)]==='gold' && g.gridPlates[CELL(2)]==='wood' && g.gridPlates[CELL(4)]==='gold','after a reload the gold and wood plates read from the deck as they were at '+viewport.width); }
     await semantic('grid-sign-5');for(const wrong of [6,7,8]){await semantic('grid-cell-'+CELL(wrong));await semantic('grid-seal');await page.waitForTimeout(150);} // Virgo: three wrong cells
     await page.waitForFunction(()=>window.ascendantDial.snapshot().gridHintLevel===3||window.ascendantDial.snapshot().gridPlaced===6,{},{timeout:10000});
     await settled();
     check((await state()).gridPlaced===6 && (await state()).caspar.includes('Virgo is placed') && !events.filter(e=>e.event_name==='grid_placed')[5].evidence_eligible,'three wrong cells hand the sign to Caspar, who seats it without evidence at '+viewport.width);
+    check((await state()).gridPlates[CELL(5)]==='wood' && (await state()).gridLive[CELL(5)],'the sign Caspar placed stays wood, its lettering alive (owner, Oct 7, 1A), at '+viewport.width);
     for(let seat=6;seat<11;seat++)await seatSign(seat);
     await semantic('grid-sign-11');await semantic('grid-cell-'+CELL(11));await semantic('grid-seal'); // the last seat without settling, so the capture lands mid-ceremony
     await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===3,{},{timeout:20000});await page.waitForTimeout(950);await page.screenshot({path:path.join(out,viewport.width+'-key3-ceremony.png')}); // Build I: the Key rises
