@@ -54,7 +54,7 @@ Your progress saves in your browser the moment anything changes. Come back later
 
 ## What's next
 
-- An art pass: the Book of Symbols and the Elemental Table get their art, the doors in the Atrium and the Wing are tapped instead of using buttons, and the Dial's eye at Key 1 is fixed. The book on the shelf gets the same treatment as the rest of the Wing.
+- An art pass: the Book of Symbols and the Elemental Table get their art, the doors in all three rooms (the Atrium, the Wing and the Chamber) are tapped instead of using buttons, and the Dial's eye at Key 1 is fixed. The book on the shelf gets the same treatment as the rest of the Wing.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in; the work is on hold until the owner says.
 - Caspar's last few lines, around practice and the journal.
 - Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.
