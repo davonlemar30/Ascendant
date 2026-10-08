@@ -582,7 +582,7 @@ namespace Ascendant.CelestialDial
             var rings = Rect("Rings", dial, 0, 102, 175, 175); rings.gameObject.SetActive(!wingBaked && !Slots.Dress(dialImage, "dial-face")); if (wingBaked) dialImage.color = new Color(0, 0, 0, 0); // the face seen from the room
             RingLines(rings, 88, new Color(Bone.r, Bone.g, Bone.b, .4f), null); RingLines(rings, 30, new Color(Bone.r, Bone.g, Bone.b, .25f), null);
             var waitingGlow = Rect("Dial glow", wingRoom, 40, 330, 250, 250); dialGlow = waitingGlow.gameObject.AddComponent<Image>(); dialGlow.sprite = wingBaked ? SoftRing() : SoftGlow(); dialGlow.color = new Color(.95f, .8f, .5f, 0); dialGlow.raycastTarget = false; waitingGlow.SetSiblingIndex(dial.GetSiblingIndex()); // Build I (86bc1brxd): behind the Dial
-            var dialLabel = Label(wingRoom, "The Dial", 40, 452, 120, 16, 10); dialLabel.gameObject.SetActive(wingKit.Count == 0); // Build M: the grey labels go once the kit is in (owner, Sept 24) dialLabel.color = Muted;
+            var dialLabel = Label(wingRoom, "The Dial", 40, 452, 120, 16, 10); dialLabel.gameObject.SetActive(wingKit.Count == 0); dialLabel.color = Muted; // Build M: the grey labels go once the kit is in (owner, Sept 24)
             Tappable(dial, () => Walk("dial"));
             // Build B (07 Room Scope amendment): a second interactive object, the table with its board of twelve, dark until the modality unit is complete.
             var table = Block(wingRoom, "The table", -62, 400, 90, 90, wingBaked ? null : "table"); if (wingBaked) table.GetComponent<Image>().color = new Color(0, 0, 0, 0);
@@ -595,7 +595,7 @@ namespace Ascendant.CelestialDial
             if (wingKit.Count > 0) foreach (var block in new[] { shelf, table, door }) foreach (var t in block.GetComponentsInChildren<Text>(true)) t.gameObject.SetActive(false); // Build M: the plates name the doors now
             var light = Rect("Doorway light", door, 0, 72, 30, 118); var lightImage = light.gameObject.AddComponent<Image>(); lightImage.color = new Color(.95f, .8f, .5f, HasArt(door) ? .05f : .25f); lightImage.raycastTarget = false;
             var floor = Rect("Floor band", wingRoom, 0, BandY, 340, 30); var floorImage = floor.gameObject.AddComponent<Image>(); floorImage.color = new Color(.16f, .16f, .19f, wingBaked ? 0 : 1); floorImage.raycastTarget = false;
-            wingRoomCaption = Label(wingRoom, "The Dial stands at the center of the room. The doorway behind you leads back to the Atrium.", 0, 466, 340, 36, 12); // owner (worksheet section 6) // two lines at 360 wide wingRoomCaption.color = Muted; // placeholder (owner writes)
+            wingRoomCaption = Label(wingRoom, "The Dial stands at the center of the room. The doorway behind you leads back to the Atrium.", 0, 466, 340, 36, 12); wingRoomCaption.color = Muted; // owner (worksheet section 6); two lines at 360 wide
             enterGrid = MakeButton(wingRoom, "The Table", 0, 512, 300, 52, () => Walk("grid")); enterGrid.gameObject.SetActive(false); // Build B: shown once the table has woken // owner (worksheet section 11)
             enterDial = MakeButton(wingRoom, "The Dial", 0, 624, 300, 52, () => Walk("dial"));
             enterShelf = MakeButton(wingRoom, "The Bookshelf", 0, 568, 300, 52, () => Walk("shelf")); enterShelf.gameObject.SetActive(false); // owner (worksheet section 7)
