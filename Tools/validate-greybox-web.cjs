@@ -1006,7 +1006,7 @@ const path=require('path');
     await visit();await send('motion-on');await landing();
     { const s=await snap(); check(s.inscriptionId!==second.inscriptionId && s.inscriptionId!=='first' && !s.inscriptionWriting && inscription(s).length>=1 && s.inscriptionRecent.join()===second.inscriptionId+','+s.inscriptionId,'the visit after brings a different line ('+s.inscriptionId+'); with Reduced motion it shows whole at once, at '+viewport.width); }
     // Jeffrey, #128 B2: a reload in the middle of the first-ever title page brings the title page and the Oct 2 line back
-    await send('close-journal');await act('jump-key1');await resumed();await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='title',8000);
+    await send('close-journal');await act('jump-key1');await ip.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='title',8000);
     await visit();await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().inscriptionWriting,12000);
     { const s=await snap(); check(s.inscriptionId==='first' && inscription(s).join(' ')==="What's up, Tester. I'm your journal, and I'll keep a record of what you learn from the Library.",'a game closed during the first-ever title page shows the title page and the Oct 2 line next time, at '+viewport.width); }
     check(inkErrors.length===0,'Oct 7: no runtime exceptions through the inscription\'s visits at '+viewport.width+(inkErrors.length?': '+inkErrors[0]:''));
