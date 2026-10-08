@@ -20,7 +20,7 @@ Validation (local, Unity 6000.3.24f1, final head `c1d9dac`):
 - headless WebGL 0 errors and 0 warnings;
 - browser suite 689/689 at desktop density and 689/689 at phone density;
 - GitHub Actions Web build green;
-- production: still to come (the check is in progress; Claude posts the number on the task).
+- production, after the Pages deploy of main `fcbaa9d`: 689/689 at phone density (`DEVICE_SCALE=2 MOBILE=1`) against https://davonlemar30.github.io/Ascendant/, main's own suite, no failures (Claude, posted on 86bcex5kc).
 
 Captures on the task: the eye at Key 1 before and after, and Key 2 for comparison (the first after-capture shows the too-wide band Jeffrey caught). Reviews: Jeffrey's B1 (the lifted opening covers the eye only) fixed; N1 (a swallowed statement restored), N2 (stale comments) and N3 (Chamber checks) applied; N5 as above; N4 (no capture of the doorway glow) was accepted, since the glow is not tested on a phone; N6 (wording slips) closed. Not tested: the doorway glow on a real phone. Open tidy-up: a whitespace-only line at `index.html:175`, left in to keep the reviewed head.
 
@@ -44,7 +44,7 @@ Validation (local, Unity 6000.3.24f1, final head `881bd80`):
 - headless WebGL 0 errors and 0 warnings;
 - browser suite 685/685 at desktop density and 685/685 at phone density;
 - GitHub Actions Web build green;
-- production: still to come. Claude posts the number on the task after the Pages deploy.
+- production: 689/689 at phone density against https://davonlemar30.github.io/Ascendant/. The check was deferred and ran on the later main `fcbaa9d`, which includes #128 and #131 (its own suite, so 689 not 685), with no failures (Claude, posted on 86bceba0a). Main at #128's own merge, `9b94eea`, was not checked separately.
 
 Reviews: Jeffrey's B1 (the tap layer ends above Close the journal) and B2 (the first-ever open saves after its title beat) fixed; N1 to N3 applied; N4 (Dante's `sun-table` question) was answered on the PR, not by a change; N5 is this record and the pointers below; N6 is an open bug (closing the journal by hand during the first-ever title page, then quitting before reopening, loses the Oct 2 line). Claude folded the fix into the art pass (task 86bcex5kc, comment 90140265774355) as his own working choice: the owner was told and did not object, and it is not the owner's ruling. The fix is commit 98bb708 on codex/art-pass. Dante's flags: the owner changed one line ("Some journals stay blank forever. I got lucky, [Name]." in place of "...Not me, [Name]. Not with you around.") and kept the other two. Not tested: a real absence between real sittings in a browser (the mechanical checks fake the count), a name with "<" on screen, a phone or the APK (no cut).
 
