@@ -735,17 +735,18 @@ namespace Ascendant.Build
             Check(swallowed.Count == 0, "no line of the game's C# hides statements behind a // comment" + (swallowed.Count > 0 ? ": " + string.Join(", ", swallowed) : ""));
         }
         // A comment's tail hides code if it has the first form's shape, a call (a name right against its `(`, closed by `);`), or an
-        // assignment (`=`, `+=`, `-=` and the like) whose right side reads as code. Prose like "owner (worksheet section 13);" puts a space
-        // before its `(`, and prose like "dialVoice = the box wears the Dial's blue;" has two plain words side by side, which code has
-        // only around a keyword ("new Color", "is not null"). String and char literals are blanked first, so quoted words count as neither.
+        // assignment (`=`, `+=`, `-=` and the like) whose right side reads as code; a name runs through `.`, `?.`, indexers, type arguments and calls.
+        // Prose like "owner (worksheet section 13);" puts a space before its `(`. Prose like "dialVoice = the box wears the Dial's blue;"
+        // or "size = 340 wide;" has two plain words (or a number and a word) side by side, which code has only around a keyword
+        // ("new Color", "is not null"). String and char literals are blanked first, so quoted words count as neither.
         static readonly System.Text.RegularExpressions.Regex FirstFormClose = new System.Text.RegularExpressions.Regex(@"\)\s*;");
         static readonly System.Text.RegularExpressions.Regex FirstFormStatement = new System.Text.RegularExpressions.Regex(@";\s*(?:var |string |int |float |bool )?[A-Za-z_][\w\.\[\]]*\s*(?:\(|=[^=>])");
         static readonly System.Text.RegularExpressions.Regex Literal = new System.Text.RegularExpressions.Regex(@"""(?:[^""\\]|\\.)*""|'(?:[^'\\]|\\.)'");
-        const string CodeName = @"(?<![\w.])[A-Za-z_]\w*(?:\.[A-Za-z_]\w*|\[[^\]\[;]*\]|<[^<>;]*>|\([^();]*\))*";
+        const string CodeName = @"(?<![\w.])[A-Za-z_]\w*(?:\??\.[A-Za-z_]\w*|\??\[[^\]\[;]*\]|<[^<>;]*>|\([^();]*\))*";
         static readonly System.Text.RegularExpressions.Regex Call = new System.Text.RegularExpressions.Regex(CodeName + @"\((?:(?!//)[^;])*\)\s*;");
         static readonly System.Text.RegularExpressions.Regex Assignment = new System.Text.RegularExpressions.Regex(CodeName + @"\s*(?:[-+*/%&|^]|\?\?)?=(?![=>])(?<rhs>(?:(?!//)[^;])+);");
         const string Keyword = @"(?:new|is|as|not|and|or|in|out|ref|await|typeof|nameof|default|null|true|false|this|base|var|stackalloc|checked|unchecked|when|with|switch)(?![\w.])";
-        static readonly System.Text.RegularExpressions.Regex PlainWords = new System.Text.RegularExpressions.Regex(@"(?<![\w.])(?!" + Keyword + @")[A-Za-z_][\w.]*\s+(?!" + Keyword + @")[A-Za-z_]");
+        static readonly System.Text.RegularExpressions.Regex PlainWords = new System.Text.RegularExpressions.Regex(@"(?<![\w.])(?!" + Keyword + @")\w[\w.]*\s+(?!" + Keyword + @")[A-Za-z_]");
         static bool HidesStatement(string tail)
         {
             if (FirstFormClose.IsMatch(tail) && FirstFormStatement.IsMatch(tail)) return true;
