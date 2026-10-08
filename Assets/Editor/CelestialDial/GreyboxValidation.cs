@@ -532,7 +532,7 @@ namespace Ascendant.Build
             var sitOut = lines.Where(l => Enumerable.Range(0, 12).Any(z => Rows(Fill(l.text, longest, z)) > SliceFlow.InscriptionMostLines)).Select(l => l.id).ToList();
             Check(groups.All(g => lines.Any(l => l.group == g && !sitOut.Contains(l.id))), "with a 24-character name every group keeps lines; those that would take a fourth line sit out for that name (" + (sitOut.Count == 0 ? "none" : string.Join(", ", sitOut)) + ")");
             var seconds = filled.Select(t => SliceView.InkSeconds(SliceView.WrapWords(probe, t, SliceView.KeeperWidth))).ToList();
-            Check(seconds.Min() >= 1.5f && seconds.Max() <= 4f && SliceView.InkFade == .15f && SliceView.InkStep == .035f && SliceView.InkDelay == .3f, "the ink: each letter fades over 0.15 s, 35 ms apart, with a rest at a comma or a full stop; a line takes " + seconds.Min().ToString("0.0") + " to " + seconds.Max().ToString("0.0") + " s, starting 0.3 s after the landing");
+            Check(seconds.Min() >= 2f && seconds.Max() <= 3.6f && SliceView.InkFade == .15f && SliceView.InkStep == .035f && SliceView.InkDelay == .3f, "the ink: each letter fades over 0.15 s, 35 ms apart, with a rest at a comma or a full stop; a line takes " + seconds.Min().ToString("0.0") + " to " + seconds.Max().ToString("0.0") + " s, starting 0.3 s after the landing");
             UnityEngine.Object.DestroyImmediate(probeObject);
             // how a line is picked
             SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.SetName("Davon"); f.Continue(); f.ChooseBirth("skip"); f.PickSkipSun(1); f.PickSkipMoon(3); f.PickRising(4); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; }
@@ -570,6 +570,8 @@ namespace Ascendant.Build
             var narrow = JsonUtility.FromJson<SaveData>(after); var fits = new List<string>(); for (int i = 0; i < 20; i++) { var v = new SliceFlow(() => 1); v.SeedInscription(100 + i); v.InscriptionFits = t => !t.Contains("Davon"); v.Restore(JsonUtility.FromJson<SaveData>(after)); v.OpenJournal(); fits.Add(v.InscriptionText); }
             Check(fits.All(t => !t.Contains("Davon")), "a line the record can't fit in three lines for this name sits out of this player's pool");
             var keeper = new SliceFlow(() => 1); Check(keeper.FillInscription("Hello again, {name}.") == "Hello again, Keeper.", "with no saved name the line says Keeper");
+            var odd = Fresh(); odd.SetName("{sun}"); Check(odd.FillInscription("Hello again, {name}.") == "Hello again, {sun}.", "a name goes in last, as typed, so it never pulls in the sun's words (Jeffrey, #128 N1)");
+            Check(SliceView.InkTapBottom <= SliceView.JournalCloseY - 24, "the tap that finishes the line ends at " + SliceView.InkTapBottom + ", above Close the journal (Jeffrey, #128 B1)");
         }
         static void ValidateTriangles()
         {

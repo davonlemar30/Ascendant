@@ -1931,7 +1931,7 @@ namespace Ascendant.CelestialDial
             PageLine(journalTitlePage, SliceFlow.TitlePageLine, JournalX, 392, 280, 16, journalItalic, new Color(SilverInk.r, SilverInk.g, SilverInk.b, .86f));
             // the landing: the Keeper's record, then the two doors (placed by ShowJournalLanding, under the record's lines)
             journalLanding = Rect("Landing", journal, 0, 400, 360, 800); journalLandingGroup = journalLanding.gameObject.AddComponent<CanvasGroup>();
-            var inkTap = Rect("Finish the line", journalLanding, 0, 400, 360, 800); var inkTapImage = inkTap.gameObject.AddComponent<Image>(); inkTapImage.color = Color.clear; // a tap on the page finishes the line (Oct 7); the doors sit above it
+            var inkTap = Rect("Finish the line", journalLanding, 0, InkTapBottom / 2, 360, InkTapBottom); var inkTapImage = inkTap.gameObject.AddComponent<Image>(); inkTapImage.color = Color.clear; // a tap on the page finishes the line (Oct 7); the doors sit above it
             inkTap.gameObject.AddComponent<Button>().onClick.AddListener(InscriptionTap); inkTap.GetComponent<Button>().transition = Selectable.Transition.None;
             Flourish(journalLanding, KeeperFirst); journalFlourishBottom = Flourish(journalLanding, KeeperFirst + KeeperRule * 6);
             journalKeeperHeading = PageLine(journalLanding, SliceFlow.KeeperHeading, JournalX, 0, 200, 16, serif, GiltInk); journalKeeperHeading.gameObject.AddComponent<Tracking>().Spacing = 16 * .3f; // the board: small capitals spaced .3 em
@@ -2061,6 +2061,7 @@ namespace Ascendant.CelestialDial
         // full stop, so it reads as a pen moving, not a typewriter. It starts 0.3 s after the landing shows; on the first-ever open, as the
         // title page finishes fading. Nothing waits for it: the doors work throughout, and a tap anywhere else on the page finishes the line.
         // Reduced motion shows it whole at once (decision 4); the screen reader hears it whole from the start.
+        public const float InkTapBottom = JournalCloseY - 24 - 8; // the tap layer ends above Close the journal (Jeffrey, #128 B1)
         public const float InkFade = .15f, InkStep = .035f, InkComma = .12f, InkStop = .22f, InkDelay = .3f;
         List<string> inscriptionLines = new List<string>(); string inscriptionWritten = ""; Coroutine inscriptionWriting;
         public static float[] InkTimes(IList<string> lines) // when each letter starts, line by line, in seconds after the first
@@ -2095,7 +2096,7 @@ namespace Ascendant.CelestialDial
                     }
                     keeperLines[i].text = text.ToString();
                 }
-                if (done) break;
+                if (done || ReducedMotion) break; // Reduced motion turned on mid-line shows it whole (decision 4)
                 yield return null;
             }
             FinishInscription();
@@ -2434,7 +2435,7 @@ namespace Ascendant.CelestialDial
             if (Flow.SignKnows(seat, ItemKind.Glyph)) facts.Insert(0, "Symbol: " + Zodiac.Seats[seat].Glyph);
             return "Your journal. " + Zodiac.Seats[seat].Name + ", " + SliceFlow.SeatStateNames[Flow.SeatState(seat)] + ". " + string.Join(". ", facts) + (Flow.SignDue(seat) ? ". Ready for practice." : ".");
         }
-        void OpenJournal() { if (busy || !Flow.OpenJournal()) return; Sound.Play("page"); Save(); Show(); Publish(); } // saved now: the line just picked must not come round next time, even if the game closes (Oct 7)
+        void OpenJournal() { if (busy || !Flow.OpenJournal()) return; Sound.Play("page"); if (Flow.JournalAt == JournalView.Landing) Save(); Show(); Publish(); } // saved now: the line just picked must not come round next time, even if the game closes (Oct 7); the first-ever open saves after its title beat, so a close mid-beat brings the title page back (Jeffrey, #128 B2)
         void CloseJournal() { if (busy || !Flow.CloseJournal()) return; if (journalBeat != null) { StopCoroutine(journalBeat); journalBeat = null; } Sound.Play("page"); Save(); Show(); Publish(); }
         void JournalContents() { if (busy || !Flow.JournalToContents()) return; Sound.Play("page"); ShowJournal(); Publish(); } // the Contents door, and "‹ Contents" on a chapter
         void JournalHome() { if (busy || !Flow.JournalToLanding()) return; Sound.Play("page"); ShowJournal(); Publish(); }   // "‹ Your Journal" on Contents

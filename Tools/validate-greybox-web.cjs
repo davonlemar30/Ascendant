@@ -993,14 +993,22 @@ const path=require('path');
     check(second.inscriptionId!=='first' && ['any','key','sun'].includes(second.inscriptionGroup) && second.inscriptionWriting && inscription(second).length>=1 && inscription(second).length<=3 && !/[0-9]/.test(secondLine) && !secondLine.includes('{') && second.inscriptionRecent.join()===second.inscriptionId && second.caspar.includes(secondLine),
       'the next visit lands on a new line ('+second.inscriptionId+': '+secondLine+'), three lines at most, no number; the screen reader hears it whole while it writes, at '+viewport.width);
     await ip.screenshot({path:path.join(out,viewport.width+'-inscription-writing.png')});
-    await tap(-150,700); // the page's margin, clear of the doors
+    await tap(-150,600); // the page's margin, clear of the doors
     { const s=await snap(); check(!s.inscriptionWriting && s.journalView==='landing' && inscription(s).join(' ')===secondLine,'a tap on the page finishes the line at once, at '+viewport.width); }
     await ip.screenshot({path:path.join(out,viewport.width+'-inscription-written.png')});
     await act('journal-contents');await until(()=>window.ascendantDial.snapshot().journalView==='contents');await act('journal-landing');await until(()=>window.ascendantDial.snapshot().journalView==='landing');
     { const s=await snap(); check(s.inscriptionId===second.inscriptionId && !s.inscriptionWriting && s.inscriptionRecent.length===1,'back from Contents the same line shows, already written; the line holds for the visit, at '+viewport.width); }
+    await tap(0,714);await until(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,8000).catch(()=>{}); // Jeffrey, #128 B1: Close the journal, tapped on the canvas from the landing
+    { const s=await snap(); check(s.screen==='hub','a canvas tap on Close the journal closes it from the landing, at '+viewport.width); }
+    await landing();
+    { const s=await snap(); check(s.inscriptionId===second.inscriptionId && !s.inscriptionWriting,'opened again in the same visit, the same line, written, at '+viewport.width); }
     // another visit, with Reduced motion: a different line, shown whole at once
     await visit();await send('motion-on');await landing();
     { const s=await snap(); check(s.inscriptionId!==second.inscriptionId && s.inscriptionId!=='first' && !s.inscriptionWriting && inscription(s).length>=1 && s.inscriptionRecent.join()===second.inscriptionId+','+s.inscriptionId,'the visit after brings a different line ('+s.inscriptionId+'); with Reduced motion it shows whole at once, at '+viewport.width); }
+    // Jeffrey, #128 B2: a reload in the middle of the first-ever title page brings the title page and the Oct 2 line back
+    await send('close-journal');await act('jump-key1');await resumed();await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='title',8000);
+    await visit();await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().inscriptionWriting,12000);
+    { const s=await snap(); check(s.inscriptionId==='first' && inscription(s).join(' ')==="What's up, Tester. I'm your journal, and I'll keep a record of what you learn from the Library.",'a game closed during the first-ever title page shows the title page and the Oct 2 line next time, at '+viewport.width); }
     check(inkErrors.length===0,'Oct 7: no runtime exceptions through the inscription\'s visits at '+viewport.width+(inkErrors.length?': '+inkErrors[0]:''));
     await inkContext.close();
   }));

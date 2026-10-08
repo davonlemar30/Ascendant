@@ -627,10 +627,8 @@ namespace Ascendant.CelestialDial
         public void SeedInscription(int seed) { inscriptionDice = new Random(seed); }
         public string FillInscription(string text)
         {
-            text = text.Replace("{name}", DisplayName);
-            if (!HasSunSign) return text;
-            var sun = Zodiac.Seats[SunSign];
-            return text.Replace("{sun}", sun.Name).Replace("{element}", sun.Element).Replace("{modality}", sun.Modality).Replace("{opposite}", Zodiac.Seats[Zodiac.Opposite(SunSign)].Name);
+            if (HasSunSign) { var sun = Zodiac.Seats[SunSign]; text = text.Replace("{sun}", sun.Name).Replace("{element}", sun.Element).Replace("{modality}", sun.Modality).Replace("{opposite}", Zodiac.Seats[Zodiac.Opposite(SunSign)].Name); }
+            return text.Replace("{name}", DisplayName); // the name last, so a name can't pull in the sun's words
         }
         public bool InscriptionUnlocked(InscriptionLine line) => Learned(line.unlock) && (line.group != "sun" || HasSunSign); // an older save with no sun has no sun lines
         void PickInscription()
