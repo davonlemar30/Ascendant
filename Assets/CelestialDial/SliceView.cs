@@ -2608,6 +2608,7 @@ namespace Ascendant.CelestialDial
             InsetFrame(r, new Color(Muted.r, Muted.g, Muted.b, .6f), 2);
             Label(r, slot, 0, 388, 330, 26, 18).color = Bone;
             Label(r, "placeholder: art follows", 0, 414, 330, 18, 11).color = Muted;
+            foreach (var top in new[] { 60f, 620f }) Label(r, slot, 0, top, 330, 20, 13).color = Muted; // the name again higher and lower, so a comic panel's window shows it too
             foreach (var g in r.GetComponentsInChildren<Graphic>(true)) g.raycastTarget = false;
         }
         void StartPrologue()

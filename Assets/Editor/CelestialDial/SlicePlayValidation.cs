@@ -57,7 +57,8 @@ namespace Ascendant.Build
             Report.Clear();Steps.Clear();RuntimeErrors.Clear();Application.logMessageReceived+=CaptureLog;
             // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue; a tap shows Skip and never advances a shot; Skip hides
             // again after about 3 s; the scene plays through on its own, every shot captured, and ends in darkness on WHO ARE YOU?
-            Steps.Enqueue(()=>{Check(View!=null && View.Flow.Screen==SliceScreen.Prologue && View.Dial.Snapshot().screen=="prologue" && !View.Flow.CanContinue && !View.OrbShown && View.Dial.Snapshot().canSkip && !View.SkipShown && View.Dial.Snapshot().prologueShots==7,"a new game opens on the opening scene, Skip ready for the screen reader and hidden on screen");});
+            Steps.Enqueue(()=>{Check(View!=null && View.Flow.Screen==SliceScreen.Prologue && View.Dial.Snapshot().screen=="prologue" && !View.Flow.CanContinue && !View.OrbShown && View.Dial.Snapshot().canSkip && !View.SkipShown && View.Dial.Snapshot().prologueShots==7,"a new game opens on the opening scene, Skip ready for the screen reader and hidden on screen");
+                Act("restart");}); // a fresh start in a settled Editor, so the shots' real-time clock and the steps line up (the batch Editor's first seconds stall)
             Prologue("slice-390-prologue",false);
             Until(()=>View.Flow.Screen==SliceScreen.Identity && !View.Busy,30,"the prologue's end",1.0);
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && View.OrbShown && View.Flow.OpeningAnswers==0 && View.OrbStarsLit==0 && View.PrologueShotIndex==-1,"the prologue ends on WHO ARE YOU?, the orb above it with no stars yet");OrbClear("WHO ARE YOU?");Capture("slice-390-identity.png");SafeArea.Simulated=24;});
@@ -406,7 +407,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>Act("close-journal"));
             Steps.Enqueue(()=>Act("reload"));
             Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==6 && View.Flow.Keys==4 && View.Flow.LocksFilled==4 && View.Flow.WingWhole && View.Dial.Lesson.Key4Earned && View.Dial.Lesson.PolarityShown && View.Dial.Lesson.OppositesComplete && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && View.Grid.Key3Earned && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with four Keys spent, the Books, the sides, the six pairs, and the pair items as data");stashedSave=PlayerPrefs.GetString(SliceView.SaveKey);Act("restart");});
-            Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Prologue && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again, with the opening scene (Ashantis, Oct 8)");Act("motion");Check(View.Dial.Lesson.Dial.ReducedMotion,"reduced motion on, mid-way through the first shot");});
+            Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Prologue && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again, with the opening scene (Ashantis, Oct 8)");Act("motion");Check(View.Dial.Lesson.Dial.ReducedMotion,"reduced motion on, mid-way through the first shot");nextAt=EditorApplication.timeSinceStartup+.1;});
             Prologue("slice-390-prologue-reduced",true);
             Until(()=>View.Flow.Screen==SliceScreen.Identity && !View.Busy,30,"the reduced prologue's end",1.0);
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && View.OrbShown,"under reduced motion the prologue still ends on WHO ARE YOU?");Act("motion");GreyboxPlayValidation.SetSize(360,800);});
@@ -494,7 +495,7 @@ namespace Ascendant.Build
         // the prologue played through: each shot and frame captured once it has settled; under reduced motion, every shot still, the eyes already dim
         static void Prologue(string file,bool reduced)
         {
-            var shots=new (int shot,string frame,double after)[]{(0,"prologue-city",2.0),(1,"prologue-desk",1.5),(1,"prologue-notebook",1.2),(2,"prologue-desk",.5),(2,"prologue-light",1.6),(2,"prologue-look",.6),(2,"prologue-headphones",.3),
+            var shots=new (int shot,string frame,double after)[]{(0,"prologue-city",1.6),(1,"prologue-desk",1.5),(1,"prologue-notebook",1.2),(2,"prologue-desk",.5),(2,"prologue-light",1.6),(2,"prologue-look",.6),(2,"prologue-headphones",.3),
                 (3,"prologue-street-above",1.0),(3,"prologue-street-above",3.5),(4,"prologue-puzzled",1.5),(5,"prologue-caspar-back",1.0),(5,"prologue-caspar-turn",1.0),(5,reduced?"prologue-caspar-face-dim":"prologue-caspar-face",.5),(5,"prologue-caspar-face-dim",2.0)};
             int n=0;
             foreach(var (shot,frame,after) in shots)
@@ -505,7 +506,7 @@ namespace Ascendant.Build
                     if(reduced && shot>=1) Check(s.prologueStill && Mathf.Approximately(View.PrologueCameraScale,1) && View.ProloguePanelsSettled,"reduced motion: shot "+(shot+1)+" held still (scale "+View.PrologueCameraScale+"), panels in place");
                     if(!reduced && (shot==0 || shot==3 || shot==5)) Check(View.PrologueCameraScale>=1,"the camera never goes below scale 1 ("+View.PrologueCameraScale.ToString("0.000")+")");
                     if(reduced && shot==5 && frame!="prologue-caspar-back" && frame!="prologue-caspar-turn") Check(frame=="prologue-caspar-face-dim","reduced motion: the eyes are dim from the start");
-                    Capture(file+"-"+index.ToString("00")+"-"+id+"-"+frame.Replace("prologue-","")+".png");});
+                    Capture(file+"-"+index.ToString("00")+"-"+id+"-"+frame.Replace("prologue-","")+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
             }
             Until(()=>View.PrologueShotIndex==6,25,"the flash",reduced?.1:.15,true);
             Steps.Enqueue(()=>{Check(View.Busy && View.Dial.Snapshot().busy && !View.Dial.Snapshot().canSkip && View.Dial.Snapshot().prologueShotId=="flash","the flash holds the busy guard and Skip waits it out");Capture(file+"-15-flash.png");});
