@@ -1641,7 +1641,7 @@ namespace Ascendant.CelestialDial
             state.canName = s == SliceScreen.Identity;
             // the opening scene (owner, Oct 8): the shot playing, the frame on top, whether Skip shows and whether it can be used; the orb and its stars
             bool onPrologue = s == SliceScreen.Prologue; state.prologueShot = onPrologue ? prologueShot : -1; state.prologueShots = PrologueShots.Length;
-            state.prologueShotId = onPrologue && prologueShot >= 0 && prologueShot < PrologueShots.Length ? PrologueShots[prologueShot].Id : ""; state.prologueFrame = onPrologue ? prologueFrameShown : "";
+            state.prologueShotId = onPrologue && prologueShot >= 0 && prologueShot < PrologueShots.Length ? PrologueShots[prologueShot].Id : ""; state.prologueFrame = onPrologue ? prologueFrameShown : ""; state.prologueShotFrames = onPrologue ? shotFrames.ToArray() : new string[0];
             state.prologueStill = onPrologue && prologueStill; state.skipShown = onPrologue && skipShown; state.canSkip = onPrologue && !busy;
             state.orbShown = OrbWanted; state.orbStars = OrbWanted ? OrbStarCount : 0; state.orbStarsLit = OrbWanted ? OrbStarsLit : 0; state.orbArt = Slots.Source("orb");
             state.canBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice == "";
@@ -2756,6 +2756,10 @@ namespace Ascendant.CelestialDial
         {
             public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height, SrcX = float.NaN, SrcY = float.NaN; public int From;
             public float PushTo, PushSeconds; public Vector2 PushView;
+            public string[] Loop; public float LoopFrame; public bool Moving;
+            // Loop (the owner, Oct 9: "slight animations", frame swaps within ruling 4): from At, for Seconds, the panel holding Frame swaps
+            // hard through Frame, then each Loop frame, every LoopFrame s, starting with the first Loop frame. Moving: a step that is only motion
+            // (an in-between frame); reduced motion skips it.
             // How: "cut" (the frame replaces what is on screen), "fade" (it crossfades in over Seconds), "panel" (a framed comic panel slides in
             // from the left, From -1, or the right, +1, at X and Top, Width x Height on the layout; it shows the part of the frame centred on SrcX,
             // SrcY, its own place unless set). Push: the frame itself pushes in from scale 1 to PushTo over PushSeconds, held on PushView (as View).
@@ -2772,6 +2776,8 @@ namespace Ascendant.CelestialDial
         static PrologueStep Cut(float at, string frame) => new PrologueStep { At = at, Frame = frame };
         static PrologueStep FadeTo(float at, string frame, float seconds) => new PrologueStep { At = at, Frame = frame, How = "fade", Seconds = seconds };
         static PrologueStep Panel(float at, string frame, float x, float top, float width, float height, int from, float srcY = float.NaN) => new PrologueStep { At = at, Frame = frame, How = "panel", Seconds = PanelSlide, X = x, Top = top, Width = width, Height = height, From = from, SrcY = srcY };
+        static PrologueStep LoopIn(float at, string frame, string[] loop, float frameSeconds, float seconds) => new PrologueStep { At = at, Frame = frame, How = "loop", Loop = loop, LoopFrame = frameSeconds, Seconds = seconds };
+        static PrologueStep InBetween(PrologueStep step) { step.Moving = true; return step; }
         static PrologueStep Pushed(PrologueStep step, float to, Vector2 view, float seconds) { step.PushTo = to; step.PushView = view; step.PushSeconds = seconds; return step; }
         public static Vector2 ViewOn(float x, float y) => new Vector2(2 * x - 1, 2 * y - 1); // the view that holds a point of the frame (shares across and down) still while the scale grows
         public const float PrologueLeadIn = .6f, PanelSlide = .7f, StillFade = .4f, SkipShowsFor = 3f, FlashIn = .6f, FlashHold = .35f, FlashBloom = 1.06f, FlashOut = .6f, Darkness = 1.2f; // timings are working choices to tune against the art (the brief)
@@ -2783,10 +2789,13 @@ namespace Ascendant.CelestialDial
                 Line = "Night in the city. The street is empty. One window is still lit.", Steps = new[] { FadeTo(0, "prologue-city", 1.5f) } },
             new PrologueShot { Id = "desk", Seconds = 8f, Page = true,
                 Line = "A young man sits at his desk with his headphones on, writing in his notebook.",
-                Steps = new[] { Panel(.3f, "prologue-desk", 0, 204, 340, 300, -1, 330), Panel(3.2f, "prologue-notebook", 0, 524, 340, 300, 1, 424) } }, // the final art: the wide shows 22.5% to 60% down (his head, the desk and the notebook); the close 34% to 72% (the arm, the hand and pen, the open notebook). On screen 54 to 354 and 374 to 674 down, clear of the gear above and of Skip below (Jeffrey, #141 N7)
+                Steps = new[] { Panel(.3f, "prologue-desk", 0, 204, 340, 300, -1, 330), Panel(3.2f, "prologue-notebook", 0, 524, 340, 300, 1, 424),
+                    LoopIn(3.2f + PanelSlide, "prologue-notebook", new[] { "prologue-notebook-2", "prologue-notebook-3" }, .25f, 8f - 3.2f - PanelSlide) } }, // the owner, Oct 9: his hand writes, a loop at 4 frames a second once the panel has landed // the final art: the wide shows 22.5% to 60% down (his head, the desk and the notebook); the close 34% to 72% (the arm, the hand and pen, the open notebook). On screen 54 to 354 and 374 to 674 down, clear of the gear above and of Skip below (Jeffrey, #141 N7)
             new PrologueShot { Id = "light", Seconds = 9f,
                 Line = "A white-gold light floods his room. He looks up and pulls his headphones down.",
-                Steps = new[] { Cut(0, "prologue-desk"), FadeTo(1f, "prologue-light", 1.2f), Cut(4f, "prologue-look"), Cut(6.5f, "prologue-headphones") } },
+                // the owner, Oct 9: his head turns to the window (a quick 0.15 s crossfade, 0.9 s after the light has flooded in), then the close-up;
+                // the headphones fall in three steps, 0.14 s apart (reduced motion: a single crossfade, no in-between)
+                Steps = new[] { Cut(0, "prologue-desk"), FadeTo(1f, "prologue-light", 1.2f), FadeTo(3.1f, "prologue-light-up", .15f), Cut(4f, "prologue-look"), InBetween(Cut(6.5f, "prologue-headphones-mid")), Cut(6.64f, "prologue-headphones") } },
             // Caspar and his ring on the final art: pixels 132 to 487 across, 850 to 1205 down (the ring's centre 47.5% across, 68.8% down); the pan ends
             // a little left, the window then 7% to 84% across and 23% to 100% down, so he and the whole ring are in view
             new PrologueShot { Id = "street", Seconds = 7f, ScaleFrom = 1.3f, ScaleTo = 1.3f, ViewFrom = new Vector2(0, -1), ViewTo = new Vector2(-.4f, 1),
@@ -2804,7 +2813,7 @@ namespace Ascendant.CelestialDial
             new PrologueShot { Id = "flash", Seconds = FlashIn + FlashHold + FlashOut + Darkness, Flash = true, Line = "A flash of white light. Then darkness." },
         };
         public static float PrologueSeconds => PrologueLeadIn + PrologueShots.Sum(s => s.Seconds); // about 50 s (the brief: 45-60)
-        public static IEnumerable<string> PrologueFrames => PrologueShots.SelectMany(s => s.Steps).Select(p => p.Frame).Where(f => f != null).Distinct();
+        public static IEnumerable<string> PrologueFrames => PrologueShots.SelectMany(s => s.Steps).SelectMany(p => new[] { p.Frame }.Concat(p.Loop ?? new string[0])).Where(f => f != null).Distinct();
         public const string SkipWords = "Skip"; // the Skip label: Claude's draft for Dante (ruling 5)
         public const float SkipX = 118, SkipY = 744, SkipWidth = 96, SkipHeight = 44; // the bottom right, clear of the gear (a working choice)
         // the camera's offset for a scale and a view: at scale s the frame can move (s - 1) x half its size each way and never show an edge
@@ -2816,6 +2825,10 @@ namespace Ascendant.CelestialDial
         Coroutine prologueRun; int prologueShot = -1; string prologueFrameShown = ""; bool skipShown, prologueStill; float skipHideAt;
         public int PrologueShotIndex => Flow.AtPrologue ? prologueShot : -1; // fixture evidence
         public bool SkipShown => skipShown;
+        // the frames shown so far in this shot, in order: the evidence for the owner's Oct 9 frame swaps, some only 0.14 s long
+        readonly List<string> shotFrames = new List<string>();
+        public IReadOnlyList<string> PrologueShotFrames => shotFrames;
+        void FrameShown(string slot) { prologueFrameShown = slot; if (shotFrames.Count == 0 || shotFrames[shotFrames.Count - 1] != slot) shotFrames.Add(slot); }
         public float PrologueCameraScale => prologueCamera != null ? prologueCamera.localScale.x : 1; // fixture evidence: never below 1, held at 1 under reduced motion
         public float PrologueFrameScale => prologueFrames.TryGetValue(prologueFrameShown, out var f) ? f.Rect.localScale.x : 1; // the frame on top's own push (shot 6)
         Vector2 lastPushView;
@@ -2876,7 +2889,7 @@ namespace Ascendant.CelestialDial
             yield return new WaitForSecondsRealtime(PrologueLeadIn); // a breath of darkness before the city: the web page's reduced-motion setting arrives in it
             for (int i = 0; i < PrologueShots.Length; i++)
             {
-                var shot = PrologueShots[i]; prologueShot = i; prologueStill = ReducedMotion; // a change to reduced motion lands from the next shot (Ashantis)
+                var shot = PrologueShots[i]; prologueShot = i; prologueStill = ReducedMotion; shotFrames.Clear(); // a change to reduced motion lands from the next shot (Ashantis)
                 if (shot.Flash) { yield return PrologueFlash(); yield break; }
                 if (!shot.Under) { foreach (var p in prologuePanelsShown) if (p != null) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == p) ParkFrame(f); Destroy(p.gameObject); } prologuePanelsShown.Clear(); panelHomes.Clear(); prologueDim.color = new Color(0, 0, 0, 0); }
                 if (shot.Page) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == prologueCamera) f.Rect.gameObject.SetActive(false); prologueFrameShown = ""; }
@@ -2903,6 +2916,8 @@ namespace Ascendant.CelestialDial
         Func<bool> RunStep(PrologueStep step)
         {
             string slot = step.Frame;
+            if (step.Moving && prologueStill) return () => true; // reduced motion skips an in-between frame
+            if (step.How == "loop") return RunLoop(step);
             if (!prologueFrames.TryGetValue(slot, out var frame)) return () => true;
             if (step.How == "panel")
             {
@@ -2912,7 +2927,7 @@ namespace Ascendant.CelestialDial
                 frame.Rect.SetParent(panel, false); frame.Rect.anchorMin = frame.Rect.anchorMax = frame.Rect.pivot = new Vector2(.5f, .5f); frame.Rect.anchoredPosition = new Vector2(-(float.IsNaN(step.SrcX) ? step.X : step.SrcX), (float.IsNaN(step.SrcY) ? step.Top : step.SrcY) - 400); // the window shows the frame's part centred on its source
                 frame.Rect.localScale = Vector3.one; frame.Group.alpha = 1; frame.Rect.gameObject.SetActive(true);
                 var border = Rect("Border", panel, 0, step.Height / 2, step.Width, step.Height); InsetFrame(border, new Color(Bone.r, Bone.g, Bone.b, .9f), 3); // the comic panel's frame (a working choice)
-                var group = panel.gameObject.AddComponent<CanvasGroup>(); group.blocksRaycasts = false; prologueFrameShown = slot;
+                var group = panel.gameObject.AddComponent<CanvasGroup>(); group.blocksRaycasts = false; FrameShown(slot);
                 Vector2 home = panel.anchoredPosition, away = home + new Vector2(step.From * (180 + step.Width / 2 + 8), 0); float began = Time.unscaledTime; panelHomes[panel] = home;
                 if (prologueStill) { group.alpha = 0; return () => { if (group == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / StillFade); group.alpha = k; return k >= 1; }; } // reduced motion: the panel fades in where it sits
                 panel.anchoredPosition = away;
@@ -2920,7 +2935,7 @@ namespace Ascendant.CelestialDial
             }
             var others = prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).ToList();
             bool up = frame.Rect.gameObject.activeSelf && frame.Rect.parent == prologueCamera && frame.Group.alpha >= 1;
-            frame.Rect.SetAsLastSibling(); frame.Rect.gameObject.SetActive(true); prologueFrameShown = slot;
+            frame.Rect.SetAsLastSibling(); frame.Rect.gameObject.SetActive(true); FrameShown(slot);
             Func<bool> push = () => true; float pushed = Time.unscaledTime;
             if (step.PushTo > 1 && !prologueStill) // the frame's own slow push-in (reduced motion holds it still)
             {
@@ -2929,10 +2944,35 @@ namespace Ascendant.CelestialDial
                     frame.Rect.localScale = new Vector3(sc, sc, 1); frame.Rect.anchoredPosition = new Vector2(0, -400) + CameraOffset(sc, step.PushView); return k >= 1; };
             }
             if (up && others.Count == 0) return push; // already on screen
-            float seconds = step.How == "fade" ? step.Seconds : prologueStill ? StillFade : 0; // reduced motion: a cut crossfades
+            float seconds = step.How == "fade" ? (prologueStill ? Mathf.Max(step.Seconds, StillFade) : step.Seconds) : prologueStill ? StillFade : 0; // reduced motion: a cut crossfades, and no fade is quicker than StillFade
             if (seconds <= 0) { frame.Group.alpha = 1; foreach (var o in others) o.Rect.gameObject.SetActive(false); return push; }
             frame.Group.alpha = 0; float from = Time.unscaledTime; bool faded = false;
             return () => { if (frame.Rect == null) return true; bool moved = push(); if (!faded) { float k = Mathf.Clamp01((Time.unscaledTime - from) / seconds); frame.Group.alpha = k; if (k >= 1) { faded = true; foreach (var o in others) o.Rect.gameObject.SetActive(false); } } return faded && moved; };
+        }
+        // a loop of hard frame swaps inside the panel that holds its first frame (the writing hand); reduced motion holds the first frame
+        Func<bool> RunLoop(PrologueStep step)
+        {
+            if (prologueStill || !prologueFrames.TryGetValue(step.Frame, out var basis) || basis.Rect.parent == prologueCamera) return () => true;
+            var holder = (RectTransform)basis.Rect.parent; var border = holder.Find("Border");
+            var cycle = new[] { step.Frame }.Concat(step.Loop).Select(n => prologueFrames.TryGetValue(n, out var f) ? f : null).Where(f => f != null).ToList();
+            foreach (var f in cycle) if (f != basis)
+            {
+                f.Rect.SetParent(holder, false); f.Rect.anchorMin = basis.Rect.anchorMin; f.Rect.anchorMax = basis.Rect.anchorMax; f.Rect.pivot = basis.Rect.pivot;
+                f.Rect.anchoredPosition = basis.Rect.anchoredPosition; f.Rect.localScale = basis.Rect.localScale; f.Group.alpha = 1; f.Rect.gameObject.SetActive(false);
+            }
+            float began = Time.unscaledTime; int shown = 0;
+            return () =>
+            {
+                if (holder == null) return true;
+                float t = Time.unscaledTime - began; bool done = t >= step.Seconds;
+                int i = done ? 0 : (1 + (int)(t / Mathf.Max(.01f, step.LoopFrame))) % cycle.Count;
+                if (i != shown)
+                {
+                    shown = i; for (int k = 0; k < cycle.Count; k++) cycle[k].Rect.gameObject.SetActive(k == i);
+                    if (border != null) border.SetAsLastSibling(); FrameShown(cycle[i].Slot); Publish();
+                }
+                return done;
+            };
         }
         IEnumerator PrologueFlash()
         {

@@ -41,6 +41,7 @@ IMAGES = [
     ("emblem-aries", 180, 180), ("emblem-taurus", 180, 180), ("emblem-gemini", 180, 180), ("emblem-cancer", 180, 180), ("emblem-leo", 180, 180), ("emblem-virgo", 180, 180), ("emblem-libra", 180, 180), ("emblem-scorpio", 180, 180), ("emblem-sagittarius", 180, 180), ("emblem-capricorn", 180, 180), ("emblem-aquarius", 180, 180), ("emblem-pisces", 180, 180),
     ("prologue-city", 180, 400), ("prologue-desk", 180, 400), ("prologue-notebook", 180, 400), ("prologue-light", 180, 400), ("prologue-look", 180, 400), ("prologue-headphones", 180, 400),  # the opening scene (Oct 8): its twelve frames,
     ("prologue-street-above", 180, 400), ("prologue-puzzled", 180, 400), ("prologue-caspar-back", 180, 400), ("prologue-caspar-turn", 180, 400), ("prologue-caspar-face", 180, 400), ("prologue-caspar-eyes", 180, 400),
+    ("prologue-notebook-2", 180, 400), ("prologue-notebook-3", 180, 400), ("prologue-light-up", 180, 400), ("prologue-headphones-mid", 180, 400),  # its slight animations (owner, Oct 9)
     ("orb", 120, 120), ("orb-star", 16, 16),  # the orb and its star, round, with transparent corners
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism", "orb"}

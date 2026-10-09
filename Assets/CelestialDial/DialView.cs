@@ -155,7 +155,7 @@ namespace Ascendant.CelestialDial
             // Oct 3 (owner: step 4, Practice, approved): the journal's Practice as drawn (SliceView.Publish); quiz* is a round's question page
             public string[] journalPractice, quizChoices; public float[] journalPracticeRows, quizChoiceBoxes, quizButtons; public string quizConcept = "", quizCounter = "", quizGlyph = "", quizAsk = "", quizFeedback = "", quizEnd = ""; public int quizPicked = -1, quizRight = -1, quizAskLines; public bool quizOver, canQuizChoice, canQuizNext, canQuizBack;
             public string sunSign = "";
-            public int prologueShot = -1, prologueShots, orbStars, orbStarsLit; public string prologueShotId = "", prologueFrame = "", orbArt = ""; public bool prologueStill, skipShown, canSkip, orbShown; // the opening scene (owner, Oct 8, 86bcfhmha): the shot and frame playing, Skip; the orb and the stars gathered
+            public int prologueShot = -1, prologueShots, orbStars, orbStarsLit; public string prologueShotId = "", prologueFrame = "", orbArt = ""; public bool prologueStill, skipShown, canSkip, orbShown; public string[] prologueShotFrames; // the opening scene (owner, Oct 8, 86bcfhmha): the shot and frame playing, Skip; the orb and the stars gathered
             public int locksFilled;
             // v0.4 tap-to-move
             public string room = "", walkTarget = "", avatarAt = "", walkSpeed = "";

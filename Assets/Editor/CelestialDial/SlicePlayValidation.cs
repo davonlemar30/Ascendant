@@ -495,7 +495,7 @@ namespace Ascendant.Build
         // the prologue played through: each shot and frame captured once it has settled; under reduced motion, every shot still, held on the eyes before the flash
         static void Prologue(string file,bool reduced)
         {
-            var shots=new (int shot,string frame,double after)[]{(0,"prologue-city",1.6),(1,"prologue-desk",1.5),(1,"prologue-notebook",1.2),(2,"prologue-desk",.5),(2,"prologue-light",1.6),(2,"prologue-look",.6),(2,"prologue-headphones",.3),
+            var shots=new (int shot,string frame,double after)[]{(0,"prologue-city",1.6),(1,"prologue-desk",1.5),(1,"prologue-notebook",.5),(2,"prologue-desk",.5),(2,"prologue-light",1.6),(2,"prologue-light-up",.4),(2,"prologue-look",.6),(2,"prologue-headphones",.3),
                 (3,"prologue-street-above",1.0),(3,"prologue-street-above",3.5),(4,"prologue-puzzled",1.5),(5,"prologue-caspar-back",1.0),(5,"prologue-caspar-turn",1.0),(5,"prologue-caspar-face",1.5),(5,"prologue-caspar-eyes",2.0)};
             int n=0;
             foreach(var (shot,frame,after) in shots)
@@ -507,9 +507,27 @@ namespace Ascendant.Build
                     if(!reduced && (shot==0 || shot==3 || shot==5)) Check(View.PrologueCameraScale>=1 && View.PrologueFrameScale>=1,"the camera never goes below scale 1 ("+View.PrologueCameraScale.ToString("0.000")+")");
                     if(shot==5 && frame=="prologue-caspar-eyes") Check(reduced ? Mathf.Approximately(View.PrologueFrameScale,1) : View.PrologueFrameScale>1.05f,reduced?"reduced motion: held still on the eyes' close-up":"the push-in carries on into the eyes' close-up (scale "+View.PrologueFrameScale.ToString("0.00")+")");
                     Capture(file+"-"+index.ToString("00")+"-"+id+"-"+frame.Replace("prologue-","")+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
+                // the owner, Oct 9: the hand's writing loop once the notebook's panel has landed; the headphones' fall in three steps (read from the
+                // frames the shot has shown, in order, since the in-between lasts only 0.14 s)
+                if(shot==1 && frame=="prologue-notebook")
+                {
+                    Watch(1.5,"the writing loop");
+                    Steps.Enqueue(()=>{var seen=View.PrologueShotFrames.ToList();Check(reduced ? seen.SequenceEqual(new[]{"prologue-desk","prologue-notebook"}) : seen.Contains("prologue-notebook-2") && seen.Contains("prologue-notebook-3") && seen.LastIndexOf("prologue-notebook")>seen.IndexOf("prologue-notebook-3"),
+                        (reduced?"reduced motion: no writing loop, the notebook held":"the hand writes: the loop runs notebook, -2, -3 and round")+" ("+string.Join(" ",seen.Select(f=>f.Replace("prologue-","")))+")");nextAt=EditorApplication.timeSinceStartup+.1;});
+                    if(!reduced){ Until(()=>View.Dial.Snapshot().prologueFrame=="prologue-notebook-2",5,"the writing loop's second frame",.02); Steps.Enqueue(()=>{Capture(file+"-"+index.ToString("00")+"b-desk-notebook-2.png");nextAt=EditorApplication.timeSinceStartup+.1;}); }
+                }
+                if(shot==2 && frame=="prologue-headphones")
+                    Steps.Enqueue(()=>{var seen=View.PrologueShotFrames.ToList();var want=reduced?new[]{"prologue-desk","prologue-light","prologue-light-up","prologue-look","prologue-headphones"}:new[]{"prologue-desk","prologue-light","prologue-light-up","prologue-look","prologue-headphones-mid","prologue-headphones"};
+                        Check(seen.SequenceEqual(want),(reduced?"reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between":"shot 3 in order: desk, light, the head turned (light-up), the close-up, the headphones mid-fall, down")+" ("+string.Join(" ",seen.Select(f=>f.Replace("prologue-","")))+")");nextAt=EditorApplication.timeSinceStartup+.1;});
             }
             Until(()=>View.PrologueShotIndex==6,25,"the flash",reduced?.1:.4,true);
-            Steps.Enqueue(()=>{Check(View.Busy && View.Dial.Snapshot().busy && !View.Dial.Snapshot().canSkip && View.Dial.Snapshot().prologueShotId=="flash","the flash holds the busy guard and Skip waits it out");Capture(file+"-15-flash.png");});
+            Steps.Enqueue(()=>{Check(View.Busy && View.Dial.Snapshot().busy && !View.Dial.Snapshot().canSkip && View.Dial.Snapshot().prologueShotId=="flash","the flash holds the busy guard and Skip waits it out");Capture(file+"-"+(n+1).ToString("00")+"-flash.png");});
+        }
+        static double watchFrom;
+        static void Watch(double seconds,string what) // let the shot play on for a while before reading what it has shown
+        {
+            Steps.Enqueue(()=>{watchFrom=EditorApplication.timeSinceStartup;nextAt=EditorApplication.timeSinceStartup;});
+            Until(()=>EditorApplication.timeSinceStartup-watchFrom>=seconds,seconds+10,what);
         }
         // nothing on the opening's screens (no word, button or box, nor the gear) overlaps the orb, its stars or its bob
         static void OrbClear(string where)
