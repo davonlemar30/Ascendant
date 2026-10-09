@@ -11,7 +11,7 @@ const path=require('path');
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
-  const PROLOGUE=[[0,'prologue-city',2000],[1,'prologue-desk',1500],[1,'prologue-notebook',500],[2,'prologue-desk',500],[2,'prologue-light',1600],[2,'prologue-light-up',400],[2,'prologue-look',600],[2,'prologue-headphones',300],
+  const PROLOGUE=[[0,'prologue-city',2000],[1,'prologue-desk',1500],[1,'prologue-notebook',300],[2,'prologue-desk',500],[2,'prologue-light',1600],[2,'prologue-light-up',400],[2,'prologue-look',600],[2,'prologue-headphones',300],
     [3,'prologue-street-above',1000],[3,'prologue-street-above',3500],[4,'prologue-puzzled',1500],[5,'prologue-caspar-back',1000],[5,'prologue-caspar-turn',1000],[5,'prologue-caspar-face',1500],[5,'prologue-caspar-eyes',2000]]; // [shot, frame, ms to settle]
   const newGame=async pg=>{await pg.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='prologue',{},{timeout:120000});await pg.locator('#loading').waitFor({state:'detached'});};
   const skipPrologue=async pg=>{await newGame(pg);for(let n=0;n<5;n++){await pg.locator('#skip-prologue').evaluate(b=>b.click());try{await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:3000});return;}catch{}}throw Error('the semantic Skip did not leave the prologue');};
@@ -22,7 +22,8 @@ const path=require('path');
       await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.prologueShot===k&&s.prologueFrame===f;},[shot,want],{timeout:25000});
       await pg.waitForTimeout(settle);
       const s=await snap(),said=await pg.locator('#announcement').textContent(),skip=await pg.locator('#skip-prologue').isEnabled();
-      check(s.screen==='prologue'&&s.prologueShot===shot&&s.prologueFrame===want&&s.caspar!==''&&said.includes(s.caspar)&&s.canSkip&&skip&&!s.canSliceContinue&&!s.orbShown&&(!reduced||shot<1||s.prologueStill),'the opening scene'+(reduced?', reduced motion':'')+': shot '+(shot+1)+' ('+s.prologueShotId+'), '+want+', its spoken line announced ("'+s.caspar+'"), the semantic Skip offered'+(reduced&&shot===0?(s.prologueStill?', still from the first shot':', the first shot as it began'):'')+' at '+where);
+      const loopFrame=frame==='prologue-notebook'&&/^prologue-notebook(-[23])?$/.test(s.prologueFrame); // the writing loop may already have begun (it starts 0.7 s after the panel)
+      check(s.screen==='prologue'&&s.prologueShot===shot&&(s.prologueFrame===want||(!reduced&&loopFrame))&&s.caspar!==''&&said.includes(s.caspar)&&s.canSkip&&skip&&!s.canSliceContinue&&!s.orbShown&&(!reduced||shot<1||s.prologueStill),'the opening scene'+(reduced?', reduced motion':'')+': shot '+(shot+1)+' ('+s.prologueShotId+'), '+want+', its spoken line announced ("'+s.caspar+'"), the semantic Skip offered'+(reduced&&shot===0?(s.prologueStill?', still from the first shot':', the first shot as it began'):'')+' at '+where);
       await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png')});
       // the owner, Oct 9: slight animations as frame swaps; read from the frames the shot has shown, in order (the headphones' in-between lasts 0.14 s)
       if(shot===1&&frame==='prologue-notebook'){
