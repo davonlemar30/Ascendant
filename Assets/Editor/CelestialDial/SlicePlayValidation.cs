@@ -503,9 +503,9 @@ namespace Ascendant.Build
                 int index=++n; string id=SliceView.PrologueShots[shot].Id;
                 Until(()=>View.PrologueShotIndex==shot && View.Dial.Snapshot().prologueFrame==frame,25,"shot "+(shot+1)+" ("+frame+")",after);
                 Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="prologue" && s.prologueShotId==id && s.caspar==SliceView.PrologueShots[shot].Line && s.canSkip && !View.Flow.CanContinue,"shot "+(shot+1)+", "+id+": "+frame+", its spoken line \""+s.caspar+"\""+(reduced?", reduced motion":""));
-                    if(reduced && shot>=1) Check(s.prologueStill && Mathf.Approximately(View.PrologueCameraScale,1) && View.ProloguePanelsSettled,"reduced motion: shot "+(shot+1)+" held still (scale "+View.PrologueCameraScale+"), panels in place");
-                    if(!reduced && (shot==0 || shot==3 || shot==5)) Check(View.PrologueCameraScale>=1,"the camera never goes below scale 1 ("+View.PrologueCameraScale.ToString("0.000")+")");
-                    if(shot==5 && frame=="prologue-caspar-eyes") Check(reduced ? Mathf.Approximately(View.PrologueCameraScale,1) : View.PrologueCameraScale>1.1f,reduced?"reduced motion: held still on the eyes' close-up":"the push-in has carried on into the eyes' close-up (scale "+View.PrologueCameraScale.ToString("0.00")+")");
+                    if(reduced && shot>=1) Check(s.prologueStill && Mathf.Approximately(View.PrologueCameraScale,1) && Mathf.Approximately(View.PrologueFrameScale,1) && View.ProloguePanelsSettled,"reduced motion: shot "+(shot+1)+" held still (scale "+View.PrologueCameraScale+"), panels in place");
+                    if(!reduced && (shot==0 || shot==3 || shot==5)) Check(View.PrologueCameraScale>=1 && View.PrologueFrameScale>=1,"the camera never goes below scale 1 ("+View.PrologueCameraScale.ToString("0.000")+")");
+                    if(shot==5 && frame=="prologue-caspar-eyes") Check(reduced ? Mathf.Approximately(View.PrologueFrameScale,1) : View.PrologueFrameScale>1.05f,reduced?"reduced motion: held still on the eyes' close-up":"the push-in carries on into the eyes' close-up (scale "+View.PrologueFrameScale.ToString("0.00")+")");
                     Capture(file+"-"+index.ToString("00")+"-"+id+"-"+frame.Replace("prologue-","")+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
             }
             Until(()=>View.PrologueShotIndex==6,25,"the flash",reduced?.1:.4,true);

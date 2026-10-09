@@ -2754,44 +2754,53 @@ namespace Ascendant.CelestialDial
         // from the next shot (Ashantis). Settings stays on its gear and pauses nothing, as on every screen (Build U).
         public sealed class PrologueStep
         {
-            public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height; public int From;
+            public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height, SrcX = float.NaN, SrcY = float.NaN; public int From;
+            public float PushTo, PushSeconds; public Vector2 PushView;
             // How: "cut" (the frame replaces what is on screen), "fade" (it crossfades in over Seconds), "panel" (a framed comic panel slides in
-            // from the left, From -1, or the right, +1, at X and Top, Width x Height on the layout; it shows the frame at its own place).
+            // from the left, From -1, or the right, +1, at X and Top, Width x Height on the layout; it shows the part of the frame centred on SrcX,
+            // SrcY, its own place unless set). Push: the frame itself pushes in from scale 1 to PushTo over PushSeconds, held on PushView (as View).
         }
         public sealed class PrologueShot
         {
-            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1, MoveFrom; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash; public float UnderDim;
+            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash; public float UnderDim;
             public PrologueStep[] Steps = new PrologueStep[0];
             // View: where the camera looks inside the frame, -1 to 1 each way (x: left to right; y: top to bottom), so the pan never shows an
-            // edge at any scale; a push-in holds its View on the point it moves toward; the camera holds until MoveFrom s into the shot. Page: the
+            // edge at any scale; a push-in holds its View on the point it moves toward. Page: the
             // shot opens on the black comic page. Under: the last shot's frame stays under it, dimmed to UnderDim. Flash: the white flash, then
             // darkness, then the name.
         }
         static PrologueStep Cut(float at, string frame) => new PrologueStep { At = at, Frame = frame };
         static PrologueStep FadeTo(float at, string frame, float seconds) => new PrologueStep { At = at, Frame = frame, How = "fade", Seconds = seconds };
-        static PrologueStep Panel(float at, string frame, float x, float top, float width, float height, int from) => new PrologueStep { At = at, Frame = frame, How = "panel", Seconds = PanelSlide, X = x, Top = top, Width = width, Height = height, From = from };
+        static PrologueStep Panel(float at, string frame, float x, float top, float width, float height, int from, float srcY = float.NaN) => new PrologueStep { At = at, Frame = frame, How = "panel", Seconds = PanelSlide, X = x, Top = top, Width = width, Height = height, From = from, SrcY = srcY };
+        static PrologueStep Pushed(PrologueStep step, float to, Vector2 view, float seconds) { step.PushTo = to; step.PushView = view; step.PushSeconds = seconds; return step; }
+        public static Vector2 ViewOn(float x, float y) => new Vector2(2 * x - 1, 2 * y - 1); // the view that holds a point of the frame (shares across and down) still while the scale grows
         public const float PrologueLeadIn = .6f, PanelSlide = .7f, StillFade = .4f, SkipShowsFor = 3f, FlashIn = .6f, FlashHold = .35f, FlashBloom = 1.06f, FlashOut = .6f, Darkness = 1.2f; // timings are working choices to tune against the art (the brief)
         // The shot list (the brief's table, shots 1-7; timings are working choices). The spoken lines are Claude's drafts for Dante.
         public static readonly PrologueShot[] PrologueShots =
         {
-            new PrologueShot { Id = "city", Seconds = 6f, ScaleFrom = 1f, ScaleTo = 1.18f, ViewFrom = new Vector2(.24f, -.24f), ViewTo = new Vector2(.24f, -.24f),
+            // the city's one lit window, measured on the final art (720 x 1600): pixels 412 to 425 across, 351 to 408 down, its centre 58.1% across, 23.7% down
+            new PrologueShot { Id = "city", Seconds = 6f, ScaleFrom = 1f, ScaleTo = 1.18f, ViewFrom = ViewOn(.581f, .237f), ViewTo = ViewOn(.581f, .237f),
                 Line = "Night in the city. The street is empty. One window is still lit.", Steps = new[] { FadeTo(0, "prologue-city", 1.5f) } },
             new PrologueShot { Id = "desk", Seconds = 8f, Page = true,
                 Line = "A young man sits at his desk with his headphones on, writing in his notebook.",
-                Steps = new[] { Panel(.3f, "prologue-desk", 0, 187, 340, 338, -1), Panel(3.2f, "prologue-notebook", 0, 545, 340, 338, 1) } },
+                Steps = new[] { Panel(.3f, "prologue-desk", 0, 187, 340, 338, -1, 330), Panel(3.2f, "prologue-notebook", 0, 545, 340, 338, 1, 424) } }, // the final art: the wide shows 20% to 62% down (his head, the desk and the notebook); the close 32% to 74% (the arm, the hand and pen, the open notebook)
             new PrologueShot { Id = "light", Seconds = 9f,
                 Line = "A white-gold light floods his room. He looks up and pulls his headphones down.",
                 Steps = new[] { Cut(0, "prologue-desk"), FadeTo(1f, "prologue-light", 1.2f), Cut(4f, "prologue-look"), Cut(6.5f, "prologue-headphones") } },
-            new PrologueShot { Id = "street", Seconds = 7f, ScaleFrom = 1.3f, ScaleTo = 1.3f, ViewFrom = new Vector2(0, -1), ViewTo = new Vector2(0, 1),
+            // Caspar and his ring on the final art: pixels 132 to 487 across, 850 to 1205 down (the ring's centre 47.5% across, 68.8% down); the pan ends
+            // a little left, the window then 7% to 84% across and 23% to 100% down, so he and the whole ring are in view
+            new PrologueShot { Id = "street", Seconds = 7f, ScaleFrom = 1.3f, ScaleTo = 1.3f, ViewFrom = new Vector2(0, -1), ViewTo = new Vector2(-.4f, 1),
                 Line = "Down in the empty street, a hooded figure stands with his back turned, in a fading ring of light.", Steps = new[] { Cut(0, "prologue-street-above") } },
             new PrologueShot { Id = "puzzled", Seconds = 5f, Under = true, UnderDim = .55f,
-                Line = "He stares down from his window, puzzled.", Steps = new[] { Panel(.3f, "prologue-puzzled", 0, 400, 300, 390, 1) } },
+                Line = "He stares down from his window, puzzled.", Steps = new[] { Panel(.3f, "prologue-puzzled", 0, 400, 300, 390, 1, 330) } }, // the final art: 17% to 66% down, his hair, his face and his eyes
             // The owner, Oct 8 (over the brief's fading glow): "my vision was for the intro to end on a zoom in, zooming into caspars glowing eyes and
             // then a flash as the player is transported into nothingness". He turns; on his face the camera starts a slow push toward his eyes,
             // crossfades to the eyes' close-up and keeps pushing, and the white blooms out of the glow.
-            new PrologueShot { Id = "turn", Seconds = 11.5f, ScaleFrom = 1f, ScaleTo = 1.35f, MoveFrom = 4.5f, ViewFrom = new Vector2(0, -.3f), ViewTo = new Vector2(0, -.3f),
+            // Measured on the final art: on the face his eyes glow at pixels 380 to 438 across, 334 to 349 down (centre 56.6%, 21.3%); on the
+            // close-up the glow spans 279 to 470 across, 731 to 801 down (centre 50.7%, 47.1%; the art lane measured 50.6%, 47.1%).
+            new PrologueShot { Id = "turn", Seconds = 11.5f,
                 Line = "The hooded figure turns around. His eyes glow white-gold, closer and closer.",
-                Steps = new[] { Cut(0, "prologue-caspar-back"), Cut(2.5f, "prologue-caspar-turn"), Cut(4.5f, "prologue-caspar-face"), FadeTo(7.5f, "prologue-caspar-eyes", 1.2f) } },
+                Steps = new[] { Cut(0, "prologue-caspar-back"), Cut(2.5f, "prologue-caspar-turn"), Pushed(Cut(4.5f, "prologue-caspar-face"), 1.3f, ViewOn(.566f, .213f), 7f), Pushed(FadeTo(7.5f, "prologue-caspar-eyes", 1.2f), 1.25f, ViewOn(.507f, .471f), 4f) } },
             new PrologueShot { Id = "flash", Seconds = FlashIn + FlashHold + FlashOut + Darkness, Flash = true, Line = "A flash of white light. Then darkness." },
         };
         public static float PrologueSeconds => PrologueLeadIn + PrologueShots.Sum(s => s.Seconds); // about 50 s (the brief: 45-60)
@@ -2808,6 +2817,8 @@ namespace Ascendant.CelestialDial
         public int PrologueShotIndex => Flow.AtPrologue ? prologueShot : -1; // fixture evidence
         public bool SkipShown => skipShown;
         public float PrologueCameraScale => prologueCamera != null ? prologueCamera.localScale.x : 1; // fixture evidence: never below 1, held at 1 under reduced motion
+        public float PrologueFrameScale => prologueFrames.TryGetValue(prologueFrameShown, out var f) ? f.Rect.localScale.x : 1; // the frame on top's own push (shot 6)
+        Vector2 lastPushView;
         public bool ProloguePanelsSettled => prologuePanelsShown.All(p => p == null || (panelHomes.TryGetValue(p, out var home) && Vector2.Distance(p.anchoredPosition, home) < .5f && p.GetComponent<CanvasGroup>().alpha > .99f));
         readonly Dictionary<RectTransform, Vector2> panelHomes = new Dictionary<RectTransform, Vector2>();
         void BuildPrologue()
@@ -2852,12 +2863,12 @@ namespace Ascendant.CelestialDial
             foreach (var p in prologuePanelsShown) if (p != null) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == p) ParkFrame(f); Destroy(p.gameObject); }
             prologuePanelsShown.Clear(); panelHomes.Clear();
             foreach (var f in prologueFrames.Values) ParkFrame(f);
-            prologueCamera.localScale = Vector3.one; prologueCamera.anchoredPosition = new Vector2(0, -400); prologueDim.color = new Color(0, 0, 0, 0); prologueFrameShown = "";
+            prologueCamera.localScale = Vector3.one; prologueCamera.anchoredPosition = new Vector2(0, -400); prologueDim.color = new Color(0, 0, 0, 0); prologueFrameShown = ""; lastPushView = Vector2.zero;
         }
         void ParkFrame(PrologueFrame f)
         {
             f.Rect.SetParent(prologueCamera, false); f.Rect.anchorMin = f.Rect.anchorMax = new Vector2(.5f, 1); f.Rect.pivot = new Vector2(.5f, .5f); f.Rect.anchoredPosition = new Vector2(0, -400);
-            f.Group.alpha = 1; f.Rect.gameObject.SetActive(false);
+            f.Rect.localScale = Vector3.one; f.Group.alpha = 1; f.Rect.gameObject.SetActive(false);
         }
         IEnumerator PlayPrologue()
         {
@@ -2876,7 +2887,7 @@ namespace Ascendant.CelestialDial
                     float t = Time.unscaledTime - start;
                     while (next < shot.Steps.Length && shot.Steps[next].At <= t) { live.Add(RunStep(shot.Steps[next])); next++; Publish(); }
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
-                    else CameraAt(shot, Mathf.Clamp01((t - shot.MoveFrom) / Mathf.Max(.01f, shot.Seconds - shot.MoveFrom))); // the camera holds until MoveFrom
+                    else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
                     live.RemoveAll(step => step());
                     if (t >= shot.Seconds && live.Count == 0) break;
                     yield return null;
@@ -2897,7 +2908,7 @@ namespace Ascendant.CelestialDial
             {
                 var panel = Rect("Panel " + slot, prologuePanels, step.X, step.Top, step.Width, step.Height); prologuePanelsShown.Add(panel);
                 panel.gameObject.AddComponent<Image>().color = Color.black; panel.GetComponent<Image>().raycastTarget = false; panel.gameObject.AddComponent<RectMask2D>();
-                frame.Rect.SetParent(panel, false); frame.Rect.anchorMin = frame.Rect.anchorMax = frame.Rect.pivot = new Vector2(.5f, .5f); frame.Rect.anchoredPosition = new Vector2(-step.X, step.Top - 400); // the window shows the frame at its own place
+                frame.Rect.SetParent(panel, false); frame.Rect.anchorMin = frame.Rect.anchorMax = frame.Rect.pivot = new Vector2(.5f, .5f); frame.Rect.anchoredPosition = new Vector2(-(float.IsNaN(step.SrcX) ? step.X : step.SrcX), (float.IsNaN(step.SrcY) ? step.Top : step.SrcY) - 400); // the window shows the frame's part centred on its source
                 frame.Rect.localScale = Vector3.one; frame.Group.alpha = 1; frame.Rect.gameObject.SetActive(true);
                 var border = Rect("Border", panel, 0, step.Height / 2, step.Width, step.Height); InsetFrame(border, new Color(Bone.r, Bone.g, Bone.b, .9f), 3); // the comic panel's frame (a working choice)
                 var group = panel.gameObject.AddComponent<CanvasGroup>(); group.blocksRaycasts = false; prologueFrameShown = slot;
@@ -2909,19 +2920,25 @@ namespace Ascendant.CelestialDial
             var others = prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).ToList();
             bool up = frame.Rect.gameObject.activeSelf && frame.Rect.parent == prologueCamera && frame.Group.alpha >= 1;
             frame.Rect.SetAsLastSibling(); frame.Rect.gameObject.SetActive(true); prologueFrameShown = slot;
-            if (up && others.Count == 0) return () => true; // already on screen
+            Func<bool> push = () => true; float pushed = Time.unscaledTime;
+            if (step.PushTo > 1 && !prologueStill) // the frame's own slow push-in (reduced motion holds it still)
+            {
+                lastPushView = step.PushView;
+                push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed) / Mathf.Max(.01f, step.PushSeconds)), sc = Mathf.Lerp(1, step.PushTo, Mathf.SmoothStep(0, 1, k));
+                    frame.Rect.localScale = new Vector3(sc, sc, 1); frame.Rect.anchoredPosition = new Vector2(0, -400) + CameraOffset(sc, step.PushView); return k >= 1; };
+            }
+            if (up && others.Count == 0) return push; // already on screen
             float seconds = step.How == "fade" ? step.Seconds : prologueStill ? StillFade : 0; // reduced motion: a cut crossfades
-            if (seconds <= 0) { frame.Group.alpha = 1; foreach (var o in others) o.Rect.gameObject.SetActive(false); return () => true; }
-            frame.Group.alpha = 0; float from = Time.unscaledTime;
-            return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - from) / seconds); frame.Group.alpha = k; if (k >= 1) foreach (var o in others) o.Rect.gameObject.SetActive(false); return k >= 1; };
+            if (seconds <= 0) { frame.Group.alpha = 1; foreach (var o in others) o.Rect.gameObject.SetActive(false); return push; }
+            frame.Group.alpha = 0; float from = Time.unscaledTime; bool faded = false;
+            return () => { if (frame.Rect == null) return true; bool moved = push(); if (!faded) { float k = Mathf.Clamp01((Time.unscaledTime - from) / seconds); frame.Group.alpha = k; if (k >= 1) { faded = true; foreach (var o in others) o.Rect.gameObject.SetActive(false); } } return faded && moved; };
         }
         IEnumerator PrologueFlash()
         {
             busy = true; skipShown = false; skipButton.gameObject.SetActive(false); Publish(); // the busy guard and publish, as WhiteLight
             if (!prologueStill) // the glow blooms into the white: the push on his eyes carries on a little as the white comes up
             {
-                var scale0 = prologueCamera.localScale.x; var at0 = prologueCamera.anchoredPosition - new Vector2(0, -400);
-                yield return Tween(FlashIn, k => { float e = k * k; flash.color = new Color(1, 1, 1, e); float sc = scale0 * Mathf.Lerp(1, FlashBloom, k); prologueCamera.localScale = new Vector3(sc, sc, 1); prologueCamera.anchoredPosition = new Vector2(0, -400) + at0 * (sc / scale0); });
+                yield return Tween(FlashIn, k => { flash.color = new Color(1, 1, 1, k * k); float sc = Mathf.Lerp(1, FlashBloom, k); prologueCamera.localScale = new Vector3(sc, sc, 1); prologueCamera.anchoredPosition = new Vector2(0, -400) + CameraOffset(sc, lastPushView); }); // held on the glow, as the push was
             }
             else flash.color = Color.white; // reduced motion: held still on the eyes, then an instant flash
             yield return new WaitForSecondsRealtime(FlashHold);
