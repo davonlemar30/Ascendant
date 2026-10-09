@@ -12,5 +12,7 @@ namespace Ascendant.CelestialDial
         public void OnBeginDrag(PointerEventData e) { dragging = View != null && View.PlateDragBegin(Seat); if (dragging) View.PlateDragMove(e.position, e.pressEventCamera); }
         public void OnDrag(PointerEventData e) { if (dragging) View.PlateDragMove(e.position, e.pressEventCamera); }
         public void OnEndDrag(PointerEventData e) { if (!dragging) return; dragging = false; View.PlateDragEnd(); }
+        // uGUI sends no OnEndDrag to a hidden plate: a drag cut short sends it home without choosing a well
+        void OnDisable() { if (!dragging) return; dragging = false; if (View != null) View.PlateDragCancel(); }
     }
 }

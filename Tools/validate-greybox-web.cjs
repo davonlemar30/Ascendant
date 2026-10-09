@@ -648,6 +648,8 @@ const path=require('path');
     const seatSign=async(seat)=>{await semantic('grid-sign-'+seat);await semantic('grid-cell-'+CELL(seat));await semantic('grid-seal');await settled();};
     await page.waitForTimeout(300);
     await tap(-129,344);await tap(-72,128);await tap(0,654); // the thumb path: the Aries tile, the Fire-cardinal cell, Seal on the canvas
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().busy,{},{timeout:3000}).catch(()=>{});
+    { const g=await state(); check(g.busy && g.gridPlates[CELL(0)]==='gold' && !g.gridGoldWhole[CELL(0)],'without Reduced motion the gold spreads from the centre: not yet whole at the Seal at '+viewport.width); }
     await settled();
     check((await state()).gridPlaced===1 && events.some(e=>e.event_name==='grid_placed'&&e.evidence_eligible&&e.start_sign==='Aries'),'canvas taps seat Aries at Level 0 with evidence at '+viewport.width);
     await semantic('grid-sign-1');await semantic('grid-cell-'+CELL(8));await semantic('grid-seal'); // Taurus to Fire mutable: the row is wrong
@@ -690,10 +692,19 @@ const path=require('path');
     await settled();
     check((await state()).gridPlaced===6 && (await state()).caspar.includes('Virgo is placed') && !events.filter(e=>e.event_name==='grid_placed')[5].evidence_eligible,'three wrong cells hand the sign to Caspar, who seats it without evidence at '+viewport.width);
     check((await state()).gridPlates[CELL(5)]==='wood' && (await state()).gridLive[CELL(5)],'the sign Caspar placed stays wood, its lettering alive (owner, Oct 7, 1A), at '+viewport.width);
-    for(let seat=6;seat<11;seat++)await seatSign(seat);
+    for(let seat=6;seat<8;seat++)await seatSign(seat);
+    // Reduced motion (the brief: "Reduced motion throughout"): a correct Seal shows the gold whole and the lettering awake at once, with no spread
+    await semantic('motion');await page.waitForFunction(()=>window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000});
+    await semantic('grid-sign-8');await semantic('grid-cell-'+CELL(8));await semantic('grid-seal');await page.waitForTimeout(120);
+    { const g=await state(); check(g.busy && g.gridPlates[CELL(8)]==='gold' && g.gridGoldWhole[CELL(8)] && g.gridLive[CELL(8)],'with Reduced motion a correct Seal shows the gold whole and the lettering awake at once, inside the hold, at '+viewport.width); }
+    await settled();
+    await seatSign(9);check((await state()).gridGoldWhole[CELL(9)],'with Reduced motion the next plate is gold too at '+viewport.width);
+    await semantic('motion');await page.waitForFunction(()=>!window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000});
+    await seatSign(10);
     await semantic('grid-sign-11');await semantic('grid-cell-'+CELL(11));await semantic('grid-seal'); // the last seat without settling, so the capture lands mid-ceremony
     await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===3,{},{timeout:20000});await page.waitForTimeout(950);await page.screenshot({path:path.join(out,viewport.width+'-key3-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key3&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
+    { const g=await state(); check(g.gridPlates[CELL(11)]==='gold' && g.gridGoldWhole[CELL(11)] && g.gridLive[CELL(11)],'the twelfth plate ends gold and whole, its lettering awake, after the Key 3 ceremony at '+viewport.width); }
     check((await state()).keys===3 && (await state()).gridPlaced===12 && (await state()).gridComplete && !(await state()).canGridPick && events.filter(e=>e.event_name==='key3_earned').length===1 && (await state()).caspar.includes('Keeper Key 3 is yours'),'twelve seated earns Key 3 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-key3.png')});
     await semantic('leave-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});

@@ -595,7 +595,10 @@ namespace Ascendant.Build
                 "the Book's ink: twelve places on its open pages, six to a page clear of the gutter and of each other, and a sign's place is not its wheel order (owner, Oct 7, 2A)");
             Check(SliceView.InkFull > SliceView.InkFaint && SliceView.InkFaint > 0 && SliceView.DarkPlate.r < .4f && SliceView.EmblemY < SliceView.RiseFrom && SliceView.RiseFrom < 420,
                 "a symbol learned alone inks fully, one shown with help faintly (1A); the answer plates are near-black (owner, Oct 8); a question rises from the pages to its place");
-            var grid = new GridModel(() => 0); Check(grid.InputMethod == "DirectCell", "a tapped well logs DirectCell, and a dragged plate logs Drag; grading is the same either way (owner, Oct 7: drag and tap)");
+            var grid = new GridModel(() => 0); bool begun = grid.InputMethod == "DirectCell" && grid.Begin() && grid.Pick(0);
+            grid.InputMethod = "Drag"; bool dragged = begun && grid.Choose(GridModel.CellOf(0)); grid.InputMethod = "DirectCell"; var sealedByTap = dragged ? grid.Seal() : null;
+            Check(dragged && grid.Events.Any(e => e.event_name == "cell_chosen" && e.input_method == "Drag") && sealedByTap != null && sealedByTap.correctness && sealedByTap.input_method == "DirectCell",
+                "a dragged plate's well logs Drag and a tap logs DirectCell; the drag grades the same (owner, Oct 7: drag and tap)");
         }
         static void ValidateTriangles()
         {

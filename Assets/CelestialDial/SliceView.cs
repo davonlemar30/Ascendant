@@ -81,7 +81,9 @@ namespace Ascendant.CelestialDial
         // placed with Caspar's help stays wood with its lettering alive (answer 1A). Nothing shows an element before the Seal.
         readonly Image[] gridWellLight = new Image[12], gridCellWood = new Image[12], gridCellGold = new Image[12]; readonly RectTransform[] gridGoldMask = new RectTransform[12];
         readonly Material[] gridCellGlyphLive = new Material[12], gridCellNameLive = new Material[12]; readonly Vector2[] gridTileHome = new Vector2[12];
-        int goldSeat = -1, dragSeat = -1, hoverCell = -1; bool gridPlates;
+        int goldSeat = -1, dragSeat = -1, hoverCell = -1, slidingSeat = -1; bool gridPlates; // slidingSeat: a plate moving on its own (back to the tray, or into Caspar's well)
+        public const float SlideSeconds = .25f, WakeSeconds = .3f;
+        readonly Outline[] glyphWarm = new Outline[4]; // the Book's warm edge on the right answer, its own component beside the engraving's
         public const float GoldSeconds = .5f, LiftScale = 1.06f;
         public static readonly Color BurnedInk = new Color(.23f, .14f, .09f);
         // live lettering (owner, Oct 8: "outline on all four"): the symbol and the name both take their element's fill, edged with the Art Bible's
@@ -1013,7 +1015,7 @@ namespace Ascendant.CelestialDial
             if (Grid.Begin()) { Flow.StartGrid(); Save(); } // the first opening introduces the twelve sign → cell items (deck as data)
             demoCell = -1; Show(); Publish();
         }
-        void LeaveGrid() { if (busy || !Flow.LeaveGrid()) return; Save(); Show(); Publish(); }
+        void LeaveGrid() { if (busy) return; PlateDragCancel(); if (!Flow.LeaveGrid()) return; Save(); Show(); Publish(); }
         // the row and column names, engraved in the table's frame and inlaid gold: a dark cut above the letters, a faint catch of light below
         void BurnIntoEdge(Text label)
         {
@@ -1036,6 +1038,7 @@ namespace Ascendant.CelestialDial
             var gold = new GameObject("Gold plate", typeof(RectTransform)).AddComponent<Image>(); gold.rectTransform.SetParent(mask, false); Centre(gold.rectTransform, 78, 42); gold.raycastTarget = false; Slots.Dress(gold, "table-plate-gold"); gridCellGold[cell] = gold;
             light.rectTransform.SetSiblingIndex(0); wood.rectTransform.SetSiblingIndex(1); // under the cell's symbol and name
             BurnIn(gridCellNames[cell]); BurnIn(gridCellGlyphs[cell]); gridCellGlyphs[cell].fontSize = 18;
+            ((RectTransform)gridCellGlyphs[cell].transform).anchoredPosition += new Vector2(4, 0); // inside the 78 px plate, inset as on the tray (it hung past the plate's left edge)
             foreach (var label in new[] { gridCellNames[cell], gridCellGlyphs[cell] }) { var line = label.gameObject.AddComponent<Outline>(); line.effectColor = LetterLine; line.effectDistance = new Vector2(1, -1); line.enabled = false; } // live lettering keeps the Art Bible's dark-brown line, so every element reads on the wood and the gold
             int seat = GridModel.SeatOf(cell); var fill = Slots.Image(LetterSlot(seat)); var shader = Resources.Load<Shader>("Shaders/LetterFill");
             if (fill != null && shader != null) { gridCellGlyphLive[cell] = LiveLetters(shader, fill, gridCellGlyphs[cell]); gridCellNameLive[cell] = LiveLetters(shader, fill, gridCellNames[cell]); }
@@ -1047,7 +1050,7 @@ namespace Ascendant.CelestialDial
         }
         // Drag (owner, Oct 7: "drag and tap"): lifting a plate picks it, letting it go over a well chooses that well, and Seal still commits, the same
         // results as the taps (the Dial lock: the same results from every input). Dropped anywhere else, the plate goes back to its place in hand.
-        public bool PlateDragBegin(int seat) { if (busy || Flow.Screen != SliceScreen.Grid || (Grid.Sign != seat && !Grid.Pick(seat))) return false; dragSeat = seat; hoverCell = -1; ShowGrid(); Publish(); return true; }
+        public bool PlateDragBegin(int seat) { if (dragSeat >= 0 || busy || Flow.Screen != SliceScreen.Grid || (Grid.Sign != seat && !Grid.Pick(seat))) return false; dragSeat = seat; hoverCell = -1; ShowGrid(); Publish(); return true; }
         public void PlateDragMove(Vector2 screen, Camera eye)
         {
             if (dragSeat < 0) return; var tile = (RectTransform)gridTiles[dragSeat].transform;
@@ -1062,6 +1065,21 @@ namespace Ascendant.CelestialDial
             ShowGrid(); Publish();
         }
         public int DragSeat => dragSeat;
+        // a drag cut short (its plate hidden, or the player leaving the Table): the plate goes home and no well is chosen
+        public void PlateDragCancel() { if (dragSeat < 0) return; int seat = dragSeat; dragSeat = -1; hoverCell = -1; ((RectTransform)gridTiles[seat].transform).anchoredPosition = gridTileHome[seat]; if (isActiveAndEnabled && Flow.Screen == SliceScreen.Grid) { ShowGrid(); Publish(); } }
+        // the live lettering's strength, outline included: 0 asleep, 1 awake, and ShowGrid sets it whole
+        void LetterAlpha(int cell, float a)
+        {
+            foreach (var label in new[] { gridCellNames[cell], gridCellGlyphs[cell] }) { var c = label.color; c.a = a; label.color = c; var line = label.GetComponent<Outline>(); if (line != null) { var e = LetterLine; e.a *= a; line.effectColor = e; } }
+        }
+        IEnumerator LettersWake(int cell) { for (float t = 0; t < WakeSeconds; t += Time.unscaledDeltaTime) { LetterAlpha(cell, t / WakeSeconds); yield return null; } LetterAlpha(cell, 1); }
+        // a plate moving on its own between two places on the table, eased, no bounce, and Reduced motion skips it
+        IEnumerator SlidePlate(int seat, Vector2 from, Vector2 to, float seconds)
+        {
+            slidingSeat = seat; var tile = (RectTransform)gridTiles[seat].transform;
+            for (float t = 0; t < seconds; t += Time.unscaledDeltaTime) { tile.anchoredPosition = Vector2.Lerp(from, to, Mathf.SmoothStep(0, 1, t / seconds)); yield return null; }
+            tile.anchoredPosition = to; slidingSeat = -1;
+        }
         // the gold opening from the plate's centre outward, hard-edged (Art Bible rules 2 and 8)
         IEnumerator GoldSpreads(int cell)
         {
@@ -1075,17 +1093,18 @@ namespace Ascendant.CelestialDial
         void GridSeal()
         {
             if (busy || Flow.Screen != SliceScreen.Grid) return;
-            int sealing = Grid.Sign; var result = Grid.Seal(); if (result == null) return;
+            int sealing = Grid.Sign, at = Grid.Cell; var result = Grid.Seal(); if (result == null) return;
             if (result.correctness) { goldSeat = sealing; StartCoroutine(GridSeated()); }
             else if (Grid.Demonstrating) StartCoroutine(GridDemonstrate());
-            else { ShowGrid(); Publish(); }
+            else { ShowGrid(); Publish(); if (gridPlates && !ReducedMotion && sealing >= 0 && at >= 0) StartCoroutine(SlidePlate(sealing, ((RectTransform)gridCells[at].transform).anchoredPosition, gridTileHome[sealing], SlideSeconds)); } // a wrong Seal: the plate slides out of the well, back to its tray spot, still in hand
         }
         IEnumerator GridSeated()
         {
             busy = true; ShowGrid(); Publish();
             int cell = goldSeat >= 0 ? GridModel.CellOf(goldSeat) : -1; bool gold = goldSeat >= 0 && gridPlates && PlacedOwn(goldSeat);
-            if (gold && !ReducedMotion) { gridGoldMask[cell].sizeDelta = new Vector2(0, 42); yield return GoldSpreads(cell); yield return new WaitForSecondsRealtime(1.1f - GoldSeconds); } // the gold plays inside today's hold
-            else yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.1f);
+            if (gold && !ReducedMotion) { gridGoldMask[cell].sizeDelta = new Vector2(0, 42); LetterAlpha(cell, 0); yield return GoldSpreads(cell); yield return LettersWake(cell); yield return new WaitForSecondsRealtime(1.1f - GoldSeconds - WakeSeconds); } // the gold plays inside today's hold, then the lettering wakes
+            else if (cell >= 0 && gridPlates && !ReducedMotion) { LetterAlpha(cell, 0); yield return LettersWake(cell); yield return new WaitForSecondsRealtime(1.1f - WakeSeconds); } // a helped plate stays wood, and its lettering still wakes
+            else { if (gold) { gridGoldMask[cell].sizeDelta = new Vector2(78, 42); Publish(); } yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.1f); } // Reduced motion: the gold is whole at the Seal
             goldSeat = -1;
             // Key 3's ceremony follows the seating inside the same busy span. Run side by side, the seating cleared busy mid-ceremony, and the
             // ceremony's end later cleared the walk home's busy mid-fade, so the fade ate the first tap in the Atrium (Sept 25).
@@ -1099,7 +1118,9 @@ namespace Ascendant.CelestialDial
             float beat = ReducedMotion ? DialView.ReducedBeatSeconds : DialView.BeatSeconds;
             yield return new WaitForSecondsRealtime(beat);
             demoCell = Grid.DemonstrationCell; ShowGrid(); Publish();
-            yield return new WaitForSecondsRealtime(beat);
+            int helped = Grid.Sign; // Caspar's own hand: his plate slides from the tray into its well over the second beat
+            if (gridPlates && !ReducedMotion && helped >= 0 && demoCell >= 0) yield return SlidePlate(helped, gridTileHome[helped], ((RectTransform)gridCells[demoCell].transform).anchoredPosition, beat);
+            else yield return new WaitForSecondsRealtime(beat);
             demoCell = -1; Grid.AfterDemonstration(); Save(); ShowGrid(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? .6f : 1.2f);
             busy = false; ShowGrid(); Publish();
@@ -1426,7 +1447,7 @@ namespace Ascendant.CelestialDial
             {
                 glyphNameButtons[i].interactable = naming && !busy && target >= 0;
                 var label = glyphNameButtons[i].GetComponentInChildren<Text>(); bool picked = revealSeat >= 0 && revealSlot == i && revealOwn; // the right answer floats a little higher, warm
-                var warm = label.GetComponent<Outline>(); if (warm == null) { warm = label.gameObject.AddComponent<Outline>(); warm.effectDistance = new Vector2(1.5f, -1.5f); }
+                var warm = glyphWarm[i]; if (warm == null) { warm = label.gameObject.AddComponent<Outline>(); warm.effectDistance = new Vector2(1.5f, -1.5f); glyphWarm[i] = warm; } // its own component: the engraving's dark edge stays as ButtonLook set it
                 warm.effectColor = new Color(1, .66f, .3f, picked ? .8f : 0); label.rectTransform.anchoredPosition = new Vector2(0, picked ? 3 : 0);
             }
             glyphCaspar.text = DialLesson.GlyphIntro; glyphNote.text = busy ? glyphNote.text : "";
@@ -1457,6 +1478,7 @@ namespace Ascendant.CelestialDial
                 // the tray: a placed plate has left it; the one in hand sits in its chosen well, or lifts in place until a well is chosen
                 bool inWell = inHand && g.Cell >= 0, gone = seated || inWell, lifted = inHand && !inWell;
                 var tile = (RectTransform)gridTiles[i].transform; var tileImage = gridTiles[i].GetComponent<Image>();
+                if (i != dragSeat && i != slidingSeat) tile.anchoredPosition = gridTileHome[i]; // no plate is left where a finger let go
                 tileImage.color = gone ? Color.clear : Color.white; gridTileNames[i].color = gridTileGlyphs[i].color = gone ? Color.clear : BurnedInk;
                 tile.localScale = Vector3.one * (lifted || dragSeat == i ? LiftScale : 1); var shade = tileImage.GetComponent<Shadow>(); if (shade == null) { shade = tileImage.gameObject.AddComponent<Shadow>(); shade.effectDistance = new Vector2(3, -5); }
                 shade.effectColor = new Color(0, 0, 0, lifted || dragSeat == i ? .5f : 0); // a lifted plate casts a hard drawn shadow (Art Bible rule 8)
@@ -1471,6 +1493,7 @@ namespace Ascendant.CelestialDial
                 gridCellNames[i].material = live ? gridCellNameLive[i] : null; gridCellGlyphs[i].material = live ? gridCellGlyphLive[i] : null; // the symbol and the name take their element's material
                 foreach (var label in new[] { gridCellNames[i], gridCellGlyphs[i] }) { var line = label.GetComponent<Outline>(); if (line != null) line.enabled = live; } // all four elements, edged (owner, Oct 8)
                 gridCellGlyphs[i].color = live && gridCellGlyphLive[i] != null ? Color.white : BurnedInk;
+                foreach (var label in new[] { gridCellNames[i], gridCellGlyphs[i] }) { var line = label.GetComponent<Outline>(); if (line != null) line.effectColor = LetterLine; }
                 gridCellNames[i].color = live && gridCellNameLive[i] != null ? Color.white : i == g.Rejected && !shows ? Bone : BurnedInk;
                 var drift = ReducedMotion ? Vector2.zero : LetterDrift(seat); if (gridCellNameLive[i] != null) { gridCellNameLive[i].SetVector("_Drift", drift); gridCellGlyphLive[i].SetVector("_Drift", drift); }
             }
@@ -1749,6 +1772,7 @@ namespace Ascendant.CelestialDial
                 state.gridSign = Grid.Sign >= 0 ? Zodiac.Seats[Grid.Sign].Name : ""; state.gridCell = Grid.Cell; state.gridLocked = Grid.Locked;
                 state.gridTiles = Enumerable.Range(0, 12).Select(i => Grid.TileLabel(i)).ToArray(); state.gridCells = Enumerable.Range(0, 12).Select(i => Grid.CellLabel(i)).ToArray();
                 state.gridArt = gridPlates; state.gridDrag = dragSeat >= 0 ? Zodiac.Seats[dragSeat].Name : ""; state.gridHover = hoverCell;
+                state.gridGoldWhole = Enumerable.Range(0, 12).Select(i => gridPlates && gridGoldMask[i] != null && gridGoldMask[i].sizeDelta.x >= 77).ToArray(); // the gold as drawn, not as graded
                 state.gridEdgeBox = gridEdge.SelectMany(InkBox).ToArray(); // each frame name's laid-out box, held on the table's wood by the web suite (owner, Oct 8)
                 state.gridPlates = Enumerable.Range(0, 12).Select(i => { int seat = GridModel.SeatOf(i); return Grid.Placed[seat] ? (PlacedOwn(seat) ? "gold" : "wood") : inHandCell(i) >= 0 ? "pending" : ""; }).ToArray();
                 state.gridLive = Enumerable.Range(0, 12).Select(i => gridPlates && gridCellGlyphLive[i] != null && gridCellGlyphs[i].material == gridCellGlyphLive[i] && gridCellNames[i].material == gridCellNameLive[i]
