@@ -906,11 +906,11 @@ namespace Ascendant.CelestialDial
             if (s == SliceScreen.Atrium && Page < AtriumPages.Length - 1) { Page++; Sound.Play("page"); ShowPage(); Publish(); return; }
             if (s == SliceScreen.AtriumReturn && Page < ReturnPages.Length - 1) { Page++; Sound.Play("page"); ShowPage(); Publish(); return; }
             if (s == SliceScreen.Chamber && !Flow.Ended) { if (Page < ChamberPages.Length - 1) { Page++; Sound.Play("page"); ShowPage(); Publish(); } return; }
-            var from = Flow.Screen;
+            var from = Flow.Screen; int starsBefore = OrbStarCount;
             if (!Flow.Continue()) return;
             Page = 0;
             if (Flow.Screen == SliceScreen.Hub) Save();
-            if (from == SliceScreen.Birth) StartCoroutine(WhiteLight()); else { Show(); Publish(); }
+            if (from == SliceScreen.Birth) { orbHeld = true; orbHeldStars = starsBefore; StartCoroutine(WhiteLight()); } else { Show(); Publish(); } // the orb and its stars stay on the birth screen until the white covers it (Jeffrey, #141 B1)
         }
         void WingContinue() { Continue(); } // Build T: only the opening's Continue after Key 1; the Dial's exit is its own button
         void Insert()
@@ -1371,7 +1371,7 @@ namespace Ascendant.CelestialDial
             var task = Flow.CurrentReview;
             bool practiceOnDial = s == SliceScreen.Practice && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth); if (s == SliceScreen.Birth) ShowBirth(); // Oct 7: "Your Birth" opens the opening's boxes
-            prologue.gameObject.SetActive(s == SliceScreen.Prologue); orb.gameObject.SetActive(OrbWanted); // the opening scene (owner, Oct 8); the orb on the opening's name and birth screens only
+            orbHeld = false; prologue.gameObject.SetActive(s == SliceScreen.Prologue); orb.gameObject.SetActive(OrbWanted); // the opening scene (owner, Oct 8); the orb on the opening's name and birth screens only
             journal.gameObject.SetActive(s == SliceScreen.Journal); if (s == SliceScreen.Journal) ShowJournal();
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom); hub.gameObject.SetActive(s == SliceScreen.Hub);
@@ -1643,7 +1643,7 @@ namespace Ascendant.CelestialDial
             bool onPrologue = s == SliceScreen.Prologue; state.prologueShot = onPrologue ? prologueShot : -1; state.prologueShots = PrologueShots.Length;
             state.prologueShotId = onPrologue && prologueShot >= 0 && prologueShot < PrologueShots.Length ? PrologueShots[prologueShot].Id : ""; state.prologueFrame = onPrologue ? prologueFrameShown : "";
             state.prologueStill = onPrologue && prologueStill; state.skipShown = onPrologue && skipShown; state.canSkip = onPrologue && !busy;
-            state.orbShown = OrbWanted; state.orbStars = OrbWanted ? Mathf.Min(Flow.OpeningAnswers, SliceFlow.MostOpeningAnswers) : 0; state.orbStarsLit = OrbWanted ? OrbStarsLit : 0; state.orbArt = Slots.Source("orb");
+            state.orbShown = OrbWanted; state.orbStars = OrbWanted ? OrbStarCount : 0; state.orbStarsLit = OrbWanted ? OrbStarsLit : 0; state.orbArt = Slots.Source("orb");
             state.canBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice == "";
             bool birthNow = s == SliceScreen.Birth && !busy; string birthStep = Flow.BirthStep; state.birthStep = s == SliceScreen.Birth ? birthStep : "";
             state.canBirthDate = birthNow && Flow.BirthChoice == "chart" && birthStep == "date"; state.canBirthTime = birthNow && Flow.BirthChoice == "chart" && birthStep == "time"; state.canBirthPlace = birthNow && Flow.BirthChoice == "chart" && birthStep == "place";
@@ -2775,7 +2775,7 @@ namespace Ascendant.CelestialDial
         static PrologueStep Pushed(PrologueStep step, float to, Vector2 view, float seconds) { step.PushTo = to; step.PushView = view; step.PushSeconds = seconds; return step; }
         public static Vector2 ViewOn(float x, float y) => new Vector2(2 * x - 1, 2 * y - 1); // the view that holds a point of the frame (shares across and down) still while the scale grows
         public const float PrologueLeadIn = .6f, PanelSlide = .7f, StillFade = .4f, SkipShowsFor = 3f, FlashIn = .6f, FlashHold = .35f, FlashBloom = 1.06f, FlashOut = .6f, Darkness = 1.2f; // timings are working choices to tune against the art (the brief)
-        // The shot list (the brief's table, shots 1-7; timings are working choices). The spoken lines are Claude's drafts for Dante.
+        // The shot list (the brief's table, shots 1-7; timings are working choices). The spoken lines are Claude's drafts as Dante edited them (#141).
         public static readonly PrologueShot[] PrologueShots =
         {
             // the city's one lit window, measured on the final art (720 x 1600): pixels 412 to 425 across, 351 to 408 down, its centre 58.1% across, 23.7% down
@@ -2783,14 +2783,14 @@ namespace Ascendant.CelestialDial
                 Line = "Night in the city. The street is empty. One window is still lit.", Steps = new[] { FadeTo(0, "prologue-city", 1.5f) } },
             new PrologueShot { Id = "desk", Seconds = 8f, Page = true,
                 Line = "A young man sits at his desk with his headphones on, writing in his notebook.",
-                Steps = new[] { Panel(.3f, "prologue-desk", 0, 187, 340, 338, -1, 330), Panel(3.2f, "prologue-notebook", 0, 545, 340, 338, 1, 424) } }, // the final art: the wide shows 20% to 62% down (his head, the desk and the notebook); the close 32% to 74% (the arm, the hand and pen, the open notebook)
+                Steps = new[] { Panel(.3f, "prologue-desk", 0, 204, 340, 300, -1, 330), Panel(3.2f, "prologue-notebook", 0, 524, 340, 300, 1, 424) } }, // the final art: the wide shows 22.5% to 60% down (his head, the desk and the notebook); the close 34% to 72% (the arm, the hand and pen, the open notebook). On screen 54 to 354 and 374 to 674 down, clear of the gear above and of Skip below (Jeffrey, #141 N7)
             new PrologueShot { Id = "light", Seconds = 9f,
                 Line = "A white-gold light floods his room. He looks up and pulls his headphones down.",
                 Steps = new[] { Cut(0, "prologue-desk"), FadeTo(1f, "prologue-light", 1.2f), Cut(4f, "prologue-look"), Cut(6.5f, "prologue-headphones") } },
             // Caspar and his ring on the final art: pixels 132 to 487 across, 850 to 1205 down (the ring's centre 47.5% across, 68.8% down); the pan ends
             // a little left, the window then 7% to 84% across and 23% to 100% down, so he and the whole ring are in view
             new PrologueShot { Id = "street", Seconds = 7f, ScaleFrom = 1.3f, ScaleTo = 1.3f, ViewFrom = new Vector2(0, -1), ViewTo = new Vector2(-.4f, 1),
-                Line = "Down in the empty street, a hooded figure stands with his back turned, in a fading ring of light.", Steps = new[] { Cut(0, "prologue-street-above") } },
+                Line = "In the street below, a hooded figure stands with his back to us, inside a fading ring of light.", Steps = new[] { Cut(0, "prologue-street-above") } },
             new PrologueShot { Id = "puzzled", Seconds = 5f, Under = true, UnderDim = .55f,
                 Line = "He stares down from his window, puzzled.", Steps = new[] { Panel(.3f, "prologue-puzzled", 0, 400, 300, 390, 1, 330) } }, // the final art: 17% to 66% down, his hair, his face and his eyes
             // The owner, Oct 8 (over the brief's fading glow): "my vision was for the intro to end on a zoom in, zooming into caspars glowing eyes and
@@ -2799,7 +2799,7 @@ namespace Ascendant.CelestialDial
             // Measured on the final art: on the face his eyes glow at pixels 380 to 438 across, 334 to 349 down (centre 56.6%, 21.3%); on the
             // close-up the glow spans 279 to 470 across, 731 to 801 down (centre 50.7%, 47.1%; the art lane measured 50.6%, 47.1%).
             new PrologueShot { Id = "turn", Seconds = 11.5f,
-                Line = "The hooded figure turns around. His eyes glow white-gold, closer and closer.",
+                Line = "The hooded figure turns. The view pushes in on his white-gold eyes.",
                 Steps = new[] { Cut(0, "prologue-caspar-back"), Cut(2.5f, "prologue-caspar-turn"), Pushed(Cut(4.5f, "prologue-caspar-face"), 1.3f, ViewOn(.566f, .213f), 7f), Pushed(FadeTo(7.5f, "prologue-caspar-eyes", 1.2f), 1.25f, ViewOn(.507f, .471f), 4f) } },
             new PrologueShot { Id = "flash", Seconds = FlashIn + FlashHold + FlashOut + Darkness, Flash = true, Line = "A flash of white light. Then darkness." },
         };
@@ -2906,7 +2906,8 @@ namespace Ascendant.CelestialDial
             if (!prologueFrames.TryGetValue(slot, out var frame)) return () => true;
             if (step.How == "panel")
             {
-                var panel = Rect("Panel " + slot, prologuePanels, step.X, step.Top, step.Width, step.Height); prologuePanelsShown.Add(panel);
+                float band = prologueShot >= 0 && prologueShot < PrologueShots.Length && PrologueShots[prologueShot].Page ? SafeArea.TopInset(canvas) : 0; // a comic page moves down by a cutout's band, as the gear does
+                var panel = Rect("Panel " + slot, prologuePanels, step.X, step.Top + band, step.Width, step.Height); prologuePanelsShown.Add(panel);
                 panel.gameObject.AddComponent<Image>().color = Color.black; panel.GetComponent<Image>().raycastTarget = false; panel.gameObject.AddComponent<RectMask2D>();
                 frame.Rect.SetParent(panel, false); frame.Rect.anchorMin = frame.Rect.anchorMax = frame.Rect.pivot = new Vector2(.5f, .5f); frame.Rect.anchoredPosition = new Vector2(-(float.IsNaN(step.SrcX) ? step.X : step.SrcX), (float.IsNaN(step.SrcY) ? step.Top : step.SrcY) - 400); // the window shows the frame's part centred on its source
                 frame.Rect.localScale = Vector3.one; frame.Group.alpha = 1; frame.Rect.gameObject.SetActive(true);
@@ -2970,7 +2971,7 @@ namespace Ascendant.CelestialDial
         // ---- The orb and its stars (owner, Oct 8: ruling 3, the orb unknown; ruling 8, the stars; C2) ----
         // The orb floats above the question on the opening's name and birth screens, centred in the empty band between the top of the screen
         // (below any cutout's band) and the question (both headings sit at y 200); the faint ring stays. One star gathers per step answered, at
-        // eight even places around it in the order answered (Ashantis); they leave with the white light. "Your Birth" from the journal has neither.
+        // eight even places around it, taken in a spread order (OrbStarOrder); they leave with the white light. "Your Birth" from the journal has neither.
         public const float OrbSize = 120, OrbStarSize = 16, OrbStarRadius = 68, OrbBob = 3, OrbBobSeconds = 3.2f, StarFadeSeconds = .8f, QuestionTop = 183;
         public static float OrbCentreY(float safeTop) => (Mathf.Max(0, safeTop) + QuestionTop) / 2; // the band's middle: 91.5 with no band
         public static Vector2 OrbStarAt(int k) { float a = (90 - 45 * k) * Mathf.Deg2Rad; return new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * OrbStarRadius; } // the first at the top, then clockwise
@@ -2986,28 +2987,36 @@ namespace Ascendant.CelestialDial
             if (!Slots.Dress(orbImage, "orb")) { orbImage.sprite = DiscSprite(); orbImage.color = new Color(.32f, .3f, .33f, .9f); var label = Label(body, "orb", 0, OrbSize / 2, 100, 16, 11); label.color = Bone; } // the labelled placeholder
             for (int k = 0; k < orbStars.Length; k++)
             {
-                var p = OrbStarAt(k); var star = Rect("Star " + (k + 1), orb, p.x, OrbReach - p.y, OrbStarSize, OrbStarSize); orbStars[k] = star.gameObject.AddComponent<Image>(); orbStars[k].raycastTarget = false;
+                var p = OrbStarAt(OrbStarOrder[k]); var star = Rect("Star " + (k + 1), orb, p.x, OrbReach - p.y, OrbStarSize, OrbStarSize); orbStars[k] = star.gameObject.AddComponent<Image>(); orbStars[k].raycastTarget = false;
                 if (!Slots.Dress(orbStars[k], "orb-star")) { orbStars[k].sprite = DiscSprite(); orbStars[k].color = Bone; } // the placeholder: a small bone dot
                 orbStars[k].color = new Color(orbStars[k].color.r, orbStars[k].color.g, orbStars[k].color.b, 0); star.gameObject.SetActive(false);
             }
             orb.gameObject.SetActive(false);
         }
-        bool OrbWanted => Flow.Screen == SliceScreen.Identity || (Flow.Screen == SliceScreen.Birth && !Flow.Amending);
+        // Jeffrey, #141 B1: Continue moves the flow to the Atrium before the white light covers the birth screen; the orb and its stars are held
+        // as they were until Show() runs under full white, so they leave with the light
+        bool orbHeld; int orbHeldStars;
+        bool OrbWanted => orbHeld || Flow.Screen == SliceScreen.Identity || (Flow.Screen == SliceScreen.Birth && !Flow.Amending);
+        int OrbStarCount => orbHeld ? orbHeldStars : Mathf.Min(Flow.OpeningAnswers, SliceFlow.MostOpeningAnswers);
+        // Jeffrey, #141 N2: the stars take the eight places in a spread order, so any count sits balanced round the orb: top, bottom, right, left,
+        // then top right, bottom left, top left, bottom right (places counted clockwise from the top, as OrbStarAt)
+        public static readonly int[] OrbStarOrder = { 0, 4, 2, 6, 1, 5, 7, 3 };
         void UpdateOrb()
         {
             bool shown = OrbWanted; if (orb.gameObject.activeSelf != shown) orb.gameObject.SetActive(shown);
             if (!shown) { for (int k = 0; k < orbStars.Length; k++) { orbStarAlpha[k] = 0; orbStars[k].gameObject.SetActive(false); } return; }
             float bob = ReducedMotion ? 0 : OrbBob * Mathf.Sin(Time.unscaledTime * Mathf.PI * 2 / OrbBobSeconds); // a gentle bob; still under reduced motion
             orb.anchoredPosition = new Vector2(0, -(OrbCentreY(SafeArea.TopInset(canvas)) + bob));
-            int count = Mathf.Min(Flow.OpeningAnswers, orbStars.Length); bool landed = false;
+            int count = OrbStarCount; bool landed = false, changed = false;
             for (int k = 0; k < orbStars.Length; k++)
             {
                 float want = k < count ? 1 : 0, before = orbStarAlpha[k];
-                orbStarAlpha[k] = want <= 0 ? 0 : ReducedMotion ? 1 : Mathf.MoveTowards(before, 1, Time.unscaledDeltaTime / StarFadeSeconds); // Back takes the last star at once
+                orbStarAlpha[k] = want <= 0 ? 0 : ReducedMotion ? 1 : Mathf.MoveTowards(before, 1, Time.unscaledDeltaTime / StarFadeSeconds); // Change my answer takes the birth's stars at once
                 if (orbStarAlpha[k] >= 1 && before < 1) landed = true;
-                var c = orbStars[k].color; orbStars[k].color = new Color(c.r, c.g, c.b, orbStarAlpha[k]); orbStars[k].gameObject.SetActive(orbStarAlpha[k] > 0);
+                var c = orbStars[k].color; orbStars[k].color = new Color(c.r, c.g, c.b, orbStarAlpha[k]);
+                if (orbStars[k].gameObject.activeSelf != orbStarAlpha[k] > 0) { orbStars[k].gameObject.SetActive(orbStarAlpha[k] > 0); changed = true; }
             }
-            if (landed) Publish(); // the web state reads a star once it has fully gathered
+            if (landed || changed) Publish(); // the web state follows a star as it appears, gathers, or is taken away (Jeffrey, #141 B2)
         }
         static Sprite discSprite;
         static Sprite DiscSprite()

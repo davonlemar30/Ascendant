@@ -841,6 +841,13 @@ namespace Ascendant.Build
             Check(SliceView.OrbCentreY(0)-SliceView.OrbReach>=0 && SliceView.OrbCentreY(0)+SliceView.OrbReach<=SliceView.QuestionTop && SliceView.OrbCentreY(24)-SliceView.OrbReach>=24 && SliceView.OrbCentreY(24)+SliceView.OrbReach<=SliceView.QuestionTop,"the orb, its stars and its bob fit the band above the question with no top band and with a 24 px one (centre "+SliceView.OrbCentreY(0)+", reach "+SliceView.OrbReach+")");
             var places=Enumerable.Range(0,SliceFlow.MostOpeningAnswers).Select(SliceView.OrbStarAt).ToList();
             Check(places.All(pl=>Mathf.Abs(pl.magnitude-SliceView.OrbStarRadius)<.01f && pl.magnitude-SliceView.OrbStarSize/2>=SliceView.OrbSize/2-3) && Enumerable.Range(0,places.Count).All(i=>Mathf.Abs(Vector2.Angle(places[i],places[(i+1)%places.Count])-45)<.01f) && places[0].y>0 && Mathf.Abs(places[0].x)<.01f,"eight star places evenly round the orb, the first at the top, clear of its body");
+            // Jeffrey, #141 N2: the stars take the places in a spread order, so every count from two up sits balanced round the orb
+            var order=SliceView.OrbStarOrder;var lean=new List<string>();
+            for(int n=2;n<=order.Length;n++){var c=order.Take(n).Select(SliceView.OrbStarAt).Aggregate(Vector2.zero,(acc,v)=>acc+v)/n;if(c.magnitude>SliceView.OrbStarRadius/3+.01f)lean.Add(n+": "+c.magnitude.ToString("0.0"));}
+            Check(order.OrderBy(i=>i).SequenceEqual(Enumerable.Range(0,8)) && order[0]==0 && lean.Count==0,"the stars fill the places in a spread order (top, bottom, right, left, then the diagonals), balanced at every count"+(lean.Count>0?"; leaning: "+string.Join(", ",lean):""));
+            // Jeffrey, #141 N7: the comic page's panels clear the gear (its 44 px target at the top right) and Skip at the bottom, with room for a 30 px cutout band
+            var pagePanels=shots.Where(x=>x.Page).SelectMany(x=>x.Steps).Where(st=>st.How=="panel").ToList();
+            Check(pagePanels.Count==2 && pagePanels.All(st=>st.Top-st.Height/2>=44 && st.Top+st.Height/2+30<=SliceView.SkipY-SliceView.SkipHeight/2),"shot 2's panels sit clear of the gear and of Skip, a cutout's band included");
         }
         static void ValidateBuildF()
         {

@@ -82,6 +82,14 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-birth.png')});
     check(await page.evaluate(()=>window.ascendantDial.snapshot().canSliceContinue===false),'birth prompt waits for a choice at '+viewport.width);
     check(JSON.stringify((await state()).birthChoices)==='["Yes, I know my birthday","I\'ll skip it"]','Oct 7: the opening\'s question has two answers (the known path and the random sun retired) at '+viewport.width);
+    // Jeffrey, #141 B2: on the chart path the date's star gathers; Change my answer takes the birth's stars back, and the published count drops at once
+    await semantic('birth-chart');await page.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
+    await page.evaluate(()=>window.ascendantDial.act('birthdate:1990-04-25'));await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='time');
+    await starsSettled(page);check((await state()).orbStars===3&&(await state()).orbStarsLit===3,'the orb: three stars once the date is in (the name, the question, the date) at '+viewport.width);
+    await page.screenshot({path:path.join(out,viewport.width+'-birth-chart-date.png')});
+    await semantic('change-birth');await page.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.orbStars===1&&s.orbStarsLit===1;},{},{timeout:500}).catch(()=>{});
+    { const c=await state(); check(c.birthStep===''&&c.orbStars===1&&c.orbStarsLit===1,'Change my answer: the published stars drop at once to the name\'s ('+c.orbStars+' counted, '+c.orbStarsLit+' shown) at '+viewport.width); }
+    await page.screenshot({path:path.join(out,viewport.width+'-birth-changed.png')});
     // the birth-time build (owner, Oct 7): I'll skip it asks which sign the player goes by, a sign or I'm not sure; nothing else is asked
     await semantic('birth-skip');await page.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);
     check((await state()).birthStep==='sun-pick'&&!(await state()).canSignUnknown&&!(await state()).canSliceContinue,'I\'ll skip it: which sign do you go by, with no I\'m not sure (Oct 7, 86bced0tc), at '+viewport.width);
@@ -92,7 +100,8 @@ const path=require('path');
     await semantic('sign-4');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done'&&window.ascendantDial.snapshot().canSliceContinue);
     check((await state()).bigThree==='\u2609 Taurus \u00b7 \u263d Cancer \u00b7 \u2191 Leo'&&(await state()).sunBasis==='picked','the sun, the moon and the rising picked, no unknown: '+(await state()).bigThree+' at '+viewport.width);
     await starsSettled(page);check((await state()).orbStars===5,'the orb: five stars once the skip path is answered at '+viewport.width);await page.screenshot({path:path.join(out,viewport.width+'-birth-skip-done.png')});
-    await semantic('next-screen');
+    await semantic('next-screen');await page.waitForTimeout(200); // Jeffrey, #141 B1: the orb and its stars leave with the white light, not before it
+    { const w=await state(); check(w.busy&&w.orbShown&&w.orbStars===5&&w.orbStarsLit===5,'0.2 s into the white light the orb and its five stars still show over the birth screen at '+viewport.width);await page.screenshot({path:path.join(out,viewport.width+'-birth-white-light.png')}); }
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await page.screenshot({path:path.join(out,viewport.width+'-atrium.png')});
     { const m=(await state()).masters||[]; check(m.includes('atrium'),'Batch 2 (the masters approved, Oct 2): the Grand Atrium draws its 1200 x 1840 master whole ('+m.join(', ')+') at '+viewport.width); }
