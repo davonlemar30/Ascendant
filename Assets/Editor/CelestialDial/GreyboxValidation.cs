@@ -575,6 +575,31 @@ namespace Ascendant.Build
             var odd = Fresh(); odd.SetName("{sun}"); Check(odd.FillInscription("Hello again, {name}.") == "Hello again, {sun}.", "a name goes in last, as typed, so it never pulls in the sun's words (Jeffrey, #128 N1)");
             Check(SliceView.InkTapBottom <= SliceView.JournalCloseY - 24, "the tap that finishes the line ends at " + SliceView.InkTapBottom + ", above Close the journal (Jeffrey, #128 B1)");
         }
+        static void ValidateComeAlive()
+        {
+            // ---- the Table and the Book come alive (owner, Oct 7-8; task 86bcf0x71) ----
+            var names = new[] { "book-room", "table-room", "table-well", "table-plate", "table-plate-gold", "letter-fire", "letter-earth", "letter-air", "letter-water" }.Concat(Enumerable.Range(0, 12).Select(SliceView.EmblemSlot)).ToArray();
+            Check(names.Length == 21 && names.All(n => Slots.Find(n) != null && Slots.Image(n) != null) && Slots.Find("book-room").Width == 360 && Slots.Find("table-room").Height == 800 && Slots.Find("table-well").Width == 86 && Slots.Find("table-plate").Height == 44 && Slots.Find("emblem-aries").Width == 180,
+                "the 21 come-alive slots are in the manifest and every one has its file: the Book's room and the Table's top, the well and the two plates, four fills, and an emblem for each of the twelve signs");
+            Check(Enumerable.Range(0, 12).All(i => Slots.Image(SliceView.EmblemSlot(i)) is Sprite e && Mathf.Abs(e.rect.width - e.rect.height) < 1) && Enumerable.Range(0, 12).Select(SliceView.EmblemSlot).Distinct().Count() == 12,
+                "an emblem per sign, square, named for its sign (emblem-aries ... emblem-pisces)");
+            Check(Enumerable.Range(0, 12).All(i => SliceView.LetterSlot(i) == "letter-" + Zodiac.Seats[i].Element.ToLowerInvariant() && Slots.Image(SliceView.LetterSlot(i)) != null) && SliceView.LetterDrift(1) == Vector2.zero && SliceView.LetterDrift(0).y > 0,
+                "each sign's live lettering takes its element's fill; earth holds still, fire rises");
+            Check(SliceView.LetterLine.maxColorComponent < .2f && SliceView.LetterLine.r > SliceView.LetterLine.b && SliceView.LetterLine.a > .9f && SliceView.FrameGold.r > SliceView.FrameGold.g && SliceView.FrameGold.g > SliceView.FrameGold.b,
+                "live lettering is edged in the Art Bible's dark-brown line on all four elements (owner, Oct 8), and the frame's names are inlaid gold");
+            var shader = Resources.Load<Shader>("Shaders/LetterFill");
+            Check(shader != null && shader.name == "Ascendant/LetterFill" && shader.isSupported, "the live lettering's shader ships under Resources (so the Web build carries it) and compiles");
+            Check(SliceView.InkPlace.OrderBy(x => x).SequenceEqual(Enumerable.Range(0, 12)) && !SliceView.InkPlace.SequenceEqual(Enumerable.Range(0, 12)) && SliceView.InkSpots.Length == 12 && SliceView.InkSpots.Distinct().Count() == 12
+                && SliceView.InkSpots.Take(6).All(p => p.x <= -24) && SliceView.InkSpots.Skip(6).All(p => p.x >= 24) && SliceView.InkSpots.All(p => Mathf.Abs(p.x) <= 126 && p.y >= 308 && p.y <= 388)
+                && new[] { SliceView.InkSpots.Take(6), SliceView.InkSpots.Skip(6) }.All(page => page.All(p => page.Where(q => q != p).Min(q => Vector2.Distance(p, q)) >= SliceView.InkSize + 2)),
+                "the Book's ink: twelve places on its open pages, six to a page clear of the gutter and of each other, and a sign's place is not its wheel order (owner, Oct 7, 2A)");
+            Check(SliceView.InkFull > SliceView.InkFaint && SliceView.InkFaint > 0 && SliceView.DarkPlate.r < .4f && SliceView.EmblemY < SliceView.RiseFrom && SliceView.RiseFrom < 420,
+                "a symbol learned alone inks fully, one shown with help faintly (1A); the answer plates are near-black (owner, Oct 8); a question rises from the pages to its place");
+            var grid = new GridModel(() => 0); bool begun = grid.InputMethod == "DirectCell" && grid.Begin() && grid.Pick(0);
+            grid.InputMethod = "Drag"; bool dragged = begun && grid.Choose(GridModel.CellOf(0)); grid.InputMethod = "DirectCell"; var sealedByTap = dragged ? grid.Seal() : null;
+            Check(dragged && grid.Events.Any(e => e.event_name == "cell_chosen" && e.input_method == "Drag") && sealedByTap != null && sealedByTap.correctness && sealedByTap.input_method == "DirectCell",
+                "a dragged plate's well logs Drag and a tap logs DirectCell; the drag grades the same (owner, Oct 7: drag and tap)");
+        }
         static void ValidateTriangles()
         {
             // ---- the family triangles (owner, Oct 3: the overlay approved, mixed strength; the board on 86bcbn6w6, Oct 2) ----
@@ -1248,7 +1273,7 @@ namespace Ascendant.Build
               && new[]{"dial-room","dial-room-light","dial-ring","dial-ring-light"}.All(b=>new[]{"-worn","-bright"}.All(l=>Slots.Art.Any(a=>a.Name==b+l && a.Width==Slots.Find(b).Width && a.Height==Slots.Find(b).Height)))
               && Slots.Find("kit-dial-bright")!=null && Slots.Find("kit-dial-bright-open")!=null,"the Dial's wake-up: five steps from three looks (worn, halfway, today's, halfway, bright), each Dial layer with its worn and bright slot at its own size, the Wing's small Dial with its bright pair");
             // Build E: art slots and sound hooks. The manifest, the URL, the loader on the shipped test set, the import settings, the cues, the size budget.
-            const int artSlots=166; // the message reads the number it asserts (it said 138 from Build Z to Build AC); 151 since the Dial's wake-up (+10: its worn and bright looks); 158 since batch 2's buttons (+7: the plate, its notch and diamond, the arrow, the rule's three pieces); 166 since the journal's landing (+8: the door frame, five emblems, the flourish, the Library plan)
+            const int artSlots=187; // the message reads the number it asserts (it said 138 from Build Z to Build AC); 151 since the Dial's wake-up (+10: its worn and bright looks); 158 since batch 2's buttons (+7: the plate, its notch and diamond, the arrow, the rule's three pieces); 166 since the journal's landing (+8: the door frame, five emblems, the flourish, the Library plan); 187 since the Table and the Book come alive (+21: the two rooms, the well and two plates, four fills, twelve emblems)
             Check(Slots.Art.Length==artSlots && Slots.Art.Select(a=>a.Name).Distinct().Count()==artSlots && Slots.Art.All(a=>a.Name.All(c=>char.IsLower(c)||c=='-') && a.Width>0 && a.Height>0 && a.MaxSize>=Mathf.Max(a.Width,a.Height) && a.Where.Length>0),artSlots+" art slots with unique kebab-case names, a rect, a size cap at or above the rect, and a place");
             Check(Slots.Sounds.Select(s=>s.Name).SequenceEqual(new[]{"step","seal","miss","key","page","door","ambient"}) && Slots.Sounds.All(s=>s.When.Length>0),"seven sound slots: step, seal, miss, key, page, door, ambient");
             Check(SliceView.CasparPoses.SequenceEqual(new[]{"calm","explain","warm","wry","moved","solemn"}) && SliceView.CasparPoses.All(p=>Slots.Art.Any(a=>a.Name=="caspar-"+p && a.Width==264 && a.Height==468)) && Slots.Art.Any(a=>a.Name=="chat-box" && a.Width==324 && a.Height==240) && Slots.Art.Any(a=>a.Name=="chat-plate"),"Build P: six poses of Caspar, each a 264 x 468 slot, and the chat box with its plate");
@@ -1287,6 +1312,7 @@ namespace Ascendant.Build
             ValidateTriangles();
             ValidateJournalFront();
             ValidateInscription();
+            ValidateComeAlive();
             ValidatePractice();
             ValidateBirthChart();
             ValidateBirthRecord();

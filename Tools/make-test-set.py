@@ -36,6 +36,9 @@ IMAGES = [
     ("dial-room", 180, 400), ("dial-room-light", 180, 400), ("dial-ring", 180, 180), ("dial-ring-light", 180, 180), ("kit-dial-worn-open", 188, 208), ("kit-dial-restored-open", 188, 208),  # Build Z: the Dial's room, its glow, the Wing Dial's open eye
     ("dial-room-worn", 180, 400), ("dial-room-light-worn", 180, 400), ("dial-ring-worn", 180, 180), ("dial-ring-light-worn", 180, 180),  # the Dial's wake-up (Oct 2): its worn and bright looks
     ("dial-room-bright", 180, 400), ("dial-room-light-bright", 180, 400), ("dial-ring-bright", 180, 180), ("dial-ring-light-bright", 180, 180), ("kit-dial-bright", 188, 208), ("kit-dial-bright-open", 188, 208),
+    ("book-room", 180, 400), ("table-room", 180, 400), ("table-well", 88, 48), ("table-plate", 84, 44), ("table-plate-gold", 84, 44),  # the Table and the Book come alive (Oct 8)
+    ("letter-fire", 128, 128), ("letter-earth", 128, 128), ("letter-air", 128, 128), ("letter-water", 128, 128),
+    ("emblem-aries", 180, 180), ("emblem-taurus", 180, 180), ("emblem-gemini", 180, 180), ("emblem-cancer", 180, 180), ("emblem-leo", 180, 180), ("emblem-virgo", 180, 180), ("emblem-libra", 180, 180), ("emblem-scorpio", 180, 180), ("emblem-sagittarius", 180, 180), ("emblem-capricorn", 180, 180), ("emblem-aquarius", 180, 180), ("emblem-pisces", 180, 180),
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
