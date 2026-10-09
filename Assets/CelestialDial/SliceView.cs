@@ -74,6 +74,7 @@ namespace Ascendant.CelestialDial
         const float DarkArt = .35f, ShutArt = .55f, LockDarkArt = .45f; // a file's brightness where the placeholder used a dark color
         readonly Button[] gridTiles = new Button[12], gridCells = new Button[12];
         readonly Text[] gridTileNames = new Text[12], gridTileGlyphs = new Text[12], gridCellNames = new Text[12], gridCellGlyphs = new Text[12];
+        readonly Text[] gridEdge = new Text[GridModel.Columns + GridModel.Rows]; // the column then row names in the table's frame
         int demoCell = -1;
         // The Table comes alive (owner, Oct 7-8; task 86bcf0x71): wells carved in the table's top, wooden plates in a tray, dragged or tapped into a
         // well; Seal still commits. A correct Seal on the player's own turns the plate gold and its lettering takes its element's material; a sign
@@ -83,11 +84,11 @@ namespace Ascendant.CelestialDial
         int goldSeat = -1, dragSeat = -1, hoverCell = -1; bool gridPlates;
         public const float GoldSeconds = .5f, LiftScale = 1.06f;
         public static readonly Color BurnedInk = new Color(.23f, .14f, .09f);
-        // a live name's colour: its element's (Build S's hues, darkened), deep enough to read: 4.5:1 or better on the gold plate, and on the darker
-        // wood as legible as the burned-in lettering beside it (about 2.5:1; even black reaches only 3.6:1 there), measured from the plate art
-        public static Color DeepElement(int seat) { switch (Zodiac.Seats[Zodiac.Wrap(seat)].Element) { case "Fire": return new Color(.62f, .16f, .07f); case "Earth": return new Color(.19f, .36f, .12f); case "Air": return new Color(.42f, .30f, .08f); default: return new Color(.08f, .24f, .48f); } }
-        public const float LiveOnGold = .8f, LiveOnWood = .5f;
-        public static Color LiveName(int seat, bool gold) { var c = DeepElement(seat) * (gold ? LiveOnGold : LiveOnWood); c.a = 1; return c; }
+        // live lettering (owner, Oct 8: "outline on all four"): the symbol and the name both take their element's fill, edged with the Art Bible's
+        // dark-brown line, so every element reads on the pale wood and on the gold (alone, air's pale fill measured 1.01:1 on the gold plate)
+        public static readonly Color LetterLine = new Color(.17f, .11f, .09f, .95f);
+        // the row and column names, engraved in the frame and inlaid gold like the table's own lines (the owner's pick, Oct 8)
+        public static readonly Color FrameGold = new Color(.76f, .63f, .31f);
         public static string LetterSlot(int seat) => "letter-" + Zodiac.Seats[Zodiac.Wrap(seat)].Element.ToLowerInvariant();
         public static Vector2 LetterDrift(int seat) { switch (Zodiac.Seats[Zodiac.Wrap(seat)].Element) { case "Fire": return new Vector2(0, .25f); case "Water": return new Vector2(.18f, 0); case "Air": return new Vector2(.12f, .06f); default: return Vector2.zero; } }
         // a placed sign is the player's own when the deck holds it as practising (Level 0/1 at the Seal), as the journal reads it
@@ -527,8 +528,8 @@ namespace Ascendant.CelestialDial
             gridPlates = Slots.Image("table-plate") != null && Slots.Image("table-well") != null;
             SafeArea.Top(Label(gridScreen, "THE ELEMENTAL TABLE", 0, 32, 340, 24, 18)); // the instrument's own name (owner, Sept 26 playtest, note 13; name picked by the owner, Sept 27)
             gridKeys = SafeArea.Top(Label(gridScreen, "Keeper Keys: 2", 100, 62, 140, 20, 12), SafeArea.UnderTitle); gridKeys.alignment = TextAnchor.MiddleRight; // ten px in from the edge: at 360 wide the Dial's indicator touches it
-            for (int c = 0; c < GridModel.Columns; c++) BurnIntoEdge(Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, 96, 86, 18, 11));
-            for (int r = 0; r < GridModel.Rows; r++) BurnIntoEdge(Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12));
+            for (int c = 0; c < GridModel.Columns; c++) BurnIntoEdge(gridEdge[c] = Label(gridScreen, GridModel.ColumnName(c), -72 + c * 92, Slots.Image("table-room") != null ? 88 : 96, 86, 18, 11)); // with the table's art, on its carved header, clear of the panel's gold border
+            for (int r = 0; r < GridModel.Rows; r++) BurnIntoEdge(gridEdge[GridModel.Columns + r] = Label(gridScreen, GridModel.RowName(r), -150, 128 + r * 52, 56, 48, 12));
             for (int cell = 0; cell < 12; cell++)
             {
                 int index = cell;
@@ -1013,8 +1014,14 @@ namespace Ascendant.CelestialDial
             demoCell = -1; Show(); Publish();
         }
         void LeaveGrid() { if (busy || !Flow.LeaveGrid()) return; Save(); Show(); Publish(); }
-        // the row and column names, burned into the table's edge: bone ink pressed into the wood, legible on its dark top
-        void BurnIntoEdge(Text label) { if (Slots.Image("table-room") == null) { label.color = Muted; return; } label.font = ButtonLook.EngravedFont ?? label.font; label.color = new Color(Bone.r, Bone.g, Bone.b, .82f); var press = label.gameObject.AddComponent<Shadow>(); press.effectColor = new Color(0, 0, 0, .7f); press.effectDistance = new Vector2(.8f, -1.2f); }
+        // the row and column names, engraved in the table's frame and inlaid gold: a dark cut above the letters, a faint catch of light below
+        void BurnIntoEdge(Text label)
+        {
+            if (Slots.Image("table-room") == null) { label.color = Muted; return; }
+            label.font = ButtonLook.EngravedFont ?? label.font; label.color = FrameGold;
+            var cut = label.gameObject.AddComponent<Shadow>(); cut.effectColor = new Color(0, 0, 0, .85f); cut.effectDistance = new Vector2(-.6f, .9f);
+            var catchLight = label.gameObject.AddComponent<Shadow>(); catchLight.effectColor = new Color(1, .89f, .67f, .25f); catchLight.effectDistance = new Vector2(.5f, -.7f);
+        }
         // a plate's symbol and name, burned into the wood
         void BurnIn(Text label) { if (label.font != Dial.GlyphFont) { label.font = ButtonLook.EngravedFont ?? label.font; label.resizeTextForBestFit = true; label.resizeTextMaxSize = label.fontSize; label.resizeTextMinSize = 8; label.horizontalOverflow = HorizontalWrapMode.Wrap; } label.color = BurnedInk; var edge = label.gameObject.AddComponent<Shadow>(); edge.effectColor = new Color(1, .9f, .75f, .3f); edge.effectDistance = new Vector2(.6f, -.8f); }
         // A well: the carved recess, a light that shows when a plate is held over it, and the plate that sits in it, wood with gold over it behind a
@@ -1029,7 +1036,7 @@ namespace Ascendant.CelestialDial
             var gold = new GameObject("Gold plate", typeof(RectTransform)).AddComponent<Image>(); gold.rectTransform.SetParent(mask, false); Centre(gold.rectTransform, 78, 42); gold.raycastTarget = false; Slots.Dress(gold, "table-plate-gold"); gridCellGold[cell] = gold;
             light.rectTransform.SetSiblingIndex(0); wood.rectTransform.SetSiblingIndex(1); // under the cell's symbol and name
             BurnIn(gridCellNames[cell]); BurnIn(gridCellGlyphs[cell]); gridCellGlyphs[cell].fontSize = 18;
-            foreach (var label in new[] { gridCellNames[cell], gridCellGlyphs[cell] }) { var line = label.gameObject.AddComponent<Outline>(); line.effectColor = new Color(.17f, .11f, .09f, .95f); line.effectDistance = new Vector2(1, -1); line.enabled = false; } // live lettering keeps the Art Bible's dark-brown line, so every element reads on gold
+            foreach (var label in new[] { gridCellNames[cell], gridCellGlyphs[cell] }) { var line = label.gameObject.AddComponent<Outline>(); line.effectColor = LetterLine; line.effectDistance = new Vector2(1, -1); line.enabled = false; } // live lettering keeps the Art Bible's dark-brown line, so every element reads on the wood and the gold
             int seat = GridModel.SeatOf(cell); var fill = Slots.Image(LetterSlot(seat)); var shader = Resources.Load<Shader>("Shaders/LetterFill");
             if (fill != null && shader != null) { gridCellGlyphLive[cell] = LiveLetters(shader, fill, gridCellGlyphs[cell]); gridCellNameLive[cell] = LiveLetters(shader, fill, gridCellNames[cell]); }
         }
@@ -1461,10 +1468,10 @@ namespace Ascendant.CelestialDial
                 if (gold && goldSeat != seat) gridGoldMask[i].sizeDelta = new Vector2(78, 42); else if (!gold) gridGoldMask[i].sizeDelta = new Vector2(0, 42);
                 bool live = filled; // the lettering comes alive once the sign is placed, on its own or with help (answer 1A)
                 gridCellNames[i].text = shows ? Zodiac.Seats[sign].Name : i == g.Rejected ? "×" : ""; gridCellGlyphs[i].text = shows ? Zodiac.Seats[sign].Glyph : "";
-                gridCellNames[i].material = null; gridCellGlyphs[i].material = live ? gridCellGlyphLive[i] : null; // the symbol takes its element's material; the name, its element's deep colour, crisp at its size
-                foreach (var label in new[] { gridCellNames[i], gridCellGlyphs[i] }) { var line = label.GetComponent<Outline>(); if (line != null) line.enabled = live && label == gridCellGlyphs[i]; }
+                gridCellNames[i].material = live ? gridCellNameLive[i] : null; gridCellGlyphs[i].material = live ? gridCellGlyphLive[i] : null; // the symbol and the name take their element's material
+                foreach (var label in new[] { gridCellNames[i], gridCellGlyphs[i] }) { var line = label.GetComponent<Outline>(); if (line != null) line.enabled = live; } // all four elements, edged (owner, Oct 8)
                 gridCellGlyphs[i].color = live && gridCellGlyphLive[i] != null ? Color.white : BurnedInk;
-                gridCellNames[i].color = live ? LiveName(seat, gold) : i == g.Rejected && !shows ? Bone : BurnedInk;
+                gridCellNames[i].color = live && gridCellNameLive[i] != null ? Color.white : i == g.Rejected && !shows ? Bone : BurnedInk;
                 var drift = ReducedMotion ? Vector2.zero : LetterDrift(seat); if (gridCellNameLive[i] != null) { gridCellNameLive[i].SetVector("_Drift", drift); gridCellGlyphLive[i].SetVector("_Drift", drift); }
             }
             gridSeal.interactable = active && g.CanSeal;
@@ -1742,8 +1749,10 @@ namespace Ascendant.CelestialDial
                 state.gridSign = Grid.Sign >= 0 ? Zodiac.Seats[Grid.Sign].Name : ""; state.gridCell = Grid.Cell; state.gridLocked = Grid.Locked;
                 state.gridTiles = Enumerable.Range(0, 12).Select(i => Grid.TileLabel(i)).ToArray(); state.gridCells = Enumerable.Range(0, 12).Select(i => Grid.CellLabel(i)).ToArray();
                 state.gridArt = gridPlates; state.gridDrag = dragSeat >= 0 ? Zodiac.Seats[dragSeat].Name : ""; state.gridHover = hoverCell;
+                state.gridEdgeBox = gridEdge.SelectMany(InkBox).ToArray(); // each frame name's laid-out box, held on the table's wood by the web suite (owner, Oct 8)
                 state.gridPlates = Enumerable.Range(0, 12).Select(i => { int seat = GridModel.SeatOf(i); return Grid.Placed[seat] ? (PlacedOwn(seat) ? "gold" : "wood") : inHandCell(i) >= 0 ? "pending" : ""; }).ToArray();
-                state.gridLive = Enumerable.Range(0, 12).Select(i => gridPlates && gridCellGlyphLive[i] != null && gridCellGlyphs[i].material == gridCellGlyphLive[i]).ToArray();
+                state.gridLive = Enumerable.Range(0, 12).Select(i => gridPlates && gridCellGlyphLive[i] != null && gridCellGlyphs[i].material == gridCellGlyphLive[i] && gridCellNames[i].material == gridCellNameLive[i]
+                    && gridCellGlyphs[i].GetComponent<Outline>().enabled && gridCellNames[i].GetComponent<Outline>().enabled).ToArray(); // symbol and name alive, both edged
                 state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
             }
         }

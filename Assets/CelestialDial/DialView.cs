@@ -163,7 +163,7 @@ namespace Ascendant.CelestialDial
             public string[] pois, poiLabels;
             // Build B: the table
             public string gridReadout = "", gridStatus = "", gridSign = "";
-            public string[] gridPlates = new string[0]; public bool[] gridLive = new bool[0]; public string gridDrag = ""; public int gridHover = -1; public bool gridArt; // the Table comes alive (Oct 7-8): each well's plate (gold, wood, pending or none), its live lettering, the plate being dragged, the well under it
+            public string[] gridPlates = new string[0]; public bool[] gridLive = new bool[0]; public float[] gridEdgeBox = new float[0]; public string gridDrag = ""; public int gridHover = -1; public bool gridArt; // the Table comes alive (Oct 7-8): each well's plate (gold, wood, pending or none), its live lettering, the plate being dragged, the well under it
             public string[] gridTiles, gridCells;
             public int gridPlaced, gridCell = -1, gridHintLevel; // the level is test evidence only, never shown
             public bool gridOpen, gridStarted, gridComplete, gridPaused, gridLocked, key3, canEnterGrid, canGridPick, canGridSeal, canGridAsk, canLeaveGrid;

@@ -53,9 +53,9 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `book-cover` | 140 × 140 | 512 | the book on the shelf, closed |
 | `book-page` | 140 × 140 | 512 | the book's open page behind each symbol |
 | `book-room` | 360 × 800 | 2048 | the Book of Symbols' screen: the Book open on a carved lectern in the Zodiac Wing's moonlight, two candles; behind today's layout (owner, Oct 7, 86bcex5kc 4A; 86bcf0x71) |
-| `table-room` | 360 × 800 | 2048 | the Elemental Table's screen: the table's dark-wood top from above, a brass border, moonlight and a warm lamp; the wells and plates draw over it (86bcf0x71) |
-| `table-well` | 86 × 48 | 256 | one well carved into the Table's top, drawn at each of its twelve squares; empty |
-| `table-plate` | 82 × 44 | 256 | a plain wooden plate, one per sign; the game burns its symbol and name in |
+| `table-room` | 360 × 800 | 2048 | the Elemental Table's screen: the Zodiac Wing's own lectern table from above, alive (owner's pick, Oct 8): gold inlay glowing from within, blackened iron fittings, a carved scorpion and phoenix on its header, dark mist; twelve slate squares on the cells, a wide left rail and header for the names, a tray on its front lip (86bcf0x71) |
+| `table-well` | 86 × 48 | 256 | one slate square, cut from table-room's centre square and drawn at each of the twelve, so all twelve are identical; empty |
+| `table-plate` | 82 × 44 | 256 | a plain pale wooden plate, one per sign (owner's pick, Oct 8); the game burns its symbol and name in |
 | `table-plate-gold` | 82 × 44 | 256 | the same plate turned gold, when a sign is placed on the player's own (owner, Oct 7) |
 | `letter-fire` | 128 × 128 | 512 | a tileable fill of drawn flames and embers for the Table's live lettering (Shaders/LetterFill) |
 | `letter-earth` | 128 × 128 | 512 | a tileable fill of drawn moss and stone for the Table's live lettering |

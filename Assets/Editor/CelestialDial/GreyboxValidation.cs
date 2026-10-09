@@ -585,8 +585,8 @@ namespace Ascendant.Build
                 "an emblem per sign, square, named for its sign (emblem-aries ... emblem-pisces)");
             Check(Enumerable.Range(0, 12).All(i => SliceView.LetterSlot(i) == "letter-" + Zodiac.Seats[i].Element.ToLowerInvariant() && Slots.Image(SliceView.LetterSlot(i)) != null) && SliceView.LetterDrift(1) == Vector2.zero && SliceView.LetterDrift(0).y > 0,
                 "each sign's live lettering takes its element's fill; earth holds still, fire rises");
-            Check(Enumerable.Range(0, 12).All(i => SliceView.LiveName(i, false).maxColorComponent < SliceView.LiveName(i, true).maxColorComponent && SliceView.LiveName(i, true).maxColorComponent < SliceView.DeepElement(i).maxColorComponent + .001f && SliceView.LiveName(i, true).a == 1)
-                && SliceView.LiveName(0, true) != SliceView.LiveName(1, true), "a live name keeps its element's colour, deepened to read on gold and deeper still on wood");
+            Check(SliceView.LetterLine.maxColorComponent < .2f && SliceView.LetterLine.r > SliceView.LetterLine.b && SliceView.LetterLine.a > .9f && SliceView.FrameGold.r > SliceView.FrameGold.g && SliceView.FrameGold.g > SliceView.FrameGold.b,
+                "live lettering is edged in the Art Bible's dark-brown line on all four elements (owner, Oct 8), and the frame's names are inlaid gold");
             var shader = Resources.Load<Shader>("Shaders/LetterFill");
             Check(shader != null && shader.name == "Ascendant/LetterFill" && shader.isSupported, "the live lettering's shader ships under Resources (so the Web build carries it) and compiles");
             Check(SliceView.InkPlace.OrderBy(x => x).SequenceEqual(Enumerable.Range(0, 12)) && !SliceView.InkPlace.SequenceEqual(Enumerable.Range(0, 12)) && SliceView.InkSpots.Length == 12 && SliceView.InkSpots.Distinct().Count() == 12
