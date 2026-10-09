@@ -7,8 +7,36 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=166,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=180,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
+  // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
+  // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
+  const PROLOGUE=[[0,'prologue-city',2000],[1,'prologue-desk',1500],[1,'prologue-notebook',1200],[2,'prologue-desk',500],[2,'prologue-light',1600],[2,'prologue-look',600],[2,'prologue-headphones',300],
+    [3,'prologue-street-above',1000],[3,'prologue-street-above',3500],[4,'prologue-puzzled',1500],[5,'prologue-caspar-back',1000],[5,'prologue-caspar-turn',1000],[5,'prologue-caspar-face',500],[5,'prologue-caspar-face-dim',2000]]; // [shot, frame, ms to settle]
+  const newGame=async pg=>{await pg.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='prologue',{},{timeout:120000});await pg.locator('#loading').waitFor({state:'detached'});};
+  const skipPrologue=async pg=>{await newGame(pg);for(let n=0;n<5;n++){await pg.locator('#skip-prologue').evaluate(b=>b.click());try{await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:3000});return;}catch{}}throw Error('the semantic Skip did not leave the prologue');};
+  const playPrologue=async(pg,prefix,reduced,where,tap)=>{
+    const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
+    for(const [i,[shot,frame,settle]] of PROLOGUE.entries()){
+      const want=reduced&&frame==='prologue-caspar-face'?'prologue-caspar-face-dim':frame; // reduced motion: the eyes are dim from the start
+      await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.prologueShot===k&&s.prologueFrame===f;},[shot,want],{timeout:25000});
+      await pg.waitForTimeout(settle);
+      const s=await snap(),said=await pg.locator('#announcement').textContent(),skip=await pg.locator('#skip-prologue').isEnabled();
+      check(s.screen==='prologue'&&s.prologueShot===shot&&s.prologueFrame===want&&s.caspar!==''&&said.includes(s.caspar)&&s.canSkip&&skip&&!s.canSliceContinue&&!s.orbShown&&(!reduced||shot<1||s.prologueStill),'the opening scene'+(reduced?', reduced motion':'')+': shot '+(shot+1)+' ('+s.prologueShotId+'), '+want+', its spoken line announced ("'+s.caspar+'"), the semantic Skip offered'+(reduced&&shot===0?(s.prologueStill?', still from the first shot':', the first shot as it began'):'')+' at '+where);
+      await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png')});
+      if(tap&&i===1){ // ruling 5: a tap anywhere shows Skip and never advances a shot; Skip hides again after about 3 s
+        await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const t0=Date.now(),a=await snap();
+        check(a.skipShown&&a.prologueShot===s.prologueShot&&a.prologueFrame===s.prologueFrame&&a.screen==='prologue','a canvas tap shows Skip and advances nothing (shot '+(a.prologueShot+1)+', '+a.prologueFrame+') at '+where);
+        await pg.screenshot({path:path.join(out,prefix+'-skip-shown.png')});
+        await pg.waitForFunction(()=>!window.ascendantDial.snapshot().skipShown,{},{timeout:6000});const held=Date.now()-t0;
+        check(held>2400&&held<4200&&(await snap()).screen==='prologue','Skip hides again after about 3 s ('+(held/1000).toFixed(1)+' s) and the scene plays on at '+where);}
+    }
+    await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueShot===6,{},{timeout:25000});await pg.waitForTimeout(reduced?100:150);
+    { const f=await snap(); check(f.prologueShotId==='flash'&&f.busy&&!f.canSkip&&!(await pg.locator('#skip-prologue').isEnabled()),'the flash: the busy guard holds and Skip waits it out at '+where);await pg.screenshot({path:path.join(out,prefix+'-15-flash.png')}); }
+    await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await pg.waitForTimeout(reduced?200:600);
+    { const e=await snap(); check(e.screen==='identity'&&e.prologueShot===-1&&e.orbShown&&e.orbStars===0&&e.canName,'the prologue ends in darkness, then WHO ARE YOU? with the orb above it'+(reduced?' (reduced motion)':'')+' at '+where);await pg.screenshot({path:path.join(out,prefix+'-16-identity.png')}); }
+  };
+  const starsSettled=pg=>pg.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.orbStarsLit===s.orbStars;},{},{timeout:5000});
   // Faster checks (Sept 25): the two viewports play in parallel, each in its own browser context; VIEWPORTS=390 (or 360) runs one.
   const VIEWPORTS=(process.env.VIEWPORTS||'390,360').split(',').map(w=>w.trim()).filter(Boolean).map(w=>w==='360'?{width:360,height:800}:/^\d+x\d+$/.test(w)?{width:+w.split('x')[0],height:+w.split('x')[1]}:{width:390,height:844}); // Part 2: or any WxH
   await Promise.all(VIEWPORTS.map(async viewport=>{
@@ -40,23 +68,30 @@ const path=require('path');
     // Note 10: leaving the Dial lands in the room; the room's doorway back returns to the Atrium (since the art pass, 86bcex5kc 1A). Two presses from the Dial, one from the room.
     const leaveToHub=async()=>{if((await state()).screen==='wing'){await page.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.canLeaveDial&&!s.busy&&!s.active;},{},{timeout:15000}).catch(()=>{});await semantic('leave-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});}await semantic('poi-atrium-door');};
     await page.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
-    await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await page.locator("#loading").waitFor({state:"detached"});
+    await newGame(page);
+    { const p=await state(); check(p.screen==='prologue'&&p.prologueShots===7&&p.canSkip&&!p.skipShown&&!p.canSliceContinue&&!p.canName,'the opening scene (owner, Oct 8): a new game opens on the prologue, seven shots, Skip offered to the screen reader and hidden on screen, at '+viewport.width);
+      check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the prologue at '+viewport.width); }
+    await playPrologue(page,viewport.width+'-prologue',false,viewport.width,tap);
+    check(events.some(e=>e.event_name==='screen_entered_prologue')&&events.some(e=>e.event_name==='prologue_ended')&&events.some(e=>e.event_name==='screen_entered_identity'),'screen_entered:Prologue is logged, then the end and Identity, at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-identity.png')});
     check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on identity at '+viewport.width);
     await page.locator('#name').fill('Tester');await page.locator('#name').dispatchEvent('change');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await semantic('next-screen');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
+    await starsSettled(page);check((await state()).orbShown&&(await state()).orbStars===1,'the orb: the name\'s star gathers on the birth question at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-birth.png')});
     check(await page.evaluate(()=>window.ascendantDial.snapshot().canSliceContinue===false),'birth prompt waits for a choice at '+viewport.width);
     check(JSON.stringify((await state()).birthChoices)==='["Yes, I know my birthday","I\'ll skip it"]','Oct 7: the opening\'s question has two answers (the known path and the random sun retired) at '+viewport.width);
     // the birth-time build (owner, Oct 7): I'll skip it asks which sign the player goes by, a sign or I'm not sure; nothing else is asked
     await semantic('birth-skip');await page.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);
     check((await state()).birthStep==='sun-pick'&&!(await state()).canSignUnknown&&!(await state()).canSliceContinue,'I\'ll skip it: which sign do you go by, with no I\'m not sure (Oct 7, 86bced0tc), at '+viewport.width);
+    await starsSettled(page);check((await state()).orbStars===2,'the orb: a second star for the answer at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-birth-skip.png')});
     await semantic('sign-1');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='moon-pick');
-    await semantic('sign-3');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='rising-pick');await page.screenshot({path:path.join(out,viewport.width+'-birth-skip-rising.png')});
+    await semantic('sign-3');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='rising-pick');await starsSettled(page);check((await state()).orbStars===4,'the orb: four stars at the rising\'s question at '+viewport.width);await page.screenshot({path:path.join(out,viewport.width+'-birth-skip-rising.png')});
     await semantic('sign-4');await page.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done'&&window.ascendantDial.snapshot().canSliceContinue);
     check((await state()).bigThree==='\u2609 Taurus \u00b7 \u263d Cancer \u00b7 \u2191 Leo'&&(await state()).sunBasis==='picked','the sun, the moon and the rising picked, no unknown: '+(await state()).bigThree+' at '+viewport.width);
+    await starsSettled(page);check((await state()).orbStars===5,'the orb: five stars once the skip path is answered at '+viewport.width);await page.screenshot({path:path.join(out,viewport.width+'-birth-skip-done.png')});
     await semantic('next-screen');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue,{},{timeout:15000});
     await page.screenshot({path:path.join(out,viewport.width+'-atrium.png')});
@@ -752,11 +787,33 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-wing-room-stage6.png')});
     { const k=await state(); check(k.kitPieces===19 && k.kitLevel===4 && k.kitRestored===k.kitPieces && k.grime===0 && k.wingLight===1,'Build M: with four Keys every Wing kit piece is restored, the grime gone, the light full at '+viewport.width); }
     await leaveToHub();await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    await semantic('restart');await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000});
-    check(true,'Start over wipes the save at '+viewport.width);
+    await semantic('restart');await newGame(page);
+    check(!(await state()).resumed,'Start over wipes the save and plays the opening scene again (Ashantis, Oct 8) at '+viewport.width);
     check(errors.length===0,'no browser runtime exceptions at '+viewport.width);
     fs.writeFileSync(path.join(out,viewport.width+'-events.json'),JSON.stringify(events,null,2));
     await context.close();
+  }));
+  // The opening scene under reduced motion (owner, Oct 8: each shot held still, cuts and panels crossfade, an instant flash, the eyes already dim),
+  // then a fresh one: the gear opens Settings without showing Skip, a canvas tap shows Skip, and a canvas tap on Skip goes straight to the name.
+  await Promise.all(VIEWPORTS.map(async viewport=>{
+    const stillContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE,reducedMotion:'reduce'});
+    const still=await stillContext.newPage();const stillErrors=[];still.on('pageerror',e=>stillErrors.push(String(e)));
+    const snap=()=>still.evaluate(()=>window.ascendantDial.snapshot());
+    const frames=async n=>{for(let i=0;i<n;i++)await still.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>r())));};
+    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await still.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await still.mouse.down();await frames(2);await still.mouse.up();await frames(2);};
+    await still.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await newGame(still);
+    await still.waitForFunction(()=>window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000}).catch(()=>{});check((await snap()).reducedMotion,'the page\'s reduced-motion setting reaches the game during the prologue at '+viewport.width);
+    await playPrologue(still,viewport.width+'-prologue-reduced',true,viewport.width,null);
+    await still.evaluate(()=>window.ascendantDial.act('restart'));await newGame(still);await still.waitForFunction(()=>window.ascendantDial.snapshot().prologueFrame==='prologue-city',{},{timeout:10000});
+    { const g=(await snap()).gearAt;await tap(g[0],g[1]);await still.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});const s=await snap();
+      check(s.settingsOpen&&!s.skipShown&&s.screen==='prologue','the gear opens Settings over the prologue, and its tap does not count as the tap that shows Skip, at '+viewport.width);
+      await still.screenshot({path:path.join(out,viewport.width+'-prologue-settings.png')});await tap(0,553);await still.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+      check(!(await snap()).settingsOpen&&!(await snap()).skipShown&&(await snap()).screen==='prologue','closing Settings leaves the prologue playing, Skip still hidden, at '+viewport.width); }
+    await tap(0,400);await still.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});check((await snap()).skipShown,'a canvas tap shows Skip at '+viewport.width);
+    await tap(118,744);await still.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000}).catch(()=>{});
+    { const s=await snap(); check(s.screen==='identity'&&s.orbShown&&s.prologueShot===-1,'a canvas tap on Skip goes straight to WHO ARE YOU? at '+viewport.width); }
+    check(stillErrors.length===0,'no runtime exceptions through the opening scene at '+viewport.width+(stillErrors.length?': '+stillErrors[0]:''));
+    await stillContext.close();
   }));
   // Build W (owner, Sept 26 note 5; task 86bca0163): DEV Mode's Jump to. A canvas tap through Settings to one checkpoint, the rest through their web buttons.
   await Promise.all(VIEWPORTS.map(async viewport=>{
@@ -767,7 +824,7 @@ const path=require('path');
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await dev.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await dev.mouse.down();await frames(2);await dev.mouse.up();await frames(2);};
     const resumed=()=>dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,{},{timeout:120000});
     await dev.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
-    await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await dev.locator('#loading').waitFor({state:'detached'});
+    await skipPrologue(dev);
     await dev.locator('#name').fill('Tester');await dev.locator('#name').dispatchEvent('change');await dev.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
     await act('birth-skip');await dev.waitForFunction(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-4');await dev.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='moon-pick');await act('sign-7');await dev.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='rising-pick');await act('sign-0');await dev.waitForFunction(()=>window.ascendantDial.snapshot().sunSign==='Leo'&&window.ascendantDial.snapshot().birthStep==='done');
@@ -838,14 +895,14 @@ const path=require('path');
     for(const [id,step] of [['no-time','rising-pick'],['no-place','moon'],['neither','cusp'],['skip','sun-pick']]){
       await act('jump-birth-'+id);await dev.waitForFunction(k=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep===k,step,{timeout:120000});
       const c=await snap(); check(c.playerName==='Tester' && !c.resumed && !c.canSliceContinue && (step==='moon'?c.canMoon:step==='cusp'?(c.canCusp&&c.cuspTime===''):c.canSignPick),'DEV Mode\'s '+id+' sample: the opening at its first question ('+step+'), the name kept, at '+viewport.width); }
-    await dev.evaluate(()=>window.ascendantDial.act('restart'));await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity'&&!window.ascendantDial.snapshot().resumed,{},{timeout:120000}); // Settings' Start over (the page's own button waits for the Atrium)
+    await dev.evaluate(()=>window.ascendantDial.act('restart'));await newGame(dev);check(!(await snap()).resumed,'Settings\' Start over opens on the opening scene at '+viewport.width); // Settings' Start over (the page's own button waits for the Atrium)
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
     await devContext.close();
   }));
   const recoveryContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const recovery=await recoveryContext.newPage();
   await recovery.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
-  await recovery.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});
+  await skipPrologue(recovery);
   const action=async(id)=>recovery.locator('#'+id).evaluate(b=>b.click());
   await action('next-screen');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().screen==='birth');
   // no unknown Big Three (owner, Oct 7, 86bced0tc): the skip path asks the sun, the moon and the rising, with no I'm not sure
@@ -925,7 +982,7 @@ const path=require('path');
     const until=(f,t=15000)=>bp.waitForFunction(f,{},{timeout:t});
     const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);
     const landing=async()=>{await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,8000);};
-    await bp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await bp.locator('#loading').waitFor({state:'detached'});
+    await bp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await skipPrologue(bp);
     await bp.locator('#name').fill('Tester');await bp.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');
     // Oct 7 (86bced0tc): the skip path's three picks (Taurus, Cancer, Leo), then the After Key 1 checkpoint under this player's own record (the jump keeps it)
@@ -982,7 +1039,7 @@ const path=require('path');
     const visit=async()=>{await send('reload');await ip.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();};
     const landing=async()=>{await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,8000);};
     const inscription=s=>(s.journalKeeper||[]).slice(3);
-    await ip.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await ip.locator('#loading').waitFor({state:'detached'});
+    await ip.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await skipPrologue(ip);
     await ip.locator('#name').fill('Tester');await ip.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
     await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');
     await act('birth-skip');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await until(()=>window.ascendantDial.snapshot().birthStep==='moon-pick');await act('sign-3');await until(()=>window.ascendantDial.snapshot().birthStep==='rising-pick');await act('sign-4');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
@@ -1020,7 +1077,8 @@ const path=require('path');
     const artContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
     const art=await artContext.newPage();
     await art.goto(withQuery('art=test'));
-    await art.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='identity',{},{timeout:120000});await art.locator('#loading').waitFor({state:'detached'});
+    await newGame(art);await art.waitForFunction(()=>window.ascendantDial.snapshot().prologueFrame==='prologue-city',{},{timeout:10000});await art.waitForTimeout(1800);
+    await art.screenshot({path:path.join(out,viewport.width+'-art-prologue-city.png')});await skipPrologue(art);
     const snap=()=>art.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>art.locator('#'+id).evaluate(b=>b.click());
     let s=await snap();check(s.artSet==='test'&&s.artFiles===ART_SLOTS&&s.soundFiles===7&&!s.style,'?art=test plays the game with a file in every slot at '+viewport.width);
     check(s.lightFiles===3&&s.lightAlpha===0,'the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at '+viewport.width); // Build H
@@ -1076,7 +1134,7 @@ const path=require('path');
           for(const [side,[x,y,sw,sh]] of Object.entries(strips)){if(sw<8||sh<8)continue;const d=g.getImageData(Math.round(x*k),Math.round(y*k),Math.max(1,Math.round(sw*k)),Math.max(1,Math.round(sh*k))).data;let n=0,m=0,q=0;let bg=0;for(let i=0;i<d.length;i+=16){const l=.2126*d[i]+.7152*d[i+1]+.0722*d[i+2];n++;m+=l;q+=l*l;if(Math.abs(d[i]-19)<=3&&Math.abs(d[i+1]-19)<=3&&Math.abs(d[i+2]-23)<=3)bg++;}m/=n;res[side]={sd:Math.sqrt(Math.max(0,q/n-m*m)),bg:bg/n};}
           return res;},[shot.toString('base64'),{w,h,left,top}]);};
       const filled=(res,label)=>{const bar=Object.entries(res).filter(([,v])=>v.bg>.5||(v.sd<2.5&&v.bg>.1));check(bar.length===0,'Part 2: at '+name+' ('+w+' x '+h+') the '+label+'\'s art reaches every edge, with no bar of the canvas\'s own colour in any margin ('+(Object.keys(res).length?Object.entries(res).map(([k,v])=>k+' spread '+v.sd.toFixed(1)+', bar '+Math.round(v.bg*100)+'%').join('; '):'none: the column fills the screen')+')');}; // a bar is the canvas's own charcoal (19, 19, 23); an art edge that is dark and even (the journal's desk) carries on and passes
-      await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await until(()=>window.ascendantDial?.snapshot()?.screen==='identity',120000);await pg.locator('#loading').waitFor({state:'detached'});
+      await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await skipPrologue(pg);
       await pg.locator('#name').fill('Tester');await pg.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
       await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='birth');await act('birth-skip');await until(()=>window.ascendantDial.snapshot().canSignPick);await act('sign-1');await until(()=>window.ascendantDial.snapshot().birthStep==='moon-pick');await act('sign-3');await until(()=>window.ascendantDial.snapshot().birthStep==='rising-pick');await act('sign-4');await until(()=>window.ascendantDial.snapshot().birthStep==='done');
       await act('next-screen');await until(()=>window.ascendantDial.snapshot().screen==='atrium'&&window.ascendantDial.snapshot().canSliceContinue);

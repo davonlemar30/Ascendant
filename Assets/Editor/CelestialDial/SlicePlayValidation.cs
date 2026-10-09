@@ -55,18 +55,24 @@ namespace Ascendant.Build
         static void QueueChecks()
         {
             Report.Clear();Steps.Clear();RuntimeErrors.Clear();Application.logMessageReceived+=CaptureLog;
-            Steps.Enqueue(()=>{Check(View!=null && View.Flow.Screen==SliceScreen.Identity,"slice opens on the identity screen");Capture("slice-390-identity.png");});
+            // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue; a tap shows Skip and never advances a shot; Skip hides
+            // again after about 3 s; the scene plays through on its own, every shot captured, and ends in darkness on WHO ARE YOU?
+            Steps.Enqueue(()=>{Check(View!=null && View.Flow.Screen==SliceScreen.Prologue && View.Dial.Snapshot().screen=="prologue" && !View.Flow.CanContinue && !View.OrbShown && View.Dial.Snapshot().canSkip && !View.SkipShown && View.Dial.Snapshot().prologueShots==7,"a new game opens on the opening scene, Skip ready for the screen reader and hidden on screen");});
+            Prologue("slice-390-prologue",false);
+            Until(()=>View.Flow.Screen==SliceScreen.Identity && !View.Busy,30,"the prologue's end",1.0);
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && View.OrbShown && View.Flow.OpeningAnswers==0 && View.OrbStarsLit==0 && View.PrologueShotIndex==-1,"the prologue ends on WHO ARE YOU?, the orb above it with no stars yet");OrbClear("WHO ARE YOU?");Capture("slice-390-identity.png");SafeArea.Simulated=24;});
+            Steps.Enqueue(()=>{float y=-View.OrbRect.anchoredPosition.y;Check(Mathf.Abs(y-SliceView.OrbCentreY(24))<=SliceView.OrbBob+.01f,"a 24 px top band moves the orb down by half of it, still centred in the band above the question ("+y.ToString("0.0")+")");OrbClear("WHO ARE YOU? under a 24 px band");Capture("slice-390-identity-band.png");SafeArea.Simulated=-1;});
             Steps.Enqueue(()=>{Act("name:Tester");Check(View.Flow.DisplayName=="Tester","name reaches the flow through the bridge");Act("next-screen");});
-            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth,"birth prompt follows identity");Capture("slice-390-birth.png");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth && View.Flow.OpeningAnswers==1 && View.OrbStarsLit==1,"birth prompt follows identity; the name's star has gathered round the orb");OrbClear("the birth question");Capture("slice-390-birth.png");});
             Steps.Enqueue(()=>{Act("next-screen");Check(View.Flow.Screen==SliceScreen.Birth,"birth prompt blocks continue until a choice");Act("birth:skip");Check(View.Flow.BirthStep=="sun-pick" && View.Dial.Snapshot().canSignPick && !View.Dial.Snapshot().canSignUnknown,"Oct 7: I'll skip it asks which sign the player goes by, with no I'm not sure (86bced0tc)");Act("sign:-1");Check(View.Flow.BirthStep=="sun-pick" && !View.Flow.HasSunSign && !View.Flow.CanContinue,"a sign is the only answer: no unknown sun");Act("birth:");Check(!View.Flow.HasSunSign && View.Flow.BirthChoice=="","the answer can be changed");
                 // batch 2, the cusp day (owner ruling, Oct 2 evening): no birth time on the day the sun changed sign asks the player, then the answer is changed again
-                Act("birth:chart");Act("birthdate:1990-04-20");Act("birthtime-unknown");Act("birthplace-search:London");Act("birthplace:0");
+                Act("birth:chart");OrbClear("the date");Act("birthdate:1990-04-20");OrbClear("the time");Act("birthtime-unknown");Act("birthplace-search:London");OrbClear("the place");Act("birthplace:0");
                 Check(View.Flow.BirthStep=="cusp" && View.Dial.Snapshot().cuspQuestion.Contains("from Aries into Taurus") && View.Dial.Snapshot().cuspTime=="9:27 am" && !View.Flow.CanContinue,"the cusp question: "+View.Flow.CuspQuestion);
-                Act("cusp-why");Check(View.Dial.Snapshot().cuspWhy,"Why? opens its reason");Act("cusp:1");Check(View.Flow.BirthStep=="moon" && View.Dial.Snapshot().canMoon && View.Dial.Snapshot().moonOptions.Length==2 && !View.Flow.CanContinue,"after the cusp pick the moon is asked, like the cusp sun (Oct 7): "+View.Flow.MoonQuestion);
-                Act("moon:0");Check(View.Flow.BirthStep=="rising-pick" && View.Dial.Snapshot().canSignPick && !View.Flow.CanContinue,"then the rising is asked (Oct 7, 86bced0tc: no unknowns)");
-                Act("sign:5");Check(View.Flow.SunSign==1 && View.Flow.SunBasis=="picked" && View.Flow.CanContinue && View.Flow.ChoiceFor("moon").how=="picked" && View.Flow.MoonSign>=0 && View.Flow.RisingChosen && View.Flow.RisingSign==5 && !View.Dial.Snapshot().bigThree.Contains("unknown"),"the cusp pick, a moon and a rising, each flagged the player's; Continue opens: "+View.Dial.Snapshot().bigThree);Act("birth:");
-                Act("birth:skip");Act("sign:1");Check(View.Flow.BirthStep=="moon-pick" && View.Dial.Snapshot().birthStep=="moon-pick","the moon sign next");Act("sign:3");Check(View.Flow.BirthStep=="rising-pick","then the rising sign");Act("sign:4");
-                Check(View.Flow.SunSign==1 && View.Flow.MoonSign==3 && View.Flow.RisingSign==4 && View.Flow.Choices.All(c=>c.how=="picked") && View.Flow.Note=="Your sun sign is Taurus, your moon sign Cancer, and your rising sign Leo." && View.Flow.CanContinue,"Oct 7: I'll skip it asks the sun, the moon and the rising, each picked; nothing invented: "+View.Flow.BigThreeLine);Act("next-screen");});
+                OrbClear("the cusp question");Act("cusp-why");Check(View.Dial.Snapshot().cuspWhy,"Why? opens its reason");Act("cusp:1");Check(View.Flow.BirthStep=="moon" && View.Dial.Snapshot().canMoon && View.Dial.Snapshot().moonOptions.Length==2 && !View.Flow.CanContinue,"after the cusp pick the moon is asked, like the cusp sun (Oct 7): "+View.Flow.MoonQuestion);
+                OrbClear("the moon question");Act("moon:0");Check(View.Flow.BirthStep=="rising-pick" && View.Dial.Snapshot().canSignPick && !View.Flow.CanContinue,"then the rising is asked (Oct 7, 86bced0tc: no unknowns)");
+                Check(View.Flow.OpeningAnswers==7,"seven stars before the last answer on the longest path: the name, the question, the date, the time, the place, the cusp, the moon");OrbClear("the rising question");Act("sign:5");Check(View.Flow.SunSign==1 && View.Flow.SunBasis=="picked" && View.Flow.CanContinue && View.Flow.ChoiceFor("moon").how=="picked" && View.Flow.MoonSign>=0 && View.Flow.RisingChosen && View.Flow.RisingSign==5 && !View.Dial.Snapshot().bigThree.Contains("unknown"),"the cusp pick, a moon and a rising, each flagged the player's; Continue opens: "+View.Dial.Snapshot().bigThree);Act("birth:");
+                Check(View.Flow.OpeningAnswers==1,"Change my answer takes the birth's stars back");OrbClear("the birth question, again");Act("birth:skip");Act("sign:1");Check(View.Flow.BirthStep=="moon-pick" && View.Dial.Snapshot().birthStep=="moon-pick","the moon sign next");Act("sign:3");Check(View.Flow.BirthStep=="rising-pick","then the rising sign");Act("sign:4");
+                Check(View.Flow.OpeningAnswers==5 && View.OrbShown,"the skip path ends with five stars");OrbClear("the record");Check(View.Flow.SunSign==1 && View.Flow.MoonSign==3 && View.Flow.RisingSign==4 && View.Flow.Choices.All(c=>c.how=="picked") && View.Flow.Note=="Your sun sign is Taurus, your moon sign Cancer, and your rising sign Leo." && View.Flow.CanContinue,"Oct 7: I'll skip it asks the sun, the moon and the rising, each picked; nothing invented: "+View.Flow.BigThreeLine);Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Atrium && !View.Busy,"white light leads to the atrium");Capture("slice-390-atrium.png");});
             Steps.Enqueue(()=>{for(int i=0;i<SliceView.AtriumPages.Length;i++)Act("next-screen");});
             // Build T (owner, APK playtest, Sept 29): the opening hands over the Atrium; Caspar sends the player to the Zodiac Wing, and the Dial is tapped there.
@@ -400,7 +406,10 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>Act("close-journal"));
             Steps.Enqueue(()=>Act("reload"));
             Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==6 && View.Flow.Keys==4 && View.Flow.LocksFilled==4 && View.Flow.WingWhole && View.Dial.Lesson.Key4Earned && View.Dial.Lesson.PolarityShown && View.Dial.Lesson.OppositesComplete && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && View.Grid.Key3Earned && View.Flow.Walk.At=="entry","a reload resumes at the Hub from the local save with four Keys spent, the Books, the sides, the six pairs, and the pair items as data");stashedSave=PlayerPrefs.GetString(SliceView.SaveKey);Act("restart");});
-            Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Identity && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again");GreyboxPlayValidation.SetSize(360,800);});
+            Steps.Enqueue(()=>{Check(View!=null && !View.Resumed && View.Flow.Screen==SliceScreen.Prologue && !UnityEngine.PlayerPrefs.HasKey(SliceView.SaveKey),"Start over wipes the save and begins again, with the opening scene (Ashantis, Oct 8)");Act("motion");Check(View.Dial.Lesson.Dial.ReducedMotion,"reduced motion on, mid-way through the first shot");});
+            Prologue("slice-390-prologue-reduced",true);
+            Until(()=>View.Flow.Screen==SliceScreen.Identity && !View.Busy,30,"the reduced prologue's end",1.0);
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && View.OrbShown,"under reduced motion the prologue still ends on WHO ARE YOU?");Act("motion");GreyboxPlayValidation.SetSize(360,800);});
             Steps.Enqueue(()=>{Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");});
             // Build E: the same save with the test set in every slot, at both viewports; the cues; then the style page on both sets.
             Steps.Enqueue(()=>{Check(Slots.Set=="" && !View.StyleShown && Sound.LastCue!="","the run so far played on the Art folder and the sound hooks fired, files or not (last cue: "+Sound.LastCue+")");PlayerPrefs.SetString(SliceView.SaveKey,stashedSave);PlayerPrefs.Save();Slots.Request(Slots.TestSet,false);Act("reload");});
@@ -456,6 +465,17 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.screen=="style" && s.style && s.styleSlots.Length==Slots.Art.Length && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": test set")) && s.styleSounds.All(t=>t.EndsWith(": test set")) && s.artSet==Slots.TestSet,"?style=test: the style page lists every slot on the test set, each with its source");Capture("slice-390-style-test.png");});
             Steps.Enqueue(()=>{int played=Sound.Played;Act("sound:seal");Check(Sound.LastCue=="seal" && Sound.Played==played+1,"a sound slot plays from the style page");Act("mute");Check(Sound.Muted && View.Dial.Snapshot().muted,"the test mute toggle silences the game");Act("mute");Check(!Sound.Muted,"and back");Slots.Request("",true);Act("reload");});
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.StyleShown && s.styleSlots.Length==Slots.Art.Length && s.styleSounds.Length==7 && s.styleSlots.All(t=>t.EndsWith(": file") || t.EndsWith(": placeholder")) && s.styleSounds.All(t=>t.EndsWith(": file") || t.EndsWith(": silent")) && s.artSet=="" && (Slots.DressedCount==0 || Slots.ArtFiles>0),"?style: the style page on the Art folder lists every slot as file or placeholder; nothing is dressed without a file");Capture("slice-390-style.png");});
+            // the opening scene with the test set: its frames and the orb take their files; a canvas tap shows Skip, and Skip goes straight to the name
+            Steps.Enqueue(()=>{PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save();Slots.Request(Slots.TestSet,false);Act("reload");});
+            Until(()=>View!=null && View.Flow.AtPrologue && View.Dial.Snapshot().prologueFrame=="prologue-city",10,"the test set's city",2.0);
+            Steps.Enqueue(()=>{Check(Slots.IsDressed("prologue-city") && SliceView.PrologueFrames.All(f=>Slots.Image(f)!=null),"the prologue's frames take their files from the test set");Capture("slice-390-art-prologue-city.png");});
+            Steps.Enqueue(()=>{int shot=View.PrologueShotIndex;string frame=View.Dial.Snapshot().prologueFrame;Act("prologue-tap");Act("next-screen");tappedAt=EditorApplication.timeSinceStartup;
+                Check(View.SkipShown && View.Dial.Snapshot().skipShown && View.PrologueShotIndex==shot && View.Dial.Snapshot().prologueFrame==frame && View.Flow.AtPrologue,"a tap shows Skip and advances nothing (shot "+(shot+1)+", "+frame+"; Continue does nothing either)");Capture("slice-390-art-prologue-skip.png");});
+            Until(()=>!View.SkipShown,8,"Skip to hide");
+            Steps.Enqueue(()=>{double shown=EditorApplication.timeSinceStartup-tappedAt;Check(!View.Dial.Snapshot().skipShown && View.Flow.AtPrologue && shown>2.7 && shown<4.2,"Skip hides again after about 3 s ("+shown.ToString("0.0")+" s) and the scene plays on");Act("prologue-tap");Check(View.SkipShown,"another tap shows it again");Act("skip-prologue");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && !View.Busy && View.OrbShown && Slots.IsDressed("orb") && View.PrologueShotIndex==-1,"Skip goes straight to WHO ARE YOU?, the orb on its file");Act("name:Tester");Act("next-screen");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth && View.OrbStarsLit==1 && Slots.IsDressed("orb-star"),"the name's star on its file");OrbClear("the birth question, test set");Capture("slice-390-art-birth-orb.png");Act("birth:skip");Act("sign:1");});
+            Steps.Enqueue(()=>{Check(View.OrbStarsLit==3,"three stars after two answers");Capture("slice-390-art-birth-orb-3.png");});
             Steps.Enqueue(()=>{Slots.Request(null,null);PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save();});
             Steps.Enqueue(()=>{
                 Check(!PlayerPrefs.HasKey(SliceView.SaveKey) && Slots.Set=="" && !Slots.StyleRequested,"the fixture leaves no save and no set request behind");
@@ -467,16 +487,63 @@ namespace Ascendant.Build
             });
             nextAt=EditorApplication.timeSinceStartup+2;EditorApplication.update+=Tick;
         }
+        // ---- the opening scene's helpers (Oct 8) ----
+        static Func<bool> waitFor; static double waitLimit, waitThen, tappedAt; static string waitWhat; static bool waitBusyOk, BusyStep;
+        // a step that holds the queue until a condition is met (or fails after a time limit), then waits a little more before the next step
+        static void Until(Func<bool> condition,double seconds,string what,double then=.05,bool busyOk=false) => Steps.Enqueue(()=>{waitFor=condition;waitLimit=EditorApplication.timeSinceStartup+seconds;waitWhat=what;waitThen=then;waitBusyOk=busyOk;});
+        // the prologue played through: each shot and frame captured once it has settled; under reduced motion, every shot still, the eyes already dim
+        static void Prologue(string file,bool reduced)
+        {
+            var shots=new (int shot,string frame,double after)[]{(0,"prologue-city",2.0),(1,"prologue-desk",1.5),(1,"prologue-notebook",1.2),(2,"prologue-desk",.5),(2,"prologue-light",1.6),(2,"prologue-look",.6),(2,"prologue-headphones",.3),
+                (3,"prologue-street-above",1.0),(3,"prologue-street-above",3.5),(4,"prologue-puzzled",1.5),(5,"prologue-caspar-back",1.0),(5,"prologue-caspar-turn",1.0),(5,reduced?"prologue-caspar-face-dim":"prologue-caspar-face",.5),(5,"prologue-caspar-face-dim",2.0)};
+            int n=0;
+            foreach(var (shot,frame,after) in shots)
+            {
+                int index=++n; string id=SliceView.PrologueShots[shot].Id;
+                Until(()=>View.PrologueShotIndex==shot && View.Dial.Snapshot().prologueFrame==frame,25,"shot "+(shot+1)+" ("+frame+")",after);
+                Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="prologue" && s.prologueShotId==id && s.caspar==SliceView.PrologueShots[shot].Line && s.canSkip && !View.Flow.CanContinue,"shot "+(shot+1)+", "+id+": "+frame+", its spoken line \""+s.caspar+"\""+(reduced?", reduced motion":""));
+                    if(reduced && shot>=1) Check(s.prologueStill && Mathf.Approximately(View.PrologueCameraScale,1) && View.ProloguePanelsSettled,"reduced motion: shot "+(shot+1)+" held still (scale "+View.PrologueCameraScale+"), panels in place");
+                    if(!reduced && (shot==0 || shot==3 || shot==5)) Check(View.PrologueCameraScale>=1,"the camera never goes below scale 1 ("+View.PrologueCameraScale.ToString("0.000")+")");
+                    if(reduced && shot==5 && frame!="prologue-caspar-back" && frame!="prologue-caspar-turn") Check(frame=="prologue-caspar-face-dim","reduced motion: the eyes are dim from the start");
+                    Capture(file+"-"+index.ToString("00")+"-"+id+"-"+frame.Replace("prologue-","")+".png");});
+            }
+            Until(()=>View.PrologueShotIndex==6,25,"the flash",reduced?.1:.15,true);
+            Steps.Enqueue(()=>{Check(View.Busy && View.Dial.Snapshot().busy && !View.Dial.Snapshot().canSkip && View.Dial.Snapshot().prologueShotId=="flash","the flash holds the busy guard and Skip waits it out");Capture(file+"-15-flash.png");});
+        }
+        // nothing on the opening's screens (no word, button or box, nor the gear) overlaps the orb, its stars or its bob
+        static void OrbClear(string where)
+        {
+            var orb=View.OrbRect;var root=(RectTransform)orb.parent;float safe=View.Dial.Snapshot().safeTop,cy=SliceView.OrbCentreY(safe),reach=SliceView.OrbReach;
+            Check(orb.gameObject.activeInHierarchy,"the orb shows on "+where);
+            var hits=new List<string>();
+            var screen=root.Cast<Transform>().First(t=>(t.name=="Identity"||t.name=="Birth") && t.gameObject.activeSelf);
+            var parts=screen.GetComponentsInChildren<UnityEngine.UI.Graphic>(false).Where(g=>g.enabled && ((g is UnityEngine.UI.Text tx && tx.text.Trim()!="") || g.GetComponent<UnityEngine.UI.Selectable>()!=null)).Select(g=>(Transform)g.transform).ToList();
+            if(View.Settings!=null && View.Settings.Gear!=null) parts.Add(View.Settings.Gear);
+            foreach(var part in parts)
+            {
+                var c=new Vector3[4];((RectTransform)part).GetWorldCorners(c);var a=root.InverseTransformPoint(c[0]);var b=root.InverseTransformPoint(c[2]);
+                float left=Mathf.Min(a.x,b.x),right=Mathf.Max(a.x,b.x),top=400-Mathf.Max(a.y,b.y),bottom=400-Mathf.Min(a.y,b.y);
+                if(right>-reach && left<reach && bottom>cy-reach && top<cy+reach) hits.Add(part.name+" ("+top.ToString("0")+" to "+bottom.ToString("0")+")");
+            }
+            Check(hits.Count==0,"the orb and its stars clear every word and control on "+where+" (centre "+cy.ToString("0.0")+", reach "+reach+")"+(hits.Count>0?"; overlaps: "+string.Join(", ",hits):""));
+        }
         static void CaptureLog(string message,string stack,LogType type)
         { if((type==LogType.Error || type==LogType.Exception) && !stack.Contains("UnityEditor.Search.SearchDatabase")) RuntimeErrors.Add(message); }
         static void Tick()
         {
             if(EditorApplication.isPaused){Debug.LogWarning("[SlicePlayValidation] Resuming paused Editor for fixture.");EditorApplication.isPaused=false;}
             EditorApplication.QueuePlayerLoopUpdate();
+            if(waitFor!=null)
+            {
+                bool met=false; try{met=View!=null && waitFor();}catch(Exception){}
+                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;return;}
+                if(EditorApplication.timeSinceStartup<waitLimit)return;
+                var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+            }
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
-            var view=View; if(view!=null && (view.Busy || view.Dial.Busy))return; // Beats own the frame.
+            var view=View; if(view!=null && (view.Busy || view.Dial.Busy) && !BusyStep)return; // Beats own the frame.
             nextAt=EditorApplication.timeSinceStartup+StepGap; // each step also waits until no beat owns the frame
-            try{Steps.Dequeue()();}
+            try{BusyStep=false;Steps.Dequeue()();}
             catch(Exception e)
             {
                 Debug.LogException(e);Directory.CreateDirectory("Logs");File.WriteAllText(ReportPath,"FAIL: "+e);
