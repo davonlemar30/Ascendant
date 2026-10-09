@@ -812,7 +812,7 @@ namespace Ascendant.Build
             Check(beforeCusp==5 && most.BirthDone && most.OpeningAnswers==SliceFlow.MostOpeningAnswers && SliceFlow.MostOpeningAnswers==8,"the longest path (a cusp day with no time: the date, time, place, cusp, moon and rising) gathers all eight stars");
             var amend=BirthPlayer(o=>{o.ChooseBirth("skip");o.PickSkipSun(1);o.PickSkipMoon(3);o.PickRising(4);},out _);amend.StartAddFacts();
             Check(amend.Screen==SliceScreen.Birth && amend.Amending && amend.OpeningAnswers==0,"\"Your Birth\" from the journal has no stars (the orb is the opening's)");
-            // the shot list: the brief's seven shots, the twelve frames, motion only inside a frame, about 45-60 s, a spoken line each
+            // the shot list: the brief's seven shots, the sixteen frames (with the Oct 9 in-betweens), motion only inside a frame, about 45-60 s, a spoken line each
             var shots=SliceView.PrologueShots;
             Check(shots.Select(x=>x.Id).SequenceEqual(new[]{"city","desk","light","street","puzzled","turn","flash"}) && shots.Last().Flash && shots.Count(x=>x.Flash)==1,"seven shots in the brief's order, the flash last");
             var frames=new[]{"prologue-city","prologue-desk","prologue-notebook","prologue-light","prologue-look","prologue-headphones","prologue-street-above","prologue-puzzled","prologue-caspar-back","prologue-caspar-turn","prologue-caspar-face","prologue-caspar-eyes","prologue-notebook-2","prologue-notebook-3","prologue-light-up","prologue-headphones-mid"};
