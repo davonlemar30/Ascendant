@@ -2522,27 +2522,27 @@ namespace Ascendant.CelestialDial
         // more, so no edge ever shows), in crossfades and cuts, in framed comic panels that slide in, and in the flash. It plays on its own: a
         // tap never advances a shot, it shows a small Skip that hides again after about 3 s; Skip goes straight to the name. The screen
         // reader's layer has Skip at all times, and each shot has one plain spoken line (drafts for Dante; the owner may rewrite them).
-        // Reduced motion: each shot held still, cuts and panels crossfade, the flash is instant, the eyes already dim. A change to it lands
+        // Reduced motion: each shot held still, cuts and panels crossfade, the flash is instant (held on the eyes, then white). A change to it lands
         // from the next shot (Ashantis). Settings stays on its gear and pauses nothing, as on every screen (Build U).
         public sealed class PrologueStep
         {
-            public float At, Seconds; public string Frame, How = "cut", Reduced; public float X, Top, Width, Height; public int From;
+            public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height; public int From;
             // How: "cut" (the frame replaces what is on screen), "fade" (it crossfades in over Seconds), "panel" (a framed comic panel slides in
             // from the left, From -1, or the right, +1, at X and Top, Width x Height on the layout; it shows the frame at its own place).
-            // Reduced: the frame shown instead under reduced motion (the face already dim).
         }
         public sealed class PrologueShot
         {
-            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash; public float UnderDim;
+            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1, MoveFrom; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash; public float UnderDim;
             public PrologueStep[] Steps = new PrologueStep[0];
             // View: where the camera looks inside the frame, -1 to 1 each way (x: left to right; y: top to bottom), so the pan never shows an
-            // edge at any scale; a push-in holds its View on the point it moves toward. Page: the shot opens on the black comic page. Under: the
-            // last shot's frame stays under it, dimmed to UnderDim. Flash: the white flash, then darkness, then the name.
+            // edge at any scale; a push-in holds its View on the point it moves toward; the camera holds until MoveFrom s into the shot. Page: the
+            // shot opens on the black comic page. Under: the last shot's frame stays under it, dimmed to UnderDim. Flash: the white flash, then
+            // darkness, then the name.
         }
-        static PrologueStep Cut(float at, string frame, string reduced = null) => new PrologueStep { At = at, Frame = frame, Reduced = reduced };
+        static PrologueStep Cut(float at, string frame) => new PrologueStep { At = at, Frame = frame };
         static PrologueStep FadeTo(float at, string frame, float seconds) => new PrologueStep { At = at, Frame = frame, How = "fade", Seconds = seconds };
         static PrologueStep Panel(float at, string frame, float x, float top, float width, float height, int from) => new PrologueStep { At = at, Frame = frame, How = "panel", Seconds = PanelSlide, X = x, Top = top, Width = width, Height = height, From = from };
-        public const float PrologueLeadIn = .6f, PanelSlide = .7f, StillFade = .4f, SkipShowsFor = 3f, FlashIn = .25f, FlashHold = .35f, FlashOut = .6f, Darkness = 1.2f; // timings are working choices to tune against the art (the brief)
+        public const float PrologueLeadIn = .6f, PanelSlide = .7f, StillFade = .4f, SkipShowsFor = 3f, FlashIn = .6f, FlashHold = .35f, FlashBloom = 1.06f, FlashOut = .6f, Darkness = 1.2f; // timings are working choices to tune against the art (the brief)
         // The shot list (the brief's table, shots 1-7; timings are working choices). The spoken lines are Claude's drafts for Dante.
         public static readonly PrologueShot[] PrologueShots =
         {
@@ -2558,13 +2558,16 @@ namespace Ascendant.CelestialDial
                 Line = "Down in the empty street, a hooded figure stands with his back turned, in a fading ring of light.", Steps = new[] { Cut(0, "prologue-street-above") } },
             new PrologueShot { Id = "puzzled", Seconds = 5f, Under = true, UnderDim = .55f,
                 Line = "He stares down from his window, puzzled.", Steps = new[] { Panel(.3f, "prologue-puzzled", 0, 400, 300, 390, 1) } },
-            new PrologueShot { Id = "turn", Seconds = 11f, ScaleFrom = 1f, ScaleTo = 1.08f, ViewFrom = new Vector2(0, -.3f), ViewTo = new Vector2(0, -.3f),
-                Line = "The hooded figure turns around. The glow in his eyes fades.",
-                Steps = new[] { Cut(0, "prologue-caspar-back"), Cut(2.5f, "prologue-caspar-turn"), Cut(4.5f, "prologue-caspar-face", "prologue-caspar-face-dim"), FadeTo(6.5f, "prologue-caspar-face-dim", 1.5f) } },
+            // The owner, Oct 8 (over the brief's fading glow): "my vision was for the intro to end on a zoom in, zooming into caspars glowing eyes and
+            // then a flash as the player is transported into nothingness". He turns; on his face the camera starts a slow push toward his eyes,
+            // crossfades to the eyes' close-up and keeps pushing, and the white blooms out of the glow.
+            new PrologueShot { Id = "turn", Seconds = 11.5f, ScaleFrom = 1f, ScaleTo = 1.35f, MoveFrom = 4.5f, ViewFrom = new Vector2(0, -.3f), ViewTo = new Vector2(0, -.3f),
+                Line = "The hooded figure turns around. His eyes glow white-gold, closer and closer.",
+                Steps = new[] { Cut(0, "prologue-caspar-back"), Cut(2.5f, "prologue-caspar-turn"), Cut(4.5f, "prologue-caspar-face"), FadeTo(7.5f, "prologue-caspar-eyes", 1.2f) } },
             new PrologueShot { Id = "flash", Seconds = FlashIn + FlashHold + FlashOut + Darkness, Flash = true, Line = "A flash of white light. Then darkness." },
         };
         public static float PrologueSeconds => PrologueLeadIn + PrologueShots.Sum(s => s.Seconds); // about 50 s (the brief: 45-60)
-        public static IEnumerable<string> PrologueFrames => PrologueShots.SelectMany(s => s.Steps).SelectMany(p => new[] { p.Frame, p.Reduced }).Where(f => f != null).Distinct();
+        public static IEnumerable<string> PrologueFrames => PrologueShots.SelectMany(s => s.Steps).Select(p => p.Frame).Where(f => f != null).Distinct();
         public const string SkipWords = "Skip"; // the Skip label: Claude's draft for Dante (ruling 5)
         public const float SkipX = 118, SkipY = 744, SkipWidth = 96, SkipHeight = 44; // the bottom right, clear of the gear (a working choice)
         // the camera's offset for a scale and a view: at scale s the frame can move (s - 1) x half its size each way and never show an edge
@@ -2645,7 +2648,7 @@ namespace Ascendant.CelestialDial
                     float t = Time.unscaledTime - start;
                     while (next < shot.Steps.Length && shot.Steps[next].At <= t) { live.Add(RunStep(shot.Steps[next])); next++; Publish(); }
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
-                    else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
+                    else CameraAt(shot, Mathf.Clamp01((t - shot.MoveFrom) / Mathf.Max(.01f, shot.Seconds - shot.MoveFrom))); // the camera holds until MoveFrom
                     live.RemoveAll(step => step());
                     if (t >= shot.Seconds && live.Count == 0) break;
                     yield return null;
@@ -2660,7 +2663,7 @@ namespace Ascendant.CelestialDial
         // one step of a shot: returns a function the shot calls every frame until it reports the step done
         Func<bool> RunStep(PrologueStep step)
         {
-            string slot = prologueStill && step.Reduced != null ? step.Reduced : step.Frame;
+            string slot = step.Frame;
             if (!prologueFrames.TryGetValue(slot, out var frame)) return () => true;
             if (step.How == "panel")
             {
@@ -2678,7 +2681,7 @@ namespace Ascendant.CelestialDial
             var others = prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).ToList();
             bool up = frame.Rect.gameObject.activeSelf && frame.Rect.parent == prologueCamera && frame.Group.alpha >= 1;
             frame.Rect.SetAsLastSibling(); frame.Rect.gameObject.SetActive(true); prologueFrameShown = slot;
-            if (up && others.Count == 0) return () => true; // already on screen (under reduced motion the eyes were dim from the start)
+            if (up && others.Count == 0) return () => true; // already on screen
             float seconds = step.How == "fade" ? step.Seconds : prologueStill ? StillFade : 0; // reduced motion: a cut crossfades
             if (seconds <= 0) { frame.Group.alpha = 1; foreach (var o in others) o.Rect.gameObject.SetActive(false); return () => true; }
             frame.Group.alpha = 0; float from = Time.unscaledTime;
@@ -2687,7 +2690,12 @@ namespace Ascendant.CelestialDial
         IEnumerator PrologueFlash()
         {
             busy = true; skipShown = false; skipButton.gameObject.SetActive(false); Publish(); // the busy guard and publish, as WhiteLight
-            if (!prologueStill) yield return Fade(flash, 0, 1, FlashIn); else flash.color = Color.white; // reduced motion: an instant flash
+            if (!prologueStill) // the glow blooms into the white: the push on his eyes carries on a little as the white comes up
+            {
+                var scale0 = prologueCamera.localScale.x; var at0 = prologueCamera.anchoredPosition - new Vector2(0, -400);
+                yield return Tween(FlashIn, k => { float e = k * k; flash.color = new Color(1, 1, 1, e); float sc = scale0 * Mathf.Lerp(1, FlashBloom, k); prologueCamera.localScale = new Vector3(sc, sc, 1); prologueCamera.anchoredPosition = new Vector2(0, -400) + at0 * (sc / scale0); });
+            }
+            else flash.color = Color.white; // reduced motion: held still on the eyes, then an instant flash
             yield return new WaitForSecondsRealtime(FlashHold);
             ResetPrologueStage(); // under the white the frames go: darkness follows
             if (!prologueStill) yield return Fade(flash, 1, 0, FlashOut);

@@ -12,13 +12,13 @@ const path=require('path');
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
   const PROLOGUE=[[0,'prologue-city',2000],[1,'prologue-desk',1500],[1,'prologue-notebook',1200],[2,'prologue-desk',500],[2,'prologue-light',1600],[2,'prologue-look',600],[2,'prologue-headphones',300],
-    [3,'prologue-street-above',1000],[3,'prologue-street-above',3500],[4,'prologue-puzzled',1500],[5,'prologue-caspar-back',1000],[5,'prologue-caspar-turn',1000],[5,'prologue-caspar-face',500],[5,'prologue-caspar-face-dim',2000]]; // [shot, frame, ms to settle]
+    [3,'prologue-street-above',1000],[3,'prologue-street-above',3500],[4,'prologue-puzzled',1500],[5,'prologue-caspar-back',1000],[5,'prologue-caspar-turn',1000],[5,'prologue-caspar-face',1500],[5,'prologue-caspar-eyes',2000]]; // [shot, frame, ms to settle]
   const newGame=async pg=>{await pg.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='prologue',{},{timeout:120000});await pg.locator('#loading').waitFor({state:'detached'});};
   const skipPrologue=async pg=>{await newGame(pg);for(let n=0;n<5;n++){await pg.locator('#skip-prologue').evaluate(b=>b.click());try{await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:3000});return;}catch{}}throw Error('the semantic Skip did not leave the prologue');};
   const playPrologue=async(pg,prefix,reduced,where,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
     for(const [i,[shot,frame,settle]] of PROLOGUE.entries()){
-      const want=reduced&&frame==='prologue-caspar-face'?'prologue-caspar-face-dim':frame; // reduced motion: the eyes are dim from the start
+      const want=frame;
       await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.prologueShot===k&&s.prologueFrame===f;},[shot,want],{timeout:25000});
       await pg.waitForTimeout(settle);
       const s=await snap(),said=await pg.locator('#announcement').textContent(),skip=await pg.locator('#skip-prologue').isEnabled();
@@ -31,7 +31,7 @@ const path=require('path');
         await pg.waitForFunction(()=>!window.ascendantDial.snapshot().skipShown,{},{timeout:6000});const held=Date.now()-t0;
         check(held>2400&&held<4200&&(await snap()).screen==='prologue','Skip hides again after about 3 s ('+(held/1000).toFixed(1)+' s) and the scene plays on at '+where);}
     }
-    await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueShot===6,{},{timeout:25000});await pg.waitForTimeout(reduced?100:150);
+    await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueShot===6,{},{timeout:25000});await pg.waitForTimeout(reduced?100:400); // the white blooming out of the glow
     { const f=await snap(); check(f.prologueShotId==='flash'&&f.busy&&!f.canSkip&&!(await pg.locator('#skip-prologue').isEnabled()),'the flash: the busy guard holds and Skip waits it out at '+where);await pg.screenshot({path:path.join(out,prefix+'-15-flash.png')}); }
     await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await pg.waitForTimeout(reduced?200:600);
     { const e=await snap(); check(e.screen==='identity'&&e.prologueShot===-1&&e.orbShown&&e.orbStars===0&&e.canName,'the prologue ends in darkness, then WHO ARE YOU? with the orb above it'+(reduced?' (reduced motion)':'')+' at '+where);await pg.screenshot({path:path.join(out,prefix+'-16-identity.png')}); }
@@ -793,7 +793,7 @@ const path=require('path');
     fs.writeFileSync(path.join(out,viewport.width+'-events.json'),JSON.stringify(events,null,2));
     await context.close();
   }));
-  // The opening scene under reduced motion (owner, Oct 8: each shot held still, cuts and panels crossfade, an instant flash, the eyes already dim),
+  // The opening scene under reduced motion (owner, Oct 8: each shot held still, cuts and panels crossfade, held on the eyes, then an instant flash),
   // then a fresh one: the gear opens Settings without showing Skip, a canvas tap shows Skip, and a canvas tap on Skip goes straight to the name.
   await Promise.all(VIEWPORTS.map(async viewport=>{
     const stillContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE,reducedMotion:'reduce'});

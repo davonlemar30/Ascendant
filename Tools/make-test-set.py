@@ -37,7 +37,7 @@ IMAGES = [
     ("dial-room-worn", 180, 400), ("dial-room-light-worn", 180, 400), ("dial-ring-worn", 180, 180), ("dial-ring-light-worn", 180, 180),  # the Dial's wake-up (Oct 2): its worn and bright looks
     ("dial-room-bright", 180, 400), ("dial-room-light-bright", 180, 400), ("dial-ring-bright", 180, 180), ("dial-ring-light-bright", 180, 180), ("kit-dial-bright", 188, 208), ("kit-dial-bright-open", 188, 208),
     ("prologue-city", 180, 400), ("prologue-desk", 180, 400), ("prologue-notebook", 180, 400), ("prologue-light", 180, 400), ("prologue-look", 180, 400), ("prologue-headphones", 180, 400),  # the opening scene (Oct 8): its twelve frames,
-    ("prologue-street-above", 180, 400), ("prologue-puzzled", 180, 400), ("prologue-caspar-back", 180, 400), ("prologue-caspar-turn", 180, 400), ("prologue-caspar-face", 180, 400), ("prologue-caspar-face-dim", 180, 400),
+    ("prologue-street-above", 180, 400), ("prologue-puzzled", 180, 400), ("prologue-caspar-back", 180, 400), ("prologue-caspar-turn", 180, 400), ("prologue-caspar-face", 180, 400), ("prologue-caspar-eyes", 180, 400),
     ("orb", 120, 120), ("orb-star", 16, 16),  # the orb and its star, round, with transparent corners
 ]
 ROUND = {"dial-face", "floor-markings", "mechanism", "orb"}

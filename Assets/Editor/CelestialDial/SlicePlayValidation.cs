@@ -492,11 +492,11 @@ namespace Ascendant.Build
         static Func<bool> waitFor; static double waitLimit, waitThen, tappedAt; static string waitWhat; static bool waitBusyOk, BusyStep;
         // a step that holds the queue until a condition is met (or fails after a time limit), then waits a little more before the next step
         static void Until(Func<bool> condition,double seconds,string what,double then=.05,bool busyOk=false) => Steps.Enqueue(()=>{waitFor=condition;waitLimit=EditorApplication.timeSinceStartup+seconds;waitWhat=what;waitThen=then;waitBusyOk=busyOk;});
-        // the prologue played through: each shot and frame captured once it has settled; under reduced motion, every shot still, the eyes already dim
+        // the prologue played through: each shot and frame captured once it has settled; under reduced motion, every shot still, held on the eyes before the flash
         static void Prologue(string file,bool reduced)
         {
             var shots=new (int shot,string frame,double after)[]{(0,"prologue-city",1.6),(1,"prologue-desk",1.5),(1,"prologue-notebook",1.2),(2,"prologue-desk",.5),(2,"prologue-light",1.6),(2,"prologue-look",.6),(2,"prologue-headphones",.3),
-                (3,"prologue-street-above",1.0),(3,"prologue-street-above",3.5),(4,"prologue-puzzled",1.5),(5,"prologue-caspar-back",1.0),(5,"prologue-caspar-turn",1.0),(5,reduced?"prologue-caspar-face-dim":"prologue-caspar-face",.5),(5,"prologue-caspar-face-dim",2.0)};
+                (3,"prologue-street-above",1.0),(3,"prologue-street-above",3.5),(4,"prologue-puzzled",1.5),(5,"prologue-caspar-back",1.0),(5,"prologue-caspar-turn",1.0),(5,"prologue-caspar-face",1.5),(5,"prologue-caspar-eyes",2.0)};
             int n=0;
             foreach(var (shot,frame,after) in shots)
             {
@@ -505,10 +505,10 @@ namespace Ascendant.Build
                 Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="prologue" && s.prologueShotId==id && s.caspar==SliceView.PrologueShots[shot].Line && s.canSkip && !View.Flow.CanContinue,"shot "+(shot+1)+", "+id+": "+frame+", its spoken line \""+s.caspar+"\""+(reduced?", reduced motion":""));
                     if(reduced && shot>=1) Check(s.prologueStill && Mathf.Approximately(View.PrologueCameraScale,1) && View.ProloguePanelsSettled,"reduced motion: shot "+(shot+1)+" held still (scale "+View.PrologueCameraScale+"), panels in place");
                     if(!reduced && (shot==0 || shot==3 || shot==5)) Check(View.PrologueCameraScale>=1,"the camera never goes below scale 1 ("+View.PrologueCameraScale.ToString("0.000")+")");
-                    if(reduced && shot==5 && frame!="prologue-caspar-back" && frame!="prologue-caspar-turn") Check(frame=="prologue-caspar-face-dim","reduced motion: the eyes are dim from the start");
+                    if(shot==5 && frame=="prologue-caspar-eyes") Check(reduced ? Mathf.Approximately(View.PrologueCameraScale,1) : View.PrologueCameraScale>1.1f,reduced?"reduced motion: held still on the eyes' close-up":"the push-in has carried on into the eyes' close-up (scale "+View.PrologueCameraScale.ToString("0.00")+")");
                     Capture(file+"-"+index.ToString("00")+"-"+id+"-"+frame.Replace("prologue-","")+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
             }
-            Until(()=>View.PrologueShotIndex==6,25,"the flash",reduced?.1:.15,true);
+            Until(()=>View.PrologueShotIndex==6,25,"the flash",reduced?.1:.4,true);
             Steps.Enqueue(()=>{Check(View.Busy && View.Dial.Snapshot().busy && !View.Dial.Snapshot().canSkip && View.Dial.Snapshot().prologueShotId=="flash","the flash holds the busy guard and Skip waits it out");Capture(file+"-15-flash.png");});
         }
         // nothing on the opening's screens (no word, button or box, nor the gear) overlaps the orb, its stars or its bob
