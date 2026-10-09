@@ -2790,7 +2790,7 @@ namespace Ascendant.CelestialDial
             new PrologueShot { Id = "desk", Seconds = 8f, Page = true,
                 Line = "A young man sits at his desk with his headphones on, writing in his notebook.",
                 Steps = new[] { Panel(.3f, "prologue-desk", 0, 204, 340, 300, -1, 330), Panel(3.2f, "prologue-notebook", 0, 524, 340, 300, 1, 424),
-                    LoopIn(3.2f + PanelSlide, "prologue-notebook", new[] { "prologue-notebook-2", "prologue-notebook-3" }, .25f, 8f - 3.2f - PanelSlide) } }, // the owner, Oct 9: his hand writes, a loop at 4 frames a second once the panel has landed // the final art: the wide shows 22.5% to 60% down (his head, the desk and the notebook); the close 34% to 72% (the arm, the hand and pen, the open notebook). On screen 54 to 354 and 374 to 674 down, clear of the gear above and of Skip below (Jeffrey, #141 N7)
+                    LoopIn(3.2f + PanelSlide, "prologue-notebook", new[] { "prologue-notebook-2", "prologue-notebook-3" }, .25f, 8f - 3.2f - PanelSlide) } }, // the owner, Oct 9: his hand writes, a loop at 4 frames a second once the panel has landed; the final art: the wide shows 22.5% to 60% down (his head, the desk and the notebook); the close 34% to 72% (the arm, the hand and pen, the open notebook). On screen 54 to 354 and 374 to 674 down, clear of the gear above and of Skip below (Jeffrey, #141 N7)
             new PrologueShot { Id = "light", Seconds = 9f,
                 Line = "A white-gold light floods his room. He looks up and pulls his headphones down.",
                 // the owner, Oct 9: his head turns to the window (a quick 0.15 s crossfade, 0.9 s after the light has flooded in), then the close-up;
