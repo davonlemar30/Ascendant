@@ -215,7 +215,7 @@ namespace Ascendant.CelestialDial
             Settings = gameObject.AddComponent<SettingsMenu>();
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
             Settings.WakeLabel = () => WakeLabel; Settings.CycleWake = CycleWake; // the Dial's wake-up preview
-            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo; Settings.CuspDay = CuspDay; Settings.BirthOpening = BirthOpening;
+            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = id => JumpTo(id); Settings.EraDemo = JumpToEra; Settings.CuspDay = CuspDay; Settings.BirthOpening = BirthOpening;
             Settings.MainMenu = MainMenu; Settings.MainMenuConfirmed = MainMenuConfirmed; Settings.InGame = () => !Flow.AtLaunch && !Flow.AtMenu; // the launch (owner, Oct 9): Main menu, and the panel on the menu without the in-game rows
             Settings.Build(font);
             SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
@@ -236,8 +236,10 @@ namespace Ascendant.CelestialDial
             }
             else if (goMenu) Flow.OpenMenu();
             else if (Flow.BeginLaunch()) StartLaunch();
+            bool openEra = eraNext && goIn; eraNext = false; // DEV Mode's era demo opens over the save it just wrote
             Show(); Publish();
             if (fadeIn) { fadeImage.color = Color.black; fadeImage.raycastTarget = true; StartCoroutine(FadeIn()); } // the menu's fade into the game, or back to the menu, ends on this side
+            if (openEra) OpenEraDemo();
         }
         IEnumerator FadeIn() { busy = true; Publish(); yield return FadeTo(0); busy = false; Publish(); } // the busy guard holds while the screen comes up out of the dark
         void Update()
@@ -783,6 +785,7 @@ namespace Ascendant.CelestialDial
             else if (command == "walk-speed") { CycleWalkSpeed(); Settings.Refresh(); }
             else if (command == "settings") Settings.Toggle(); // Build U: the gear
             else if (command.StartsWith("jump:")) JumpTo(command.Substring(5)); // Build W: DEV Mode
+            else if (command == "era-demo") JumpToEra(); // the era demo (86bcg8az2)
             else if (command == "leave-wing") LeaveWing();
             else if (command == "leave-dial") LeaveDial(); // note 10
             else if (command == "continue-lesson") ContinueLesson(); // Build F
@@ -992,16 +995,29 @@ namespace Ascendant.CelestialDial
         string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, acolyte. Bring them to the Books." : "You hold a Key, acolyte. " + ChamberBringLine); // owner (worksheet section 13)
         void Restart() { if (busy) return; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); } // the slot in play (slot 1 if none), straight in, past the logo, the movie and the menu (owner, Oct 9)
         // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
-        void JumpTo(string id)
+        bool JumpTo(string id)
         {
-            if (busy || !DevCheckpoints.Known(id)) return;
+            if (busy || !DevCheckpoints.Known(id)) return false;
             SaveData save;
             try { save = DevCheckpoints.Play(id, Flow.PlayerName, Flow.HasBirthRecord ? Flow.LessonSun : 1); }
-            catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return; }
+            catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return false; }
             if (Flow.HasBirthRecord) Flow.WriteBirth(save); // Oct 7: the jump keeps the player's birth record; the London sample only stands in when there is none
             SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(save)); // the slot in play (slot 1 if none), straight in (owner, Oct 9)
             Debug.Log("[CelestialDial] jumped to checkpoint " + id);
-            Reload(true);
+            Reload(true); return true;
+        }
+        // The walkable-era demo (task 86bcg8az2; owner, Oct 9, on its own branch): DEV Mode writes the Wing-whole save (the first trip comes after
+        // the Library's first rooms) and reloads into it, then the demo opens over the Atrium. Its door home reloads into that save.
+        static bool eraNext;
+        public EraDemo.EraDemoView Era { get; private set; }
+        void JumpToEra() { if (busy) return; eraNext = true; if (!JumpTo("whole")) eraNext = false; }
+        void OpenEraDemo()
+        {
+            foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.gameObject.name != "Settings Canvas" && c.gameObject.name != "White light") c.enabled = false; // the slice hides; Settings stays on top
+            if (Camera.main != null) Camera.main.enabled = false; // the demo's camera draws the map
+            Era = new GameObject("Era demo").AddComponent<EraDemo.EraDemoView>(); Era.transform.SetParent(transform, false);
+            Era.Reduced = () => ReducedMotion; Era.Speed = () => Flow.Walk.Speed; Era.Home = () => Reload(true, false, true);
+            Era.Build(font); Settings.Close(); Publish();
         }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
         void EnterWing() { Walk("wing-door"); }
