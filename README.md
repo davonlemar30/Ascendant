@@ -50,7 +50,7 @@ The journal is a black book written in gold and silver. The first time you ever 
 
 ## Saving
 
-Your progress saves in your browser the moment anything changes, once your first Keeper Key is in the Chamber's lock. There are three save slots. Come back later, press **Continue** on the main menu, and you are in the Atrium with your Keys and everything the wheel remembers; **Load Game** lets you pick a slot. **New Game** asks before it replaces a saved game. **Main menu** in Settings takes you back to the menu. No account, and nothing leaves your device. **Start over**, under Testing in Settings, wipes it. Testing also has **Jump to...**, which loads a saved checkpoint so you can test any stage without replaying. Those buttons are for testing and will go away.
+Your progress saves in your browser the moment anything changes, once your first Keeper Key is spent and you are back in the Atrium. There are three save slots. Come back later, press **Continue** on the main menu, and you are in the Atrium with your Keys and everything the wheel remembers; **Load Game** lets you pick a slot. **New Game** asks before it replaces a saved game. **Main menu** in Settings takes you back to the menu. No account, and nothing leaves your device. **Start over**, under Testing in Settings, wipes it. Testing also has **Jump to...**, which loads a saved checkpoint so you can test any stage without replaying. Those buttons are for testing and will go away.
 
 ## What's next
 
