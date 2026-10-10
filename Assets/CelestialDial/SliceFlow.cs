@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal, Prologue } // Prologue last: the opening scene (owner, Oct 8, 86bcfhmha); appended, so no screen is renumbered
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal, Prologue, Logo, Intro, Menu, SaveSlots } // Prologue: the opening scene (owner, Oct 8, 86bcfhmha); then the launch (owner, Oct 9, 86bcg62x3): the logo screen, the launch movie, the main menu, the slot list; each appended, so no screen is renumbered
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
     public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map, Practice, Quiz, Birth } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map; Oct 3: Practice's list and its question page; Oct 7: "Your Birth"
     public enum JournalLens { Element, Modality, Polarity, Opposites } // Build AA: the tabs that recolour the Wheel or the Table, each once learned
@@ -26,6 +26,21 @@ namespace Ascendant.CelestialDial
         public bool EndPrologue() => LeavePrologue("prologue_ended");
         public bool SkipPrologue() => LeavePrologue("prologue_skipped");
         bool LeavePrologue(string how) { if (!AtPrologue) return false; Screen = SliceScreen.Identity; Note = ""; Logged?.Invoke(how); Logged?.Invoke("screen_entered:" + Screen); return true; }
+        // ---- The launch (owner, Oct 9, 86bcg62x3, round 3): every launch shows the logo screen, then the launch movie, then the main menu; one
+        // Skip covers the logo and the movie. New Game and the slots leave the menu by a fresh start (SliceView reloads the scene), so the flow
+        // only walks the launch's own screens; a fresh flow still starts at the prologue, which is where New Game, Start over and the DEV
+        // samples arrive. "Main menu" from Settings comes straight here, past the logo and the movie.
+        public bool AtLaunch => Screen == SliceScreen.Logo || Screen == SliceScreen.Intro;
+        public bool AtMenu => Screen == SliceScreen.Menu || Screen == SliceScreen.SaveSlots;
+        bool Fresh => AtPrologue && !prologueOpened;
+        public string SlotsFor { get; private set; } = ""; // the slot list's purpose: "new" (New Game) or "load" (Load Game)
+        void Enter(SliceScreen screen) { Screen = screen; Note = ""; Logged?.Invoke("screen_entered:" + Screen); }
+        public bool BeginLaunch() { if (!Fresh) return false; Enter(SliceScreen.Logo); return true; }
+        public bool EndLogo() { if (Screen != SliceScreen.Logo) return false; Enter(SliceScreen.Intro); return true; }
+        public bool EndIntro() { if (Screen != SliceScreen.Intro) return false; Logged?.Invoke("intro_ended"); Enter(SliceScreen.Menu); return true; }
+        public bool SkipLaunch() { if (!AtLaunch) return false; Logged?.Invoke("launch_skipped"); Enter(SliceScreen.Menu); return true; }
+        public bool OpenMenu() { if (!Fresh && Screen != SliceScreen.SaveSlots) return false; SlotsFor = ""; Enter(SliceScreen.Menu); return true; } // from Settings' Main menu (a fresh flow), or Back from the slot list
+        public bool OpenSlots(string mode) { if (Screen != SliceScreen.Menu || (mode != "new" && mode != "load")) return false; SlotsFor = mode; Logged?.Invoke("slots:" + mode); Enter(SliceScreen.SaveSlots); return true; }
         // The orb's stars (owner, Oct 8, ruling 8): one per step answered in the opening, counted as it stands now, so Change my answer takes
         // them back (Ashantis's settled call): the name once it is continued, then the birth question's answer and each step after it.
         int birthAnswers;

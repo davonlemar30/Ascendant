@@ -157,6 +157,10 @@ namespace Ascendant.CelestialDial
             public string sunSign = "";
             public int prologueShot = -1, prologueShots, orbStars, orbStarsLit; public string prologueShotId = "", prologueFrame = "", orbArt = ""; public bool prologueStill, skipShown, canSkip, orbShown; public string[] prologueShotFrames; // the opening scene (owner, Oct 8, 86bcfhmha): the shot and frame playing, Skip; the orb and the stars gathered
             public int locksFilled;
+            // the launch (owner, Oct 9, 86bcg62x3): the logo and the launch movie (launchCamera: the frame on top's scale and turn), the gear, the main menu, the slot list and its question, Settings' rows
+            public int launchShot = -1, launchShots, slotInPlay, continueSlot; public string launchShotId = "", launchFrame = "", menuTitleArt = "", menuArt = "", slotsFor = "", slotsTitle = "", confirmLine = "", settingsAskLine = ""; public float menuTitleTop;
+            public bool launchStill, gearShown, canMenuContinue, canMenuNew, canMenuLoad, canMenuSettings, confirmShown, canConfirm, canSlotsBack, settingsAsk;
+            public string[] launchShotFrames = new string[0], menuButtons = new string[0], slotCards = new string[0], settingsRows = new string[0]; public float[] launchCamera = new float[0], menuAlpha = new float[0], slotAlpha = new float[0], settingsRowTops = new float[0]; public bool[] slotFilled = new bool[0], slotEnabled = new bool[0];
             // v0.4 tap-to-move
             public string room = "", walkTarget = "", avatarAt = "", walkSpeed = "";
             public float avatarX;

@@ -206,7 +206,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth(); BuildOrb(); // the orb rides over the opening's two screens (owner, Oct 8)
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue, out atriumPose);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue, out returnPose);
-            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildAvatar(); BuildTravel(); BuildPrologue(); BuildFade(); // the prologue under the fade, which brings WHO ARE YOU? out of the dark
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildAvatar(); BuildTravel(); BuildPrologue(); BuildMenu(); BuildFade(); // the prologue under the fade, which brings WHO ARE YOU? out of the dark; the menu and its slot list (owner, Oct 9) under it too
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -216,22 +216,35 @@ namespace Ascendant.CelestialDial
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
             Settings.WakeLabel = () => WakeLabel; Settings.CycleWake = CycleWake; // the Dial's wake-up preview
             Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo; Settings.CuspDay = CuspDay; Settings.BirthOpening = BirthOpening;
+            Settings.MainMenu = MainMenu; Settings.MainMenuConfirmed = MainMenuConfirmed; Settings.InGame = () => !Flow.AtLaunch && !Flow.AtMenu; // the launch (owner, Oct 9): Main menu, and the panel on the menu without the in-game rows
             Settings.Build(font);
             SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
             SafeArea.Moved = Publish; // Part 2: the gear and the mini-menu button keep the web page's boxes on them
+            // The launch (owner, Oct 9, 86bcg62x3): every launch opens on the logo screen, the launch movie and the main menu. A start from the menu
+            // (Continue, New Game, a slot), Start over, DEV Jump to and the DEV samples reload the scene straight into the game; Settings' Main menu
+            // reloads it straight onto the menu. The flags ride across the reload, read once here.
+            if (carriedMotion.HasValue) { if (carriedMotion.Value && !ReducedMotion) Dial.WebAction("motion-on"); carriedMotion = null; } // the player's reduced motion survives the reload
+            bool goIn = straightIn || cuspDayFor != null || birthSampleFor != null, goMenu = toMenu && !goIn, fadeIn = enterFade; straightIn = toMenu = enterFade = false;
             if (Slots.StyleRequested) Settings.GearShown = false; // the style page is a test page, not the game
             if (Slots.StyleRequested) { BuildStyle(); ShowStyle(); Publish(); return; } // Build E: the style page instead of the game; the save is not touched
-            TryRestore();
-            if (cuspDayFor != null) OpenCuspDay(); // DEV Mode's cusp-day sample
-            if (birthSampleFor != null) OpenBirthOpening(); // Oct 7: DEV Mode's sample for each other path
-            StartPrologue(); // a new game opens on the opening scene (owner, Oct 8); a save and the DEV samples have already left it
+            if (goIn)
+            {
+                TryRestore();
+                if (cuspDayFor != null) OpenCuspDay(); // DEV Mode's cusp-day sample
+                if (birthSampleFor != null) OpenBirthOpening(); // Oct 7: DEV Mode's sample for each other path
+                StartPrologue(); // a new game opens on the opening scene (owner, Oct 8); a save and the DEV samples have already left it
+            }
+            else if (goMenu) Flow.OpenMenu();
+            else if (Flow.BeginLaunch()) StartLaunch();
             Show(); Publish();
+            if (fadeIn) { fadeImage.color = Color.black; fadeImage.raycastTarget = true; StartCoroutine(FadeIn()); } // the menu's fade into the game, or back to the menu, ends on this side
         }
+        IEnumerator FadeIn() { busy = true; Publish(); yield return FadeTo(0); busy = false; Publish(); } // the busy guard holds while the screen comes up out of the dark
         void Update()
         {
             if (canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f);
             if (styleShown) return;
-            UpdatePrologue(); UpdateOrb(); // the opening scene's Skip, and the orb's bob and stars
+            UpdatePrologue(); UpdateOrb(); // the opening scene's Skip (and the launch's), and the orb's bob and stars
             if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (!Dial.Showing) Dial.WakeStep = WakeTarget; // the wake-up: a step lands the next time the player comes to the Dial, never mid-lesson
@@ -713,12 +726,21 @@ namespace Ascendant.CelestialDial
         {
             if (command == "mute") { ToggleMute(); return; }
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
-            if (styleShown && command != "reload") return; // the style page is not the game (a reload, test-only, still gets out of it)
+            if (styleShown && command != "reload" && command != "relaunch") return; // the style page is not the game (a reload, test-only, still gets out of it)
             if (command.StartsWith("safe-inset:") && float.TryParse(command.Substring(11), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float band)) { SafeArea.Simulated = band; Publish(); return; } // test-only (Platform fit, Part 1): a top band in layout units; -1 restores the screen's own
             if (command == "wake-cycle") { CycleWake(); return; } // DEV Mode: the Dial's wake-up preview, a step at a time
             if (command.StartsWith("wake:") && int.TryParse(command.Substring(5), out int wake)) { wakePreview = Mathf.Clamp(wake, -1, 4); Dial.WakeStep = WakeTarget; Settings?.Refresh(); Publish(); return; } // test-only: a step, or -1 for as earned
             if (command == "next-screen") Continue();
-            else if (command == "skip-prologue") SkipPrologue(); // the opening scene's Skip: the screen reader's and the keyboard's, with no reveal (ruling 5)
+            else if (command == "skip-prologue") SkipPrologue(); // the opening scene's Skip: the screen reader's and the keyboard's, with no reveal (ruling 5); on the logo or the launch movie, the launch's Skip
+            else if (command == "skip-launch") SkipLaunch(); // the launch's Skip (owner, Oct 9): the logo and the movie, to the menu
+            else if (command.StartsWith("menu:")) MenuPick(Array.IndexOf(MenuCommands, command.Substring(5))); // the main menu: continue, new, load, settings
+            else if (command.StartsWith("slot:") && int.TryParse(command.Substring(5), out int saveSlot)) PickSlot(saveSlot); // the slot list: 1 to 3
+            else if (command == "slots-back") SlotsBack();
+            else if (command == "confirm-start") ConfirmStart(); // the slot list's question before a filled slot is replaced
+            else if (command == "confirm-back") ConfirmBack();
+            else if (command == "main-menu") MainMenu(); // Settings' Main menu row (its twin for the checks); before Key 1 it asks first
+            else if (command == "main-menu-confirm") { if (Settings != null && Settings.Asking) MainMenuConfirmed(); }
+            else if (command == "main-menu-back") { if (Settings != null && Settings.Asking) { Settings.ShowMain(); Publish(); } }
             else if (command == "prologue-tap") RevealSkip(); // test-only: the canvas tap's twin, which only shows Skip
             else if (command.StartsWith("birth:")) ChooseBirth(command.Substring(6));
             else if (command.StartsWith("birthdate:")) UseDate(command.Substring(10));
@@ -743,7 +765,8 @@ namespace Ascendant.CelestialDial
             else if (command == "enter-chamber") EnterChamber();
             else if (command == "leave-chamber") LeaveChamber();
             else if (command == "restart") Restart();
-            else if (command == "reload") { if (!busy) SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); } // test-only: resume from the local save
+            else if (command == "reload") { if (!busy) Reload(true); } // test-only: resume from the local save (the slot in play), straight in as Continue does
+            else if (command == "relaunch") { if (!busy) Reload(false); } // test-only: a launch, as a page reload or a new app start (the logo, the movie, the menu)
             else if (command == "travel") MiniMenu?.Toggle(); // the room mini-menu (86bca07wv): the button, then a row
             else if (command.StartsWith("travel:")) MiniMenu?.Pick(command.Substring(7));
             else if (command == "enter-wing") EnterWing();
@@ -835,12 +858,12 @@ namespace Ascendant.CelestialDial
                 case "v4-legacy": save.chartFrom = ""; save.sunSign = 2; break;
                 default: return;
             }
-            PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(save)); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(save)); Reload(true);
         }
         // DEV Mode (Oct 7, 86bced0tc): a fresh opening at a path's first question, the name kept: skip (Which sign do you go by?), no-time
         // (London, May 2 1990, no birth time: the rising asked), no-place (May 10 1990, 2:30 pm, I don't know where: the moon asked, then the rising),
         // neither (Apr 20 1990, no time, no place: the cusp question with no clock time, then the moon, then the rising)
-        void BirthOpening(string id) { if (busy || !SettingsMenu.BirthSamples.Any(b => b.id == id)) return; birthSampleFor = Flow.PlayerName; birthSampleId = id; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+        void BirthOpening(string id) { if (busy || !SettingsMenu.BirthSamples.Any(b => b.id == id)) return; birthSampleFor = Flow.PlayerName; birthSampleId = id; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); }
         void OpenBirthOpening()
         {
             var name = birthSampleFor; var id = birthSampleId; birthSampleFor = birthSampleId = null; Flow.SetName(name); Flow.SkipPrologue(); // a DEV sample goes straight to its question (Ashantis, Oct 8)
@@ -851,7 +874,7 @@ namespace Ascendant.CelestialDial
             else if (id == "neither") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 4, 20); Flow.SetBirthTime(-1); Flow.SetBirthPlace(null); } // a cusp day: the question with no clock time, then the moon, then the rising
             if (nameField != null) nameField.SetTextWithoutNotify(Flow.PlayerName); ShowBirth();
         }
-        void CuspDay() { if (busy) return; cuspDayFor = Flow.PlayerName; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+        void CuspDay() { if (busy) return; cuspDayFor = Flow.PlayerName; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); }
         void OpenCuspDay()
         {
             var name = cuspDayFor; cuspDayFor = null; Flow.SetName(name); Flow.SkipPrologue(); BirthChart.CuspSample(out int year, out int month, out int day, out var place); // DEV Mode's sample skips the prologue
@@ -967,7 +990,7 @@ namespace Ascendant.CelestialDial
         }
         // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
         string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, acolyte. Bring them to the Books." : "You hold a Key, acolyte. " + ChamberBringLine); // owner (worksheet section 13)
-        void Restart() { if (busy) return; PlayerPrefs.DeleteKey(SaveKey); PlayerPrefs.Save(); SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+        void Restart() { if (busy) return; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); } // the slot in play (slot 1 if none), straight in, past the logo, the movie and the menu (owner, Oct 9)
         // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
         void JumpTo(string id)
         {
@@ -976,9 +999,9 @@ namespace Ascendant.CelestialDial
             try { save = DevCheckpoints.Play(id, Flow.PlayerName, Flow.HasBirthRecord ? Flow.LessonSun : 1); }
             catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return; }
             if (Flow.HasBirthRecord) Flow.WriteBirth(save); // Oct 7: the jump keeps the player's birth record; the London sample only stands in when there is none
-            PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(save)); PlayerPrefs.Save();
+            SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(save)); // the slot in play (slot 1 if none), straight in (owner, Oct 9)
             Debug.Log("[CelestialDial] jumped to checkpoint " + id);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Reload(true);
         }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
         void EnterWing() { Walk("wing-door"); }
@@ -1371,7 +1394,9 @@ namespace Ascendant.CelestialDial
             var task = Flow.CurrentReview;
             bool practiceOnDial = s == SliceScreen.Practice && task != null && (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality) && !task.done;
             identity.gameObject.SetActive(s == SliceScreen.Identity); birth.gameObject.SetActive(s == SliceScreen.Birth); if (s == SliceScreen.Birth) ShowBirth(); // Oct 7: "Your Birth" opens the opening's boxes
-            orbHeld = false; prologue.gameObject.SetActive(s == SliceScreen.Prologue); orb.gameObject.SetActive(OrbWanted); // the opening scene (owner, Oct 8); the orb on the opening's name and birth screens only
+            orbHeld = false; prologue.gameObject.SetActive(s == SliceScreen.Prologue || Flow.AtLaunch); orb.gameObject.SetActive(OrbWanted); // the opening scene (owner, Oct 8), and on its stage the logo and the launch movie (Oct 9); the orb on the opening's name and birth screens only
+            menuScreen.gameObject.SetActive(s == SliceScreen.Menu); if (s == SliceScreen.Menu) ShowMenu(); slotsScreen.gameObject.SetActive(s == SliceScreen.SaveSlots); if (s == SliceScreen.SaveSlots) ShowSlots(); // the main menu and its slot list (owner, Oct 9)
+            bool gear = !Flow.AtLaunch && !Flow.AtMenu; if (Settings != null && Settings.GearShown != gear) Settings.GearShown = gear; // no gear on the logo, the movie or the menu (owner, Oct 9); the menu's own Settings opens the panel
             journal.gameObject.SetActive(s == SliceScreen.Journal); if (s == SliceScreen.Journal) ShowJournal();
             atrium.gameObject.SetActive(s == SliceScreen.Atrium); atriumReturn.gameObject.SetActive(s == SliceScreen.AtriumReturn);
             chamber.gameObject.SetActive(s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom); hub.gameObject.SetActive(s == SliceScreen.Hub);
@@ -1632,7 +1657,8 @@ namespace Ascendant.CelestialDial
                 s == SliceScreen.Chamber ? chamberText.text + (Flow.Ended ? " " + chamberEnd.text : "") :
                 s == SliceScreen.Hub ? hubText.text + " " + hubCaption.text :
                 s == SliceScreen.Practice && !practiceOnDial ? (Flow.PracticeDone ? Flow.PracticeSummary + " " + reviewNote.text : reviewProgress.text + ". " + reviewQuestion.text + " " + reviewNote.text) :
-                s == SliceScreen.Journal ? JournalSpoken() : "";
+                s == SliceScreen.Journal ? JournalSpoken() :
+                s == SliceScreen.SaveSlots && confirmSlot > 0 ? confirmLine.text : ""; // the slot list's question (the launch, Oct 9); the menu's buttons speak for themselves
             state.casparPose = s == SliceScreen.Atrium && atriumPose.enabled ? AtriumPoses[Mathf.Min(Page, AtriumPoses.Length - 1)] : s == SliceScreen.AtriumReturn && returnPose.enabled ? ReturnPoses[Mathf.Min(Page, ReturnPoses.Length - 1)] : s == SliceScreen.Chamber && chamberPose.enabled ? chamberPoseName : ""; // Build P, Build R
             state.keyRevealed = Flow.KeyRevealed; state.keyInserted = Flow.KeyInserted; state.ended = Flow.Ended; state.locksFilled = Flow.LocksFilled;
             state.sunSign = Flow.HasSunSign ? Zodiac.Seats[Flow.SunSign].Name : "";
@@ -1642,7 +1668,22 @@ namespace Ascendant.CelestialDial
             // the opening scene (owner, Oct 8): the shot playing, the frame on top, whether Skip shows and whether it can be used; the orb and its stars
             bool onPrologue = s == SliceScreen.Prologue; state.prologueShot = onPrologue ? prologueShot : -1; state.prologueShots = PrologueShots.Length;
             state.prologueShotId = onPrologue && prologueShot >= 0 && prologueShot < PrologueShots.Length ? PrologueShots[prologueShot].Id : ""; state.prologueFrame = onPrologue ? prologueFrameShown : ""; state.prologueShotFrames = onPrologue ? shotFrames.ToArray() : new string[0];
-            state.prologueStill = onPrologue && prologueStill; state.skipShown = onPrologue && skipShown; state.canSkip = onPrologue && !busy;
+            state.prologueStill = onPrologue && prologueStill; state.skipShown = (onPrologue || Flow.AtLaunch) && skipShown; state.canSkip = (onPrologue || Flow.AtLaunch) && !busy; // one Skip for the opening scene, and for the logo and the launch movie (owner, Oct 9)
+            // the launch (owner, Oct 9): the shot playing on the logo screen and the movie, the frame on top; the gear; the menu, its slot list and its question
+            bool onLaunch = Flow.AtLaunch, shotOk = onLaunch && prologueShot >= 0 && prologueShot < LaunchShots.Length; state.launchShot = onLaunch ? prologueShot : -1; state.launchShots = LaunchShots.Length;
+            state.launchShotId = shotOk ? LaunchShots[prologueShot].Id : ""; state.launchFrame = onLaunch ? prologueFrameShown : ""; state.launchShotFrames = onLaunch ? shotFrames.ToArray() : new string[0]; state.launchStill = onLaunch && prologueStill;
+            state.launchCamera = onLaunch && prologueFrames.TryGetValue(prologueFrameShown, out var shownFrame) ? new[] { shownFrame.Rect.localScale.x, shownFrame.Fill != null ? 0 : shownFrame.Rect.localEulerAngles.z > 180 ? shownFrame.Rect.localEulerAngles.z - 360 : shownFrame.Rect.localEulerAngles.z, shownFrame.Fill != null ? shownFrame.Fill.fillAmount : 1 } : new float[0]; // scale, turn (a swept layer's mask turn is its start, not motion), and a swept layer's reveal
+            state.gearShown = Settings != null && Settings.GearShown;
+            bool onMenu = s == SliceScreen.Menu, onSlots = s == SliceScreen.SaveSlots;
+            state.menuButtons = onMenu ? MenuWords : new string[0]; state.menuAlpha = onMenu ? menuButtons.Select(b => { var g = b.GetComponent<CanvasGroup>(); return g != null ? g.alpha : 1f; }).ToArray() : new float[0];
+            state.canMenuContinue = onMenu && !busy && anySave && continueSlot > 0; state.canMenuLoad = onMenu && !busy && anySave; state.canMenuNew = state.canMenuSettings = onMenu && !busy;
+            state.menuTitleArt = Slots.Source("menu-title"); state.menuArt = Slots.Source("menu-city"); state.menuTitleTop = onMenu ? -menuTitle.anchoredPosition.y : 0;
+            state.slotsFor = onSlots ? Flow.SlotsFor : ""; state.slotsTitle = onSlots ? (Flow.SlotsFor == "load" ? "Load Game" : "New Game") : "";
+            state.slotCards = onSlots ? cards.Select(c => c.Spoken).ToArray() : new string[0]; state.slotFilled = onSlots ? cards.Select(c => c.Filled).ToArray() : new bool[0];
+            state.slotEnabled = onSlots ? slotCards.Select(b => b.interactable && confirmSlot < 1 && !busy).ToArray() : new bool[0]; state.slotAlpha = onSlots ? slotCards.Select(b => { var g = b.GetComponent<CanvasGroup>(); return g != null ? g.alpha : 1f; }).ToArray() : new float[0];
+            state.confirmShown = onSlots && confirmSlot > 0; state.confirmLine = state.confirmShown ? confirmLine.text : ""; state.canConfirm = state.confirmShown && !busy; state.canSlotsBack = onSlots && !busy && confirmSlot < 1;
+            state.slotInPlay = SaveSlots.InPlay; state.continueSlot = onMenu || onSlots ? continueSlot : 0;
+            if (Settings != null) { state.settingsRows = Settings.RowWords; state.settingsRowTops = Settings.RowTops; state.settingsAsk = Settings.Asking; state.settingsAskLine = Settings.Asking ? Settings.AskLine : ""; }
             state.orbShown = OrbWanted; state.orbStars = OrbWanted ? OrbStarCount : 0; state.orbStarsLit = OrbWanted ? OrbStarsLit : 0; state.orbArt = Slots.Source("orb");
             state.canBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice == "";
             bool birthNow = s == SliceScreen.Birth && !busy; string birthStep = Flow.BirthStep; state.birthStep = s == SliceScreen.Birth ? birthStep : "";
@@ -2757,6 +2798,9 @@ namespace Ascendant.CelestialDial
             public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height, SrcX = float.NaN, SrcY = float.NaN; public int From;
             public float PushTo, PushSeconds; public Vector2 PushView;
             public string[] Loop; public float LoopFrame; public bool Moving;
+            public float SpinFrom, SpinTo, SpinSeconds; public string SpinEase = "smooth"; // the launch movie (Oct 9): the frame turns from SpinFrom to SpinTo degrees over SpinSeconds (eased "smooth", "in" or "out"); a full frame scaled just enough that no edge shows (Cover), a round layer as it is; reduced motion holds it still
+            public int Sectors; public bool Over; // How "sweep" (round 4): a radial reveal of a round layer over Seconds, smooth, or in Sectors hard steps (the twelve symbols); reduced motion: a plain fade. Over: a full frame that comes in over the round layers (they go when it is in)
+            // How "out" (the logo screen): every frame on screen fades out to the dark page over Seconds.
             // Loop (the owner, Oct 9: "slight animations", frame swaps within ruling 4): from At, for Seconds, the panel holding Frame swaps
             // hard through Frame, then each Loop frame, every LoopFrame s, starting with the first Loop frame. Moving: a step that is only motion
             // (an in-between frame); reduced motion skips it.
@@ -2766,7 +2810,7 @@ namespace Ascendant.CelestialDial
         }
         public sealed class PrologueShot
         {
-            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash; public float UnderDim;
+            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash, Logo; public float UnderDim; // Logo: a shot of the launch's logo screen (the movie begins at the first shot without it)
             public PrologueStep[] Steps = new PrologueStep[0];
             // View: where the camera looks inside the frame, -1 to 1 each way (x: left to right; y: top to bottom), so the pan never shows an
             // edge at any scale; a push-in holds its View on the point it moves toward. Page: the
@@ -2779,6 +2823,13 @@ namespace Ascendant.CelestialDial
         static PrologueStep LoopIn(float at, string frame, string[] loop, float frameSeconds, float seconds) => new PrologueStep { At = at, Frame = frame, How = "loop", Loop = loop, LoopFrame = frameSeconds, Seconds = seconds };
         static PrologueStep InBetween(PrologueStep step) { step.Moving = true; return step; }
         static PrologueStep Pushed(PrologueStep step, float to, Vector2 view, float seconds) { step.PushTo = to; step.PushView = view; step.PushSeconds = seconds; return step; }
+        static PrologueStep Spun(PrologueStep step, float from, float to, float seconds, string ease = "smooth") { step.SpinFrom = from; step.SpinTo = to; step.SpinSeconds = seconds; step.SpinEase = ease; return step; }
+        static PrologueStep Sweep(float at, string frame, float seconds, int sectors = 0) => new PrologueStep { At = at, Frame = frame, How = "sweep", Seconds = seconds, Sectors = sectors };
+        static PrologueStep Over(PrologueStep step) { step.Over = true; return step; }
+        public static float Eased(string ease, float k) => ease == "in" ? k * k : ease == "out" ? 1 - (1 - k) * (1 - k) : ease == "linear" ? k : Mathf.SmoothStep(0, 1, k);
+        static PrologueStep FadeOut(float at, float seconds) => new PrologueStep { At = at, How = "out", Seconds = seconds };
+        // the scale a full 360 x 800 frame turned by some degrees needs so that it still covers the column (no corner of the dark page shows)
+        public static float Cover(float degrees) { float a = Mathf.Abs(degrees) * Mathf.Deg2Rad; return Mathf.Max(1, Mathf.Cos(a) + 800f / 360f * Mathf.Sin(a)); }
         public static Vector2 ViewOn(float x, float y) => new Vector2(2 * x - 1, 2 * y - 1); // the view that holds a point of the frame (shares across and down) still while the scale grows
         public const float PrologueLeadIn = .6f, PanelSlide = .7f, StillFade = .4f, SkipShowsFor = 3f, FlashIn = .6f, FlashHold = .35f, FlashBloom = 1.06f, FlashOut = .6f, Darkness = 1.2f; // timings are working choices to tune against the art (the brief)
         // The shot list (the brief's table, shots 1-7; timings are working choices). The spoken lines are Claude's drafts as Dante edited them (#141).
@@ -2813,16 +2864,17 @@ namespace Ascendant.CelestialDial
             new PrologueShot { Id = "flash", Seconds = FlashIn + FlashHold + FlashOut + Darkness, Flash = true, Line = "A flash of white light. Then darkness." },
         };
         public static float PrologueSeconds => PrologueLeadIn + PrologueShots.Sum(s => s.Seconds); // about 50 s (the brief: 45-60)
-        public static IEnumerable<string> PrologueFrames => PrologueShots.SelectMany(s => s.Steps).SelectMany(p => new[] { p.Frame }.Concat(p.Loop ?? new string[0])).Where(f => f != null).Distinct();
+        public static IEnumerable<string> PrologueFrames => FramesOf(PrologueShots);
+        static IEnumerable<string> FramesOf(PrologueShot[] shots) => shots.SelectMany(s => s.Steps).SelectMany(p => new[] { p.Frame }.Concat(p.Loop ?? new string[0])).Where(f => f != null).Distinct();
         public const string SkipWords = "Skip"; // the Skip label: Claude's draft for Dante (ruling 5)
         public const float SkipX = 118, SkipY = 744, SkipWidth = 96, SkipHeight = 44; // the bottom right, clear of the gear (a working choice)
         // the camera's offset for a scale and a view: at scale s the frame can move (s - 1) x half its size each way and never show an edge
         public static Vector2 CameraOffset(float scale, Vector2 view) { scale = Mathf.Max(1, scale); return new Vector2(-Mathf.Clamp(view.x, -1, 1) * 180 * (scale - 1), Mathf.Clamp(view.y, -1, 1) * 400 * (scale - 1)); }
-        sealed class PrologueFrame { public string Slot; public RectTransform Rect; public CanvasGroup Group; public Image Image; }
+        sealed class PrologueFrame { public string Slot; public RectTransform Rect; public CanvasGroup Group; public Image Image, Fill; public bool Layer; } // Fill: a swept layer's radial mask (round 4); Layer: a round layer, not a full frame
         RectTransform prologue, prologueCamera, prologuePanels; Image prologueDim; Button skipButton;
         readonly Dictionary<string, PrologueFrame> prologueFrames = new Dictionary<string, PrologueFrame>();
         readonly List<RectTransform> prologuePanelsShown = new List<RectTransform>();
-        Coroutine prologueRun; int prologueShot = -1; string prologueFrameShown = ""; bool skipShown, prologueStill; float skipHideAt;
+        Coroutine prologueRun; int prologueShot = -1; string prologueFrameShown = ""; bool skipShown, prologueStill; float skipHideAt; PrologueShot[] playing = PrologueShots; // prologueShot: the shot playing in the list playing (the prologue's or the launch's)
         public int PrologueShotIndex => Flow.AtPrologue ? prologueShot : -1; // fixture evidence
         public bool SkipShown => skipShown;
         // the frames shown so far in this shot, in order: the evidence for the owner's Oct 9 frame swaps, some only 0.14 s long
@@ -2839,12 +2891,17 @@ namespace Ascendant.CelestialDial
             prologue = ScreenPanel("Prologue"); prologue.GetComponent<Image>().color = Color.black; // the page between shots is dark
             var stage = Rect("Stage", prologue, 0, 400, 360, 800); stage.gameObject.AddComponent<RectMask2D>(); // the column: a scaled frame never spills past it
             prologueCamera = Rect("Camera", stage, 0, 400, 360, 800);
-            foreach (var slot in PrologueFrames)
+            foreach (var slot in PrologueFrames.Concat(LaunchFrames).Distinct()) // the launch's logo and movie play on the same stage (owner, Oct 9)
             {
-                var r = Rect(slot, prologueCamera, 0, 400, 360, 800); var image = r.gameObject.AddComponent<Image>(); image.raycastTarget = false; image.color = new Color(.16f, .16f, .19f);
+                var size = FrameSize(slot); var r = Rect(slot, prologueCamera, 0, 400, size.x, size.y); bool layer = size != new Vector2(360, 800);
                 var group = r.gameObject.AddComponent<CanvasGroup>(); group.blocksRaycasts = false; group.interactable = false;
-                if (!Slots.Dress(image, slot)) PlaceholderFrame(r, slot); // the labelled placeholder until the art lands (the brief)
-                r.gameObject.SetActive(false); prologueFrames[slot] = new PrologueFrame { Slot = slot, Rect = r, Group = group, Image = image };
+                Image fill = null; var holder = r; // a swept layer (round 4): a radial mask on the frame, the art inside it, the mask turned to its start and the art turned back upright
+                if (SweptFrames.Contains(slot)) { fill = r.gameObject.AddComponent<Image>(); fill.sprite = DiscSprite(); fill.type = Image.Type.Filled; fill.fillMethod = Image.FillMethod.Radial360; fill.raycastTarget = false; r.gameObject.AddComponent<Mask>().showMaskGraphic = false; holder = Rect("Art", r, 0, size.y / 2, size.x, size.y); }
+                var image = holder.gameObject.AddComponent<Image>(); image.raycastTarget = false; image.color = new Color(.16f, .16f, .19f);
+                if (Slots.Dress(image, slot)) image.preserveAspect = layer; // a box smaller than the column (the logo, a round layer) draws its file whole, its shape kept
+                else if (slot.StartsWith("intro-") && layer) LayerPlaceholder(holder, slot); // a labelled circle on transparency, so the layering shows
+                else PlaceholderFrame(holder, slot); // the labelled placeholder until the art lands (the brief)
+                r.gameObject.SetActive(false); prologueFrames[slot] = new PrologueFrame { Slot = slot, Rect = r, Group = group, Image = image, Fill = fill, Layer = layer };
             }
             var dim = Rect("Dim", stage, 0, 400, 360, 800); prologueDim = dim.gameObject.AddComponent<Image>(); prologueDim.color = new Color(0, 0, 0, 0); prologueDim.raycastTarget = false;
             prologuePanels = Rect("Panels", stage, 0, 400, 360, 800);
@@ -2858,6 +2915,7 @@ namespace Ascendant.CelestialDial
         {
             // a grey frame with its slot's name and a faint grid, so a pan or a push-in reads before the art lands
             var faint = new Color(Muted.r, Muted.g, Muted.b, .22f);
+            if (r.sizeDelta != new Vector2(360, 800)) { SmallPlaceholder(r, slot); return; } // a box smaller than the column: its frame and its name only
             for (int i = 1; i < 4; i++) { var v = Rect("Grid", r, -180 + i * 90, 400, 1, 800); v.gameObject.AddComponent<Image>().color = faint; }
             for (int i = 1; i < 8; i++) { var h = Rect("Grid", r, 0, i * 100, 360, 1); h.gameObject.AddComponent<Image>().color = faint; }
             InsetFrame(r, new Color(Muted.r, Muted.g, Muted.b, .6f), 2);
@@ -2881,15 +2939,18 @@ namespace Ascendant.CelestialDial
         void ParkFrame(PrologueFrame f)
         {
             f.Rect.SetParent(prologueCamera, false); f.Rect.anchorMin = f.Rect.anchorMax = new Vector2(.5f, 1); f.Rect.pivot = new Vector2(.5f, .5f); f.Rect.anchoredPosition = new Vector2(0, -400);
-            f.Rect.localScale = Vector3.one; f.Group.alpha = 1; f.Rect.gameObject.SetActive(false);
+            f.Rect.localScale = Vector3.one; f.Rect.localRotation = Quaternion.identity; f.Group.alpha = 1; f.Rect.gameObject.SetActive(false); if (f.Fill != null) f.Fill.fillAmount = 1;
         }
-        IEnumerator PlayPrologue()
+        IEnumerator PlayPrologue() { playing = PrologueShots; yield return PlayShots(PrologueLeadIn); } // a breath of darkness before the city: the web page's reduced-motion setting arrives in it
+        // the player for a shot list: the prologue's, or the launch's (owner, Oct 9: the logo and the launch movie, on the same machinery)
+        IEnumerator PlayShots(float leadIn)
         {
             ResetPrologueStage(); prologueShot = 0; Publish();
-            yield return new WaitForSecondsRealtime(PrologueLeadIn); // a breath of darkness before the city: the web page's reduced-motion setting arrives in it
-            for (int i = 0; i < PrologueShots.Length; i++)
+            if (leadIn > 0) yield return new WaitForSecondsRealtime(leadIn);
+            for (int i = 0; i < playing.Length; i++)
             {
-                var shot = PrologueShots[i]; prologueShot = i; prologueStill = ReducedMotion; shotFrames.Clear(); // a change to reduced motion lands from the next shot (Ashantis)
+                var shot = playing[i]; prologueShot = i; prologueStill = ReducedMotion; shotFrames.Clear(); // a change to reduced motion lands from the next shot (Ashantis)
+                if (!shot.Logo && Flow.Screen == SliceScreen.Logo) Flow.EndLogo(); // the logo screen gives way to the launch movie
                 if (shot.Flash) { yield return PrologueFlash(); yield break; }
                 if (!shot.Under) { foreach (var p in prologuePanelsShown) if (p != null) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == p) ParkFrame(f); Destroy(p.gameObject); } prologuePanelsShown.Clear(); panelHomes.Clear(); prologueDim.color = new Color(0, 0, 0, 0); }
                 if (shot.Page) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == prologueCamera) f.Rect.gameObject.SetActive(false); prologueFrameShown = ""; }
@@ -2902,6 +2963,7 @@ namespace Ascendant.CelestialDial
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
                     else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
                     live.RemoveAll(step => step());
+                    if (Flow.AtLaunch && Time.unscaledTime >= launchPublishAt) { launchPublishAt = Time.unscaledTime + .25f; Publish(); } // the launch's pushes and turn move every frame: the web state follows them four times a second
                     if (t >= shot.Seconds && live.Count == 0) break;
                     yield return null;
                 }
@@ -2918,10 +2980,12 @@ namespace Ascendant.CelestialDial
             string slot = step.Frame;
             if (step.Moving && prologueStill) return () => true; // reduced motion skips an in-between frame
             if (step.How == "loop") return RunLoop(step);
+            if (step.How == "out") return RunOut(step);
             if (!prologueFrames.TryGetValue(slot, out var frame)) return () => true;
+            if (step.How == "sweep") return RunSweep(step, frame);
             if (step.How == "panel")
             {
-                float band = prologueShot >= 0 && prologueShot < PrologueShots.Length && PrologueShots[prologueShot].Page ? SafeArea.TopInset(canvas) : 0; // a comic page moves down by a cutout's band, as the gear does
+                float band = prologueShot >= 0 && prologueShot < playing.Length && playing[prologueShot].Page ? SafeArea.TopInset(canvas) : 0; // a comic page moves down by a cutout's band, as the gear does
                 var panel = Rect("Panel " + slot, prologuePanels, step.X, step.Top + band, step.Width, step.Height); prologuePanelsShown.Add(panel);
                 panel.gameObject.AddComponent<Image>().color = Color.black; panel.GetComponent<Image>().raycastTarget = false; panel.gameObject.AddComponent<RectMask2D>();
                 frame.Rect.SetParent(panel, false); frame.Rect.anchorMin = frame.Rect.anchorMax = frame.Rect.pivot = new Vector2(.5f, .5f); frame.Rect.anchoredPosition = new Vector2(-(float.IsNaN(step.SrcX) ? step.X : step.SrcX), (float.IsNaN(step.SrcY) ? step.Top : step.SrcY) - 400); // the window shows the frame's part centred on its source
@@ -2933,21 +2997,58 @@ namespace Ascendant.CelestialDial
                 panel.anchoredPosition = away;
                 return () => { if (panel == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); panel.anchoredPosition = Vector2.Lerp(away, home, 1 - (1 - k) * (1 - k) * (1 - k)); return k >= 1; };
             }
-            var others = prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).ToList();
+            var others = prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf && (step.Over || f.Layer == frame.Layer)).ToList(); // round 4: a layer replaces layers, a frame replaces frames (the sky stays under the wheel), unless it comes in Over them
             bool up = frame.Rect.gameObject.activeSelf && frame.Rect.parent == prologueCamera && frame.Group.alpha >= 1;
-            frame.Rect.SetAsLastSibling(); frame.Rect.gameObject.SetActive(true); FrameShown(slot);
+            PlaceOnStage(frame, step.Over); frame.Rect.gameObject.SetActive(true); FrameShown(slot);
             Func<bool> push = () => true; float pushed = Time.unscaledTime;
+            bool spins = (step.SpinFrom != 0 || step.SpinTo != 0) && !prologueStill; // the launch movie's little turn (reduced motion holds it still)
+            if (!spins && !up) frame.Rect.localRotation = Quaternion.identity;
             if (step.PushTo > 1 && !prologueStill) // the frame's own slow push-in (reduced motion holds it still)
             {
                 lastPushView = step.PushView;
                 push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed) / Mathf.Max(.01f, step.PushSeconds)), sc = Mathf.Lerp(1, step.PushTo, Mathf.SmoothStep(0, 1, k));
                     frame.Rect.localScale = new Vector3(sc, sc, 1); frame.Rect.anchoredPosition = new Vector2(0, -400) + CameraOffset(sc, step.PushView); return k >= 1; };
             }
+            else if (spins)
+            {
+                push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed) / Mathf.Max(.01f, step.SpinSeconds)), angle = Mathf.Lerp(step.SpinFrom, step.SpinTo, Eased(step.SpinEase, k)), sc = frame.Layer ? 1 : Cover(angle);
+                    frame.Rect.localRotation = Quaternion.Euler(0, 0, angle); frame.Rect.localScale = new Vector3(sc, sc, 1); frame.Rect.anchoredPosition = new Vector2(0, -400); return k >= 1; };
+                push();
+            }
             if (up && others.Count == 0) return push; // already on screen
             float seconds = step.How == "fade" ? (prologueStill ? Mathf.Max(step.Seconds, StillFade) : step.Seconds) : prologueStill ? StillFade : 0; // reduced motion: a cut crossfades, and no fade is quicker than StillFade
             if (seconds <= 0) { frame.Group.alpha = 1; foreach (var o in others) o.Rect.gameObject.SetActive(false); return push; }
             frame.Group.alpha = 0; float from = Time.unscaledTime; bool faded = false;
             return () => { if (frame.Rect == null) return true; bool moved = push(); if (!faded) { float k = Mathf.Clamp01((Time.unscaledTime - from) / seconds); frame.Group.alpha = k; if (k >= 1) { faded = true; foreach (var o in others) o.Rect.gameObject.SetActive(false); } } return faded && moved; };
+        }
+        // round 4: a frame on top of its class; a full frame below every round layer showing, unless it comes in over them
+        void PlaceOnStage(PrologueFrame frame, bool over)
+        {
+            int low = frame.Layer || over ? -1 : prologueFrames.Values.Where(f => f != frame && f.Layer && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).Select(f => f.Rect.GetSiblingIndex()).DefaultIfEmpty(-1).Min();
+            if (low < 0) { frame.Rect.SetAsLastSibling(); return; }
+            int at = frame.Rect.GetSiblingIndex(); frame.Rect.SetSiblingIndex(at < low ? low - 1 : low);
+        }
+        // the wheel draws itself (round 4): a round layer revealed by a radial sweep from its start, smooth or a sector at a time; it adds to what
+        // shows (the lines stay under the symbols). Reduced motion: no sweep, a plain fade
+        Func<bool> RunSweep(PrologueStep step, PrologueFrame frame)
+        {
+            PlaceOnStage(frame, false); frame.Rect.localRotation = Quaternion.identity; frame.Rect.localScale = Vector3.one; frame.Rect.gameObject.SetActive(true); FrameShown(frame.Slot);
+            bool glyphs = step.Sectors > 0; float began = Time.unscaledTime;
+            if (frame.Fill != null) { frame.Fill.fillOrigin = glyphs ? GlyphOrigin : SweepOrigin; frame.Fill.fillClockwise = glyphs ? GlyphClockwise : SweepClockwise; frame.Rect.localRotation = Quaternion.Euler(0, 0, glyphs ? GlyphOffset : SweepOffset); frame.Rect.Find("Art").localRotation = Quaternion.Euler(0, 0, -(glyphs ? GlyphOffset : SweepOffset)); }
+            if (prologueStill || frame.Fill == null)
+            {
+                if (frame.Fill != null) frame.Fill.fillAmount = 1; frame.Group.alpha = 0; float seconds = Mathf.Max(StillFade, 1f);
+                return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / seconds); frame.Group.alpha = k; return k >= 1; };
+            }
+            frame.Group.alpha = 1; frame.Fill.fillAmount = 0;
+            return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); frame.Fill.fillAmount = glyphs ? Mathf.Min(step.Sectors, Mathf.Floor(k * step.Sectors) + 1) / step.Sectors : k; return k >= 1; };
+        }
+        // every frame on screen fades out to the dark page (the logo screen's fade out); reduced motion: no fade quicker than StillFade, as a fade
+        Func<bool> RunOut(PrologueStep step)
+        {
+            var shown = prologueFrames.Values.Where(f => f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).ToList(); var from = shown.Select(f => f.Group.alpha).ToList();
+            float seconds = prologueStill ? Mathf.Max(step.Seconds, StillFade) : step.Seconds, began = Time.unscaledTime; prologueFrameShown = "";
+            return () => { float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, seconds)); for (int i = 0; i < shown.Count; i++) if (shown[i].Rect != null) { shown[i].Group.alpha = from[i] * (1 - k); if (k >= 1) shown[i].Rect.gameObject.SetActive(false); } return k >= 1; };
         }
         // a loop of hard frame swaps inside the panel that holds its first frame (the writing hand); reduced motion holds the first frame
         Func<bool> RunLoop(PrologueStep step)
@@ -2992,11 +3093,12 @@ namespace Ascendant.CelestialDial
         }
         void RevealSkip()
         {
-            if (!Flow.AtPrologue || busy) return;
+            if ((!Flow.AtPrologue && !Flow.AtLaunch) || busy) return; // the opening scene's, and the launch's (owner, Oct 9: one Skip covers the logo and the movie)
             skipShown = true; skipHideAt = Time.unscaledTime + SkipShowsFor; skipButton.gameObject.SetActive(true); skipButton.interactable = true; Publish();
         }
         void SkipPrologue()
         {
+            if (Flow.AtLaunch) { SkipLaunch(); return; } // the same Skip on the logo screen and the launch movie goes to the menu
             if (!Flow.AtPrologue || busy) return;
             if (prologueRun != null) { StopCoroutine(prologueRun); prologueRun = null; }
             ResetPrologueStage(); flash.color = new Color(1, 1, 1, 0); fadeImage.color = new Color(0, 0, 0, 0); fadeImage.raycastTarget = false;
@@ -3005,8 +3107,206 @@ namespace Ascendant.CelestialDial
         }
         void UpdatePrologue()
         {
-            if (skipShown && (Time.unscaledTime >= skipHideAt || !Flow.AtPrologue)) { skipShown = false; skipButton.gameObject.SetActive(false); Publish(); } // it hides again after about 3 s (ruling 5)
+            if (skipShown && (Time.unscaledTime >= skipHideAt || (!Flow.AtPrologue && !Flow.AtLaunch))) { skipShown = false; skipButton.gameObject.SetActive(false); Publish(); } // it hides again after about 3 s (ruling 5)
         }
+
+        // ---- The launch (owner, Oct 9, 86bcg62x3; round 3's picks and working choices) ----
+        // Every launch: the studio's logo on black (fade in, hold about 2 s, fade out), then the launch movie, then the main menu. They play on
+        // the prologue's stage and machinery (cuts, fades, pushes; since round 4 also round layers, a sweep and a spin). One Skip covers the logo and the movie, working as the
+        // prologue's does: a tap shows it, Skip goes to the menu; the screen reader's and the keyboard's Skip is there at all times. No text on
+        // screen, no sound, no clock. Reduced motion: as the prologue (each shot still, no push or turn, crossfades, the fade to the menu instant).
+        public const float LogoFade = .6f, LogoHold = 2f, DescentFade = .8f, DescentPush = 1.15f, LaunchFadeOut = 1f; // timings are working choices, tuned later against the art
+        // Round 4 (owner, Oct 9): the wheel and Earth are round cut-out layers (360 x 360, centred on the screen) over one painted sky. The wheel
+        // draws itself in pencil (a radial sweep reveals its lines, then its twelve symbols appear one at a time in zodiac order), comes alive
+        // as the black behind becomes the sky, burns alive and starts to spin, and spins on as it blends into Earth, the spin easing to a stop.
+        public const float DrawSeconds = 2.5f, GlyphStep = .12f, BurnSeconds = 3f, TransformSeconds = 4.5f, EarthIn = 2.4f, WheelEarthFade = 1.8f, EarthFade = 1.8f;
+        // the sweeps' start and direction (Image.Origin360: 0 bottom, 1 right, 2 top, 3 left; the offset turns the start further, in degrees,
+        // counter-clockwise), set once the art lane reports where its wheel starts and which way its signs run; working choices until then
+        public const int SweepOrigin = 2, GlyphOrigin = 2; public const bool SweepClockwise = true, GlyphClockwise = true; public const float SweepOffset = 0, GlyphOffset = 0;
+        // the spin: one whole turn, clockwise, from the burn's start to the transform's end, starting slowly and easing to a stop, so Earth ends
+        // level (a turn of 360 degrees leaves it as drawn). The burn eases in and the transform eases out, at the same speed where they meet.
+        public const float SpinTurn = -360f;
+        public static float SpinAtBurnEnd => SpinTurn * BurnSeconds / (BurnSeconds + TransformSeconds); // the eased-in part: equal speeds where it meets the eased-out part
+        public static float SpinAt(float t) => Mathf.Lerp(SpinAtBurnEnd, SpinTurn, Eased("out", Mathf.Clamp01(t / TransformSeconds))); // the wheel's angle t s into the transform
+        static readonly string[] SweptFrames = { "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs" };
+        // Dante's shot list, the owner's beats in order (rounds 3 and 4). The pushes hold on each frame's centre until the art lands and is measured.
+        public static readonly PrologueShot[] LaunchShots =
+        {
+            new PrologueShot { Id = "logo", Logo = true, Seconds = LogoFade + LogoHold + LogoFade, Steps = new[] { FadeTo(0, "studio-logo", LogoFade), FadeOut(LogoFade + LogoHold, LogoFade) } },
+            new PrologueShot { Id = "dark", Seconds = .6f }, // darkness
+            new PrologueShot { Id = "draw", Seconds = 2.8f, Steps = new[] { Sweep(0, "intro-wheel-pencil-lines", DrawSeconds) } }, // the wheel draws itself in pencil: its lines
+            new PrologueShot { Id = "glyphs", Seconds = 1.7f, Steps = new[] { Sweep(0, "intro-wheel-pencil-glyphs", 12 * GlyphStep, 12) } }, // then its twelve symbols, one at a time, in zodiac order
+            new PrologueShot { Id = "alive", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
+            new PrologueShot { Id = "burn", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin
+            new PrologueShot { Id = "transform", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
+                Spun(FadeTo(0, "intro-wheel-earth", WheelEarthFade), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"), Spun(FadeTo(EarthIn, "intro-earth", EarthFade), SpinAt(EarthIn), SpinTurn, TransformSeconds - EarthIn, "out") } }, // it spins on, blending into Earth; the spin eases to a stop with Earth level
+            new PrologueShot { Id = "earth", Seconds = 2.4f, Steps = new[] { Pushed(Cut(0, "intro-earth"), 1.12f, ViewOn(.5f, .5f), 2.4f) } }, // the calm Earth, a slow push
+            Descent("continents", "intro-continents", 1.6f), Descent("america", "intro-america", 1.6f), Descent("newyork-state", "intro-newyork-state", 1.4f), // flying down
+            Descent("newyork-city", "intro-newyork-city", 1.4f), Descent("brooklyn", "intro-brooklyn", 1.4f), Descent("block", "intro-block", 1.8f),
+            new PrologueShot { Id = "window", Seconds = 2.2f, Steps = new[] { Over(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f)) } }, // one building, every window dark but one (the opening's own city frame); then the fade to the menu
+        };
+        static PrologueShot Descent(string id, string frame, float seconds) => new PrologueShot { Id = id, Seconds = seconds, Steps = new[] { Over(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds)) } }; // each comes in over what shows (the first over Earth)
+        // a round layer's placeholder (round 4): a labelled circle on transparency, the disc's outer radius 153 (306 of the 720 file), so the layering shows
+        public const float LayerRadius = 153;
+        void LayerPlaceholder(RectTransform r, string slot)
+        {
+            var image = r.GetComponent<Image>(); image.sprite = null; image.color = new Color(0, 0, 0, 0);
+            var tints = new Dictionary<string, Color> { { "intro-wheel-pencil-lines", new Color(.75f, .75f, .72f) }, { "intro-wheel-pencil-glyphs", new Color(.75f, .75f, .72f) }, { "intro-wheel-lit", new Color(.95f, .8f, .45f) },
+                { "intro-wheel-burning", new Color(.95f, .45f, .2f) }, { "intro-wheel-earth", new Color(.45f, .7f, .65f) }, { "intro-earth", new Color(.3f, .5f, .85f) } };
+            var tint = tints.TryGetValue(slot, out var c) ? c : Muted; var centre = new Vector2(0, -r.sizeDelta.y / 2);
+            if (slot != "intro-wheel-pencil-lines" && slot != "intro-wheel-pencil-glyphs") { var disc = Rect("Disc", r, 0, r.sizeDelta.y / 2, LayerRadius * 2, LayerRadius * 2).gameObject.AddComponent<Image>(); disc.sprite = DiscSprite(); disc.color = new Color(tint.r, tint.g, tint.b, .35f); }
+            if (slot != "intro-wheel-pencil-glyphs")
+            {
+                RingLines(Rect("Ring", r, 0, r.sizeDelta.y / 2, 0, 0), LayerRadius, tint, null); RingLines(Rect("Ring", r, 0, r.sizeDelta.y / 2, 0, 0), LayerRadius * .62f, tint, null);
+                for (int i = 0; i < 12; i++) { var spoke = Rect("Spoke", r, 0, r.sizeDelta.y / 2, 2, LayerRadius * .38f); spoke.pivot = new Vector2(.5f, 0); spoke.anchoredPosition = centre + (Vector2)(Quaternion.Euler(0, 0, -30 * i) * new Vector2(0, LayerRadius * .62f)); spoke.localRotation = Quaternion.Euler(0, 0, -30 * i); spoke.gameObject.AddComponent<Image>().color = tint; }
+            }
+            if (slot == "intro-wheel-pencil-glyphs" || slot == "intro-wheel-lit" || slot == "intro-wheel-burning")
+                for (int i = 0; i < 12; i++) { var at = centre + (Vector2)(Quaternion.Euler(0, 0, -30 * i - 15) * new Vector2(0, LayerRadius * .81f)); var mark = Label(r, (i + 1).ToString(), 0, 0, 28, 20, 13); mark.rectTransform.anchoredPosition = at; mark.color = tint; } // the twelve signs' places, numbered in zodiac order from the top, clockwise
+            var name = Label(r, slot, 0, r.sizeDelta.y / 2 - 8, 300, 20, 14); name.color = Bone; var note = Label(r, "placeholder layer: art follows", 0, r.sizeDelta.y / 2 + 12, 300, 16, 10); note.color = Muted;
+            foreach (var g in r.GetComponentsInChildren<Graphic>(true)) g.raycastTarget = false;
+        }
+        public static IEnumerable<string> LaunchFrames => FramesOf(LaunchShots);
+        public static float LogoSeconds => LaunchShots.Where(s => s.Logo).Sum(s => s.Seconds);
+        public static float MovieSeconds => LaunchShots.Where(s => !s.Logo).Sum(s => s.Seconds) + LaunchFadeOut; // about 30 s (round 4; it was about 25)
+        static Vector2 FrameSize(string slot) { var a = Slots.Find(slot); return a != null ? new Vector2(a.Width, a.Height) : new Vector2(360, 800); }
+        public int LaunchShotIndex => Flow.AtLaunch ? prologueShot : -1; // fixture evidence
+        float launchPublishAt;
+        public bool GearShown => Settings != null && Settings.GearShown;
+        void StartLaunch() { if (!Flow.AtLaunch || prologueRun != null) return; prologueRun = StartCoroutine(PlayLaunch()); }
+        IEnumerator PlayLaunch()
+        {
+            playing = LaunchShots; yield return PlayShots(0);
+            busy = true; skipShown = false; skipButton.gameObject.SetActive(false); Publish(); // the fade to the menu: Skip waits it out, as the prologue's flash
+            fadeImage.raycastTarget = true; yield return Tween(ReducedMotion ? 0 : LaunchFadeOut, k => fadeImage.color = new Color(0, 0, 0, k));
+            ResetPrologueStage(); prologueRun = null; prologueShot = -1; playing = PrologueShots; Flow.EndIntro(); Show(); Publish();
+            yield return FadeTo(0); busy = false; Publish(); // the menu comes up out of the dark (instant under reduced motion); the busy guard holds until it has
+        }
+        void SkipLaunch()
+        {
+            if (!Flow.AtLaunch || busy) return;
+            if (prologueRun != null) { StopCoroutine(prologueRun); prologueRun = null; }
+            ResetPrologueStage(); fadeImage.color = new Color(0, 0, 0, 0); fadeImage.raycastTarget = false;
+            skipShown = false; skipButton.gameObject.SetActive(false); prologueShot = -1; playing = PrologueShots;
+            Flow.SkipLaunch(); Show(); Publish();
+        }
+        // a box smaller than the column (the logo, the menu's title): a faint fill, its frame, and its slot's name
+        void SmallPlaceholder(RectTransform r, string slot)
+        {
+            var image = r.GetComponent<Image>(); if (image != null) image.color = new Color(.16f, .16f, .19f, .85f);
+            InsetFrame(r, new Color(Muted.r, Muted.g, Muted.b, .6f), 2);
+            Label(r, slot, 0, r.sizeDelta.y / 2 - 9, r.sizeDelta.x - 20, 22, 16).color = Bone;
+            Label(r, "placeholder: art follows", 0, r.sizeDelta.y / 2 + 13, r.sizeDelta.x - 20, 16, 11).color = Muted;
+            foreach (var g in r.GetComponentsInChildren<Graphic>(true)) g.raycastTarget = false;
+        }
+
+        // ---- The main menu (owner, Oct 9; round 3) ----
+        // M1b's night city behind, the owner's title near the top, four Room buttons from 496 down: Continue, New Game, Load Game, Settings.
+        // Continue and Load Game dim to half while no slot holds a save (the shipped unavailable look). The menu goes into the game by the
+        // game's fade, and the game starts afresh there (a scene reload, straight in).
+        public const float MenuTitleY = 115, MenuTitleWidth = 270, MenuTitleHeight = 196, MenuButtonTop = 496, MenuButtonWidth = 232, MenuButtonHeight = 44, MenuButtonGap = 12; // the board's numbers (MainMenu-2026-10-09/_scripts/compose.py); the title's box fits the approved seal (round 4: landscape, about 1.38:1, about 270 wide, centred near 115, its top about 16 px clear)
+        public static readonly string[] MenuWords = { "Continue", "New Game", "Load Game", "Settings" }; // drafts for Dante (the owner's words; the board's order)
+        static readonly string[] MenuCommands = { "continue", "new", "load", "settings" };
+        public static float MenuButtonY(int i) => MenuButtonTop + MenuButtonHeight / 2 + i * (MenuButtonHeight + MenuButtonGap); // a button's centre, down from the top
+        // the slot list: three cards, Back below them; a filled slot asks before New Game replaces it
+        public const float SlotsTitleY = 170, SlotCardTop = 250, SlotCardWidth = 280, SlotCardHeight = 96, SlotCardGap = 14, SlotsBackY = 574, ConfirmY = 400, ConfirmWidth = 280, ConfirmHeight = 168;
+        public static float SlotCardY(int slot) => SlotCardTop + (slot - 1) * (SlotCardHeight + SlotCardGap); // a card's centre (slots 1 to 3)
+        public const string NewGameTitle = "N E W   G A M E", LoadGameTitle = "L O A D   G A M E"; // the slot list's title, spaced like Settings' (drafts for Dante)
+        public const string ReplaceLine = "This replaces your saved game.", StartWords = "Start", BackWords = "Back"; // drafts for Dante (Ashantis's line)
+        public const string MainMenuAskLine = "Nothing is saved until your first Keeper Key. Go to the main menu?"; // Settings' Main menu before Key 1 (a draft for Dante)
+        // the flags carried across the scene reload (read once in Awake)
+        static bool straightIn, toMenu, enterFade; static bool? carriedMotion;
+        void Reload(bool straight, bool menu = false, bool fade = false) { straightIn = straight; toMenu = menu; enterFade = fade; carriedMotion = ReducedMotion; SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
+        RectTransform menuScreen, menuTitle, slotsScreen, confirmBox; Image menuTitleImage; Text slotsTitle, confirmLine; Button slotsBack, confirmStart, confirmBack;
+        readonly Button[] menuButtons = new Button[4], slotCards = new Button[SaveSlots.Count]; readonly Text[] cardName = new Text[SaveSlots.Count], cardKeys = new Text[SaveSlots.Count], cardSigns = new Text[SaveSlots.Count];
+        SaveSlots.Card[] cards = new SaveSlots.Card[0]; bool anySave; int confirmSlot = -1, continueSlot;
+        public bool AnySave => anySave; public int ConfirmSlot => confirmSlot; public IReadOnlyList<SaveSlots.Card> Cards => cards; // fixture evidence
+        public Button MenuButton(int i) => menuButtons[i]; public Button SlotCard(int slot) => slotCards[slot - 1];
+        void BuildMenu()
+        {
+            menuScreen = ScreenPanel("Menu", "menu-city"); if (!HasArt(menuScreen)) PlaceholderFrame(menuScreen, "menu-city");
+            menuTitle = Rect("menu-title", menuScreen, 0, MenuTitleY, MenuTitleWidth, MenuTitleHeight); menuTitleImage = menuTitle.gameObject.AddComponent<Image>(); menuTitleImage.raycastTarget = false;
+            if (Slots.Dress(menuTitleImage, "menu-title")) menuTitleImage.preserveAspect = true; else SmallPlaceholder(menuTitle, "menu-title");
+            for (int i = 0; i < menuButtons.Length; i++) { int k = i; menuButtons[i] = MakeButton(menuScreen, MenuWords[i], 0, MenuButtonY(i), MenuButtonWidth, MenuButtonHeight, () => MenuPick(k)); ButtonLook.Room(menuButtons[i], font); }
+            menuScreen.gameObject.SetActive(false);
+            slotsScreen = ScreenPanel("Save slots", "menu-city"); if (!HasArt(slotsScreen)) PlaceholderFrame(slotsScreen, "menu-city");
+            var veil = Rect("Veil", slotsScreen, 0, 400, 360, 800).gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f); veil.raycastTarget = false; Bleed.Add(veil, root); // the menu's street, dimmed as Settings dims, so the cards read
+            slotsTitle = Label(slotsScreen, NewGameTitle, 0, SlotsTitleY, 300, 24, 14); slotsTitle.color = ButtonLook.RoomGold; slotsTitle.fontStyle = FontStyle.Bold;
+            for (int i = 0; i < slotCards.Length; i++)
+            {
+                int slot = i + 1; var card = slotCards[i] = MakeButton(slotsScreen, "", 0, SlotCardY(slot), SlotCardWidth, SlotCardHeight, () => PickSlot(slot)); card.name = "Slot " + slot;
+                var feel = ButtonLook.Custom(card, "card"); // the Room look's frame, three lines inside; pressed and dimmed as every button
+                var frame = Rect("Frame", feel.Look, 0, 0, 0, 0); frame.anchorMin = Vector2.zero; frame.anchorMax = Vector2.one; frame.pivot = new Vector2(.5f, .5f); frame.offsetMin = frame.offsetMax = Vector2.zero; frame.SetAsFirstSibling();
+                var frameImage = frame.gameObject.AddComponent<Image>(); frameImage.sprite = ButtonLook.RoomFrameSprite(); frameImage.type = Image.Type.Sliced; frameImage.pixelsPerUnitMultiplier = 2; frameImage.raycastTarget = false; feel.Pieces.Add(frameImage);
+                var name = cardName[i] = feel.Label; name.font = font; name.fontStyle = FontStyle.Bold; name.fontSize = 16; name.alignment = TextAnchor.MiddleCenter; name.horizontalOverflow = HorizontalWrapMode.Overflow;
+                var nr = name.rectTransform; nr.anchorMin = nr.anchorMax = new Vector2(.5f, 1); nr.pivot = new Vector2(.5f, .5f); nr.sizeDelta = new Vector2(SlotCardWidth - 24, 24); feel.LabelUp = ButtonLook.RoomGold; feel.LabelDown = ButtonLook.RoomGoldDown;
+                cardKeys[i] = Label(feel.Look, "", 0, 50, SlotCardWidth - 24, 20, 13); cardSigns[i] = Label(feel.Look, "", 0, 72, SlotCardWidth - 24, 20, 12);
+            }
+            slotsBack = MakeButton(slotsScreen, BackWords, 0, SlotsBackY, MenuButtonWidth, MenuButtonHeight, SlotsBack); ButtonLook.Room(slotsBack, font);
+            confirmBox = Rect("Confirm", slotsScreen, 0, 400, 360, 800); var shade = confirmBox.gameObject.AddComponent<Image>(); shade.color = new Color(0, 0, 0, .5f); Bleed.Add(shade, root); // its veil takes the taps meant for the cards
+            var box = Rect("Confirm box", confirmBox, 0, ConfirmY, ConfirmWidth, ConfirmHeight); var boxImage = box.gameObject.AddComponent<Image>(); boxImage.sprite = Slots.InstrumentBoxSprite(); boxImage.type = Image.Type.Sliced; boxImage.pixelsPerUnitMultiplier = 2; // Settings' slim box
+            confirmLine = Label(box, ReplaceLine, 0, 56, ConfirmWidth - 40, 48, 15); confirmLine.horizontalOverflow = HorizontalWrapMode.Wrap;
+            confirmStart = MakeButton(box, StartWords, -66, 124, 120, 44, ConfirmStart); ButtonLook.Room(confirmStart, font);
+            confirmBack = MakeButton(box, BackWords, 66, 124, 120, 44, ConfirmBack); ButtonLook.Room(confirmBack, font);
+            confirmBox.gameObject.SetActive(false); slotsScreen.gameObject.SetActive(false);
+        }
+        void ReadSlots() { cards = Enumerable.Range(1, SaveSlots.Count).Select(SaveSlots.Describe).ToArray(); anySave = cards.Any(c => c.Filled); continueSlot = SaveSlots.ContinueSlot; }
+        void ShowMenu()
+        {
+            ReadSlots();
+            menuTitle.anchoredPosition = new Vector2(0, -(MenuTitleY + SafeArea.TopInset(canvas))); // below any cutout's band, as the gear
+            menuButtons[0].interactable = anySave; menuButtons[2].interactable = anySave; menuButtons[1].interactable = menuButtons[3].interactable = true;
+            foreach (var b in menuButtons) { var feel = b.GetComponent<ButtonFeel>(); if (feel != null) feel.Show(); } // the dimmed look this frame, so the web state reads it
+        }
+        void ShowSlots()
+        {
+            ReadSlots(); bool load = Flow.SlotsFor == "load";
+            slotsTitle.text = load ? LoadGameTitle : NewGameTitle;
+            for (int i = 0; i < slotCards.Length; i++)
+            {
+                var c = cards[i]; cardName[i].text = c.Name; cardKeys[i].text = c.Keys; cardSigns[i].text = c.BigThree;
+                cardName[i].rectTransform.anchoredPosition = new Vector2(0, c.Filled ? -26 : -SlotCardHeight / 2); // "Empty" sits in the card's middle
+                slotCards[i].interactable = !load || c.Filled; // Load Game: an empty slot is dimmed
+                var feel = slotCards[i].GetComponent<ButtonFeel>(); if (feel != null) feel.Show();
+            }
+            confirmBox.gameObject.SetActive(confirmSlot > 0);
+        }
+        void LogSlice(string name) => Dial.Lesson.Dial.Log(name, false, false, "slice");
+        void MenuPick(int i)
+        {
+            if (busy || Flow.Screen != SliceScreen.Menu || i < 0 || i >= menuButtons.Length) return;
+            if (i == 0) { if (continueSlot > 0) StartCoroutine(EnterGame(continueSlot, false)); } // the slot played last, or the first that holds a save
+            else if (i == 1) { if (!anySave) StartCoroutine(EnterGame(1, true)); else OpenSlotList("new"); } // a first launch: straight into slot 1 and the opening scene
+            else if (i == 2) { if (anySave) OpenSlotList("load"); }
+            else { Settings.Toggle(); Publish(); }
+        }
+        void OpenSlotList(string mode) { if (!Flow.OpenSlots(mode)) return; confirmSlot = -1; Show(); Publish(); }
+        void PickSlot(int slot)
+        {
+            if (busy || Flow.Screen != SliceScreen.SaveSlots || confirmSlot > 0 || slot < 1 || slot > SaveSlots.Count) return;
+            bool filled = cards.Length == SaveSlots.Count && cards[slot - 1].Filled;
+            if (Flow.SlotsFor == "load") { if (filled) StartCoroutine(EnterGame(slot, false)); return; }
+            if (!filled) { StartCoroutine(EnterGame(slot, true)); return; } // an empty slot: the new game starts there
+            confirmSlot = slot; ShowSlots(); Publish(); // a filled slot asks first
+        }
+        void ConfirmStart() { if (busy || confirmSlot < 1) return; int slot = confirmSlot; confirmSlot = -1; StartCoroutine(EnterGame(slot, true)); } // replacing clears the slot at once
+        void ConfirmBack() { if (busy || confirmSlot < 1) return; confirmSlot = -1; ShowSlots(); Publish(); }
+        void SlotsBack() { if (busy || Flow.Screen != SliceScreen.SaveSlots || confirmSlot > 0) return; Flow.OpenMenu(); Show(); Publish(); }
+        // into the game: a new game (the slot cleared at once) or a load; the slot becomes the one played last; the fade, then a fresh start
+        IEnumerator EnterGame(int slot, bool fresh)
+        {
+            busy = true; if (Settings != null) Settings.Close();
+            if (fresh) SaveSlots.Clear(slot); SaveSlots.InPlay = slot; LogSlice((fresh ? "slot_new_" : "slot_loaded_") + slot); Publish();
+            yield return FadeTo(1); busy = false; Reload(true, false, true);
+        }
+        // Settings' Main menu (round 3): straight to the menu, past the logo and the movie; before Key 1 (nothing saved yet) it asks first
+        void MainMenu()
+        {
+            if (busy || Flow.AtLaunch || Flow.AtMenu || Settings == null) return;
+            if (Flow.AtriumStage < 2) { Settings.Ask(MainMenuAskLine); Publish(); return; } // Save() writes nothing before the Atrium's stage 2
+            StartCoroutine(LeaveForMenu());
+        }
+        void MainMenuConfirmed() { if (busy || Flow.AtLaunch || Flow.AtMenu) return; StartCoroutine(LeaveForMenu()); }
+        IEnumerator LeaveForMenu() { busy = true; Settings.Close(); Save(); Publish(); yield return FadeTo(1); busy = false; Reload(false, true, true); }
 
         // ---- The orb and its stars (owner, Oct 8: ruling 3, the orb unknown; ruling 8, the stars; C2) ----
         // The orb floats above the question on the opening's name and birth screens, centred in the empty band between the top of the screen
@@ -3071,15 +3371,12 @@ namespace Ascendant.CelestialDial
         void Save()
         {
             if (Flow.AtriumStage < 2) return;
-            try { PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(Flow.CaptureProgress(Dial.Lesson, Grid))); PlayerPrefs.Save(); }
+            try { SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(Flow.CaptureProgress(Dial.Lesson, Grid))); } // the slot in play (owner, Oct 9: three slots; slot 1 is today's key)
             catch (Exception e) { Debug.LogWarning("[CelestialDial] save failed: " + e.Message); }
         }
         void TryRestore()
         {
-            string json = PlayerPrefs.GetString(SaveKey, "");
-            if (string.IsNullOrEmpty(json)) return;
-            SaveData save = null;
-            try { save = JsonUtility.FromJson<SaveData>(json); } catch (Exception e) { Debug.LogWarning("[CelestialDial] save unreadable: " + e.Message); }
+            var save = SaveSlots.Read(SaveSlots.InPlay); // the slot in play: Continue's, a slot's, or slot 1 for Start over, Jump to and a test reload
             if (save == null || !Flow.Restore(save)) return;
             Dial.Lesson.RestoreProgress(Flow.LessonSun, Flow.HasSunSign, save.lit, save.kin, save.keyEarned); // the record's sun, or Aries with none (Oct 7)
             Dial.Lesson.RevealsPlayed.Clear(); if (save.revealsPlayed != null) Dial.Lesson.RevealsPlayed.UnionWith(save.revealsPlayed); // Build Z
@@ -3573,7 +3870,7 @@ namespace Ascendant.CelestialDial
         void ShowStyle()
         {
             styleShown = true; Dial.Inert = true;
-            foreach (var screen in new[] { identity, birth, atrium, atriumReturn, chamber, hub, review, glyphs, gridScreen, wingRoom, avatar, prologue, orb }) screen.gameObject.SetActive(false);
+            foreach (var screen in new[] { identity, birth, atrium, atriumReturn, chamber, hub, review, glyphs, gridScreen, wingRoom, avatar, prologue, orb, menuScreen, slotsScreen }) screen.gameObject.SetActive(false);
             Dial.UiCanvas.gameObject.SetActive(false); style.gameObject.SetActive(true);
         }
         void FillStyle(DialView.WebState state)
