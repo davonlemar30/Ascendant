@@ -192,8 +192,7 @@ namespace Ascendant.EraDemo
         void ShowChat()
         {
             var line = Talk.Current; chat.gameObject.SetActive(line != null); placesButton.interactable = line == null && !Leaving;
-            Changed?.Invoke();
-            if (line == null) return;
+            if (line == null) { Changed?.Invoke(); return; }
             if (chatSpeaker != null) chatSpeaker.text = Plate(Talk.With.Speaker);
             chatLine.text = line.Text;
             int choices = line.Choices.Length; chatNext.gameObject.SetActive(choices == 0);
@@ -207,6 +206,7 @@ namespace Ascendant.EraDemo
             float by = 26 + text + 10; nextTop = 800 - 18 - height + by + 17; // a button's centre, from the column's top
             if (choices == 0) chatNext.GetComponent<RectTransform>().anchoredPosition = new Vector2(ChatWidth / 2 - 70, -(by + 17));
             for (int i = 0; i < choices; i++) choiceButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -(by + 17 + i * 40));
+            Changed?.Invoke(); // after the layout, so the page's focus boxes read this line's places (Jeffrey, #150 N11)
         }
         IEnumerator GoHome()
         {

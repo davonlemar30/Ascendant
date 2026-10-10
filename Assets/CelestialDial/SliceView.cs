@@ -727,7 +727,7 @@ namespace Ascendant.CelestialDial
         // ---- actions (all input paths, including the Web bridge, arrive here) ----
         public void WebAction(string command)
         {
-            if (Era != null && command != "relaunch" && command != "reload" && command != "walk-speed" && !command.StartsWith("jump:")) { EraAction(command); return; } // the era demo owns the page: the hidden slice takes no web actions (Jeffrey, #150 B1)
+            if (Era != null && command != "relaunch" && command != "reload" && command != "walk-speed" && !command.StartsWith("jump")) { EraAction(command); return; } // the era demo owns the page: the hidden slice takes no web actions (Jeffrey, #150 B1)
             if (command == "mute") { ToggleMute(); return; }
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
             if (styleShown && command != "reload" && command != "relaunch") return; // the style page is not the game (a reload, test-only, still gets out of it)
