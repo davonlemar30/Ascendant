@@ -185,7 +185,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-settings.png')});
     { const st=await state(); check(st.settingsRows.indexOf('Main menu')===2&&st.settingsRows.indexOf('Main menu')<st.settingsRows.findIndex(r=>r.startsWith('Walk'))&&st.settingsRows.includes('Start over'),'the launch (Oct 9): in the game Settings has Main menu in the player\'s section, above Testing ('+st.settingsRows.join(', ')+') at '+viewport.width);
       await tap(0,rowAt(st,'Main menu'));await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsAsk,{},{timeout:5000}).catch(()=>{});
-      const a=await state(); check(a.settingsAsk&&a.settingsAskLine==='Nothing is saved until your first Keeper Key. Go to the main menu?'&&JSON.stringify(a.settingsRows)==='["Main menu","Back"]'&&a.screen==='hub','before Key 1 (nothing saved yet) the Main menu row asks first ("'+a.settingsAskLine+'") at '+viewport.width);
+      const a=await state(); check(a.settingsAsk&&a.settingsAskLine==='Saving begins at your first Keeper Key. Go to the main menu?'&&JSON.stringify(a.settingsRows)==='["Main menu","Back"]'&&a.screen==='hub','before Key 1 (nothing saved yet) the Main menu row asks first ("'+a.settingsAskLine+'") at '+viewport.width);
       await page.screenshot({path:path.join(out,viewport.width+'-settings-main-menu-ask.png')});
       await tap(0,rowAt(a,'Back'));await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsAsk,{},{timeout:5000}).catch(()=>{});
       check(!(await state()).settingsAsk&&(await state()).settingsOpen&&(await state()).screen==='hub','Back keeps the game, back on Settings, at '+viewport.width); }

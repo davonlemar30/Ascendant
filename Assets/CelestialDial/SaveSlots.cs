@@ -38,7 +38,7 @@ namespace Ascendant.CelestialDial
         // Continue: the slot played last, or, if it holds nothing to load, the first slot that does; 0 when none does
         public static int ContinueSlot { get { int last = InPlay; if (CanLoad(last)) return last; for (int s = 1; s <= Count; s++) if (CanLoad(s)) return s; return 0; } }
         // A slot's card (owner's pick: the name, the Keeper Keys and the Big Three; an empty slot reads "Empty"; no date or time)
-        public sealed class Card { public int Slot; public bool Filled; public string Name = "", Keys = "", BigThree = ""; public string Spoken => "Slot " + Slot + ": " + (Filled ? string.Join(", ", new[] { Name, Keys, BigThree }.Where(t => t != "")) : EmptyWords); }
+        public sealed class Card { public int Slot; public bool Filled; public string Name = "", Keys = "", BigThree = ""; public string Spoken => "Slot " + Slot + ": " + (Filled ? string.Join(", ", new[] { Name, Keys, BigThree.Replace(" · ", ", ") }.Where(t => t != "")) : EmptyWords); } // the spoken label joins the Big Three with commas: a screen reader reads "·" as "middle dot" (Dante, Oct 9)
         public const string EmptyWords = "Empty";
         public static Card Describe(int slot)
         {

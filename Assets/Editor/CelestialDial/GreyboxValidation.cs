@@ -849,7 +849,7 @@ namespace Ascendant.Build
                 var old=new SaveData{version=4,playerName="Davon",chartFrom="known",sunSign=4,moonSign=7,risingSign=0,atriumStage=2,keyEarned=true,keys=2};
                 store[SliceView.SaveKey]=JsonUtility.ToJson(old); // a save written before the menu, under the one key there was
                 var card=SaveSlots.Describe(1);
-                Check(card.Filled && SaveSlots.CanLoad(1) && SaveSlots.AnySave && card.Name=="Davon" && card.Keys=="Keeper Keys: 2" && card.BigThree=="Leo sun · Scorpio moon · Aries rising" && card.Spoken=="Slot 1: Davon, Keeper Keys: 2, Leo sun · Scorpio moon · Aries rising","an old single save shows up in slot 1 as it stands (no migration): its name, Keeper Keys and Big Three");
+                Check(card.Filled && SaveSlots.CanLoad(1) && SaveSlots.AnySave && card.Name=="Davon" && card.Keys=="Keeper Keys: 2" && card.BigThree=="Leo sun · Scorpio moon · Aries rising" && card.Spoken=="Slot 1: Davon, Keeper Keys: 2, Leo sun, Scorpio moon, Aries rising","an old single save shows up in slot 1 as it stands (no migration): its name, Keeper Keys and Big Three");
                 Check(SaveSlots.ContinueSlot==1 && !SaveSlots.CanLoad(2) && !SaveSlots.CanLoad(3),"Continue picks slot 1 when it is the only save");
                 store[SaveSlots.Key(3)]=JsonUtility.ToJson(new SaveData{playerName="Ana",sunSign=9,atriumStage=3,keyEarned=true,keys=4});
                 SaveSlots.InPlay=3;Check(SaveSlots.HasLast && store[SaveSlots.LastKey]=="3" && SaveSlots.ContinueSlot==3 && SaveSlots.Describe(3).BigThree=="Capricorn sun" && SaveSlots.Describe(3).Keys=="Keeper Keys: 4","Continue picks the slot played last (a number, no date); a card shows only the signs the save holds");

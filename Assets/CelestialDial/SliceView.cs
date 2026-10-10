@@ -3212,7 +3212,7 @@ namespace Ascendant.CelestialDial
         public static float SlotCardY(int slot) => SlotCardTop + (slot - 1) * (SlotCardHeight + SlotCardGap); // a card's centre (slots 1 to 3)
         public const string NewGameTitle = "N E W   G A M E", LoadGameTitle = "L O A D   G A M E"; // the slot list's title, spaced like Settings' (drafts for Dante)
         public const string ReplaceLine = "This replaces your saved game.", StartWords = "Start", BackWords = "Back"; // drafts for Dante (Ashantis's line)
-        public const string MainMenuAskLine = "Nothing is saved until your first Keeper Key. Go to the main menu?"; // Settings' Main menu before Key 1 (a draft for Dante)
+        public const string MainMenuAskLine = "Saving begins at your first Keeper Key. Go to the main menu?"; // Settings' Main menu before Key 1 (Dante, Oct 9)
         // the flags carried across the scene reload (read once in Awake)
         static bool straightIn, toMenu, enterFade; static bool? carriedMotion;
         void Reload(bool straight, bool menu = false, bool fade = false) { straightIn = straight; toMenu = menu; enterFade = fade; carriedMotion = ReducedMotion; SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); }
