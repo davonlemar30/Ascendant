@@ -2,6 +2,39 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The opening scene, the launch movie and the main menu (tasks 86bcfhmha and 86bcg62x3, Oct 8-9)
+
+PR #141 holds two builds: the movie-style opening (a new game's prologue, then WHO ARE YOU? with the orb) and the launch flow (the TSG Games logo, a 30-second launch movie, the main menu, three save slots, "Main menu" in Settings). What shipped is in the [build log](../README.md); this is the validation record, taken from PR #141's body and the pass record on 86bcg62x3 (comment 90140266922040).
+
+**Checks added.** Counts at the end of the PR: 804 mechanical, 456 fixture, 977 suite.
+- **Opening (mechanical):** a new game starts at Prologue; `Continue` and the birth questions do nothing there; `screen_entered:Prologue` is logged once; the end and Skip each reach Identity once; a restored save resumes at the Hub; the enum is appended (Prologue 13, Journal 12, Identity 0); the stars count the answers (0 to 5 on the skip path, 8 on the longest path, none on "Your Birth"); the shot list (seven shots in order, the frames as 360 x 800 slots at cap 2048, every scale 1 or more, every pan inside the frame, every panel on screen, a line per shot with none of the banned words or dashes); Skip a 44 px target; the orb and its stars fit the band; eight even star places; slot names may hold digits after the first letter (working choice 25); every old flow that opened on Identity now skips the prologue first (29 call sites).
+- **Opening (Oct 9 animations):** the web state publishes each shot's frames in order (`prologueShotFrames`); the writing loop runs (notebook, -2, -3 and round, from the panel's landing to the shot's end); shot 3 in order (desk, light, light-up, look, headphones-mid, headphones), 9 s; reduced motion holds [desk, notebook] and drops the mid frame.
+- **Launch (new):** the launch order (logo, movie shots in order, menu); Skip; the spoken lines (all 15 quoted); the glint on the sweep's angle and ring, gone afterwards; the zoom rising through draw (0.853), glyphs (0.948) and alive (0.992), then 1.0 at burn; Aries alone at the first glyph step and Aries to Virgo at the halfway step; the menu's four buttons and their dimmed state; the slot lists, confirm-before-replace, Continue picking the last-played slot, and the old single save showing in slot 1; "Main menu" from Settings before and after Key 1; reduced motion.
+- **Slot count:** 221 (166 + #140's 21 + the opening's 18 + the launch's 16), in `GreyboxValidation`, the suite's `ART_SLOTS`, and `ART-SLOTS.md`'s test-set line.
+
+**Validation (local, Unity 6000.3.24f1), on `e675bde` (the final art), then `bae79b1` (one docs line, Jeffrey's B1):**
+
+| Rung | Result |
+| --- | --- |
+| Mechanical (`GreyboxValidation.Run`) | 804/804 |
+| Slice fixture (`SlicePlayValidation.Begin`) | 456/456, no runtime errors |
+| Headless WebGL (`WebBuild.Build`) | succeeded, 48,035,648 bytes, 0 errors, 0 warnings |
+| Browser suite, desktop density | 977/977 |
+| Browser suite, phone density (`DEVICE_SCALE=2 MOBILE=1`) | 977/977 |
+
+- **Earlier runs:** the launch with placeholders on `0f8464c`: 801 / 446 / build clean / 971 at both densities. The opening, on `2cfed3e` (the Oct 9 animations and their art): 758 / 383 / WebGL 43,208,316 bytes / 835 at both densities; after Jeffrey's review (`a84d7bc`) 756 / 376 / 41,780,611 bytes / 823; the final-art run on `c7260aa` 754 / 376 / 41,780,355 bytes / 817; the placeholder runs on `2239562` 745 / 376 / 36,175,757 bytes / 785.
+- **One suite failure first (opening):** in `validate-all.sh` the desktop suite failed one check at 360, because the notebook capture read the state after the writing loop had begun; `595a0b4` fixed the suite only (the capture settles 0.3 s and accepts a loop frame), and both suites then passed 835/835 on the same build. An earlier fixture timeout (the batch Editor's first seconds stalling while the prologue keeps real time) was fixed in `2239562`.
+- **Warnings:** none new (no `warning CS` lines). Pre-existing: the Editor's Search indexing `ArgumentOutOfRangeException` at fixture start-up, which the fixture ignores.
+- **Import churn:** `ProjectSettings.asset` and `UniversalRP.asset` (import noise) and the owner's URP and ShaderGraph upgrade markers were left uncommitted.
+- **Seen by Claude at phone density:** the logo screen, every movie shot with the real art, the menu fresh and with a save, the slot lists, the confirm box, Settings on the menu and in-game; every prologue frame at 390 and 360, normal and reduced motion.
+- **Not tested:** Android and the emulator, WebKit, a hand-run screen reader (the announcements are checked from the live region), and production at the time of the PR.
+- **Production:** owed. Claude runs the check after the Pages deploy of main 4d4d48e and posts it on 86bcfhmha and 86bcg62x3; the number goes into a follow-up docs PR.
+- **Captures:** on 86bcg62x3 (the launch sheet, the menu sheet, the two-moons frame, and a zip of all 36 phone captures); locally in the `opening-scene` worktree under `Logs/WebEvidencePhone/` (`390-prologue-*`, `390-launch-*`, `-menu-*`, `-slots-*`, `-settings*`) and `Logs/Evidence/`.
+
+Reviews: Dante passed the text (the prologue's Skip label and lines, two edits on lines 4 and 6; the menu's two fixes: the Main menu question and commas in the spoken slot label). Jeffrey cleared the launch delta at bae79b1: B1 (`ART-SLOTS.md` said 205) fixed in bae79b1, B2 (the pass record and captures) fixed on the task; 8 NOTEs, none blocking. The owner ruled on two of them (round 7): the two moons ghosting together in the street crossfades, "Leave it"; a replaced slot clears at confirm, "Keep".
+
+Merged as PR #141 (main `4d4d48e`, Oct 9), head `bae79b1`.
+
 ## The swallowed-code check catches a hidden assignment or a lone call (task 86bcf5j8k, Oct 8)
 
 Editor-only: `Assets/Editor/CelestialDial/GreyboxValidation.cs`. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #136's body and comments. No player-facing change, no Dante pass.
