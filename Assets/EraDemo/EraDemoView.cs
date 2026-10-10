@@ -15,6 +15,7 @@ namespace Ascendant.EraDemo
     public sealed class EraDemoView : MonoBehaviour
     {
         public Func<bool> Reduced; public Func<float> Speed; public Action Home; public Action<string> Logged;
+        public Action Changed; // the web state republishes (the page's accessible controls follow the demo)
         public EraMap Map { get; private set; }
         public EraWalker Walker { get; private set; }
         public EraTalk Talk { get; private set; }
@@ -171,21 +172,23 @@ namespace Ascendant.EraDemo
             Tap(new Cell(Mathf.RoundToInt(w.x), Mathf.RoundToInt(-w.y)));
         }
         // The taps and the Places list do the same thing through the same walk (Q06 phase 2, decision 5).
-        public bool Tap(Cell c) { if (Leaving || Talk.Open) return false; bool ok = Walker.Tap(c); if (ok && Reduced != null && Reduced()) Walker.Jump(); return ok; }
-        public bool GoTo(string id) { if (Leaving || Talk.Open) return false; bool ok = Walker.GoTo(id); if (ok && Reduced != null && Reduced()) Walker.Jump(); return ok; }
+        public bool Tap(Cell c) { if (Leaving || Talk.Open) return false; bool ok = Walker.Tap(c); if (ok && Reduced != null && Reduced()) Walker.Jump(); Changed?.Invoke(); return ok; }
+        public bool GoTo(string id) { if (Leaving || Talk.Open) return false; bool ok = Walker.GoTo(id); if (ok && Reduced != null && Reduced()) Walker.Jump(); Changed?.Invoke(); return ok; }
         void Arrived(string id)
         {
-            var p = Map.Point(id); if (p == null) return;
-            if (p.Portal) { StartCoroutine(GoHome()); return; }
-            if (Talk.Begin(p)) ShowChat();
+            var p = Map.Point(id);
+            if (p != null && p.Portal) StartCoroutine(GoHome());
+            else if (p != null) { ClosePlaces(); if (Talk.Begin(p)) ShowChat(); } // a talk closes Places, so the first tap continues it (Jeffrey, #150 N3)
+            Changed?.Invoke();
         }
         public bool Next() { if (!Talk.Open || Talk.Waiting) return false; Talk.Next(); ShowChat(); return true; }
         public bool Choose(int i) { if (!Talk.Choose(i)) return false; ShowChat(); return true; }
-        public void TogglePlaces() { if (PlacesOpen) ClosePlaces(); else if (!Talk.Open && !Leaving) places.gameObject.SetActive(true); }
-        public void ClosePlaces() { if (places != null) places.gameObject.SetActive(false); }
+        public void TogglePlaces() { if (PlacesOpen) ClosePlaces(); else if (!Talk.Open && !Leaving) { places.gameObject.SetActive(true); Changed?.Invoke(); } }
+        public void ClosePlaces() { if (places == null || !places.gameObject.activeSelf) return; places.gameObject.SetActive(false); Changed?.Invoke(); }
         void ShowChat()
         {
             var line = Talk.Current; chat.gameObject.SetActive(line != null); placesButton.interactable = line == null && !Leaving;
+            Changed?.Invoke();
             if (line == null) return;
             if (chatSpeaker != null) chatSpeaker.text = Plate(Talk.With.Speaker);
             chatLine.text = line.Text;
@@ -203,7 +206,7 @@ namespace Ascendant.EraDemo
         }
         IEnumerator GoHome()
         {
-            Leaving = true; ClosePlaces(); placesButton.interactable = false; fade.raycastTarget = true; Note("era_demo_left");
+            Leaving = true; ClosePlaces(); placesButton.interactable = false; fade.raycastTarget = true; Note("era_demo_left"); Changed?.Invoke();
             float t = 0, seconds = Reduced != null && Reduced() ? 0 : FadeSeconds; // reduced motion: an instant fade (Q06 lock 4)
             while (t < seconds) { t += Time.unscaledDeltaTime; fade.color = new Color(0, 0, 0, Mathf.Clamp01(t / seconds)); yield return null; }
             fade.color = Color.black;

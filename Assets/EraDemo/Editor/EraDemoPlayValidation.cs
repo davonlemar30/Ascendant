@@ -45,9 +45,11 @@ namespace Ascendant.EraDemo
         static void Capture(string file) { Directory.CreateDirectory(Evidence); ScreenCapture.CaptureScreenshot(Evidence + file); }
         static void Step(string what, Func<bool> ready, Action act) => Steps.Enqueue((what, ready, act));
         static void Click(string path) { var t = Era.transform.Find(path); if (t == null) throw new Exception("no " + path); t.GetComponent<Button>().onClick.Invoke(); }
+        // The plates as the shipped one reads (FitBox.CasparPlate), written out here rather than computed by the code under test (Jeffrey, #150 N5).
+        static readonly Dictionary<string, string> Plates = new Dictionary<string, string> { ["THE BAKER"] = "T H E   B A K E R", ["THE COPYIST"] = "T H E   C O P Y I S T", ["THE TEACHER"] = "T H E   T E A C H E R", ["CASPAR"] = "C A S P A R" };
         static void Talked(string speaker, int lines)
         {
-            for (int i = 0; i < lines; i++) { Check(Era.Talk.Open && Era.Speaker == speaker && Era.PlateShown == EraDemoView.Plate(speaker) && Era.LineShown.StartsWith("[Placeholder]"), speaker + " line " + (i + 1) + " (plate \"" + Era.PlateShown + "\"): " + Era.LineShown); Era.Next(); }
+            for (int i = 0; i < lines; i++) { Check(Era.Talk.Open && Era.Speaker == speaker && Era.PlateShown == Plates[speaker] && Era.LineShown.StartsWith("[Placeholder]"), speaker + " line " + (i + 1) + " (plate \"" + Era.PlateShown + "\"): " + Era.LineShown); Era.Next(); }
             Check(!Era.Talk.Open && Era.LineShown == "", speaker + ": the talk ends and the chat box closes");
         }
 
@@ -90,11 +92,13 @@ namespace Ascendant.EraDemo
                 Check(Era.Walker.At == new Cell(5, 9), "he stops on the tapped square: " + Era.Walker.At);
                 Capture("era-04-square.png");
                 Check(Era.GoTo("teacher"), "the teacher, on the roof up the stairs");
+                Era.TogglePlaces(); Check(Era.PlacesOpen && Era.Walker.Walking, "Places can open while he walks");
             });
             Step("the teacher", () => Era.Talk.Open, () =>
             {
                 float camY = -Era.Camera.transform.position.y, half = Era.Camera.orthographicSize;
                 Check(camY < startRow - 3 && Mathf.Abs(camY - Era.Walker.Y) <= half - .5f, "the camera has followed him up the map and holds him in view (camera row " + camY.ToString("0.0") + " from " + startRow.ToString("0.0") + ", Keeper row " + Era.Walker.Y + ", half height " + half.ToString("0.0") + ")");
+                Check(!Era.PlacesOpen, "a talk closes Places, so the first tap continues it (Jeffrey, #150 N3)");
                 Check(Era.Speaker == "THE TEACHER", "the teacher talks"); Era.Next();
                 Check(Era.Talk.Waiting && !Era.Next(), "a choice waits: Continue does nothing");
                 Capture("era-05-choice.png");

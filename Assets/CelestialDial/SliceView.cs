@@ -726,6 +726,7 @@ namespace Ascendant.CelestialDial
         // ---- actions (all input paths, including the Web bridge, arrive here) ----
         public void WebAction(string command)
         {
+            if (Era != null && command != "relaunch" && command != "reload" && command != "walk-speed" && !command.StartsWith("jump:")) { EraAction(command); return; } // the era demo owns the page: the hidden slice takes no web actions (Jeffrey, #150 B1)
             if (command == "mute") { ToggleMute(); return; }
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
             if (styleShown && command != "reload" && command != "relaunch") return; // the style page is not the game (a reload, test-only, still gets out of it)
@@ -1011,12 +1012,33 @@ namespace Ascendant.CelestialDial
         static bool eraNext;
         public EraDemo.EraDemoView Era { get; private set; }
         void JumpToEra() { if (busy) return; eraNext = true; if (!JumpTo("whole")) eraNext = false; }
+        void EraAction(string command)
+        {
+            if (command.StartsWith("era-goto:")) Era.GoTo(command.Substring(9));
+            else if (command == "era-next") Era.Next();
+            else if (command.StartsWith("era-choose:") && int.TryParse(command.Substring(11), out int choice)) Era.Choose(choice);
+            else if (command == "mute") ToggleMute();
+            Publish();
+        }
+        // The web state while the demo shows: every slice control reports unavailable (its can* flags off, no points, no Travel), and the demo's own
+        // controls take their place: a row per person and the way back, Continue, and a line's choices.
+        void EraState(DialView.WebState state)
+        {
+            foreach (var f in typeof(DialView.WebState).GetFields()) if (f.FieldType == typeof(bool) && (f.Name.StartsWith("can") || f.Name == "active" || f.Name == "travelShown" || f.Name == "travelOpen")) f.SetValue(state, false);
+            state.pois = new string[0]; state.poiLabels = new string[0];
+            state.screen = "era"; state.note = "";
+            var era = Era; var line = era.Talk.Current;
+            state.eraPoints = era.Map.Points.OrderBy(p => p.Portal ? 1 : 0).Select(p => p.Id).ToArray(); state.eraLabels = era.Map.Points.OrderBy(p => p.Portal ? 1 : 0).Select(p => p.Label).ToArray();
+            state.eraTalking = era.Talk.Open; state.eraSpeaker = era.Speaker; state.eraLine = line != null ? line.Text : ""; state.eraChoices = line != null ? line.Choices : new string[0];
+            state.canEraWalk = !era.Talk.Open && !era.Leaving; state.canEraNext = era.Talk.Open && !era.Talk.Waiting; state.eraAt = era.Walker.At.ToString(); state.eraWalking = era.Walker.Walking; state.eraTarget = era.Walker.TargetId; state.eraPlacesOpen = era.PlacesOpen;
+            state.caspar = line != null ? era.Speaker + ": " + line.Text : "The era demo, a greybox. Choose a person or the way back to walk there.";
+        }
         void OpenEraDemo()
         {
             foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.gameObject.name != "Settings Canvas" && c.gameObject.name != "White light") c.enabled = false; // the slice hides; Settings stays on top
             if (Camera.main != null) Camera.main.enabled = false; // the demo's camera draws the map
             Era = new GameObject("Era demo").AddComponent<EraDemo.EraDemoView>(); Era.transform.SetParent(transform, false);
-            Era.Reduced = () => ReducedMotion; Era.Speed = () => Flow.Walk.Speed; Era.Home = () => Reload(true, false, true);
+            Era.Reduced = () => ReducedMotion; Era.Speed = () => Flow.Walk.Speed; Era.Home = () => Reload(true, false, true); Era.Changed = Publish;
             Era.Build(font); Settings.Close(); Publish();
         }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
@@ -1848,6 +1870,7 @@ namespace Ascendant.CelestialDial
                     && gridCellGlyphs[i].GetComponent<Outline>().enabled && gridCellNames[i].GetComponent<Outline>().enabled).ToArray(); // symbol and name alive, both edged
                 state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
             }
+            if (Era != null) EraState(state); // the era demo owns the page while it shows (Jeffrey, #150 B1)
         }
 
         // ---- Build H: the light overlays. A file in a room's light slot is drawn over the background and under everything else; without one nothing exists. ----
