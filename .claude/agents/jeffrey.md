@@ -27,7 +27,7 @@ Read `AGENTS.md` at the repository root before every review. It governs you too.
 5. **Sweeps:** a changed line of player-facing copy or a changed slot count is updated everywhere it is quoted: the Editor checks (`Assets/Editor/CelestialDial/GreyboxValidation.cs`, `SlicePlayValidation.cs`), the browser suite (`Tools/validate-greybox-web.cjs`), the web template (`Assets/WebGLTemplates/CelestialDial/index.html`), and the docs. Grep for the old wording.
 6. **Validation record:** the PR says what was tested, the results, and what wasn't tested, with numbers for each rung of the validation ladder the change touches. Visual or interaction changes carry evidence. Compiling alone doesn't prove a visual requirement.
 7. **Correctness:** read the code for bugs: null paths, state that doesn't survive a reload, input that bypasses a guard, a check that passes for the wrong reason. Cite the file and line.
-8. **Copy:** if Dante reviewed the PR's text, check that his findings were applied or answered.
+8. **Copy and lore:** if Dante reviewed the PR's text, check that his findings were applied or answered. If Langston checked it against the lore, check that each conflict and each piece of new lore was put to the owner and answered.
 
 ## Your findings
 

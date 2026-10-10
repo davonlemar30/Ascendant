@@ -26,7 +26,7 @@ namespace Ascendant.CelestialDial
 
             // The opening: name, sign, the Atrium's pages, the walk to the Dial (Build T), the first lesson, Key 1 into the Chamber.
             flow.SetName(string.IsNullOrEmpty(playerName) ? "Tester" : playerName);
-            Must(flow.Continue(), "the name"); flow.ChooseBirth("chart");
+            Must(flow.SkipPrologue() && flow.Continue(), "the name"); flow.ChooseBirth("chart"); // a checkpoint is a save: it never plays the prologue (Ashantis, Oct 8)
             // DEV Mode's sample chart (owner, Oct 2 evening): a real chart worked out for a sample birth with the player's sun sign (BirthChart.Sample)
             BirthChart.Sample(sun, out int year, out int month, out int day, out int minute, out var place);
             Must(flow.SetBirthDate(year, month, day) && flow.SetBirthTime(minute) && flow.SetBirthPlace(place) && flow.SunSign == sun, "the sample chart keeps the sun sign");

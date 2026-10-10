@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal }
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal, Prologue, Logo, Intro, Menu, SaveSlots } // Prologue: the opening scene (owner, Oct 8, 86bcfhmha); then the launch (owner, Oct 9, 86bcg62x3): the logo screen, the launch movie, the main menu, the slot list; each appended, so no screen is renumbered
     public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality }
     public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map, Practice, Quiz, Birth } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map; Oct 3: Practice's list and its question page; Oct 7: "Your Birth"
     public enum JournalLens { Element, Modality, Polarity, Opposites } // Build AA: the tabs that recolour the Wheel or the Table, each once learned
@@ -17,7 +17,36 @@ namespace Ascendant.CelestialDial
     // Unit 1.1 continuation, local save. Pure state, no Unity types.
     public sealed class SliceFlow
     {
-        public SliceScreen Screen { get; private set; } = SliceScreen.Identity;
+        public SliceScreen Screen { get; private set; } = SliceScreen.Prologue; // a new game opens on the prologue (owner, Oct 8: Q01 amended); a restored save resumes at the Hub and never sees it
+        // ---- The opening scene (owner, Oct 8, 86bcfhmha; rulings 1 and 5): it plays like a movie, then darkness and WHO ARE YOU?. Taps never
+        // advance it; its end, or Skip, goes to Identity. The save never stores the screen, so nothing migrates (Ashantis, comment 90140266396338).
+        public bool AtPrologue => Screen == SliceScreen.Prologue;
+        bool prologueOpened;
+        public void OpenPrologue() { if (!AtPrologue || prologueOpened) return; prologueOpened = true; Logged?.Invoke("screen_entered:" + Screen); } // the same "screen_entered:" path as every screen
+        public bool EndPrologue() => LeavePrologue("prologue_ended");
+        public bool SkipPrologue() => LeavePrologue("prologue_skipped");
+        bool LeavePrologue(string how) { if (!AtPrologue) return false; Screen = SliceScreen.Identity; Note = ""; Logged?.Invoke(how); Logged?.Invoke("screen_entered:" + Screen); return true; }
+        // ---- The launch (owner, Oct 9, 86bcg62x3, round 3): every launch shows the logo screen, then the launch movie, then the main menu; one
+        // Skip covers the logo and the movie. New Game and the slots leave the menu by a fresh start (SliceView reloads the scene), so the flow
+        // only walks the launch's own screens; a fresh flow still starts at the prologue, which is where New Game, Start over and the DEV
+        // samples arrive. "Main menu" from Settings comes straight here, past the logo and the movie.
+        public bool AtLaunch => Screen == SliceScreen.Logo || Screen == SliceScreen.Intro;
+        public bool AtMenu => Screen == SliceScreen.Menu || Screen == SliceScreen.SaveSlots;
+        bool Fresh => AtPrologue && !prologueOpened;
+        public string SlotsFor { get; private set; } = ""; // the slot list's purpose: "new" (New Game) or "load" (Load Game)
+        void Enter(SliceScreen screen) { Screen = screen; Note = ""; Logged?.Invoke("screen_entered:" + Screen); }
+        public bool BeginLaunch() { if (!Fresh) return false; Enter(SliceScreen.Logo); return true; }
+        public bool EndLogo() { if (Screen != SliceScreen.Logo) return false; Enter(SliceScreen.Intro); return true; }
+        public bool EndIntro() { if (Screen != SliceScreen.Intro) return false; Logged?.Invoke("intro_ended"); Enter(SliceScreen.Menu); return true; }
+        public bool SkipLaunch() { if (!AtLaunch) return false; Logged?.Invoke("launch_skipped"); Enter(SliceScreen.Menu); return true; }
+        public bool OpenMenu() { if (!Fresh && Screen != SliceScreen.SaveSlots) return false; SlotsFor = ""; Enter(SliceScreen.Menu); return true; } // from Settings' Main menu (a fresh flow), or Back from the slot list
+        public bool OpenSlots(string mode) { if (Screen != SliceScreen.Menu || (mode != "new" && mode != "load")) return false; SlotsFor = mode; Logged?.Invoke("slots:" + mode); Enter(SliceScreen.SaveSlots); return true; }
+        // The orb's stars (owner, Oct 8, ruling 8): one per step answered in the opening, counted as it stands now, so Change my answer takes
+        // them back (Ashantis's settled call): the name once it is continued, then the birth question's answer and each step after it.
+        int birthAnswers;
+        public int OpeningAnswers => Amending ? 0 : Screen == SliceScreen.Birth ? 1 + birthAnswers : 0;
+        public const int MostOpeningAnswers = 8; // the name, the birth question, the date, the time, the place, the cusp, the moon, the rising
+        void Answered() { if (!Amending) birthAnswers++; }
         public string PlayerName { get; private set; } = "";
         public string BirthChoice { get; private set; } = "";
         public string Note { get; private set; } = "";
@@ -197,7 +226,7 @@ namespace Ascendant.CelestialDial
         {
             if (Screen != SliceScreen.Birth || BirthStep != "moon" || choice < 0 || choice >= MoonAsk.Length) return false;
             heldMoon = new ChoiceRecord { point = "moon", sign = MoonAsk[choice], how = "picked" };
-            Logged?.Invoke("moon_picked"); if (!AskRising()) Commit(); return true;
+            Logged?.Invoke("moon_picked"); Answered(); if (!AskRising()) Commit(); return true;
         }
         public static string ClockTime(int minute) { int h = minute / 60, m = minute % 60; return (h % 12 == 0 ? 12 : h % 12) + ":" + m.ToString("00") + (h < 12 ? " am" : " pm"); }
         public string CuspQuestion => CuspFrom < 0 ? "" : CuspMinute >= 0
@@ -208,7 +237,7 @@ namespace Ascendant.CelestialDial
         {
             if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < 0 || choice > 1) return false;
             heldSun = new ChoiceRecord { point = "sun", sign = choice == 0 ? CuspFrom : CuspTo, how = "picked" };
-            Logged?.Invoke("cusp_sun_picked"); if (!AskNext()) Commit(); return true;
+            Logged?.Invoke("cusp_sun_picked"); Answered(); if (!AskNext()) Commit(); return true;
         }
         // The opening's words and "Your Birth"'s (Oct 7): Claude's drafts from the approved recommendation, checked by Dante; the owner rewrites them
         public const string BirthQuestion = "Do you know when you were born?", KnowBirthday = "Yes, I know my birthday", SkipBirthday = "I'll skip it";
@@ -235,6 +264,7 @@ namespace Ascendant.CelestialDial
             BirthChoice = choice == "chart" || choice == "skip" ? choice : ""; OpeningPath = BirthChoice;
             Facts = new BirthFacts(); draft = new BirthFacts(); Chart = new WorkedChart(); choices.Clear(); pending = null; Note = ""; ClearCusp();
             BirthStep = BirthChoice == "chart" ? "date" : BirthChoice == "skip" ? "sun-pick" : "";
+            birthAnswers = BirthChoice == "" ? 0 : 1; // the answer to the birth question is the first of the birth's stars
             Logged?.Invoke("birth_choice:" + BirthChoice);
         }
         // the steps in order; on "Your Birth" only the facts still missing are asked
@@ -250,17 +280,17 @@ namespace Ascendant.CelestialDial
         {
             if (!OnFactStep("date")) return false;
             if (year < FirstBirthYear || month < 1 || month > 12 || day < 1 || day > DateTime.DaysInMonth(year, month) || new DateTime(year, month, day) > DateTime.UtcNow.Date.AddDays(1)) return false;
-            draft.SetDate(year, month, day); Note = ""; Logged?.Invoke("birth_date_entered"); Advance("date"); return true;
+            draft.SetDate(year, month, day); Note = ""; Logged?.Invoke("birth_date_entered"); Answered(); Advance("date"); return true;
         }
         public bool SetBirthTime(int minuteOfDay) // -1: "I don't know my birth time"
         {
             if (!OnFactStep("time") || minuteOfDay < -1 || minuteOfDay >= 24 * 60) return false;
-            draft.SetTime(minuteOfDay); Note = ""; Logged?.Invoke(minuteOfDay < 0 ? "birth_time_unknown" : "birth_time_entered"); Advance("time"); return true;
+            draft.SetTime(minuteOfDay); Note = ""; Logged?.Invoke(minuteOfDay < 0 ? "birth_time_unknown" : "birth_time_entered"); Answered(); Advance("time"); return true;
         }
         public bool SetBirthPlace(Place place) // null: "I don't know where"
         {
             if (!OnFactStep("place")) return false;
-            draft.SetPlace(place); Logged?.Invoke(place == null ? "birth_place_unknown" : "birth_place_entered"); Advance("place"); return true;
+            draft.SetPlace(place); Logged?.Invoke(place == null ? "birth_place_unknown" : "birth_place_entered"); Answered(); Advance("place"); return true;
         }
         // the facts are in: work the chart out; on a cusp day ask the sun, unless the player already chose one of its two signs
         void Settle()
@@ -309,12 +339,12 @@ namespace Ascendant.CelestialDial
         public bool PickSkipSun(int seat)
         {
             if (Screen != SliceScreen.Birth || Amending || BirthStep != "sun-pick" || seat < 0 || seat > 11) return false;
-            Choose("sun", seat, "picked"); Chart = new WorkedChart { maths = BirthChart.Maths }; BirthStep = "moon-pick"; Logged?.Invoke("sun_picked"); return true;
+            Choose("sun", seat, "picked"); Chart = new WorkedChart { maths = BirthChart.Maths }; BirthStep = "moon-pick"; Logged?.Invoke("sun_picked"); Answered(); return true;
         }
         public bool PickSkipMoon(int seat)
         {
             if (Screen != SliceScreen.Birth || Amending || BirthStep != "moon-pick" || seat < 0 || seat > 11) return false;
-            Choose("moon", seat, "picked"); BirthStep = "rising-pick"; Logged?.Invoke("moon_picked"); return true;
+            Choose("moon", seat, "picked"); BirthStep = "rising-pick"; Logged?.Invoke("moon_picked"); Answered(); return true;
         }
         // the sign grid answers whichever question it is showing (the cusp's and the Moon's options have their own buttons)
         public bool PickSign(int seat) => BirthStep == "rising-pick" ? PickRising(seat) : BirthStep == "moon-pick" ? PickSkipMoon(seat) : PickSkipSun(seat);
@@ -362,7 +392,7 @@ namespace Ascendant.CelestialDial
         public bool PickRising(int seat)
         {
             if (Screen != SliceScreen.Birth || BirthStep != "rising-pick" || seat < 0 || seat > 11 || Worked("rising")) return false;
-            Logged?.Invoke("rising_chosen");
+            Logged?.Invoke("rising_chosen"); Answered();
             if (pending != null) { heldRising = new ChoiceRecord { point = "rising", sign = seat, how = "picked" }; Commit(); return true; }
             Choose("rising", seat, "picked"); BirthStep = "done";
             if (!Amending) { Note = ChartNote(); return true; }
