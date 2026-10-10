@@ -61,6 +61,28 @@ Reviews: Dante passed the text (the prologue's Skip label and lines, two edits o
 
 Merged as PR #141 (main `4d4d48e`, Oct 9), head `bae79b1`.
 
+## The Elemental Table and the Book of Symbols come alive (task 86bcf0x71, Oct 8)
+
+What shipped is in the [build log](../README.md); this is the validation record, taken from PR #140's body and Claude's hand-off. Player-facing change (the Table and the Book); no words added or changed, so no Dante pass.
+
+- **Mechanical** (`GreyboxValidation.Run`): PASS, 729 checks, no compile errors. **Slice Play Mode fixture:** 286 passed. **Headless WebGL build** (`WebBuild.Build`): succeeded, 37,288,238 bytes, 0 errors, 0 warnings.
+- **Browser suite** on head b5782e1: 721 passed, 0 failed at desktop density (390 and 360) and 721 passed, 0 failed at phone density (`DEVICE_SCALE=2 MOBILE=1`).
+- **New and changed checks:**
+  - Every row and column name sits on the table's wood: each laid-out name is checked against `table-room` with a 95% floor (the run measured at least 98%; the pre-fix art fails it, "Fire" 67%, "Earth" 60%).
+  - The Table comes alive: the live state requires both materials (symbol and name) and both outlines.
+  - Reduced motion: without it the gold is not yet whole at the Seal (it spreads); with it a correct Seal shows the gold whole and the lettering awake at once, inside the hold; the next plate is gold too and the twelfth ends gold and whole after the Key 3 ceremony.
+  - Mechanical: a dragged well logs "Drag", a tapped Seal logs "DirectCell", and the drag grades the same; live lettering is edged in the Art Bible's line on all four elements; the frame's names are inlaid gold. The deepened name colours and their Editor check are retired.
+- **Contrast on the pale plates** (each material's average fill against the plate face; the outline against gold is 11.5:1): Fire 3.03:1 on wood, 4.38:1 on gold; Earth 2.41:1 and 3.49:1; Air 1.44:1 and 1.01:1 (why every element gets the outline); Water 3.29:1 and 4.76:1.
+- **Visual:** four phone captures of the Table (`pr140-phone-grid-start`, `-drag`, `-gold`, `-key3`), taken at 4dac9ef before the fixes in b5782e1, checked by eye, on the task (comment 90140266414568); no miss capture and no Book capture is on the task.
+- **Slots:** 187 in `Slots.cs` (`new ArtSlot(`); the 21 new rows in ART-SLOTS.md match the manifest's names, sizes and max sizes (Whitney, on main 2de2855).
+- **Not covered by a check:** faint ink when Caspar shows the answer; a drop outside any well; a drag while the sign is locked; the slide motions themselves (skipped under Reduced motion, which is checked); the Book's Reduced motion paths (the still emblem, no rise, the shorter full-pages look) (Jeffrey's N13).
+- **Not tested:** the Android APK (not cut; cut only on the owner's word).
+- **Production** (every-merge tier: new art under `Assets/`): main's own suite at phone density against https://davonlemar30.github.io/Ascendant/ on main 2de2855: 721/721, 0 failures; Pages deploy run 37888181400 succeeded; names on wood at least 99%; the twelfth plate gold after Key 3 (Claude, comment 90140266494462 on 86bcf0x71). **The last main production checked was then 2de2855.**
+
+Reviews: Jeffrey's first review had two BLOCKING items (B1 a stuck plate after a cut-short drag; B2 Reduced motion), both fixed in b5782e1; the re-review was clear. Follow-ups, not blocking: N11 (a plate grabbed during its 0.25 s slide back jitters; `PlateDragBegin` could refuse the sliding seat), N12 (the "gold not yet whole" check reads state inside the 0.5 s spread, so a slow runner could fail it falsely), N13 (above). CI: Build Web player and Guard agent files green.
+
+Merged as PR #140 (merge commit, main `2de2855`, Oct 8); the reviewed head is `b5782e1`. Left out on purpose: an uncommitted Book edit in the `mini-menu` worktree on `codex/come-alive`, never committed or reviewed.
+
 ## The swallowed-code check catches a hidden assignment or a lone call (task 86bcf5j8k, Oct 8)
 
 Editor-only: `Assets/Editor/CelestialDial/GreyboxValidation.cs`. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #136's body and comments. No player-facing change, no Dante pass.

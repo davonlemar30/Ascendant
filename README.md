@@ -21,9 +21,9 @@ The shapes, rooms, instruments, and learning are real. The Grand Atrium, the Zod
 3. **THE CELESTIAL DIAL.** A great cast bronze wheel of twelve seats that wakes when you step close: each sign's name in its own recess on the rim, each seat's window showing its symbol and the one thing the lesson is about, and the sign under the pointer named on the ribbon the phoenix holds. Turn it and the whole ring turns with you; count the seats and press **Seal** when you're sure. Caspar teaches the four elements here, and how signs of one element sit evenly around the wheel. Fine lines of light join each element's three seats; the family you are learning glows in its element's colour, and when the whole wheel is lit, all four burn for a moment. Your first **Keeper Key** rises out of it.
 4. **The Crystal Book Chamber.** Seven sealed Books that give the Library its life, three locks each. Spend your Key on the first lock and the Library takes her first breath.
 5. **Back to the Wing, on your own time.** It keeps giving:
-   - **The symbols.** The Book of Symbols teaches each sign's glyph, then the wheel hides its names and asks you to find each one by its shape. **Key 2.**
+   - **The symbols.** The Book of Symbols teaches each sign's glyph, then the wheel hides its names and asks you to find each one by its shape. Each symbol rises from the open pages; once it is answered it becomes the sign's emblem and sinks in as ink (full when you answer alone, faint when Caspar shows the answer). **Key 2.**
    - **The modalities.** Every third sign shares a *modality* (cardinal, fixed, or mutable), taught on the same wheel, three seats at a time.
-   - **THE ELEMENTAL TABLE.** Four elements by three modalities. Every sign has exactly one square. Place all twelve. **Key 3.**
+   - **THE ELEMENTAL TABLE.** Four elements by three modalities. Every sign has exactly one square, a well carved into the Wing's own table. Drag or tap a wooden plate into its well and press **Seal**; a plate you place yourself turns gold and its sign wakes in its element's colour. Place all twelve. **Key 3.**
    - **Polarity and opposites.** Every sign is Yang or Yin and has a partner straight across the wheel that shares its modality and polarity but not its element. Caspar hands you parts and you build the sign, find its partner, and say what the two share. **Key 4.**
 6. **Spend what you earn.** Every Key goes back to the Chamber. Each one wakes the Atrium another step (lamps, shelves taking their books back, light behind a sealed door) until the Wing is whole, with two doors still sealed for another day.
 
@@ -54,7 +54,6 @@ Your progress saves in your browser the moment anything changes, once your first
 
 ## What's next
 
-- The Elemental Table and the Book of Symbols coming alive: the Table's squares become carved wells with wooden plates you drag or tap into place, the Book's questions rise out of the open book, and sign names are lettered in their element. Concept boards come first.
 - The game's sounds: one ambient loop and a few interface sounds. The hooks are already in; the work is on hold until the owner says.
 - Caspar's last few lines, around practice and the journal.
 - Then the rest of the Library: planets, houses, aspects, and the people who come to have their charts read.
