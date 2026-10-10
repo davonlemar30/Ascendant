@@ -35,7 +35,7 @@ namespace Ascendant.EraDemo
             "~~~#....#~~~",
             "~~~#....#~~~",
             "~~~#....#~~~",
-            "~~~D.K..#~~~", // the door the Keeper came through, and goes home by
+            "~~~D.K..#~~~", // the way the Keeper came in, and goes back by
             "~~~######~~~",
         };
         public const string Title = "Era demo (greybox)";
@@ -59,7 +59,7 @@ namespace Ascendant.EraDemo
             }));
             map.Points.Add(new EraPoint("caspar", "Caspar", "CASPAR", new Cell(a.X + 1, a.Y), Lines(
                 "[Placeholder] Caspar's line: he can't stay long, because he is tethered to the Library."), follower: true));
-            map.Points.Add(new EraPoint("portal", "The door home", "", map.Find('D'), null, portal: true));
+            map.Points.Add(new EraPoint("portal", "The way back", "", map.Find('D'), null, portal: true)); // neutral: no ruling names the Library his home (Langston, #150)
             return map;
         }
         static List<EraLine> Lines(params string[] text) { var list = new List<EraLine>(); foreach (var t in text) list.Add(new EraLine(t)); return list; }

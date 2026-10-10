@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace Ascendant.EraDemo
 {
     // The walkable-era demo's view (task 86bcg8az2; owner, Oct 9): a greybox map under an orthographic camera that follows the Keeper,
-    // tap-to-move square by square, the shared chat box for talk, a Places list that reaches everyone without walking, and the door home.
+    // tap-to-move square by square, the shared chat box for talk, a Places list that reaches everyone without walking, and the way back.
     // Opened from DEV Mode over the slice; the slice's own canvases are hidden while it shows, Settings stays on top.
     public sealed class EraDemoView : MonoBehaviour
     {
@@ -22,6 +22,9 @@ namespace Ascendant.EraDemo
         public bool PlacesOpen => places != null && places.gameObject.activeSelf;
         public string Speaker => Talk.Open ? Talk.With.Speaker : "";
         public string LineShown => chat != null && chat.gameObject.activeSelf ? chatLine.text : "";
+        public string PlateShown => chatSpeaker != null && chat.gameObject.activeSelf ? chatSpeaker.text : "";
+        // The name plate spaced like the shipped plates (FitBox.CasparPlate): the legacy Text has no letter spacing.
+        public static string Plate(string speaker) => speaker == "CASPAR" ? FitBox.CasparPlate : string.Join("   ", speaker.Split(' ').Select(w => string.Join(" ", w.ToCharArray())));
         public Camera Camera => cam;
         public readonly List<string> Log = new List<string>();
 
@@ -83,7 +86,7 @@ namespace Ascendant.EraDemo
                 if (p.Portal)
                 {
                     Tile("Door frame", p.At, Door, 1, 1, view); Tile("Door", p.At, new Color(.35f, .22f, .12f), .78f, 2, view);
-                    Word("home", World(p.At.X, p.At.Y), 3, Bone, .9f, view);
+                    Word("back", World(p.At.X, p.At.Y), 3, Bone, .9f, view);
                 }
                 else
                 {
@@ -134,7 +137,7 @@ namespace Ascendant.EraDemo
         }
         void BuildPlaces()
         {
-            var rows = Map.Points.OrderBy(p => p.Portal ? 1 : 0).ToList(); // people first, the door home last
+            var rows = Map.Points.OrderBy(p => p.Portal ? 1 : 0).ToList(); // people first, the way back last
             float height = 62 + rows.Count * 46 + 56;
             places = Rect("Places box", root, 0, 400, 280, height);
             var box = places.gameObject.AddComponent<Image>(); box.sprite = Slots.InstrumentBoxSprite(); box.type = Image.Type.Sliced; box.pixelsPerUnitMultiplier = 2;
@@ -184,7 +187,7 @@ namespace Ascendant.EraDemo
         {
             var line = Talk.Current; chat.gameObject.SetActive(line != null); placesButton.interactable = line == null && !Leaving;
             if (line == null) return;
-            if (chatSpeaker != null) chatSpeaker.text = Talk.With.Speaker;
+            if (chatSpeaker != null) chatSpeaker.text = Plate(Talk.With.Speaker);
             chatLine.text = line.Text;
             int choices = line.Choices.Length; chatNext.gameObject.SetActive(choices == 0);
             for (int i = 0; i < choiceButtons.Count; i++) { bool shown = i < choices; choiceButtons[i].gameObject.SetActive(shown); if (shown) choiceButtons[i].GetComponentInChildren<Text>().text = line.Choices[i]; }

@@ -13,7 +13,7 @@ namespace Ascendant.EraDemo
 {
     // Scripted Play Mode pass through the walkable-era demo (task 86bcg8az2): DEV Mode opens it over the Wing-whole save, the Places list and a
     // tap on the map both walk the Keeper, Caspar follows, each person talks through the chat box, a choice waits, reduced motion jumps, and
-    // the door home fades back to the Atrium. Captures each step. Not a human playtest.
+    // the way back fades to the Atrium. Captures each step. Not a human playtest.
     [InitializeOnLoad]
     public static class EraDemoPlayValidation
     {
@@ -47,7 +47,7 @@ namespace Ascendant.EraDemo
         static void Click(string path) { var t = Era.transform.Find(path); if (t == null) throw new Exception("no " + path); t.GetComponent<Button>().onClick.Invoke(); }
         static void Talked(string speaker, int lines)
         {
-            for (int i = 0; i < lines; i++) { Check(Era.Talk.Open && Era.Speaker == speaker && Era.LineShown.StartsWith("[Placeholder]"), speaker + " line " + (i + 1) + ": " + Era.LineShown); Era.Next(); }
+            for (int i = 0; i < lines; i++) { Check(Era.Talk.Open && Era.Speaker == speaker && Era.PlateShown == EraDemoView.Plate(speaker) && Era.LineShown.StartsWith("[Placeholder]"), speaker + " line " + (i + 1) + " (plate \"" + Era.PlateShown + "\"): " + Era.LineShown); Era.Next(); }
             Check(!Era.Talk.Open && Era.LineShown == "", speaker + ": the talk ends and the chat box closes");
         }
 
@@ -114,11 +114,11 @@ namespace Ascendant.EraDemo
                 Talked("THE COPYIST", 2);
                 View.Dial.WebAction("motion"); Check(Era.GoTo("caspar"), "Caspar, who follows");
             });
-            Step("Caspar", () => Era.Talk.Open, () => { Talked("CASPAR", 1); Check(Era.GoTo("portal") && Era.Walker.Walking, "the door home"); });
-            Step("home", () => Era == null && View != null && !View.Busy, () =>
+            Step("Caspar", () => Era.Talk.Open, () => { Talked("CASPAR", 1); Check(Era.GoTo("portal") && Era.Walker.Walking, "the way back"); });
+            Step("back", () => Era == null && View != null && !View.Busy, () =>
             {
-                Check(View.Flow.AtHub && View.Flow.WingWhole, "the door home fades back to the Atrium, the Wing whole");
-                Capture("era-07-home.png");
+                Check(View.Flow.AtHub && View.Flow.WingWhole, "the way back fades to the Atrium, the Wing whole");
+                Capture("era-07-back.png");
             });
             Step("done", () => true, () => { Check(Errors.Count == 0, "no errors in the log" + (Errors.Count > 0 ? ": " + string.Join(" | ", Errors.Take(3)) : "")); Finish("PASS: " + Report.Count + " checks"); });
             nextAt = EditorApplication.timeSinceStartup + 2; limit = nextAt + 30; EditorApplication.update += Tick;
