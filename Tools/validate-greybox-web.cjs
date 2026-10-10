@@ -7,13 +7,48 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=205,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=221,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
   const PROLOGUE=[[0,'prologue-city',2000],[1,'prologue-desk',1500],[1,'prologue-notebook',300],[2,'prologue-desk',500],[2,'prologue-light',1600],[2,'prologue-light-up',400],[2,'prologue-look',600],[2,'prologue-headphones',300],
     [3,'prologue-street-above',1000],[3,'prologue-street-above',3500],[4,'prologue-puzzled',1500],[5,'prologue-caspar-back',1000],[5,'prologue-caspar-turn',1000],[5,'prologue-caspar-face',1500],[5,'prologue-caspar-eyes',2000]]; // [shot, frame, ms to settle]
-  const newGame=async pg=>{await pg.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='prologue',{},{timeout:120000});await pg.locator('#loading').waitFor({state:'detached'});};
+  // The launch (owner, Oct 9, 86bcg62x3): every page load opens on the logo screen, then the launch movie, then the main menu; one Skip covers
+  // both. newGame leaves the launch by the screen reader's Skip, then New Game (on a first launch straight into slot 1; with a save, slot 1,
+  // replacing it); Start over and the DEV samples arrive straight on the prologue. relaunch reloads the page and Continues into the Hub.
+  const LAUNCH=[['logo','studio-logo',700],['draw','intro-wheel-pencil-lines',1000],['glyphs','intro-wheel-pencil-glyphs',500],['alive','intro-wheel-lit',1100],['burn','intro-wheel-burning',1300],['transform','intro-earth',700],['earth','intro-earth',900],
+    ['continents','intro-continents',400],['america','intro-america',400],['newyork-state','intro-newyork-state',400],['newyork-city','intro-newyork-city',400],['brooklyn','intro-brooklyn',400],['block','intro-block',500],['window','prologue-city',900]]; // [shot, frame, ms to settle] (round 4: the wheel's layers over the sky)
+  const loaded=async pg=>{await pg.waitForFunction(()=>!!window.ascendantDial?.snapshot()?.screen,{},{timeout:120000});await pg.locator('#loading').waitFor({state:'detached'});};
+  const press=(pg,id)=>pg.locator('#'+id).evaluate(b=>b.click());
+  const toMenu=async pg=>{await loaded(pg);for(let n=0;n<60;n++){const s=await pg.evaluate(()=>window.ascendantDial.snapshot());if(s.screen==='menu'&&!s.busy)return;if((s.screen==='logo'||s.screen==='intro')&&s.canSkip)await press(pg,'skip-prologue');await pg.waitForTimeout(250);}throw Error('the launch did not reach the menu');};
+  const newGame=async pg=>{await loaded(pg);
+    for(let n=0;n<120;n++){const s=await pg.evaluate(()=>window.ascendantDial.snapshot());if(s.screen==='prologue')return;
+      if((s.screen==='logo'||s.screen==='intro')&&s.canSkip)await press(pg,'skip-prologue');else if(s.screen==='menu'&&s.canMenuNew)await press(pg,'menu-new');
+      else if(s.screen==='saveslots'&&s.canConfirm)await press(pg,'confirm-start');else if(s.screen==='saveslots'&&s.slotEnabled&&s.slotEnabled[0])await press(pg,'slot-1');
+      await pg.waitForTimeout(250);}
+    throw Error('New Game did not reach the opening scene');};
+  const relaunch=async pg=>{await pg.reload();await toMenu(pg);await pg.waitForFunction(()=>window.ascendantDial.snapshot().canMenuContinue,{},{timeout:5000});await press(pg,'menu-continue');
+    await pg.waitForFunction(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='hub'&&s.resumed&&!s.busy;},{},{timeout:60000});};
+  const rowAt=(s,w)=>{const i=(s.settingsRows||[]).findIndex(r=>r.startsWith(w));if(i<0)throw Error('no Settings row '+w+' in '+JSON.stringify(s.settingsRows));return s.settingsRowTops[i];}; // a Settings row's centre down the layout, as the web state reports it
+  // the logo and the launch movie played through: each shot's frame captured once it has come up (until stopAt, if given)
+  const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
+    const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
+    for(const [i,[id,frame,settle]] of LAUNCH.entries()){
+      await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
+      await pg.waitForTimeout(settle);
+      const s=await snap(),skip=await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo';
+      check(s.screen===(logo?'logo':'intro')&&s.launchShotId===id&&s.launchFrame===frame&&s.canSkip&&skip&&!s.gearShown&&s.caspar===''&&!s.canSliceContinue,'the launch'+(reduced?', reduced motion':'')+': '+id+' ('+frame+') on the '+(logo?'logo screen':'launch movie')+', the semantic Skip offered, no gear, no text at '+where);
+      if(reduced&&!logo)check(s.launchStill&&cam.length===3&&Math.abs(cam[0]-1)<.001&&Math.abs(cam[1])<.01&&Math.abs(cam[2]-1)<.001,'reduced motion: '+id+' held still and level, no sweep ('+JSON.stringify(cam)+') at '+where);
+      if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
+      if(!reduced&&id==='glyphs')check(cam.length===3&&cam[2]>0&&cam[2]<1&&Math.abs(cam[2]*12-Math.round(cam[2]*12))<.01,'its symbols appear one at a time: '+Math.round((cam[2]||0)*12)+' of 12 so far at '+where);
+      if(!reduced&&['burn','transform'].includes(id))check(cam.length===3&&Math.abs(cam[1])>.1&&Math.abs(cam[0]-1)<.001,'the wheel spins: '+frame+' turned '+(cam[1]||0).toFixed(1)+' degrees, a round layer at its own size, at '+where);
+      if(!reduced&&['earth','brooklyn','window'].includes(id))check(cam.length===3&&cam[0]>1&&Math.abs(cam[1])<.01,'the push-in on '+frame+' (scale '+(cam[0]||0).toFixed(3)+') at '+where);
+      await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+id+'.png')});
+      if(tap&&id==='continents'){await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const a=await snap();
+        check(a.skipShown&&a.screen==='intro'&&a.launchShot>=s.launchShot,'in the launch movie a canvas tap shows Skip and advances nothing at '+where);}
+      if(id===stopAt)return;
+    }
+  };
   const skipPrologue=async pg=>{await newGame(pg);for(let n=0;n<5;n++){await pg.locator('#skip-prologue').evaluate(b=>b.click());try{await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:3000});return;}catch{}}throw Error('the semantic Skip did not leave the prologue');};
   const playPrologue=async(pg,prefix,reduced,where,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
@@ -76,9 +111,26 @@ const path=require('path');
     const semantic=async(id)=>page.locator('#'+id).evaluate(b=>b.click());
     // Note 10: leaving the Dial lands in the room; the room's doorway back returns to the Atrium (since the art pass, 86bcex5kc 1A). Two presses from the Dial, one from the room.
     const leaveToHub=async()=>{if((await state()).screen==='wing'){await page.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.canLeaveDial&&!s.busy&&!s.active;},{},{timeout:15000}).catch(()=>{});await semantic('leave-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});}await semantic('poi-atrium-door');};
-    await page.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
-    await newGame(page);
-    { const p=await state(); check(p.screen==='prologue'&&p.prologueShots===7&&p.canSkip&&!p.skipShown&&!p.canSliceContinue&&!p.canName,'the opening scene (owner, Oct 8): a new game opens on the prologue, seven shots, Skip offered to the screen reader and hidden on screen, at '+viewport.width);
+    await page.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await loaded(page);
+    // The launch (owner, Oct 9, 86bcg62x3): the logo screen, the launch movie (every shot captured), then the menu, played from a fresh launch in a settled page
+    { const l=await state(); check((l.screen==='logo'||l.screen==='intro')&&!l.gearShown&&l.canSkip&&!l.skipShown&&l.launchShots===15&&!l.canSliceContinue,'the launch (owner, Oct 9): a page load opens on the logo screen, no gear, Skip offered to the screen reader and hidden on screen, at '+viewport.width); }
+    await page.evaluate(()=>window.ascendantDial.act('relaunch'));
+    await playLaunch(page,viewport.width+'-launch',false,viewport.width,null,tap);
+    await page.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.screen==='menu'&&!s.busy;},{},{timeout:15000});await page.waitForTimeout(500);
+    { const m=await state(),b=await looks();
+      check(JSON.stringify(m.menuButtons)==='["Continue","New Game","Load Game","Settings"]'&&!m.gearShown&&!m.canMenuContinue&&!m.canMenuLoad&&m.canMenuNew&&m.canMenuSettings&&JSON.stringify(m.menuAlpha)==='[0.5,1,0.5,1]','the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save Continue and Load Game at half; no gear, at '+viewport.width);
+      check(['CONTINUE','NEW GAME','LOAD GAME','SETTINGS'].every(w=>lookOf(b,w)==='room 232x44')&&small(b).length===0,'the menu\'s buttons wear the Room look at 232 x 44 ('+['CONTINUE','NEW GAME','LOAD GAME','SETTINGS'].map(w=>lookOf(b,w)).join(', ')+') at '+viewport.width);
+      check(await page.locator('#menu-continue').isDisabled()&&await page.locator('#menu-load').isDisabled()&&await page.locator('#menu-new').isEnabled()&&await page.locator('#menu-settings').isEnabled()&&['menu-new','unity-canvas'].includes(await page.evaluate(()=>document.activeElement.id)),'the screen reader\'s menu offers New Game and Settings (focus on New Game, or kept by the canvas after a canvas tap: '+(await page.evaluate(()=>document.activeElement.id))+') at '+viewport.width);
+      check(m.menuArt==='placeholder'&&m.menuTitleArt==='placeholder'&&Math.abs(m.menuTitleTop-115)<.01,'the menu\'s background and title are labelled placeholders until the art lands, the title centred 115 down, at '+viewport.width);
+      check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the menu at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-menu-fresh.png')}); }
+    check(['screen_entered_logo','screen_entered_intro','intro_ended','screen_entered_menu'].every(n=>events.some(e=>e.event_name===n)),'screen_entered:Logo, :Intro and :Menu are logged as every screen is, with the movie\'s end, at '+viewport.width);
+    await tap(0,630);await page.waitForTimeout(400);check((await state()).screen==='menu','with no save Load Game does nothing on the canvas at '+viewport.width);
+    await tap(0,686);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+    { const st=await state(); check(st.settingsOpen&&!st.settingsRows.includes('Start over')&&!st.settingsRows.includes('Main menu')&&st.settingsRows.includes('Jump to...')&&!st.gearShown,'the menu\'s Settings (a canvas tap) opens the same panel without Start over and Main menu ('+st.settingsRows.join(', ')+') at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-menu-settings.png')});await tap(0,rowAt(st,'Close'));await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{}); }
+    await tap(0,574);await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='prologue'&&!window.ascendantDial.snapshot().busy,{},{timeout:30000}); // a first launch: New Game goes straight into slot 1 and the opening scene
+    { const p=await state(); check(p.screen==='prologue'&&p.prologueShots===7&&p.canSkip&&!p.skipShown&&!p.canSliceContinue&&!p.canName&&p.slotInPlay===1&&p.gearShown,'the opening scene (owner, Oct 8): New Game on a first launch (a canvas tap) goes straight into slot 1 and the prologue, seven shots, Skip offered to the screen reader and hidden on screen, the gear back, at '+viewport.width);
       check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the prologue at '+viewport.width); }
     await playPrologue(page,viewport.width+'-prologue',false,viewport.width,tap);
     check(events.some(e=>e.event_name==='screen_entered_prologue')&&events.some(e=>e.event_name==='prologue_ended')&&events.some(e=>e.event_name==='screen_entered_identity'),'screen_entered:Prologue is logged, then the end and Identity, at '+viewport.width);
@@ -131,11 +183,17 @@ const path=require('path');
     await tap(158,22);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
     check((await state()).settingsOpen&&!(await state()).canQuit,'Build U: a tap on the gear opens Settings; a web page offers no Quit at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-settings.png')});
-    await tap(0,267);await page.waitForTimeout(200);check((await state()).muted!==muted0,'Build U: the Sound row turns the sound '+(muted0?'on':'off')+' at '+viewport.width);
-    await tap(0,267);await page.waitForTimeout(200);
-    const reduced0=(await state()).reducedMotion;await tap(0,323);await page.waitForTimeout(200);check((await state()).reducedMotion!==reduced0,'Build U: the Reduced motion row works from Settings at '+viewport.width);
-    await tap(0,323);await page.waitForTimeout(200);
-    await tap(0,553);await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+    { const st=await state(); check(st.settingsRows.indexOf('Main menu')===2&&st.settingsRows.indexOf('Main menu')<st.settingsRows.findIndex(r=>r.startsWith('Walk'))&&st.settingsRows.includes('Start over'),'the launch (Oct 9): in the game Settings has Main menu in the player\'s section, above Testing ('+st.settingsRows.join(', ')+') at '+viewport.width);
+      await tap(0,rowAt(st,'Main menu'));await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsAsk,{},{timeout:5000}).catch(()=>{});
+      const a=await state(); check(a.settingsAsk&&a.settingsAskLine==='Nothing is saved until your first Keeper Key. Go to the main menu?'&&JSON.stringify(a.settingsRows)==='["Main menu","Back"]'&&a.screen==='hub','before Key 1 (nothing saved yet) the Main menu row asks first ("'+a.settingsAskLine+'") at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-settings-main-menu-ask.png')});
+      await tap(0,rowAt(a,'Back'));await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsAsk,{},{timeout:5000}).catch(()=>{});
+      check(!(await state()).settingsAsk&&(await state()).settingsOpen&&(await state()).screen==='hub','Back keeps the game, back on Settings, at '+viewport.width); }
+    await tap(0,rowAt(await state(),'Sound'));await page.waitForTimeout(200);check((await state()).muted!==muted0,'Build U: the Sound row turns the sound '+(muted0?'on':'off')+' at '+viewport.width);
+    await tap(0,rowAt(await state(),'Sound'));await page.waitForTimeout(200);
+    const reduced0=(await state()).reducedMotion;await tap(0,rowAt(await state(),'Reduced motion'));await page.waitForTimeout(200);check((await state()).reducedMotion!==reduced0,'Build U: the Reduced motion row works from Settings at '+viewport.width);
+    await tap(0,rowAt(await state(),'Reduced motion'));await page.waitForTimeout(200);
+    await tap(0,rowAt(await state(),'Close'));await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
     check(!(await state()).settingsOpen&&(await state()).muted===muted0&&(await state()).reducedMotion===reduced0,'Build U: Close shuts Settings, both settings back as they were at '+viewport.width);
     // Platform fit, Part 1 (owner, Oct 1: "Hide the bar and draw behind it"; 86bcbn6mf): with a top band (a camera cutout's, simulated here: the web has none),
     // the gear moves below it and takes its taps there, its semantic box follows, and its old place no longer opens Settings.
@@ -144,7 +202,7 @@ const path=require('path');
       await page.screenshot({path:path.join(out,viewport.width+'-safe-band.png')}); // the Atrium's title and the gear below the band
       await tap(158,22);await page.waitForTimeout(300);const oldSpot=(await state()).settingsOpen;
       await tap(158,22+band);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});const newSpot=(await state()).settingsOpen;
-      if(newSpot){await tap(0,553);await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});}
+      if(newSpot){await tap(0,rowAt(await state(),'Close'));await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});}
       check(Math.abs(s.safeTop-band)<.01&&!oldSpot&&newSpot&&Math.abs(gearBox-((viewport.height-800*scale)/2+(22+band)*scale))<1.5&&!(await state()).settingsOpen,'Platform fit, Part 1: with a '+band+' px top band the gear moves below it, its tap and semantic box with it, at '+viewport.width+' (band '+s.safeTop+', old spot '+oldSpot+', new spot '+newSpot+', box '+gearBox.toFixed(1)+' for '+((viewport.height-800*scale)/2+(22+band)*scale).toFixed(1)+')');
       await page.evaluate(()=>window.ascendantDial.act('safe-inset:-1'));await page.waitForFunction(()=>window.ascendantDial.snapshot().safeTop===0,{},{timeout:5000}).catch(()=>{});await frames(3);
       check((await state()).safeTop===0,'Platform fit, Part 1: the web page has no top band of its own, so the top row stays where it was at '+viewport.width); }
@@ -446,7 +504,7 @@ const path=require('path');
             const shown=[p1.casparShown,p2.casparShown];for(let k=3;k<=p2.casparPages;k++){await semantic('caspar-page');await page.waitForFunction(k=>window.ascendantDial.snapshot().casparPage===k,k,{timeout:5000});shown.push((await state()).casparShown);}
             check(shown.some(t=>t.includes('<color=#E0643C>Fire</color>'))&&shown.some(t=>t.includes('<color=#63A6E0>Water</color>')),'Build S: the pages name Fire and Water in their colours at '+viewport.width);
             await page.screenshot({path:path.join(out,viewport.width+'-dial-pages.png')});
-            reloadedMidPractice=true;const before=(await state()).dueCount;await page.screenshot({path:path.join(out,viewport.width+'-practice-dial.png')});await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+            reloadedMidPractice=true;const before=(await state()).dueCount;await page.screenshot({path:path.join(out,viewport.width+'-practice-dial.png')});await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
             check((await state()).dueCount===before && (await state()).sitting===1,'a reload during practice keeps the deck, its ready count, and the sitting at '+viewport.width);
             await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
             await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().fork==='both'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -554,7 +612,7 @@ const path=require('path');
         check(p.bookInkBox.length===48 && share.every(x=>x>=.97),'every inked symbol sits wholly on the parchment (least '+Math.round(Math.min(...share)*100)+'% parchment under a symbol) at '+viewport.width); }
       if(n===4){
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
-        await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+        await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
         await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         check((await state()).glyphChar==='\u264D','mid-naming reload resumes at Virgo after five committed cards at '+viewport.width);
@@ -576,7 +634,7 @@ const path=require('path');
       await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
       if(n===4){
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
-        await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+        await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
         await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         check((await state()).glyphTarget==='Virgo','mid-placement reload resumes at Virgo after five committed placements at '+viewport.width);
@@ -675,7 +733,7 @@ const path=require('path');
     await leaveToHub();await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // from the Dial, two presses: into the room, then out (note 10)
     }
     check(sawModality,'a practice carries modality items within six sittings at '+viewport.width);
-    await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
     check((await state()).modalitiesComplete && (await state()).gridOpen && !(await state()).gridStarted,'a reload keeps the modality unit complete, and the table has woken at '+viewport.width);
     // ---- Build B: the table and Key 3 ----
     await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -733,7 +791,7 @@ const path=require('path');
     check((await state()).gridPlaced===4 && (await state()).gridPlates[CELL(3)]==='gold' && events.filter(e=>e.event_name==='grid_placed')[3].evidence_eligible,'the dragged plate seals like a tapped one and turns gold at '+viewport.width);
     await seatSign(4);
     check((await state()).gridPlaced===5,'five seated at '+viewport.width);
-    await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
     check((await state()).gridStarted && (await state()).gridPlaced===5 && (await state()).keys===2,'a reload mid-table keeps the five seated signs at '+viewport.width);
     await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).caspar.includes('already placed'),'the room says the table waits, part seated, at '+viewport.width);
@@ -773,7 +831,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key3.png')});
     await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await leaveToHub();await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-    await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
     check((await state()).atriumStage===5 && (await state()).keys===3 && (await state()).keysSpent===3 && (await state()).booksOpen===1 && (await state()).key3 && (await state()).gridComplete && (await state()).cleanRuns===1 && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with three Keys spent, Book 1 open, the full table, and the clean run at '+viewport.width);
     // ---- Build C: polarity, the six opposite pairs, the builder, and Key 4 ----
     const OPP=seat=>(seat+6)%12;
@@ -844,7 +902,7 @@ const path=require('path');
     await page.waitForFunction(()=>{const l=window.ascendantDial.snapshot().lightAlpha;return l>0.59&&l<0.6;},{},{timeout:5000});
     check((await state()).lightAlpha>0.59&&(await state()).lightAlpha<0.6,'the light overlay sits at half plus four of 21 locks once the Wing is whole; full light waits for the last Book (owner, Sept 27) at '+viewport.width); // Build H, rekeyed to the arc
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
-    await page.reload();await page.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed,{},{timeout:120000});
+    await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
     check((await state()).atriumStage===6 && (await state()).keys===4 && (await state()).keysSpent===4 && (await state()).wingWhole && (await state()).key4 && (await state()).polarityShown && (await state()).oppositesComplete && (await state()).avatarAt==='entry','a reload resumes at the Hub from the local save with four Keys spent, the Wing whole, the sides, and the six pairs at '+viewport.width);
     // Build L: the Wing at full light (Stage 6), the capture the owner judges the light overlay by
     await page.waitForFunction(()=>window.ascendantDial.snapshot().atriumKitRestored===9,{},{timeout:8000}); // the restore fade settles piece by piece
@@ -867,19 +925,75 @@ const path=require('path');
     const snap=()=>still.evaluate(()=>window.ascendantDial.snapshot());
     const frames=async n=>{for(let i=0;i<n;i++)await still.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>r())));};
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await still.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await still.mouse.down();await frames(2);await still.mouse.up();await frames(2);};
-    await still.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await newGame(still);
+    await still.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await loaded(still);
+    // the launch under reduced motion (owner, Oct 9): each shot still, no push or turn; a canvas tap shows Skip, and a canvas tap on Skip goes to the menu
+    await still.waitForFunction(()=>window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000}).catch(()=>{});await still.evaluate(()=>window.ascendantDial.act('relaunch'));
+    await playLaunch(still,viewport.width+'-launch-reduced',true,viewport.width,'continents',null);
+    await tap(0,400);await still.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});check((await snap()).skipShown&&(await snap()).screen==='intro','a canvas tap in the launch movie shows Skip at '+viewport.width);
+    await still.screenshot({path:path.join(out,viewport.width+'-launch-skip.png')});
+    await tap(118,744);await still.waitForFunction(()=>window.ascendantDial.snapshot().screen==='menu'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000}).catch(()=>{});
+    { const s=await snap(); check(s.screen==='menu'&&s.launchShot===-1&&s.reducedMotion&&!s.gearShown,'a canvas tap on Skip goes straight to the menu, reduced motion kept, at '+viewport.width); }
+    await newGame(still);
     await still.waitForFunction(()=>window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000}).catch(()=>{});check((await snap()).reducedMotion,'the page\'s reduced-motion setting reaches the game during the prologue at '+viewport.width);
     await playPrologue(still,viewport.width+'-prologue-reduced',true,viewport.width,null);
     await still.evaluate(()=>window.ascendantDial.act('restart'));await newGame(still);await still.waitForFunction(()=>window.ascendantDial.snapshot().prologueFrame==='prologue-city',{},{timeout:10000});
     { const g=(await snap()).gearAt;await tap(g[0],g[1]);await still.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});const s=await snap();
       check(s.settingsOpen&&!s.skipShown&&s.screen==='prologue','the gear opens Settings over the prologue, and its tap does not count as the tap that shows Skip, at '+viewport.width);
-      await still.screenshot({path:path.join(out,viewport.width+'-prologue-settings.png')});await tap(0,553);await still.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+      await still.screenshot({path:path.join(out,viewport.width+'-prologue-settings.png')});await tap(0,rowAt(await snap(),'Close'));await still.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
       check(!(await snap()).settingsOpen&&!(await snap()).skipShown&&(await snap()).screen==='prologue','closing Settings leaves the prologue playing, Skip still hidden, at '+viewport.width); }
     await tap(0,400);await still.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});check((await snap()).skipShown,'a canvas tap shows Skip at '+viewport.width);
     await tap(118,744);await still.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000}).catch(()=>{});
     { const s=await snap(); check(s.screen==='identity'&&s.orbShown&&s.prologueShot===-1,'a canvas tap on Skip goes straight to WHO ARE YOU? at '+viewport.width); }
     check(stillErrors.length===0,'no runtime exceptions through the opening scene at '+viewport.width+(stillErrors.length?': '+stillErrors[0]:''));
     await stillContext.close();
+  }));
+  // The launch's save slots (owner, Oct 9, 86bcg62x3, round 3): a save written the old way (one key; a DEV jump writes slot 1 under today's key,
+  // and no slot is remembered) shows up in slot 1; the menu with a save; Load Game and New Game's slot lists; the question before a filled slot
+  // is replaced; a new game in an empty slot; Settings' Main menu before Key 1 (it asks) and after (it doesn't); Continue picking the slot played
+  // last, or falling back to the one that holds a save; replacing slot 1. Canvas taps throughout.
+  await Promise.all(VIEWPORTS.map(async viewport=>{
+    const menuContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});
+    const mp=await menuContext.newPage();const menuErrors=[];mp.on('pageerror',e=>menuErrors.push(String(e)));
+    const snap=()=>mp.evaluate(()=>window.ascendantDial.snapshot());const send=c=>mp.evaluate(k=>window.ascendantDial.act(k),c);const w=viewport.width;
+    const frames=async n=>{for(let i=0;i<n;i++)await mp.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>r())));};
+    const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await mp.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await mp.mouse.down();await frames(2);await mp.mouse.up();await frames(2);};
+    const until=(f,t=15000,a)=>mp.waitForFunction(f,a,{timeout:t});
+    const onMenu=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='menu'&&!s.busy;});await mp.waitForTimeout(300);};
+    const onHub=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='hub'&&s.resumed&&!s.busy;},60000);await mp.waitForTimeout(300);};
+    const onPrologue=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='prologue'&&!s.busy;},30000);await mp.waitForTimeout(300);};
+    await mp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await toMenu(mp);
+    await send('jump:key1');await onHub(); // a save under today's key, nothing else
+    await mp.reload();await toMenu(mp);await mp.waitForTimeout(400);
+    { const m=await snap(); check(m.canMenuContinue&&m.canMenuLoad&&JSON.stringify(m.menuAlpha)==='[1,1,1,1]'&&m.continueSlot===1&&m.slotInPlay===1&&await mp.evaluate(()=>document.activeElement.id)==='menu-continue','with a save every menu button is available, Continue on slot 1 (focus on Continue) at '+w);
+      await mp.screenshot({path:path.join(out,w+'-menu-save.png')}); }
+    await tap(0,630);await until(()=>window.ascendantDial.snapshot().screen==='saveslots');await mp.waitForTimeout(300);
+    { const s=await snap(); check(s.slotsFor==='load'&&s.slotsTitle==='Load Game'&&s.slotFilled.join()==='true,false,false'&&/^Slot 1: [^,]+, Keeper Keys: 1, /.test(s.slotCards[0])&&s.slotCards[1]==='Slot 2: Empty'&&s.slotEnabled.join()==='true,false,false'&&JSON.stringify(s.slotAlpha)==='[1,0.5,0.5]'&&!s.gearShown,'Load Game (a canvas tap): the old single save shows up in slot 1 ('+s.slotCards[0]+'); the empty slots read Empty, dimmed, at '+w);
+      check(await mp.locator('#slot-1').isEnabled()&&await mp.locator('#slot-2').isDisabled()&&(await mp.locator('#slot-1').getAttribute('aria-label'))===s.slotCards[0],'the screen reader\'s slot list names each slot\'s card at '+w);
+      await mp.screenshot({path:path.join(out,w+'-slots-load.png')}); }
+    await tap(0,360);await mp.waitForTimeout(300);check((await snap()).screen==='saveslots','an empty slot does nothing in Load Game at '+w);
+    await tap(0,574);await onMenu();check((await snap()).screen==='menu','Back returns to the menu at '+w);
+    await tap(0,574);await until(()=>window.ascendantDial.snapshot().screen==='saveslots');await mp.waitForTimeout(300);
+    { const s=await snap(); check(s.slotsFor==='new'&&s.slotsTitle==='New Game'&&s.slotEnabled.join()==='true,true,true'&&!s.confirmShown,'New Game with a save opens the slot list, every slot available, at '+w);await mp.screenshot({path:path.join(out,w+'-slots-new.png')}); }
+    await tap(0,250);await until(()=>window.ascendantDial.snapshot().confirmShown,5000);
+    { const s=await snap(),said=await mp.locator('#announcement').textContent(); check(s.confirmShown&&s.confirmLine==='This replaces your saved game.'&&s.canConfirm&&!s.canSlotsBack&&said.includes(s.confirmLine)&&await mp.locator('#confirm-back').isEnabled()&&await mp.locator('#slot-2').isDisabled(),'a filled slot asks first ("'+s.confirmLine+'", announced) at '+w);await mp.screenshot({path:path.join(out,w+'-slots-confirm.png')}); }
+    await tap(66,440);await until(()=>!window.ascendantDial.snapshot().confirmShown,5000);check((await snap()).screen==='saveslots'&&(await snap()).slotFilled[0],'Back on the question keeps the save at '+w);
+    await tap(0,360);await onPrologue(); // an empty slot: the new game starts there
+    { const s=await snap(); check(s.slotInPlay===2&&!s.resumed&&s.gearShown,'an empty slot starts the new game there (slot 2, the opening scene) at '+w); }
+    { const g=(await snap()).gearAt;await tap(g[0],g[1]);await until(()=>window.ascendantDial.snapshot().settingsOpen,5000);await tap(0,rowAt(await snap(),'Main menu'));await until(()=>window.ascendantDial.snapshot().settingsAsk,5000);
+      await mp.screenshot({path:path.join(out,w+'-prologue-main-menu-ask.png')});check((await snap()).screen==='prologue','Main menu over the opening scene asks first at '+w);await tap(0,rowAt(await snap(),'Main menu')); }
+    await onMenu();
+    { const m=await snap(); check(m.continueSlot===1&&m.slotInPlay===2&&m.canMenuContinue&&m.launchShot===-1,'Main menu comes straight to the menu; the slot played last (2) holds nothing, so Continue falls back to slot 1, at '+w); }
+    await tap(0,518);await onHub();check((await snap()).slotInPlay===1&&(await snap()).keys===1,'Continue (a canvas tap) resumes slot 1 at the Hub, slot 1 in play again, at '+w);
+    { const g=(await snap()).gearAt;await tap(g[0],g[1]);await until(()=>window.ascendantDial.snapshot().settingsOpen,5000);const st=await snap();
+      check(st.settingsRows.includes('Main menu')&&st.settingsRows.includes('Start over'),'in the game Settings shows Main menu and Start over ('+st.settingsRows.join(', ')+') at '+w);await mp.screenshot({path:path.join(out,w+'-settings-in-game.png')});
+      await tap(0,rowAt(st,'Main menu')); }
+    await onMenu();check(!(await snap()).settingsAsk&&(await snap()).continueSlot===1,'after Key 1 Main menu goes straight to the menu, with no question (the game saves as it goes), at '+w);
+    await tap(0,574);await until(()=>window.ascendantDial.snapshot().screen==='saveslots');await tap(0,250);await until(()=>window.ascendantDial.snapshot().confirmShown,5000);
+    await tap(-66,440);await onPrologue();check((await snap()).slotInPlay===1,'Start on the question replaces slot 1 and starts the new game there at '+w);
+    await mp.reload();await toMenu(mp);await mp.waitForTimeout(300);
+    { const m=await snap(); check(!m.canMenuContinue&&!m.canMenuLoad&&JSON.stringify(m.menuAlpha)==='[0.5,1,0.5,1]','replacing cleared slot 1 at once: no save left, Continue and Load Game at half again, at '+w); }
+    check(menuErrors.length===0,'no runtime exceptions through the menu and the slots at '+w+(menuErrors.length?': '+menuErrors[0]:''));
+    await menuContext.close();
   }));
   // Build W (owner, Sept 26 note 5; task 86bca0163): DEV Mode's Jump to. A canvas tap through Settings to one checkpoint, the rest through their web buttons.
   await Promise.all(VIEWPORTS.map(async viewport=>{
@@ -898,7 +1012,7 @@ const path=require('path');
     for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await dev.waitForTimeout(150);}
     await dev.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     await tap(158,22);await dev.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
-    await tap(0,449);await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
+    await tap(0,rowAt(await snap(),'Jump to'));await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
     check((await snap()).settingsOpen&&(await snap()).jumpsShown,'Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at '+viewport.width);
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-jump.png')});
     await tap(0,311);await resumed(); // the fifth row: After Key 4 (Oct 7: the list is four rows taller with the opening's samples, its top 92 px higher)
@@ -1081,7 +1195,7 @@ const path=require('path');
     { const s=await snap(); check(JSON.stringify(s.journalBirthLines)==='["Your rising is Virgo.","It takes the place of the one you chose.","Your moon is Taurus.","Everything you\'ve learned stays as it is."]' && JSON.stringify(s.journalBirthRows)==='["Date: 25 April 1990","Time: 2:30 pm","Place: London, Britain (UK)"]' && !s.canBirthAdd && !s.canBirthRising && s.lessonSun==='Taurus' && s.keys===1,
       'the facts added in the opening\'s boxes decide: a line for each change, the Key kept, the lessons now from Taurus: '+s.journalBirthLines.join(' / ')+' at '+viewport.width); }
     await bp.screenshot({path:path.join(out,viewport.width+'-your-birth-added.png')});
-    await bp.reload();await resumed();await landing();
+    await relaunch(bp);await resumed();await landing();
     { const s=await snap(); check(s.journalKeeper[2]==='☉ Taurus · ☽ Taurus · ↑ Virgo' && !s.risingChosen,'after a reload the record reads the saved chart: '+s.journalKeeper[2]+' at '+viewport.width); }
     // an old version 4 save from each path, converted once on load
     for(const [id,expect] of [['known','☉ Leo · ☽ Scorpio · ↑ unknown'],['chosen','☉ Capricorn · ☽ unknown · ↑ unknown'],['legacy','☉ Gemini · ☽ unknown · ↑ unknown']]){
@@ -1215,7 +1329,7 @@ const path=require('path');
       const gearBox=await pg.locator('#settings').evaluate(b=>[parseFloat(b.style.left)+parseFloat(b.style.width)/2,parseFloat(b.style.top)+parseFloat(b.style.height)/2]);
       check(Math.abs(gearBox[0]-(w/2+g[0]*scale))<1.5&&Math.abs(gearBox[1]-(top+g[1]*scale))<1.5,'Part 2: at '+name+' the semantic gear sits on the gear');
       await tap(g[0],g[1]);await until(()=>window.ascendantDial.snapshot().settingsOpen,5000).catch(()=>{});check((await snap()).settingsOpen,'Part 2: at '+name+' a tap on the gear opens Settings');
-      await tap(0,553);await until(()=>!window.ascendantDial.snapshot().settingsOpen,5000).catch(()=>{});
+      await tap(0,rowAt(await snap(),'Close'));await until(()=>!window.ascendantDial.snapshot().settingsOpen,5000).catch(()=>{});
       await tap(t[0],t[1]);await until(()=>window.ascendantDial.snapshot().travelOpen,5000).catch(()=>{});check((await snap()).travelOpen,'Part 2: at '+name+' a tap on the mini-menu button opens TRAVEL');
       await pg.screenshot({path:path.join(out,'shape-'+name+'-travel.png')});await act('travel');await until(()=>!window.ascendantDial.snapshot().travelOpen,5000).catch(()=>{});
       await tap(0,310);await until(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,15000).catch(()=>{});

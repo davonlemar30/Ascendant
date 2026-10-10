@@ -35,13 +35,14 @@ namespace Ascendant.Build
         public static void Begin()
         {
             EditorSceneManager.OpenScene("Assets/Scenes/VerticalSlice.unity");
-            PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save(); // a stale local save from an earlier run would resume at the Hub
+            ClearSlots(); // a stale local save from an earlier run would show on the menu (the three slots and the slot played last)
             SlotMenus.ClearForFixture();Slots.Request(null,null); // Build E: the run plays on the Art folder; the test set comes in at the end
             int scale=Environment.GetCommandLineArgs().Contains("-sliceScale2") ? 2 : 1; // phone pixel density: the same layout at twice the pixels
             GreyboxPlayValidation.SetSize(390*scale,844*scale);SessionState.SetBool("AscendantSlicePlayValidation",true);
             EditorApplication.EnterPlaymode();
         }
         static void Check(bool value,string text) { if(!value)throw new Exception(text);Report.Add("PASS: "+text); }
+        static void ClearSlots() { for(int i=1;i<=SaveSlots.Count;i++)PlayerPrefs.DeleteKey(SaveSlots.Key(i));PlayerPrefs.DeleteKey(SaveSlots.LastKey);PlayerPrefs.Save(); }
         static void Act(string command) => View.Dial.WebAction(command);
         static void AnswerReview(bool captureGlyph)
         {
@@ -55,10 +56,24 @@ namespace Ascendant.Build
         static void QueueChecks()
         {
             Report.Clear();Steps.Clear();RuntimeErrors.Clear();Application.logMessageReceived+=CaptureLog;
+            // The launch (owner, Oct 9, 86bcg62x3): every launch opens on the logo screen, then the launch movie, then the main menu. A first launch
+            // has no save: Continue and Load Game dim to half, and New Game goes straight into slot 1 and the opening scene.
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View!=null && View.Flow.AtLaunch && (s.screen=="logo" || s.screen=="intro") && !View.GearShown && !s.gearShown && s.canSkip && !View.SkipShown && s.launchShots==SliceView.LaunchShots.Length,"a launch opens on the logo screen: no gear, Skip ready for the screen reader and hidden on screen");
+                Act("relaunch");nextAt=EditorApplication.timeSinceStartup+.1;}); // a fresh launch in a settled Editor, so the shots' real-time clock and the steps line up (the batch Editor's first seconds stall)
+            Launch("slice-390-launch",false,null);
+            Until(()=>View.Flow.Screen==SliceScreen.Menu && !View.Busy,15,"the menu after the launch movie",1.0);
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="menu" && s.menuButtons.SequenceEqual(SliceView.MenuWords) && !s.gearShown && !View.AnySave && !View.MenuButton(0).interactable && !View.MenuButton(2).interactable && View.MenuButton(1).interactable && View.MenuButton(3).interactable && Mathf.Approximately(s.menuAlpha[0],.5f) && Mathf.Approximately(s.menuAlpha[2],.5f) && s.menuAlpha[1]==1 && s.menuAlpha[3]==1 && !s.canMenuContinue && !s.canMenuLoad && s.canMenuNew && s.canMenuSettings,"the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save, Continue and Load Game at half (the unavailable look); no gear");
+                Check(Enumerable.Range(0,4).All(i=>{var r=(RectTransform)View.MenuButton(i).transform;return r.sizeDelta==new Vector2(232,44) && Mathf.Approximately(-r.anchoredPosition.y,SliceView.MenuButtonY(i)) && r.anchoredPosition.x==0 && ButtonLook.KindOf(View.MenuButton(i))=="room";}),"the menu's buttons wear the Room look, 232 x 44, centred, 12 px apart from 496 down");
+                Check(s.menuArt=="placeholder" && s.menuTitleArt=="placeholder" && Mathf.Approximately(s.menuTitleTop,SliceView.MenuTitleY+s.safeTop),"the menu's background and title are labelled placeholders until the art lands; the title centred 115 down");Capture("slice-390-menu-fresh.png");});
+            Steps.Enqueue(()=>{Act("menu:load");Act("menu:continue");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu && !View.Busy,"with no save, Load Game and Continue do nothing");Act("menu:settings");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.Settings.Open && s.settingsOpen && !s.settingsRows.Contains("Start over") && !s.settingsRows.Contains("Main menu") && s.settingsRows.Contains("Jump to...") && s.settingsRows.Contains("Close") && !View.GearShown,"the menu's Settings opens the same panel without the in-game rows (Start over, Main menu): "+string.Join(", ",s.settingsRows));Capture("slice-390-menu-settings.png");});
+            Steps.Enqueue(()=>Act("settings"));
+            Steps.Enqueue(()=>{Check(!View.Settings.Open && View.Flow.Screen==SliceScreen.Menu,"Close returns to the menu");Act("menu:new");}); // a first launch: straight into slot 1 and the opening scene
             // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue; a tap shows Skip and never advances a shot; Skip hides
             // again after about 3 s; the scene plays through on its own, every shot captured, and ends in darkness on WHO ARE YOU?
-            Steps.Enqueue(()=>{Check(View!=null && View.Flow.Screen==SliceScreen.Prologue && View.Dial.Snapshot().screen=="prologue" && !View.Flow.CanContinue && !View.OrbShown && View.Dial.Snapshot().canSkip && !View.SkipShown && View.Dial.Snapshot().prologueShots==7,"a new game opens on the opening scene, Skip ready for the screen reader and hidden on screen");
-                Act("restart");}); // a fresh start in a settled Editor, so the shots' real-time clock and the steps line up (the batch Editor's first seconds stall)
+            Until(()=>View!=null && View.Flow.AtPrologue && View.PrologueShotIndex==0,10,"the opening scene from New Game",.05);
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Prologue && View.Dial.Snapshot().screen=="prologue" && !View.Flow.CanContinue && !View.OrbShown && View.Dial.Snapshot().canSkip && !View.SkipShown && View.Dial.Snapshot().prologueShots==7 && SaveSlots.InPlay==1 && View.GearShown,"a first launch's New Game goes straight into slot 1 and the opening scene, Skip ready for the screen reader and hidden on screen, the gear back");nextAt=EditorApplication.timeSinceStartup+.1;});
             Prologue("slice-390-prologue",false);
             Until(()=>View.Flow.Screen==SliceScreen.Identity && !View.Busy,30,"the prologue's end",1.0);
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && View.OrbShown && View.Flow.OpeningAnswers==0 && View.OrbStarsLit==0 && View.PrologueShotIndex==-1,"the prologue ends on WHO ARE YOU?, the orb above it with no stars yet");OrbClear("WHO ARE YOU?");Capture("slice-390-identity.png");SafeArea.Simulated=24;});
@@ -78,7 +93,12 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{for(int i=0;i<SliceView.AtriumPages.Length;i++)Act("next-screen");});
             // Build T (owner, APK playtest, Sept 29): the opening hands over the Atrium; Caspar sends the player to the Zodiac Wing, and the Dial is tapped there.
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Hub && View.Flow.AtriumStage==1 && !View.Busy && View.Dial.Snapshot().caspar.StartsWith(SliceView.HubOpeningLine) && !View.Flow.CanEnterChamber,"Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing, the Chamber shut");Capture("slice-390-opening-hub.png");Act("settings");});
-            Steps.Enqueue(()=>{Check(View.Settings.Open && View.Dial.Snapshot().settingsOpen && View.Settings.GearShown,"Build U: the gear opens Settings over the Atrium");Capture("slice-390-settings.png");Act("settings");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.Settings.Open && s.settingsOpen && View.Settings.GearShown,"Build U: the gear opens Settings over the Atrium");
+                int mm=System.Array.IndexOf(s.settingsRows,"Main menu");Check(mm>=2 && s.settingsRows[mm-1]==(SettingsMenu.CanQuit?"Quit the game":"Reduced motion: off") && s.settingsRows[mm+1].StartsWith("Walk") && s.settingsRows.Contains("Start over") && s.settingsRowTops.Length==s.settingsRows.Length && Mathf.Approximately(s.settingsRowTops[mm+1]-s.settingsRowTops[mm],78),"the launch (Oct 9): in the game, Settings has Main menu in the player's section, above Testing: "+string.Join(", ",s.settingsRows));Capture("slice-390-settings.png");});
+            Steps.Enqueue(()=>Act("main-menu"));
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.Settings.Asking && s.settingsAsk && s.settingsAskLine==SliceView.MainMenuAskLine && s.settingsRows.SequenceEqual(new[]{"Main menu","Back"}) && View.Flow.Screen==SliceScreen.Hub,"before Key 1 (nothing saved yet), Main menu asks first: \""+s.settingsAskLine+"\"");Capture("slice-390-settings-main-menu-ask.png");});
+            Steps.Enqueue(()=>Act("main-menu-back"));
+            Steps.Enqueue(()=>{Check(View.Settings.Open && !View.Settings.Asking && View.Flow.Screen==SliceScreen.Hub && View.Dial.Snapshot().settingsRows.Contains("Main menu"),"Back keeps the game and returns to Settings");Act("settings");});
             Steps.Enqueue(()=>{Check(!View.Settings.Open,"Build U: the gear closes Settings again");});
             // Platform fit, Part 1 (owner, Oct 1; 86bcbn6mf): a 24 px top band (a cutout's, simulated: the Editor has none) moves the top row down,
             // the title and the gear by the band and the line under the title by what is left after its gap; without a band nothing moves.
@@ -412,6 +432,14 @@ namespace Ascendant.Build
             Until(()=>View.Flow.Screen==SliceScreen.Identity && !View.Busy,30,"the reduced prologue's end",1.0);
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && View.OrbShown,"under reduced motion the prologue still ends on WHO ARE YOU?");Act("motion");GreyboxPlayValidation.SetSize(360,800);});
             Steps.Enqueue(()=>{Check(UnityEngine.Object.FindFirstObjectByType<Canvas>().pixelRect.size==new Vector2(360,800),"small portrait viewport");Capture("slice-360-identity.png");});
+            // the launch under reduced motion (carried across the reload, as a page sends its setting again): each shot still, no push or turn;
+            // a tap shows Skip, and Skip goes to the menu
+            Steps.Enqueue(()=>{Act("motion");Check(View.Dial.Lesson.Dial.ReducedMotion,"reduced motion on");Act("relaunch");nextAt=EditorApplication.timeSinceStartup+.1;});
+            Launch("slice-360-launch-reduced",true,"continents");
+            Steps.Enqueue(()=>{Act("prologue-tap");Act("next-screen");Check(View.SkipShown && View.Dial.Snapshot().skipShown && View.Flow.Screen==SliceScreen.Intro && View.LaunchShotIndex>0,"in the launch movie a tap shows Skip and advances nothing");Capture("slice-360-launch-skip.png");});
+            Steps.Enqueue(()=>Act("skip-prologue"));
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu && !View.Busy && View.LaunchShotIndex==-1 && !View.Dial.Snapshot().gearShown && View.Dial.Lesson.Dial.ReducedMotion,"Skip goes straight to the menu (reduced motion kept)");Capture("slice-360-menu.png");});
+            Steps.Enqueue(()=>Act("motion"));
             // Build E: the same save with the test set in every slot, at both viewports; the cues; then the style page on both sets.
             Steps.Enqueue(()=>{Check(Slots.Set=="" && !View.StyleShown && Sound.LastCue!="","the run so far played on the Art folder and the sound hooks fired, files or not (last cue: "+Sound.LastCue+")");PlayerPrefs.SetString(SliceView.SaveKey,stashedSave);PlayerPrefs.Save();Slots.Request(Slots.TestSet,false);Act("reload");});
             Steps.Enqueue(()=>{Check(View!=null && View.Resumed && View.Flow.Screen==SliceScreen.Hub && Slots.Set==Slots.TestSet && Slots.ArtFiles==Slots.Art.Length && Slots.SoundFiles==7,"?art=test: the save resumes at the Hub with the test set, every slot with a file");
@@ -477,9 +505,38 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && !View.Busy && View.OrbShown && Slots.IsDressed("orb") && View.PrologueShotIndex==-1,"Skip goes straight to WHO ARE YOU?, the orb on its file");Act("name:Tester");Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth && View.OrbStarsLit==1 && Slots.IsDressed("orb-star"),"the name's star on its file");OrbClear("the birth question, test set");Capture("slice-390-art-birth-orb.png");Act("birth:skip");Act("sign:1");});
             Steps.Enqueue(()=>{Check(View.OrbStarsLit==3,"three stars after two answers");Capture("slice-390-art-birth-orb-3.png");});
-            Steps.Enqueue(()=>{Slots.Request(null,null);PlayerPrefs.DeleteKey(SliceView.SaveKey);PlayerPrefs.Save();});
+            // The launch's slots (owner, Oct 9; round 3): the Wing-whole save back in slot 1 (an old single save, under today's key), then Main menu
+            // from the birth question (nothing saved yet: it asks), the slot lists, the question before a filled slot is replaced, a new game in an
+            // empty slot, and Continue falling back to the slot that holds a save; the menu's files from the test set
+            Steps.Enqueue(()=>{PlayerPrefs.SetString(SliceView.SaveKey,stashedSave);PlayerPrefs.DeleteKey(SaveSlots.LastKey);PlayerPrefs.Save();Act("main-menu");});
+            Steps.Enqueue(()=>{Check(View.Settings.Asking && View.Flow.Screen==SliceScreen.Birth,"Main menu on the birth question asks first");Act("main-menu-confirm");});
+            Until(()=>View!=null && View.Flow.Screen==SliceScreen.Menu && !View.Busy,10,"the menu from Settings",.5);
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="menu" && View.AnySave && View.MenuButton(0).interactable && View.MenuButton(2).interactable && s.menuAlpha.All(a=>a==1) && s.canMenuContinue && s.canMenuLoad && s.continueSlot==1 && !s.gearShown,"Main menu comes straight to the menu (no logo, no movie); with a save in slot 1 every button is available");
+                Check(Slots.IsDressed("menu-city") && Slots.IsDressed("menu-title") && s.menuArt=="test set" && s.menuTitleArt=="test set","the menu's background and title take their files");Capture("slice-390-art-menu.png");});
+            Steps.Enqueue(()=>Act("menu:load"));
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();var c=View.Cards;Check(s.screen=="saveslots" && s.slotsFor=="load" && c[0].Filled && c[0].Name=="Tester" && c[0].Keys=="Keeper Keys: 4" && c[0].BigThree!="" && !c[1].Filled && !c[2].Filled && c[1].Name=="Empty" && s.slotEnabled.SequenceEqual(new[]{true,false,false}) && Mathf.Approximately(s.slotAlpha[1],.5f) && Mathf.Approximately(s.slotAlpha[2],.5f) && s.slotAlpha[0]==1,"Load Game: the old save shows in slot 1 ("+c[0].Spoken+"); the empty slots read Empty and are dimmed");
+                Capture("slice-390-art-slots-load.png");});
+            Steps.Enqueue(()=>{Act("slot:2");Act("slots-back");});
+            Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu,"an empty slot does nothing in Load Game; Back returns to the menu");Act("menu:new");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="saveslots" && s.slotsFor=="new" && s.slotEnabled.All(e=>e) && !s.confirmShown,"New Game with a save opens the slot list, every slot available");Act("slot:1");});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.confirmShown && s.confirmLine==SliceView.ReplaceLine && View.ConfirmSlot==1 && s.canConfirm && !s.canSlotsBack && s.caspar==SliceView.ReplaceLine && PlayerPrefs.HasKey(SliceView.SaveKey),"a filled slot asks first: \""+s.confirmLine+"\"");Capture("slice-390-art-slots-confirm.png");});
+            Steps.Enqueue(()=>Act("confirm-back"));
+            Steps.Enqueue(()=>{Check(!View.Dial.Snapshot().confirmShown && View.Flow.Screen==SliceScreen.SaveSlots && SaveSlots.CanLoad(1),"Back keeps the save");Act("slot:2");});
+            Until(()=>View!=null && View.Flow.AtPrologue && View.PrologueShotIndex==0,10,"the opening scene in slot 2",.05);
+            Steps.Enqueue(()=>{Check(SaveSlots.InPlay==2 && SaveSlots.CanLoad(1) && !SaveSlots.CanLoad(2) && !View.Resumed,"an empty slot starts the new game there: slot 2 is in play, slot 1 untouched");Act("main-menu");});
+            Steps.Enqueue(()=>{Check(View.Settings.Asking,"Main menu over the opening scene asks first (nothing saved yet)");Act("main-menu-confirm");});
+            Until(()=>View!=null && View.Flow.Screen==SliceScreen.Menu && !View.Busy,10,"the menu again",.5);
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.continueSlot==1 && s.slotInPlay==2 && s.canMenuContinue,"the slot played last (2) holds nothing, so Continue falls back to slot 1");Act("menu:continue");});
+            Until(()=>View!=null && View.Flow.Screen==SliceScreen.Hub && View.Resumed && !View.Busy,10,"Continue into slot 1",.5);
+            Steps.Enqueue(()=>{Check(SaveSlots.InPlay==1 && View.Flow.Keys==4 && View.Flow.WingWhole && View.GearShown,"Continue resumes slot 1 at the Hub, and slot 1 is in play again");Act("main-menu");});
+            Until(()=>View!=null && View.Flow.Screen==SliceScreen.Menu && !View.Busy,10,"the menu after Key 1, with no question",.5);
+            Steps.Enqueue(()=>{Check(!View.Settings.Open && View.Dial.Snapshot().continueSlot==1,"after Key 1 Main menu goes straight to the menu (the game saves as it goes)");Act("menu:new");});
+            Steps.Enqueue(()=>{Act("slot:1");Act("confirm-start");});
+            Until(()=>View!=null && View.Flow.AtPrologue && View.PrologueShotIndex==0,10,"the new game over slot 1",.05);
+            Steps.Enqueue(()=>{Check(SaveSlots.InPlay==1 && !SaveSlots.CanLoad(1) && !PlayerPrefs.HasKey(SliceView.SaveKey),"confirming clears the slot at once and starts the new game there");});
+            Steps.Enqueue(()=>{Slots.Request(null,null);ClearSlots();});
             Steps.Enqueue(()=>{
-                Check(!PlayerPrefs.HasKey(SliceView.SaveKey) && Slots.Set=="" && !Slots.StyleRequested,"the fixture leaves no save and no set request behind");
+                Check(Enumerable.Range(1,SaveSlots.Count).All(i=>!PlayerPrefs.HasKey(SaveSlots.Key(i))) && !PlayerPrefs.HasKey(SaveSlots.LastKey) && Slots.Set=="" && !Slots.StyleRequested,"the fixture leaves no save and no set request behind");
                 Check(RuntimeErrors.Count==0,"no runtime errors: "+string.Join("; ",RuntimeErrors));
                 Application.logMessageReceived-=CaptureLog;
                 Directory.CreateDirectory("Logs");File.WriteAllLines(ReportPath,Report);
@@ -487,6 +544,27 @@ namespace Ascendant.Build
                 SessionState.SetBool("AscendantSlicePlayValidation",false);EditorApplication.update-=Tick;EditorApplication.ExitPlaymode();
             });
             nextAt=EditorApplication.timeSinceStartup+2;EditorApplication.update+=Tick;
+        }
+        // ---- the launch's helper (Oct 9): the logo and the movie, each shot's frame captured once it has come up (until stopAt, if given) ----
+        static void Launch(string file,bool reduced,string stopAt)
+        {
+            var shots=new (string id,string frame,double after)[]{("logo","studio-logo",.6),("draw","intro-wheel-pencil-lines",1.0),("glyphs","intro-wheel-pencil-glyphs",.6),("alive","intro-wheel-lit",1.2),("burn","intro-wheel-burning",1.4),("transform","intro-earth",.8),("earth","intro-earth",1.0),
+                ("continents","intro-continents",.5),("america","intro-america",.5),("newyork-state","intro-newyork-state",.5),("newyork-city","intro-newyork-city",.5),("brooklyn","intro-brooklyn",.5),("block","intro-block",.6),("window","prologue-city",1.0)};
+            int n=0;
+            foreach(var (id,frame,after) in shots)
+            {
+                int index=++n; bool logo=id=="logo";
+                Until(()=>View.LaunchShotIndex>=0 && View.Dial.Snapshot().launchShotId==id && View.Dial.Snapshot().launchFrame==frame,20,"the launch's "+id+" ("+frame+")",after);
+                Steps.Enqueue(()=>{var s=View.Dial.Snapshot();var cam=s.launchCamera;
+                    Check(s.screen==(logo?"logo":"intro") && View.Flow.Screen==(logo?SliceScreen.Logo:SliceScreen.Intro) && s.launchShotId==id && s.launchFrame==frame && s.canSkip && !s.gearShown && s.caspar=="" && !View.Flow.CanContinue && cam.Length==3,"the launch: "+id+", "+frame+" on the "+(logo?"logo screen":"movie")+", Skip offered, no gear, no line"+(reduced?", reduced motion":""));
+                    if(reduced && !logo) Check(s.launchStill && Mathf.Approximately(cam[0],1) && Mathf.Abs(cam[1])<.01f && Mathf.Approximately(cam[2],1),"reduced motion: "+id+" held still, level, at scale 1, with no sweep");
+                    if(!reduced && id=="draw") Check(cam[2]>.05f && cam[2]<.95f,"the wheel draws itself: the sweep has revealed "+(cam[2]*100).ToString("0")+"% of its lines");
+                    if(!reduced && id=="glyphs") Check(cam[2]<1 && Mathf.Abs(cam[2]*12-Mathf.Round(cam[2]*12))<.01f && cam[2]>0,"its symbols appear one at a time: "+Mathf.Round(cam[2]*12)+" of 12 so far");
+                    if(!reduced && (id=="burn" || id=="transform")) Check(Mathf.Abs(cam[1])>.1f && Mathf.Approximately(cam[0],1),"the wheel spins ("+id+", "+frame+" turned "+cam[1].ToString("0.0")+" degrees), a round layer, at its own size");
+                    if(!reduced && (id=="earth" || id=="brooklyn" || id=="window")) Check(cam[0]>1 && Mathf.Abs(cam[1])<.01f,"the push-in on "+frame+" (scale "+cam[0].ToString("0.000")+"), level");
+                    Capture(file+"-"+index.ToString("00")+"-"+id+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
+                if(id==stopAt) return;
+            }
         }
         // ---- the opening scene's helpers (Oct 8) ----
         static Func<bool> waitFor; static double waitLimit, waitThen, tappedAt; static string waitWhat; static bool waitBusyOk, BusyStep;
