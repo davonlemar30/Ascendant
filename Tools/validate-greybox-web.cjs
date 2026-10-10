@@ -16,7 +16,7 @@ const path=require('path');
   // The launch (owner, Oct 9, 86bcg62x3): every page load opens on the logo screen, then the launch movie, then the main menu; one Skip covers
   // both. newGame leaves the launch by the screen reader's Skip, then New Game (on a first launch straight into slot 1; with a save, slot 1,
   // replacing it); Start over and the DEV samples arrive straight on the prologue. relaunch reloads the page and Continues into the Hub.
-  const LAUNCH=[['logo','studio-logo',700,'TSG Games.'],['draw','intro-wheel-pencil-lines',1000,'A zodiac wheel draws itself in pencil, then adds its twelve symbols.'],['glyphs','intro-wheel-pencil-glyphs',500,''],
+  const LAUNCH=[['logo','studio-logo',700,'TSG Games.'],['draw','intro-wheel-pencil-lines',1000,'A zodiac wheel draws itself in pencil, then adds its twelve symbols.'],['glyphs','intro-wheel-pencil-glyphs',650,''],
     ['alive','intro-wheel-lit',1100,'The wheel lights up in gold, and the dark fills with stars.'],['burn','intro-wheel-burning',1300,'The wheel burns with golden fire and begins to spin.'],['transform','intro-earth',700,'The fire turns to light. The wheel becomes Earth.'],
     ['earth','intro-earth',900,'Earth, seen from space.'],['continents','intro-continents',400,'North America at night.'],['america','intro-america',400,'The United States at night.'],['newyork-state','intro-newyork-state',400,'New York State.'],
     ['newyork-city','intro-newyork-city',400,'New York City, between its rivers.'],['brooklyn','intro-brooklyn',400,"Brooklyn's rooftops at night."],['block','intro-block',500,'A street of apartment buildings, a few cars, lit shopfronts.'],
@@ -36,6 +36,7 @@ const path=require('path');
   // the logo and the launch movie played through: each shot's frame captured once it has come up (until stopAt, if given)
   const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
+    let zoomSeen=0;
     for(const [i,[id,frame,settle,line]] of LAUNCH.entries()){
       await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
       await pg.waitForTimeout(settle);
@@ -44,6 +45,7 @@ const path=require('path');
       if(reduced&&!logo)check(s.launchStill&&cam.length===3&&Math.abs(cam[0]-1)<.001&&Math.abs(cam[1])<.01&&Math.abs(cam[2]-1)<.001,'reduced motion: '+id+' held still and level, no sweep ('+JSON.stringify(cam)+') at '+where);
       if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
       if(!reduced&&id==='glyphs')check(cam.length===3&&cam[2]>0&&cam[2]<1&&Math.abs(cam[2]*12-Math.round(cam[2]*12))<.01,'its symbols appear one at a time: '+Math.round((cam[2]||0)*12)+' of 12 so far at '+where);
+      if(!reduced&&['draw','glyphs','alive'].includes(id)){check(cam.length===3&&cam[0]>=.799&&cam[0]<1&&cam[0]>zoomSeen,'the wheel zooms in slowly through '+id+' (scale '+(cam[0]||0).toFixed(3)+', up from '+zoomSeen.toFixed(3)+') at '+where);zoomSeen=cam[0];}
       if(!reduced&&['burn','transform'].includes(id))check(cam.length===3&&Math.abs(cam[1])>.1&&Math.abs(cam[0]-1)<.001,'the wheel spins: '+frame+' turned '+(cam[1]||0).toFixed(1)+' degrees, a round layer at its own size, at '+where);
       if(!reduced&&['earth','brooklyn','window'].includes(id))check(cam.length===3&&cam[0]>1&&Math.abs(cam[1])<.01,'the push-in on '+frame+' (scale '+(cam[0]||0).toFixed(3)+') at '+where);
       await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+id+'.png')});

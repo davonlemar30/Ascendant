@@ -2811,7 +2811,7 @@ namespace Ascendant.CelestialDial
         }
         public sealed class PrologueShot
         {
-            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash, Logo; public float UnderDim; // Logo: a shot of the launch's logo screen (the movie begins at the first shot without it)
+            public string Id, Line; public float Seconds, ScaleFrom = 1, ScaleTo = 1; public Vector2 ViewFrom, ViewTo; public bool Page, Under, Flash, Logo, WheelZoom; public float UnderDim; // WheelZoom: the launch's slow zoom on the wheel runs through this shot // Logo: a shot of the launch's logo screen (the movie begins at the first shot without it)
             public PrologueStep[] Steps = new PrologueStep[0];
             // View: where the camera looks inside the frame, -1 to 1 each way (x: left to right; y: top to bottom), so the pan never shows an
             // edge at any scale; a push-in holds its View on the point it moves toward. Page: the
@@ -2953,6 +2953,8 @@ namespace Ascendant.CelestialDial
             {
                 var shot = playing[i]; prologueShot = i; prologueStill = ReducedMotion; shotFrames.Clear(); // a change to reduced motion lands from the next shot (Ashantis)
                 if (!shot.Logo && Flow.Screen == SliceScreen.Logo) Flow.EndLogo(); // the logo screen gives way to the launch movie
+                if (shot.WheelZoom && (i == 0 || !playing[i - 1].WheelZoom)) { zoomBegan = Time.unscaledTime; zoomSeconds = playing.Skip(i).TakeWhile(x => x.WheelZoom).Sum(x => x.Seconds); } // the zoom runs across its shots as one
+                if (!shot.WheelZoom && i > 0 && playing[i - 1].WheelZoom) WheelZoomTo(1); // and stops exactly at 1 before the burn
                 if (shot.Flash) { yield return PrologueFlash(); yield break; }
                 if (!shot.Under) { foreach (var p in prologuePanelsShown) if (p != null) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == p) ParkFrame(f); Destroy(p.gameObject); } prologuePanelsShown.Clear(); panelHomes.Clear(); prologueDim.color = new Color(0, 0, 0, 0); }
                 if (shot.Page) { foreach (var f in prologueFrames.Values) if (f.Rect.parent == prologueCamera) f.Rect.gameObject.SetActive(false); prologueFrameShown = ""; }
@@ -2965,6 +2967,7 @@ namespace Ascendant.CelestialDial
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
                     else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
                     live.RemoveAll(step => step());
+                    if (shot.WheelZoom) WheelZoomTo(prologueStill ? 1 : WheelZoomAt(Time.unscaledTime - zoomBegan, zoomSeconds));
                     if (Flow.AtLaunch && Time.unscaledTime >= launchPublishAt) { launchPublishAt = Time.unscaledTime + .25f; Publish(); } // the launch's pushes and turn move every frame: the web state follows them four times a second
                     if (t >= shot.Seconds && live.Count == 0) break;
                     yield return null;
@@ -3049,13 +3052,16 @@ namespace Ascendant.CelestialDial
             return () =>
             {
                 if (frame.Rect == null || glint == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); frame.Fill.fillAmount = k;
-                glint.rectTransform.anchoredPosition = new Vector2(0, -400) + SweepPoint(k, GlintRadius);
+                glint.rectTransform.anchoredPosition = new Vector2(0, -400) + SweepPoint(k, GlintRadius * frame.Rect.localScale.x); // on the ring as the wheel zooms
                 float after = Time.unscaledTime - began - step.Seconds; glint.color = new Color(GlintColor.r, GlintColor.g, GlintColor.b, GlintColor.a * (after <= 0 ? 1 : Mathf.Clamp01(1 - after / GlintFade)));
                 if (after >= GlintFade) { glint.gameObject.SetActive(false); return true; }
                 return false;
             };
         }
         // the glint: a soft radial dot, warm gold, low alpha, on the outer ring's radius (tunable); it never rides the symbols' steps, and reduced motion has none
+        float zoomBegan, zoomSeconds;
+        public static float WheelZoomAt(float t, float seconds) => Mathf.Lerp(WheelZoomFrom, 1, Eased("out", Mathf.Clamp01(t / Mathf.Max(.01f, seconds))));
+        void WheelZoomTo(float scale) { foreach (var f in prologueFrames.Values) if (f.Layer && f.Slot.StartsWith("intro-wheel") && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf) f.Rect.localScale = new Vector3(scale, scale, 1); } // the wheel's layers only
         public const float GlintSize = 7, GlintRadius = 150, GlintFade = .3f; public static readonly Color GlintColor = new Color(1f, .84f, .52f, .55f);
         Image sweepGlint;
         public bool GlintShown => sweepGlint != null && sweepGlint.gameObject.activeInHierarchy && sweepGlint.color.a > .01f; // fixture evidence
@@ -3147,7 +3153,13 @@ namespace Ascendant.CelestialDial
         public const float DrawSeconds = 2.5f, GlyphStep = .12f, BurnSeconds = 3f, TransformSeconds = 4.5f, EarthIn = 2.4f, WheelEarthFade = 1.8f, EarthFade = 1.8f;
         // the sweeps' start and direction (Image.Origin360: 0 bottom, 1 right, 2 top, 3 left; the offset turns the start further, in degrees,
         // counter-clockwise), set once the art lane reports where its wheel starts and which way its signs run; working choices until then
-        public const int SweepOrigin = 2, GlyphOrigin = 2; public const bool SweepClockwise = true, GlyphClockwise = true; public const float SweepOffset = 0, GlyphOffset = 0;
+        // The art lane's measurements (Oct 9, round 2 art; 0 degrees at 3 o'clock, counter-clockwise on screen): the lines start at the Aries cusp,
+        // 136.5 degrees (about 10:30), and run counter-clockwise; the symbols appear Aries to Pisces, counter-clockwise, a 30 degree cell each from that cusp
+        public const int SweepOrigin = 1, GlyphOrigin = 1; public const bool SweepClockwise = false, GlyphClockwise = false; public const float SweepOffset = 136.5f, GlyphOffset = 136.5f;
+        // the owner, Oct 9: "at the beginning the zodiac wheel should be zooming in slowly and only stop once we get to the zodiac wheel glowing right
+        // before it catches on fire": the wheel's layers scale from WheelZoomFrom to 1 across the draw, the symbols and the coming alive, eased out so
+        // it settles, never above 1 (the layers are drawn at 2x); the sky holds still; reduced motion holds them at 1
+        public const float WheelZoomFrom = .8f;
         // the spin: one whole turn, clockwise, from the burn's start to the transform's end, starting slowly and easing to a stop, so Earth ends
         // level (a turn of 360 degrees leaves it as drawn). The burn eases in and the transform eases out, at the same speed where they meet.
         public const float SpinTurn = -360f;
@@ -3160,9 +3172,9 @@ namespace Ascendant.CelestialDial
         {
             new PrologueShot { Id = "logo", Line = "TSG Games.", Logo = true, Seconds = LogoFade + LogoHold + LogoFade, Steps = new[] { FadeTo(0, "studio-logo", LogoFade), FadeOut(LogoFade + LogoHold, LogoFade) } },
             new PrologueShot { Id = "dark", Seconds = .6f }, // darkness
-            new PrologueShot { Id = "draw", Line = "A zodiac wheel draws itself in pencil, then adds its twelve symbols.", Seconds = 2.8f, Steps = new[] { Sweep(0, "intro-wheel-pencil-lines", DrawSeconds) } }, // the wheel draws itself in pencil: its lines
-            new PrologueShot { Id = "glyphs", Seconds = 1.7f, Steps = new[] { Sweep(0, "intro-wheel-pencil-glyphs", 12 * GlyphStep, 12) } }, // then its twelve symbols, one at a time, in zodiac order
-            new PrologueShot { Id = "alive", Line = "The wheel lights up in gold, and the dark fills with stars.", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
+            new PrologueShot { Id = "draw", WheelZoom = true, Line = "A zodiac wheel draws itself in pencil, then adds its twelve symbols.", Seconds = 2.8f, Steps = new[] { Sweep(0, "intro-wheel-pencil-lines", DrawSeconds) } }, // the wheel draws itself in pencil: its lines
+            new PrologueShot { Id = "glyphs", WheelZoom = true, Seconds = 1.7f, Steps = new[] { Sweep(0, "intro-wheel-pencil-glyphs", 12 * GlyphStep, 12) } }, // then its twelve symbols, one at a time, in zodiac order
+            new PrologueShot { Id = "alive", WheelZoom = true, Line = "The wheel lights up in gold, and the dark fills with stars.", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
             new PrologueShot { Id = "burn", Line = "The wheel burns with golden fire and begins to spin.", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin
             new PrologueShot { Id = "transform", Line = "The fire turns to light. The wheel becomes Earth.", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
                 Spun(FadeTo(0, "intro-wheel-earth", WheelEarthFade), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"), Spun(FadeTo(EarthIn, "intro-earth", EarthFade), SpinAt(EarthIn), SpinTurn, TransformSeconds - EarthIn, "out") } }, // it spins on, blending into Earth; the spin eases to a stop with Earth level

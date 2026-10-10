@@ -547,9 +547,11 @@ namespace Ascendant.Build
             nextAt=EditorApplication.timeSinceStartup+2;EditorApplication.update+=Tick;
         }
         // ---- the launch's helper (Oct 9): the logo and the movie, each shot's frame captured once it has come up (until stopAt, if given) ----
+        static float zoomSeen;
         static void Launch(string file,bool reduced,string stopAt)
         {
-            var shots=new (string id,string frame,double after)[]{("logo","studio-logo",.6),("draw","intro-wheel-pencil-lines",1.0),("glyphs","intro-wheel-pencil-glyphs",.6),("alive","intro-wheel-lit",1.2),("burn","intro-wheel-burning",1.4),("transform","intro-earth",.8),("earth","intro-earth",1.0),
+            Steps.Enqueue(()=>{zoomSeen=0;nextAt=EditorApplication.timeSinceStartup;});
+            var shots=new (string id,string frame,double after)[]{("logo","studio-logo",.6),("draw","intro-wheel-pencil-lines",1.0),("glyphs","intro-wheel-pencil-glyphs",.05),("alive","intro-wheel-lit",1.2),("burn","intro-wheel-burning",1.4),("transform","intro-earth",.8),("earth","intro-earth",1.0),
                 ("continents","intro-continents",.5),("america","intro-america",.5),("newyork-state","intro-newyork-state",.5),("newyork-city","intro-newyork-city",.5),("brooklyn","intro-brooklyn",.5),("block","intro-block",.6),("window","prologue-city",1.0)};
             var lines=new Dictionary<string,string>{{"logo","TSG Games."},{"draw","A zodiac wheel draws itself in pencil, then adds its twelve symbols."},{"glyphs",""},{"alive","The wheel lights up in gold, and the dark fills with stars."},{"burn","The wheel burns with golden fire and begins to spin."},
                 {"transform","The fire turns to light. The wheel becomes Earth."},{"earth","Earth, seen from space."},{"continents","North America at night."},{"america","The United States at night."},{"newyork-state","New York State."},{"newyork-city","New York City, between its rivers."},
@@ -563,13 +565,21 @@ namespace Ascendant.Build
                     Check(s.screen==(logo?"logo":"intro") && View.Flow.Screen==(logo?SliceScreen.Logo:SliceScreen.Intro) && s.launchShotId==id && s.launchFrame==frame && s.canSkip && !s.gearShown && s.caspar==line && !View.Flow.CanContinue && cam.Length==3,"the launch: "+id+", "+frame+" on the "+(logo?"logo screen":"movie")+", Skip offered, no gear, its spoken line "+(line==""?"none":"\""+line+"\"")+(reduced?", reduced motion":""));
                     if(reduced && !logo) Check(s.launchStill && Mathf.Approximately(cam[0],1) && Mathf.Abs(cam[1])<.01f && Mathf.Approximately(cam[2],1),"reduced motion: "+id+" held still, level, at scale 1, with no sweep");
                     if(!reduced && id=="draw") Check(cam[2]>.05f && cam[2]<.95f,"the wheel draws itself: the sweep has revealed "+(cam[2]*100).ToString("0")+"% of its lines");
-                    if(!reduced && id=="draw") Check(View.GlintShown && Vector2.Distance(View.GlintOffset,SliceView.SweepPoint(cam[2],SliceView.GlintRadius))<2 && Mathf.Abs(View.GlintOffset.magnitude-SliceView.GlintRadius)<2,"the pencil's glint rides the sweep's leading edge ("+SliceView.SweepAngle(cam[2]).ToString("0")+" degrees, "+SliceView.GlintRadius+" px out)");
+                    if(!reduced && id=="draw") Check(View.GlintShown && Vector2.Distance(View.GlintOffset,SliceView.SweepPoint(cam[2],SliceView.GlintRadius*cam[0]))<2.5f && Mathf.Abs(View.GlintOffset.magnitude-SliceView.GlintRadius*cam[0])<2.5f,"the pencil's glint rides the sweep's leading edge ("+SliceView.SweepAngle(cam[2]).ToString("0")+" degrees, on the ring "+(SliceView.GlintRadius*cam[0]).ToString("0")+" px out as the wheel zooms)");
                     if(id=="draw" && reduced) Check(!View.GlintShown,"reduced motion: no glint");
                     if(id=="glyphs") Check(!View.GlintShown,"the glint is gone once the lines are drawn, and doesn't ride the symbols");
                     if(!reduced && id=="glyphs") Check(cam[2]<1 && Mathf.Abs(cam[2]*12-Mathf.Round(cam[2]*12))<.01f && cam[2]>0,"its symbols appear one at a time: "+Mathf.Round(cam[2]*12)+" of 12 so far");
+                    if(!reduced && (id=="draw" || id=="glyphs" || id=="alive")) { Check(cam[0]>=SliceView.WheelZoomFrom-.001f && cam[0]<1 && cam[0]>zoomSeen,"the wheel zooms in slowly through "+id+" (scale "+cam[0].ToString("0.000")+", up from "+zoomSeen.ToString("0.000")+")"); zoomSeen=cam[0]; }
                     if(!reduced && (id=="burn" || id=="transform")) Check(Mathf.Abs(cam[1])>.1f && Mathf.Approximately(cam[0],1),"the wheel spins ("+id+", "+frame+" turned "+cam[1].ToString("0.0")+" degrees), a round layer, at its own size");
                     if(!reduced && (id=="earth" || id=="brooklyn" || id=="window")) Check(cam[0]>1 && Mathf.Abs(cam[1])<.01f,"the push-in on "+frame+" (scale "+cam[0].ToString("0.000")+"), level");
                     Capture(file+"-"+index.ToString("00")+"-"+id+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
+                if(id=="draw" && !reduced) // the symbols in their steps (the art lane's angles): at the first step Aries alone, at half Aries to Virgo
+                {
+                    Until(()=>View.Dial.Snapshot().launchShotId=="glyphs" && View.Dial.Snapshot().launchCamera.Length==3 && Mathf.Abs(View.Dial.Snapshot().launchCamera[2]-1/12f)<.001f,10,"the first symbol",0);
+                    Steps.Enqueue(()=>{Check(Mathf.Abs(View.Dial.Snapshot().launchCamera[2]-1/12f)<.001f,"the first step shows one symbol (Aries)");Capture(file+"-03a-glyphs-1-of-12.png");nextAt=EditorApplication.timeSinceStartup;});
+                    Until(()=>View.Dial.Snapshot().launchCamera.Length==3 && Mathf.Abs(View.Dial.Snapshot().launchCamera[2]-.5f)<.001f,10,"half the symbols",0);
+                    Steps.Enqueue(()=>{Check(Mathf.Abs(View.Dial.Snapshot().launchCamera[2]-.5f)<.001f,"at half, six symbols (Aries to Virgo)");Capture(file+"-03b-glyphs-6-of-12.png");nextAt=EditorApplication.timeSinceStartup;});
+                }
                 if(id==stopAt) return;
             }
         }
