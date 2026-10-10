@@ -245,6 +245,7 @@ namespace Ascendant.CelestialDial
             if (canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f);
             if (styleShown) return;
             UpdatePrologue(); UpdateOrb(); // the opening scene's Skip (and the launch's), and the orb's bob and stars
+            UpdateMenuLife(); // the menu's window pulse and its rat (owner, Oct 9)
             if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
             if (!Dial.Showing) Dial.WakeStep = WakeTarget; // the wake-up: a step lands the next time the player comes to the Dial, never mid-lesson
@@ -736,6 +737,7 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("menu:")) MenuPick(Array.IndexOf(MenuCommands, command.Substring(5))); // the main menu: continue, new, load, settings
             else if (command.StartsWith("slot:") && int.TryParse(command.Substring(5), out int saveSlot)) PickSlot(saveSlot); // the slot list: 1 to 3
             else if (command == "slots-back") SlotsBack();
+            else if (command == "rat") StartRat(); // test-only: the menu's rat runs now (if the menu is idle and motion is on)
             else if (command == "confirm-start") ConfirmStart(); // the slot list's question before a filled slot is replaced
             else if (command == "confirm-back") ConfirmBack();
             else if (command == "main-menu") MainMenu(); // Settings' Main menu row (its twin for the checks); before Key 1 it asks first
@@ -1675,6 +1677,7 @@ namespace Ascendant.CelestialDial
             state.launchShotId = shotOk ? LaunchShots[prologueShot].Id : ""; state.launchFrame = onLaunch ? prologueFrameShown : ""; state.launchShotFrames = onLaunch ? shotFrames.ToArray() : new string[0]; state.launchStill = onLaunch && prologueStill;
             state.launchCamera = onLaunch && prologueFrames.TryGetValue(prologueFrameShown, out var shownFrame) ? new[] { shownFrame.Rect.localScale.x, shownFrame.Fill != null ? 0 : shownFrame.Rect.localEulerAngles.z > 180 ? shownFrame.Rect.localEulerAngles.z - 360 : shownFrame.Rect.localEulerAngles.z, shownFrame.Fill != null ? shownFrame.Fill.fillAmount : 1 } : new float[0]; // scale, turn (a swept layer's mask turn is its start, not motion), and a swept layer's reveal
             state.gearShown = Settings != null && Settings.GearShown;
+            state.launchLayers = onLaunch ? LaunchLayers().Select(l => l.slot + ":" + l.angle.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + ":" + l.alpha.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)).ToArray() : new string[0]; // the round layers on stage, back to front: slot, turn, alpha (Oct 9)
             bool onMenu = s == SliceScreen.Menu, onSlots = s == SliceScreen.SaveSlots;
             state.menuButtons = onMenu ? MenuWords : new string[0]; state.menuAlpha = onMenu ? menuButtons.Select(b => { var g = b.GetComponent<CanvasGroup>(); return g != null ? g.alpha : 1f; }).ToArray() : new float[0];
             state.canMenuContinue = onMenu && !busy && anySave && continueSlot > 0; state.canMenuLoad = onMenu && !busy && anySave; state.canMenuNew = state.canMenuSettings = onMenu && !busy;
@@ -1684,6 +1687,7 @@ namespace Ascendant.CelestialDial
             state.slotEnabled = onSlots ? slotCards.Select(b => b.interactable && confirmSlot < 1 && !busy).ToArray() : new bool[0]; state.slotAlpha = onSlots ? slotCards.Select(b => { var g = b.GetComponent<CanvasGroup>(); return g != null ? g.alpha : 1f; }).ToArray() : new float[0];
             state.confirmShown = onSlots && confirmSlot > 0; state.confirmLine = state.confirmShown ? confirmLine.text : ""; state.canConfirm = state.confirmShown && !busy; state.canSlotsBack = onSlots && !busy && confirmSlot < 1;
             state.slotInPlay = SaveSlots.InPlay; state.continueSlot = onMenu || onSlots ? continueSlot : 0;
+            state.windowGlow = WindowGlowShown ? menuGlowAlpha : 0; state.windowGlowShown = WindowGlowShown; state.ratRuns = ratRuns; state.ratShown = RatShown; state.ratX = RatShown ? rat.anchoredPosition.x : 0; state.ratY = RatShown ? RatY : 0; state.ratEdge = ratEdge; state.visibleHalf = VisibleHalfWidth; state.slotsGlow = slotsGlow.outer != null && slotsGlow.outer.gameObject.activeInHierarchy ? menuGlowAlpha : 0; state.slotsGlowShown = slotsGlow.outer != null && slotsGlow.outer.gameObject.activeInHierarchy; state.ratFacing = ratDir; state.ratFrame = ratFrame; state.ratArt = Slots.Source("menu-rat-1"); // the menu's life (Oct 9)
             if (Settings != null) { state.settingsRows = Settings.RowWords; state.settingsRowTops = Settings.RowTops; state.settingsAsk = Settings.Asking; state.settingsAskLine = Settings.Asking ? Settings.AskLine : ""; }
             state.orbShown = OrbWanted; state.orbStars = OrbWanted ? OrbStarCount : 0; state.orbStarsLit = OrbWanted ? OrbStarsLit : 0; state.orbArt = Slots.Source("orb");
             state.canBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice == "";
@@ -2800,7 +2804,7 @@ namespace Ascendant.CelestialDial
             public float PushTo, PushSeconds; public Vector2 PushView;
             public string[] Loop; public float LoopFrame; public bool Moving;
             public float SpinFrom, SpinTo, SpinSeconds; public string SpinEase = "smooth"; // the launch movie (Oct 9): the frame turns from SpinFrom to SpinTo degrees over SpinSeconds (eased "smooth", "in" or "out"); a full frame scaled just enough that no edge shows (Cover), a round layer as it is; reduced motion holds it still
-            public int Sectors; public bool Over; // How "sweep" (round 4): a radial reveal of a round layer over Seconds, smooth, or in Sectors hard steps (the twelve symbols); reduced motion: a plain fade. Over: a full frame that comes in over the round layers (they go when it is in)
+            public int Sectors; public bool Over; public bool Below; public string FadeEase = "linear"; // Below: a layer that fades in under the layers showing and replaces none (Earth under the burning wheel); FadeEase: the fade's alpha curve (the logo's is smooth) // How "sweep" (round 4): a radial reveal of a round layer over Seconds, smooth, or in Sectors hard steps (the twelve symbols); reduced motion: a plain fade. Over: a full frame that comes in over the round layers (they go when it is in)
             // How "out" (the logo screen): every frame on screen fades out to the dark page over Seconds.
             // Loop (the owner, Oct 9: "slight animations", frame swaps within ruling 4): from At, for Seconds, the panel holding Frame swaps
             // hard through Frame, then each Loop frame, every LoopFrame s, starting with the first Loop frame. Moving: a step that is only motion
@@ -2827,6 +2831,9 @@ namespace Ascendant.CelestialDial
         static PrologueStep Spun(PrologueStep step, float from, float to, float seconds, string ease = "smooth") { step.SpinFrom = from; step.SpinTo = to; step.SpinSeconds = seconds; step.SpinEase = ease; return step; }
         static PrologueStep Sweep(float at, string frame, float seconds, int sectors = 0) => new PrologueStep { At = at, Frame = frame, How = "sweep", Seconds = seconds, Sectors = sectors };
         static PrologueStep Over(PrologueStep step) { step.Over = true; return step; }
+        static PrologueStep Beneath(PrologueStep step) { step.Below = true; return step; }
+        static PrologueStep Smooth(PrologueStep step) { step.FadeEase = "smooth"; return step; }
+        static PrologueStep FadeAway(float at, string frame, float seconds) => new PrologueStep { At = at, Frame = frame, How = "away", Seconds = seconds }; // one frame fades out and goes
         public static float Eased(string ease, float k) => ease == "in" ? k * k : ease == "out" ? 1 - (1 - k) * (1 - k) : ease == "linear" ? k : Mathf.SmoothStep(0, 1, k);
         static PrologueStep FadeOut(float at, float seconds) => new PrologueStep { At = at, How = "out", Seconds = seconds };
         // the scale a full 360 x 800 frame turned by some degrees needs so that it still covers the column (no corner of the dark page shows)
@@ -2988,6 +2995,7 @@ namespace Ascendant.CelestialDial
             if (step.How == "out") return RunOut(step);
             if (!prologueFrames.TryGetValue(slot, out var frame)) return () => true;
             if (step.How == "sweep") return RunSweep(step, frame);
+            if (step.How == "away") return RunAway(step, frame);
             if (step.How == "panel")
             {
                 float band = prologueShot >= 0 && prologueShot < playing.Length && playing[prologueShot].Page ? SafeArea.TopInset(canvas) : 0; // a comic page moves down by a cutout's band, as the gear does
@@ -3002,9 +3010,9 @@ namespace Ascendant.CelestialDial
                 panel.anchoredPosition = away;
                 return () => { if (panel == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); panel.anchoredPosition = Vector2.Lerp(away, home, 1 - (1 - k) * (1 - k) * (1 - k)); return k >= 1; };
             }
-            var others = prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf && (step.Over || f.Layer == frame.Layer)).ToList(); // round 4: a layer replaces layers, a frame replaces frames (the sky stays under the wheel), unless it comes in Over them
+            var others = step.Below ? new List<PrologueFrame>() : prologueFrames.Values.Where(f => f != frame && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf && (step.Over || f.Layer == frame.Layer)).ToList(); // round 4: a layer replaces layers, a frame replaces frames (the sky stays under the wheel), unless it comes in Over them
             bool up = frame.Rect.gameObject.activeSelf && frame.Rect.parent == prologueCamera && frame.Group.alpha >= 1;
-            PlaceOnStage(frame, step.Over); frame.Rect.gameObject.SetActive(true); FrameShown(slot);
+            PlaceOnStage(frame, step.Over, step.Below); frame.Rect.gameObject.SetActive(true); FrameShown(slot);
             Func<bool> push = () => true; float pushed = Time.unscaledTime;
             bool spins = (step.SpinFrom != 0 || step.SpinTo != 0) && !prologueStill; // the launch movie's little turn (reduced motion holds it still)
             if (!spins && !up) frame.Rect.localRotation = Quaternion.identity;
@@ -3024,12 +3032,14 @@ namespace Ascendant.CelestialDial
             float seconds = step.How == "fade" ? (prologueStill ? Mathf.Max(step.Seconds, StillFade) : step.Seconds) : prologueStill ? StillFade : 0; // reduced motion: a cut crossfades, and no fade is quicker than StillFade
             if (seconds <= 0) { frame.Group.alpha = 1; foreach (var o in others) o.Rect.gameObject.SetActive(false); return push; }
             frame.Group.alpha = 0; float from = Time.unscaledTime; bool faded = false;
-            return () => { if (frame.Rect == null) return true; bool moved = push(); if (!faded) { float k = Mathf.Clamp01((Time.unscaledTime - from) / seconds); frame.Group.alpha = k; if (k >= 1) { faded = true; foreach (var o in others) o.Rect.gameObject.SetActive(false); } } return faded && moved; };
+            var turnWith = spins && frame.Layer ? others.Where(o => o.Layer && o.Slot.StartsWith("intro-wheel")).ToList() : new List<PrologueFrame>(); // the owner, Oct 9 ("fix that immediately"): a spinning wheel fading in over other wheel layers turns them with it, one angle, until they go
+            return () => { if (frame.Rect == null) return true; bool moved = push(); foreach (var o in turnWith) if (o.Rect != null && o.Rect.gameObject.activeSelf) o.Rect.localRotation = frame.Rect.localRotation;
+                if (!faded) { float k = Mathf.Clamp01((Time.unscaledTime - from) / seconds); frame.Group.alpha = Eased(step.FadeEase, k); if (k >= 1) { faded = true; foreach (var o in others) o.Rect.gameObject.SetActive(false); } } return faded && moved; };
         }
         // round 4: a frame on top of its class; a full frame below every round layer showing, unless it comes in over them
-        void PlaceOnStage(PrologueFrame frame, bool over)
+        void PlaceOnStage(PrologueFrame frame, bool over, bool below = false)
         {
-            int low = frame.Layer || over ? -1 : prologueFrames.Values.Where(f => f != frame && f.Layer && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).Select(f => f.Rect.GetSiblingIndex()).DefaultIfEmpty(-1).Min();
+            int low = (frame.Layer && !below) || over ? -1 : prologueFrames.Values.Where(f => f != frame && f.Layer && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).Select(f => f.Rect.GetSiblingIndex()).DefaultIfEmpty(-1).Min();
             if (low < 0) { frame.Rect.SetAsLastSibling(); return; }
             int at = frame.Rect.GetSiblingIndex(); frame.Rect.SetSiblingIndex(at < low ? low - 1 : low);
         }
@@ -3079,8 +3089,18 @@ namespace Ascendant.CelestialDial
         {
             var shown = prologueFrames.Values.Where(f => f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).ToList(); var from = shown.Select(f => f.Group.alpha).ToList();
             float seconds = prologueStill ? Mathf.Max(step.Seconds, StillFade) : step.Seconds, began = Time.unscaledTime; prologueFrameShown = "";
-            return () => { float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, seconds)); for (int i = 0; i < shown.Count; i++) if (shown[i].Rect != null) { shown[i].Group.alpha = from[i] * (1 - k); if (k >= 1) shown[i].Rect.gameObject.SetActive(false); } return k >= 1; };
+            return () => { float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, seconds)); for (int i = 0; i < shown.Count; i++) if (shown[i].Rect != null) { shown[i].Group.alpha = from[i] * (1 - Eased(step.FadeEase, k)); if (k >= 1) shown[i].Rect.gameObject.SetActive(false); } return k >= 1; };
         }
+        // one frame fades out and goes (the burning wheel leaving Earth, Oct 9); reduced motion: no fade quicker than StillFade
+        Func<bool> RunAway(PrologueStep step, PrologueFrame frame)
+        {
+            if (!frame.Rect.gameObject.activeSelf) return () => true;
+            float from = frame.Group.alpha, seconds = prologueStill ? Mathf.Max(step.Seconds, StillFade) : step.Seconds, began = Time.unscaledTime;
+            return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, seconds)); frame.Group.alpha = from * (1 - Eased(step.FadeEase, k)); if (k >= 1) frame.Rect.gameObject.SetActive(false); return k >= 1; };
+        }
+        // the round layers on stage now, for the checks: slot, turn (degrees) and alpha
+        public IEnumerable<(string slot, float angle, float alpha)> LaunchLayers() => prologueFrames.Values.Where(f => f.Layer && f.Slot.StartsWith("intro-") && f.Rect.parent == prologueCamera && f.Rect.gameObject.activeSelf).OrderBy(f => f.Rect.GetSiblingIndex())
+            .Select(f => (f.Slot, f.Fill != null ? 0 : (f.Rect.localEulerAngles.z > 180 ? f.Rect.localEulerAngles.z - 360 : f.Rect.localEulerAngles.z), f.Group.alpha));
         // a loop of hard frame swaps inside the panel that holds its first frame (the writing hand); reduced motion holds the first frame
         Func<bool> RunLoop(PrologueStep step)
         {
@@ -3146,11 +3166,11 @@ namespace Ascendant.CelestialDial
         // the prologue's stage and machinery (cuts, fades, pushes; since round 4 also round layers, a sweep and a spin). One Skip covers the logo and the movie, working as the
         // prologue's does: a tap shows it, Skip goes to the menu; the screen reader's and the keyboard's Skip is there at all times. No text on
         // screen, no sound, no clock. Reduced motion: as the prologue (each shot still, no push or turn, crossfades, the fade to the menu instant).
-        public const float LogoFade = .6f, LogoHold = 2f, DescentFade = .8f, DescentPush = 1.15f, LaunchFadeOut = 1f; // timings are working choices, tuned later against the art
+        public const float LogoFade = 1.2f, LogoHold = 2.5f, DescentFade = .8f, DescentPush = 1.15f, LaunchFadeOut = 1f; // timings are working choices, tuned later against the art
         // Round 4 (owner, Oct 9): the wheel and Earth are round cut-out layers (360 x 360, centred on the screen) over one painted sky. The wheel
         // draws itself in pencil (a radial sweep reveals its lines, then its twelve symbols appear one at a time in zodiac order), comes alive
-        // as the black behind becomes the sky, burns alive and starts to spin, and spins on as it blends into Earth, the spin easing to a stop.
-        public const float DrawSeconds = 2.5f, GlyphStep = .12f, BurnSeconds = 3f, TransformSeconds = 4.5f, EarthIn = 2.4f, WheelEarthFade = 1.8f, EarthFade = 1.8f;
+        // as the black behind becomes the sky, burns alive and starts to spin, and spins on as it fades away, leaving a level Earth (Oct 9).
+        public const float DrawSeconds = 2.5f, GlyphStep = .12f, BurnSeconds = 3f, TransformSeconds = 4.5f, EarthIn = .3f, EarthFade = 2.6f, BurnAway = 3f; // the transform (owner, Oct 9: "it doenst blend that cleanly"): the burning wheel spins on and fades away over BurnAway while a level Earth fades in under it, from EarthIn over EarthFade
         // the sweeps' start and direction (Image.Origin360: 0 bottom, 1 right, 2 top, 3 left; the offset turns the start further, in degrees,
         // counter-clockwise), set once the art lane reports where its wheel starts and which way its signs run; working choices until then
         // The art lane's measurements (Oct 9, round 2 art; 0 degrees at 3 o'clock, counter-clockwise on screen): the lines start at the Aries cusp,
@@ -3160,24 +3180,24 @@ namespace Ascendant.CelestialDial
         // before it catches on fire": the wheel's layers scale from WheelZoomFrom to 1 across the draw, the symbols and the coming alive, eased out so
         // it settles, never above 1 (the layers are drawn at 2x); the sky holds still; reduced motion holds them at 1
         public const float WheelZoomFrom = .8f;
-        // the spin: one whole turn, clockwise, from the burn's start to the transform's end, starting slowly and easing to a stop, so Earth ends
-        // level (a turn of 360 degrees leaves it as drawn). The burn eases in and the transform eases out, at the same speed where they meet.
+        // the spin: one whole turn, clockwise, from the burn's start to the transform's end, starting slowly and easing to a stop (the burning
+        // wheel only; Earth never turns). The burn eases in and the transform eases out, at the same speed where they meet.
         public const float SpinTurn = -360f;
         public static float SpinAtBurnEnd => SpinTurn * BurnSeconds / (BurnSeconds + TransformSeconds); // the eased-in part: equal speeds where it meets the eased-out part
-        public static float SpinAt(float t) => Mathf.Lerp(SpinAtBurnEnd, SpinTurn, Eased("out", Mathf.Clamp01(t / TransformSeconds))); // the wheel's angle t s into the transform
+        public static float SpinAt(float t) => Mathf.Lerp(SpinAtBurnEnd, SpinTurn, Eased("out", Mathf.Clamp01(t / TransformSeconds))); // the burning wheel's angle t s into the transform
         static readonly string[] SweptFrames = { "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs" };
         // Dante's shot list, the owner's beats in order (rounds 3 and 4). The pushes hold on each frame's centre until the art lands and is measured.
         // Each shot's spoken line for the screen reader, as the prologue's (owner, Oct 9: "Approved as drafted"); the dark and the symbols have none.
         public static readonly PrologueShot[] LaunchShots =
         {
-            new PrologueShot { Id = "logo", Line = "TSG Games.", Logo = true, Seconds = LogoFade + LogoHold + LogoFade, Steps = new[] { FadeTo(0, "studio-logo", LogoFade), FadeOut(LogoFade + LogoHold, LogoFade) } },
+            new PrologueShot { Id = "logo", Line = "TSG Games.", Logo = true, Seconds = LogoFade + LogoHold + LogoFade, Steps = new[] { Smooth(FadeTo(0, "studio-logo", LogoFade)), Smooth(FadeOut(LogoFade + LogoHold, LogoFade)) } }, // the owner, Oct 9: "a lil more screen time" and "a nice fade in and fade out", then "shortened a bit before the fade out": 4.9 s, eased fades
             new PrologueShot { Id = "dark", Seconds = .6f }, // darkness
             new PrologueShot { Id = "draw", WheelZoom = true, Line = "A zodiac wheel draws itself in pencil, then adds its twelve symbols.", Seconds = 2.8f, Steps = new[] { Sweep(0, "intro-wheel-pencil-lines", DrawSeconds) } }, // the wheel draws itself in pencil: its lines
             new PrologueShot { Id = "glyphs", WheelZoom = true, Seconds = 1.7f, Steps = new[] { Sweep(0, "intro-wheel-pencil-glyphs", 12 * GlyphStep, 12) } }, // then its twelve symbols, one at a time, in zodiac order
             new PrologueShot { Id = "alive", WheelZoom = true, Line = "The wheel lights up in gold, and the dark fills with stars.", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
-            new PrologueShot { Id = "burn", Line = "The wheel burns with golden fire and begins to spin.", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin
+            new PrologueShot { Id = "burn", Line = "The wheel burns with golden fire and begins to spin.", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin (the lit wheel under it turns with it while it fades in)
             new PrologueShot { Id = "transform", Line = "The fire turns to light. The wheel becomes Earth.", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
-                Spun(FadeTo(0, "intro-wheel-earth", WheelEarthFade), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"), Spun(FadeTo(EarthIn, "intro-earth", EarthFade), SpinAt(EarthIn), SpinTurn, TransformSeconds - EarthIn, "out") } }, // it spins on, blending into Earth; the spin eases to a stop with Earth level
+                FadeAway(0, "intro-wheel-burning", BurnAway), Beneath(FadeTo(EarthIn, "intro-earth", EarthFade)) } }, // it spins on and fades away, the ring of fire leaving a level, calm Earth behind (Earth never turns)
             new PrologueShot { Id = "earth", Line = "Earth, seen from space.", Seconds = 2.4f, Steps = new[] { Pushed(Cut(0, "intro-earth"), 1.12f, ViewOn(.5f, .5f), 2.4f) } }, // the calm Earth, a slow push
             Descent("continents", "intro-continents", 1.6f, "North America at night."), Descent("america", "intro-america", 1.6f, "The United States at night."), Descent("newyork-state", "intro-newyork-state", 1.4f, "New York State."), // flying down
             Descent("newyork-city", "intro-newyork-city", 1.4f, "New York City, between its rivers."), Descent("brooklyn", "intro-brooklyn", 1.4f, "Brooklyn's rooftops at night."), Descent("block", "intro-block", 1.8f, "A street of apartment buildings, a few cars, lit shopfronts."),
@@ -3190,7 +3210,7 @@ namespace Ascendant.CelestialDial
         {
             var image = r.GetComponent<Image>(); image.sprite = null; image.color = new Color(0, 0, 0, 0);
             var tints = new Dictionary<string, Color> { { "intro-wheel-pencil-lines", new Color(.75f, .75f, .72f) }, { "intro-wheel-pencil-glyphs", new Color(.75f, .75f, .72f) }, { "intro-wheel-lit", new Color(.95f, .8f, .45f) },
-                { "intro-wheel-burning", new Color(.95f, .45f, .2f) }, { "intro-wheel-earth", new Color(.45f, .7f, .65f) }, { "intro-earth", new Color(.3f, .5f, .85f) } };
+                { "intro-wheel-burning", new Color(.95f, .45f, .2f) }, { "intro-earth", new Color(.3f, .5f, .85f) } };
             var tint = tints.TryGetValue(slot, out var c) ? c : Muted; var centre = new Vector2(0, -r.sizeDelta.y / 2);
             if (slot != "intro-wheel-pencil-lines" && slot != "intro-wheel-pencil-glyphs") { var disc = Rect("Disc", r, 0, r.sizeDelta.y / 2, LayerRadius * 2, LayerRadius * 2).gameObject.AddComponent<Image>(); disc.sprite = DiscSprite(); disc.color = new Color(tint.r, tint.g, tint.b, .35f); }
             if (slot != "intro-wheel-pencil-glyphs")
@@ -3262,11 +3282,13 @@ namespace Ascendant.CelestialDial
         void BuildMenu()
         {
             menuScreen = ScreenPanel("Menu", "menu-city"); if (!HasArt(menuScreen)) PlaceholderFrame(menuScreen, "menu-city");
+            menuGlow = WindowGlow(menuScreen); BuildRat(); // the window's pulse and the rat (owner, Oct 9), over the street and under the title and the buttons
             menuTitle = Rect("menu-title", menuScreen, 0, MenuTitleY, MenuTitleWidth, MenuTitleHeight); menuTitleImage = menuTitle.gameObject.AddComponent<Image>(); menuTitleImage.raycastTarget = false;
             if (Slots.Dress(menuTitleImage, "menu-title")) menuTitleImage.preserveAspect = true; else SmallPlaceholder(menuTitle, "menu-title");
             for (int i = 0; i < menuButtons.Length; i++) { int k = i; menuButtons[i] = MakeButton(menuScreen, MenuWords[i], 0, MenuButtonY(i), MenuButtonWidth, MenuButtonHeight, () => MenuPick(k)); ButtonLook.Room(menuButtons[i], font); }
             menuScreen.gameObject.SetActive(false);
             slotsScreen = ScreenPanel("Save slots", "menu-city"); if (!HasArt(slotsScreen)) PlaceholderFrame(slotsScreen, "menu-city");
+            slotsGlow = WindowGlow(slotsScreen); // the same window under the slot list's veil
             var veil = Rect("Veil", slotsScreen, 0, 400, 360, 800).gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f); veil.raycastTarget = false; Bleed.Add(veil, root); // the menu's street, dimmed as Settings dims, so the cards read
             slotsTitle = Label(slotsScreen, NewGameTitle, 0, SlotsTitleY, 300, 24, 14); slotsTitle.color = ButtonLook.RoomGold; slotsTitle.fontStyle = FontStyle.Bold;
             for (int i = 0; i < slotCards.Length; i++)
@@ -3288,6 +3310,88 @@ namespace Ascendant.CelestialDial
             confirmBox.gameObject.SetActive(false); slotsScreen.gameObject.SetActive(false);
         }
         void ReadSlots() { cards = Enumerable.Range(1, SaveSlots.Count).Select(SaveSlots.Describe).ToArray(); anySave = cards.Any(c => c.Filled); continueSlot = SaveSlots.ContinueSlot; }
+        // ---- The menu's life (owner, Oct 9, after watching the merged launch) ----
+        // "while idling at the main menu screen, can we have the light from the window pulsing": a soft warm glow over menu-city's lit window
+        // (measured on M1b: the warm cluster spans x 389 to 402, y 522 to 574 of the 720 x 1600 file, so 6.5 x 26 logical, centred 17.7 right of
+        // the middle and 274 down), about 3x the window, with a tight inner glow that brightens the window itself; its alpha follows a slow sine.
+        // It shows on the menu and under the slot list's veil, not while Settings is open; reduced motion holds it steady. Working choices all.
+        public const float WindowX = 17.7f, WindowY = 274f, WindowW = 6.5f, WindowH = 26f, GlowScale = 3f, GlowInnerScale = 1.4f, GlowInnerShare = .5f, GlowPeriod = 3.5f, GlowLow = .15f, GlowHigh = .5f, GlowStill = .3f;
+        public static readonly Color GlowColor = new Color(1f, .72f, .36f);
+        public static float GlowAt(float t) => Mathf.Lerp(GlowLow, GlowHigh, (1 - Mathf.Cos(2 * Mathf.PI * t / GlowPeriod)) / 2); // a sine: eased at both ends, never a blink
+        (Image outer, Image inner) menuGlow, slotsGlow; float menuGlowAlpha;
+        public bool WindowGlowShown => menuGlow.outer != null && menuGlow.outer.gameObject.activeInHierarchy;
+        public float WindowGlowAlpha => menuGlowAlpha;
+        (Image, Image) WindowGlow(RectTransform screen)
+        {
+            Image Make(string name, float scale) { var r = Rect(name, screen, WindowX, WindowY, WindowW * scale, WindowH * scale); var im = r.gameObject.AddComponent<Image>(); im.sprite = SoftSprite(); im.raycastTarget = false; im.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, 0); return im; }
+            return (Make("Window glow", GlowScale), Make("Window glow (inner)", GlowInnerScale));
+        }
+        // "can we have a rat run across the floor every so often at the main menu during idle in the background": a 4-frame run cycle (menu-rat-1
+        // to -4, facing right, flipped when it runs left), on the street: its feet (the files' shared line, 47 of 48 down) on M1b's asphalt at
+        // about 762 (the art lane's check: 1524 of 1600), so the box is centred 750.5 down; across the whole width in 2.2 s at 12 frames a
+        // second, behind the title and the buttons and never taking a tap. It first runs 6 to 10 s after the menu turns idle, then every 15 to 30 s;
+        // only on the menu with nothing open over it; none under reduced motion; no sound. It runs right first, then alternates.
+        // Jeffrey, #149 B1: on a screen wider than the column the street (menu-city's bleed) reaches past it, up to 300 each side; the run starts
+        // and ends just beyond whichever is nearer, the screen's edge or the bleed's, and a lane as wide as the bleed clips the rat to the street.
+        // The speed holds (the column's width plus the rat in RatSeconds), so a longer run takes longer.
+        public const float RatY = 750.5f, RatWidth = 48, RatHeight = 24, RatSeconds = 2.2f, RatSpeed = (Bleed.ColumnWidth + RatWidth) / RatSeconds, RatFps = 12, RatFirstMin = 6, RatFirstMax = 10, RatGapMin = 15, RatGapMax = 30;
+        RectTransform rat, ratLane; float ratEdge; Image ratImage; Text ratLabel; bool ratRunning; float ratBegan, ratNextAt = -1, ratPublishAt, glowPublishAt; int ratDir = -1, ratRuns, ratFrame;
+        public bool RatShown => rat != null && rat.gameObject.activeInHierarchy; public int RatRuns => ratRuns; public RectTransform RatRect => rat; public RectTransform RatLane => ratLane; public float RatEdge => ratEdge; // fixture evidence
+        // the screen's half-width in the column's units (the canvas scales to fit the 360 x 800 column), and the run's end for it
+        public float VisibleHalfWidth => canvas != null && canvas.scaleFactor > 0 && canvas.pixelRect.width >= 1 ? canvas.pixelRect.width / canvas.scaleFactor / 2 : Bleed.ColumnWidth / 2;
+        public static float RatEdgeFor(float visibleHalf) => Mathf.Min(Mathf.Max(visibleHalf, Bleed.ColumnWidth / 2), Bleed.Width / 2) + RatWidth / 2;
+        public static string RatSlot(int frame) => "menu-rat-" + (frame + 1);
+        void BuildRat()
+        {
+            ratLane = Rect("Rat lane", menuScreen, 0, RatY, Bleed.Width, RatHeight + 8); ratLane.gameObject.AddComponent<RectMask2D>(); // the street's width (the bleed's): the rat is never drawn past it
+            rat = Rect("Rat", ratLane, 0, (RatHeight + 8) / 2, RatWidth, RatHeight); ratImage = rat.gameObject.AddComponent<Image>(); ratImage.raycastTarget = false;
+            if (!Slots.Dress(ratImage, RatSlot(0))) { ratImage.color = new Color(.42f, .38f, .36f, .9f); ratLabel = Label(rat, "rat 1", 0, RatHeight / 2, RatWidth, RatHeight, 9); ratLabel.color = Bone; } // the labelled placeholder until the art lands
+            else ratImage.preserveAspect = true;
+            rat.gameObject.SetActive(false);
+        }
+        bool MenuIdle => Flow.Screen == SliceScreen.Menu && !busy && (Settings == null || !Settings.Open);
+        void StartRat()
+        {
+            if (!MenuIdle || ReducedMotion || ratRunning) return;
+            ratRunning = true; ratBegan = Time.unscaledTime; ratEdge = RatEdgeFor(VisibleHalfWidth); ratRuns++; ratDir = -ratDir; ratFrame = 0; rat.localScale = new Vector3(ratDir, 1, 1); if (ratLabel != null) ratLabel.rectTransform.localScale = new Vector3(ratDir, 1, 1); // its words stay readable
+            rat.gameObject.SetActive(true); PlaceRat(0); Publish();
+        }
+        void StopRat() { ratRunning = false; if (rat != null) rat.gameObject.SetActive(false); Publish(); }
+        void PlaceRat(float k)
+        {
+            rat.anchoredPosition = new Vector2(Mathf.Lerp(-ratEdge, ratEdge, k) * ratDir, -(RatHeight + 8) / 2);
+            int frame = (int)((Time.unscaledTime - ratBegan) * RatFps) % 4; if (frame == ratFrame && k > 0) return; ratFrame = frame;
+            var art = Slots.Image(RatSlot(frame)); if (art != null) ratImage.sprite = art; else if (ratLabel != null) ratLabel.text = "rat " + (frame + 1);
+        }
+        void UpdateMenuLife()
+        {
+            if (menuScreen == null) return;
+            bool menuOn = Flow.Screen == SliceScreen.Menu, slotsOn = Flow.Screen == SliceScreen.SaveSlots, settingsOpen = Settings != null && Settings.Open;
+            menuGlowAlpha = ReducedMotion ? GlowStill : GlowAt(Time.unscaledTime);
+            ShowGlow(menuGlow.outer, menuGlow.inner, menuOn && !settingsOpen); ShowGlow(slotsGlow.outer, slotsGlow.inner, slotsOn);
+            if ((menuOn || slotsOn) && Time.unscaledTime >= glowPublishAt) { glowPublishAt = Time.unscaledTime + .25f; Publish(); } // the web state follows the pulse four times a second
+            if (!MenuIdle || ReducedMotion) { if (ratRunning) StopRat(); ratNextAt = -1; return; }
+            if (ratNextAt < 0) ratNextAt = Time.unscaledTime + UnityEngine.Random.Range(RatFirstMin, RatFirstMax);
+            if (!ratRunning && Time.unscaledTime >= ratNextAt) StartRat();
+            if (!ratRunning) return;
+            float k = (Time.unscaledTime - ratBegan) * RatSpeed / (2 * ratEdge); // at the same speed on any width
+            if (k >= 1) { StopRat(); ratNextAt = Time.unscaledTime + UnityEngine.Random.Range(RatGapMin, RatGapMax); return; }
+            PlaceRat(k); if (Time.unscaledTime >= ratPublishAt) { ratPublishAt = Time.unscaledTime + .05f; Publish(); } // the web state follows the run closely (its ends are checked)
+        }
+        void ShowGlow(Image outer, Image inner, bool on)
+        {
+            if (outer == null) return; if (outer.gameObject.activeSelf != on) { outer.gameObject.SetActive(on); inner.gameObject.SetActive(on); }
+            if (on) { outer.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, menuGlowAlpha); inner.color = new Color(1, .86f, .6f, menuGlowAlpha * GlowInnerShare); }
+        }
+        // a soft radial dot (the window's glow): full at the middle, falling off smoothly to nothing at the edge
+        static Sprite softSprite;
+        static Sprite SoftSprite()
+        {
+            if (softSprite != null) return softSprite;
+            const int size = 64; var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+            for (int y = 0; y < size; y++) for (int x = 0; x < size; x++) { float d = Mathf.Sqrt((x - 31.5f) * (x - 31.5f) + (y - 31.5f) * (y - 31.5f)) / 32f, a = Mathf.Clamp01(1 - d); texture.SetPixel(x, y, new Color(1, 1, 1, a * a * (3 - 2 * a))); }
+            texture.Apply(); softSprite = Sprite.Create(texture, new UnityEngine.Rect(0, 0, size, size), new Vector2(.5f, .5f), 100); return softSprite;
+        }
         void ShowMenu()
         {
             ReadSlots();
