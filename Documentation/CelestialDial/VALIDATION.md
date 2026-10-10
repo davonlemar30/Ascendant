@@ -2,6 +2,32 @@
 
 This is an interaction test, not production art or a gameplay-validation result. The governing records are linked in [the source index](../README.md).
 
+## The launch, after the owner watched it: one wheel, a clean blend, the logo's fades, the window's pulse and a rat (task 86bcg62x3, Oct 9-10)
+
+PR #149, a follow-up to #141. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #149's body and Claude's note. No new player-facing text.
+
+**Checks added.** The fixture watches every tick through the burn and the transform: every wheel layer on stage shares one angle, and Earth stays at 0 (in the main run and under reduced motion). It also checks the glow pulses and holds steady under reduced motion; the rat runs behind the buttons and moves along; Settings still opens while the rat runs; the rat never appears on the slot list or under reduced motion; at 1280 x 800 the run's ends are 324 (the bleed's 300 plus half the rat), clipped to the street; and on the slot list the window still glows under the veil and pulses (new web-state fields `slotsGlow` and `slotsGlowShown`). The suite runs the same checks from the published state, taps where the running rat is and asserts nothing happens, checks the slot list's glow, and runs a 1280 x 800 menu pass (the rat first shows past the visible street, crosses all of it, leaves past the far edge, and keeps the column's speed).
+- **Slot count:** 224 (221, -1 `intro-wheel-earth`, +4 `menu-rat-*`), in `Slots.cs`, `GreyboxValidation`, the suite's `ART_SLOTS` and `ART-SLOTS.md`.
+
+**Validation (local, Unity 6000.3.24f1), on `f924d18`:**
+
+| Rung | Result |
+| --- | --- |
+| Mechanical (`GreyboxValidation.Run`) | 810/810 |
+| Slice fixture (`SlicePlayValidation.Begin`) | 471/471, no runtime errors |
+| Headless WebGL (`WebBuild.Build`) | succeeded, 47,823,002 bytes, 0 errors, 0 warnings |
+| Browser suite, desktop density | 1005/1005 |
+| Browser suite, phone density (`DEVICE_SCALE=2 MOBILE=1`) | 1005/1005 |
+
+- **Warnings:** none new (no `warning CS`). Pre-existing: the Editor's Search indexing exception at fixture start-up.
+- **Not tested:** Android and the emulator, WebKit, a hand-run screen reader.
+- **Production:** passed, 1005/1005 at desktop and 1005/1005 at phone density, on main 8c196a6 after the Pages deploy (task 86bcg62x3, comment "PR #149 merged and checked in production"). The production suite runs from a checkout of main (it reads repo files relative to itself).
+- **Captures:** on 86bcg62x3 (the burn and transform sequence with layer angles, the logo mid-fade and at the hold, the glow low and high, the rat mid-run, the 1280 x 800 pass).
+
+Reviews: Jeffrey at 95c5b33: B1 (the rat's run ended at the wrong place on wide windows) fixed in `feb17a8` and `13569ec`; N2 and N3 done; N1 (the "no animated characters" exception) went to the owner, who ruled "Widen it: menu can animate". N7 (the logo slot's description still says about 2 s) is open, in code.
+
+Merged as PR #149 (main `8c196a6`, Oct 10), head `f924d18`.
+
 ## The opening scene, the launch movie and the main menu (tasks 86bcfhmha and 86bcg62x3, Oct 8-9)
 
 PR #141 holds two builds: the movie-style opening (a new game's prologue, then WHO ARE YOU? with the orb) and the launch flow (the TSG Games logo, a 30-second launch movie, the main menu, three save slots, "Main menu" in Settings). What shipped is in the [build log](../README.md); this is the validation record, taken from PR #141's body and the pass record on 86bcg62x3 (comment 90140266922040).
@@ -28,10 +54,10 @@ PR #141 holds two builds: the movie-style opening (a new game's prologue, then W
 - **Import churn:** `ProjectSettings.asset` and `UniversalRP.asset` (import noise) and the owner's URP and ShaderGraph upgrade markers were left uncommitted.
 - **Seen by Claude at phone density:** the logo screen, every movie shot with the real art, the menu fresh and with a save, the slot lists, the confirm box, Settings on the menu and in-game; every prologue frame at 390 and 360, normal and reduced motion.
 - **Not tested:** Android and the emulator, WebKit, a hand-run screen reader (the announcements are checked from the live region), and production at the time of the PR.
-- **Production:** owed. Claude runs the check after the Pages deploy of main 4d4d48e and posts it on 86bcfhmha and 86bcg62x3; the number goes into a follow-up docs PR.
+- **Production:** passed, 977/977 at desktop and 977/977 at phone density, on main 4d4d48e after the Pages deploy (task 86bcg62x3, comment 90140266943337). The first phone run stalled while a Unity run went in parallel; the rerun passed.
 - **Captures:** on 86bcg62x3 (the launch sheet, the menu sheet, the two-moons frame, and a zip of all 36 phone captures); locally in the `opening-scene` worktree under `Logs/WebEvidencePhone/` (`390-prologue-*`, `390-launch-*`, `-menu-*`, `-slots-*`, `-settings*`) and `Logs/Evidence/`.
 
-Reviews: Dante passed the text (the prologue's Skip label and lines, two edits on lines 4 and 6; the menu's two fixes: the Main menu question and commas in the spoken slot label). Jeffrey cleared the launch delta at bae79b1: B1 (`ART-SLOTS.md` said 205) fixed in bae79b1, B2 (the pass record and captures) fixed on the task; 8 NOTEs, none blocking. The owner ruled on two of them (round 7): the two moons ghosting together in the street crossfades, "Leave it"; a replaced slot clears at confirm, "Keep".
+Reviews: Dante passed the text (the prologue's Skip label and lines, two edits on lines 4 and 6; the menu's two fixes: the Main menu question and commas in the spoken slot label). Jeffrey cleared the launch delta at bae79b1: B1 (`ART-SLOTS.md` said 205) fixed in bae79b1, B2 (the pass record and captures) fixed on the task; 8 NOTEs, none blocking. The owner ruled on two of them (round 7): the two moons ghosting together in the street crossfades, "Leave it"; a replaced slot clears at confirm, "Keep: clear on confirm".
 
 Merged as PR #141 (main `4d4d48e`, Oct 9), head `bae79b1`.
 
