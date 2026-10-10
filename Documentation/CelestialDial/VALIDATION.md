@@ -74,7 +74,7 @@ Validation (local, Unity 6000.3.24f1):
 - on 93bbb05 (the merged tree), in Unity: compile 0 errors and 0 warnings; fixture A again (exactly :585, :598); mechanical 721/721 (zero hits); slice fixture 286/286;
 - on 9e4de2c with #134's `SliceView.cs` copied in: headless WebGL succeeded (36,154,769 bytes, 0 errors, 0 warnings); browser suite 689/689 at desktop density and 689/689 at phone density. Not rerun after the B1 fix (Editor-only regex constants, identical player code); Jeffrey accepted that;
 - GitHub Actions "Build Web player" green on 93bbb05;
-- production: owed; the Pages deploy for main fc41242 (run 37835042917) was queued at hand-off behind d382830's run. An Editor-only change cannot change the player. The result is to be appended in a follow-up docs PR (count, density, served time, main SHA served).
+- production: waived by the owner on Oct 8 ("can we actually skip the production run this time?"; Claude's comment 90140266287133 on 86bcf5j8k has the reason). An Editor-only change cannot change the player, and the Pages deploy for main fc41242 (run 37835042917) passed. Under the three tiers the owner ruled that day (PR #138) this merge would be Skip. The waiver does not move the production baseline.
 
 Reviews: Jeffrey, B1 BLOCKING (hidden `?.` calls passed) fixed in 93bbb05; N1 partly taken (a number and its unit read as prose); N2 left (cast-wrapped target); N3 closed. Re-review at 93bbb05 clear.
 
