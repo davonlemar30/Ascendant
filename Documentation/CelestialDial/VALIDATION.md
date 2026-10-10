@@ -60,6 +60,7 @@ PR #141 holds two builds: the movie-style opening (a new game's prologue, then W
 Reviews: Dante passed the text (the prologue's Skip label and lines, two edits on lines 4 and 6; the menu's two fixes: the Main menu question and commas in the spoken slot label). Jeffrey cleared the launch delta at bae79b1: B1 (`ART-SLOTS.md` said 205) fixed in bae79b1, B2 (the pass record and captures) fixed on the task; 8 NOTEs, none blocking. The owner ruled on two of them (round 7): the two moons ghosting together in the street crossfades, "Leave it"; a replaced slot clears at confirm, "Keep: clear on confirm".
 
 Merged as PR #141 (main `4d4d48e`, Oct 9), head `bae79b1`.
+
 ## The Elemental Table and the Book of Symbols come alive (task 86bcf0x71, Oct 8)
 
 What shipped is in the [build log](../README.md); this is the validation record, taken from PR #140's body and Claude's hand-off. Player-facing change (the Table and the Book); no words added or changed, so no Dante pass.
@@ -76,7 +77,7 @@ What shipped is in the [build log](../README.md); this is the validation record,
 - **Slots:** 187 in `Slots.cs` (`new ArtSlot(`); the 21 new rows in ART-SLOTS.md match the manifest's names, sizes and max sizes (Whitney, on main 2de2855).
 - **Not covered by a check:** faint ink when Caspar shows the answer; a drop outside any well; a drag while the sign is locked; the slide motions themselves (skipped under Reduced motion, which is checked); the Book's Reduced motion paths (the still emblem, no rise, the shorter full-pages look) (Jeffrey's N13).
 - **Not tested:** the Android APK (not cut; cut only on the owner's word).
-- **Production** (every-merge tier: new art under `Assets/`): main's own suite at phone density against https://davonlemar30.github.io/Ascendant/ on main 2de2855: 721/721, 0 failures; Pages deploy run 37888181400 succeeded; names on wood at least 99%; the twelfth plate gold after Key 3 (Claude, comment 90140266494462 on 86bcf0x71). **The last main production checked is now 2de2855.**
+- **Production** (every-merge tier: new art under `Assets/`): main's own suite at phone density against https://davonlemar30.github.io/Ascendant/ on main 2de2855: 721/721, 0 failures; Pages deploy run 37888181400 succeeded; names on wood at least 99%; the twelfth plate gold after Key 3 (Claude, comment 90140266494462 on 86bcf0x71). **The last main production checked was then 2de2855.**
 
 Reviews: Jeffrey's first review had two BLOCKING items (B1 a stuck plate after a cut-short drag; B2 Reduced motion), both fixed in b5782e1; the re-review was clear. Follow-ups, not blocking: N11 (a plate grabbed during its 0.25 s slide back jitters; `PlateDragBegin` could refuse the sliding seat), N12 (the "gold not yet whole" check reads state inside the 0.5 s spread, so a slow runner could fail it falsely), N13 (above). CI: Build Web player and Guard agent files green.
 
