@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,12 +19,19 @@ namespace Ascendant.CelestialDial
         public Action CuspDay; // batch 2: DEV Mode's cusp-day sample (owner, Oct 2 evening): a fresh opening at the cusp question
         public Action<string> BirthOpening; // Oct 7 (86bced0tc): a fresh opening at each other path's first question: skip, no-time, no-place, neither
         public Func<string> WakeLabel; public Action CycleWake; // the Dial's wake-up (86bcbn6w6): DEV Mode previews each step
+        // the launch (owner, Oct 9, 86bcg62x3, round 3): a Main menu row in the player's section, above Testing; before Key 1 it asks first (Ask).
+        // On the menu the panel leaves out the in-game rows, Start over and Main menu (InGame false).
+        public Action MainMenu, MainMenuConfirmed; public Func<bool> InGame;
+        public const string MainMenuWords = "Main menu";
         public bool JumpsShown => jumpPanel != null && jumpPanel.gameObject.activeSelf;
         public bool Open { get; private set; }
         public Vector2 GearAt => gear != null && gear.GetComponent<SafeTop>() != null ? gear.GetComponent<SafeTop>().At : new Vector2(158, 22); // Part 2: where the gear sits (x from the column's centre, y down from its top)
         public Transform Gear => gear != null ? gear.transform : null; // batch 2: the gear's button, for the web state's list of buttons
         public bool GearShown { get => gear != null && gear.gameObject.activeSelf; set { if (gear != null) gear.gameObject.SetActive(value); if (!value) Close(); } }
-        Canvas canvas; RectTransform menu, mainPanel, jumpPanel; Button gear; Text sound, motion, walk, wakeRow; Font font;
+        Canvas canvas; RectTransform menu, mainPanel, jumpPanel, askPanel; Button gear; Text sound, motion, walk, wakeRow, askLine; Font font;
+        RectTransform soundRow, motionRow, quitRow, mainMenuRow, testingLabel, walkRow, jumpRow, overRow, closeRow;
+        public bool Asking => askPanel != null && askPanel.gameObject.activeSelf;
+        public string AskLine => askLine != null ? askLine.text : "";
         static readonly Color Gold = new Color(.84f, .69f, .38f), Bone = new Color(.93f, .89f, .8f), RowColor = new Color(.16f, .15f, .18f);
 
         public void Build(Font uiFont)
@@ -41,20 +50,21 @@ namespace Ascendant.CelestialDial
             menu = Rect("Settings", root, 0, 400, 360, 800);
             var veil = menu.gameObject.AddComponent<Image>(); veil.color = new Color(0, 0, 0, .6f); Bleed.Add(veil, root); // Part 2: the veil dims the whole screen
             var veilButton = menu.gameObject.AddComponent<Button>(); veilButton.targetGraphic = veil; veilButton.transition = Selectable.Transition.None; veilButton.onClick.AddListener(Close);
-            bool quit = CanQuit; float height = quit ? 454 : 398; // Build W: one more Testing row, Jump to...
+            bool quit = CanQuit; float height = quit ? 510 : 454; // Build W: one more Testing row, Jump to...; the launch (Oct 9): Main menu (Layout sets it again)
             var panel = mainPanel = Rect("Settings box", menu, 0, 400, 280, height);
             var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.sprite = Slots.InstrumentBoxSprite(); panelImage.type = Image.Type.Sliced; panelImage.pixelsPerUnitMultiplier = 2;
             panel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None; // taps on the box itself do not close it
             var title = Label(panel, "S E T T I N G S", 0, 24, 240, 18, 12); title.color = Gold; title.fontStyle = FontStyle.Bold;
-            float y = 66;
-            sound = Row(panel, y, () => ToggleSound?.Invoke()); y += 56;
-            motion = Row(panel, y, () => ToggleMotion?.Invoke()); y += 56;
-            if (quit) { var q = Row(panel, y, Application.Quit); q.text = "Quit the game"; q.transform.parent.name = "Quit the game"; y += 56; }
-            var testing = Label(panel, "T E S T I N G", 0, y - 6, 240, 16, 10); testing.color = new Color(Gold.r, Gold.g, Gold.b, .7f); y += 22;
-            walk = Row(panel, y, () => CycleWalk?.Invoke(), 40); y += 48;
-            var jump = Row(panel, y, ShowJumps, 40); jump.text = "Jump to..."; jump.transform.parent.name = "Jump to"; y += 48; // Latin-1 dots: the web font has no ellipsis
-            var over = Row(panel, y, () => StartOver?.Invoke(), 40); over.text = "Start over"; y += 56;
-            var close = Row(panel, y, Close); close.text = "Close"; close.color = Gold;
+            float y = 66; // the rows' places are set by Layout, which leaves out the in-game rows on the menu
+            sound = Row(panel, y, () => ToggleSound?.Invoke()); soundRow = RowOf(sound);
+            motion = Row(panel, y, () => ToggleMotion?.Invoke()); motionRow = RowOf(motion);
+            if (quit) { var q = Row(panel, y, Application.Quit); q.text = "Quit the game"; q.transform.parent.name = "Quit the game"; quitRow = RowOf(q); }
+            var main = Row(panel, y, () => MainMenu?.Invoke()); main.text = MainMenuWords; main.transform.parent.name = MainMenuWords; mainMenuRow = RowOf(main); // the launch (owner, Oct 9)
+            var testing = Label(panel, "T E S T I N G", 0, y - 6, 240, 16, 10); testing.color = new Color(Gold.r, Gold.g, Gold.b, .7f); testingLabel = testing.rectTransform;
+            walk = Row(panel, y, () => CycleWalk?.Invoke(), 40); walkRow = RowOf(walk);
+            var jump = Row(panel, y, ShowJumps, 40); jump.text = "Jump to..."; jump.transform.parent.name = "Jump to"; jumpRow = RowOf(jump); // Latin-1 dots: the web font has no ellipsis
+            var over = Row(panel, y, () => StartOver?.Invoke(), 40); over.text = "Start over"; overRow = RowOf(over);
+            var close = Row(panel, y, Close); close.text = "Close"; close.color = Gold; closeRow = RowOf(close);
             // Build W: the checkpoint list, in place of the main box while it shows.
             float jumpHeight = 62 + DevCheckpoints.All.Length * 46 + 46 * (1 + BirthSamples.Length) + 56 + 24 + 22; // the checkpoints, the opening's samples (the cusp day first), then the Dial's wake-up preview
             jumpPanel = Rect("Jump to box", menu, 0, 400, 280, jumpHeight);
@@ -68,13 +78,41 @@ namespace Ascendant.CelestialDial
             wakeRow = Row(jumpPanel, jy, () => CycleWake?.Invoke(), 40); wakeRow.transform.parent.name = "Dial wake"; jy += 46; // DEV Mode: a tap steps the Dial's look (first visit, Key 1 to Key 4), then back to as earned
             var back = Row(jumpPanel, jy + 10, ShowMain); back.text = "Back"; back.color = Gold;
             jumpPanel.gameObject.SetActive(false);
+            // the launch (Oct 9): Main menu's question before Key 1, in place of the main box (as Jump to's list): the line, Main menu, Back
+            askPanel = Rect("Ask box", menu, 0, 400, 280, 238);
+            var askImage = askPanel.gameObject.AddComponent<Image>(); askImage.sprite = Slots.InstrumentBoxSprite(); askImage.type = Image.Type.Sliced; askImage.pixelsPerUnitMultiplier = 2;
+            askPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
+            askLine = Label(askPanel, "", 0, 66, 240, 60, 14); askLine.horizontalOverflow = HorizontalWrapMode.Wrap;
+            var askYes = Row(askPanel, 136, () => MainMenuConfirmed?.Invoke()); askYes.text = MainMenuWords; askYes.transform.parent.name = "Ask " + MainMenuWords;
+            var askBack = Row(askPanel, 192, ShowMain); askBack.text = "Back"; askBack.color = Gold; askBack.transform.parent.name = "Ask back";
+            askPanel.gameObject.SetActive(false);
             menu.gameObject.SetActive(false);
             Refresh();
         }
+        static RectTransform RowOf(Text label) => (RectTransform)label.transform.parent;
+        // the main box's rows top to bottom: 56 apart in the player's section, 48 apart under Testing, 56 before Close; on the menu, no Main menu and no Start over
+        void Layout()
+        {
+            if (mainPanel == null) return; bool inGame = InGame == null || InGame();
+            float y = 66;
+            foreach (var r in new[] { soundRow, motionRow, quitRow }) if (r != null) { Place(r, y); y += 56; }
+            mainMenuRow.gameObject.SetActive(inGame); if (inGame) { Place(mainMenuRow, y); y += 56; }
+            testingLabel.anchoredPosition = new Vector2(0, -(y - 6)); y += 22;
+            overRow.gameObject.SetActive(inGame); var tests = inGame ? new[] { walkRow, jumpRow, overRow } : new[] { walkRow, jumpRow };
+            for (int i = 0; i < tests.Length; i++) { Place(tests[i], y); y += i < tests.Length - 1 ? 48 : 56; }
+            Place(closeRow, y); mainPanel.sizeDelta = new Vector2(280, y + 46);
+        }
+        static void Place(RectTransform row, float y) => row.anchoredPosition = new Vector2(0, -y);
+        // the rows of the box showing, as words and as their centres down the 360 x 800 layout (the web state; the checks tap them)
+        public string[] RowWords => ShownRows().Select(b => b.GetComponentInChildren<Text>().text).ToArray();
+        public float[] RowTops { get { var box = ShownBox(); return box == null ? new float[0] : ShownRows().Select(b => Mathf.Round((400 - box.sizeDelta.y / 2 - ((RectTransform)b.transform).anchoredPosition.y) * 100) / 100).ToArray(); } }
+        RectTransform ShownBox() => !Open ? null : Asking ? askPanel : JumpsShown ? jumpPanel : mainPanel;
+        IEnumerable<Button> ShownRows() { var box = ShownBox(); return box == null ? Enumerable.Empty<Button>() : box.GetComponentsInChildren<Button>().Where(b => b.transform.parent == box && b.GetComponentInChildren<Text>() != null); }
+        public void Ask(string line) { if (!Open) Toggle(); askLine.text = line; mainPanel.gameObject.SetActive(false); jumpPanel.gameObject.SetActive(false); askPanel.gameObject.SetActive(true); Changed?.Invoke(); }
         public void ShowJumps() { mainPanel.gameObject.SetActive(false); jumpPanel.gameObject.SetActive(true); Changed?.Invoke(); }
-        public void ShowMain() { jumpPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); Changed?.Invoke(); }
+        public void ShowMain() { jumpPanel.gameObject.SetActive(false); if (askPanel != null) askPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); Changed?.Invoke(); }
         public void Toggle() { if (Open) Close(); else { Open = true; menu.gameObject.SetActive(true); Refresh(); Changed?.Invoke(); } }
-        public void Close() { if (!Open) return; Open = false; menu.gameObject.SetActive(false); if (jumpPanel != null) { jumpPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); } Changed?.Invoke(); }
+        public void Close() { if (!Open) return; Open = false; menu.gameObject.SetActive(false); if (jumpPanel != null) { jumpPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); } if (askPanel != null) askPanel.gameObject.SetActive(false); Changed?.Invoke(); }
         public void Refresh()
         {
             if (sound == null) return;
@@ -82,6 +120,7 @@ namespace Ascendant.CelestialDial
             motion.text = "Reduced motion: " + (Reduced != null && Reduced() ? "on" : "off");
             walk.text = "Walk: " + (WalkSpeed != null ? WalkSpeed() : "normal");
             if (wakeRow != null) wakeRow.text = "Dial wake: " + (WakeLabel != null ? WakeLabel() : "as earned");
+            Layout();
         }
         void Update() { if (canvas != null && canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f); }
 

@@ -36,8 +36,20 @@ IMAGES = [
     ("dial-room", 180, 400), ("dial-room-light", 180, 400), ("dial-ring", 180, 180), ("dial-ring-light", 180, 180), ("kit-dial-worn-open", 188, 208), ("kit-dial-restored-open", 188, 208),  # Build Z: the Dial's room, its glow, the Wing Dial's open eye
     ("dial-room-worn", 180, 400), ("dial-room-light-worn", 180, 400), ("dial-ring-worn", 180, 180), ("dial-ring-light-worn", 180, 180),  # the Dial's wake-up (Oct 2): its worn and bright looks
     ("dial-room-bright", 180, 400), ("dial-room-light-bright", 180, 400), ("dial-ring-bright", 180, 180), ("dial-ring-light-bright", 180, 180), ("kit-dial-bright", 188, 208), ("kit-dial-bright-open", 188, 208),
+    ("book-room", 180, 400), ("table-room", 180, 400), ("table-well", 88, 48), ("table-plate", 84, 44), ("table-plate-gold", 84, 44),  # the Table and the Book come alive (Oct 8)
+    ("letter-fire", 128, 128), ("letter-earth", 128, 128), ("letter-air", 128, 128), ("letter-water", 128, 128),
+    ("emblem-aries", 180, 180), ("emblem-taurus", 180, 180), ("emblem-gemini", 180, 180), ("emblem-cancer", 180, 180), ("emblem-leo", 180, 180), ("emblem-virgo", 180, 180), ("emblem-libra", 180, 180), ("emblem-scorpio", 180, 180), ("emblem-sagittarius", 180, 180), ("emblem-capricorn", 180, 180), ("emblem-aquarius", 180, 180), ("emblem-pisces", 180, 180),
+    ("prologue-city", 180, 400), ("prologue-desk", 180, 400), ("prologue-notebook", 180, 400), ("prologue-light", 180, 400), ("prologue-look", 180, 400), ("prologue-headphones", 180, 400),  # the opening scene (Oct 8): its twelve frames,
+    ("prologue-street-above", 180, 400), ("prologue-puzzled", 180, 400), ("prologue-caspar-back", 180, 400), ("prologue-caspar-turn", 180, 400), ("prologue-caspar-face", 180, 400), ("prologue-caspar-eyes", 180, 400),
+    ("prologue-notebook-2", 180, 400), ("prologue-notebook-3", 180, 400), ("prologue-light-up", 180, 400), ("prologue-headphones-mid", 180, 400),  # its slight animations (owner, Oct 9)
+    ("orb", 120, 120), ("orb-star", 16, 16),  # the orb and its star, round, with transparent corners
+    ("studio-logo", 160, 160),  # the launch (owner, Oct 9): the studio's logo screen,
+    ("intro-stars", 180, 400), ("intro-continents", 180, 400),  # the launch movie's frames (round 4: the sky, then the descent),
+    ("intro-wheel-pencil-lines", 180, 180), ("intro-wheel-pencil-glyphs", 180, 180), ("intro-wheel-lit", 180, 180), ("intro-wheel-burning", 180, 180), ("intro-earth", 180, 180),  # its round layers,
+    ("intro-america", 180, 400), ("intro-newyork-state", 180, 400), ("intro-newyork-city", 180, 400), ("intro-brooklyn", 180, 400), ("intro-block", 180, 400),
+    ("menu-city", 180, 400), ("menu-title", 136, 100), ("menu-rat-1", 48, 24), ("menu-rat-2", 48, 24), ("menu-rat-3", 48, 24), ("menu-rat-4", 48, 24),  # the main menu's background and title
 ]
-ROUND = {"dial-face", "floor-markings", "mechanism"}
+ROUND = {"dial-face", "floor-markings", "mechanism", "orb", "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs", "intro-wheel-lit", "intro-wheel-burning", "intro-earth"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
     "A": ("010", "101", "111", "101", "101"), "B": ("110", "101", "110", "101", "110"), "C": ("011", "100", "100", "100", "011"),
     "D": ("110", "101", "101", "101", "110"), "E": ("111", "100", "110", "100", "111"), "F": ("111", "100", "110", "100", "100"),
@@ -92,7 +104,7 @@ def image(index, name, width, height):
     label, scale = text_pixels(name, width, height)
     corner = 3 if min(width, height) >= 16 else 0
     walk_band = name == "keeper-walk"
-    light = name.endswith("-light") or "-light-" in name  # the wake-up's looks of a light layer (dial-room-light-worn) are overlays too; Build H: a translucent amber wash, brighter at the top, with diagonal shafts; the name stays readable
+    light = (name.endswith("-light") or "-light-" in name) and not name.startswith("prologue-")  # a prologue frame is a whole picture, never an overlay. The wake-up's looks of a light layer (dial-room-light-worn) are overlays too; Build H: a translucent amber wash, brighter at the top, with diagonal shafts; the name stays readable
     def pixel(x, y):
         if light:
             if (x, y) in label:

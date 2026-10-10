@@ -109,6 +109,7 @@ namespace Ascendant.CelestialDial
             public bool namesHidden, glyphWheel, key2, v03Complete;
             public string glyphMode = "", glyphChar = "", glyphTarget = "";
             public string[] glyphOptions;
+            public string bookEmblem = ""; public int[] bookInk = new int[0]; public bool bookPages, bookRising, bookArt; public int bookInkDrawn; public string bookPicked = ""; public float[] bookInkBox = new float[0]; // the Book comes alive (owner, Oct 7-8): the emblem shown, each seat's ink (0, 1 faint, 2 full), the pages' look, the rise, the right plate
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public float chatBoxHeight;
@@ -154,7 +155,14 @@ namespace Ascendant.CelestialDial
             // Oct 3 (owner: step 4, Practice, approved): the journal's Practice as drawn (SliceView.Publish); quiz* is a round's question page
             public string[] journalPractice, quizChoices; public float[] journalPracticeRows, quizChoiceBoxes, quizButtons; public string quizConcept = "", quizCounter = "", quizGlyph = "", quizAsk = "", quizFeedback = "", quizEnd = ""; public int quizPicked = -1, quizRight = -1, quizAskLines; public bool quizOver, canQuizChoice, canQuizNext, canQuizBack;
             public string sunSign = "";
+            public int prologueShot = -1, prologueShots, orbStars, orbStarsLit; public string prologueShotId = "", prologueFrame = "", orbArt = ""; public bool prologueStill, skipShown, canSkip, orbShown; public string[] prologueShotFrames; // the opening scene (owner, Oct 8, 86bcfhmha): the shot and frame playing, Skip; the orb and the stars gathered
             public int locksFilled;
+            // the launch (owner, Oct 9, 86bcg62x3): the logo and the launch movie (launchCamera: the frame on top's scale and turn), the gear, the main menu, the slot list and its question, Settings' rows
+            public int launchShot = -1, launchShots, slotInPlay, continueSlot; public string launchShotId = "", launchFrame = "", menuTitleArt = "", menuArt = "", slotsFor = "", slotsTitle = "", confirmLine = "", settingsAskLine = ""; public float menuTitleTop;
+            public bool launchStill, gearShown, canMenuContinue, canMenuNew, canMenuLoad, canMenuSettings, confirmShown, canConfirm, canSlotsBack, settingsAsk;
+            public string[] launchShotFrames = new string[0], menuButtons = new string[0], slotCards = new string[0], settingsRows = new string[0]; public float[] launchCamera = new float[0], menuAlpha = new float[0], slotAlpha = new float[0], settingsRowTops = new float[0]; public bool[] slotFilled = new bool[0], slotEnabled = new bool[0];
+            // the menu's life (owner, Oct 9): the window's glow (its alpha now), the rat (runs so far, on screen, where, which way, its frame, its art)
+            public string[] launchLayers = new string[0]; public float windowGlow, ratX, ratY, ratEdge, visibleHalf, slotsGlow; public bool slotsGlowShown; public bool windowGlowShown, ratShown; public int ratRuns, ratFacing, ratFrame; public string ratArt = "";
             // v0.4 tap-to-move
             public string room = "", walkTarget = "", avatarAt = "", walkSpeed = "";
             public float avatarX;
@@ -162,6 +170,7 @@ namespace Ascendant.CelestialDial
             public string[] pois, poiLabels;
             // Build B: the table
             public string gridReadout = "", gridStatus = "", gridSign = "";
+            public string[] gridPlates = new string[0]; public bool[] gridLive = new bool[0]; public float[] gridEdgeBox = new float[0]; public bool[] gridGoldWhole = new bool[0]; public string gridDrag = ""; public int gridHover = -1; public bool gridArt; // the Table comes alive (Oct 7-8): each well's plate (gold, wood, pending or none), its live lettering, the plate being dragged, the well under it
             public string[] gridTiles, gridCells;
             public int gridPlaced, gridCell = -1, gridHintLevel; // the level is test evidence only, never shown
             public bool gridOpen, gridStarted, gridComplete, gridPaused, gridLocked, key3, canEnterGrid, canGridPick, canGridSeal, canGridAsk, canLeaveGrid;

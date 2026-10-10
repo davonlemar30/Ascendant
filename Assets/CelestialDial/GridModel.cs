@@ -26,6 +26,7 @@ namespace Ascendant.CelestialDial
         readonly List<DialEvent> events = new List<DialEvent>();
         public IReadOnlyList<DialEvent> Events => events;
         public event Action<DialEvent> Logged;
+        public string InputMethod = "DirectCell"; // the come-alive build (owner, Oct 7: drag and tap): a dragged plate logs "Drag", the name the Dial uses; grading is the same
         public event Action ProgressCommitted;
         public readonly bool[] Placed = new bool[12];
         public readonly bool[] Assisted = new bool[12];     // seated at Level 2 or 3; never evidence
@@ -179,7 +180,7 @@ namespace Ascendant.CelestialDial
                 event_name = name, problem_id = problemId, start_seat = Math.Max(0, Sign),
                 start_sign = Sign >= 0 ? SignName(Sign) : "", requested_relationship = "cell_of_sign",
                 selected_destination = cell, destination_sign = SignName(SeatOf(cell)),
-                correctness = correct, input_method = method ?? "DirectCell",
+                correctness = correct, input_method = method ?? InputMethod,
                 hint_level = HintLevel, attempt_number = Attempts,
                 response_time = Sign >= 0 ? Math.Max(0, now() - startedAt) : 0, movement_count = 0,
                 evidence_eligible = evidence
