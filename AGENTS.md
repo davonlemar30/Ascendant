@@ -55,7 +55,7 @@ These instructions apply to the entire repository.
 
 ## The studio team (owner, 2026-10-06)
 
-Claude builds and orchestrates. Five agents, each defined in `.claude/agents/`, check the work at fixed points or answer questions. None of them rules on design; every ruling stays with the owner.
+Claude builds and orchestrates. Six agents, each defined in `.claude/agents/`, check the work at fixed points or answer questions. None of them rules on design; every ruling stays with the owner.
 
 | Agent | Job | Claude calls them | Model |
 | --- | --- | --- | --- |
@@ -63,9 +63,10 @@ Claude builds and orchestrates. Five agents, each defined in `.claude/agents/`, 
 | Dante | Copywriter: the owner's writing rules and Caspar's voice | On every PR that adds or changes player-facing text | Sonnet |
 | Imani | Researcher, read-only: what the rulings, canon, and code already say; deep reports from outside sources | Whenever a design, build, or task prep needs what's already known (owner, 2026-10-07) | Sonnet |
 | Jeffrey | Reviewer: brief, AGENTS.md, sweeps, correctness | On every PR, before asking the owner to merge | Opus |
+| Langston | Lore-keeper: the canon, the rulings and what the game says, kept consistent; keeps the Lore ledger; the owner's partner for lore conversations | On every PR that adds or changes player-facing text or shows a character, place, or story beat; the owner talks with Langston directly (`claude --agent langston`) (owner, 2026-10-09) | Opus |
 | Whitney | Docs and continuity: build log, `VALIDATION.md`, mirrors, indexes, memory | After every merge, and Monday and Thursday | Sonnet |
 
-- **A build's order:** Ashantis preps the task, the owner answers only the "Needs you" list, Claude builds, Dante reviews the text, Jeffrey reviews the PR, the owner merges, Whitney records.
+- **A build's order:** Ashantis preps the task, the owner answers only the "Needs you" list, Claude builds, Dante reviews the text, Langston checks it against the lore, Jeffrey reviews the PR, the owner merges, Whitney records.
 - **Jeffrey's BLOCKING findings hold the merge** until they're fixed or the owner waves them through in their own words.
 - **Claude does no docs pass of its own.** The PR body carries the full validation record, and Claude hands Whitney a short "what changed" note after the merge. The build's pass record and captures still go on its ClickUp task.
 - **Models:** each agent's file sets a default. Claude may override the model for a single job; when Opus misses the same fix twice, rerun that job on Fable.
