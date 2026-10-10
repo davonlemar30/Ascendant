@@ -36,6 +36,7 @@ namespace Ascendant.EraDemo
         public const float FadeSeconds = .6f;
         public const float PlacesX = -126, PlacesTop = 26, PlacesWidth = 92, PlacesHeight = 34; // the top left, where the room mini-menu's button sits in the Library
         public const float ChatTop = 588, ChatWidth = 324, ChatMax = 196;
+        public const float TopClear = 48; // layout px kept clear above the map's top row, under the top strip's controls (Places, the gear: 22 + 26); APK smoke test, Oct 10
         // Greybox colours: plain and flat, to be replaced by the art; the pre-dawn grade is only hinted.
         static readonly Color VoidColor = new Color(.07f, .07f, .09f), Seam = new Color(.11f, .1f, .12f), Floor = new Color(.52f, .47f, .4f), Stairs = new Color(.66f, .6f, .5f),
             Wall = new Color(.3f, .23f, .19f), Prop = new Color(.42f, .34f, .27f), Person = new Color(.32f, .42f, .6f), CasparColor = new Color(.45f, .2f, .22f),
@@ -240,7 +241,7 @@ namespace Ascendant.EraDemo
             if (cam.pixelRect.height < 1) return;
             float scale = Mathf.Min(cam.pixelRect.width / 360f, cam.pixelRect.height / 800f), size = cam.pixelRect.height / scale / 2 / EraMap.SquarePx; // one square is 40 layout px, as on the column
             cam.orthographicSize = size; float half = size * cam.aspect;
-            float x = Walker.X, y = -Walker.Y, minX = -.5f + half, maxX = Map.Width - .5f - half, minY = -(Map.Height - .5f) + size, maxY = .5f - size;
+            float x = Walker.X, y = -Walker.Y, minX = -.5f + half, maxX = Map.Width - .5f - half, minY = -(Map.Height - .5f) + size, maxY = .5f + TopClear / EraMap.SquarePx - size; // the map's top row stops below Places and the gear
             x = minX > maxX ? (Map.Width - 1) / 2f : Mathf.Clamp(x, minX, maxX); y = minY > maxY ? -(Map.Height - 1) / 2f : Mathf.Clamp(y, minY, maxY);
             cam.transform.position = new Vector3(x, y, -10);
         }
