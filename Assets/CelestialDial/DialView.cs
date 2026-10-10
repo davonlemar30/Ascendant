@@ -161,6 +161,8 @@ namespace Ascendant.CelestialDial
             public int launchShot = -1, launchShots, slotInPlay, continueSlot; public string launchShotId = "", launchFrame = "", menuTitleArt = "", menuArt = "", slotsFor = "", slotsTitle = "", confirmLine = "", settingsAskLine = ""; public float menuTitleTop;
             public bool launchStill, gearShown, canMenuContinue, canMenuNew, canMenuLoad, canMenuSettings, confirmShown, canConfirm, canSlotsBack, settingsAsk;
             public string[] launchShotFrames = new string[0], menuButtons = new string[0], slotCards = new string[0], settingsRows = new string[0]; public float[] launchCamera = new float[0], menuAlpha = new float[0], slotAlpha = new float[0], settingsRowTops = new float[0]; public bool[] slotFilled = new bool[0], slotEnabled = new bool[0];
+            // the menu's life (owner, Oct 9): the window's glow (its alpha now), the rat (runs so far, on screen, where, which way, its frame, its art)
+            public string[] launchLayers = new string[0]; public float windowGlow, ratX, ratY; public bool windowGlowShown, ratShown; public int ratRuns, ratFacing, ratFrame; public string ratArt = "";
             // v0.4 tap-to-move
             public string room = "", walkTarget = "", avatarAt = "", walkSpeed = "";
             public float avatarX;
