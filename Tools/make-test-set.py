@@ -43,8 +43,13 @@ IMAGES = [
     ("prologue-street-above", 180, 400), ("prologue-puzzled", 180, 400), ("prologue-caspar-back", 180, 400), ("prologue-caspar-turn", 180, 400), ("prologue-caspar-face", 180, 400), ("prologue-caspar-eyes", 180, 400),
     ("prologue-notebook-2", 180, 400), ("prologue-notebook-3", 180, 400), ("prologue-light-up", 180, 400), ("prologue-headphones-mid", 180, 400),  # its slight animations (owner, Oct 9)
     ("orb", 120, 120), ("orb-star", 16, 16),  # the orb and its star, round, with transparent corners
+    ("studio-logo", 160, 160),  # the launch (owner, Oct 9): the studio's logo screen,
+    ("intro-stars", 180, 400), ("intro-continents", 180, 400),  # the launch movie's frames (round 4: the sky, then the descent),
+    ("intro-wheel-pencil-lines", 180, 180), ("intro-wheel-pencil-glyphs", 180, 180), ("intro-wheel-lit", 180, 180), ("intro-wheel-burning", 180, 180), ("intro-wheel-earth", 180, 180), ("intro-earth", 180, 180),  # its round layers,
+    ("intro-america", 180, 400), ("intro-newyork-state", 180, 400), ("intro-newyork-city", 180, 400), ("intro-brooklyn", 180, 400), ("intro-block", 180, 400),
+    ("menu-city", 180, 400), ("menu-title", 136, 100),  # the main menu's background and title
 ]
-ROUND = {"dial-face", "floor-markings", "mechanism", "orb"}
+ROUND = {"dial-face", "floor-markings", "mechanism", "orb", "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs", "intro-wheel-lit", "intro-wheel-burning", "intro-wheel-earth", "intro-earth"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
     "A": ("010", "101", "111", "101", "101"), "B": ("110", "101", "110", "101", "110"), "C": ("011", "100", "100", "100", "011"),
     "D": ("110", "101", "101", "101", "110"), "E": ("111", "100", "110", "100", "111"), "F": ("111", "100", "110", "100", "100"),
