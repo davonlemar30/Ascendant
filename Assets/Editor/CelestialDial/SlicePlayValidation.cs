@@ -65,6 +65,20 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="menu" && s.menuButtons.SequenceEqual(SliceView.MenuWords) && !s.gearShown && !View.AnySave && !View.MenuButton(0).interactable && !View.MenuButton(2).interactable && View.MenuButton(1).interactable && View.MenuButton(3).interactable && Mathf.Approximately(s.menuAlpha[0],.5f) && Mathf.Approximately(s.menuAlpha[2],.5f) && s.menuAlpha[1]==1 && s.menuAlpha[3]==1 && !s.canMenuContinue && !s.canMenuLoad && s.canMenuNew && s.canMenuSettings,"the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save, Continue and Load Game at half (the unavailable look); no gear");
                 Check(Enumerable.Range(0,4).All(i=>{var r=(RectTransform)View.MenuButton(i).transform;return r.sizeDelta==new Vector2(232,44) && Mathf.Approximately(-r.anchoredPosition.y,SliceView.MenuButtonY(i)) && r.anchoredPosition.x==0 && ButtonLook.KindOf(View.MenuButton(i))=="room";}),"the menu's buttons wear the Room look, 232 x 44, centred, 12 px apart from 496 down");
                 Check(s.menuArt=="file" && s.menuTitleArt=="file" && Slots.IsDressed("menu-city") && Slots.IsDressed("menu-title") && Mathf.Approximately(s.menuTitleTop,SliceView.MenuTitleY+s.safeTop),"the menu stands on the owner's approved art (M1b's city, the Library Seal), the title centred "+SliceView.MenuTitleY+" down");Capture("slice-390-menu-fresh.png");});
+            // the menu's life (owner, Oct 9): the window's glow pulses slowly; the rat runs across the street behind the buttons, and a button still works while it runs
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.WindowGlowShown && s.windowGlowShown && s.windowGlow>=SliceView.GlowLow-.001f && s.windowGlow<=SliceView.GlowHigh+.001f,"the window's glow shows on the menu (alpha "+s.windowGlow.ToString("0.00")+")");glowSeen=View.WindowGlowAlpha;glowLow=glowHigh=glowSeen;});
+            for(int g=0;g<8;g++) Steps.Enqueue(()=>{float a=View.WindowGlowAlpha;glowLow=Mathf.Min(glowLow,a);glowHigh=Mathf.Max(glowHigh,a);nextAt=EditorApplication.timeSinceStartup+.45;});
+            Steps.Enqueue(()=>{Check(glowHigh-glowLow>.15f && glowLow>=SliceView.GlowLow-.001f && glowHigh<=SliceView.GlowHigh+.001f,"it pulses slowly between "+glowLow.ToString("0.00")+" and "+glowHigh.ToString("0.00")+" over a few seconds");Act("rat");nextAt=EditorApplication.timeSinceStartup+.3;});
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();var r=View.RatRect;int buttonsAt=View.MenuButton(0).transform.GetSiblingIndex();
+                Check(View.RatShown && s.ratShown && s.ratRuns>=1 && Mathf.Abs(s.ratY-SliceView.RatY)<.01f && Mathf.Abs(s.ratX)<=180+SliceView.RatWidth/2+.01f && View.RatLane.parent==View.MenuButton(0).transform.parent && View.RatLane.GetSiblingIndex()<buttonsAt && r.parent==View.RatLane && Mathf.Approximately(View.RatEdge,SliceView.RatEdgeFor(View.VisibleHalfWidth)) && r.GetComponentsInChildren<UnityEngine.UI.Graphic>(true).All(gr=>!gr.raycastTarget) && Slots.IsDressed("menu-rat-1") && s.ratArt=="file","the rat (the art lane\'s run cycle) runs across the street (y "+s.ratY+", x "+s.ratX.ToString("0")+"), drawn behind the title and the buttons, taking no taps");Capture("slice-390-menu-rat.png");ratXSeen=s.ratX;nextAt=EditorApplication.timeSinceStartup+.4;}); // the run lasts 2.2 s: the next look comes soon
+            Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.ratShown && (s.ratX-ratXSeen)*s.ratFacing>0 && Mathf.Abs(s.ratX)<=180+SliceView.RatWidth/2+.01f,"it moves along, facing its way ("+(s.ratFacing>0?"right":"left")+", x "+s.ratX.ToString("0")+")");Act("menu:settings");});
+            Steps.Enqueue(()=>{Check(View.Settings.Open && !View.RatShown && !View.WindowGlowShown,"Settings works while the rat runs; with the panel open the rat and the glow step aside");Act("settings");});
+            // Jeffrey, #149 B1: on a wide screen the street reaches past the column (the bleed, 300 each side): the run starts and ends past what shows, the lane clipping it to the street
+            Steps.Enqueue(()=>GreyboxPlayValidation.SetSize(1280,800));
+            Steps.Enqueue(()=>{Act("rat");});
+            Steps.Enqueue(()=>{var lane=View.RatLane;Check(View.RatShown && Mathf.Abs(View.VisibleHalfWidth-640)<1 && Mathf.Approximately(View.RatEdge,324) && Mathf.Abs(View.RatRect.anchoredPosition.x)<=324.01f && lane.GetComponent<UnityEngine.UI.RectMask2D>()!=null && Mathf.Approximately(lane.sizeDelta.x,Bleed.Width),"at 1280 x 800 the rat runs from past the street's edge to past the other (ends at 324: the bleed's 300 plus half the rat), clipped to the street ("+View.RatRect.anchoredPosition.x.ToString("0")+")");Capture("slice-1280-menu-rat.png");});
+            Steps.Enqueue(()=>GreyboxPlayValidation.SetSize(390,844));
+            Until(()=>!View.RatShown,8,"the wide run to end",.3);
             Steps.Enqueue(()=>{Act("menu:load");Act("menu:continue");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu && !View.Busy,"with no save, Load Game and Continue do nothing");Act("menu:settings");});
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.Settings.Open && s.settingsOpen && !s.settingsRows.Contains("Start over") && !s.settingsRows.Contains("Main menu") && s.settingsRows.Contains("Jump to...") && s.settingsRows.Contains("Close") && !View.GearShown,"the menu's Settings opens the same panel without the in-game rows (Start over, Main menu): "+string.Join(", ",s.settingsRows));Capture("slice-390-menu-settings.png");});
@@ -439,6 +453,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Act("prologue-tap");Act("next-screen");Check(View.SkipShown && View.Dial.Snapshot().skipShown && View.Flow.Screen==SliceScreen.Intro && View.LaunchShotIndex>0,"in the launch movie a tap shows Skip and advances nothing");Capture("slice-360-launch-skip.png");});
             Steps.Enqueue(()=>Act("skip-prologue"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu && !View.Busy && View.LaunchShotIndex==-1 && !View.Dial.Snapshot().gearShown && View.Dial.Lesson.Dial.ReducedMotion,"Skip goes straight to the menu (reduced motion kept)");Capture("slice-360-menu.png");});
+            Steps.Enqueue(()=>{Check(View.WindowGlowShown && Mathf.Approximately(View.WindowGlowAlpha,SliceView.GlowStill),"reduced motion: the window's glow holds steady at "+SliceView.GlowStill);Act("rat");});
+            Steps.Enqueue(()=>{Check(!View.RatShown && View.Dial.Snapshot().windowGlow==SliceView.GlowStill,"reduced motion: no rat");});
             Steps.Enqueue(()=>Act("motion"));
             // Build E: the same save with the test set in every slot, at both viewports; the cues; then the style page on both sets.
             Steps.Enqueue(()=>{Check(Slots.Set=="" && !View.StyleShown && Sound.LastCue!="","the run so far played on the Art folder and the sound hooks fired, files or not (last cue: "+Sound.LastCue+")");PlayerPrefs.SetString(SliceView.SaveKey,stashedSave);PlayerPrefs.Save();Slots.Request(Slots.TestSet,false);Act("reload");});
@@ -516,6 +532,9 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>Act("menu:load"));
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();var c=View.Cards;Check(s.screen=="saveslots" && s.slotsFor=="load" && c[0].Filled && c[0].Name=="Tester" && c[0].Keys=="Keeper Keys: 4" && c[0].BigThree!="" && !c[1].Filled && !c[2].Filled && c[1].Name=="Empty" && s.slotEnabled.SequenceEqual(new[]{true,false,false}) && Mathf.Approximately(s.slotAlpha[1],.5f) && Mathf.Approximately(s.slotAlpha[2],.5f) && s.slotAlpha[0]==1,"Load Game: the old save shows in slot 1 ("+c[0].Spoken+"); the empty slots read Empty and are dimmed");
                 Capture("slice-390-art-slots-load.png");});
+            Steps.Enqueue(()=>{Act("rat");var s=View.Dial.Snapshot();Check(!View.RatShown && !View.WindowGlowShown && View.Flow.Screen==SliceScreen.SaveSlots && s.slotsGlowShown && s.slotsGlow>=SliceView.GlowLow-.001f && s.slotsGlow<=SliceView.GlowHigh+.001f,"the rat never runs on the slot list; its window glows under the veil there (alpha "+s.slotsGlow.ToString("0.00")+")");glowLow=glowHigh=s.slotsGlow;});
+            for(int g=0;g<8;g++) Steps.Enqueue(()=>{float a=View.Dial.Snapshot().slotsGlow;glowLow=Mathf.Min(glowLow,a);glowHigh=Mathf.Max(glowHigh,a);nextAt=EditorApplication.timeSinceStartup+.45;});
+            Steps.Enqueue(()=>Check(glowHigh-glowLow>.15f,"and it pulses there too ("+glowLow.ToString("0.00")+" to "+glowHigh.ToString("0.00")+")"));
             Steps.Enqueue(()=>{Act("slot:2");Act("slots-back");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu,"an empty slot does nothing in Load Game; Back returns to the menu");Act("menu:new");});
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="saveslots" && s.slotsFor=="new" && s.slotEnabled.All(e=>e) && !s.confirmShown,"New Game with a save opens the slot list, every slot available");Act("slot:1");});
@@ -547,10 +566,19 @@ namespace Ascendant.Build
             nextAt=EditorApplication.timeSinceStartup+2;EditorApplication.update+=Tick;
         }
         // ---- the launch's helper (Oct 9): the logo and the movie, each shot's frame captured once it has come up (until stopAt, if given) ----
-        static float zoomSeen;
+        static float zoomSeen, glowSeen, glowLow, glowHigh, ratXSeen; static Action probe; static int wheelSamples; static readonly List<string> wheelFaults=new List<string>();
+        // the owner, Oct 9 ("fix that immediately"; "it doenst blend that cleanly"): through the burn and the transform every wheel layer on stage
+        // turns at one angle, and Earth never turns; read from the stage on every tick
+        static void WatchWheel()
+        {
+            var v=View;if(v==null || v.LaunchShotIndex<0)return;var id=SliceView.LaunchShots[v.LaunchShotIndex].Id;if(id!="burn" && id!="transform")return;
+            var layers=v.LaunchLayers().ToList();var wheels=layers.Where(l=>l.slot.StartsWith("intro-wheel")).ToList();wheelSamples++;
+            if(wheels.Count>1 && wheels.Any(w=>Mathf.Abs(Mathf.DeltaAngle(w.angle,wheels[0].angle))>.01f) && wheelFaults.Count<5)wheelFaults.Add(id+": "+string.Join(", ",wheels.Select(w=>w.slot+" "+w.angle.ToString("0.0"))));
+            foreach(var e in layers.Where(l=>l.slot=="intro-earth"))if(Mathf.Abs(e.angle)>.01f && wheelFaults.Count<5)wheelFaults.Add(id+": intro-earth turned "+e.angle.ToString("0.0"));
+        }
         static void Launch(string file,bool reduced,string stopAt)
         {
-            Steps.Enqueue(()=>{zoomSeen=0;nextAt=EditorApplication.timeSinceStartup;});
+            Steps.Enqueue(()=>{zoomSeen=0;wheelSamples=0;wheelFaults.Clear();probe=WatchWheel;nextAt=EditorApplication.timeSinceStartup;});
             var shots=new (string id,string frame,double after)[]{("logo","studio-logo",.6),("draw","intro-wheel-pencil-lines",1.0),("glyphs","intro-wheel-pencil-glyphs",.05),("alive","intro-wheel-lit",1.2),("burn","intro-wheel-burning",1.4),("transform","intro-earth",.8),("earth","intro-earth",1.0),
                 ("continents","intro-continents",.5),("america","intro-america",.5),("newyork-state","intro-newyork-state",.5),("newyork-city","intro-newyork-city",.5),("brooklyn","intro-brooklyn",.5),("block","intro-block",.6),("window","prologue-city",1.0)};
             var lines=new Dictionary<string,string>{{"logo","TSG Games."},{"draw","A zodiac wheel draws itself in pencil, then adds its twelve symbols."},{"glyphs",""},{"alive","The wheel lights up in gold, and the dark fills with stars."},{"burn","The wheel burns with golden fire and begins to spin."},
@@ -570,7 +598,9 @@ namespace Ascendant.Build
                     if(id=="glyphs") Check(!View.GlintShown,"the glint is gone once the lines are drawn, and doesn't ride the symbols");
                     if(!reduced && id=="glyphs") Check(cam[2]<1 && Mathf.Abs(cam[2]*12-Mathf.Round(cam[2]*12))<.01f && cam[2]>0,"its symbols appear one at a time: "+Mathf.Round(cam[2]*12)+" of 12 so far");
                     if(!reduced && (id=="draw" || id=="glyphs" || id=="alive")) { Check(cam[0]>=SliceView.WheelZoomFrom-.001f && cam[0]<1 && cam[0]>zoomSeen,"the wheel zooms in slowly through "+id+" (scale "+cam[0].ToString("0.000")+", up from "+zoomSeen.ToString("0.000")+")"); zoomSeen=cam[0]; }
-                    if(!reduced && (id=="burn" || id=="transform")) Check(Mathf.Abs(cam[1])>.1f && Mathf.Approximately(cam[0],1),"the wheel spins ("+id+", "+frame+" turned "+cam[1].ToString("0.0")+" degrees), a round layer, at its own size");
+                    if(!reduced && id=="burn") Check(Mathf.Abs(cam[1])>.1f && Mathf.Approximately(cam[0],1),"the wheel spins ("+frame+" turned "+cam[1].ToString("0.0")+" degrees), a round layer, at its own size");
+                    if(id=="transform") { var ls=View.LaunchLayers().ToList();var burning=ls.FirstOrDefault(l=>l.slot=="intro-wheel-burning");Check(Mathf.Abs(cam[1])<.01f && Mathf.Approximately(cam[0],1) && burning.slot!=null && burning.alpha<1 && burning.alpha>0 && (reduced || Mathf.Abs(burning.angle)>.1f) && ls.FindIndex(l=>l.slot=="intro-earth")<ls.FindIndex(l=>l.slot=="intro-wheel-burning"),"the transform: Earth fades in level under the burning wheel ("+(reduced?"still":"turned "+burning.angle.ToString("0.0"))+", alpha "+burning.alpha.ToString("0.00")+"), which fades away"); }
+                    if(id=="earth") { Check(wheelSamples>20 && wheelFaults.Count==0,"through the burn and the transform every wheel layer on stage turned at one angle and Earth never turned ("+wheelSamples+" ticks"+(wheelFaults.Count>0?"; "+string.Join(" | ",wheelFaults):"")+")"); Check(View.LaunchLayers().All(l=>l.slot=="intro-earth"),"after the transform only Earth is on stage (the burning wheel is gone)"); }
                     if(!reduced && (id=="earth" || id=="brooklyn" || id=="window")) Check(cam[0]>1 && Mathf.Abs(cam[1])<.01f,"the push-in on "+frame+" (scale "+cam[0].ToString("0.000")+"), level");
                     Capture(file+"-"+index.ToString("00")+"-"+id+".png");nextAt=EditorApplication.timeSinceStartup+.1;}); // the next wait starts at once: the shots keep real time
                 if(id=="draw" && !reduced) // the symbols in their steps (the art lane's angles): at the first step Aries alone, at half Aries to Virgo
@@ -580,8 +610,9 @@ namespace Ascendant.Build
                     Until(()=>View.Dial.Snapshot().launchCamera.Length==3 && Mathf.Abs(View.Dial.Snapshot().launchCamera[2]-.5f)<.001f,10,"half the symbols",0);
                     Steps.Enqueue(()=>{Check(Mathf.Abs(View.Dial.Snapshot().launchCamera[2]-.5f)<.001f,"at half, six symbols (Aries to Virgo)");Capture(file+"-03b-glyphs-6-of-12.png");nextAt=EditorApplication.timeSinceStartup;});
                 }
-                if(id==stopAt) return;
+                if(id==stopAt) { Steps.Enqueue(()=>{probe=null;nextAt=EditorApplication.timeSinceStartup;}); return; }
             }
+            Steps.Enqueue(()=>{probe=null;nextAt=EditorApplication.timeSinceStartup;});
         }
         // ---- the opening scene's helpers (Oct 8) ----
         static Func<bool> waitFor; static double waitLimit, waitThen, tappedAt; static string waitWhat; static bool waitBusyOk, BusyStep;
@@ -647,6 +678,7 @@ namespace Ascendant.Build
         {
             if(EditorApplication.isPaused){Debug.LogWarning("[SlicePlayValidation] Resuming paused Editor for fixture.");EditorApplication.isPaused=false;}
             EditorApplication.QueuePlayerLoopUpdate();
+            if(probe!=null){try{probe();}catch(Exception){}} // a check that watches every tick (the launch's wheel through the burn and the transform)
             if(waitFor!=null)
             {
                 bool met=false; try{met=View!=null && waitFor();}catch(Exception){}

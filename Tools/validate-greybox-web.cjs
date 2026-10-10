@@ -7,7 +7,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=221,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=224,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
@@ -37,6 +37,10 @@ const path=require('path');
   const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
     let zoomSeen=0;
+    // the owner, Oct 9 ("fix that immediately"): a watcher in the page reads every state the game publishes through the burn and the transform
+    await pg.evaluate(()=>{window.__wheel={n:0,bad:[]};let last='';const tick=()=>{const s=window.ascendantDial?.snapshot();if(s&&(s.launchShotId==='burn'||s.launchShotId==='transform')){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
+      const ls=(s.launchLayers||[]).map(x=>x.split(':')),w=ls.filter(x=>x[0].startsWith('intro-wheel'));if(w.some(x=>Math.abs(((+x[1]-+w[0][1]+540)%360)-180)>.05))window.__wheel.bad.push(key);if(ls.some(x=>x[0]==='intro-earth'&&Math.abs(+x[1])>.05))window.__wheel.bad.push('earth turned: '+key);}}
+      if(!s||s.screen==='logo'||s.screen==='intro')requestAnimationFrame(tick);};requestAnimationFrame(tick);});
     for(const [i,[id,frame,settle,line]] of LAUNCH.entries()){
       await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
       await pg.waitForTimeout(settle);
@@ -46,7 +50,11 @@ const path=require('path');
       if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
       if(!reduced&&id==='glyphs')check(cam.length===3&&cam[2]>0&&cam[2]<1&&Math.abs(cam[2]*12-Math.round(cam[2]*12))<.01,'its symbols appear one at a time: '+Math.round((cam[2]||0)*12)+' of 12 so far at '+where);
       if(!reduced&&['draw','glyphs','alive'].includes(id)){check(cam.length===3&&cam[0]>=.799&&cam[0]<1&&cam[0]>zoomSeen,'the wheel zooms in slowly through '+id+' (scale '+(cam[0]||0).toFixed(3)+', up from '+zoomSeen.toFixed(3)+') at '+where);zoomSeen=cam[0];}
-      if(!reduced&&['burn','transform'].includes(id))check(cam.length===3&&Math.abs(cam[1])>.1&&Math.abs(cam[0]-1)<.001,'the wheel spins: '+frame+' turned '+(cam[1]||0).toFixed(1)+' degrees, a round layer at its own size, at '+where);
+      if(!reduced&&id==='burn')check(cam.length===3&&Math.abs(cam[1])>.1&&Math.abs(cam[0]-1)<.001,'the wheel spins: '+frame+' turned '+(cam[1]||0).toFixed(1)+' degrees, a round layer at its own size, at '+where);
+      if(id==='transform'){const ls=(s.launchLayers||[]).map(x=>x.split(':')),b=ls.find(x=>x[0]==='intro-wheel-burning'),e=ls.findIndex(x=>x[0]==='intro-earth');
+        check(cam.length===3&&Math.abs(cam[1])<.01&&b&&+b[2]<1&&e>=0&&e<ls.indexOf(b)&&(reduced||Math.abs(+b[1])>.1),'the transform: Earth fades in level under the burning wheel ('+JSON.stringify(s.launchLayers)+'), which spins on and fades away, at '+where);}
+      if(id==='earth'){const w=await pg.evaluate(()=>window.__wheel);check(w&&w.n>=4&&w.bad.length===0,'through the burn and the transform every wheel layer turned at one angle and Earth never turned ('+(w?w.n:0)+' states read'+(w&&w.bad.length?'; '+w.bad.slice(0,3).join(' | '):'')+') at '+where);
+        check(JSON.stringify(s.launchLayers.map(x=>x.split(':')[0]))==='["intro-earth"]','after the transform only Earth is on stage at '+where);}
       if(!reduced&&['earth','brooklyn','window'].includes(id))check(cam.length===3&&cam[0]>1&&Math.abs(cam[1])<.01,'the push-in on '+frame+' (scale '+(cam[0]||0).toFixed(3)+') at '+where);
       await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+id+'.png')});
       if(tap&&id==='continents'){await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const a=await snap();
@@ -129,6 +137,18 @@ const path=require('path');
       check(m.menuArt==='file'&&m.menuTitleArt==='file'&&Math.abs(m.menuTitleTop-MENU_TITLE_Y)<.01,'the menu stands on the owner\'s approved art (M1b\'s city, the Library Seal), the title centred '+MENU_TITLE_Y+' down, at '+viewport.width);
       check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the menu at '+viewport.width);
       await page.screenshot({path:path.join(out,viewport.width+'-menu-fresh.png')}); }
+    // the menu's life (owner, Oct 9): the window's glow pulses slowly; the rat runs across the street behind the buttons, and a button still takes a tap while it runs
+    { const g=[];for(let n=0;n<3;n++){g.push((await state()).windowGlow);await page.waitForTimeout(1170);} // a third of the 3.5 s period apart: the range always shows
+      check((await state()).windowGlowShown&&g.every(a=>a>=.149&&a<=.501)&&Math.max(...g)-Math.min(...g)>.1,'the window\'s glow pulses on the menu ('+g.map(a=>a.toFixed(2)).join(', ')+', between 0.15 and 0.5) at '+viewport.width); }
+    await page.evaluate(()=>window.ascendantDial.act('rat'));await page.waitForFunction(()=>window.ascendantDial.snapshot().ratShown,{},{timeout:3000});await page.waitForTimeout(500);
+    { const r=await state(); check(r.ratShown&&r.ratRuns>=1&&Math.abs(r.ratY-750.5)<.01&&Math.abs(r.ratX)<=r.ratEdge+.01&&Math.abs(r.ratEdge-(Math.min(Math.max(r.visibleHalf,180),300)+24))<.01&&r.ratArt==='file','the rat runs across the street (x '+r.ratX.toFixed(0)+', y '+r.ratY+', facing '+(r.ratFacing>0?'right':'left')+') at '+viewport.width);
+      await page.screenshot({path:path.join(out,viewport.width+'-menu-rat.png')});
+      { const x=(await state()).ratX;await tap(x,750);await page.waitForTimeout(300);const q=await state(); // Jeffrey, #149 N2: a tap where the rat is lands on the street, not on the rat: nothing happens
+        check(q.screen==='menu'&&!q.settingsOpen&&!q.busy,'a canvas tap on the running rat (x '+x.toFixed(0)+', y 750) does nothing: it takes no taps, at '+viewport.width); }
+      await page.evaluate(()=>window.ascendantDial.act('rat'));await page.waitForTimeout(200); // running (again, if the first run has ended) as Settings is tapped
+      await tap(0,686);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
+      const t=await state(); check(t.settingsOpen&&!t.ratShown&&!t.windowGlowShown,'while the rat runs a canvas tap on Settings still lands, and the rat and the glow step aside, at '+viewport.width);
+      await tap(0,rowAt(t,'Close'));await page.waitForFunction(()=>!window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{}); }
     check(['screen_entered_logo','screen_entered_intro','intro_ended','screen_entered_menu'].every(n=>events.some(e=>e.event_name===n)),'screen_entered:Logo, :Intro and :Menu are logged as every screen is, with the movie\'s end, at '+viewport.width);
     await tap(0,630);await page.waitForTimeout(400);check((await state()).screen==='menu','with no save Load Game does nothing on the canvas at '+viewport.width);
     await tap(0,686);await page.waitForFunction(()=>window.ascendantDial.snapshot().settingsOpen,{},{timeout:5000}).catch(()=>{});
@@ -938,6 +958,8 @@ const path=require('path');
     await still.screenshot({path:path.join(out,viewport.width+'-launch-skip.png')});
     await tap(118,744);await still.waitForFunction(()=>window.ascendantDial.snapshot().screen==='menu'&&!window.ascendantDial.snapshot().busy,{},{timeout:5000}).catch(()=>{});
     { const s=await snap(); check(s.screen==='menu'&&s.launchShot===-1&&s.reducedMotion&&!s.gearShown,'a canvas tap on Skip goes straight to the menu, reduced motion kept, at '+viewport.width); }
+    await still.evaluate(()=>window.ascendantDial.act('rat'));await still.waitForTimeout(600);
+    { const s=await snap(); check(Math.abs(s.windowGlow-.3)<.001&&s.windowGlowShown&&!s.ratShown&&s.ratRuns===0,'reduced motion: the window\'s glow holds steady at 0.3 and the rat never runs at '+viewport.width); }
     await newGame(still);
     await still.waitForFunction(()=>window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000}).catch(()=>{});check((await snap()).reducedMotion,'the page\'s reduced-motion setting reaches the game during the prologue at '+viewport.width);
     await playPrologue(still,viewport.width+'-prologue-reduced',true,viewport.width,null);
@@ -976,6 +998,9 @@ const path=require('path');
       check(await mp.locator('#slot-1').isEnabled()&&await mp.locator('#slot-2').isDisabled()&&(await mp.locator('#slot-1').getAttribute('aria-label'))===s.slotCards[0],'the screen reader\'s slot list names each slot\'s card at '+w);
       await mp.screenshot({path:path.join(out,w+'-slots-load.png')}); }
     await tap(0,360);await mp.waitForTimeout(300);check((await snap()).screen==='saveslots','an empty slot does nothing in Load Game at '+w);
+    await send('rat');await mp.waitForTimeout(400);check(!(await snap()).ratShown&&!(await snap()).windowGlowShown,'the rat never runs on the slot list at '+w);
+    { const g=[];for(let n=0;n<3;n++){g.push((await snap()).slotsGlow);await mp.waitForTimeout(1170);} // Jeffrey, #149 N3: the window glows under the slot list's veil, pulsing
+      check((await snap()).slotsGlowShown&&g.every(a=>a>=.149&&a<=.501)&&Math.max(...g)-Math.min(...g)>.1,'on the slot list the window\'s glow shows under the veil and pulses ('+g.map(a=>a.toFixed(2)).join(', ')+') at '+w); }
     await tap(0,574);await onMenu();check((await snap()).screen==='menu','Back returns to the menu at '+w);
     await tap(0,574);await until(()=>window.ascendantDial.snapshot().screen==='saveslots');await mp.waitForTimeout(300);
     { const s=await snap(); check(s.slotsFor==='new'&&s.slotsTitle==='New Game'&&s.slotEnabled.join()==='true,true,true'&&!s.confirmShown,'New Game with a save opens the slot list, every slot available, at '+w);await mp.screenshot({path:path.join(out,w+'-slots-new.png')}); }
@@ -1000,6 +1025,19 @@ const path=require('path');
     check(menuErrors.length===0,'no runtime exceptions through the menu and the slots at '+w+(menuErrors.length?': '+menuErrors[0]:''));
     await menuContext.close();
   }));
+  // Jeffrey, #149 B1: on a screen wider than the column the street (menu-city's bleed, 300 each side) shows past it: the rat's run starts and
+  // ends past what shows (or at the bleed's edge), never mid-street, at the same speed. One menu pass at 1280 x 800.
+  { const wideContext=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:Number(process.env.DEVICE_SCALE||1)});const wp=await wideContext.newPage();const wideErrors=[];wp.on('pageerror',e=>wideErrors.push(String(e)));
+    const snap=()=>wp.evaluate(()=>window.ascendantDial.snapshot());
+    await wp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await toMenu(wp);await wp.waitForTimeout(400);
+    const xs=await wp.evaluate(async()=>{const seen=[];window.ascendantDial.act('rat');const t0=performance.now();let s=window.ascendantDial.snapshot();seen.push([0,s.ratShown,s.ratX,s.ratEdge,s.visibleHalf,s.ratFacing]);
+      while(performance.now()-t0<6000){await new Promise(r=>requestAnimationFrame(r));s=window.ascendantDial.snapshot();const last=seen[seen.length-1];if(s.ratShown!==last[1]||s.ratX!==last[2])seen.push([performance.now()-t0,s.ratShown,s.ratX,s.ratEdge,s.visibleHalf,s.ratFacing]);if(!s.ratShown&&seen.length>2)break;}return seen;});
+    const shown=xs.filter(x=>x[1]),first=shown[0],last=shown[shown.length-1],end=xs.find(x=>!x[1]&&x[0]>0),edge=first?first[3]:0,half=first?first[4]:0,street=Math.min(half,300);
+    check(first&&Math.abs(half-640)<1&&Math.abs(edge-(street+24))<.01&&Math.abs(first[2])>=street&&Math.abs(first[2])-edge<.01,'at 1280 x 800 the rat starts past the visible street (x '+(first?first[2].toFixed(0):'?')+'; the street shows to '+street+', the run ends at '+edge+')');
+    check(last&&shown.every(x=>Math.abs(x[2])<=edge+.01)&&(Math.abs(last[2])>=street-(185.5*.12)),'it crosses the whole street and leaves past the far edge (last seen at x '+(last?last[2].toFixed(0):'?')+')');
+    const took=end?end[0]/1000:0;check(end&&Math.abs(took-2*edge/((360+48)/2.2))<.5,'at the same speed as on the column: the longer run takes '+took.toFixed(2)+' s ('+(2*edge/((360+48)/2.2)).toFixed(2)+' s expected)');
+    await wp.evaluate(()=>window.ascendantDial.act('rat'));await wp.waitForTimeout(1700);await wp.screenshot({path:path.join(out,'1280-menu-rat.png')});
+    check(wideErrors.length===0,'no runtime exceptions at 1280 x 800');await wideContext.close(); }
   // Build W (owner, Sept 26 note 5; task 86bca0163): DEV Mode's Jump to. A canvas tap through Settings to one checkpoint, the rest through their web buttons.
   await Promise.all(VIEWPORTS.map(async viewport=>{
     const devContext=await browser.newContext({viewport,deviceScaleFactor:Number(process.env.DEVICE_SCALE||1),isMobile:!!process.env.MOBILE,hasTouch:!!process.env.MOBILE});

@@ -247,9 +247,8 @@ namespace Ascendant.CelestialDial
             new ArtSlot("intro-wheel-pencil-lines", 360, 360, 1024, "a launch-movie layer (round 4), 720 x 720 in the file with transparency, centred on the screen (the disc's outer radius 306 of the 720): the zodiac wheel's pencil lines (rings and spokes), no symbols; it draws itself, revealed by a radial sweep (the owner: \"its own classic unique zodiac wheel\"; \"make it look like its drawing itself\")"),
             new ArtSlot("intro-wheel-pencil-glyphs", 360, 360, 1024, "a launch-movie layer, framed as intro-wheel-pencil-lines: the twelve symbols in pencil only, which appear one at a time in zodiac order after the lines are drawn"),
             new ArtSlot("intro-wheel-lit", 360, 360, 1024, "a launch-movie layer, framed as the pencil layers: the wheel come alive, its lines joined by light and its symbols glowing softly"),
-            new ArtSlot("intro-wheel-burning", 360, 360, 1024, "a launch-movie layer, framed the same: the wheel burning alive and glowing; it starts to spin"),
-            new ArtSlot("intro-wheel-earth", 360, 360, 1024, "a launch-movie layer, framed the same: the burning wheel blending into Earth (it looks as if it is transforming), crossfaded in as it spins"),
-            new ArtSlot("intro-earth", 360, 360, 1024, "a launch-movie layer, framed the same: the calm Earth, whole, where the wheel was; it comes in as the spin eases to a stop, then a slow push-in"),
+            new ArtSlot("intro-wheel-burning", 360, 360, 1024, "a launch-movie layer, framed the same: the wheel burning alive and glowing; it starts to spin, and in the transform spins on and fades away, its ring of fire on Earth's rim (both radius 306 of the 720)"),
+            new ArtSlot("intro-earth", 360, 360, 1024, "a launch-movie layer, framed the same: the calm Earth, whole, where the wheel was; it fades in level under the burning wheel as that spins away (it never turns), then a slow push-in"),
             new ArtSlot("intro-continents", 360, 800, 2048, "a full 360 x 800 frame of the launch movie; shot 7, flying down: the continents; a push-in toward the centre (the target is measured again on the art)"),
             new ArtSlot("intro-america", 360, 800, 2048, "a full 360 x 800 frame of the launch movie; shot 8: America; a push-in toward the centre"),
             new ArtSlot("intro-newyork-state", 360, 800, 2048, "a full 360 x 800 frame of the launch movie; shot 9: New York State; a push-in toward the centre"),
@@ -258,6 +257,11 @@ namespace Ascendant.CelestialDial
             new ArtSlot("intro-block", 360, 800, 2048, "a full 360 x 800 frame of the launch movie; shot 12: apartment buildings in a semi-busy neighborhood at night; then shot 13 ends on prologue-city (one building, every window dark but one), and the movie fades to the menu"),
             new ArtSlot("menu-city", 360, 800, 2048, "the main menu's background (owner, Oct 9: M1b, the night city recomposed as a title screen, the street of prologue-city); room for the title near the top and the four buttons from 496 down; no text in the picture"),
             new ArtSlot("menu-title", 270, 196, 1024, "the main menu's title (owner, Oct 9; approved in round 4): the owner's ASCENDANT \"Library Seal\" logo, landscape (about 1.38:1 trimmed), its black ground keyed out to transparency, drawn whole inside the box (its shape kept), about 270 wide, centred 115 down (below any cutout's band), its top about 16 px clear of the safe area"),
+            // the menu's rat (owner, Oct 9: "can we have a rat run across the floor every so often at the main menu during idle in the background")
+            new ArtSlot("menu-rat-1", 48, 24, 256, "the menu's rat, run frame 1 of 4 (extended; then gathering, bunched, pushing off): a small rat in side view facing right, cut out to transparency (96 x 48 in the file), its feet on a line shared by the four frames (47 of 48 down) and its body centred the same in each, so the cycle doesn't slide; it runs across the street now and then while the menu is idle, about 12 frames a second, flipped when it runs left"),
+            new ArtSlot("menu-rat-2", 48, 24, 256, "the menu's rat, run frame 2 of 4, framed as menu-rat-1"),
+            new ArtSlot("menu-rat-3", 48, 24, 256, "the menu's rat, run frame 3 of 4, framed as menu-rat-1"),
+            new ArtSlot("menu-rat-4", 48, 24, 256, "the menu's rat, run frame 4 of 4, framed as menu-rat-1"),
         };
         public static readonly SoundSlot[] Sounds =
         {
