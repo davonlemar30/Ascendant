@@ -1032,7 +1032,7 @@ namespace Ascendant.CelestialDial
             var era = Era; var line = era.Talk.Current;
             state.eraPoints = era.Map.Points.OrderBy(p => p.Portal ? 1 : 0).Select(p => p.Id).ToArray(); state.eraLabels = era.Map.Points.OrderBy(p => p.Portal ? 1 : 0).Select(p => p.Label).ToArray();
             state.eraTalking = era.Talk.Open; state.eraSpeaker = era.Speaker; state.eraLine = line != null ? line.Text : ""; state.eraChoices = line != null ? line.Choices : new string[0];
-            state.canEraWalk = !era.Talk.Open && !era.Leaving; state.canEraNext = era.Talk.Open && !era.Talk.Waiting; state.eraAt = era.Walker.At.ToString(); state.eraWalking = era.Walker.Walking; state.eraTarget = era.Walker.TargetId; state.eraPlacesOpen = era.PlacesOpen;
+            state.canEraWalk = !era.Talk.Open && !era.Leaving; state.canEraNext = era.Talk.Open && !era.Talk.Waiting; state.eraAt = era.Walker.At.ToString(); state.eraWalking = era.Walker.Walking; state.eraTarget = era.Walker.TargetId; state.eraPlacesOpen = era.PlacesOpen; state.eraNextBox = era.NextBox; state.eraChoiceBox = era.ChoiceBox;
             state.caspar = line != null ? era.Speaker + ": " + line.Text : "The era demo, a greybox. Choose a person or the way back to walk there.";
         }
         void OpenEraDemo()

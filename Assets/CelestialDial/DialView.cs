@@ -123,7 +123,7 @@ namespace Ascendant.CelestialDial
             public string[] masters; // batch 2 (the owner approved the bleed masters, Oct 2): the full-screen layers on screen drawing a 1200 x 1840 master whole, by file
             public string[] buttons; // batch 2 (3b C, 3c C, 3d): the buttons on screen, "words:look:width x height" (the look: plate, arrow-previous, arrow-next, rule, room, plain)
             public bool travelShown, travelOpen; public string[] travelRows; // the room mini-menu (86bca07wv): its button in a room, its panel, its rows ("The Zodiac Wing, here", "Sealed")
-            public string[] eraPoints, eraLabels, eraChoices; public string eraSpeaker = "", eraLine = "", eraAt = "", eraTarget = ""; public bool eraTalking, eraWalking, eraPlacesOpen, canEraWalk, canEraNext; // the era demo (86bcg8az2)
+            public string[] eraPoints, eraLabels, eraChoices; public string eraSpeaker = "", eraLine = "", eraAt = "", eraTarget = ""; public bool eraTalking, eraWalking, eraPlacesOpen, canEraWalk, canEraNext; public float[] eraNextBox, eraChoiceBox; // the era demo (86bcg8az2); the boxes: x, top, width, height on the 360 x 800 layout
             public string speaker = ""; // Build V: who speaks in the Dial's box, "caspar" or "dial" ("" when it is hidden)
             public float dialBoxHeight; // Build R: the Dial's Caspar box, fitted to its line (0 when hidden)
             public bool dialRing; public float ringTurn; public string[] seatNames, seatFacts; public string framedFacts = ""; // Build AB: the Astrolabe

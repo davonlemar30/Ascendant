@@ -23,6 +23,10 @@ namespace Ascendant.EraDemo
         public bool PlacesOpen => places != null && places.gameObject.activeSelf;
         public string Speaker => Talk.Open ? Talk.With.Speaker : "";
         public string LineShown => chat != null && chat.gameObject.activeSelf ? chatLine.text : "";
+        // Where Continue and the first choice are drawn (x from the column's centre, top of the box from the column's top), for the page's focus rings.
+        public float[] NextBox => new[] { ChatWidth / 2 - 70, nextTop - 17, 116, 34 };
+        public float[] ChoiceBox => new[] { 0, nextTop - 17, ChatWidth - 48, 34 };
+        float nextTop;
         public string PlateShown => chatSpeaker != null && chat.gameObject.activeSelf ? chatSpeaker.text : "";
         // The name plate spaced like the shipped plates (FitBox.CasparPlate): the legacy Text has no letter spacing.
         public static string Plate(string speaker) => speaker == "CASPAR" ? FitBox.CasparPlate : string.Join("   ", speaker.Split(' ').Select(w => string.Join(" ", w.ToCharArray())));
@@ -200,7 +204,7 @@ namespace Ascendant.EraDemo
             float buttons = choices == 0 ? 44 : choices * 40 + 4, height = Mathf.Min(ChatMax + 60, 26 + text + 10 + buttons + 22);
             chat.sizeDelta = new Vector2(ChatWidth, height); chat.anchoredPosition = new Vector2(0, -(800 - 18 - height / 2)); // its bottom 18 above the column's
             chatLine.rectTransform.anchoredPosition = new Vector2(0, -(26 + text / 2)); chatLine.rectTransform.sizeDelta = new Vector2(ChatWidth - 48, text);
-            float by = 26 + text + 10;
+            float by = 26 + text + 10; nextTop = 800 - 18 - height + by + 17; // a button's centre, from the column's top
             if (choices == 0) chatNext.GetComponent<RectTransform>().anchoredPosition = new Vector2(ChatWidth / 2 - 70, -(by + 17));
             for (int i = 0; i < choices; i++) choiceButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -(by + 17 + i * 40));
         }
