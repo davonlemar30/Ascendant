@@ -53,7 +53,7 @@ The ledger is one ClickUp page, "Lore ledger (an index, not canon)", in the cano
 
 The ledger names the `main` commit it last matched. At the start of every run, list what has merged since (`git log --oneline <that commit>..origin/main`) and bring the ledger up to date before anything else. Update it too whenever a ruling lands.
 
-If the page doesn't exist yet, create it on your first run and give its ID in your reply, so it can be added to this file.
+The ledger is page `2kyd583p-25574` (created Oct 9, 2026). If it has been deleted, create it again and give its new ID in your reply, so it can be updated here.
 
 ## A conversation with the owner
 
