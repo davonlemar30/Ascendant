@@ -793,6 +793,8 @@ namespace Ascendant.Build
         }
         // The launch (owner, Oct 9, 86bcg62x3, round 3): the logo screen, the launch movie and the menu in the flow; the shot list as data; the
         // menu's and the slot list's layout; the three save slots on a stand-in store (slot 1 is today's key, so an old save is slot 1 as it stands)
+        // the owner's approved screen-reader lines for the launch (Oct 9: "Approved as drafted"), one per shot in order
+        static readonly string[] SliceLaunchLines={"TSG Games.","","A zodiac wheel draws itself in pencil, then adds its twelve symbols.","","The wheel lights up in gold, and the dark fills with stars.","The wheel burns with golden fire and begins to spin.","The fire turns to light. The wheel becomes Earth.","Earth, seen from space.","North America at night.","The United States at night.","New York State.","New York City, between its rivers.","Brooklyn's rooftops at night.","A street of apartment buildings, a few cars, lit shopfronts.","One building. Every window is dark but one."};
         static void ValidateLaunch()
         {
             Check((int)SliceScreen.Prologue==13 && (int)SliceScreen.Logo==14 && (int)SliceScreen.Intro==15 && (int)SliceScreen.Menu==16 && (int)SliceScreen.SaveSlots==17,"the launch's screens (Logo, Intro, Menu, SaveSlots) are appended after Prologue, so none is renumbered");
@@ -818,7 +820,8 @@ namespace Ascendant.Build
             Check(layers.All(f=>{var a=Slots.Find(f);return a!=null && a.Width==360 && a.Height==360 && a.MaxSize==1024;}) && fulls.All(f=>{var a=Slots.Find(f);return a!=null && a.Width==360 && a.Height==800 && a.MaxSize==2048;}) && Slots.Art.Count(a=>a.Name.StartsWith("intro-"))==13 && Slots.Find("intro-wheel-pencil")==null,"round 4: six round layers (360 x 360, 720 x 720 files, centred) over one painted sky, and the seven full frames of the sky and the descent; the single pencil frame is gone");
             var logoSlot=Slots.Find("studio-logo");Check(logoSlot!=null && logoSlot.Width==320 && logoSlot.Height==320 && logoSlot.MaxSize==1024,"the studio's logo is a 320 x 320 slot on the black screen, drawn whole");
             Check(SliceView.MovieSeconds>=28 && SliceView.MovieSeconds<=32,"the launch movie runs about 30 s (round 4): "+SliceView.MovieSeconds.ToString("0.0")+" s");
-            Check(shots.All(x=>string.IsNullOrEmpty(x.Line) && !x.Page && !x.Under && !x.Flash && x.ScaleFrom==1 && x.ScaleTo==1),"no text on the logo or the movie (no spoken line written for them), no comic page, no flash; the camera itself holds still");
+            Check(shots.All(x=>!x.Page && !x.Under && !x.Flash && x.ScaleFrom==1 && x.ScaleTo==1),"no comic page and no flash in the launch; the camera itself holds still");
+            Check(shots.Select(x=>x.Line??"").SequenceEqual(SliceLaunchLines),"each launch shot's spoken line for the screen reader, exactly as the owner approved them (Oct 9), none for the dark and the symbols; nothing written on screen");
             Check(Slots.Sounds.Length==7,"no sound for the launch (the sound hold): still the seven sound slots");
             var draw=shots.First(x=>x.Id=="draw").Steps.Single();var glyphs=shots.First(x=>x.Id=="glyphs").Steps.Single();
             Check(draw.How=="sweep" && draw.Frame=="intro-wheel-pencil-lines" && draw.Sectors==0 && Mathf.Abs(draw.Seconds-2.5f)<.001f && glyphs.How=="sweep" && glyphs.Frame=="intro-wheel-pencil-glyphs" && glyphs.Sectors==12 && Mathf.Abs(glyphs.Seconds-12*SliceView.GlyphStep)<.001f && Mathf.Abs(SliceView.GlyphStep-.12f)<.001f,"the wheel draws itself: a radial sweep reveals its lines over about 2.5 s, then its twelve symbols appear one at a time, 0.12 s apart");

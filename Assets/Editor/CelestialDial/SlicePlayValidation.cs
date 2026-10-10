@@ -64,7 +64,7 @@ namespace Ascendant.Build
             Until(()=>View.Flow.Screen==SliceScreen.Menu && !View.Busy,15,"the menu after the launch movie",1.0);
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.screen=="menu" && s.menuButtons.SequenceEqual(SliceView.MenuWords) && !s.gearShown && !View.AnySave && !View.MenuButton(0).interactable && !View.MenuButton(2).interactable && View.MenuButton(1).interactable && View.MenuButton(3).interactable && Mathf.Approximately(s.menuAlpha[0],.5f) && Mathf.Approximately(s.menuAlpha[2],.5f) && s.menuAlpha[1]==1 && s.menuAlpha[3]==1 && !s.canMenuContinue && !s.canMenuLoad && s.canMenuNew && s.canMenuSettings,"the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save, Continue and Load Game at half (the unavailable look); no gear");
                 Check(Enumerable.Range(0,4).All(i=>{var r=(RectTransform)View.MenuButton(i).transform;return r.sizeDelta==new Vector2(232,44) && Mathf.Approximately(-r.anchoredPosition.y,SliceView.MenuButtonY(i)) && r.anchoredPosition.x==0 && ButtonLook.KindOf(View.MenuButton(i))=="room";}),"the menu's buttons wear the Room look, 232 x 44, centred, 12 px apart from 496 down");
-                Check(s.menuArt=="placeholder" && s.menuTitleArt=="placeholder" && Mathf.Approximately(s.menuTitleTop,SliceView.MenuTitleY+s.safeTop),"the menu's background and title are labelled placeholders until the art lands; the title centred 115 down");Capture("slice-390-menu-fresh.png");});
+                Check(s.menuArt=="file" && s.menuTitleArt=="file" && Slots.IsDressed("menu-city") && Slots.IsDressed("menu-title") && Mathf.Approximately(s.menuTitleTop,SliceView.MenuTitleY+s.safeTop),"the menu stands on the owner's approved art (M1b's city, the Library Seal), the title centred "+SliceView.MenuTitleY+" down");Capture("slice-390-menu-fresh.png");});
             Steps.Enqueue(()=>{Act("menu:load");Act("menu:continue");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Menu && !View.Busy,"with no save, Load Game and Continue do nothing");Act("menu:settings");});
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(View.Settings.Open && s.settingsOpen && !s.settingsRows.Contains("Start over") && !s.settingsRows.Contains("Main menu") && s.settingsRows.Contains("Jump to...") && s.settingsRows.Contains("Close") && !View.GearShown,"the menu's Settings opens the same panel without the in-game rows (Start over, Main menu): "+string.Join(", ",s.settingsRows));Capture("slice-390-menu-settings.png");});
@@ -528,8 +528,9 @@ namespace Ascendant.Build
             Until(()=>View!=null && View.Flow.Screen==SliceScreen.Menu && !View.Busy,10,"the menu again",.5);
             Steps.Enqueue(()=>{var s=View.Dial.Snapshot();Check(s.continueSlot==1 && s.slotInPlay==2 && s.canMenuContinue,"the slot played last (2) holds nothing, so Continue falls back to slot 1");Act("menu:continue");});
             Until(()=>View!=null && View.Flow.Screen==SliceScreen.Hub && View.Resumed && !View.Busy,10,"Continue into slot 1",.5);
-            Steps.Enqueue(()=>{Check(SaveSlots.InPlay==1 && View.Flow.Keys==4 && View.Flow.WingWhole && View.GearShown,"Continue resumes slot 1 at the Hub, and slot 1 is in play again");Act("main-menu");});
+            Steps.Enqueue(()=>{Check(SaveSlots.InPlay==1 && View.Flow.Keys==4 && View.Flow.WingWhole && View.GearShown,"Continue resumes slot 1 at the Hub, and slot 1 is in play again");Slots.Request(null,null);Act("main-menu");});
             Until(()=>View!=null && View.Flow.Screen==SliceScreen.Menu && !View.Busy,10,"the menu after Key 1, with no question",.5);
+            Steps.Enqueue(()=>{Check(View.AnySave && View.MenuButton(0).interactable && Slots.IsDressed("menu-city"),"the menu with a save, on the owner's art");Capture("slice-390-menu-save.png");});
             Steps.Enqueue(()=>{Check(!View.Settings.Open && View.Dial.Snapshot().continueSlot==1,"after Key 1 Main menu goes straight to the menu (the game saves as it goes)");Act("menu:new");});
             Steps.Enqueue(()=>{Act("slot:1");Act("confirm-start");});
             Until(()=>View!=null && View.Flow.AtPrologue && View.PrologueShotIndex==0,10,"the new game over slot 1",.05);
@@ -550,15 +551,21 @@ namespace Ascendant.Build
         {
             var shots=new (string id,string frame,double after)[]{("logo","studio-logo",.6),("draw","intro-wheel-pencil-lines",1.0),("glyphs","intro-wheel-pencil-glyphs",.6),("alive","intro-wheel-lit",1.2),("burn","intro-wheel-burning",1.4),("transform","intro-earth",.8),("earth","intro-earth",1.0),
                 ("continents","intro-continents",.5),("america","intro-america",.5),("newyork-state","intro-newyork-state",.5),("newyork-city","intro-newyork-city",.5),("brooklyn","intro-brooklyn",.5),("block","intro-block",.6),("window","prologue-city",1.0)};
+            var lines=new Dictionary<string,string>{{"logo","TSG Games."},{"draw","A zodiac wheel draws itself in pencil, then adds its twelve symbols."},{"glyphs",""},{"alive","The wheel lights up in gold, and the dark fills with stars."},{"burn","The wheel burns with golden fire and begins to spin."},
+                {"transform","The fire turns to light. The wheel becomes Earth."},{"earth","Earth, seen from space."},{"continents","North America at night."},{"america","The United States at night."},{"newyork-state","New York State."},{"newyork-city","New York City, between its rivers."},
+                {"brooklyn","Brooklyn's rooftops at night."},{"block","A street of apartment buildings, a few cars, lit shopfronts."},{"window","One building. Every window is dark but one."}}; // the owner's approved lines (Oct 9)
             int n=0;
             foreach(var (id,frame,after) in shots)
             {
-                int index=++n; bool logo=id=="logo";
+                int index=++n; bool logo=id=="logo"; string line=lines[id];
                 Until(()=>View.LaunchShotIndex>=0 && View.Dial.Snapshot().launchShotId==id && View.Dial.Snapshot().launchFrame==frame,20,"the launch's "+id+" ("+frame+")",after);
                 Steps.Enqueue(()=>{var s=View.Dial.Snapshot();var cam=s.launchCamera;
-                    Check(s.screen==(logo?"logo":"intro") && View.Flow.Screen==(logo?SliceScreen.Logo:SliceScreen.Intro) && s.launchShotId==id && s.launchFrame==frame && s.canSkip && !s.gearShown && s.caspar=="" && !View.Flow.CanContinue && cam.Length==3,"the launch: "+id+", "+frame+" on the "+(logo?"logo screen":"movie")+", Skip offered, no gear, no line"+(reduced?", reduced motion":""));
+                    Check(s.screen==(logo?"logo":"intro") && View.Flow.Screen==(logo?SliceScreen.Logo:SliceScreen.Intro) && s.launchShotId==id && s.launchFrame==frame && s.canSkip && !s.gearShown && s.caspar==line && !View.Flow.CanContinue && cam.Length==3,"the launch: "+id+", "+frame+" on the "+(logo?"logo screen":"movie")+", Skip offered, no gear, its spoken line "+(line==""?"none":"\""+line+"\"")+(reduced?", reduced motion":""));
                     if(reduced && !logo) Check(s.launchStill && Mathf.Approximately(cam[0],1) && Mathf.Abs(cam[1])<.01f && Mathf.Approximately(cam[2],1),"reduced motion: "+id+" held still, level, at scale 1, with no sweep");
                     if(!reduced && id=="draw") Check(cam[2]>.05f && cam[2]<.95f,"the wheel draws itself: the sweep has revealed "+(cam[2]*100).ToString("0")+"% of its lines");
+                    if(!reduced && id=="draw") Check(View.GlintShown && Vector2.Distance(View.GlintOffset,SliceView.SweepPoint(cam[2],SliceView.GlintRadius))<2 && Mathf.Abs(View.GlintOffset.magnitude-SliceView.GlintRadius)<2,"the pencil's glint rides the sweep's leading edge ("+SliceView.SweepAngle(cam[2]).ToString("0")+" degrees, "+SliceView.GlintRadius+" px out)");
+                    if(id=="draw" && reduced) Check(!View.GlintShown,"reduced motion: no glint");
+                    if(id=="glyphs") Check(!View.GlintShown,"the glint is gone once the lines are drawn, and doesn't ride the symbols");
                     if(!reduced && id=="glyphs") Check(cam[2]<1 && Mathf.Abs(cam[2]*12-Mathf.Round(cam[2]*12))<.01f && cam[2]>0,"its symbols appear one at a time: "+Mathf.Round(cam[2]*12)+" of 12 so far");
                     if(!reduced && (id=="burn" || id=="transform")) Check(Mathf.Abs(cam[1])>.1f && Mathf.Approximately(cam[0],1),"the wheel spins ("+id+", "+frame+" turned "+cam[1].ToString("0.0")+" degrees), a round layer, at its own size");
                     if(!reduced && (id=="earth" || id=="brooklyn" || id=="window")) Check(cam[0]>1 && Mathf.Abs(cam[1])<.01f,"the push-in on "+frame+" (scale "+cam[0].ToString("0.000")+"), level");

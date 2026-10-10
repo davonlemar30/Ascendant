@@ -7,7 +7,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=221,SOUND_SLOTS=7; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=221,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
@@ -16,8 +16,11 @@ const path=require('path');
   // The launch (owner, Oct 9, 86bcg62x3): every page load opens on the logo screen, then the launch movie, then the main menu; one Skip covers
   // both. newGame leaves the launch by the screen reader's Skip, then New Game (on a first launch straight into slot 1; with a save, slot 1,
   // replacing it); Start over and the DEV samples arrive straight on the prologue. relaunch reloads the page and Continues into the Hub.
-  const LAUNCH=[['logo','studio-logo',700],['draw','intro-wheel-pencil-lines',1000],['glyphs','intro-wheel-pencil-glyphs',500],['alive','intro-wheel-lit',1100],['burn','intro-wheel-burning',1300],['transform','intro-earth',700],['earth','intro-earth',900],
-    ['continents','intro-continents',400],['america','intro-america',400],['newyork-state','intro-newyork-state',400],['newyork-city','intro-newyork-city',400],['brooklyn','intro-brooklyn',400],['block','intro-block',500],['window','prologue-city',900]]; // [shot, frame, ms to settle] (round 4: the wheel's layers over the sky)
+  const LAUNCH=[['logo','studio-logo',700,'TSG Games.'],['draw','intro-wheel-pencil-lines',1000,'A zodiac wheel draws itself in pencil, then adds its twelve symbols.'],['glyphs','intro-wheel-pencil-glyphs',500,''],
+    ['alive','intro-wheel-lit',1100,'The wheel lights up in gold, and the dark fills with stars.'],['burn','intro-wheel-burning',1300,'The wheel burns with golden fire and begins to spin.'],['transform','intro-earth',700,'The fire turns to light. The wheel becomes Earth.'],
+    ['earth','intro-earth',900,'Earth, seen from space.'],['continents','intro-continents',400,'North America at night.'],['america','intro-america',400,'The United States at night.'],['newyork-state','intro-newyork-state',400,'New York State.'],
+    ['newyork-city','intro-newyork-city',400,'New York City, between its rivers.'],['brooklyn','intro-brooklyn',400,"Brooklyn's rooftops at night."],['block','intro-block',500,'A street of apartment buildings, a few cars, lit shopfronts.'],
+    ['window','prologue-city',900,'One building. Every window is dark but one.']]; // [shot, frame, ms to settle, its spoken line (the owner's, Oct 9)] (round 4: the wheel's layers over the sky)
   const loaded=async pg=>{await pg.waitForFunction(()=>!!window.ascendantDial?.snapshot()?.screen,{},{timeout:120000});await pg.locator('#loading').waitFor({state:'detached'});};
   const press=(pg,id)=>pg.locator('#'+id).evaluate(b=>b.click());
   const toMenu=async pg=>{await loaded(pg);for(let n=0;n<60;n++){const s=await pg.evaluate(()=>window.ascendantDial.snapshot());if(s.screen==='menu'&&!s.busy)return;if((s.screen==='logo'||s.screen==='intro')&&s.canSkip)await press(pg,'skip-prologue');await pg.waitForTimeout(250);}throw Error('the launch did not reach the menu');};
@@ -33,11 +36,11 @@ const path=require('path');
   // the logo and the launch movie played through: each shot's frame captured once it has come up (until stopAt, if given)
   const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
-    for(const [i,[id,frame,settle]] of LAUNCH.entries()){
+    for(const [i,[id,frame,settle,line]] of LAUNCH.entries()){
       await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
       await pg.waitForTimeout(settle);
-      const s=await snap(),skip=await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo';
-      check(s.screen===(logo?'logo':'intro')&&s.launchShotId===id&&s.launchFrame===frame&&s.canSkip&&skip&&!s.gearShown&&s.caspar===''&&!s.canSliceContinue,'the launch'+(reduced?', reduced motion':'')+': '+id+' ('+frame+') on the '+(logo?'logo screen':'launch movie')+', the semantic Skip offered, no gear, no text at '+where);
+      const s=await snap(),skip=await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo',said=await pg.locator('#announcement').textContent();
+      check(s.screen===(logo?'logo':'intro')&&s.launchShotId===id&&s.launchFrame===frame&&s.canSkip&&skip&&!s.gearShown&&s.caspar===line&&(line===''||said.includes(line))&&!s.canSliceContinue,'the launch'+(reduced?', reduced motion':'')+': '+id+' ('+frame+') on the '+(logo?'logo screen':'launch movie')+', its spoken line '+(line?'announced ("'+line+'")':'none')+', the semantic Skip offered, no gear, at '+where);
       if(reduced&&!logo)check(s.launchStill&&cam.length===3&&Math.abs(cam[0]-1)<.001&&Math.abs(cam[1])<.01&&Math.abs(cam[2]-1)<.001,'reduced motion: '+id+' held still and level, no sweep ('+JSON.stringify(cam)+') at '+where);
       if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
       if(!reduced&&id==='glyphs')check(cam.length===3&&cam[2]>0&&cam[2]<1&&Math.abs(cam[2]*12-Math.round(cam[2]*12))<.01,'its symbols appear one at a time: '+Math.round((cam[2]||0)*12)+' of 12 so far at '+where);
@@ -121,7 +124,7 @@ const path=require('path');
       check(JSON.stringify(m.menuButtons)==='["Continue","New Game","Load Game","Settings"]'&&!m.gearShown&&!m.canMenuContinue&&!m.canMenuLoad&&m.canMenuNew&&m.canMenuSettings&&JSON.stringify(m.menuAlpha)==='[0.5,1,0.5,1]','the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save Continue and Load Game at half; no gear, at '+viewport.width);
       check(['CONTINUE','NEW GAME','LOAD GAME','SETTINGS'].every(w=>lookOf(b,w)==='room 232x44')&&small(b).length===0,'the menu\'s buttons wear the Room look at 232 x 44 ('+['CONTINUE','NEW GAME','LOAD GAME','SETTINGS'].map(w=>lookOf(b,w)).join(', ')+') at '+viewport.width);
       check(await page.locator('#menu-continue').isDisabled()&&await page.locator('#menu-load').isDisabled()&&await page.locator('#menu-new').isEnabled()&&await page.locator('#menu-settings').isEnabled()&&['menu-new','unity-canvas'].includes(await page.evaluate(()=>document.activeElement.id)),'the screen reader\'s menu offers New Game and Settings (focus on New Game, or kept by the canvas after a canvas tap: '+(await page.evaluate(()=>document.activeElement.id))+') at '+viewport.width);
-      check(m.menuArt==='placeholder'&&m.menuTitleArt==='placeholder'&&Math.abs(m.menuTitleTop-115)<.01,'the menu\'s background and title are labelled placeholders until the art lands, the title centred 115 down, at '+viewport.width);
+      check(m.menuArt==='file'&&m.menuTitleArt==='file'&&Math.abs(m.menuTitleTop-MENU_TITLE_Y)<.01,'the menu stands on the owner\'s approved art (M1b\'s city, the Library Seal), the title centred '+MENU_TITLE_Y+' down, at '+viewport.width);
       check(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),'no vertical scroll on the menu at '+viewport.width);
       await page.screenshot({path:path.join(out,viewport.width+'-menu-fresh.png')}); }
     check(['screen_entered_logo','screen_entered_intro','intro_ended','screen_entered_menu'].every(n=>events.some(e=>e.event_name===n)),'screen_entered:Logo, :Intro and :Menu are logged as every screen is, with the movie\'s end, at '+viewport.width);

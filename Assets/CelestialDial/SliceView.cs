@@ -1651,6 +1651,7 @@ namespace Ascendant.CelestialDial
             state.screen = s.ToString().ToLowerInvariant(); state.playerName = Flow.DisplayName; state.note = Flow.Note;
             state.busy = state.busy || busy; // The semantic layer must see the slice's own beats as busy too.
             state.caspar = s == SliceScreen.Prologue ? (prologueShot >= 0 && prologueShot < PrologueShots.Length ? PrologueShots[prologueShot].Line : "") : // one plain line per shot (drafts for Dante)
+                Flow.AtLaunch ? (prologueShot >= 0 && prologueShot < LaunchShots.Length ? LaunchShots[prologueShot].Line ?? "" : "") : // the launch's spoken line per shot (owner, Oct 9)
                 s == SliceScreen.Identity ? "Who are you? Enter a name, then continue." :
                 s == SliceScreen.Birth ? (Flow.Amending ? SliceFlow.BirthPageTitle + "." : SliceFlow.BirthQuestion) + BirthAsk() :
                 s == SliceScreen.Atrium ? atriumText.text : s == SliceScreen.AtriumReturn ? returnText.text :
@@ -2935,6 +2936,7 @@ namespace Ascendant.CelestialDial
             prologuePanelsShown.Clear(); panelHomes.Clear();
             foreach (var f in prologueFrames.Values) ParkFrame(f);
             prologueCamera.localScale = Vector3.one; prologueCamera.anchoredPosition = new Vector2(0, -400); prologueDim.color = new Color(0, 0, 0, 0); prologueFrameShown = ""; lastPushView = Vector2.zero;
+            if (sweepGlint != null) sweepGlint.gameObject.SetActive(false);
         }
         void ParkFrame(PrologueFrame f)
         {
@@ -3041,8 +3043,31 @@ namespace Ascendant.CelestialDial
                 return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / seconds); frame.Group.alpha = k; return k >= 1; };
             }
             frame.Group.alpha = 1; frame.Fill.fillAmount = 0;
-            return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); frame.Fill.fillAmount = glyphs ? Mathf.Min(step.Sectors, Mathf.Floor(k * step.Sectors) + 1) / step.Sectors : k; return k >= 1; };
+            if (glyphs) return () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); frame.Fill.fillAmount = Mathf.Min(step.Sectors, Mathf.Floor(k * step.Sectors) + 1) / step.Sectors; return k >= 1; };
+            // the pencil's glint (owner, Oct 9: "Yes, a soft glint"): a soft warm point rides the lines' sweep at its leading edge, then fades out
+            var glint = SweepGlint(); glint.rectTransform.SetAsLastSibling(); glint.gameObject.SetActive(true); glint.color = GlintColor;
+            return () =>
+            {
+                if (frame.Rect == null || glint == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - began) / Mathf.Max(.01f, step.Seconds)); frame.Fill.fillAmount = k;
+                glint.rectTransform.anchoredPosition = new Vector2(0, -400) + SweepPoint(k, GlintRadius);
+                float after = Time.unscaledTime - began - step.Seconds; glint.color = new Color(GlintColor.r, GlintColor.g, GlintColor.b, GlintColor.a * (after <= 0 ? 1 : Mathf.Clamp01(1 - after / GlintFade)));
+                if (after >= GlintFade) { glint.gameObject.SetActive(false); return true; }
+                return false;
+            };
         }
+        // the glint: a soft radial dot, warm gold, low alpha, on the outer ring's radius (tunable); it never rides the symbols' steps, and reduced motion has none
+        public const float GlintSize = 7, GlintRadius = 150, GlintFade = .3f; public static readonly Color GlintColor = new Color(1f, .84f, .52f, .55f);
+        Image sweepGlint;
+        public bool GlintShown => sweepGlint != null && sweepGlint.gameObject.activeInHierarchy && sweepGlint.color.a > .01f; // fixture evidence
+        public Vector2 GlintOffset => sweepGlint != null ? sweepGlint.rectTransform.anchoredPosition - new Vector2(0, -400) : Vector2.zero; // from the wheel's centre, y up
+        Image SweepGlint()
+        {
+            if (sweepGlint != null) return sweepGlint;
+            var r = Rect("Pencil glint", prologueCamera, 0, 400, GlintSize, GlintSize); sweepGlint = r.gameObject.AddComponent<Image>(); sweepGlint.sprite = DiscSprite(); sweepGlint.raycastTarget = false; r.gameObject.SetActive(false); return sweepGlint;
+        }
+        // the sweep's leading edge at a fill (0 to 1), from the wheel's centre (y up), honouring SweepOrigin, SweepClockwise and SweepOffset
+        public static float SweepAngle(float fill) { float start = SweepOrigin == 0 ? -90 : SweepOrigin == 1 ? 0 : SweepOrigin == 2 ? 90 : 180; return start + SweepOffset + (SweepClockwise ? -360 : 360) * Mathf.Clamp01(fill); }
+        public static Vector2 SweepPoint(float fill, float radius) { float a = SweepAngle(fill) * Mathf.Deg2Rad; return new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius; }
         // every frame on screen fades out to the dark page (the logo screen's fade out); reduced motion: no fade quicker than StillFade, as a fade
         Func<bool> RunOut(PrologueStep step)
         {
@@ -3130,22 +3155,23 @@ namespace Ascendant.CelestialDial
         public static float SpinAt(float t) => Mathf.Lerp(SpinAtBurnEnd, SpinTurn, Eased("out", Mathf.Clamp01(t / TransformSeconds))); // the wheel's angle t s into the transform
         static readonly string[] SweptFrames = { "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs" };
         // Dante's shot list, the owner's beats in order (rounds 3 and 4). The pushes hold on each frame's centre until the art lands and is measured.
+        // Each shot's spoken line for the screen reader, as the prologue's (owner, Oct 9: "Approved as drafted"); the dark and the symbols have none.
         public static readonly PrologueShot[] LaunchShots =
         {
-            new PrologueShot { Id = "logo", Logo = true, Seconds = LogoFade + LogoHold + LogoFade, Steps = new[] { FadeTo(0, "studio-logo", LogoFade), FadeOut(LogoFade + LogoHold, LogoFade) } },
+            new PrologueShot { Id = "logo", Line = "TSG Games.", Logo = true, Seconds = LogoFade + LogoHold + LogoFade, Steps = new[] { FadeTo(0, "studio-logo", LogoFade), FadeOut(LogoFade + LogoHold, LogoFade) } },
             new PrologueShot { Id = "dark", Seconds = .6f }, // darkness
-            new PrologueShot { Id = "draw", Seconds = 2.8f, Steps = new[] { Sweep(0, "intro-wheel-pencil-lines", DrawSeconds) } }, // the wheel draws itself in pencil: its lines
+            new PrologueShot { Id = "draw", Line = "A zodiac wheel draws itself in pencil, then adds its twelve symbols.", Seconds = 2.8f, Steps = new[] { Sweep(0, "intro-wheel-pencil-lines", DrawSeconds) } }, // the wheel draws itself in pencil: its lines
             new PrologueShot { Id = "glyphs", Seconds = 1.7f, Steps = new[] { Sweep(0, "intro-wheel-pencil-glyphs", 12 * GlyphStep, 12) } }, // then its twelve symbols, one at a time, in zodiac order
-            new PrologueShot { Id = "alive", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
-            new PrologueShot { Id = "burn", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin
-            new PrologueShot { Id = "transform", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
+            new PrologueShot { Id = "alive", Line = "The wheel lights up in gold, and the dark fills with stars.", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
+            new PrologueShot { Id = "burn", Line = "The wheel burns with golden fire and begins to spin.", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin
+            new PrologueShot { Id = "transform", Line = "The fire turns to light. The wheel becomes Earth.", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
                 Spun(FadeTo(0, "intro-wheel-earth", WheelEarthFade), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"), Spun(FadeTo(EarthIn, "intro-earth", EarthFade), SpinAt(EarthIn), SpinTurn, TransformSeconds - EarthIn, "out") } }, // it spins on, blending into Earth; the spin eases to a stop with Earth level
-            new PrologueShot { Id = "earth", Seconds = 2.4f, Steps = new[] { Pushed(Cut(0, "intro-earth"), 1.12f, ViewOn(.5f, .5f), 2.4f) } }, // the calm Earth, a slow push
-            Descent("continents", "intro-continents", 1.6f), Descent("america", "intro-america", 1.6f), Descent("newyork-state", "intro-newyork-state", 1.4f), // flying down
-            Descent("newyork-city", "intro-newyork-city", 1.4f), Descent("brooklyn", "intro-brooklyn", 1.4f), Descent("block", "intro-block", 1.8f),
-            new PrologueShot { Id = "window", Seconds = 2.2f, Steps = new[] { Over(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f)) } }, // one building, every window dark but one (the opening's own city frame); then the fade to the menu
+            new PrologueShot { Id = "earth", Line = "Earth, seen from space.", Seconds = 2.4f, Steps = new[] { Pushed(Cut(0, "intro-earth"), 1.12f, ViewOn(.5f, .5f), 2.4f) } }, // the calm Earth, a slow push
+            Descent("continents", "intro-continents", 1.6f, "North America at night."), Descent("america", "intro-america", 1.6f, "The United States at night."), Descent("newyork-state", "intro-newyork-state", 1.4f, "New York State."), // flying down
+            Descent("newyork-city", "intro-newyork-city", 1.4f, "New York City, between its rivers."), Descent("brooklyn", "intro-brooklyn", 1.4f, "Brooklyn's rooftops at night."), Descent("block", "intro-block", 1.8f, "A street of apartment buildings, a few cars, lit shopfronts."),
+            new PrologueShot { Id = "window", Line = "One building. Every window is dark but one.", Seconds = 2.2f, Steps = new[] { Over(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f)) } }, // one building, every window dark but one (the opening's own city frame); then the fade to the menu
         };
-        static PrologueShot Descent(string id, string frame, float seconds) => new PrologueShot { Id = id, Seconds = seconds, Steps = new[] { Over(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds)) } }; // each comes in over what shows (the first over Earth)
+        static PrologueShot Descent(string id, string frame, float seconds, string line) => new PrologueShot { Id = id, Line = line, Seconds = seconds, Steps = new[] { Over(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds)) } }; // each comes in over what shows (the first over Earth)
         // a round layer's placeholder (round 4): a labelled circle on transparency, the disc's outer radius 153 (306 of the 720 file), so the layering shows
         public const float LayerRadius = 153;
         void LayerPlaceholder(RectTransform r, string slot)
