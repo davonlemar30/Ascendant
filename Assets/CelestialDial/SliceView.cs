@@ -1733,7 +1733,7 @@ namespace Ascendant.CelestialDial
             var at = Flow.JournalAt; bool onSign = state.journal && at == JournalView.Sign, onWheel = state.journal && at == JournalView.Wheel; int signSeat = Flow.JournalSignSeat;
             state.journalView = !state.journal ? "" : onSign ? "sign" : onWheel ? (Flow.JournalTableView ? "table" : "wheel") : at.ToString().ToLowerInvariant(); // batch 2: title, landing, contents, map
             bool front = state.journal && (at == JournalView.Title || at == JournalView.Landing);
-            state.journalKeeper = front ? new[] { journalKeeperHeading.text, journalKeys.text }.Concat(bigThreeLine.gameObject.activeSelf ? new[] { string.Concat(Enumerable.Range(0, 3).Select(i => bigThreeGlyphs[i].text + bigThreeWords[i].text)) } : new string[0]).Concat(inscriptionLines).ToArray() : new string[0];
+            state.journalKeeper = front ? new[] { journalKeeperHeading.text }.Concat(bigThreeLine.gameObject.activeSelf ? new[] { string.Concat(Enumerable.Range(0, 3).Select(i => bigThreeGlyphs[i].text + bigThreeWords[i].text)) } : new string[0]).Concat(inscriptionLines).ToArray() : new string[0];
             state.inscriptionId = Flow.InscriptionId; state.inscriptionGroup = Flow.InscriptionGroup; state.inscriptionWriting = inscriptionWriting != null; state.inscriptionRecent = Flow.RecentInscriptions.ToArray(); // the living inscription (Oct 7)
             state.canJournalContents = Flow.CanJournalContents && at != JournalView.Title && !busy; state.canJournalHome = Flow.CanJournalHome && !busy; state.canJournalPractice = Flow.CanJournalPractice && !busy && journalBeat == null;
             state.journalDoors = state.journal && at == JournalView.Landing ? new[] { journalPracticeDoor, journalContentsDoor }.SelectMany(b => { var r = (RectTransform)b.transform; return new[] { r.anchoredPosition.x, -r.anchoredPosition.y, r.sizeDelta.x, r.sizeDelta.y }; }).ToArray() : new float[0];
@@ -2049,7 +2049,7 @@ namespace Ascendant.CelestialDial
         const float GaramondLift = .3545f, FrakLift = .267f;             // a line's baseline below its centre, per point: EB Garamond (ascender 1007, descender 298 of 1000) and UnifrakturMaguntia (1607 and 513 of 2048)
         static readonly Color GiltInk = new Color32(0xe3, 0xa3, 0x4a, 0xff), GiltDown = new Color32(0xb4, 0x80, 0x3a, 0xff), SilverInk = new Color32(0xc9, 0xcf, 0xdb, 0xff), SealedInk = new Color32(0x7d, 0x81, 0x8c, 0xff), SealedRing = new Color32(0x6d, 0x71, 0x7c, 0xcc); // the board's gilt (and pressed), silver, and the sealed grey
         RectTransform journalTitlePage, journalLanding, journalContents, journalMap, journalFlourishBottom; CanvasGroup journalTitlePageGroup, journalLandingGroup, journalTitleGroup;
-        Text journalKeeperHeading, journalKeys; readonly List<Text> keeperLines = new List<Text>(); readonly Text[] journalMapNames = new Text[3];
+        Text journalKeeperHeading; readonly List<Text> keeperLines = new List<Text>(); readonly Text[] journalMapNames = new Text[3];
         Button journalPracticeDoor, journalContentsDoor, journalHomeLink, journalContentsLink; readonly Button[] journalChapterRows = new Button[2];
         Font journalItalic; Coroutine journalBeat;
         // the Big Three's line (owner, Oct 2 evening: approved, unknowns A): each glyph in the font that carries it, gilt; the words in the italic
@@ -2240,7 +2240,6 @@ namespace Ascendant.CelestialDial
             inkTap.gameObject.AddComponent<Button>().onClick.AddListener(InscriptionTap); inkTap.GetComponent<Button>().transition = Selectable.Transition.None;
             Flourish(journalLanding, KeeperFirst); journalFlourishBottom = Flourish(journalLanding, KeeperFirst + KeeperRule * 6);
             journalKeeperHeading = PageLine(journalLanding, SliceFlow.KeeperHeading, JournalX, 0, 200, 16, serif, GiltInk); journalKeeperHeading.gameObject.AddComponent<Tracking>().Spacing = 16 * .3f; // the board: small capitals spaced .3 em
-            journalKeys = PageLine(journalLanding, "", JournalX, 0, KeeperWidth + 24, 17, journalItalic, SilverInk);
             for (int i = 0; i < 4; i++) keeperLines.Add(PageLine(journalLanding, "", JournalX, 0, KeeperWidth + 24, 16, journalItalic, new Color(SilverInk.r, SilverInk.g, SilverInk.b, .86f)));
             Flow.InscriptionFits = text => WrapWords(keeperLines[0], text, KeeperWidth).Count <= SliceFlow.InscriptionMostLines; // a line that would take a fourth line for this name sits out (Oct 7)
             bigThreeLine = Rect("Big Three", journalLanding, JournalX, 0, KeeperWidth, 30);
@@ -2330,13 +2329,13 @@ namespace Ascendant.CelestialDial
             }
             if (line != "") lines.Add(line); return lines;
         }
-        // The Keeper's record on the page's rules: KEEPER, the Keys and Books, then the inscription; the closing flourish and the doors follow.
-        // The Big Three's line sits between the Keys and the inscription (owner, Oct 2 late evening: approved, unknowns A).
+        // The Keeper's record on the page's rules: KEEPER, then the inscription; the closing flourish and the doors follow. The Keys and Books
+        // line is gone (owner, Oct 10: the key count comes off the journal's first page; Oct 11: "the whole line going", Books too, 86bcgfkdy).
+        // The Big Three's line sits between KEEPER and the inscription (owner, Oct 2 late evening: approved, unknowns A).
         void ShowJournalLanding()
         {
             int row = 1; void Place(Text line) { line.rectTransform.anchoredPosition = new Vector2(JournalX, -(KeeperFirst + KeeperRule * row++ - 3 - GaramondLift * line.fontSize)); }
             journalKeeperHeading.text = SliceFlow.KeeperHeading; Place(journalKeeperHeading);
-            journalKeys.text = Flow.KeysLine; Place(journalKeys);
             bool record = Flow.BirthDone; bigThreeLine.gameObject.SetActive(record); journalBigThree.gameObject.SetActive(record); // every player's, "☉ unknown" included (Oct 7)
             if (record) { float baseline = KeeperFirst + KeeperRule * row++ - 3; PlaceBigThree(baseline); ((RectTransform)journalBigThree.transform).anchoredPosition = new Vector2(JournalX, -(baseline - 5)); journalBigThree.interactable = Flow.CanOpenBirthPage && !busy && journalBeat == null; }
             // the living inscription (owner, Oct 7): the breaks are worked out before the first letter, so no word jumps lines while it writes.
@@ -2717,7 +2716,7 @@ namespace Ascendant.CelestialDial
             switch (Flow.JournalAt)
             {
                 case JournalView.Title: return "Your journal. " + SliceFlow.KeeperHeading.Substring(0, 1) + SliceFlow.KeeperHeading.Substring(1).ToLowerInvariant() + ". " + SliceFlow.TitlePageLine;
-                case JournalView.Landing: return "Your journal. Keeper: " + Flow.KeysLine + ". " + Flow.InscriptionText + " " + SliceFlow.PracticeDoor + (SliceFlow.PracticeDoorLine != "" ? ": " + SliceFlow.PracticeDoorLine.ToLowerInvariant() : "") + (Flow.PracticeConcepts.Count > 0 ? ". " : ", not open yet. ") + SliceFlow.ContentsDoor + ": " + SliceFlow.ContentsDoorLine.ToLowerInvariant() + ".";
+                case JournalView.Landing: return "Your journal. Keeper. " + Flow.InscriptionText + " " + SliceFlow.PracticeDoor + (SliceFlow.PracticeDoorLine != "" ? ": " + SliceFlow.PracticeDoorLine.ToLowerInvariant() : "") + (Flow.PracticeConcepts.Count > 0 ? ". " : ", not open yet. ") + SliceFlow.ContentsDoor + ": " + SliceFlow.ContentsDoorLine.ToLowerInvariant() + ".";
                 case JournalView.Contents: return "Your journal. " + SliceFlow.ContentsTitle + ". " + SliceFlow.WheelTitle + ": " + SliceFlow.WheelChapterLine.ToLowerInvariant() + ". " + SliceFlow.MapTitle + ": " + SliceFlow.MapChapterLine.ToLowerInvariant() + ". " + SliceFlow.SealedChapters + " chapters sealed.";
                 case JournalView.Map: return "Your journal. " + SliceFlow.MapTitle + ". " + SliceFlow.MapChapterLine + ": " + string.Join(", ", TravelMenu.Rooms.Where(r => TravelOpen(r.id)).Select(r => r.name)) + ".";
                 case JournalView.Practice: return "Your journal. " + SliceFlow.PracticeTitle + ". " + string.Join(" ", Flow.PracticeConcepts.Select(c => c.name + ": " + c.line + "."));
@@ -3162,7 +3161,7 @@ namespace Ascendant.CelestialDial
         }
 
         // ---- The launch (owner, Oct 9, 86bcg62x3; round 3's picks and working choices) ----
-        // Every launch: the studio's logo on black (fade in, hold about 2 s, fade out), then the launch movie, then the main menu. They play on
+        // Every launch: the studio's logo on black (fade in, hold 2.5 s, fade out: 4.9 s in all), then the launch movie, then the main menu. They play on
         // the prologue's stage and machinery (cuts, fades, pushes; since round 4 also round layers, a sweep and a spin). One Skip covers the logo and the movie, working as the
         // prologue's does: a tap shows it, Skip goes to the menu; the screen reader's and the keyboard's Skip is there at all times. No text on
         // screen, no sound, no clock. Reduced motion: as the prologue (each shot still, no push or turn, crossfades, the fade to the menu instant).
