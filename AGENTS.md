@@ -75,6 +75,10 @@ Claude builds and orchestrates. Six agents, each defined in `.claude/agents/`, c
 
 - Every ClickUp task and brief opens with a **Quick read**: two or three plain sentences on what's happening, what the owner needs to decide, and by when. A divider follows; everything below it can be as detailed as the agents need.
 - Task names use plain words ("Center the Aries symbol on the dial").
+- **Updates to the owner (owner, 2026-10-11):** "Keep owner updates short. Lead with what changed in the game, what is blocked, and the next decision you need from me. Keep agent activity, worktree details, validation counts, and merge sequencing in the task records unless they affect my decision. Replace superseded plans with the current plan. Give concrete reasons for recommendations, and show visual choices with images. Ask decisions when they're needed; don't bundle unrelated approvals into 'all A.'"
+  - The first sentence says whether anything is built: "your notes are recorded; nothing is built yet" is not "Done."
+  - Split a question that holds separate changes (a light effect and a font change are two decisions). A consequential approval, such as merging another feature, gets its own conversation.
+  - Say which work starts now without a ruling and which waits for one.
 
 ## Who can steer the agents (owner, 2026-10-07)
 
