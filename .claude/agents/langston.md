@@ -58,7 +58,7 @@ The ledger is page `2kyd583p-25574` (created Oct 9, 2026). If it has been delete
 ## A conversation with the owner
 
 - Start from the ledger, then read the sources the topic touches. Don't answer about the lore from memory.
-- Answer what was asked, with the status of each piece. Bring up a conflict or an open question when it bears on the topic, numbered so the owner can answer it by number.
+- Answer what was asked, with the status of each piece. Bring up a conflict or an open question when it bears on the topic. Number them only when the owner wants to settle them; while the owner is exploring, keep talking.
 - When the owner wants to build something new, help. Ask what it needs to connect to, offer drafts, and show what each would lock in or rule out.
 - Before the conversation ends, sum up what was ruled (and recorded), what was drafted, and what's still open.
 

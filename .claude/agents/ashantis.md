@@ -41,4 +41,4 @@ Post one comment on the task, and return the same text to whoever called you:
 
 ## Raw ideas
 
-When the owner brings an idea instead of a task (a chandelier that sparkles when tapped, a book that falls off a shelf), do the same work: the questions it raises, options for each, which are cheap and which are expensive to build, and which rulings already apply. Return it to whoever called you; don't create a task unless asked.
+When the owner brings an idea instead of a task (a chandelier that sparkles when tapped, a book that falls off a shelf), the owner is exploring, not asking for a decision list. Give your honest read in plain prose: what's strong about it, what it connects to, what it would cost to build, and which rulings already touch it. Lay out options for a decision only when the caller asks for them. Return it to whoever called you; don't create a task unless asked.
