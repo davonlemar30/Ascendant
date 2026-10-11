@@ -173,7 +173,7 @@ Answer in your own words. Short is fine.
 
 - Reference sizes: 390 × 844 logical pixels, and it must fit at 360 × 800. On desktop Chrome, open the device toolbar and set 360 × 800 for the small-window checks.
 - Optional event log: the browser console prints lines prefixed `CelestialDial`.
-- The sun comes from `BirthChart.Work` (the date, a time window and a place); on a cusp day the game asks which sign the player goes by instead of guessing. The game never invents a sun, and a sign the facts can't settle is picked by the player at the opening.
+- The sun comes from `BirthChart.Work` (the date, a time window and a place); on a cusp day the game asks which sign the player goes by instead of guessing. Since 86bcg8nft, whatever piece the player doesn't know (the day, the time or the place) is drawn at random and kept apart from the facts given (`filled` in the save); the sign the player goes by steers the draw for the sun.
 - Count beats: `DialView.BeatSeconds` (0.9 s) and `ReducedBeatSeconds` (0.5 s) pace the Level 2 count and the Level 3 demonstration.
 - First-drag resistance is off by default; `DialView.firstDragResistance` re-enables it for comparison. Inertia is `DialView.inertiaEnabled`.
 - Known and not a defect: automated pointer input in the very first frame after a phase transition is ignored; not reachable by a human.

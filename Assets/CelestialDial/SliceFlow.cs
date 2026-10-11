@@ -153,7 +153,7 @@ namespace Ascendant.CelestialDial
         public string DisplayName => string.IsNullOrEmpty(PlayerName) ? "Keeper" : PlayerName;
         public void SetName(string name) { PlayerName = (name ?? "").Trim(); }
         // ---- The birth record (the birth-time build, owner, Oct 7: the recommendation on 86bceb6fq approved, comment 90140265369479) ----
-        // Facts come from the player, the player's choices fill what the facts can't decide, and the game works out the rest and never guesses:
+        // Facts come from the player, the player's choices fill what the facts can't decide, and the game works out the rest (since 86bcg8nft, a missing piece is drawn at random, kept apart in Filled):
         // worked out (exact or stable) beats chosen, and chosen beats unknown; an uncertain point shows its options ("Pisces or Aries", Oct 3).
         // The opening's question has two answers. "Yes, I know my birthday": the date, then the time (or "I don't know my birth time"), then the
         // place (or "I don't know where"), the chart worked out from whatever is known, and on a cusp day the sun asked (Oct 2). "I'll skip it":
@@ -247,7 +247,7 @@ namespace Ascendant.CelestialDial
                 if (!draft.HasTime && !fill.HasTime) fill.SetTime(birthDice.Next(24 * 60));
                 if (!draft.HasPlace && !fill.HasPlace && places.Count > 0) fill.SetPlace(places[birthDice.Next(places.Count)]);
                 var chart = BirthChart.Work(Overlay(draft, fill));
-                if (sun < 0 || chart.Sun == sun || attempt >= 400) { pending = chart; pendingFill = fill; return; }
+                if (sun < 0 || chart.Sun == sun || attempt >= 400) { if (sun >= 0 && chart.Sun != sun) Logged?.Invoke("birth_fill_gave_up"); pending = chart; pendingFill = fill; return; } // Jeffrey, #156 N6: never silent
             }
         }
         // No unknown Big Three (owner, Oct 7, task 86bced0tc: "i dont want the player to have an unknown big three or sign during there play
@@ -385,7 +385,7 @@ namespace Ascendant.CelestialDial
             if (lines.Count > 0) lines.Add(StaysLearned);
             Logged?.Invoke("birth_added"); FinishAmending(lines);
         }
-        // the skip path (Oct 7, 86bced0tc): "Which sign do you go by?", then the moon's and the rising's questions, each from the twelve
+        // the skip path: "Which sign do you go by?" (Oct 7, 86bced0tc), then the rest drawn around it (86bcg8nft, 3A); PickSkipMoon stays for nothing a new game reaches
         public bool PickSkipSun(int seat)
         {
             if (Screen != SliceScreen.Birth || Amending || BirthStep != "sun-pick" || seat < 0 || seat > 11) return false;

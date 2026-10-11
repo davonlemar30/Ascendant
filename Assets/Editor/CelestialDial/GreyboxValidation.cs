@@ -898,7 +898,7 @@ namespace Ascendant.Build
             var london=Places.Find("London, Britain (UK)");var most=new SliceFlow(()=>1);most.SkipPrologue();most.Continue();most.ChooseBirth("chart");most.SetBirthDate(1990,4,20);most.SetBirthTime(-1);most.SetBirthPlace(london);
             int beforeCusp=most.OpeningAnswers;most.PickCuspSun(0);
             Check(beforeCusp==5 && most.BirthDone && most.OpeningAnswers==SliceFlow.MostOpeningAnswers && SliceFlow.MostOpeningAnswers==6,"the longest path (a cusp day with no time: the date, time, place and cusp; the moon and rising are filled in, 86bcg8nft) gathers all six stars");
-            var amend=BirthPlayer(o=>{o.ChooseBirth("skip");o.PickSkipSun(1);o.PickSkipMoon(3);o.PickRising(4);},out _);amend.StartAddFacts();
+            var amend=BirthPlayer(o=>{o.ChooseBirth("skip");o.PickSkipSun(1);},out _);amend.StartAddFacts();
             Check(amend.Screen==SliceScreen.Birth && amend.Amending && amend.OpeningAnswers==0,"\"Your Birth\" from the journal has no stars (the orb is the opening's)");
             // the shot list: the brief's seven shots, the sixteen frames (with the Oct 9 in-betweens), motion only inside a frame, about 45-60 s, a spoken line each
             var shots=SliceView.PrologueShots;

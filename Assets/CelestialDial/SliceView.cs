@@ -27,6 +27,9 @@ namespace Ascendant.CelestialDial
         public const string SaveKey = "ascendant.v02.save";
         Canvas canvas, flashCanvas; RectTransform root; Font font;
         RectTransform identity, birth, atrium, atriumReturn, chamber, hub, review, birthChoices, birthDate, birthSigns, glyphs;
+        public const float BirthNoteY = 545, BirthNoteRoomTop = 300, BirthNoteRoomBottom = 654 - 28 - 6; // the note's band: under Change my answer, above Continue
+        // the drawn height of a note in the birth screen's box (its own font, size and width), so a check can hold the longest one inside the band
+        public float BirthNoteHeight(string text) { var s = birthNote.GetGenerationSettings(new Vector2(birthNote.rectTransform.rect.width, 0)); return birthNote.cachedTextGeneratorForLayout.GetPreferredHeight(text, s) / birthNote.pixelsPerUnit; }
         Text birthNote, atriumText, returnText, chamberText, chamberEnd, keyIndicator, keyLabel, dateHint;
         Image atriumPose, returnPose; // Build P: Caspar behind the chat box on the story screens, one pose per page
         Image chamberPose; string chamberPoseName = ""; // Build R: Caspar behind the Chamber's box on its story beats only
@@ -335,7 +338,7 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 12; i++) { int seat = i; MakeButton(birthSigns, Zodiac.Seats[i].Name, -110 + (i % 3) * 110, 26 + (i / 3) * 58, 100, 52, () => PickBirthSign(seat)); }
             changeChoice = MakeButton(birth, "Change my answer", 0, 250, 200, 48, () => ChooseBirth("")); changeChoice.GetComponent<Image>().color = PanelColor;
             birthCancel = MakeButton(birth, SliceFlow.BackToJournal, 0, 250, 200, 48, CancelBirthAmend); birthCancel.GetComponent<Image>().color = PanelColor; // from "Your Birth": back, nothing changed
-            birthNote = Label(birth, "", 0, 545, 320, 60, 14);
+            birthNote = Label(birth, "", 0, BirthNoteY, 320, 60, 14); birthNote.verticalOverflow = VerticalWrapMode.Overflow; // Jeffrey, #156 B1: a long note grows both ways from its centre, into the empty band, rather than losing its last lines
             birthContinue = MakeButton(birth, "Continue", 0, 654, 190, 56, () => Continue());
             ShowBirth();
         }
