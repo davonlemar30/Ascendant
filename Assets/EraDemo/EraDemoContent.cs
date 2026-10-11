@@ -3,7 +3,10 @@ using System.Collections.Generic;
 namespace Ascendant.EraDemo
 {
     // The demo's map and people. A greybox: the layout loosely follows Langston's draft slice (task 86bcg8az2: an oven lane, a square, a
-    // courtyard, a roof), which the owner has not ruled on; every line is a labelled placeholder describing its beat, not game text.
+    // courtyard, a roof). The era is Timbuktu, spring 1583 (owner, Oct 9: "That era is fine" for the demo). The lines are Langston's draft
+    // dialogue (his slice, section 5), drafts the owner rewrites: his optional "nobody remembers her face" hint and the Founder hint are left
+    // out (they commit lore), names stay roles (his item 14 is open), and Caspar's tether line follows the owner's Oct 9 ruling ("he makes it
+    // clear he cant stay long, as he is tethered to the library"). Claude's call on the owner's Oct 11 word to go with its recommendations.
     public static class EraDemoContent
     {
         public static readonly string[] Rows =
@@ -46,19 +49,25 @@ namespace Ascendant.EraDemo
             var map = new EraMap(Rows);
             var a = map.Arrival;
             map.Points.Add(new EraPoint("baker", "The baker", "THE BAKER", map.Find('b'), Lines(
-                "[Placeholder] The baker's lines: the town believes the world ends with the meeting of the two stars.",
-                "[Placeholder] She sends you across the square to the old teacher's house.")));
+                "Up early, stranger, or up late? The bread doesn't care which.",
+                "Nobody's slept. They say the two great stars rise together before the sun, in the last of the signs. The end of the water, then the end of everything.",
+                "If you want trouble, go to the old teacher's house. His grandson was out here an hour ago, asking if anyone would talk sense to him.")));
             map.Points.Add(new EraPoint("copyist", "The copyist", "THE COPYIST", map.Find('c'), Lines(
-                "[Placeholder] The copyist's lines: his grandfather means to give the family's books to the river at first light.",
-                "[Placeholder] He asks you to go up to the roof and talk to him.")));
+                "Did the baker send you? You don't look like a scholar. Good. He's stopped listening to scholars.",
+                "He's copied books his whole life, and his father did before him. Now he says, what's the use, if the world ends with the meeting? At first light he'll give them to the river.",
+                "Star tables. Prayer times. A hundred years of the sky in our family's hands. He's on the roof, waiting to watch them rise. Please.")));
             map.Points.Add(new EraPoint("teacher", "The teacher", "THE TEACHER", map.Find('t'), new List<EraLine>
             {
-                new EraLine("[Placeholder] The teacher's lines: he watches the two planets rise together in the east."),
-                new EraLine("[Placeholder] The Keeper answers him.", "[Placeholder] Choice A", "[Placeholder] Choice B"),
-                new EraLine("[Placeholder] Either answer leads here: he decides to keep the books."),
+                new EraLine("My grandson found a stranger to send up. Sit, then. Watch the east with me."),
+                new EraLine("There. The two lords, rising together in the last sign. The old books say great changes ride on meetings like this one."),
+                new EraLine("Nine years to the thousandth year, and a meeting at the end of the signs. What use is keeping pages, if the water is coming for all of it?",
+                    "They meet every twenty years. You'd know that better than me.", "If it's the end, why are you up here watching?"),
+                new EraLine("A meeting is a mark in the margin, not the last page. My grandson knew it. It took a stranger to say it to me."),
+                new EraLine("We won't give them to the river. We'll keep them in the walls, where the water can't reach. Hidden is not lost."),
             }));
             map.Points.Add(new EraPoint("caspar", "Caspar", "CASPAR", new Cell(a.X + 1, a.Y), Lines(
-                "[Placeholder] Caspar's line: he can't stay long, because he is tethered to the Library."), follower: true));
+                "Timbuktu, in the spring of 1583. Listen more than you speak, acolyte.",
+                "I can't stay long. The Library holds me, and I feel it pulling already. Bring back what they would have lost."), follower: true));
             map.Points.Add(new EraPoint("portal", "The way back", "", map.Find('D'), null, portal: true)); // neutral: no ruling names the Library his home (Langston, #150)
             return map;
         }

@@ -1127,7 +1127,7 @@ const path=require('path');
     await dev.screenshot({path:path.join(out,viewport.width+'-era-arrival.png')});
     await dev.locator('#era-goto-baker').focus();await dev.keyboard.press('Enter');
     await dev.waitForFunction(()=>window.ascendantDial.snapshot().eraTalking,{},{timeout:30000});
-    { const s=await snap(); check(s.eraSpeaker==='THE BAKER'&&s.eraLine.startsWith('[Placeholder]')&&s.canEraNext&&!s.canEraWalk,'the era demo: Enter on The baker walks him there and the chat box opens ('+s.eraLine.slice(0,48)+'...) at '+viewport.width); }
+    { const s=await snap(); check(s.eraSpeaker==='THE BAKER'&&s.eraLine.startsWith('Up early, stranger')&&s.canEraNext&&!s.canEraWalk,'the era demo: Enter on The baker walks him there and the chat box opens ('+s.eraLine.slice(0,48)+'...) at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-era-baker.png')});
     for(let n=0;n<6&&(await snap()).eraTalking;n++){await act('era-next');await dev.waitForTimeout(250);}
     check(!(await snap()).eraTalking&&(await snap()).canEraWalk,'the era demo: Continue reads the baker\'s lines to the end at '+viewport.width);

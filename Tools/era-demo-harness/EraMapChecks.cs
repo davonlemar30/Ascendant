@@ -22,10 +22,10 @@ static class T {
     Check(w.Tap(new Cell(1,1)) && w.Jump() && w.At==new Cell(1,1),"a floor square walks there");
     arrived=null; Check(w.GoTo("caspar") && (w.Jump()||true) && arrived=="caspar" && w.At.Distance(map.Point("caspar").At)==1,"walk to Caspar (beside already: arrives at once)");
     var talk=new EraTalk(); string ended=null; talk.Ended+=p=>ended=p.Id;
-    Check(talk.Begin(map.Point("teacher")) && talk.Current.Text.StartsWith("[Placeholder]"),"talk begins");
-    Check(talk.Next() && talk.Waiting && !talk.Next(),"a choice line waits");
-    Check(talk.Choose(1) && talk.Chosen=="[Placeholder] Choice B" && !talk.Waiting,"choose B");
-    Check(talk.Next() && ended=="teacher" && !talk.Open,"talk ends");
+    Check(talk.Begin(map.Point("teacher")) && talk.Current.Text.StartsWith("My grandson"),"talk begins");
+    Check(talk.Next() && !talk.Waiting && talk.Next() && talk.Waiting && !talk.Next(),"a choice line waits");
+    Check(talk.Choose(1) && talk.Chosen=="If it's the end, why are you up here watching?" && !talk.Waiting,"choose B");
+    Check(talk.Next() && talk.Next() && ended=="teacher" && !talk.Open,"talk ends");
     Check(!talk.Begin(map.Point("portal")),"the portal has no talk");
     Check(w.GoTo("portal") && w.Jump() && arrived=="portal" && w.At==map.Beside(map.Find('D'))[0],"walks to the door home");
     // mid-step retarget

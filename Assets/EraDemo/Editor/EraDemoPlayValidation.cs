@@ -49,7 +49,7 @@ namespace Ascendant.EraDemo
         static readonly Dictionary<string, string> Plates = new Dictionary<string, string> { ["THE BAKER"] = "T H E   B A K E R", ["THE COPYIST"] = "T H E   C O P Y I S T", ["THE TEACHER"] = "T H E   T E A C H E R", ["CASPAR"] = "C A S P A R" };
         static void Talked(string speaker, int lines)
         {
-            for (int i = 0; i < lines; i++) { Check(Era.Talk.Open && Era.Speaker == speaker && Era.PlateShown == Plates[speaker] && Era.LineShown.StartsWith("[Placeholder]"), speaker + " line " + (i + 1) + " (plate \"" + Era.PlateShown + "\"): " + Era.LineShown); Era.Next(); }
+            for (int i = 0; i < lines; i++) { Check(Era.Talk.Open && Era.Speaker == speaker && Era.PlateShown == Plates[speaker] && Era.LineShown.Length > 0 && !Era.LineShown.StartsWith("[Placeholder]"), speaker + " line " + (i + 1) + " (plate \"" + Era.PlateShown + "\"): " + Era.LineShown); Era.Next(); }
             Check(!Era.Talk.Open && Era.LineShown == "", speaker + ": the talk ends and the chat box closes");
         }
 
@@ -82,7 +82,7 @@ namespace Ascendant.EraDemo
             });
             Step("the baker's talk", () => true, () =>
             {
-                Talked("THE BAKER", 2);
+                Talked("THE BAKER", 3);
                 // a tap on the map: the square three above the well, through the screen, as a finger would
                 var target = new Cell(5, 9); var screen = Era.ScreenOf(target); Era.GetComponentInChildren<TapCatcher>().Tapped(screen);
                 Check(Era.Walker.Walking, "a tap on the map at " + target + " walks him there (screen " + screen + ")");
@@ -99,13 +99,13 @@ namespace Ascendant.EraDemo
                 float camY = -Era.Camera.transform.position.y, half = Era.Camera.orthographicSize;
                 Check(camY < startRow - 3 && Mathf.Abs(camY - Era.Walker.Y) <= half - .5f, "the camera has followed him up the map and holds him in view (camera row " + camY.ToString("0.0") + " from " + startRow.ToString("0.0") + ", Keeper row " + Era.Walker.Y + ", half height " + half.ToString("0.0") + ")");
                 Check(!Era.PlacesOpen, "a talk closes Places, so the first tap continues it (Jeffrey, #150 N3)");
-                Check(Era.Speaker == "THE TEACHER", "the teacher talks"); Era.Next();
+                Check(Era.Speaker == "THE TEACHER", "the teacher talks"); Era.Next(); Era.Next();
                 Check(Era.Talk.Waiting && !Era.Next(), "a choice waits: Continue does nothing");
                 Capture("era-05-choice.png");
             });
             Step("the choice", () => true, () =>
             {
-                Check(Era.Choose(0) && Era.Talk.Open && !Era.Talk.Waiting, "choice A leads on"); Era.Next();
+                Check(Era.Choose(0) && Era.Talk.Open && !Era.Talk.Waiting, "choice A leads on"); Era.Next(); Era.Next();
                 Check(!Era.Talk.Open, "the teacher's talk ends");
                 View.Dial.WebAction("motion-on"); Check(Era.GoTo("copyist") && !Era.Walker.Walking, "reduced motion: he is simply there");
             });
@@ -115,10 +115,10 @@ namespace Ascendant.EraDemo
             });
             Step("the copyist's talk", () => true, () =>
             {
-                Talked("THE COPYIST", 2);
+                Talked("THE COPYIST", 3);
                 View.Dial.WebAction("motion"); Check(Era.GoTo("caspar"), "Caspar, who follows");
             });
-            Step("Caspar", () => Era.Talk.Open, () => { Talked("CASPAR", 1); Check(Era.GoTo("portal") && Era.Walker.Walking, "the way back"); });
+            Step("Caspar", () => Era.Talk.Open, () => { Talked("CASPAR", 2); Check(Era.GoTo("portal") && Era.Walker.Walking, "the way back"); });
             Step("back", () => Era == null && View != null && !View.Busy, () =>
             {
                 Check(View.Flow.AtHub && View.Flow.WingWhole, "the way back fades to the Atrium, the Wing whole");
