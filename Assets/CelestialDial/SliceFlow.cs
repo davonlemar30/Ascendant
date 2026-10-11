@@ -45,7 +45,7 @@ namespace Ascendant.CelestialDial
         // them back (Ashantis's settled call): the name once it is continued, then the birth question's answer and each step after it.
         int birthAnswers;
         public int OpeningAnswers => Amending ? 0 : Screen == SliceScreen.Birth ? 1 + birthAnswers : 0;
-        public const int MostOpeningAnswers = 8; // the name, the birth question, the date, the time, the place, the cusp, the moon, the rising
+        public const int MostOpeningAnswers = 6; // the name, the birth question, the date, the time, the place, the cusp (86bcg8nft: the moon's and the rising's questions are gone)
         void Answered() { if (!Amending) birthAnswers++; }
         public string PlayerName { get; private set; } = "";
         public string BirthChoice { get; private set; } = "";
@@ -140,8 +140,9 @@ namespace Ascendant.CelestialDial
         public string PracticeSummary { get; private set; } = "";
         public event Action<string> Logged;
         public SliceFlow() : this(null) { }
-        public SliceFlow(Func<int> randomSeat) // the random sun is retired (owner, Oct 7); the seat source is ignored, kept so the checks construct as before
+        public SliceFlow(Func<int> randomSeat) // the checks pass a fixed source, so the random birth details come out the same on every run (86bcg8nft)
         {
+            if (randomSeat != null) birthDice = new Random(randomSeat());
             Deck.Logged += n => Logged?.Invoke(n);
             Walk.Logged += n => Logged?.Invoke(n);
         }
@@ -200,6 +201,55 @@ namespace Ascendant.CelestialDial
         void ClearCusp() { CuspFrom = CuspTo = CuspNoon = CuspMinute = -1; MoonAsk = new int[0]; heldSun = heldMoon = heldRising = null; }
         // the cusp's and the Moon's answers are held until the steps finish, so going back from "Your Birth" changes nothing (Jeffrey, #123 B1)
         ChoiceRecord heldSun, heldMoon, heldRising;
+        // ---- Missing birth details are filled in at random (owner, Oct 9, in conversation with Langston: "for those who don't, then we would just
+        // give them a random birth date or time or whatever piece that they don't know"; task 86bcg8nft, answers 1A to 6A). Facts keeps only
+        // what the player gave; Filled keeps the pieces drawn at random (the save's mark, shown nowhere: "Your Birth" still reads unknown with
+        // Add, 4A). The chart is worked out from the two together, so every new record is whole: an exact sun, moon and rising. The sign the
+        // player goes by steers the draw, for the Sun only (3A). A real piece added later replaces its random one, and the chart may change (5A).
+        // An older save has no random pieces and keeps what it holds: its Add still asks the moon and the rising as before.
+        public BirthFacts Filled { get; private set; } = new BirthFacts();
+        Random birthDice = new Random(); BirthFacts pendingFill;
+        public void SeedBirth(int seed) { birthDice = new Random(seed); }
+        public const int FilledFromYear = 1950, FilledToYear = 2010; // a random year, shown nowhere (Claude's working choice, 86bcg8nft)
+        public const string FilledIn = "I filled in what you left blank, so your chart is whole. You can add your own details in your journal later."; // 4A: Claude's draft (owner writes)
+        bool Filling => !Amending || Filled.Any;
+        static BirthFacts Overlay(BirthFacts given, BirthFacts fill)
+        {
+            var r = given.Clone();
+            if (!r.HasDate) r.date = fill.date;
+            if (!r.HasTime) { r.timeFrom = fill.timeFrom; r.timeTo = fill.timeTo; }
+            if (!r.HasPlace) { r.place = fill.place; r.zone = fill.zone; r.latitude = fill.latitude; r.longitude = fill.longitude; }
+            return r;
+        }
+        static int NoonSun(int year, int month, int day) => Sky.SignOf(Sky.SunLongitude(Sky.Ephemeris(Sky.JulianDay(year, month, day, 12), year, month)));
+        void RandomDate(BirthFacts fill, int sun)
+        {
+            for (int tries = 0; ; tries++)
+            {
+                int year = birthDice.Next(FilledFromYear, FilledToYear + 1); var date = new DateTime(year, 1, 1).AddDays(birthDice.Next(DateTime.IsLeapYear(year) ? 366 : 365));
+                if (sun < 0 || tries >= 200 || NoonSun(date.Year, date.Month, date.Day) == sun) { fill.SetDate(date.Year, date.Month, date.Day); return; }
+            }
+        }
+        // the facts given, with every missing piece drawn at random; the first draw keeps the record's earlier random pieces (an Add keeps the
+        // rest), and a draw whose sun isn't the one the player goes by is drawn again
+        void Fill()
+        {
+            int sun = heldSun?.sign ?? ChoiceFor("sun")?.sign ?? (!draft.HasDate && Filled.HasDate && SunSign >= 0 ? SunSign : -1);
+            var kept = Filled.Clone();
+            if (draft.HasDate) kept.date = "";
+            if (draft.HasTime) kept.timeFrom = kept.timeTo = -1;
+            if (draft.HasPlace) kept.SetPlace(null);
+            var places = Places.All;
+            for (int attempt = 0; ; attempt++)
+            {
+                var fill = attempt == 0 ? kept.Clone() : new BirthFacts();
+                if (!draft.HasDate && !fill.HasDate) RandomDate(fill, sun);
+                if (!draft.HasTime && !fill.HasTime) fill.SetTime(birthDice.Next(24 * 60));
+                if (!draft.HasPlace && !fill.HasPlace && places.Count > 0) fill.SetPlace(places[birthDice.Next(places.Count)]);
+                var chart = BirthChart.Work(Overlay(draft, fill));
+                if (sun < 0 || chart.Sun == sun || attempt >= 400) { pending = chart; pendingFill = fill; return; }
+            }
+        }
         // No unknown Big Three (owner, Oct 7, task 86bced0tc: "i dont want the player to have an unknown big three or sign during there play
         // thru"; "Yes, at the opening"): whatever the facts can't settle is asked, in the record's order (the sun, the moon, the rising), with
         // no "I'm not sure"; each pick is the player's choice, flagged picked. Older saves keep what they hold (owner: "Leave them; I'll start fresh").
@@ -237,7 +287,7 @@ namespace Ascendant.CelestialDial
         {
             if (Screen != SliceScreen.Birth || BirthStep != "cusp" || choice < 0 || choice > 1) return false;
             heldSun = new ChoiceRecord { point = "sun", sign = choice == 0 ? CuspFrom : CuspTo, how = "picked" };
-            Logged?.Invoke("cusp_sun_picked"); Answered(); if (!AskNext()) Commit(); return true;
+            Logged?.Invoke("cusp_sun_picked"); Answered(); if (Filling) { Fill(); Commit(); } else if (!AskNext()) Commit(); return true;
         }
         // The opening's words and "Your Birth"'s (Oct 7): Claude's drafts from the approved recommendation, checked by Dante; the owner rewrites them
         public const string BirthQuestion = "Do you know when you were born?", KnowBirthday = "Yes, I know my birthday", SkipBirthday = "I'll skip it";
@@ -262,7 +312,7 @@ namespace Ascendant.CelestialDial
         {
             if (Screen != SliceScreen.Birth || Amending) return;
             BirthChoice = choice == "chart" || choice == "skip" ? choice : ""; OpeningPath = BirthChoice;
-            Facts = new BirthFacts(); draft = new BirthFacts(); Chart = new WorkedChart(); choices.Clear(); pending = null; Note = ""; ClearCusp();
+            Facts = new BirthFacts(); Filled = new BirthFacts(); draft = new BirthFacts(); Chart = new WorkedChart(); choices.Clear(); pending = null; pendingFill = null; Note = ""; ClearCusp();
             BirthStep = BirthChoice == "chart" ? "date" : BirthChoice == "skip" ? "sun-pick" : "";
             birthAnswers = BirthChoice == "" ? 0 : 1; // the answer to the birth question is the first of the birth's stars
             Logged?.Invoke("birth_choice:" + BirthChoice);
@@ -302,7 +352,7 @@ namespace Ascendant.CelestialDial
                 BirthStep = "cusp"; Note = ""; Logged?.Invoke("sun_cusp"); return;
             }
             if (!Amending) Logged?.Invoke("chart_worked_out");
-            if (!AskNext()) Commit();
+            if (Filling) { Fill(); Commit(); } else if (!AskNext()) Commit();
         }
         struct Shown { public int sun, moon, rising; public bool sunChosen, risingChosen; }
         Shown Snapshot() => new Shown { sun = SunSign, moon = MoonSign, rising = RisingSign, sunChosen = FromChoice("sun"), risingChosen = RisingChosen };
@@ -310,7 +360,7 @@ namespace Ascendant.CelestialDial
         // way to a sign the facts now decide.
         void Commit()
         {
-            var before = Snapshot(); bool timeAdded = !Facts.HasTime && draft.HasTime, dateAdded = !Facts.HasDate && draft.HasDate;
+            var before = Snapshot(); bool timeAdded = !Facts.HasTime && draft.HasTime, dateAdded = !Facts.HasDate && draft.HasDate, wasFilled = Filled.Any;
             foreach (var held in new[] { heldSun, heldMoon, heldRising }) if (held != null) Choose(held.point, held.sign, held.how);
             if (pending != null)
             {
@@ -318,14 +368,14 @@ namespace Ascendant.CelestialDial
                 foreach (var name in new[] { "sun", "moon", "rising" })
                 {
                     var old = Chart.Point(name); var now = fresh.Point(name);
-                    bool moved = old != null && old.Settled && (now == null || !now.Settled || now.signs[0] != old.signs[0]); // only a change to the maths could move it
+                    bool moved = !wasFilled && old != null && old.Settled && (now == null || !now.Settled || now.signs[0] != old.signs[0]); // only a change to the maths could move it; a chart from random pieces gives way (5A)
                     var keep = moved ? old : now ?? old; if (keep != null) merged.Add(keep); // agreeing, the fresh point's narrower range is kept
                 }
                 Chart = new WorkedChart { maths = fresh.maths, points = merged.ToArray() };
-                Facts = draft.Clone();
+                Facts = draft.Clone(); if (pendingFill != null) Filled = pendingFill;
             }
             choices.RemoveAll(c => Worked(c.point));
-            ClearCusp(); pending = null; BirthStep = "done";
+            ClearCusp(); pending = null; pendingFill = null; BirthStep = "done";
             if (!Amending) { Note = ChartNote(); return; }
             var lines = new List<string>();
             if (RisingSign >= 0 && !RisingChosen && (before.rising < 0 || before.risingChosen)) { lines.Add(RisingIs(RisingSign)); if (before.risingChosen && before.rising != RisingSign) lines.Add(TakesThePlace); }
@@ -339,7 +389,7 @@ namespace Ascendant.CelestialDial
         public bool PickSkipSun(int seat)
         {
             if (Screen != SliceScreen.Birth || Amending || BirthStep != "sun-pick" || seat < 0 || seat > 11) return false;
-            Choose("sun", seat, "picked"); Chart = new WorkedChart { maths = BirthChart.Maths }; BirthStep = "moon-pick"; Logged?.Invoke("sun_picked"); Answered(); return true;
+            Choose("sun", seat, "picked"); Logged?.Invoke("sun_picked"); Answered(); draft = new BirthFacts(); Fill(); Commit(); return true; // 3A: the random day falls inside it
         }
         public bool PickSkipMoon(int seat)
         {
@@ -352,6 +402,7 @@ namespace Ascendant.CelestialDial
         string ChartNote()
         {
             if (!HasSunSign) return StartFromAries;
+            if (Filled.Any && MoonSign >= 0 && RisingSign >= 0) return "Your sun sign is " + Zodiac.Seats[SunSign].Name + ", your moon sign " + Zodiac.Seats[MoonSign].Name + ", and your rising sign " + Zodiac.Seats[RisingSign].Name + ". " + FilledIn;
             string Sign(int seat) => Zodiac.Seats[seat].Name; bool dated = Facts.HasDate, noTime = dated && !Facts.HasTime, noPlace = dated && Facts.HasTime && !Facts.HasPlace;
             string why = noPlace ? " Without a birth place, your rising sign stays unknown." : noTime ? " Without a birth time, your rising sign stays unknown." : " Your rising sign stays unknown."; // the second: Dante-checked (Oct 7)
             var line = "Your sun sign is " + Sign(SunSign);
@@ -402,13 +453,13 @@ namespace Ascendant.CelestialDial
         public bool CancelAmending() { if (!CanCancelAmending) return false; Logged?.Invoke("birth_add_cancelled"); FinishAmending(new List<string>()); return true; }
         void FinishAmending(List<string> lines)
         {
-            Amending = false; BirthChoice = choiceBefore; BirthStep = "done"; draft = Facts.Clone(); pending = null; ClearCusp(); Note = "";
+            Amending = false; BirthChoice = choiceBefore; BirthStep = "done"; draft = Facts.Clone(); pending = null; pendingFill = null; ClearCusp(); Note = "";
             Screen = SliceScreen.Journal; JournalAt = JournalView.Birth; BirthLines = lines;
         }
         // ---- the save's birth record: the three parts, and the old flat fields as copies an older build can still read ----
         public void WriteBirth(SaveData save)
         {
-            save.birth = Facts.Clone(); save.choices = choices.Select(c => new ChoiceRecord { point = c.point, sign = c.sign, how = c.how }).ToArray();
+            save.birth = Facts.Clone(); save.filled = Filled.Clone(); save.choices = choices.Select(c => new ChoiceRecord { point = c.point, sign = c.sign, how = c.how }).ToArray();
             save.chart = new WorkedChart { maths = Chart.maths, points = (Chart.points ?? new ChartPoint[0]).Select(p => new ChartPoint { point = p.point, signs = (int[])p.signs.Clone(), from = p.from, to = p.to, status = p.status }).ToArray() };
             save.chartFrom = OpeningPath; save.sunSign = SunSign; save.moonSign = MoonSign; save.risingSign = RisingSign; save.moonFrom = MoonFrom; save.moonTo = MoonTo;
             save.sunBasis = SunBasis == "picked" || SunBasis == "noon" ? SunBasis : ""; save.birthDate = Facts.date ?? ""; save.birthMinute = Facts.Minute;
@@ -420,13 +471,13 @@ namespace Ascendant.CelestialDial
             bool parts = (save.birth != null && save.birth.Any) || (save.choices != null && save.choices.Length > 0) || (save.chart?.points != null && save.chart.points.Length > 0);
             if (save.version >= 5 && (parts || save.sunSign < 0)) // a save with empty parts and a flat sun is read the old way below
             {
-                Facts = (save.birth ?? new BirthFacts()).Clone(); Chart = save.chart ?? new WorkedChart(); if (Chart.points == null) Chart.points = new ChartPoint[0];
+                Facts = (save.birth ?? new BirthFacts()).Clone(); Filled = (save.filled ?? new BirthFacts()).Clone(); Chart = save.chart ?? new WorkedChart(); if (Chart.points == null) Chart.points = new ChartPoint[0];
                 if (save.choices != null) foreach (var c in save.choices) if (c != null && !string.IsNullOrEmpty(c.point)) Choose(c.point, c.sign, c.how ?? "");
                 return;
             }
             // a version 4 save, converted once (owner, Oct 7): the chart path's facts move over and the chart is worked out again, the saved
             // signs winning where they differ (Oct 3: never change data already calculated); the other paths keep their signs as choices
-            Facts = new BirthFacts(); Chart = new WorkedChart { maths = BirthChart.Maths };
+            Facts = new BirthFacts(); Filled = new BirthFacts(); Chart = new WorkedChart { maths = BirthChart.Maths };
             if (OpeningPath == "chart" && !string.IsNullOrEmpty(save.birthDate) && save.birthDate.Length == 10)
             {
                 Facts.date = save.birthDate; Facts.SetTime(save.birthMinute); Facts.place = save.birthPlace ?? ""; Facts.zone = save.birthZone ?? ""; Facts.latitude = save.birthLatitude; Facts.longitude = save.birthLongitude;
