@@ -630,7 +630,6 @@ namespace Ascendant.CelestialDial
         public static readonly string[] InscriptionBreaks = { "I'm your journal, and I'll keep a record", "of what you learn from the Library." }; // the breaks it takes wherever they fit, so every screen sets it alike
         public static string InscriptionGreeting(string name) => "What's up, " + name + ".";
         public static string Inscription(string name) => InscriptionGreeting(name) + " " + InscriptionRest;
-        // The Keys collected and the Books opened, one line (Oct 1, 1d): a Book counts once all its locks are filled.
         public bool CanJournalLand => AtJournal && JournalAt == JournalView.Title;
         public bool JournalLand() { if (!CanJournalLand) return false; JournalAt = JournalView.Landing; JournalTitled = true; Landed(); Logged?.Invoke("journal_landing"); return true; }
         void Landed() { if (journalLanded) return; journalLanded = true; PickInscription(); } // the first landing of a visit picks the line (1b C), and it holds for the visit
