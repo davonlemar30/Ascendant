@@ -2802,6 +2802,7 @@ namespace Ascendant.CelestialDial
         {
             public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height, SrcX = float.NaN, SrcY = float.NaN; public int From;
             public float PushTo, PushSeconds; public Vector2 PushView;
+            public string PushEase = "smooth"; public float PushDelay; public bool Carry; // the launch's descent (owner, Oct 10, 86bcgfke1): a push may wait PushDelay s, ease its own way, and Carry on into the next shots (the shot ends without waiting for it), so the move never stops between pictures
             public string[] Loop; public float LoopFrame; public bool Moving;
             public float SpinFrom, SpinTo, SpinSeconds; public string SpinEase = "smooth"; // the launch movie (Oct 9): the frame turns from SpinFrom to SpinTo degrees over SpinSeconds (eased "smooth", "in" or "out"); a full frame scaled just enough that no edge shows (Cover), a round layer as it is; reduced motion holds it still
             public int Sectors; public bool Over; public bool Below; public string FadeEase = "linear"; // Below: a layer that fades in under the layers showing and replaces none (Earth under the burning wheel); FadeEase: the fade's alpha curve (the logo's is smooth) // How "sweep" (round 4): a radial reveal of a round layer over Seconds, smooth, or in Sectors hard steps (the twelve symbols); reduced motion: a plain fade. Over: a full frame that comes in over the round layers (they go when it is in)
@@ -2828,6 +2829,7 @@ namespace Ascendant.CelestialDial
         static PrologueStep LoopIn(float at, string frame, string[] loop, float frameSeconds, float seconds) => new PrologueStep { At = at, Frame = frame, How = "loop", Loop = loop, LoopFrame = frameSeconds, Seconds = seconds };
         static PrologueStep InBetween(PrologueStep step) { step.Moving = true; return step; }
         static PrologueStep Pushed(PrologueStep step, float to, Vector2 view, float seconds) { step.PushTo = to; step.PushView = view; step.PushSeconds = seconds; return step; }
+        static PrologueStep Carried(PrologueStep step, string ease, float delay = 0) { step.Carry = true; step.PushEase = ease; step.PushDelay = delay; return step; }
         static PrologueStep Spun(PrologueStep step, float from, float to, float seconds, string ease = "smooth") { step.SpinFrom = from; step.SpinTo = to; step.SpinSeconds = seconds; step.SpinEase = ease; return step; }
         static PrologueStep Sweep(float at, string frame, float seconds, int sectors = 0) => new PrologueStep { At = at, Frame = frame, How = "sweep", Seconds = seconds, Sectors = sectors };
         static PrologueStep Over(PrologueStep step) { step.Over = true; return step; }
@@ -2956,6 +2958,7 @@ namespace Ascendant.CelestialDial
         {
             ResetPrologueStage(); prologueShot = 0; Publish();
             if (leadIn > 0) yield return new WaitForSecondsRealtime(leadIn);
+            var carried = new List<Func<bool>>(); // pushes that run on across shots (the launch's descent)
             for (int i = 0; i < playing.Length; i++)
             {
                 var shot = playing[i]; prologueShot = i; prologueStill = ReducedMotion; shotFrames.Clear(); // a change to reduced motion lands from the next shot (Ashantis)
@@ -2970,10 +2973,10 @@ namespace Ascendant.CelestialDial
                 while (true)
                 {
                     float t = Time.unscaledTime - start;
-                    while (next < shot.Steps.Length && shot.Steps[next].At <= t) { live.Add(RunStep(shot.Steps[next])); next++; Publish(); }
+                    while (next < shot.Steps.Length && shot.Steps[next].At <= t) { (shot.Steps[next].Carry ? carried : live).Add(RunStep(shot.Steps[next])); next++; Publish(); }
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
                     else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
-                    live.RemoveAll(step => step());
+                    live.RemoveAll(step => step()); carried.RemoveAll(step => step());
                     if (shot.WheelZoom) WheelZoomTo(prologueStill ? 1 : WheelZoomAt(Time.unscaledTime - zoomBegan, zoomSeconds));
                     if (Flow.AtLaunch && Time.unscaledTime >= launchPublishAt) { launchPublishAt = Time.unscaledTime + .25f; Publish(); } // the launch's pushes and turn move every frame: the web state follows them four times a second
                     if (t >= shot.Seconds && live.Count == 0) break;
@@ -3019,7 +3022,7 @@ namespace Ascendant.CelestialDial
             if (step.PushTo > 1 && !prologueStill) // the frame's own slow push-in (reduced motion holds it still)
             {
                 lastPushView = step.PushView;
-                push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed) / Mathf.Max(.01f, step.PushSeconds)), sc = Mathf.Lerp(1, step.PushTo, Mathf.SmoothStep(0, 1, k));
+                push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed - step.PushDelay) / Mathf.Max(.01f, step.PushSeconds)), sc = Mathf.Lerp(1, step.PushTo, Eased(step.PushEase, k));
                     frame.Rect.localScale = new Vector3(sc, sc, 1); frame.Rect.anchoredPosition = new Vector2(0, -400) + CameraOffset(sc, step.PushView); return k >= 1; };
             }
             else if (spins)
@@ -3170,6 +3173,7 @@ namespace Ascendant.CelestialDial
         // Round 4 (owner, Oct 9): the wheel and Earth are round cut-out layers (360 x 360, centred on the screen) over one painted sky. The wheel
         // draws itself in pencil (a radial sweep reveals its lines, then its twelve symbols appear one at a time in zodiac order), comes alive
         // as the black behind becomes the sky, burns alive and starts to spin, and spins on as it fades away, leaving a level Earth (Oct 9).
+        public const float EarthSeconds = 2.4f, EarthPushTo = 1.2f; public static float EarthPushSeconds => TransformSeconds - BurnAway + EarthSeconds + DescentFade; // Earth's push (86bcgfke1): from the moment the burning wheel has gone, easing in, on through the calm Earth and the first descent's fade, so it never stops
         public const float DrawSeconds = 2.5f, GlyphStep = .12f, BurnSeconds = 3f, TransformSeconds = 4.5f, EarthIn = .3f, EarthFade = 2.6f, BurnAway = 3f; // the transform (owner, Oct 9: "it doenst blend that cleanly"): the burning wheel spins on and fades away over BurnAway while a level Earth fades in under it, from EarthIn over EarthFade
         // the sweeps' start and direction (Image.Origin360: 0 bottom, 1 right, 2 top, 3 left; the offset turns the start further, in degrees,
         // counter-clockwise), set once the art lane reports where its wheel starts and which way its signs run; working choices until then
@@ -3197,13 +3201,13 @@ namespace Ascendant.CelestialDial
             new PrologueShot { Id = "alive", WheelZoom = true, Line = "The wheel lights up in gold, and the dark fills with stars.", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
             new PrologueShot { Id = "burn", Line = "The wheel burns with golden fire and begins to spin.", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin (the lit wheel under it turns with it while it fades in)
             new PrologueShot { Id = "transform", Line = "The fire turns to light. The wheel becomes Earth.", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
-                FadeAway(0, "intro-wheel-burning", BurnAway), Beneath(FadeTo(EarthIn, "intro-earth", EarthFade)) } }, // it spins on and fades away, the ring of fire leaving a level, calm Earth behind (Earth never turns)
-            new PrologueShot { Id = "earth", Line = "Earth, seen from space.", Seconds = 2.4f, Steps = new[] { Pushed(Cut(0, "intro-earth"), 1.12f, ViewOn(.5f, .5f), 2.4f) } }, // the calm Earth, a slow push
+                FadeAway(0, "intro-wheel-burning", BurnAway), Beneath(Carried(Pushed(FadeTo(EarthIn, "intro-earth", EarthFade), EarthPushTo, ViewOn(.5f, .5f), EarthPushSeconds), "in", BurnAway - EarthIn)) } }, // it spins on and fades away, the ring of fire leaving a level, calm Earth behind (Earth never turns)
+            new PrologueShot { Id = "earth", Line = "Earth, seen from space.", Seconds = EarthSeconds }, // the calm Earth: its push began in the transform, once the burning wheel had gone (owner, Oct 10: "a tad bit sooner, so it's seamless")
             Descent("continents", "intro-continents", 1.6f, "North America at night."), Descent("america", "intro-america", 1.6f, "The United States at night."), Descent("newyork-state", "intro-newyork-state", 1.4f, "New York State."), // flying down
             Descent("newyork-city", "intro-newyork-city", 1.4f, "New York City, between its rivers."), Descent("brooklyn", "intro-brooklyn", 1.4f, "Brooklyn's rooftops at night."), Descent("block", "intro-block", 1.8f, "A street of apartment buildings, a few cars, lit shopfronts."),
-            new PrologueShot { Id = "window", Line = "One building. Every window is dark but one.", Seconds = 2.2f, Steps = new[] { Over(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f)) } }, // one building, every window dark but one (the opening's own city frame); then the fade to the menu
+            new PrologueShot { Id = "window", Line = "One building. Every window is dark but one.", Seconds = 2.2f, Steps = new[] { Over(Carried(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f), "out")) } }, // it arrives moving and settles on the window // one building, every window dark but one (the opening's own city frame); then the fade to the menu
         };
-        static PrologueShot Descent(string id, string frame, float seconds, string line) => new PrologueShot { Id = id, Line = line, Seconds = seconds, Steps = new[] { Over(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds)) } }; // each comes in over what shows (the first over Earth)
+        static PrologueShot Descent(string id, string frame, float seconds, string line) => new PrologueShot { Id = id, Line = line, Seconds = seconds, Steps = new[] { Over(Carried(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds + DescentFade), "linear")) } }; // each comes in over what shows (the first over Earth), pushing at one steady speed, and keeps pushing while the next fades in over it (86bcgfke1: no stop between pictures)
         // a round layer's placeholder (round 4): a labelled circle on transparency, the disc's outer radius 153 (306 of the 720 file), so the layering shows
         public const float LayerRadius = 153;
         void LayerPlaceholder(RectTransform r, string slot)
