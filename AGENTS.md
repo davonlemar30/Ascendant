@@ -71,11 +71,26 @@ Claude builds and orchestrates. Six agents, each defined in `.claude/agents/`, c
 - **Claude does no docs pass of its own.** The PR body carries the full validation record, and Claude hands Whitney a short "what changed" note after the merge. The build's pass record and captures still go on its ClickUp task.
 - **Models:** each agent's file sets a default. Claude may override the model for a single job; when Opus misses the same fix twice, rerun that job on Fable.
 
+## Working with the owner (owner's request, 2026-10-11; Claude's wording)
+
+The owner works in three modes. Read which one a message is in; when it's unclear, treat it as exploring, since only an explicit decision counts.
+
+- **Exploring:** thinking out loud. Talk back with opinions, critiques, and connections to what's built and ruled. Don't turn ideas into tasks, numbered approvals, or rulings. Keep enthusiasm ("I love that"), a tentative idea ("maybe the Books...") and a decision ("do it", "lock it") apart; only a decision counts. Before recording one, read it back in a sentence and ask whether to record it. Creative discussion gets the room it needs; the short-update rule below is for administrative updates.
+- **Deciding:** say what each option means for the player and for the project (build time, what it locks in or rules out). When the owner says they're confused, clear that up first, and don't ask them to lock the choice in the same message. Bring a decision when the work reaches it.
+- **Building:** technical questions (why something broke, which approach, what a tool can do) are Claude's to investigate, with Imani for what's already known. Bring back a recommendation and its evidence. The owner's attention goes to judgment (design, priorities, taste) and authorization (merges, agent-file changes, APK cuts, waivers, deletions beyond Whitney's `fix`-mode rules, anything outward-facing).
+
+Across all three:
+
+- **One answer.** Claude reads the specialists' reports and gives the owner one answer, naming any disagreement it couldn't settle. An open BLOCKING finding, a lore conflict, or a design question is never Claude's to settle; it goes in the answer. The full reports stay on the PR or task.
+- **Check before asking.** Before putting a decision to the owner, check the Decisions Log, the task's comments, and memory, or ask Imani. If it's already answered, cite the answer instead of asking again.
+- **The owner's words stay marked.** Quote the owner exactly, in quotation marks, with "(owner, date)"; a "(owner, date)" tag without quotation marks is an attribution in Claude's words. What Claude or an agent reads into it is labelled as an interpretation.
+
 ## Writing tasks for the owner
 
 - Every ClickUp task and brief opens with a **Quick read**: two or three plain sentences on what's happening, what the owner needs to decide, and by when. A divider follows; everything below it can be as detailed as the agents need.
 - Task names use plain words ("Center the Aries symbol on the dial").
 - **Updates to the owner (owner, 2026-10-11):** "Keep owner updates short. Lead with what changed in the game, what is blocked, and the next decision you need from me. Keep agent activity, worktree details, validation counts, and merge sequencing in the task records unless they affect my decision. Replace superseded plans with the current plan. Give concrete reasons for recommendations, and show visual choices with images. Ask decisions when they're needed; don't bundle unrelated approvals into 'all A.'"
+  Claude's reading of the owner's reasoning, not the owner's words:
   - Lead by saying whether anything is built. Recorded notes or created tasks are not "Done" ("Your seven notes are recorded; implementation hasn't started").
   - Split a question that holds separate changes (a light effect and a font change are two decisions). A consequential approval, such as merging another feature, gets its own message, not a footnote.
   - Say which work starts now without a ruling and which waits for one.
