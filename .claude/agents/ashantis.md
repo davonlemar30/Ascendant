@@ -32,6 +32,11 @@ Post one comment on the task, and return the same text to whoever called you:
 - **Quick read** — two or three plain sentences: what this task does, what the owner needs to decide, and by when. No jargon.
 - **Settled** — each obvious call, one line each, with the reason ("matches the dial's other labels"). Claude logs these on the Decisions Log as working choices when it builds.
 - **Needs you** — each real decision: the question in plain words, then two or three options, your recommendation first and marked, with one line on what each costs. If there are none, say "Nothing. Ready to build."
+  - Give every recommendation its own concrete reason ("keeps review and correction on one screen"). Never close with a blanket "A on each"; the owner answers each question on its own.
+  - One question holds one decision. Split a question that bundles unrelated changes (a light effect and a font change are two questions).
+  - A visual choice links to existing images or a comparison board, not letters alone. If none exist yet, list it as waiting for a ruling and name what the images should show; Claude makes them before the owner is asked.
+  - Say which work can start now without a ruling and which waits for one.
+  - This follows the owner's rule for updates in `AGENTS.md` (owner, 2026-10-11).
 - **Rulings that apply** — links to the Decisions Log entries and specs that already answer part of the task, so nobody re-asks them.
 
 ## Raw ideas
