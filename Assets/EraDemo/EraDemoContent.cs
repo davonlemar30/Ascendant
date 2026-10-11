@@ -6,7 +6,8 @@ namespace Ascendant.EraDemo
     // courtyard, a roof). The era is Timbuktu, spring 1583 (owner, Oct 9: "That era is fine" for the demo). The lines are Langston's draft
     // dialogue (his slice, section 5), drafts the owner rewrites: his optional "nobody remembers her face" hint and the Founder hint are left
     // out (they commit lore), names stay roles (his item 14 is open), and Caspar's tether line follows the owner's Oct 9 ruling ("he makes it
-    // clear he cant stay long, as he is tethered to the library"). Claude's call on the owner's Oct 11 word to go with its recommendations.
+    // clear he cant stay long, as he is tethered to the library"). All of it is draft lore for the owner to keep or strike (Langston on 751ae8d), not working choices. Dante's two fixes are in (no negation pivots); Caspar says only what the
+    // owner ruled ("he cant stay long"), and teaches the twenty-year meeting the scene leans on (Langston's framing, without the era door the portals ruling replaced).
     public static class EraDemoContent
     {
         public static readonly string[] Rows =
@@ -62,12 +63,12 @@ namespace Ascendant.EraDemo
                 new EraLine("There. The two lords, rising together in the last sign. The old books say great changes ride on meetings like this one."),
                 new EraLine("Nine years to the thousandth year, and a meeting at the end of the signs. What use is keeping pages, if the water is coming for all of it?",
                     "They meet every twenty years. You'd know that better than me.", "If it's the end, why are you up here watching?"),
-                new EraLine("A meeting is a mark in the margin, not the last page. My grandson knew it. It took a stranger to say it to me."),
-                new EraLine("We won't give them to the river. We'll keep them in the walls, where the water can't reach. Hidden is not lost."),
+                new EraLine("A meeting is a mark in the margin. The book goes on. My grandson knew it. It took a stranger to say it to me."),
+                new EraLine("We won't give them to the river. We'll keep them in the walls, where the water can't reach. Hidden, they stay safe."),
             }));
             map.Points.Add(new EraPoint("caspar", "Caspar", "CASPAR", new Cell(a.X + 1, a.Y), Lines(
-                "Timbuktu, in the spring of 1583. Listen more than you speak, acolyte.",
-                "I can't stay long. The Library holds me, and I feel it pulling already. Bring back what they would have lost."), follower: true));
+                "Timbuktu, in the spring of 1583. Every twenty years or so Jupiter and Saturn meet, and the Library keeps its history by those meetings.",
+                "Listen more than you speak, acolyte. I can't stay long. The Library holds me."), follower: true));
             map.Points.Add(new EraPoint("portal", "The way back", "", map.Find('D'), null, portal: true)); // neutral: no ruling names the Library his home (Langston, #150)
             return map;
         }
