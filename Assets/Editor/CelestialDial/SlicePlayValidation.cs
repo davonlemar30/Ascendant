@@ -280,6 +280,7 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Book && View.Dial.Lesson.Phase==LessonPhase.GlyphNames && View.Flow.GlyphsStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Glyph && i.entered)==12,"the shelf opens the book: Part A, and introduces the symbol items");Capture("slice-390-glyphs-a.png");});
             Steps.Enqueue(()=>{Check(View.GlyphPlatesAlpha>.99f,"86bcgfkec: the first question settles with its four plates whole, as shipped");Capture("slice-390-glyphs-settled.png");});
             for(int i=0;i<3;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
+            Until(()=>View.GlyphPlatesAlpha>.99f && !View.Busy,5,"86bcgfkec (1A): the sunk plates rise whole again after the answer's pause");
             Steps.Enqueue(()=>{Check(View.GlyphPlatesAlpha>.99f,"86bcgfkec (1A): after each answer's pause the sunk plates have risen whole again");Capture("slice-390-glyphs-after-answers.png");});
             Steps.Enqueue(()=>{var saved=JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(SliceView.SaveKey));Check(saved.glyphStage==0 && saved.glyphIndex==3,"the live naming checkpoint stores the next card after three answers");Act("reload");});
             Steps.Enqueue(()=>{Check(View.Resumed && View.Dial.Lesson.GlyphNamed.Count(v=>v)==3,"reload retains the first three named symbols");Act("enter-wing");});
