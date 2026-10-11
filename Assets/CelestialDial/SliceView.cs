@@ -1304,12 +1304,12 @@ namespace Ascendant.CelestialDial
         // A new question rises out of the open pages: the symbol, then its four plates, all alike so nothing in the motion points to the answer.
         IEnumerator RiseQuestion()
         {
-            glyphRising = true;
+            glyphRising = true; float from = GlyphPlatesAlpha; // plates that sank fade back in as they rise; the first question's rise as shipped
             for (float t = 0; t < RiseSeconds; t += Time.unscaledDeltaTime)
             {
                 float k = Mathf.SmoothStep(0, 1, t / RiseSeconds), plates = Mathf.SmoothStep(0, 1, Mathf.Clamp01((t - .1f) / (RiseSeconds - .1f)));
                 bookCardRect.anchoredPosition = new Vector2(0, -Mathf.Lerp(RiseFrom, CardY, k)); glyphCard.color = new Color(Bone.r, Bone.g, Bone.b, k);
-                for (int i = 0; i < 4; i++) { ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -18 * (1 - plates)); if (glyphPlateGroups[i] != null) glyphPlateGroups[i].alpha = plates; }
+                for (int i = 0; i < 4; i++) { ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -18 * (1 - plates)); if (glyphPlateGroups[i] != null) glyphPlateGroups[i].alpha = Mathf.Lerp(from, 1, plates); }
                 bookGlow.color = new Color(1, .84f, .55f, BookGlowAlpha * k); yield return null;
             }
             EndRise();
@@ -1495,7 +1495,8 @@ namespace Ascendant.CelestialDial
                 warm.effectColor = new Color(1, .66f, .3f, picked ? .8f : 0); label.rectTransform.anchoredPosition = new Vector2(0, picked ? 3 : 0);
             }
             glyphCaspar.text = DialLesson.GlyphIntro; glyphNote.text = busy ? glyphNote.text : "";
-            if (!busy && !glyphRising && revealSeat < 0) PlatesAt(0); // sunk only through the answer's pause; the rise below lifts them again
+            bool rises = naming && revealSeat < 0 && target >= 0 && target != shownGlyph && !busy && !ReducedMotion && Flow.Screen == SliceScreen.Book && isActiveAndEnabled;
+            if (!busy && !glyphRising && revealSeat < 0 && !rises) PlatesAt(0); // sunk only through the answer's pause; a rise below lifts them from where they are
             if (naming && revealSeat < 0 && target >= 0 && target != shownGlyph && !busy) { shownGlyph = target; if (glyphRising) EndRise(); if (!ReducedMotion && Flow.Screen == SliceScreen.Book && isActiveAndEnabled) StartCoroutine(RiseQuestion()); }
         }
         int inHandCell(int cell) => Grid.Sign >= 0 && Grid.Cell == cell && !Grid.Placed[GridModel.SeatOf(cell)] ? Grid.Sign : -1; // the plate in hand, sitting in the well it was put in, until the Seal
