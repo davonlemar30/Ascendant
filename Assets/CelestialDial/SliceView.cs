@@ -2880,6 +2880,26 @@ namespace Ascendant.CelestialDial
         public const float SkipX = 118, SkipY = 744, SkipWidth = 96, SkipHeight = 44; // the bottom right, clear of the gear (a working choice)
         // the camera's offset for a scale and a view: at scale s the frame can move (s - 1) x half its size each way and never show an edge
         public static Vector2 CameraOffset(float scale, Vector2 view) { scale = Mathf.Max(1, scale); return new Vector2(-Mathf.Clamp(view.x, -1, 1) * 180 * (scale - 1), Mathf.Clamp(view.y, -1, 1) * 400 * (scale - 1)); }
+        // Quiet motion in the prologue's backgrounds (owner, Oct 10: "little background things, glowing lights, clouds"; Oct 11, Claude's
+        // recommendation A on the owner's word, task 86bcgfke1; this build does the lights, the clouds follow as cut layers): each painted
+        // light breathes like the menu's window (the same sine, GlowAt), each a little out of step with the others; drawn in code over the
+        // approved pictures (nothing repainted), moving with its frame's push and panel. Reduced motion shows the pictures as they are, with no glow.
+        // Places measured on the 720 x 1600 art as shares across and down; size is the outer glow's width and height in layout px.
+        public static readonly (string slot, float x, float y, float w, float h, float phase)[] PrologueLights = {
+            ("prologue-city", .581f, .237f, 30, 72, 0), ("prologue-city", .931f, .622f, 56, 56, 1.3f), // the lit window, the streetlamp
+            ("prologue-desk", .955f, .441f, 96, 96, .6f),                                              // the desk lamp
+            ("prologue-street-above", .889f, .242f, 56, 56, 2.1f),                                     // the streetlamp
+            ("prologue-caspar-back", .844f, .255f, 56, 56, 1.7f),                                      // the streetlamp behind him
+            ("prologue-puzzled", .906f, .422f, 56, 56, 2.6f) };                                        // the lamp in the room behind the glass
+        readonly List<(Image glow, float phase)> prologueLights = new List<(Image, float)>();
+        void AddPrologueLight(RectTransform frame, (string slot, float x, float y, float w, float h, float phase) light)
+        {
+            var r = Rect("Light", frame, (light.x - .5f) * 360, light.y * 800, light.w, light.h); var im = r.gameObject.AddComponent<Image>(); im.sprite = SoftSprite(); im.raycastTarget = false;
+            im.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, 0); prologueLights.Add((im, light.phase));
+        }
+        void UpdatePrologueLights() { foreach (var (glow, phase) in prologueLights) glow.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, prologueStill ? 0 : GlowAt(Time.unscaledTime + phase)); }
+        public float PrologueLightAlpha(int i) => i >= 0 && i < prologueLights.Count ? prologueLights[i].glow.color.a : -1; // fixture evidence
+        public int PrologueLightCount => prologueLights.Count;
         sealed class PrologueFrame { public string Slot; public RectTransform Rect; public CanvasGroup Group; public Image Image, Fill; public bool Layer; } // Fill: a swept layer's radial mask (round 4); Layer: a round layer, not a full frame
         RectTransform prologue, prologueCamera, prologuePanels; Image prologueDim; Button skipButton;
         readonly Dictionary<string, PrologueFrame> prologueFrames = new Dictionary<string, PrologueFrame>();
@@ -2911,6 +2931,7 @@ namespace Ascendant.CelestialDial
                 if (Slots.Dress(image, slot)) image.preserveAspect = layer; // a box smaller than the column (the logo, a round layer) draws its file whole, its shape kept
                 else if (slot.StartsWith("intro-") && layer) LayerPlaceholder(holder, slot); // a labelled circle on transparency, so the layering shows
                 else PlaceholderFrame(holder, slot); // the labelled placeholder until the art lands (the brief)
+                if (image.sprite != null) foreach (var light in PrologueLights.Where(l => l.slot == slot)) AddPrologueLight(r, light); // lit art only: a placeholder has no lamp to glow
                 r.gameObject.SetActive(false); prologueFrames[slot] = new PrologueFrame { Slot = slot, Rect = r, Group = group, Image = image, Fill = fill, Layer = layer };
             }
             var dim = Rect("Dim", stage, 0, 400, 360, 800); prologueDim = dim.gameObject.AddComponent<Image>(); prologueDim.color = new Color(0, 0, 0, 0); prologueDim.raycastTarget = false;
@@ -2976,7 +2997,7 @@ namespace Ascendant.CelestialDial
                     while (next < shot.Steps.Length && shot.Steps[next].At <= t) { (shot.Steps[next].Carry ? carried : live).Add(RunStep(shot.Steps[next])); next++; Publish(); }
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
                     else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
-                    live.RemoveAll(step => step()); carried.RemoveAll(step => step());
+                    live.RemoveAll(step => step()); carried.RemoveAll(step => step()); UpdatePrologueLights();
                     if (shot.WheelZoom) WheelZoomTo(prologueStill ? 1 : WheelZoomAt(Time.unscaledTime - zoomBegan, zoomSeconds));
                     if (Flow.AtLaunch && Time.unscaledTime >= launchPublishAt) { launchPublishAt = Time.unscaledTime + .25f; Publish(); } // the launch's pushes and turn move every frame: the web state follows them four times a second
                     if (t >= shot.Seconds && live.Count == 0) break;
