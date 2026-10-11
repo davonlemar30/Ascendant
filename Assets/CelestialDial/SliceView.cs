@@ -2889,16 +2889,23 @@ namespace Ascendant.CelestialDial
             ("prologue-city", .581f, .237f, 30, 72, 0), ("prologue-city", .931f, .622f, 56, 56, 1.3f), // the lit window, the streetlamp
             ("prologue-desk", .955f, .441f, 96, 96, .6f),                                              // the desk lamp
             ("prologue-street-above", .889f, .242f, 56, 56, 2.1f),                                     // the streetlamp
-            ("prologue-caspar-back", .844f, .255f, 56, 56, 1.7f),                                      // the streetlamp behind him
+            ("prologue-caspar-back", .844f, .255f, 56, 56, 1.7f), ("prologue-caspar-turn", .844f, .255f, 56, 56, 1.7f), // the streetlamp behind him, the same lamp in the same place as he turns (Jeffrey, #159 N2: it stays lit across the cut)
             ("prologue-puzzled", .906f, .422f, 56, 56, 2.6f) };                                        // the lamp in the room behind the glass
+        // only in the shots option A names (city, desk wide, street, Caspar's back, the puzzled panel): never in the light flooding in, the push into
+        // his eyes or the launch movie, which stay as they are (Jeffrey, #159 B1); the turn shot's face and eyes frames carry no light
+        public static readonly string[] LitShots = { "city", "desk", "street", "puzzled", "turn" };
         readonly List<(Image glow, float phase)> prologueLights = new List<(Image, float)>();
         void AddPrologueLight(RectTransform frame, (string slot, float x, float y, float w, float h, float phase) light)
         {
             var r = Rect("Light", frame, (light.x - .5f) * 360, light.y * 800, light.w, light.h); var im = r.gameObject.AddComponent<Image>(); im.sprite = SoftSprite(); im.raycastTarget = false;
             im.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, 0); prologueLights.Add((im, light.phase));
         }
-        void UpdatePrologueLights() { foreach (var (glow, phase) in prologueLights) glow.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, prologueStill ? 0 : GlowAt(Time.unscaledTime + phase)); }
-        public float PrologueLightAlpha(int i) => i >= 0 && i < prologueLights.Count ? prologueLights[i].glow.color.a : -1; // fixture evidence
+        void UpdatePrologueLights()
+        {
+            bool lit = !prologueStill && !Flow.AtLaunch && prologueShot >= 0 && prologueShot < playing.Length && LitShots.Contains(playing[prologueShot].Id);
+            foreach (var (glow, phase) in prologueLights) glow.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, lit ? GlowAt(Time.unscaledTime + phase) : 0);
+        }
+        public float PrologueLightAlpha(string slot) => prologueLights.Where(l => l.glow.transform.parent != null && l.glow.transform.parent.name == slot).Select(l => l.glow.color.a).DefaultIfEmpty(-1).Max(); // fixture evidence
         public int PrologueLightCount => prologueLights.Count;
         sealed class PrologueFrame { public string Slot; public RectTransform Rect; public CanvasGroup Group; public Image Image, Fill; public bool Layer; } // Fill: a swept layer's radial mask (round 4); Layer: a round layer, not a full frame
         RectTransform prologue, prologueCamera, prologuePanels; Image prologueDim; Button skipButton;
