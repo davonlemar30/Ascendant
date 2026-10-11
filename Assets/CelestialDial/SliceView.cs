@@ -1254,6 +1254,7 @@ namespace Ascendant.CelestialDial
         {
             if (busy || Dial.Lesson.Phase != LessonPhase.GlyphNames) return;
             int target = Dial.Lesson.CurrentGlyph; if (target < 0) return;
+            pausePlatesLowest = 1; sunkPublished = false;
             var options = Dial.Lesson.GlyphOptions(target); int seat = options[slot]; bool own = Dial.Lesson.GlyphMisses <= 1; // a right answer alone or after a nudge counts as the player's own
             bool correct = Dial.Lesson.AnswerGlyphName(seat);
             if (Dial.Lesson.GlyphNamed[target]) // answered, or shown after a second miss: it comes alive (owner, Oct 7: only after the answer)
@@ -1299,7 +1300,8 @@ namespace Ascendant.CelestialDial
         }
         static void BookShade(Text label) { var shadow = label.gameObject.AddComponent<Shadow>(); shadow.effectColor = new Color(0, 0, 0, .85f); shadow.effectDistance = new Vector2(1, -1.5f); }
         // the four plates, sunk by s (0 at home, 1 under the pages): they drop and fade together, so none points to the answer
-        void PlatesAt(float s) { for (int i = 0; i < 4; i++) ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -PlateSinkDepth * s); PlatesFade(1 - s); }
+        float pausePlatesLowest = 1; bool sunkPublished; public float LastPausePlatesLowest => pausePlatesLowest; // evidence: how far the plates sank in the last answer's pause (a batch Editor's long frames can skip past the pause itself)
+        void PlatesAt(float s) { if (busy) pausePlatesLowest = Mathf.Min(pausePlatesLowest, 1 - s); if (busy && s >= .99f && !sunkPublished) { sunkPublished = true; Publish(); } for (int i = 0; i < 4; i++) ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -PlateSinkDepth * s); PlatesFade(1 - s); }
         void PlatesFade(float a) { glyphPlates.alpha = a; glyphPlates.blocksRaycasts = a >= 1; } // a plate fading in takes no tap until it is whole (Jeffrey, #158 N2)
         public float GlyphPlatesAlpha => glyphPlates != null ? glyphPlates.alpha : 1; // fixture and web evidence
         public bool GlyphPlatesTappable => glyphPlates == null || glyphPlates.blocksRaycasts;
@@ -1801,7 +1803,7 @@ namespace Ascendant.CelestialDial
                 state.glyphChar = Zodiac.Seats[target].Glyph; state.glyphOptions = new[] { Zodiac.Seats[opts[0]].Name, Zodiac.Seats[opts[1]].Name, Zodiac.Seats[opts[2]].Name, Zodiac.Seats[opts[3]].Name };
             }
             {
-                state.bookEmblem = glyphEmblem != null && glyphEmblem.gameObject.activeInHierarchy && glyphEmblem.sprite != null ? glyphEmblem.sprite.name : ""; state.bookPages = bookPagesShown; state.bookRising = glyphRising;
+                state.bookEmblem = glyphEmblem != null && glyphEmblem.gameObject.activeInHierarchy && glyphEmblem.sprite != null ? glyphEmblem.sprite.name : ""; state.bookPages = bookPagesShown; state.bookRising = glyphRising; state.bookPlates = GlyphPlatesAlpha;
                 state.bookInk = Enumerable.Range(0, 12).Select(InkOf).ToArray(); state.bookInkDrawn = bookInk.Count(t => t != null && t.isActiveAndEnabled && t.color.a > 0 && t.cachedTextGenerator.characterCountVisible > 0); state.bookArt = Slots.Image("book-room") != null; state.bookPicked = revealSeat >= 0 && revealOwn && revealSlot >= 0 ? revealNames[revealSlot] : ""; // the ink: inked and really laid out (a cut-off line draws nothing)
                 state.bookInkBox = bookInk.SelectMany(InkBox).ToArray();
                 if (partA) state.caspar = "This symbol belongs to which sign? " + (glyphNote.text ?? "") + " " + DialLesson.GlyphIntro;

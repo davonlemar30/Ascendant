@@ -622,6 +622,9 @@ const path=require('path');
         await page.waitForFunction(()=>window.ascendantDial.snapshot().bookEmblem!=='',{},{timeout:2000}).catch(()=>{});
         const a=await state(); check(a.bookArt && a.bookEmblem==='emblem-'+SIGNS[target].toLowerCase() && a.bookPicked===SIGNS[target],'a right answer raises '+SIGNS[target]+'\'s emblem from the Book, its plate floating ('+a.bookEmblem+', '+a.bookPicked+'), at '+viewport.width);
         await page.screenshot({path:path.join(out,viewport.width+'-book-emblem.png')});
+        { await page.waitForFunction(()=>window.ascendantDial.snapshot().bookPlates<.3&&window.ascendantDial.snapshot().busy,{},{timeout:2000}).catch(()=>{});
+          const k=await state(); check(k.busy&&k.bookPlates<.3,'86bcgfkec (1A): mid-pause the four plates have sunk into the Book, so the symbol is seen landing as ink (plates '+(+k.bookPlates).toFixed(2)+') at '+viewport.width);
+          await page.screenshot({path:path.join(out,viewport.width+'-book-sunk.png')}); }
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         const b=await state(); check(b.bookEmblem==='' && b.bookInk[target]===2 && b.bookInk.filter(x=>x>0).length===1,'then it sinks into the pages as ink, in full (answered on its own), and no other symbol is inked, at '+viewport.width);
       }
