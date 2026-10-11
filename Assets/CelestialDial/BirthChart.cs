@@ -243,7 +243,7 @@ namespace Ascendant.CelestialDial
 
     // the record's three parts in one object, for the web state's test evidence
     [Serializable]
-    public sealed class BirthRecordState { public BirthFacts birth; public ChoiceRecord[] choices; public WorkedChart chart; }
+    public sealed class BirthRecordState { public BirthFacts birth, filled; public ChoiceRecord[] choices; public WorkedChart chart; }
 
     // The worked-out chart, and the version of the maths that wrote it. Written at the opening and rewritten only when a fact is added.
     [Serializable]

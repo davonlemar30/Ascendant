@@ -762,6 +762,7 @@ namespace Ascendant.CelestialDial
             else if (command == "cusp-why") ToggleCuspWhy();
             else if (command.StartsWith("moon:") && int.TryParse(command.Substring(5), out int moonChoice)) PickMoonSign(moonChoice); // Oct 7: the Moon's options by index
             else if (command == "jump-cusp") CuspDay(); // DEV Mode's cusp-day sample
+            else if (command.StartsWith("birth-seed:") && int.TryParse(command.Substring(11), out int birthSeed)) Flow.SeedBirth(birthSeed); // test-only: the random birth details come out the same on every run (86bcg8nft)
             else if (command.StartsWith("name:")) { Flow.SetName(command.Substring(5)); if (nameField != null) nameField.text = Flow.PlayerName; Publish(); }
             else if (command == "insert") Insert();
             else if (command == "enter-chamber") EnterChamber();
@@ -863,8 +864,8 @@ namespace Ascendant.CelestialDial
             SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(save)); Reload(true);
         }
         // DEV Mode (Oct 7, 86bced0tc): a fresh opening at a path's first question, the name kept: skip (Which sign do you go by?), no-time
-        // (London, May 2 1990, no birth time: the rising asked), no-place (May 10 1990, 2:30 pm, I don't know where: the moon asked, then the rising),
-        // neither (Apr 20 1990, no time, no place: the cusp question with no clock time, then the moon, then the rising)
+        // (London, May 2 1990, no birth time) and no-place (May 10 1990, 2:30 pm, I don't know where), each now a filled-in chart (86bcg8nft),
+        // neither (Apr 20 1990, no time, no place: the cusp question with no clock time, then the chart filled in)
         void BirthOpening(string id) { if (busy || !SettingsMenu.BirthSamples.Any(b => b.id == id)) return; birthSampleFor = Flow.PlayerName; birthSampleId = id; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); }
         void OpenBirthOpening()
         {
@@ -873,7 +874,7 @@ namespace Ascendant.CelestialDial
             if (id == "skip") Flow.ChooseBirth("skip");
             else if (id == "no-time") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 5, 2); Flow.SetBirthTime(-1); Flow.SetBirthPlace(Places.Find("London, Britain (UK)")); }
             else if (id == "no-place") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 5, 10); Flow.SetBirthTime(14 * 60 + 30); Flow.SetBirthPlace(null); }
-            else if (id == "neither") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 4, 20); Flow.SetBirthTime(-1); Flow.SetBirthPlace(null); } // a cusp day: the question with no clock time, then the moon, then the rising
+            else if (id == "neither") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 4, 20); Flow.SetBirthTime(-1); Flow.SetBirthPlace(null); } // a cusp day: the question with no clock time, then the chart filled in (86bcg8nft)
             if (nameField != null) nameField.SetTextWithoutNotify(Flow.PlayerName); ShowBirth();
         }
         void CuspDay() { if (busy) return; cuspDayFor = Flow.PlayerName; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); }
@@ -1705,7 +1706,7 @@ namespace Ascendant.CelestialDial
             // the record's three parts, kept apart (Oct 7), and the hidden flag: test evidence only, never drawn
             state.risingChosen = Flow.RisingChosen; state.sunKnown = Flow.HasSunSign; state.openingPath = Flow.OpeningPath; state.saveVersion = SaveData.Current;
             state.lessonSun = Dial != null && Dial.Lesson != null ? Zodiac.Seats[Zodiac.Wrap(Dial.Lesson.Sun)].Name + (Dial.Lesson.SunKnown ? "" : " (starting sign)") : "";
-            state.birthRecord = Flow.BirthDone ? JsonUtility.ToJson(new BirthRecordState { birth = Flow.Facts, choices = Flow.Choices.ToArray(), chart = Flow.Chart }) : "";
+            state.birthRecord = Flow.BirthDone ? JsonUtility.ToJson(new BirthRecordState { birth = Flow.Facts, filled = Flow.Filled, choices = Flow.Choices.ToArray(), chart = Flow.Chart }) : "";
             // v0.2
             state.atriumStage = Flow.AtriumStage; state.dueCount = Flow.DueCount; state.resumed = Resumed;
             state.canEnterWing = s == SliceScreen.Hub && !busy;
@@ -3456,6 +3457,7 @@ namespace Ascendant.CelestialDial
         // eight even places around it, taken in a spread order (OrbStarOrder); they leave with the white light. "Your Birth" from the journal has neither.
         public const float OrbSize = 120, OrbStarSize = 16, OrbStarRadius = 68, OrbBob = 3, OrbBobSeconds = 3.2f, StarFadeSeconds = .8f, QuestionTop = 183;
         public static float OrbCentreY(float safeTop) => (Mathf.Max(0, safeTop) + QuestionTop) / 2; // the band's middle: 91.5 with no band
+        public const int OrbPlaces = 8; // the stars sit at eight even places; since 86bcg8nft at most six are lit (the spread order keeps any count balanced)
         public static Vector2 OrbStarAt(int k) { float a = (90 - 45 * k) * Mathf.Deg2Rad; return new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * OrbStarRadius; } // the first at the top, then clockwise
         public static float OrbReach => OrbStarRadius + OrbStarSize / 2 + OrbBob; // from the orb's centre to the farthest pixel a star can reach
         RectTransform orb; Image orbImage; readonly Image[] orbStars = new Image[SliceFlow.MostOpeningAnswers]; readonly float[] orbStarAlpha = new float[SliceFlow.MostOpeningAnswers];

@@ -378,10 +378,10 @@ namespace Ascendant.CelestialDial
             ClearCusp(); pending = null; pendingFill = null; BirthStep = "done";
             if (!Amending) { Note = ChartNote(); return; }
             var lines = new List<string>();
-            if (RisingSign >= 0 && !RisingChosen && (before.rising < 0 || before.risingChosen)) { lines.Add(RisingIs(RisingSign)); if (before.risingChosen && before.rising != RisingSign) lines.Add(TakesThePlace); }
+            if (RisingSign >= 0 && !RisingChosen && (before.rising < 0 || before.risingChosen || (wasFilled && before.rising != RisingSign))) { lines.Add(RisingIs(RisingSign)); if (before.risingChosen && before.rising != RisingSign) lines.Add(TakesThePlace); }
             else if (RisingChosen && before.rising != RisingSign) lines.Add(ItIs(RisingSign)); // a rising asked during an Add (an older save had none)
             if (MoonSign >= 0 && before.moon != MoonSign) lines.Add(MoonIs(MoonSign));
-            if (HasSunSign && before.sun != SunSign) lines.Add(before.sunChosen && timeAdded && !dateAdded && !FromChoice("sun") ? SunAtThatMinute(SunSign) : SunIs(SunSign)); // "at that minute" only for a time added to a known day (a cusp settled)
+            if (HasSunSign && before.sun != SunSign) lines.Add((before.sunChosen || wasFilled) && timeAdded && !dateAdded && !FromChoice("sun") ? SunAtThatMinute(SunSign) : SunIs(SunSign)); // "at that minute" only for a time added to a known day (a cusp settled)
             if (lines.Count > 0) lines.Add(StaysLearned);
             Logged?.Invoke("birth_added"); FinishAmending(lines);
         }
