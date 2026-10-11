@@ -73,17 +73,17 @@ Claude builds and orchestrates. Six agents, each defined in `.claude/agents/`, c
 
 ## Working with the owner (owner's request, 2026-10-11; Claude's wording)
 
-The owner works in three modes. Read which one a message is in; when it's unclear, ask in one line.
+The owner works in three modes. Read which one a message is in; when it's unclear, treat it as exploring, since only an explicit decision counts.
 
 - **Exploring:** thinking out loud. Talk back with opinions, critiques, and connections to what's built and ruled. Don't turn ideas into tasks, numbered approvals, or rulings. Keep enthusiasm ("I love that"), a tentative idea ("maybe the Books...") and a decision ("do it", "lock it") apart; only a decision counts. Before recording one, read it back in a sentence and ask whether to record it. Creative discussion gets the room it needs; the short-update rule below is for administrative updates.
 - **Deciding:** say what each option means for the player and for the project (build time, what it locks in or rules out). When the owner says they're confused, clear that up first, and don't ask them to lock the choice in the same message. Bring a decision when the work reaches it.
-- **Building:** technical questions (why something broke, which approach, what a tool can do) are Claude's to investigate, with Imani for what's already known. Bring back a recommendation and its evidence. The owner's attention goes to judgment (design, priorities, taste) and authorization (merges, agent-file changes, APK cuts, deletions, anything outward-facing).
+- **Building:** technical questions (why something broke, which approach, what a tool can do) are Claude's to investigate, with Imani for what's already known. Bring back a recommendation and its evidence. The owner's attention goes to judgment (design, priorities, taste) and authorization (merges, agent-file changes, APK cuts, waivers, deletions beyond Whitney's `fix`-mode rules, anything outward-facing).
 
 Across all three:
 
-- **One answer.** Claude reads the specialists' reports and gives the owner one answer, naming any disagreement it couldn't settle. The full reports stay on the PR or task.
+- **One answer.** Claude reads the specialists' reports and gives the owner one answer, naming any disagreement it couldn't settle. An open BLOCKING finding, a lore conflict, or a design question is never Claude's to settle; it goes in the answer. The full reports stay on the PR or task.
 - **Check before asking.** Before putting a decision to the owner, check the Decisions Log, the task's comments, and memory, or ask Imani. If it's already answered, cite the answer instead of asking again.
-- **The owner's words stay marked.** Quote the owner exactly, with "(owner, date)". What Claude or an agent reads into it is labelled as an interpretation.
+- **The owner's words stay marked.** Quote the owner exactly, in quotation marks, with "(owner, date)"; a "(owner, date)" tag without quotation marks is an attribution in Claude's words. What Claude or an agent reads into it is labelled as an interpretation.
 
 ## Writing tasks for the owner
 
