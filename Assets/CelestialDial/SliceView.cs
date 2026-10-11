@@ -34,7 +34,7 @@ namespace Ascendant.CelestialDial
         Text glyphCard, glyphProgress, glyphCaspar, glyphNote, glyphQuestion;
         // The Book comes alive (owner, Oct 7-8; task 86bcf0x71): the symbol rises from the open Book, and once it is answered it becomes its element's
         // emblem, then sinks into the pages as ink; the pages keep every symbol learned. Nothing shows an element before the answer.
-        Image glyphEmblem, bookGlow; RectTransform bookCardRect, glyphPanel; readonly CanvasGroup[] glyphPlateGroups = new CanvasGroup[4];
+        Image glyphEmblem, bookGlow; RectTransform bookCardRect, glyphPanel; CanvasGroup glyphPlates; // the four plates in one box: its own fade, apart from each plate's ButtonFeel group (Jeffrey, #158 B1)
         // The Book's polish (owner, Oct 10: "still feels like a first pass"; Oct 11, Claude's recommendations on the owner's word, task 86bcgfkec, 1A and 2A):
         // the waiting symbol stands in a soft neutral-gold light from the pages (no element colour before the answer, Oct 7); the question
         // speaks in the plates' engraved EB Garamond with the Dial's shadow; and while an answer pauses, the four plates sink back into the
@@ -531,7 +531,8 @@ namespace Ascendant.CelestialDial
             var emblemRect = Rect("Glyph emblem", glyphs, 0, EmblemY, EmblemSize, EmblemSize); glyphEmblem = emblemRect.gameObject.AddComponent<Image>(); glyphEmblem.raycastTarget = false; glyphEmblem.preserveAspect = true; emblemRect.gameObject.SetActive(false);
             glyphQuestion = Label(glyphs, "This symbol belongs to which sign?", 0, 290, 330, 24, 15); // owner (worksheet section 4)
             glyphQuestion.font = ButtonLook.EngravedFont ?? font; BookShade(glyphQuestion); // 2A: the plates' engraved face, the Dial's way (Sept 30)
-            for (int i = 0; i < 4; i++) { int slot = i; glyphNameButtons[i] = MakeButton(glyphs, "", -78 + (i % 2) * 156, 340 + (i / 2) * 64, 150, 56, () => AnswerGlyphName(slot)); }
+            var platesBox = Rect("Plates", glyphs, 0, 400, 360, 800); glyphPlates = platesBox.gameObject.AddComponent<CanvasGroup>(); // covers the screen, so each plate keeps its place
+            for (int i = 0; i < 4; i++) { int slot = i; glyphNameButtons[i] = MakeButton(platesBox, "", -78 + (i % 2) * 156, 340 + (i / 2) * 64, 150, 56, () => AnswerGlyphName(slot)); }
             var panel = Rect("Caspar panel", glyphs, 0, 520, 324, 120); var panelImage = panel.gameObject.AddComponent<Image>(); panelImage.color = PanelColor; glyphPanel = panel;
             var casparLabel = Label(panel, "CASPAR", 0, 14, 290, 20, 13);
             glyphCaspar = Label(panel, "", 0, 70, 306, 90, 12);
@@ -542,7 +543,6 @@ namespace Ascendant.CelestialDial
             for (int i = 0; i < 4; i++) // the owner, Oct 8: near-black plates, the words kept simple and floating over them
             {
                 var feel = glyphNameButtons[i].GetComponent<ButtonFeel>(); glyphPlateHome[i] = ((RectTransform)glyphNameButtons[i].transform).anchoredPosition;
-                glyphPlateGroups[i] = glyphNameButtons[i].GetComponent<CanvasGroup>() ?? glyphNameButtons[i].gameObject.AddComponent<CanvasGroup>();
                 if (feel == null) continue; feel.Tone = DarkPlate; feel.Unavailable = 1; feel.Repaint(); // solid through the answer's pause: half-strength dark plates read as glass
                 if (feel.Label != null) { var lift = feel.Label.GetComponent<Shadow>(); if (lift != null) { lift.effectColor = new Color(0, 0, 0, .85f); lift.effectDistance = new Vector2(0, -4); } }
             }
@@ -1299,8 +1299,10 @@ namespace Ascendant.CelestialDial
         }
         static void BookShade(Text label) { var shadow = label.gameObject.AddComponent<Shadow>(); shadow.effectColor = new Color(0, 0, 0, .85f); shadow.effectDistance = new Vector2(1, -1.5f); }
         // the four plates, sunk by s (0 at home, 1 under the pages): they drop and fade together, so none points to the answer
-        void PlatesAt(float s) { for (int i = 0; i < 4; i++) { ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -PlateSinkDepth * s); if (glyphPlateGroups[i] != null) glyphPlateGroups[i].alpha = 1 - s; } }
-        public float GlyphPlatesAlpha => glyphPlateGroups[0] != null ? glyphPlateGroups[0].alpha : 1; // fixture and web evidence
+        void PlatesAt(float s) { for (int i = 0; i < 4; i++) ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -PlateSinkDepth * s); PlatesFade(1 - s); }
+        void PlatesFade(float a) { glyphPlates.alpha = a; glyphPlates.blocksRaycasts = a >= 1; } // a plate fading in takes no tap until it is whole (Jeffrey, #158 N2)
+        public float GlyphPlatesAlpha => glyphPlates != null ? glyphPlates.alpha : 1; // fixture and web evidence
+        public bool GlyphPlatesTappable => glyphPlates == null || glyphPlates.blocksRaycasts;
         // A new question rises out of the open pages: the symbol, then its four plates, all alike so nothing in the motion points to the answer.
         IEnumerator RiseQuestion()
         {
@@ -1309,7 +1311,7 @@ namespace Ascendant.CelestialDial
             {
                 float k = Mathf.SmoothStep(0, 1, t / RiseSeconds), plates = Mathf.SmoothStep(0, 1, Mathf.Clamp01((t - .1f) / (RiseSeconds - .1f)));
                 bookCardRect.anchoredPosition = new Vector2(0, -Mathf.Lerp(RiseFrom, CardY, k)); glyphCard.color = new Color(Bone.r, Bone.g, Bone.b, k);
-                for (int i = 0; i < 4; i++) { ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -18 * (1 - plates)); if (glyphPlateGroups[i] != null) glyphPlateGroups[i].alpha = Mathf.Lerp(from, 1, plates); }
+                for (int i = 0; i < 4; i++) { ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -18 * (1 - plates)); } if (from < 1) PlatesFade(Mathf.Lerp(from, 1, plates));
                 bookGlow.color = new Color(1, .84f, .55f, BookGlowAlpha * k); yield return null;
             }
             EndRise();
@@ -1478,7 +1480,7 @@ namespace Ascendant.CelestialDial
             bool chrome = !bookPagesShown; glyphQuestion.gameObject.SetActive(chrome); glyphPanel.gameObject.SetActive(chrome); bookCardRect.gameObject.SetActive(chrome); glyphProgress.gameObject.SetActive(chrome); glyphNote.gameObject.SetActive(chrome);
             foreach (var b in glyphNameButtons) b.gameObject.SetActive(chrome);
             var page = Slots.Image(naming ? "book-page" : "book-cover"); bookCard.sprite = page; bookCard.color = page != null ? Color.white : PanelColor; // Build E
-            if (!naming) { glyphProgress.text = ""; glyphCard.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].GetComponentInChildren<Text>().text = ""; glyphCaspar.text = lesson.Message; glyphNote.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = false; return; } // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
+            if (!naming) { if (!busy && revealSeat < 0) { if (glyphRising) EndRise(); PlatesAt(0); } glyphProgress.text = ""; glyphCard.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].GetComponentInChildren<Text>().text = ""; glyphCaspar.text = lesson.Message; glyphNote.text = ""; for (int i = 0; i < 4; i++) glyphNameButtons[i].interactable = false; return; } // after the twelfth answer the wheel already owns the index; the last card stays up through the hold
             int shown = revealSeat >= 0 ? revealSeat : target; // during the answer's pause the answered symbol and its plates stay
             if (naming)
             {

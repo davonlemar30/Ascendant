@@ -279,7 +279,18 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.WingRoom && !View.Busy,"and in again");Act("walk:shelf");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Book && View.Dial.Lesson.Phase==LessonPhase.GlyphNames && View.Flow.GlyphsStarted && View.Flow.Deck.Items.Count(i=>i.Kind==ItemKind.Glyph && i.entered)==12,"the shelf opens the book: Part A, and introduces the symbol items");Capture("slice-390-glyphs-a.png");});
             Steps.Enqueue(()=>{Check(View.GlyphPlatesAlpha>.99f,"86bcgfkec: the first question settles with its four plates whole, as shipped");Capture("slice-390-glyphs-settled.png");});
-            for(int i=0;i<3;i++) Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
+            // 86bcgfkec: the first answer's pause, with motion: the plates sink into the Book so its ink shows (1A; Jeffrey, #158 B3)
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
+            Until(()=>View.Busy && View.GlyphPlatesAlpha<.5f,3,"the plates sinking in the answer's pause",.02,true);
+            Steps.Enqueue(()=>{Check(View.Busy && View.GlyphPlatesAlpha<.5f && !View.GlyphPlatesTappable,"86bcgfkec (1A): mid-pause the four plates have sunk into the Book (alpha "+View.GlyphPlatesAlpha.ToString("0.00")+") and take no tap");Capture("slice-390-glyphs-sunk.png");});
+            Until(()=>!View.Busy && View.GlyphPlatesAlpha>.99f && View.GlyphPlatesTappable,5,"the next question's plates risen whole",.05);
+            // the second answer under reduced motion: nothing sinks (Ashantis's settled reduced-motion checks; Jeffrey, #158 B4)
+            Steps.Enqueue(()=>{Act("motion");var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
+            Until(()=>View.Busy,2,"the reduced pause",.3,true);
+            Steps.Enqueue(()=>{Check(View.Busy && View.GlyphPlatesAlpha>.99f,"86bcgfkec, reduced motion: the plates stay whole through the answer's pause, with no sink");});
+            Until(()=>!View.Busy,5,"the reduced pause's end",.05);
+            Steps.Enqueue(()=>{Check(View.GlyphPlatesAlpha>.99f && View.GlyphPlatesTappable,"86bcgfkec, reduced motion: the next question's plates are whole and take taps");Act("motion");});
+            Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
             Until(()=>View.GlyphPlatesAlpha>.99f && !View.Busy,5,"86bcgfkec (1A): the sunk plates rise whole again after the answer's pause");
             Steps.Enqueue(()=>{Check(View.GlyphPlatesAlpha>.99f,"86bcgfkec (1A): after each answer's pause the sunk plates have risen whole again");Capture("slice-390-glyphs-after-answers.png");});
             Steps.Enqueue(()=>{var saved=JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(SliceView.SaveKey));Check(saved.glyphStage==0 && saved.glyphIndex==3,"the live naming checkpoint stores the next card after three answers");Act("reload");});
