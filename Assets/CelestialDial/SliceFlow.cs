@@ -211,7 +211,7 @@ namespace Ascendant.CelestialDial
         Random birthDice = new Random(); BirthFacts pendingFill;
         public void SeedBirth(int seed) { birthDice = new Random(seed); }
         public const int FilledFromYear = 1950, FilledToYear = 2010; // a random year, shown nowhere (Claude's working choice, 86bcg8nft)
-        public const string FilledIn = "I filled in what you left blank, so your chart is whole. You can add your own details in your journal later."; // 4A: Claude's draft (owner writes)
+        public const string FilledIn = "The details you left blank are filled in, so your chart is whole. You can add your own in your journal later."; // 4A: the note's own line, with no speaker (Langston on #156: an "I" here would be the orb's, and the orb has no lines; Caspar hasn't met the Keeper yet). Claude's draft, checked by Dante (owner writes)
         bool Filling => !Amending || Filled.Any;
         static BirthFacts Overlay(BirthFacts given, BirthFacts fill)
         {

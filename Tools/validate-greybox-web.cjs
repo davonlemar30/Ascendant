@@ -1,5 +1,5 @@
 // Run against the real locally served Unity build. Requires Playwright; no production dependency.
-const FILLED_IN="I filled in what you left blank, so your chart is whole. You can add your own details in your journal later."; // 86bcg8nft (4A): the birth screen's one line when details are filled in (Claude's draft, owner writes)
+const FILLED_IN="The details you left blank are filled in, so your chart is whole. You can add your own in your journal later."; // 86bcg8nft (4A): the birth screen's one line when details are filled in (Claude's draft, owner writes)
 const playwright=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const engine=process.env.BROWSER==='webkit' ? playwright.webkit : playwright.chromium; // BROWSER=webkit approximates iPhone browsers, which all run WebKit
 const fs=require('fs');
