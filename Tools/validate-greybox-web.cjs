@@ -1116,8 +1116,9 @@ const path=require('path');
     // Oct 7 (86bced0tc): DEV Mode's sample for each other path, a fresh opening at its first question, the name kept
     for(const [id,step] of [['no-time','done'],['no-place','done'],['neither','cusp'],['skip','sun-pick']]){ // 86bcg8nft: no time, or no place, now ends in a filled-in chart
       await dev.waitForFunction(()=>!window.ascendantDial?.snapshot()?.busy,{},{timeout:30000}).catch(()=>{}); // a DEV jump is ignored while the game is busy (86bcg8nft: the samples' opening now settles faster than the suite's next tap)
-      await act('jump-birth-'+id);
-      if(!(await dev.waitForFunction(k=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep===k&&!window.ascendantDial.snapshot().busy,step,{timeout:60000}).then(()=>true).catch(()=>false))){ await act('jump-birth-'+id); await dev.waitForFunction(k=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep===k,step,{timeout:120000}); }
+      await act('jump-birth-'+id);await dev.waitForTimeout(3000); // the jump reloads the scene: two samples in a row both end on "done", so give the reload time to start before reading the state
+      const landed=k=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep===k&&!window.ascendantDial.snapshot().busy;
+      if(!(await dev.waitForFunction(landed,step,{timeout:60000}).then(()=>true).catch(()=>false))){ await act('jump-birth-'+id);await dev.waitForTimeout(3000);await dev.waitForFunction(landed,step,{timeout:120000}); }
       const c=await snap(); check(c.playerName==='Tester' && !c.resumed && (step==='done'?(c.canSliceContinue&&!c.bigThree.includes('unknown')&&c.note.endsWith(FILLED_IN)):!c.canSliceContinue&&(step==='cusp'?(c.canCusp&&c.cuspTime===''):c.canSignPick)),'DEV Mode\'s '+id+' sample: the opening at its first question ('+step+'), the name kept, at '+viewport.width); }
     await dev.evaluate(()=>window.ascendantDial.act('restart'));await newGame(dev);check(!(await snap()).resumed,'Settings\' Start over opens on the opening scene at '+viewport.width); // Settings' Start over (the page's own button waits for the Atrium)
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
