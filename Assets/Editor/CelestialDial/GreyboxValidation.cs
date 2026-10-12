@@ -926,6 +926,7 @@ namespace Ascendant.Build
             var banned=new[]{"silence","performing","weight","mirror","real","really","very","truly","actually","basically","literally"};
             Check(shots.All(x=>!string.IsNullOrEmpty(x.Line) && !x.Line.Contains("—") && !x.Line.Contains("–") && !x.Line.Split(' ',',','.').Any(w=>banned.Contains(w.ToLowerInvariant())) && x.Line.Length<=110),"each shot has one plain spoken line: no dashes, none of the owner's banned words");
             Check(SliceView.SkipWords=="Skip" && SliceView.SkipWidth>=ButtonLook.MinTarget && SliceView.SkipHeight>=ButtonLook.MinTarget && Mathf.Abs(SliceView.SkipX)+SliceView.SkipWidth/2<=180 && SliceView.SkipY+SliceView.SkipHeight/2<=800,"Skip is a 44 px target inside the screen");
+            Check(Mathf.Approximately(SliceView.BookPagesHold(true),1.2f) && SliceView.BookPagesHold(true)<SliceView.BookPagesHold(false) && Mathf.Approximately(SliceView.BookPagesHold(false),SliceView.BookPagesSeconds),"86bcgfkec, reduced motion: the Book's full-pages look at Part A's end is the shorter one (1.2 s, not "+SliceView.BookPagesSeconds+" s)");
             // the orb and its stars: centred in the band above the question, clear of it with or without a cutout's band, eight even places
             var orbSlot=Slots.Find("orb");var starSlot=Slots.Find("orb-star");
             Check(orbSlot!=null && orbSlot.Width==120 && orbSlot.Height==120 && starSlot!=null && starSlot.Width==16 && starSlot.Height==16,"the orb (120 x 120) and the star (16 x 16) are slots");

@@ -285,9 +285,12 @@ namespace Ascendant.Build
             Until(()=>!View.Busy && View.GlyphPlatesAlpha>.99f && View.GlyphPlatesTappable,5,"the next question's plates risen whole",.05);
             Steps.Enqueue(()=>{Check(View.LastPausePlatesLowest<.05f,"86bcgfkec (1A): in the answer's pause the four plates sank into the Book (lowest alpha "+View.LastPausePlatesLowest.ToString("0.00")+"), then rose whole");});
             // the second answer under reduced motion: nothing sinks (Ashantis's settled reduced-motion checks; Jeffrey, #158 B4)
-            Steps.Enqueue(()=>{Act("motion");var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
+            int risesBefore=0;
+            Steps.Enqueue(()=>{Act("motion");risesBefore=View.RisesStarted;var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
             Until(()=>!View.Busy,5,"the reduced pause's end",.05);
-            Steps.Enqueue(()=>{Check(View.LastPausePlatesLowest>.99f,"86bcgfkec, reduced motion: the plates stayed whole through the answer's pause, with no sink");});
+            Steps.Enqueue(()=>{Check(View.LastPausePlatesLowest>.99f,"86bcgfkec, reduced motion: the plates stayed whole through the answer's pause, with no sink");
+                Check(!View.LastEmblemAnimated,"86bcgfkec, reduced motion: the emblem held still in place (no bloom, no sink to the page)");
+                Check(View.RisesStarted==risesBefore && !View.Dial.Snapshot().bookRising,"86bcgfkec, reduced motion: the next question appears with no rise");});
             Steps.Enqueue(()=>{Check(View.GlyphPlatesAlpha>.99f && View.GlyphPlatesTappable,"86bcgfkec, reduced motion: the next question's plates are whole and take taps");Act("motion");});
             Steps.Enqueue(()=>{var l=View.Dial.Lesson;Act("glyph-name:"+Array.IndexOf(l.GlyphOptions(l.CurrentGlyph),l.CurrentGlyph));});
             Until(()=>View.GlyphPlatesAlpha>.99f && !View.Busy,5,"86bcgfkec (1A): the sunk plates rise whole again after the answer's pause");

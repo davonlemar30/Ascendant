@@ -1274,7 +1274,7 @@ namespace Ascendant.CelestialDial
             if (Dial.Lesson.Phase == LessonPhase.GlyphWheel) // Part A done: a short look at the full pages (owner, Oct 7, 2A), then back to the room; the wheel runs Part B
             {
                 bookPagesShown = true; ShowGlyphs(); Publish();
-                yield return new WaitForSecondsRealtime(ReducedMotion ? 1.2f : BookPagesSeconds);
+                yield return new WaitForSecondsRealtime(BookPagesHold(ReducedMotion));
                 bookPagesShown = false; busy = false; Flow.LeaveBook(); Save(); Show(); Publish(); yield break;
             }
             busy = false; Show(); Publish();
@@ -1284,6 +1284,7 @@ namespace Ascendant.CelestialDial
         {
             var art = Slots.Image(EmblemSlot(seat)); var rect = (RectTransform)glyphEmblem.transform; var ink = InkSpots[InkPlace[seat]];
             glyphEmblem.sprite = art; glyphEmblem.gameObject.SetActive(art != null); glyphCard.enabled = art == null; bookGlow.enabled = art == null; Publish(); // the web state sees the emblem from its first frame
+            LastEmblemAnimated = art != null && !ReducedMotion;
             if (art == null || ReducedMotion) { rect.anchoredPosition = new Vector2(0, -EmblemY); rect.localScale = Vector3.one; glyphEmblem.color = Color.white; ShowGlyphs(); yield return new WaitForSecondsRealtime(hold); }
             else
             {
@@ -1301,6 +1302,8 @@ namespace Ascendant.CelestialDial
         static void BookShade(Text label) { var shadow = label.gameObject.AddComponent<Shadow>(); shadow.effectColor = new Color(0, 0, 0, .85f); shadow.effectDistance = new Vector2(1, -1.5f); }
         // the four plates, sunk by s (0 at home, 1 under the pages): they drop and fade together, so none points to the answer
         float pausePlatesLowest = 1; bool sunkPublished; public float LastPausePlatesLowest => pausePlatesLowest; // evidence: how far the plates sank in the last answer's pause (a batch Editor's long frames can skip past the pause itself)
+        public static float BookPagesHold(bool reduced) => reduced ? 1.2f : BookPagesSeconds; // the full pages' look at Part A's end: shorter under reduced motion
+        public bool LastEmblemAnimated { get; private set; } public int RisesStarted { get; private set; } // evidence for the reduced-motion checks (Jeffrey, #158 B4)
         void PlatesAt(float s) { if (busy) pausePlatesLowest = Mathf.Min(pausePlatesLowest, 1 - s); if (busy && s >= .99f && !sunkPublished) { sunkPublished = true; Publish(); } for (int i = 0; i < 4; i++) ((RectTransform)glyphNameButtons[i].transform).anchoredPosition = glyphPlateHome[i] + new Vector2(0, -PlateSinkDepth * s); PlatesFade(1 - s); }
         void PlatesFade(float a) { glyphPlates.alpha = a; glyphPlates.blocksRaycasts = a >= 1; } // a plate fading in takes no tap until it is whole (Jeffrey, #158 N2)
         public float GlyphPlatesAlpha => glyphPlates != null ? glyphPlates.alpha : 1; // fixture and web evidence
@@ -1308,7 +1311,7 @@ namespace Ascendant.CelestialDial
         // A new question rises out of the open pages: the symbol, then its four plates, all alike so nothing in the motion points to the answer.
         IEnumerator RiseQuestion()
         {
-            glyphRising = true; float from = GlyphPlatesAlpha; // plates that sank fade back in as they rise; the first question's rise as shipped
+            glyphRising = true; RisesStarted++; float from = GlyphPlatesAlpha; // plates that sank fade back in as they rise; the first question's rise as shipped
             for (float t = 0; t < RiseSeconds; t += Time.unscaledDeltaTime)
             {
                 float k = Mathf.SmoothStep(0, 1, t / RiseSeconds), plates = Mathf.SmoothStep(0, 1, Mathf.Clamp01((t - .1f) / (RiseSeconds - .1f)));
