@@ -439,7 +439,6 @@ namespace Ascendant.Build
             var c = BirthPlayer(o => { o.ChooseBirth("chart"); o.SetBirthDate(1990, 4, 20); o.SetBirthTime(-1); o.Continue(); }, out _);
             Check(c.SunSign == 7 && c.Filled.ExactTime && !c.Facts.Any && c.StartAddFacts(true) && c.BirthStep == "date" && c.SetBirthDate(1990, 4, 20) && c.SetBirthTime(8 * 60) && c.SetBirthPlace(london) && c.OnBirthPage && c.SunSign == 0 && !c.Filled.Any && c.BirthLines.Contains("Your sun is Aries.") && c.RisingSign >= 0 && c.Chart.Point("rising").status == "exact",
                 "a time unknown gives the default chart (Scorpio); a real day, 8 am and London (before the 9:27 change) replace it with an Aries sun and a worked-out rising: " + string.Join(" / ", c.BirthLines));
-                "a real birth time added to a day the default time had put in Taurus (8 am, before 9:27) puts the sun in Aries and works out the rising: " + string.Join(" / ", c.BirthLines));
             // going back before the facts finish changes nothing; an "I don't know" on "Your Birth" leaves the record as it was (owner, Oct 16: no mix)
             var back = BirthPlayer(o => { o.ChooseBirth("skip"); o.Continue(); }, out _); var backLine = back.BigThreeLine; var backFill = JsonUtility.ToJson(back.Filled);
             Check(back.StartAddFacts() && back.SetBirthDate(1990, 4, 20) && back.BirthStep == "time" && back.CancelAmending()
