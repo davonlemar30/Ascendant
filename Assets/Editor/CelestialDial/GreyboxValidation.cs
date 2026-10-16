@@ -128,7 +128,7 @@ namespace Ascendant.Build
                     "table seating " + (i + 1) + " restores placement and deck evidence");
             }
             Check(saved.keys == 3, "the final seating checkpoints Key 3 before presentation polling");
-            var keyFlow = new SliceFlow(() => 1); keyFlow.SkipPrologue(); keyFlow.Continue(); keyFlow.ChooseBirth("skip"); keyFlow.Continue(); keyFlow.Continue(); keyFlow.EnterWing(); keyFlow.EnterDial(); // Build T: the walk to the Dial
+            var keyFlow = new SliceFlow(() => 1); keyFlow.SkipPrologue(); keyFlow.Continue(); TaurusSun(keyFlow); keyFlow.Continue(); keyFlow.Continue(); keyFlow.EnterWing(); keyFlow.EnterDial(); // Build T: the walk to the Dial
             Check(keyFlow.RevealKey() && keyFlow.Keys == 1 && keyFlow.KeysInHand == 1, "the first Key reveal immediately records one earned Key");
         }
         static void ValidateEvidenceRouting()
@@ -371,6 +371,8 @@ namespace Ascendant.Build
         // The birth-time build (owner, Oct 7: the recommendation on 86bceb6fq approved). The save keeps the facts, the player's choices and the
         // worked-out chart apart; the record reads worked out over chosen over unknown; the game never invents a time or a place; adding a fact
         // only narrows what was worked out; nothing played changes; a version 4 save converts once.
+        // the flows below need a Taurus sun for their lessons; the skip path now gives the default chart (Scorpio), so they take the chart path: a real day, the default time and place (owner, Oct 15)
+        static void TaurusSun(SliceFlow f) { f.ChooseBirth("chart"); f.SetBirthDate(1990, 4, 25); f.SetBirthTime(-1); f.SetBirthPlace(null); }
         static SliceFlow BirthPlayer(Action<SliceFlow> opening, out SaveData save)
         {
             // the opening as a player gives it, the After Key 1 checkpoint's progress under it, restored as a second sitting, the journal on "Your Birth"
@@ -475,7 +477,7 @@ namespace Ascendant.Build
         }
         static void ValidateJournalFront()
         {
-            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.SkipPrologue(); f.Continue(); f.ChooseBirth("skip"); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, the journal in hand
+            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.SkipPrologue(); f.Continue(); TaurusSun(f); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, the journal in hand
             Check(!f.JournalTitled && f.OpenJournal() && f.JournalAt == JournalView.Title && !f.JournalTitled && f.CanJournalLand && !f.CanJournalContents && !f.CanJournalHome, "1e A: the journal's first-ever open shows the title page, and nothing on it leads anywhere; it counts as shown only once it lands (#128 N6)");
             var midBeat = new SliceFlow(() => 1); var beatSave = UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true)));
             Check(!beatSave.journalTitled && midBeat.Restore(beatSave) && midBeat.OpenJournal() && midBeat.JournalAt == JournalView.Title && midBeat.JournalLand() && midBeat.JournalTitled && midBeat.InscriptionId == SliceFlow.FirstLineId && midBeat.InscriptionText == SliceFlow.Inscription("Davon"), "closed (or quit) during the title page, the next open shows the title page again, then the Oct 2 line, so it is never lost (Jeffrey, #128 N6; #131 N5)");
@@ -533,7 +535,7 @@ namespace Ascendant.Build
             Check(seconds.Min() >= 2f && seconds.Max() <= 3.6f && SliceView.InkFade == .15f && SliceView.InkStep == .035f && SliceView.InkDelay == .3f, "the ink: each letter fades over 0.15 s, 35 ms apart, with a rest at a comma or a full stop; a line takes " + seconds.Min().ToString("0.0") + " to " + seconds.Max().ToString("0.0") + " s, starting 0.3 s after the landing");
             UnityEngine.Object.DestroyImmediate(probeObject);
             // how a line is picked
-            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.SetName("Davon"); f.SkipPrologue(); f.Continue(); f.ChooseBirth("skip"); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; }
+            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.SetName("Davon"); f.SkipPrologue(); f.Continue(); TaurusSun(f); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; }
             string Saved(SliceFlow f) => JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true));
             int seed = 0;
             SliceFlow Visit(string json, Action<SaveData> change = null) { var save = JsonUtility.FromJson<SaveData>(json); change?.Invoke(save); var f = new SliceFlow(() => 1); f.SeedInscription(++seed); return f.Restore(save) && f.OpenJournal() && f.JournalAt == JournalView.Landing ? f : null; }
@@ -648,7 +650,7 @@ namespace Ascendant.Build
             }
             Check(wrongFacts.Count == 0 && checkedFacts * 2 >= all.Count, "the right answers agree with the game's own data: " + checkedFacts + " of " + all.Count + " questions checked against the signs' elements, modalities, polarities, opposites and symbols" + (wrongFacts.Count > 0 ? "; WRONG: " + string.Join("; ", wrongFacts) : "") + (byHand.Count > 0 ? "; read by hand: " + string.Join(" | ", byHand) : ""));
             // the flow: the list grows with the lessons; a round asks each of its questions once, the choices shuffled; right, wrong and the why
-            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.SkipPrologue(); f.Continue(); f.ChooseBirth("skip"); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); f.SeedPractice(7);
+            var f = new SliceFlow(() => 1); f.SetName("Davon"); f.SkipPrologue(); f.Continue(); TaurusSun(f); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); f.SeedPractice(7);
             Check(f.OpenJournal() && f.JournalLand() && f.CanJournalPractice && f.PracticeConcepts.Select(c => c.id).SequenceEqual(new[] { "elements" }) && f.OpenPractice() && f.JournalAt == JournalView.Practice && f.CanJournalHome && !f.CanJournalContents, "at Key 1 the Practice door opens the list: the Elements only; ‹ Your Journal leads back");
             Check(!f.StartQuiz(1) && f.StartQuiz(0) && f.JournalAt == JournalView.Quiz && f.OnQuiz && f.QuizCount == 6 && f.QuizCounter == "1 of 6" && f.CanQuizAnswer && !f.CanQuizNext && f.QuizFeedback == "", "a concept's row starts its round: question 1 of 6, waiting for a pick (no row past the list)");
             var save = UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true)); string Deck() => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
@@ -671,7 +673,7 @@ namespace Ascendant.Build
             f.QuizToPractice(); f.JournalToLanding(); f.CloseJournal();
             var grown = new List<int>(); f.MarkKey2(); grown.Add(f.PracticeConcepts.Count); f.MarkModalitiesComplete(); grown.Add(f.PracticeConcepts.Count); f.MarkKey3(); grown.Add(f.PracticeConcepts.Count); f.MarkKey4(); grown.Add(f.PracticeConcepts.Count);
             Check(grown.SequenceEqual(new[] { 2, 3, 4, 5 }) && f.PracticeConcepts.Select(c => c.id).SequenceEqual(ids), "the list grows as each lesson finishes: the Symbols at Key 2, the Modalities with their lesson, the Table at Key 3, the Opposites at Key 4 (" + string.Join(", ", grown) + ")");
-            var early = new SliceFlow(() => 1); early.SetName("Davon"); early.SkipPrologue(); early.Continue(); early.ChooseBirth("skip"); early.Continue(); early.Continue(); early.EnterWing(); early.EnterDial();
+            var early = new SliceFlow(() => 1); early.SetName("Davon"); early.SkipPrologue(); early.Continue(); TaurusSun(early); early.Continue(); early.Continue(); early.EnterWing(); early.EnterDial();
             Check(early.PracticeConcepts.Count == 0 && !early.CanJournalPractice, "before the first lesson finishes, nothing is listed and the door is unavailable");
             // the page: every line fits its place, at the fonts' own widths; every question ends above Close the journal
             var italic = Resources.Load<Font>(SliceView.ItalicFont); var bold = ButtonLook.EngravedFont; var probeObject = new GameObject("Practice probe", typeof(RectTransform)); var probe = probeObject.AddComponent<UnityEngine.UI.Text>(); probe.horizontalOverflow = HorizontalWrapMode.Overflow;
@@ -697,7 +699,7 @@ namespace Ascendant.Build
         {
             // ---- Build J (owner, Sept 23): Illumination plus Ribbons. Build AA (owner, Sept 30; Sept 26 notes 7 and 14): the Wheel index with a
             // Wheel / Table switch and tabs as each pattern is learned; a seat's preview, then its page, which links the signs sharing each fact ----
-            var f = new SliceFlow(() => 1); f.SkipPrologue(); f.Continue(); f.ChooseBirth("skip"); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, twelve element items entered
+            var f = new SliceFlow(() => 1); f.SkipPrologue(); f.Continue(); TaurusSun(f); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); // the Hub, twelve element items entered
             string DeckKey() => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
             string Facts(int seat) => string.Join(", ", f.SignFacts(seat).Select(x => x[0] + ": " + x[1]));
             Check(f.OpenJournal() && f.JournalAt == JournalView.Title && f.JournalLand() && f.JournalToContents() && f.OpenChapter("wheel") && f.JournalAt == JournalView.Wheel, "batch 2: the journal's first-ever open is the title page, then the landing; the Wheel is a chapter, reached through Contents");
@@ -944,10 +946,10 @@ namespace Ascendant.Build
         static void ValidateBuildF()
         {
             // ---- Build F: the practice fork on the Dial (Sept 15 ruling), the sitting rule (Sept 17), the three-strikes gate, the journal in the inventory ----
-            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.SkipPrologue(); f.Continue(); f.ChooseBirth("skip"); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; } // at the Hub, Stage 2, twelve element items entered
+            SliceFlow Fresh() { var f = new SliceFlow(() => 1); f.SkipPrologue(); f.Continue(); TaurusSun(f); f.Continue(); f.Continue(); f.EnterWing(); f.EnterDial(); f.RevealKey(); f.Continue(); f.Continue(); f.InsertKey(); f.End(); f.Continue(); return f; } // at the Hub, Stage 2, twelve element items entered
             string DeckKey(SliceFlow f) => string.Join("|", f.Deck.Items.Select(i => i.seat + ":" + i.kind + ":" + i.state + ":" + i.streak + ":" + i.interval + ":" + i.dueDay + ":" + i.entered));
             void AnswerAll(SliceFlow f) { int guard = 0; while (!f.PracticeDone && guard++ < 12) { var t = f.CurrentReview; if (t.Mode == ReviewMode.Tap) f.AnswerTap(Zodiac.Seats[t.seat].Element); else if (t.Mode == ReviewMode.TapModality) f.AnswerModalityTap(Zodiac.ModalityAt(t.seat)); else if (t.Mode == ReviewMode.Glyph) f.AnswerGlyph(t.seat); else f.FinishReview(true, true); } }
-            var first = new SliceFlow(() => 1); first.SkipPrologue(); first.Continue(); first.ChooseBirth("skip"); first.Continue(); first.Continue(); first.EnterWing(); first.EnterDial();
+            var first = new SliceFlow(() => 1); first.SkipPrologue(); first.Continue(); TaurusSun(first); first.Continue(); first.Continue(); first.EnterWing(); first.EnterDial();
             Check(first.Screen == SliceScreen.Wing && !first.PracticeAvailable && !first.CanEnterPractice && !first.CanOpenJournal, "on the first visit nothing has entered the deck: no fork, no journal");
             var lit = new DialLesson(() => 0); lit.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true);
             var midB = new DialLesson(() => 0); midB.RestoreProgress(1, Enumerable.Repeat(true, 12).ToArray(), Enumerable.Repeat(true, 12).ToArray(), true); midB.RestoreGlyphs(1, 3, false);
@@ -1096,7 +1098,7 @@ namespace Ascendant.Build
             deck.RecordReview(9,false,false,1);Check(deck.Items[9].interval==0 && deck.Items[9].streak==0 && deck.Items[9].dueDay==2,"a miss at the first interval stays at one sitting with streak floor zero");
             for(int n=0;n<6;n++)deck.RecordReview(2,true,true,n*30);Check(deck.Items[2].interval==4,"the ladder caps at 30 sittings");
             deck.RecordReview(3,true,false,1);Check(deck.Items[3].State==ItemState.Introduced && deck.Items[3].interval==0,"an assisted correct review neither advances nor sets back");
-            var loop=new SliceFlow(()=>1);loop.SkipPrologue();loop.Continue();loop.ChooseBirth("skip");loop.Continue();loop.Continue();loop.EnterWing();loop.EnterDial();loop.RevealKey();loop.Continue();loop.Continue();loop.InsertKey();loop.End();
+            var loop=new SliceFlow(()=>1);loop.SkipPrologue();loop.Continue();TaurusSun(loop);loop.Continue();loop.Continue();loop.EnterWing();loop.EnterDial();loop.RevealKey();loop.Continue();loop.Continue();loop.InsertKey();loop.End();
             Check(loop.Screen==SliceScreen.Chamber && loop.CanContinue && loop.Continue() && loop.Screen==SliceScreen.Hub && loop.AtriumStage==2 && loop.Deck.Items.Where(i=>i.Kind==ItemKind.Element).All(i=>i.entered),"after the ending, Continue reaches the Hub in Stage 2 and the deck opens");
             Check(loop.Sitting==0 && loop.DueCount==12 && loop.EnterWing() && loop.EnterDial() && loop.CanEnterPractice && loop.EnterPractice() && loop.Sitting==1 && loop.Screen==SliceScreen.Practice && loop.ReviewQueue.Count==ReviewDeck.BatchSize,"no in-game time: the first practice already has items ready; the entry is the first sitting and a batch of six begins");
             Check(loop.ReviewQueue[0].Mode==ReviewMode.Dial && loop.ReviewQueue[1].Mode==ReviewMode.Tap,"review alternates compressed Dial and direct tap");
@@ -1153,13 +1155,13 @@ namespace Ascendant.Build
             Check(!noEvidence.Key2Earned && noEvidence.Phase==LessonPhase.Paused && noEvidence.Keys==1,"twelve assisted placements pause cleanly without Key 2");
             var gd=new ReviewDeck();gd.IntroduceAll(0);gd.IntroduceAll(0,ItemKind.Glyph);Check(gd.Items.Length==60 && gd.Due(1).Count==24 && gd.Item(3,ItemKind.Glyph).Kind==ItemKind.Glyph && gd.Item(3,ItemKind.Modality).Kind==ItemKind.Modality && !gd.Item(3,ItemKind.Modality).entered && !gd.Item(3,ItemKind.Grid).entered,"the deck holds twelve element, glyph, modality, and grid items; the modality and grid items wait");
             gd.RecordLesson(4,true,0,ItemKind.Glyph);Check(gd.Item(4,ItemKind.Glyph).State==ItemState.Practicing && gd.Item(4,ItemKind.Element).State==ItemState.Introduced,"glyph evidence advances only the glyph item");
-            var gflow=new SliceFlow(()=>1);gflow.SkipPrologue();gflow.Continue();gflow.ChooseBirth("skip");gflow.Continue();gflow.Continue();gflow.EnterWing();gflow.EnterDial();gflow.RevealKey();gflow.Continue();gflow.Continue();gflow.InsertKey();gflow.End();gflow.Continue();
+            var gflow=new SliceFlow(()=>1);gflow.SkipPrologue();gflow.Continue();TaurusSun(gflow);gflow.Continue();gflow.Continue();gflow.EnterWing();gflow.EnterDial();gflow.RevealKey();gflow.Continue();gflow.Continue();gflow.InsertKey();gflow.End();gflow.Continue();
             gflow.MarkWheelComplete();gflow.EnterWing();gflow.LeaveWing();gflow.StartGlyphs();Check(gflow.GlyphsStarted && gflow.Deck.Due(gflow.Sitting).Count(i=>i.Kind==ItemKind.Glyph)==12,"starting the glyph unit introduces twelve glyph items");
             gflow.MarkKey2();gflow.EnterWing();gflow.LeaveWing();Check(gflow.Keys==2 && gflow.AtriumStage==3 && gflow.KeysInHand==1,"Key 2 earned: in hand, the Atrium waits for it to be spent (Build D)");
             Check(gflow.EnterChamber() && gflow.SpendKey() && gflow.LocksFilled==2 && gflow.LeaveChamber() && gflow.AtriumStage==4 && gflow.V03Complete,"spent in the Chamber, the return completes v0.3 at Stage 4");
             Check(gflow.EnterWing() && gflow.EnterDial() && gflow.EnterPractice() && gflow.ReviewQueue.Count==6 && gflow.ReviewQueue.All(t=>t.Mode!=ReviewMode.Glyph),"element items are due before glyph items in the practice order");
             var gsave=gflow.ToSave(new bool[12],new bool[12],true);var gres=new SliceFlow(()=>1);Check(gres.Restore(gsave) && gres.Keys==2 && gres.GlyphStage==2 && gres.V03Complete && gres.Deck.Item(0,ItemKind.Glyph).entered,"a save carries Keys, glyph stage, and glyph items");
-            var greview=new SliceFlow(()=>1);greview.SkipPrologue();greview.Continue();greview.ChooseBirth("skip");greview.Continue();greview.Continue();greview.EnterWing();greview.EnterDial();greview.RevealKey();greview.Continue();greview.Continue();greview.InsertKey();greview.End();greview.Continue();
+            var greview=new SliceFlow(()=>1);greview.SkipPrologue();greview.Continue();TaurusSun(greview);greview.Continue();greview.Continue();greview.EnterWing();greview.EnterDial();greview.RevealKey();greview.Continue();greview.Continue();greview.InsertKey();greview.End();greview.Continue();
             foreach(var it in greview.Deck.Items) if(it.Kind==ItemKind.Element){it.dueDay=99;} greview.StartGlyphs();
             Check(greview.EnterWing() && greview.EnterDial() && greview.EnterPractice() && greview.ReviewQueue.All(t=>t.Mode==ReviewMode.Glyph),"glyph items practice in the glyph form");
             var gt=greview.CurrentReview;var gopts=greview.GlyphReviewOptions(gt.seat);int wrongSeat=gopts.First(o=>o!=gt.seat);
@@ -1179,7 +1181,7 @@ namespace Ascendant.Build
             Check(walker.Jump() && walker.X==76 && walker.At=="caspar" && !walker.Walking,"reduced motion jumps to the point of interest");
             walker.CycleSpeed();Check(walker.SpeedName=="fast" && walker.Speed==Walker.FastSpeed,"the test speed toggle cycles normal to fast");walker.CycleSpeed();Check(walker.SpeedName=="slow","then slow");walker.CycleSpeed();Check(walker.SpeedName=="normal","then normal again");
             var wflow=new SliceFlow(()=>4);var wlog=new List<string>();wflow.Logged+=wlog.Add;
-            wflow.SkipPrologue(); wflow.Continue();wflow.ChooseBirth("skip");wflow.Continue();wflow.Continue();wflow.EnterWing();wflow.EnterDial();wflow.RevealKey();wflow.Continue();wflow.Continue();wflow.InsertKey();wflow.End();wflow.Continue();
+            wflow.SkipPrologue(); wflow.Continue();TaurusSun(wflow);wflow.Continue();wflow.Continue();wflow.EnterWing();wflow.EnterDial();wflow.RevealKey();wflow.Continue();wflow.Continue();wflow.InsertKey();wflow.End();wflow.Continue();
             Check(wflow.Screen==SliceScreen.Hub && wflow.Walk.Room==Room.Atrium && wflow.Walk.At=="entry","the Chamber ending leads to the Atrium with the marker where you came in");
             Check(wflow.TouchSealedDoor() && wflow.Note.StartsWith("Sealed") && wlog.Last()=="sealed_door_touched","a sealed door only says it is sealed");
             Check(wflow.ApproachCaspar() && wflow.Note.Contains("Caspar") && wlog.Last()=="caspar_approached","approaching Caspar logs the approach");
@@ -1224,7 +1226,7 @@ namespace Ascendant.Build
             Check(rampFlow.CleanRuns==1 && rampFlow.GlyphReviewOptions(5).Contains(Zodiac.Wrap(5+4)) && rampFlow.GlyphReviewOptions(5).Contains(5),"after a clean run the review names harden and still include the answer");
             var rampSave=rampFlow.ToSave(new bool[12],new bool[12],true);var rampBack=new SliceFlow(()=>1);rampSave.atriumStage=4;rampSave.sunSign=1;Check(rampBack.Restore(rampSave) && rampBack.CleanRuns==1,"the clean-run count survives a save");
             // ---- Sept 14 hotfix: the deck must survive the JSON save; Part B never starts on or beside the answer ----
-            var jflow=new SliceFlow(()=>1);jflow.SkipPrologue();jflow.Continue();jflow.ChooseBirth("skip");jflow.Continue();jflow.Continue();jflow.EnterWing();jflow.EnterDial();jflow.RevealKey();jflow.Continue();jflow.Continue();jflow.InsertKey();jflow.End();jflow.Continue();
+            var jflow=new SliceFlow(()=>1);jflow.SkipPrologue();jflow.Continue();TaurusSun(jflow);jflow.Continue();jflow.Continue();jflow.EnterWing();jflow.EnterDial();jflow.RevealKey();jflow.Continue();jflow.Continue();jflow.InsertKey();jflow.End();jflow.Continue();
             jflow.RecordLessonAnswer(5,true);var jsave=UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(jflow.ToSave(new bool[12],new bool[12],true)));var jback=new SliceFlow(()=>1);
             Check(jsave.deck!=null && jsave.deck.Length==60 && jback.Restore(jsave) && jback.DueCount==jflow.DueCount && jback.Deck.Practicing==1,"the review deck survives the JSON save and reload with its due count and practicing items");
             var starts=new DialLesson(()=>0);starts.RestoreProgress(1,Enumerable.Repeat(true,12).ToArray(),new bool[12],true);starts.BeginGlyphs();for(int i=0;i<12;i++)starts.AnswerGlyphName(starts.CurrentGlyph);
@@ -1242,7 +1244,7 @@ namespace Ascendant.Build
             for(int i=0;i<8 && !mod.ModalitiesComplete;i++){if(!mod.Dial.Active)break;mod.Dial.Select(Zodiac.Destination(mod.Dial.Start,3),DialInput.DirectSeat);var r=mod.Seal();mod.AfterCorrect(r);}
             Check(mod.ModalitiesComplete && mod.Phase==LessonPhase.ModalityComplete && mod.KinMod.All(v=>v) && !mod.Key2Earned==false && mod.Dial.Events.Count(e=>e.event_name=="modalities_completed")==1 && mod.Dial.Events.Count(e=>e.event_name.StartsWith("key"))==0,"three families of four complete the unit with no new Key");
             Check(mod.SeatLabel(4).Contains("fixed"),"lit modality seats say their kind to the screen reader");
-            var mflow=new SliceFlow(()=>1);mflow.SkipPrologue();mflow.Continue();mflow.ChooseBirth("skip");mflow.Continue();mflow.Continue();mflow.EnterWing();mflow.EnterDial();mflow.RevealKey();mflow.Continue();mflow.Continue();mflow.InsertKey();mflow.End();mflow.Continue();
+            var mflow=new SliceFlow(()=>1);mflow.SkipPrologue();mflow.Continue();TaurusSun(mflow);mflow.Continue();mflow.Continue();mflow.EnterWing();mflow.EnterDial();mflow.RevealKey();mflow.Continue();mflow.Continue();mflow.InsertKey();mflow.End();mflow.Continue();
             mflow.StartModalities();Check(mflow.ModalitiesStarted && mflow.Deck.Items.Count(i=>i.Kind==ItemKind.Modality && i.entered)==12 && mflow.DueCount>=12,"starting the unit introduces twelve modality items, ready at the next check");
             foreach(var it in mflow.Deck.Items) if(it.Kind!=ItemKind.Modality) it.dueDay=99;
             Check(mflow.EnterWing() && mflow.EnterDial() && mflow.EnterPractice() && mflow.ReviewQueue.All(t=>t.Mode==ReviewMode.DialModality||t.Mode==ReviewMode.TapModality),"modality items practice as a three-step Dial item or a which-kind tap");
@@ -1288,7 +1290,7 @@ namespace Ascendant.Build
             var fullBack=new GridModel(()=>0);fullBack.Restore(grid.Placed,true,true,true);Check(fullBack.Key3Earned && fullBack.Complete && fullBack.Phase==GridPhase.Complete && fullBack.Message==GridModel.FullLine,"a restored full table with Key 3 shows itself full");
             var half=new GridModel(()=>0);half.Restore(Enumerable.Range(0,12).Select(i=>i<5).ToArray(),true,true,false);
             Check(half.PlacedCount==5 && half.Evidence && half.Started && !half.Active && half.Begin() && half.Active && half.CanPick(5) && !half.CanPick(4) && half.Message.Contains("5 of twelve"),"a restored half table resumes with its seated signs");
-            var tflow=new SliceFlow(()=>1);tflow.SkipPrologue();tflow.Continue();tflow.ChooseBirth("skip");tflow.Continue();tflow.Continue();tflow.EnterWing();tflow.EnterDial();tflow.RevealKey();tflow.Continue();tflow.Continue();tflow.InsertKey();tflow.End();tflow.Continue();
+            var tflow=new SliceFlow(()=>1);tflow.SkipPrologue();tflow.Continue();TaurusSun(tflow);tflow.Continue();tflow.Continue();tflow.EnterWing();tflow.EnterDial();tflow.RevealKey();tflow.Continue();tflow.Continue();tflow.InsertKey();tflow.End();tflow.Continue();
             tflow.MarkWheelComplete();tflow.MarkKey2();
             Check(tflow.EnterWing() && !tflow.CanOpenGrid && !tflow.EnterGrid() && tflow.TouchDarkGrid() && tflow.Note=="grid-dark" && tflow.Screen==SliceScreen.WingRoom,"before the modality unit is complete the table is dark: a note, no screen");
             Check(tflow.EnterDial() && tflow.Note=="" && tflow.LeaveDial(),"entering the Dial clears the dark-object note");
@@ -1352,7 +1354,7 @@ namespace Ascendant.Build
             Check(halfPairs.BeginOpposites() && halfPairs.Phase==LessonPhase.OppositeOwn && halfPairs.Dial.Start==2 && halfPairs.PairsKnown==2 && halfPairs.PolarityShown && halfPairs.SeatLabel(4).Contains(", Yang"),"a restored half-known pattern resumes at the next pair with the sides shown");
             var mid=AfterKey3(1);mid.SetKey3(true);mid.RestoreOpposites(true,Enumerable.Repeat(true,6).ToArray(),true,2,true,false);
             Check(mid.BeginOpposites() && mid.Phase==LessonPhase.BuilderName && mid.Built==2 && mid.BuilderTarget==8,"a restored builder resumes at the third sign");
-            var cflow=new SliceFlow(()=>1);cflow.SkipPrologue();cflow.Continue();cflow.ChooseBirth("skip");cflow.Continue();cflow.Continue();cflow.EnterWing();cflow.EnterDial();cflow.RevealKey();cflow.Continue();cflow.Continue();cflow.InsertKey();cflow.End();cflow.Continue();
+            var cflow=new SliceFlow(()=>1);cflow.SkipPrologue();cflow.Continue();TaurusSun(cflow);cflow.Continue();cflow.Continue();cflow.EnterWing();cflow.EnterDial();cflow.RevealKey();cflow.Continue();cflow.Continue();cflow.InsertKey();cflow.End();cflow.Continue();
             cflow.MarkWheelComplete();cflow.MarkKey2();cflow.MarkModalitiesComplete();cflow.MarkKey3();
             cflow.StartOpposites();Check(cflow.OppositesStarted && cflow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite && i.entered)==6 && cflow.Deck.Items.Count(i=>i.Kind==ItemKind.Opposite)==12 && cflow.Deck.DueForReview(cflow.Sitting).All(i=>i.Kind!=ItemKind.Opposite) && !ReviewDeck.Reviewable(ItemKind.Opposite),"starting the last pattern introduces six opposite-pair items as data, never in a batch");
             cflow.RecordOppositeAnswer(7,true);Check(cflow.Deck.Item(1,ItemKind.Opposite).State==ItemState.Practicing && !cflow.Deck.Item(7,ItemKind.Opposite).entered,"a pair answer from either seat advances the pair's one item");
@@ -1363,7 +1365,7 @@ namespace Ascendant.Build
             Check(clesson.Key4Earned && clesson.Phase==LessonPhase.Key4 && !clesson.CanBeginOpposites && clesson.PolarityShown && clesson.PairsKnown==3,"and the lesson restores it with Key 4 held");
             // ---- Build D: the finished loop (Keys spent, the Books, the Atrium by Keys spent, the Wing whole) ----
             Check(Rooms.Visible(Room.Chamber).Count()==2 && Rooms.Visible(Room.Chamber).All(p=>p.Walkable) && Rooms.Find(Room.Chamber,"books").X==0 && Rooms.Find(Room.Chamber,"atrium-door").X==-140 && Rooms.Find(Room.Atrium,"chamber-door").Walkable && Rooms.Find(Room.Atrium,"sealed-right")==null,"the Chamber is a room with the doorway back and the Books; the Atrium's right door is its doorway");
-            var dflow=new SliceFlow(()=>1);var dlog=new List<string>();dflow.Logged+=dlog.Add;dflow.SkipPrologue();dflow.Continue();dflow.ChooseBirth("skip");dflow.Continue();dflow.Continue();dflow.EnterWing();dflow.EnterDial();dflow.RevealKey();dflow.Continue();dflow.Continue();dflow.InsertKey();dflow.End();dflow.Continue();
+            var dflow=new SliceFlow(()=>1);var dlog=new List<string>();dflow.Logged+=dlog.Add;dflow.SkipPrologue();dflow.Continue();TaurusSun(dflow);dflow.Continue();dflow.Continue();dflow.EnterWing();dflow.EnterDial();dflow.RevealKey();dflow.Continue();dflow.Continue();dflow.InsertKey();dflow.End();dflow.Continue();
             Check(dflow.LocksFilled==1 && dflow.KeysSpent==1 && dflow.KeysInHand==0 && dflow.BooksOpen==0 && dflow.CanEnterChamber && !dflow.CanSpend,"after the opening one lock is filled and no Key is in hand");
             Check(dflow.EnterChamber() && dflow.AtChamberRoom && dflow.Walk.Room==Room.Chamber && dflow.Walk.At=="atrium-door" && !dflow.SpendKey() && dflow.LocksFilled==1,"the Chamber opens as a room; nothing accepts a Key the player does not have");
             Check(dflow.LeaveChamber() && dflow.Screen==SliceScreen.Hub && dflow.AtriumStage==2 && dflow.Walk.At=="chamber-door","leaving the Chamber places the marker at its doorway; no stage without a Key spent");
