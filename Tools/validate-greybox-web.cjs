@@ -803,15 +803,15 @@ const path=require('path');
     check((await state()).gridPlaced===1 && events.some(e=>e.event_name==='grid_placed'&&e.evidence_eligible&&e.start_sign==='Aries'),'canvas taps seat Aries at Level 0 with evidence at '+viewport.width);
     await semantic('grid-sign-1');await semantic('grid-cell-'+CELL(8));await semantic('grid-seal'); // Taurus to Fire mutable: the row is wrong
     await page.waitForFunction(()=>window.ascendantDial.snapshot().gridHintLevel===1,{},{timeout:5000});
-    check((await state()).caspar==='Not that square, acolyte. Taurus is an Earth sign. Find the Earth row.' && (await state()).canGridAsk && (await state()).gridLocked && (await state()).gridCells[CELL(8)].endsWith('not that one'),'a wrong row nudges with the element, marks the cell, and offers Ask Caspar at '+viewport.width);
+    check((await state()).caspar==='Not that square, pupil. Taurus is an Earth sign. Find the Earth row.' && (await state()).canGridAsk && (await state()).gridLocked && (await state()).gridCells[CELL(8)].endsWith('not that one'),'a wrong row nudges with the element, marks the cell, and offers Ask Caspar at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-miss.png')});
     await semantic('grid-cell-'+CELL(1));await semantic('grid-seal');await settled();
     check((await state()).gridPlaced===2 && events.filter(e=>e.event_name==='grid_placed')[1].evidence_eligible,'the right cell after one nudge seats Taurus as Level 1 evidence at '+viewport.width);
     await semantic('grid-sign-2');await semantic('grid-cell-'+CELL(6));await semantic('grid-seal'); // Gemini to Air cardinal: the column is wrong
     await page.waitForFunction(()=>window.ascendantDial.snapshot().gridHintLevel===1,{},{timeout:5000});
-    check((await state()).caspar==='Not that square, acolyte. Gemini is mutable. Find the mutable column.','a wrong column nudges with the kind at '+viewport.width);
+    check((await state()).caspar==='Not that square, pupil. Gemini is mutable. Find the mutable column.','a wrong column nudges with the kind at '+viewport.width);
     await semantic('grid-ask');await page.waitForFunction(()=>window.ascendantDial.snapshot().gridHintLevel===2,{},{timeout:5000});
-    check((await state()).caspar.startsWith('Gemini is Air and it is mutable, acolyte.') && !(await state()).canGridAsk && events.some(e=>e.event_name==='hint_asked'&&e.requested_relationship==='cell_of_sign'),'Ask Caspar states the rule once at '+viewport.width);
+    check((await state()).caspar.startsWith('Gemini is Air and it is mutable, apprentice.') && !(await state()).canGridAsk && events.some(e=>e.event_name==='hint_asked'&&e.requested_relationship==='cell_of_sign'),'Ask Caspar states the rule once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-ask.png')});
     await semantic('grid-cell-'+CELL(2));await semantic('grid-seal');await settled();
     check((await state()).gridPlaced===3 && !events.filter(e=>e.event_name==='grid_placed')[2].evidence_eligible,'a seating after asking earns no evidence at '+viewport.width);

@@ -553,7 +553,7 @@ namespace Ascendant.CelestialDial
         public bool TouchSealedDoor()
         {
             if (!AtHub) return false;
-            Note = "Sealed. Gather more Keys, acolyte, and perhaps the door shall stir and reveal what lies beyond."; Logged?.Invoke("sealed_door_touched"); return true; // owner (worksheet section 6)
+            Note = "Sealed. Gather more Keys, seeker, and perhaps the door shall stir and reveal what lies beyond."; Logged?.Invoke("sealed_door_touched"); return true; // owner (worksheet section 6)
         }
         public bool ApproachCaspar()
         {
@@ -882,7 +882,7 @@ namespace Ascendant.CelestialDial
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
-            Note = "Not that one, acolyte. Look again and try once more."; return false; // owner (worksheet section 2)
+            Note = "Not that one, apprentice. Look again and try once more."; return false; // owner (worksheet section 2)
         }
         public bool AnswerModalityTap(string modality)
         {
@@ -891,7 +891,7 @@ namespace Ascendant.CelestialDial
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
-            Note = "Not that one, acolyte. Look again and try once more."; return false; // owner (worksheet section 2)
+            Note = "Not that one, apprentice. Look again and try once more."; return false; // owner (worksheet section 2)
         }
         public bool AnswerTap(string element)
         {
@@ -900,7 +900,7 @@ namespace Ascendant.CelestialDial
             if (correct) { FinishReview(true, task.misses == 0); return true; }
             task.misses++; RecordStrike();
             if (task.misses >= 2) { FinishReview(false, false); return false; }
-            Note = "Not that one, acolyte. Look again and try once more."; return false; // owner (worksheet section 2)
+            Note = "Not that one, apprentice. Look again and try once more."; return false; // owner (worksheet section 2)
         }
         public void FinishReview(bool correct, bool eligible)
         {

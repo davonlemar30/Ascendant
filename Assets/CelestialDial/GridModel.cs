@@ -56,23 +56,23 @@ namespace Ascendant.CelestialDial
         public int DemonstrationCell => Sign >= 0 ? CellOf(Sign) : -1;
 
         // Placeholder lines (owner writes; worksheet section 11).
-        public const string IntroLine = "Four elements and three modalities, acolyte. Every sign belongs to exactly one square upon this table and no other.\nTap a sign, then the square where it belongs, then press Seal."; // owner (worksheet section 11)
+        public const string IntroLine = "Four elements and three modalities, seeker. Every sign belongs to exactly one square upon this table and no other.\nTap a sign, then the square where it belongs, then press Seal."; // owner (worksheet section 11)
         public const string ClearLine = "The table is clear again. This time, find their places yourself.\nTap a sign, then the square where it belongs, then press Seal.";
-        public const string FullLine = "The table is full, acolyte. Every sign rests where it belongs."; // owner (worksheet section 11)
-        public const string DarkLine = "The table is dark and bare, acolyte. It will not wake until the wheel has shown you more. Return to the Dial."; // owner (worksheet section 11)
-        public const string PausedLine = "That is enough of the table for now, acolyte.\nRest, and we shall continue where you left off when you return."; // owner (worksheet section 11)
+        public const string FullLine = "The table is full, initiate. Every sign rests where it belongs."; // owner (worksheet section 11)
+        public const string DarkLine = "The table is dark and bare, seeker. It will not wake until the wheel has shown you more. Return to the Dial."; // owner (worksheet section 11)
+        public const string PausedLine = "That is enough of the table for now, initiate.\nRest, and we shall continue where you left off when you return."; // owner (worksheet section 11)
         public const string NoEvidenceLine = "Twelve placed, but I did most of the placing.\nRest. We will clear the table and try again when you return.";
-        public const string Key3Line = "The table is whole, acolyte. Twelve signs, each one at the crossing of its element and its modality, and not one out of place. That is no small thing.\nThe Library stirs again, and a third Key answers to you now. Take it, Keeper Key 3 is yours."; // owner (worksheet section 11)
+        public const string Key3Line = "The table is whole, seeker. Twelve signs, each one at the crossing of its element and its modality, and not one out of place. That is no small thing.\nThe Library stirs again, and a third Key answers to you now. Take it, Keeper Key 3 is yours."; // owner (worksheet section 11)
         static string SignName(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Name;
         static string Element(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Element;
         static string Kind(int seat) => Zodiac.ModalityAt(seat).ToLowerInvariant();
         static string Article(string element) => Zodiac.Article(element);
         // Level 2 (the brief's rule): "[Sign] is [element]; it is [modality]."
-        public static string Rule(int seat) => SignName(seat) + " is " + Element(seat) + " and it is " + Kind(seat) + ", acolyte."; // owner (worksheet section 11)
+        public static string Rule(int seat) => SignName(seat) + " is " + Element(seat) + " and it is " + Kind(seat) + ", apprentice."; // owner (worksheet section 11)
         // Level 1 names one of the two: the element when the row was wrong, otherwise the kind.
         public static string Nudge(int seat, int wrongCell) => wrongCell / Columns != RowOf(seat)
-            ? "Not that square, acolyte. " + SignName(seat) + " is " + Article(Element(seat)) + " " + Element(seat) + " sign. Find the " + Element(seat) + " row."
-            : "Not that square, acolyte. " + SignName(seat) + " is " + Kind(seat) + ". Find the " + Kind(seat) + " column."; // owner (worksheet section 11)
+            ? "Not that square, pupil. " + SignName(seat) + " is " + Article(Element(seat)) + " " + Element(seat) + " sign. Find the " + Element(seat) + " row."
+            : "Not that square, pupil. " + SignName(seat) + " is " + Kind(seat) + ". Find the " + Kind(seat) + " column."; // owner (worksheet section 11)
         public string Readout => !Active ? "" : Sign < 0 ? "Select a sign, then its square, then Seal." : Cell < 0 ? "In hand: " + SignName(Sign)
             : "Placing " + SignName(Sign) + " at " + RowName(Cell / Columns) + ", " + ColumnName(Cell % Columns).ToLowerInvariant() + ". Press Seal."; // owner (worksheet section 11)
 
@@ -85,7 +85,7 @@ namespace Ascendant.CelestialDial
             Sign = Cell = Rejected = -1; Attempts = HintLevel = 0; Asked = false;
             if (cleared) { for (int i = 0; i < 12; i++) { Placed[i] = false; Assisted[i] = false; } Evidence = false; }
             Phase = GridPhase.Open;
-            Message = first ? IntroLine : cleared ? ClearLine : "The table remembers your progress, acolyte. " + PlacedCount + " of twelve placed.\nTap a sign, then its square, then press Seal."; // owner (worksheet section 11)
+            Message = first ? IntroLine : cleared ? ClearLine : "The table remembers your progress, initiate. " + PlacedCount + " of twelve placed.\nTap a sign, then its square, then press Seal."; // owner (worksheet section 11)
             Log(first ? "grid_unit_started" : cleared ? "grid_cleared" : "grid_resumed", false, false, "automatic");
             return true;
         }
@@ -118,7 +118,7 @@ namespace Ascendant.CelestialDial
             int wrong = Cell; Rejected = wrong; Cell = -1;
             if (Attempts == 1) { HintLevel = 1; Message = Nudge(Sign, wrong); }
             else if (Attempts == 2 && !Asked) { HintLevel = 2; Message = Rule(Sign) + "\nFind the square where those two meet, then press Seal."; } // owner (worksheet section 11)
-            else { HintLevel = 3; Demonstrating = true; Message = "Watch me place it, acolyte.\n" + SignName(Sign) + " is " + Element(Sign) + " and " + Kind(Sign) + "."; } // a miss after the asked rule is the third step (owner wording, section 11)
+            else { HintLevel = 3; Demonstrating = true; Message = "Watch me place it, apprentice.\n" + SignName(Sign) + " is " + Element(Sign) + " and " + Kind(Sign) + "."; } // a miss after the asked rule is the third step (owner wording, section 11)
             Log("hint_escalated");
             return result;
         }
@@ -147,7 +147,7 @@ namespace Ascendant.CelestialDial
         {
             Placed[seat] = true; Assisted[seat] = !evidence; if (evidence) Evidence = true;
             Cell = CellOf(seat); Rejected = -1; // the event names the cell the sign went to, whoever seated it
-            Message = "Yes, " + SignName(seat) + " belongs to " + Element(seat) + ", " + Kind(seat) + ".\n" + (evidence ? "You found its place on your own, acolyte." : "We found its place together."); // owner (worksheet section 11)
+            Message = "Yes, " + SignName(seat) + " belongs to " + Element(seat) + ", " + Kind(seat) + ".\n" + (evidence ? "You found its place on your own, pupil." : "We found its place together."); // owner (worksheet section 11)
             Log("grid_placed", true, evidence);
             Sign = Cell = Rejected = -1; Attempts = HintLevel = 0; Asked = false;
             if (Complete) Finish();
