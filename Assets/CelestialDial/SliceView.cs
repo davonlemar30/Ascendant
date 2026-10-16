@@ -215,7 +215,7 @@ namespace Ascendant.CelestialDial
             Settings = gameObject.AddComponent<SettingsMenu>();
             Settings.Muted = () => Sound.Muted; Settings.Reduced = () => ReducedMotion; Settings.WalkSpeed = () => Flow.Walk.SpeedName;
             Settings.WakeLabel = () => WakeLabel; Settings.CycleWake = CycleWake; // the Dial's wake-up preview
-            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = JumpTo; Settings.CuspDay = CuspDay; Settings.BirthOpening = BirthOpening;
+            Settings.ToggleSound = ToggleMute; Settings.ToggleMotion = () => Dial.WebAction("motion"); Settings.CycleWalk = CycleWalkSpeed; Settings.StartOver = Restart; Settings.Changed = Publish; Settings.Jump = id => JumpTo(id); Settings.EraDemo = JumpToEra; Settings.CuspDay = CuspDay; Settings.BirthOpening = BirthOpening;
             Settings.MainMenu = MainMenu; Settings.MainMenuConfirmed = MainMenuConfirmed; Settings.InGame = () => !Flow.AtLaunch && !Flow.AtMenu; // the launch (owner, Oct 9): Main menu, and the panel on the menu without the in-game rows
             Settings.Build(font);
             SafeArea.FitAndroidText(transform, font); // Platform fit, Part 1: on Android a line that no longer fits its box shrinks up to two points
@@ -236,8 +236,10 @@ namespace Ascendant.CelestialDial
             }
             else if (goMenu) Flow.OpenMenu();
             else if (Flow.BeginLaunch()) StartLaunch();
+            bool openEra = eraNext && goIn; eraNext = false; // DEV Mode's era demo opens over the save it just wrote
             Show(); Publish();
             if (fadeIn) { fadeImage.color = Color.black; fadeImage.raycastTarget = true; StartCoroutine(FadeIn()); } // the menu's fade into the game, or back to the menu, ends on this side
+            if (openEra) OpenEraDemo();
         }
         IEnumerator FadeIn() { busy = true; Publish(); yield return FadeTo(0); busy = false; Publish(); } // the busy guard holds while the screen comes up out of the dark
         void Update()
@@ -725,6 +727,7 @@ namespace Ascendant.CelestialDial
         // ---- actions (all input paths, including the Web bridge, arrive here) ----
         public void WebAction(string command)
         {
+            if (Era != null && command != "relaunch" && command != "reload" && command != "walk-speed" && !command.StartsWith("jump")) { EraAction(command); return; } // the era demo owns the page: the hidden slice takes no web actions (Jeffrey, #150 B1)
             if (command == "mute") { ToggleMute(); return; }
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
             if (styleShown && command != "reload" && command != "relaunch") return; // the style page is not the game (a reload, test-only, still gets out of it)
@@ -785,6 +788,7 @@ namespace Ascendant.CelestialDial
             else if (command == "walk-speed") { CycleWalkSpeed(); Settings.Refresh(); }
             else if (command == "settings") Settings.Toggle(); // Build U: the gear
             else if (command.StartsWith("jump:")) JumpTo(command.Substring(5)); // Build W: DEV Mode
+            else if (command == "era-demo") JumpToEra(); // the era demo (86bcg8az2)
             else if (command == "leave-wing") LeaveWing();
             else if (command == "leave-dial") LeaveDial(); // note 10
             else if (command == "continue-lesson") ContinueLesson(); // Build F
@@ -994,16 +998,50 @@ namespace Ascendant.CelestialDial
         string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, acolyte. Bring them to the Books." : "You hold a Key, acolyte. " + ChamberBringLine); // owner (worksheet section 13)
         void Restart() { if (busy) return; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); } // the slot in play (slot 1 if none), straight in, past the logo, the movie and the menu (owner, Oct 9)
         // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
-        void JumpTo(string id)
+        bool JumpTo(string id)
         {
-            if (busy || !DevCheckpoints.Known(id)) return;
+            if (busy || !DevCheckpoints.Known(id)) return false;
             SaveData save;
             try { save = DevCheckpoints.Play(id, Flow.PlayerName, Flow.HasBirthRecord ? Flow.LessonSun : 1); }
-            catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return; }
+            catch (Exception e) { Debug.LogWarning("[CelestialDial] " + e.Message); return false; }
             if (Flow.HasBirthRecord) Flow.WriteBirth(save); // Oct 7: the jump keeps the player's birth record; the London sample only stands in when there is none
             SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(save)); // the slot in play (slot 1 if none), straight in (owner, Oct 9)
             Debug.Log("[CelestialDial] jumped to checkpoint " + id);
-            Reload(true);
+            Reload(true); return true;
+        }
+        // The walkable-era demo (task 86bcg8az2; owner, Oct 9, on its own branch): DEV Mode writes the Wing-whole save (the first trip comes after
+        // the Library's first rooms) and reloads into it, then the demo opens over the Atrium. Its door home reloads into that save.
+        static bool eraNext;
+        public EraDemo.EraDemoView Era { get; private set; }
+        void JumpToEra() { if (busy) return; eraNext = true; if (!JumpTo("whole")) eraNext = false; }
+        void EraAction(string command)
+        {
+            if (command.StartsWith("era-goto:")) Era.GoTo(command.Substring(9));
+            else if (command == "era-next") Era.Next();
+            else if (command.StartsWith("era-choose:") && int.TryParse(command.Substring(11), out int choice)) Era.Choose(choice);
+            else if (command == "mute") ToggleMute();
+            Publish();
+        }
+        // The web state while the demo shows: every slice control reports unavailable (its can* flags off, no points, no Travel), and the demo's own
+        // controls take their place: a row per person and the way back, Continue, and a line's choices.
+        void EraState(DialView.WebState state)
+        {
+            foreach (var f in typeof(DialView.WebState).GetFields()) if (f.FieldType == typeof(bool) && (f.Name.StartsWith("can") || f.Name == "active" || f.Name == "travelShown" || f.Name == "travelOpen")) f.SetValue(state, false);
+            state.pois = new string[0]; state.poiLabels = new string[0];
+            state.screen = "era"; state.note = "";
+            var era = Era; var line = era.Talk.Current;
+            state.eraPoints = era.Map.Points.OrderBy(p => p.Portal ? 1 : 0).Select(p => p.Id).ToArray(); state.eraLabels = era.Map.Points.OrderBy(p => p.Portal ? 1 : 0).Select(p => p.Label).ToArray();
+            state.eraTalking = era.Talk.Open; state.eraSpeaker = era.Speaker; state.eraLine = line != null ? line.Text : ""; state.eraChoices = line != null ? line.Choices : new string[0];
+            state.canEraWalk = !era.Talk.Open && !era.Leaving; state.canEraNext = era.Talk.Open && !era.Talk.Waiting; state.eraAt = era.Walker.At.ToString(); state.eraWalking = era.Walker.Walking; state.eraTarget = era.Walker.TargetId; state.eraPlacesOpen = era.PlacesOpen; state.eraNextBox = era.NextBox; state.eraChoiceBox = era.ChoiceBox;
+            state.caspar = line != null ? era.Speaker + ": " + line.Text : "The era demo, a greybox.";
+        }
+        void OpenEraDemo()
+        {
+            foreach (var c in GetComponentsInChildren<Canvas>(true)) if (c.gameObject.name != "Settings Canvas" && c.gameObject.name != "White light") c.enabled = false; // the slice hides; Settings stays on top
+            if (Camera.main != null) Camera.main.enabled = false; // the demo's camera draws the map
+            Era = new GameObject("Era demo").AddComponent<EraDemo.EraDemoView>(); Era.transform.SetParent(transform, false);
+            Era.Reduced = () => ReducedMotion; Era.Speed = () => Flow.Walk.Speed; Era.Home = () => Reload(true, false, true); Era.Changed = Publish;
+            Era.Build(font); Settings.Close(); Publish();
         }
         // Q06 phase 2, decision 5: the buttons and the taps do the same thing through the same walk.
         void EnterWing() { Walk("wing-door"); }
@@ -1836,6 +1874,7 @@ namespace Ascendant.CelestialDial
                     && gridCellGlyphs[i].GetComponent<Outline>().enabled && gridCellNames[i].GetComponent<Outline>().enabled).ToArray(); // symbol and name alive, both edged
                 state.canGridPick = Grid.Active && !busy; state.canGridSeal = Grid.CanSeal && !busy; state.canGridAsk = Grid.CanAsk && !busy; state.canLeaveGrid = !busy;
             }
+            if (Era != null) EraState(state); // the era demo owns the page while it shows (Jeffrey, #150 B1)
         }
 
         // ---- Build H: the light overlays. A file in a room's light slot is drawn over the background and under everything else; without one nothing exists. ----

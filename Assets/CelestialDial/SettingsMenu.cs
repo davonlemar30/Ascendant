@@ -19,6 +19,8 @@ namespace Ascendant.CelestialDial
         public Action CuspDay; // batch 2: DEV Mode's cusp-day sample (owner, Oct 2 evening): a fresh opening at the cusp question
         public Action<string> BirthOpening; // Oct 7 (86bced0tc): a fresh opening at each other path's first question: skip, no-time, no-place, neither
         public Func<string> WakeLabel; public Action CycleWake; // the Dial's wake-up (86bcbn6w6): DEV Mode previews each step
+        public Action EraDemo; // the walkable-era demo (task 86bcg8az2; owner, Oct 9): a greybox map over the Wing-whole save, on its own branch
+        public const string EraDemoWords = "The era demo (greybox)";
         // the launch (owner, Oct 9, 86bcg62x3, round 3): a Main menu row in the player's section, above Testing; before Key 1 it asks first (Ask).
         // On the menu the panel leaves out the in-game rows, Start over and Main menu (InGame false).
         public Action MainMenu, MainMenuConfirmed; public Func<bool> InGame;
@@ -66,7 +68,7 @@ namespace Ascendant.CelestialDial
             var over = Row(panel, y, () => StartOver?.Invoke(), 40); over.text = "Start over"; overRow = RowOf(over);
             var close = Row(panel, y, Close); close.text = "Close"; close.color = Gold; closeRow = RowOf(close);
             // Build W: the checkpoint list, in place of the main box while it shows.
-            float jumpHeight = 62 + DevCheckpoints.All.Length * 46 + 46 * (1 + BirthSamples.Length) + 56 + 24 + 22; // the checkpoints, the opening's samples (the cusp day first), then the Dial's wake-up preview
+            float jumpHeight = 62 + DevCheckpoints.All.Length * 46 + 46 * (1 + BirthSamples.Length) + 56 + 24 + 22 + 46; // the checkpoints, the opening's samples (the cusp day first), the Dial's wake-up preview, then the era demo
             jumpPanel = Rect("Jump to box", menu, 0, 400, 280, jumpHeight);
             var jumpImage = jumpPanel.gameObject.AddComponent<Image>(); jumpImage.sprite = Slots.InstrumentBoxSprite(); jumpImage.type = Image.Type.Sliced; jumpImage.pixelsPerUnitMultiplier = 2;
             jumpPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
@@ -76,6 +78,7 @@ namespace Ascendant.CelestialDial
             var cusp = Row(jumpPanel, jy, () => CuspDay?.Invoke(), 40); cusp.text = "A cusp day (the opening)"; cusp.transform.parent.name = "Jump cusp"; jy += 46; // the cusp-day sample (owner, Oct 2 evening): the opening's question
             foreach (var (id, label) in BirthSamples) { string sample = id; var row = Row(jumpPanel, jy, () => BirthOpening?.Invoke(sample), 40); row.text = label; row.transform.parent.name = "Jump birth " + id; jy += 46; } // Oct 7: each path's first question
             wakeRow = Row(jumpPanel, jy, () => CycleWake?.Invoke(), 40); wakeRow.transform.parent.name = "Dial wake"; jy += 46; // DEV Mode: a tap steps the Dial's look (first visit, Key 1 to Key 4), then back to as earned
+            var era = Row(jumpPanel, jy, () => EraDemo?.Invoke(), 40); era.text = EraDemoWords; era.transform.parent.name = "Jump era demo"; jy += 46;
             var back = Row(jumpPanel, jy + 10, ShowMain); back.text = "Back"; back.color = Gold;
             jumpPanel.gameObject.SetActive(false);
             // the launch (Oct 9): Main menu's question before Key 1, in place of the main box (as Jump to's list): the line, Main menu, Back
