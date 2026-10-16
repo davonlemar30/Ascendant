@@ -118,7 +118,7 @@ namespace Ascendant.CelestialDial
         // read from them; the flat fields below are still written as copies, so an older build can open the save, and read only to convert
         // a version 4 save once.
         public BirthFacts birth = new BirthFacts();
-        public BirthFacts filled = new BirthFacts();   // the pieces drawn at random (86bcg8nft); an older save has none
+        public BirthFacts filled = new BirthFacts();   // the default chart's pieces standing in for blank ones (owner, Oct 15, 86bcg8nft; they were drawn at random before); an older save has none
         public ChoiceRecord[] choices = new ChoiceRecord[0];
         public WorkedChart chart = new WorkedChart();
         // batch 2 (owner, Oct 2 evening: the Big Three approved): the chart fixed at the opening, and the birth data it came from

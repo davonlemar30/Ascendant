@@ -266,7 +266,7 @@ namespace Ascendant.CelestialDial
         static double Jd(DateTime ut) => Sky.JulianDay(ut.Year, ut.Month, ut.Day, ut.Hour + ut.Minute / 60.0 + ut.Second / 3600.0);
         static double SunAt(long minute) { var ut = Places.UtOf(minute); return Sky.SunLongitude(Sky.Ephemeris(Jd(ut), ut.Year, ut.Month)); }
         static double MoonAt(long minute) { var ut = Places.UtOf(minute); return Sky.MoonLongitude(Sky.Ephemeris(Jd(ut), ut.Year, ut.Month)); }
-        // The birth-time build (owner, Oct 7): the chart from the facts, whatever is known (SliceFlow fills a missing piece at random first, 86bcg8nft). Here nothing is invented: with one
+        // The birth-time build (owner, Oct 7): the chart from the facts, whatever is known (SliceFlow overlays the default chart's piece for any blank one first, owner Oct 15, 86bcg8nft). Here nothing is invented: with one
         // missing it works across every UT minute the birth could have been, and keeps only what holds across all of them. No date, nothing
         // worked out. With no time, the window is the whole local day; with no place, that local time in every zone of the bundled table.
         // The sun and the moon only move one way, so the signs between the window's ends are every sign they could be in (sampled every hour
