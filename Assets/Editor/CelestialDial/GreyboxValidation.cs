@@ -514,9 +514,9 @@ namespace Ascendant.Build
         {
             // ---- the living inscription (owner, Oct 7: approved as scoped, all drafts, 86bcbn6w6 comment 90140263883109; the absence line counts
             // sittings, no clock, comment 90140265375051; task 86bceba0a) ----
-            var lines = InscriptionBook.Data.lines; string[] groups = { "any", "key", "wing", "absence", "sun" }; int[] counts = { 8, 4, 3, 3, 6 };
-            Check(lines.Length == 24 && lines.Select(l => l.id).Distinct().Count() == 24 && lines.All(l => l.draft && l.id != SliceFlow.FirstLineId && l.text != "") && Enumerable.Range(0, groups.Length).All(i => lines.Count(l => l.group == groups[i]) == counts[i]),
-                "the inscription's 24 lines live in data (Resources/Journal/inscriptions.json), each with a stable id and marked a draft: 8 any time, 4 after the first Key, 3 once the Wing is whole, 3 for an absence, 6 on the sun");
+            var lines = InscriptionBook.Data.lines; string[] groups = { "any", "key", "wing", "absence", "sun" }; int[] counts = { 8, 3, 3, 3, 6 };
+            Check(lines.Length == 23 && lines.Select(l => l.id).Distinct().Count() == 23 && lines.All(l => l.draft && l.id != SliceFlow.FirstLineId && l.text != "") && Enumerable.Range(0, groups.Length).All(i => lines.Count(l => l.group == groups[i]) == counts[i]),
+                "the inscription's 23 lines live in data (Resources/Journal/inscriptions.json), each with a stable id and marked a draft: 8 any time,  3 after the first Key, 3 once the Wing is whole, 3 for an absence, 6 on the sun");
             Check(lines.Where(l => l.group == "key").All(l => l.unlock == "key1") && lines.Where(l => l.group == "wing").All(l => l.unlock == "wing") && lines.Where(l => l.group == "any" || l.group == "absence").All(l => l.unlock == "")
                 && lines.Where(l => l.group == "sun").Select(l => l.unlock).OrderBy(u => u).SequenceEqual(new[] { "", "key1", "key2", "key3", "key4", "modalities" }.OrderBy(u => u)),
                 "each group opens with its lesson: the Key lines at Key 1, the Wing's once it is whole; the sun lines with the Elements, the Symbols, the Modalities, the Table and the Opposites, and one any time (Practice's order)");
