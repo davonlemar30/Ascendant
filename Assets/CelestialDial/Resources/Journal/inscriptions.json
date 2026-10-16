@@ -10,7 +10,6 @@
   { "id": "any-its-you", "group": "any", "unlock": "", "draft": true, "text": "Oh, good, it's you. I can always tell by the way you turn my pages." },
   { "id": "any-read-twice", "group": "any", "unlock": "", "draft": true, "text": "I've read every one of my pages twice since you were last here. They're very good." },
   { "id": "key-a-page-or-two", "group": "key", "unlock": "key1", "draft": true, "text": "You earn a Key, I gain a page or two. I'm not complaining." },
-  { "id": "key-best-hand", "group": "key", "unlock": "key1", "draft": true, "text": "I wrote your Keys down in my best hand. My ink is quietly proud of you." },
   { "id": "key-a-door-opened", "group": "key", "unlock": "key1", "draft": true, "text": "A door opened because of you. I wrote down which one, in case you forget." },
   { "id": "key-answers-to-you", "group": "key", "unlock": "key1", "draft": true, "text": "The Library answers to you now, a little more with every Key. I've been keeping notes." },
   { "id": "wing-still-come", "group": "wing", "unlock": "wing", "draft": true, "text": "The Zodiac Wing is whole, and you still come to see me. I'm flattered, {name}." },

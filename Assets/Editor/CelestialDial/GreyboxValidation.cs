@@ -483,11 +483,10 @@ namespace Ascendant.Build
             Check(f.CloseJournal() && f.OpenJournal() && f.JournalAt == JournalView.Wheel && f.JournalSelected == 0 && f.JournalToContents() && f.CloseJournal() && f.OpenJournal() && f.JournalAt == JournalView.Contents && f.CloseJournal(), "1b C: later in the same session the journal opens where it was left");
             Check(SliceFlow.Inscription("Davon") == "What's up, Davon. I'm your journal, and I'll keep a record of what you learn from the Library." && SliceFlow.Inscription(f.DisplayName) == SliceFlow.Inscription("Davon"), "the inscription is the owner's line word for word (Oct 2 evening), the saved name in its slot");
             Check(string.Join(" ", SliceFlow.InscriptionBreaks) == SliceFlow.InscriptionRest, "the inscription's own line breaks keep its words exactly: \"" + string.Join("\" / \"", SliceFlow.InscriptionBreaks) + "\"");
-            Check(f.KeysLine == "1 Key", "the Keeper's record counts the Keys collected: 1 Key, and no Book until one opens");
             var save = UnityEngine.JsonUtility.FromJson<SaveData>(UnityEngine.JsonUtility.ToJson(f.ToSave(new bool[12], new bool[12], true))); var next = new SliceFlow(() => 1);
             Check(save.journalTitled && next.Restore(save) && next.JournalTitled && next.OpenJournal() && next.JournalAt == JournalView.Landing && next.CloseJournal(), "a new session from the save: the first open is the landing; the title page never shows again");
             save.journalTitled = false; save.keys = 4; save.locksFilled = 3; var older = new SliceFlow(() => 1);
-            Check(older.Restore(save) && older.OpenJournal() && older.JournalAt == JournalView.Title && older.KeysLine == "4 Keys · 1 Book", "a save from before this build shows the title page once; four Keys with Book 1's three locks filled read 4 Keys · 1 Book");
+            Check(older.Restore(save) && older.OpenJournal() && older.JournalAt == JournalView.Title, "a save from before this build shows the title page once");
             // the fonts (owner, Oct 2 evening: "Claude sources them", open licenses only)
             var italic = Resources.Load<Font>(SliceView.ItalicFont); var sun = Resources.Load<Font>(SliceView.SunFont); var bold = ButtonLook.EngravedFont;
             var notoLicense = Resources.Load<TextAsset>("Fonts/OFL-NotoSansSymbols2"); var garamondLicense = Resources.Load<TextAsset>("Fonts/OFL-EBGaramond");
@@ -500,17 +499,17 @@ namespace Ascendant.Build
             var files = new[] { "journal-door-frame", "journal-emblem-practice", "journal-emblem-contents", "journal-emblem-wheel", "journal-emblem-map", "journal-emblem-lock", "journal-flourish", "journal-library-plan" }; int[] scale = { 2, 3, 3, 3, 3, 3, 3, 2 };
             Check(Enumerable.Range(0, files.Length).All(i => Resources.Load<Sprite>("Art/" + files[i]) is Sprite a && Slots.Find(files[i]) is Slots.ArtSlot slot && (int)a.rect.width == slot.Width * scale[i] && (int)a.rect.height == slot.Height * scale[i]), "the landing's, Contents' and the Library Map's eight files are in: the door frame and the plan at 2x their boxes, the emblems and the flourish at 3x");
             // the layout (the 360 x 800 frame): the links' targets, the Wheel's switch and tabs, and the doors with room for the Big Three's line to come
-            float linkBottom = SliceView.LinkBaseline - .3545f * 14 + ButtonLook.MinTarget / 2, closing = SliceView.KeeperFirst + SliceView.KeeperRule * 7, lastDoor = closing + SliceView.DoorBelow + SliceView.DoorStep + SliceView.DoorHeight;
+            float linkBottom = SliceView.LinkBaseline - .3545f * 14 + ButtonLook.MinTarget / 2, closing = SliceView.KeeperFirst + SliceView.KeeperRule * 6, lastDoor = closing + SliceView.DoorBelow + SliceView.DoorStep + SliceView.DoorHeight;
             Check(linkBottom <= SliceView.SwitchY - 12 && SliceView.SwitchY + 12 <= SliceView.TabsY - 11 && SliceView.TabsY + 11 <= SliceView.WheelTop - SliceView.WheelSize / 2, "the links' 44 px target ends above the Wheel / Table switch, the switch above the tabs, the tabs above the wheel");
-            Check(lastDoor <= SliceView.JournalCloseY - 24 - 8 && lastDoor <= SliceView.PageOrnamentTop, "with KEEPER, the Keys, the Big Three and three lines of inscription, the Contents door ends at " + lastDoor + ", clear of the page's lower ornaments and of Close the journal");
+            Check(lastDoor <= SliceView.JournalCloseY - 24 - 8 && lastDoor <= SliceView.PageOrnamentTop, "with KEEPER, the Big Three and three lines of inscription (no Keys line since Oct 11, 86bcgfkdy), the Contents door ends at " + lastDoor + ", clear of the page's lower ornaments and of Close the journal");
         }
         static void ValidateInscription()
         {
             // ---- the living inscription (owner, Oct 7: approved as scoped, all drafts, 86bcbn6w6 comment 90140263883109; the absence line counts
             // sittings, no clock, comment 90140265375051; task 86bceba0a) ----
-            var lines = InscriptionBook.Data.lines; string[] groups = { "any", "key", "wing", "absence", "sun" }; int[] counts = { 8, 4, 3, 3, 6 };
-            Check(lines.Length == 24 && lines.Select(l => l.id).Distinct().Count() == 24 && lines.All(l => l.draft && l.id != SliceFlow.FirstLineId && l.text != "") && Enumerable.Range(0, groups.Length).All(i => lines.Count(l => l.group == groups[i]) == counts[i]),
-                "the inscription's 24 lines live in data (Resources/Journal/inscriptions.json), each with a stable id and marked a draft: 8 any time, 4 after the first Key, 3 once the Wing is whole, 3 for an absence, 6 on the sun");
+            var lines = InscriptionBook.Data.lines; string[] groups = { "any", "key", "wing", "absence", "sun" }; int[] counts = { 8, 3, 3, 3, 6 };
+            Check(lines.Length == 23 && lines.Select(l => l.id).Distinct().Count() == 23 && lines.All(l => l.draft && l.id != SliceFlow.FirstLineId && l.text != "") && Enumerable.Range(0, groups.Length).All(i => lines.Count(l => l.group == groups[i]) == counts[i]),
+                "the inscription's 23 lines live in data (Resources/Journal/inscriptions.json), each with a stable id and marked a draft: 8 any time,  3 after the first Key, 3 once the Wing is whole, 3 for an absence, 6 on the sun");
             Check(lines.Where(l => l.group == "key").All(l => l.unlock == "key1") && lines.Where(l => l.group == "wing").All(l => l.unlock == "wing") && lines.Where(l => l.group == "any" || l.group == "absence").All(l => l.unlock == "")
                 && lines.Where(l => l.group == "sun").Select(l => l.unlock).OrderBy(u => u).SequenceEqual(new[] { "", "key1", "key2", "key3", "key4", "modalities" }.OrderBy(u => u)),
                 "each group opens with its lesson: the Key lines at Key 1, the Wing's once it is whole; the sun lines with the Elements, the Symbols, the Modalities, the Table and the Opposites, and one any time (Practice's order)");

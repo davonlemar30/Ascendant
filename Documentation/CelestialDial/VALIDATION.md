@@ -153,7 +153,7 @@ Merged as PR #131 (main `fcbaa9d`, Oct 7); the head is `c1d9dac`.
 
 The owner approved it as scoped (Oct 7), with the clock option withdrawn. What shipped is in the [build log](../README.md); this is the validation record, taken from PR #128's body and comments.
 
-- **The data:** `Resources/Journal/inscriptions.json`, 24 lines with stable ids, a group and an unlocking lesson, each marked a draft (8 any time, 4 Key, 3 Wing, 3 absence, 6 sun).
+- **The data:** `Resources/Journal/inscriptions.json`, 23 lines with stable ids, a group and an unlocking lesson, each marked a draft (8 any time, 3 Key, 3 Wing, 3 absence, 6 sun).
 - **The ink:** each letter fades over 0.15 s, 35 ms apart, with rests at commas and full stops; 2.0 to 3.5 s a line, starting 0.3 s after the landing shows. The first-ever open writes the Oct 2 line as the title page finishes fading.
 
 **Checks**
