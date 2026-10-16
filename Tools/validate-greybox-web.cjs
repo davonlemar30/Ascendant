@@ -1,5 +1,5 @@
 // Run against the real locally served Unity build. Requires Playwright; no production dependency.
-const DEFAULT_CHART="That is the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."; // owner, Oct 15 (86bcg8nft): the skip path's note (Claude's draft, owner writes)
+const DEFAULT_CHART="You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."; // owner, Oct 15 (86bcg8nft): the skip path's note (Claude's draft, owner writes)
 const DEFAULT_ON_PAGE="This is the default chart. Add your own birth details and your chart will follow them."; // "Your Birth" while the default stands in (Claude's draft, owner writes)
 // reach a given sun by the chart path with no time and no place: the default 7:19 PM and Bushwick fill in (owner, Oct 15), so the sun follows the date
 async function sunByDate(pg,date,sun){

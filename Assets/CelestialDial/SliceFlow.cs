@@ -210,7 +210,7 @@ namespace Ascendant.CelestialDial
         public const int DefaultYear = 1990, DefaultMonth = 11, DefaultDay = 4, DefaultMinute = 19 * 60 + 19; // 7:19 PM
         public const string DefaultPlaceName = "Bushwick, NY, United States"; // the bundled list's name for Bushwick, Brooklyn (40.69 N, 73.92 W; America/New_York, EST on Nov 4 1990)
         public const string DefaultTag = " (default)";
-        public const string DefaultChartNote = "That is the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."; // Claude's draft, checked by Dante (owner writes)
+        public const string DefaultChartNote = "You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."; // Claude's draft, checked by Dante (owner writes)
         public const string DefaultPartNote = "The default chart fills in what you left blank: {0}. You can add your own in your journal later."; // Claude's draft, checked by Dante (owner writes)
         public const string DefaultOnPage = "This is the default chart. Add your own birth details and your chart will follow them."; // "Your Birth" while a default stands in: Claude's draft, checked by Dante (owner writes)
         public static BirthFacts DefaultBirth()
