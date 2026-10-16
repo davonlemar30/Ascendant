@@ -891,8 +891,8 @@ namespace Ascendant.Build
             star.ChooseBirth("skip");counts.Add(star.OpeningAnswers);
             Check(counts.SequenceEqual(new[]{0,1,2}) && star.BirthDone,"the skip path's stars: none on the name, one once it is continued, one for the birth answer, and no more (the default chart asks nothing, owner, Oct 15): "+string.Join(",",counts));
             star.ChooseBirth("");Check(star.OpeningAnswers==1,"Change my answer takes the birth's stars back, the name's stays");
-            var london=Places.Find("London, Britain (UK)");var most=new SliceFlow(()=>1);most.SkipPrologue();most.Continue();most.ChooseBirth("chart");most.SetBirthDate(1990,4,20);most.SetBirthTime(-1);most.SetBirthPlace(london);
-            Check(most.BirthDone && most.OpeningAnswers==SliceFlow.MostOpeningAnswers && SliceFlow.MostOpeningAnswers==5,"the longest path (the date, time and place, with no more questions: the default chart fills in what was left blank, owner, Oct 15) gathers all five stars");
+            var london=Places.Find("London, Britain (UK)");var most=new SliceFlow(()=>1);most.SkipPrologue();most.Continue();most.ChooseBirth("chart");most.SetBirthDate(1990,4,20);most.SetBirthTime(8*60);most.SetBirthPlace(london);
+            Check(most.BirthDone && most.OpeningAnswers==SliceFlow.MostOpeningAnswers && SliceFlow.MostOpeningAnswers==5,"the longest path (the date, time and place, with no more questions; a personal chart needs all three, owner, Oct 16) gathers all five stars");
             var amend=BirthPlayer(o=>{o.ChooseBirth("skip");},out _);amend.StartAddFacts();
             Check(amend.Screen==SliceScreen.Birth && amend.Amending && amend.OpeningAnswers==0,"\"Your Birth\" from the journal has no stars (the orb is the opening's)");
             // the shot list: the brief's seven shots, the sixteen frames (with the Oct 9 in-betweens), motion only inside a frame, about 45-60 s, a spoken line each
