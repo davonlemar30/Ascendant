@@ -64,7 +64,7 @@ namespace Ascendant.EraDemo
                 new EraLine("Nine years to the thousandth year, and a meeting at the end of the signs. What use is keeping pages, if the water is coming for all of it?",
                     "They meet every twenty years. You'd know that better than me.", "If it's the end, why are you up here watching?"),
                 new EraLine("A meeting is a mark in the margin. The book goes on. My grandson knew it. It took a stranger to say it to me."),
-                new EraLine("We won't give them to the river. We'll keep them in the walls, where the water can't reach. Hidden, they stay safe."),
+                new EraLine("We won't give them to the river. We'll keep them in the walls, where the water can't reach."),
             }));
             map.Points.Add(new EraPoint("caspar", "Caspar", "CASPAR", new Cell(a.X + 1, a.Y), Lines(
                 "Timbuktu, in the spring of 1583. Every twenty years or so Jupiter and Saturn meet, and the Library keeps its history by those meetings.",
