@@ -94,14 +94,14 @@ namespace Ascendant.CelestialDial
         public static readonly string[] ShareLabels = { "Modality", "Polarity", "Element" }; // owner words (worksheet section 12)
         public int[] BuilderTargets => new[] { Sun, Zodiac.Wrap(Sun + 5), Zodiac.Wrap(Sun + 7) }; // three signs in different rows and columns of the table, opposites distinct from them
         public bool CanBeginOpposites => Key3Held && !Key4Earned && ModalitiesComplete && (Phase == LessonPhase.ModalityComplete || Phase == LessonPhase.Key2 || Phase == LessonPhase.AllLit || Phase == LessonPhase.Complete || Phase == LessonPhase.Paused || InOpposites || InBuilder);
-        public const string PolarityLine0 = "The wheel holds one last secret, acolyte: every sign carries a polarity.\nFire and Air signs are Yang, outward and active. Earth and Water signs are Yin, inward and receptive."; // owner (worksheet section 12)
+        public const string PolarityLine0 = "The wheel holds one last secret, seeker: every sign carries a polarity.\nFire and Air signs are Yang, outward and active. Earth and Water signs are Yin, inward and receptive."; // owner (worksheet section 12)
         public const string PolarityLine1 = "Some traditions say masculine and feminine. The Hellenistic astrologers called them day and night. We shall use Yin and Yang.\nLook, the wheel shows each sign's polarity now."; // owner (worksheet section 12)
-        public const string OppositesDoneLine = "Six pairs, acolyte. Every sign has a partner straight across the wheel, and none of them are enemies: they share a modality and a polarity, only the element differs.\nNow then, let us see if you can build a sign from its parts."; // owner (worksheet section 12)
+        public const string OppositesDoneLine = "Six pairs, initiate. Every sign has a partner straight across the wheel, and none of them are enemies: they share a modality and a polarity, only the element differs.\nNow then, let us see if you can build a sign from its parts."; // owner (worksheet section 12)
         // Build F: every pause points somewhere now: the journal (the Sept 15 brief's missing destination). Placeholder (owner writes).
         public const string JournalNudge = "Your journal holds what we have covered, if you want to read before we go on.";
-        public const string OppositesPausedLine = "That is enough for now, acolyte. Rest, and we shall continue where you left off when you return. " + JournalNudge; // owner (worksheet section 12); the journal sentence is Build F's placeholder (section 14)
-        public const string BuilderNoEvidenceLine = "Three signs built, though I confess my hand was in most of the building. The Key shall wait for you, acolyte.\nGo, study your journal, and when you return we shall build again. I would see you claim it on your own."; // owner (worksheet section 12)
-        public const string Key4Line = "Three signs built from their parts, three partners found across the wheel. Every pattern the wheel holds is yours now, acolyte: elements, symbols, modalities, polarities, and opposites.\nThe Library trembles. Keeper Key 4 is yours."; // owner (worksheet section 12)
+        public const string OppositesPausedLine = "That is enough for now, seeker. Rest, and we shall continue where you left off when you return. " + JournalNudge; // owner (worksheet section 12); the journal sentence is Build F's placeholder (section 14)
+        public const string BuilderNoEvidenceLine = "Three signs built, though I confess my hand was in most of the building. The Key shall wait for you, initiate.\nGo, study your journal, and when you return we shall build again. I would see you claim it on your own."; // owner (worksheet section 12)
+        public const string Key4Line = "Three signs built from their parts, three partners found across the wheel. Every pattern the wheel holds is yours now, seeker: elements, symbols, modalities, polarities, and opposites.\nThe Library trembles. Keeper Key 4 is yours."; // owner (worksheet section 12)
         static string Side(int seat) => Zodiac.PolarityAt(seat);
         static string Kind(int seat) => Zodiac.ModalityAt(seat).ToLowerInvariant();
         public bool BeginOpposites()
@@ -124,8 +124,8 @@ namespace Ascendant.CelestialDial
         {
             lastStart = Zodiac.Wrap(start); Phase = hint >= 2 ? LessonPhase.OppositeGuided : LessonPhase.OppositeOwn;
             Dial.Begin(lastStart, hint, -1, 6); CountBeatPending = hint >= 2;
-            if (hint >= 2) Message = "Now the final pattern, acolyte: every sign has an opposite, the sign that sits straight across the wheel.\nFrom " + SignName(lastStart) + ", count six signs forward: one, two, three, four, five, six.\nWhen the sign is selected, press Seal."; // owner (worksheet section 12)
-            else DialSays("Your turn now, acolyte. Find the sign that sits across the wheel from " + SignName(lastStart) + ".\nWhen it is selected, press Seal."); // owner (worksheet section 12); Build V: the Dial's
+            if (hint >= 2) Message = "Now the final pattern, pupil: every sign has an opposite, the sign that sits straight across the wheel.\nFrom " + SignName(lastStart) + ", count six signs forward: one, two, three, four, five, six.\nWhen the sign is selected, press Seal."; // owner (worksheet section 12)
+            else DialSays("Your turn now, apprentice. Find the sign that sits across the wheel from " + SignName(lastStart) + ".\nWhen it is selected, press Seal."); // owner (worksheet section 12); Build V: the Dial's
         }
         void AfterOppositeCorrect(DialEvent result)
         {
@@ -156,7 +156,7 @@ namespace Ascendant.CelestialDial
             if (Built >= 3) { FinishBuilder(); return; }
             BuilderTarget = BuilderTargets[Built]; BuilderStep = 1; builderMisses = 0; builderAssisted = false; for (int i = 0; i < 3; i++) Shared[i] = false;
             Phase = LessonPhase.BuilderName; Dial.Home();
-            DialSays(Built == 0 ? "Build me a sign from its parts, acolyte. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign is that?" : Built == 1 ? "Again. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Name it." : "One more. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign?"); // owner (worksheet section 12); Build V: the Dial asks (the owner's example)
+            DialSays(Built == 0 ? "Build me a sign from its parts, pupil. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign is that?" : Built == 1 ? "Again. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Name it." : "One more. " + Element(BuilderTarget) + " and " + Kind(BuilderTarget) + ". Which sign?"); // owner (worksheet section 12); Build V: the Dial asks (the owner's example)
             Dial.Log("builder_sign_started");
         }
         public bool AnswerBuilderName(int seat)
@@ -172,7 +172,7 @@ namespace Ascendant.CelestialDial
             if (builderMisses == 1)
             {
                 // Level 1 names the property the wrong sign misses.
-                Message = "Not that one, acolyte. " + SignName(seat) + " is " + (Element(seat) != Element(t) ? Element(seat) : Kind(seat)) + ". You are looking for the " + Element(t) + " sign that is " + Kind(t) + "."; // owner (worksheet section 12)
+                Message = "Not that one, apprentice. " + SignName(seat) + " is " + (Element(seat) != Element(t) ? Element(seat) : Kind(seat)) + ". You are looking for the " + Element(t) + " sign that is " + Kind(t) + "."; // owner (worksheet section 12)
                 Dial.Log("hint_requested"); return false;
             }
             builderAssisted = true; Dial.Log("hint_escalated"); Dial.Log("builder_named", false, false, "DirectSeat");
@@ -199,9 +199,9 @@ namespace Ascendant.CelestialDial
                 Message = "Yes, the " + (property == 0 ? "modality" : "polarity") + ". What else do they share?"; return true; // owner (worksheet section 12)
             }
             builderMisses++;
-            if (builderMisses == 1) { Message = "Not the element, acolyte. " + SignName(t) + " is " + Element(t) + " and " + SignName(o) + " is " + Element(o) + ", those differ. Tap what the two do share."; Dial.Log("hint_requested"); return false; } // owner (worksheet section 12)
+            if (builderMisses == 1) { Message = "Not the element, pupil. " + SignName(t) + " is " + Element(t) + " and " + SignName(o) + " is " + Element(o) + ", those differ. Tap what the two do share."; Dial.Log("hint_requested"); return false; } // owner (worksheet section 12)
             builderAssisted = true; Shared[0] = Shared[1] = true; Dial.Log("hint_escalated"); Dial.Log("builder_shared", false, false);
-            Message = "Opposites share the modality and the polarity. Only their elements differ: " + Element(t) + " against " + Element(o) + ". Remember this, acolyte."; FinishBuilderSign(); return false; // owner (worksheet section 12)
+            Message = "Opposites share the modality and the polarity. Only their elements differ: " + Element(t) + " against " + Element(o) + ". Remember this, apprentice."; FinishBuilderSign(); return false; // owner (worksheet section 12)
         }
         void FinishBuilderSign()
         {
@@ -231,7 +231,7 @@ namespace Ascendant.CelestialDial
             PolarityShown = polarityShown; PolarityStep = polarityShown ? 1 : 0; OppositesStarted = started || polarityShown;
             for (int p = 0; p < Zodiac.OppositePairs; p++) OppKnown[p] = oppKnown != null && p < oppKnown.Length && oppKnown[p];
             Built = Math.Max(0, Math.Min(3, built)); BuilderEvidence = builderEvidence || key4; Key4Earned = key4; BuilderStep = 0; BuilderTarget = -1;
-            if (key4) { Phase = LessonPhase.Key4; Message = "Four patterns learned, four Keys earned. The wheel is yours, acolyte, every secret it held now belongs to you."; } // owner (worksheet section 12)
+            if (key4) { Phase = LessonPhase.Key4; Message = "Four patterns learned, four Keys earned. The wheel is yours, initiate, every secret it held now belongs to you."; } // owner (worksheet section 12)
         }
         // ---- v0.3: glyphs and Key 2 (owner's form, Sept 12: Part A name the glyph by tap, Part B find the glyph on the wheel) ----
         public readonly bool[] GlyphNamed = new bool[12];    // Part A done for this seat
@@ -284,7 +284,7 @@ namespace Ascendant.CelestialDial
             if (!LitMod[start]) LitMod[start] = true;
             StartModalityProblem(start, guided ? 2 : 0);
             Message = guided
-                ? "The wheel holds a second pattern, acolyte. Every third sign shares a modality: cardinal, fixed, or mutable.\n" + (SunKnown ? "Your sign, " : "Our starting sign, ") + SignName(Sun) + ", is " + ModalityName(Sun) + ", and so are " + ModalityMembers(f) + ".\nNow find the next " + ModalityName(Sun) + " sign after " + SignName(Sun) + " upon the wheel. Count each sign forward: one, two, three. When the sign is selected, press Seal." // owner (worksheet section 10)
+                ? "The wheel holds a second pattern, seeker. Every third sign shares a modality: cardinal, fixed, or mutable.\n" + (SunKnown ? "Your sign, " : "Our starting sign, ") + SignName(Sun) + ", is " + ModalityName(Sun) + ", and so are " + ModalityMembers(f) + ".\nNow find the next " + ModalityName(Sun) + " sign after " + SignName(Sun) + " upon the wheel. Count each sign forward: one, two, three. When the sign is selected, press Seal." // owner (worksheet section 10)
                 : "Now the " + ModalityName(f).ToLowerInvariant() + " signs: " + ModalityMembers(f) + ".\nStart at " + SignName(start) + ". Three forward each time. I will only watch."; // placeholder (owner writes)
             Dial.Log(first ? "modality_unit_started" : "modality_family_started");
             return true;
@@ -302,7 +302,7 @@ namespace Ascendant.CelestialDial
             Dial.Begin(lastStart, hint, -1, 3);
             CountBeatPending = hint >= 2;
             Message = hint >= 2 ? string.Format(RuleFor(3), SignName(lastStart)) + "\nWhen the sign is selected, press Seal."
-                : ""; // Build I: the wheel poses the challenge on its face (was worksheet section 10's "Your turn now, acolyte. Find the next …")
+                : ""; // Build I: the wheel poses the challenge on its face (was worksheet section 10's "Your turn now, apprentice. Find the next …")
         }
         void AfterModalityCorrect(DialEvent result)
         {
@@ -317,18 +317,18 @@ namespace Ascendant.CelestialDial
             }
             KinMod[f] = true; Dial.Log("modality_family_completed"); Dial.Home();
             int next = NextUnlitModalityFamily();
-            if (next < 0) { Phase = LessonPhase.ModalityComplete; Message = "Twelve signs, three modalities, all accounted for. Cardinal signs are the initiators, they begin each season and set things in motion. Fixed signs are the anchors, they hold steady in the middle and do not waver. Mutable signs are the adapters, they close each season and prepare the way for what comes next.\nThe wheel has one more pattern to reveal, acolyte, and a table beside the Dial has begun to stir."; Dial.Log("modalities_completed"); return; } // owner (worksheet section 10)
+            if (next < 0) { Phase = LessonPhase.ModalityComplete; Message = "Twelve signs, three modalities, all accounted for. Cardinal signs are the initiators, they begin each season and set things in motion. Fixed signs are the anchors, they hold steady in the middle and do not waver. Mutable signs are the adapters, they close each season and prepare the way for what comes next.\nThe wheel has one more pattern to reveal, initiate, and a table beside the Dial has begun to stir."; Dial.Log("modalities_completed"); return; } // owner (worksheet section 10)
             Phase = LessonPhase.ModalityOwn; modalityFamily = next;
             int start = FirstUnlitInModalityFamily(next, out _); LitMod[start] = true;
             StartModalityProblem(start, 0);
-            Message = ModalityFamiliesComplete == 1 ? "Well done. Now the " + ModalityName(next).ToLowerInvariant() + " signs await you: " + ModalityMembers(next) + ".\nFrom " + SignName(start) + ", count three forward upon the wheel each time." : "The final modality, acolyte. " + ModalityName(next) + ": " + ModalityMembers(next) + ".\nBegin at " + SignName(start) + ". I shall let you lead."; // owner (worksheet section 10)
+            Message = ModalityFamiliesComplete == 1 ? "Well done. Now the " + ModalityName(next).ToLowerInvariant() + " signs await you: " + ModalityMembers(next) + ".\nFrom " + SignName(start) + ", count three forward upon the wheel each time." : "The final modality, seeker. " + ModalityName(next) + ": " + ModalityMembers(next) + ".\nBegin at " + SignName(start) + ". I shall let you lead."; // owner (worksheet section 10)
             Dial.Log("modality_family_started");
         }
         void AfterModalityDemonstration()
         {
             // A worked example lights the seat without evidence; three of them in one sitting pause the unit (reappearance cap).
             LitMod[Zodiac.Destination(lastStart, 3)] = true; modalityAssisted++;
-            if (modalityAssisted >= 3) { Dial.Home(); Phase = LessonPhase.ModalityPaused; Message = "That is enough of the second pattern for now, acolyte. Rest, and we shall continue where you left off when you return. " + JournalNudge; return; } // owner (worksheet section 10); the journal sentence is Build F's placeholder
+            if (modalityAssisted >= 3) { Dial.Home(); Phase = LessonPhase.ModalityPaused; Message = "That is enough of the second pattern for now, initiate. Rest, and we shall continue where you left off when you return. " + JournalNudge; return; } // owner (worksheet section 10); the journal sentence is Build F's placeholder
             AfterModalityCorrect(Dial.Events.Last());
         }
         public string RuleFor(int step) => step == 3
@@ -350,7 +350,7 @@ namespace Ascendant.CelestialDial
             Practice = true; GlyphEvidence = false; GlyphMisses = 0; GlyphIndex = 0; Dial.Home();
             for (int i = 0; i < 12; i++) { GlyphNamed[i] = false; GlyphPlaced[i] = false; NameRevealed[i] = false; order[i] = Hard ? Zodiac.Wrap(i * 5 + 1 + CleanRuns) : i; } // stride 5 visits every seat
             Phase = LessonPhase.GlyphNames;
-            Message = Hard ? "The book tests you again, acolyte, but do not expect the same ease. The symbols come in my order now, and the choices before you will try to deceive.\nName the sign each symbol belongs to, and trust what you have learned." : "Once more from the beginning, acolyte. The book presents the symbols again.\nName the sign each one belongs to."; // owner (worksheet section 9)
+            Message = Hard ? "The book tests you again, pupil, but do not expect the same ease. The symbols come in my order now, and the choices before you will try to deceive.\nName the sign each symbol belongs to, and trust what you have learned." : "Once more from the beginning, apprentice. The book presents the symbols again.\nName the sign each one belongs to."; // owner (worksheet section 9)
             Dial.Log("symbol_practice_started");
             return true;
         }
@@ -373,9 +373,9 @@ namespace Ascendant.CelestialDial
         }
         public int CurrentGlyph => Phase == LessonPhase.GlyphNames ? (GlyphIndex < 12 ? SeatAt(GlyphIndex) : -1) : Phase == LessonPhase.GlyphWheel ? Dial.Target : -1;
         public bool AllNamed { get { for (int i = 0; i < 12; i++) if (!GlyphNamed[i]) return false; return true; } } // Part A complete
-        public const string ShelfFirst = "You know the names, acolyte, but the symbols are another matter. There is a book upon the shelf that will teach you each one.\nRead it first, for when you return to the Dial the names shall vanish and only the symbols will remain."; // owner (worksheet section 7)
+        public const string ShelfFirst = "You know the names, pupil, but the symbols are another matter. There is a book upon the shelf that will teach you each one.\nRead it first, for when you return to the Dial the names shall vanish and only the symbols will remain."; // owner (worksheet section 7)
         public const string ShelfDark = "Dark and quiet, that shelf. It was not always so. I recall it waking once before, when the wheel burned bright enough to reach it."; // owner (worksheet section 7)
-        public const string ShelfRead = "Twelve symbols, all accounted for. The book has gone quiet, acolyte, and it does not wake again without reason.\nWhen the time comes, you will know."; // owner (worksheet section 7)
+        public const string ShelfRead = "Twelve symbols, all accounted for. The book has gone quiet, apprentice, and it does not wake again without reason.\nWhen the time comes, you will know."; // owner (worksheet section 7)
         // Four names: the answer plus three others, in a stable order per seat so tests and the page agree.
         public int[] GlyphOptions(int seat) => OptionsFor(seat, Hard, Hard ? CleanRuns : 0);
         public const string GlyphIntro = "Every sign upon this wheel carries a symbol of its own, twelve in all, older than the names themselves.\nI shall show you each one, and you shall tell me which sign it belongs to."; // owner (worksheet section 4)
@@ -422,13 +422,13 @@ namespace Ascendant.CelestialDial
             if (Practice)
             {
                 Practice = false; Phase = LessonPhase.Key2; bool clean = GlyphEvidence;
-                if (clean) { CleanRuns++; Message = "Well done, acolyte. Every symbol found without my hand upon the wheel.\nEnjoy this victory, for the book has noticed your progress and it shall raise the bar when next you open it."; Dial.Log("symbol_practice_clean", true, true); } // owner (worksheet section 9)
-                else Message = "The symbols are done, though I confess I did much of the work for you.\nThere is no shame in it, acolyte, but the book will not yield its reward until you can find them on your own. It shall wait for you."; // owner (worksheet section 9)
+                if (clean) { CleanRuns++; Message = "Well done, seeker. Every symbol found without my hand upon the wheel.\nEnjoy this victory, for the book has noticed your progress and it shall raise the bar when next you open it."; Dial.Log("symbol_practice_clean", true, true); } // owner (worksheet section 9)
+                else Message = "The symbols are done, though I confess I did much of the work for you.\nThere is no shame in it, initiate, but the book will not yield its reward until you can find them on your own. It shall wait for you."; // owner (worksheet section 9)
                 PracticeFinished?.Invoke(clean);
                 return;
             }
-            if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve signs, twelve symbols, all in their rightful order. You read the wheel true now, acolyte.\nLook, another Key rises from the Dial, and it is yours, for you have earned it."; Dial.Log("key2_earned", true, true); } // owner (worksheet section 5)
-            else { Phase = LessonPhase.Paused; Message = "We have reached the end, acolyte, though I confess my hand was upon the wheel more than yours.\nRest now and study your journal, for the symbols will test you again when you return, and I would see you claim that Key on your own."; } // owner (worksheet section 5)
+            if (GlyphEvidence) { Phase = LessonPhase.Key2; Key2Earned = true; Message = "Twelve signs, twelve symbols, all in their rightful order. You read the wheel true now, seeker.\nLook, another Key rises from the Dial, and it is yours, for you have earned it."; Dial.Log("key2_earned", true, true); } // owner (worksheet section 5)
+            else { Phase = LessonPhase.Paused; Message = "We have reached the end, initiate, though I confess my hand was upon the wheel more than yours.\nRest now and study your journal, for the symbols will test you again when you return, and I would see you claim that Key on your own."; } // owner (worksheet section 5)
         }
         // v0.2 (Q05): Unit 1.1 continuation on the same Dial, and compressed review problems.
         public int FamiliesComplete => Enumerable.Range(0, 4).Count(f => Kin[f]);
@@ -449,7 +449,7 @@ namespace Ascendant.CelestialDial
             // Placeholder copy (owner writes; Q05 decision 7): third family with less guidance, fourth on the player's own.
             Message = FamiliesComplete == 2
                 ? "Now the " + Element(family) + " signs. You have done this twice and the wheel has yielded to you each time.\nStart at " + SignName(family) + ", and I shall only watch." // owner (worksheet section 3)
-                : "Now for the last of the four, the " + Element(family) + " signs. Begin at " + SignName(family) + ", acolyte.\nYou have proven yourself thrice upon this wheel, I need not guide you further. You have this."; // owner (worksheet section 3)
+                : "Now for the last of the four, the " + Element(family) + " signs. Begin at " + SignName(family) + ", apprentice.\nYou have proven yourself thrice upon this wheel, I need not guide you further. You have this."; // owner (worksheet section 3)
             Dial.Log("unit11_family_started");
             return true;
         }
@@ -473,7 +473,7 @@ namespace Ascendant.CelestialDial
             Phase = !keyEarned ? LessonPhase.Rule : WheelComplete ? LessonPhase.AllLit : LessonPhase.Complete;
             Key2Earned = false; GlyphEvidence = false;
             Dial.Home();
-            Message = WheelComplete ? "The whole wheel burns." : "You return, acolyte. The wheel has held your place and it stirs at your presence."; // owner (worksheet section 3)
+            Message = WheelComplete ? "The whole wheel burns." : "You return, seeker. The wheel has held your place and it stirs at your presence."; // owner (worksheet section 3)
         }
         public DialLesson(Func<double> clock) { Dial = new DialModel(clock); family = GuidedFamily; Message = IntroLine(0); }
         static string SignName(int seat) => Zodiac.Seats[Zodiac.Wrap(seat)].Name;
@@ -567,7 +567,7 @@ namespace Ascendant.CelestialDial
                     GlyphPlaced[target] = true; if (result.evidence_eligible) GlyphEvidence = true;
                     Message = "Yes. " + SignName(target) + ", that is correct"; Dial.Log("glyph_placed", true, result.evidence_eligible); // owner (worksheet section 5), as written
                 }
-                else if (step == 1) Message = Hard ? "Not so. You are rushing, acolyte. Return your gaze to the symbol, trace its shape in your mind, and then seek it upon the wheel." : "Not that one, acolyte. Look at the symbol before you, find it upon the wheel, and count forward from where you stand."; // owner (worksheet sections 5 and 9); no Aries anchor
+                else if (step == 1) Message = Hard ? "Not so. You are rushing, pupil. Return your gaze to the symbol, trace its shape in your mind, and then seek it upon the wheel." : "Not that one, apprentice. Look at the symbol before you, find it upon the wheel, and count forward from where you stand."; // owner (worksheet sections 5 and 9); no Aries anchor
                 else if (step == 2) { NameRevealed[target] = true; Message = "Look, the name has revealed itself upon the wheel. Turn to " + SignName(target) + " and press Seal."; } // owner (worksheet section 5)
                 else Message = "Watch me find it. Then the next symbol."; // owner (worksheet section 5)
                 return result;
@@ -575,8 +575,8 @@ namespace Ascendant.CelestialDial
             if (Phase == LessonPhase.Review)
             {
                 if (result.correctness) { Message = Dial.Forward == 3 ? "Yes, " + SignName(result.selected_destination) + " is " + ModalityName(result.selected_destination).ToLowerInvariant() + "." : "Yes. " + SignName(result.selected_destination) + " is " + Zodiac.Article(Element(result.selected_destination)) + " " + Element(result.selected_destination) + " sign."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, true, result.hint_level <= 1); }
-                else if (Dial.Attempts >= 2) { Message = "It is " + SignName(Zodiac.Destination(Dial.Start, Dial.Forward)) + ", acolyte. The wheel shall test you on it again."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, false, false); } // owner (worksheet section 2)
-                else { Message = "Not that one, acolyte. Look again and try once more."; } // owner (worksheet section 2)
+                else if (Dial.Attempts >= 2) { Message = "It is " + SignName(Zodiac.Destination(Dial.Start, Dial.Forward)) + ", pupil. The wheel shall test you on it again."; Dial.Home(); ReviewFinished?.Invoke(Dial.Start, false, false); } // owner (worksheet section 2)
+                else { Message = "Not that one, apprentice. Look again and try once more."; } // owner (worksheet section 2)
                 return result;
             }
             if (!result.correctness)
@@ -586,7 +586,7 @@ namespace Ascendant.CelestialDial
                 if (step == 2) CountBeatPending = true;
                 Message = step == 1 ? "Not that one. Count your steps again.\nYou can move on from where you are." :
                     step == 2 ? string.Format(RuleFor(Dial.Forward), SignName(Dial.Start)) + "\nWhen the sign is selected, press Seal." : // owner (worksheet section 8)
-                    InOppositeProblem ? "Watch me find it, acolyte.\n" + (Phase == LessonPhase.BuilderOpposite ? "Then tell me what the two signs share." : "Then we move to the next pair.") : // owner (worksheet section 12)
+                    InOppositeProblem ? "Watch me find it, pupil.\n" + (Phase == LessonPhase.BuilderOpposite ? "Then tell me what the two signs share." : "Then we move to the next pair.") : // owner (worksheet section 12)
                     "Watch me do one.\nThen you will try again from a new sign.";
             }
             return result;
@@ -595,7 +595,7 @@ namespace Ascendant.CelestialDial
             (InOppositeProblem ? "Yes, " + SignName(result.selected_destination) + " sits across from " + SignName(Dial.Start) + ". Both are " + Kind(Dial.Start) + ", both are " + Side(Dial.Start) + ", only the element differs: " + Element(Dial.Start) + " against " + Element(result.selected_destination) + "." // owner (worksheet section 12)
                 : InModalities ? "Yes, " + SignName(result.selected_destination) + " is " + ModalityName(result.selected_destination).ToLowerInvariant() + ", just as " + SignName(Dial.Start) + " is." // owner (worksheet section 10)
                 : "Yes. " + SignName(result.selected_destination) + " is " + Zodiac.Article(Element(result.selected_destination)) + " " + Element(result.selected_destination) + " sign" + (SunKnown ? ", like your sun sign" : Element(result.selected_destination) == Element(Sun) ? ", like " + SignName(Sun) : "") + ".") + "\n" + // no sun (Oct 7): the start named only where it is true
-            (result.evidence_eligible ? (InOppositeProblem || InModalities ? "You found that one on your own, acolyte." : "You found that one on your own.") : "We found that one together.");
+            (result.evidence_eligible ? (InOppositeProblem || InModalities ? "You found that one on your own, apprentice." : "You found that one on your own.") : "We found that one together.");
         public void AfterCorrect(DialEvent result)
         {
             AfterCorrectCore(result);
@@ -677,7 +677,7 @@ namespace Ascendant.CelestialDial
             {
                 Dial.Home();
                 int next = NextUnlitFamily();
-                if (next < 0) { Phase = LessonPhase.AllLit; WheelLit?.Invoke(); Message = "The whole wheel burns, acolyte, Fire, Earth, Air, and Water, all twelve signs in their place. I confess the room feels different for it, alive in a way I had almost forgotten.\nCome, let us return to the Atrium and see what the Library has made of your work."; Dial.Log("wheel_completed"); } // owner (worksheet section 3)
+                if (next < 0) { Phase = LessonPhase.AllLit; WheelLit?.Invoke(); Message = "The whole wheel burns, seeker, Fire, Earth, Air, and Water, all twelve signs in their place. I confess the room feels different for it, alive in a way I had almost forgotten.\nCome, let us return to the Atrium and see what the Library has made of your work."; Dial.Log("wheel_completed"); } // owner (worksheet section 3)
                 else { Phase = LessonPhase.Complete; BeginContinuation(); }
                 return;
             }
@@ -739,7 +739,7 @@ namespace Ascendant.CelestialDial
             }
             GlyphIndex = index; GlyphMisses = 0; Practice = false;
             Key2Earned = key2; GlyphEvidence = key2;
-            if (key2) { Phase = LessonPhase.Key2; Message = "Twelve signs, twelve symbols. You read the wheel true, acolyte."; } // restored Key 2, in the owner's words
+            if (key2) { Phase = LessonPhase.Key2; Message = "Twelve signs, twelve symbols. You read the wheel true, initiate."; } // restored Key 2, in the owner's words
         }
         public void Say(string text) { Message = text; } // Slice beats speak through the same panel.
         public string SeatLabel(int seat)

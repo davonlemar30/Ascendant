@@ -161,24 +161,24 @@ namespace Ascendant.CelestialDial
             "So he made sure the next Keeper would have to learn the language of the stars before they could open even one. That is why the wheel tested you first.\nChoose a Book. Feed it your Key." };
         // v0.2 placeholder lines (owner writes; Q05 decision 7).
         const string HubFirstLine = "Ah look at that! That lamp just flickered on.\nThe wheel is still dark in the Zodiac Wing, when you are ready."; // owner (worksheet section 1)
-        const string HubLaterLine = "Welcome, acolyte. Much of this place remains unawakened, halls sealed and dark beyond your reach.\nBut the Zodiac Wing stirs. The Dial awaits your hand when you are ready."; // owner (worksheet section 1)
-        const string HubCompleteLine = "The whole wheel burns, acolyte, every seat alight as it was in the days before he departed this place.\nYour journal holds what you have learned, and I would counsel you to read it well, for the shelf has stirred and something within those pages calls to you now."; // owner (worksheet section 1)
-        const string HubKey2Line = "Two Keys, acolyte. He left twenty-one locks upon this place, and you have turned two of them.\nThat is enough for now. Rest, and let the Library remember what you have done."; // owner (worksheet section 6)
-        const string HubKey3Line = "Three Keys, acolyte. The table is full and the Zodiac Wing has one last pattern to teach you.\nRest now, and let the Library remember what you have done."; // owner (worksheet section 11)
-        const string HubKey4Line = "Four Keys, acolyte. Every pattern the wheel held, you hold now.\nRest, for the Chamber will want to see what you carry."; // owner (worksheet section 12)
+        const string HubLaterLine = "Welcome, seeker. Much of this place remains unawakened, halls sealed and dark beyond your reach.\nBut the Zodiac Wing stirs. The Dial awaits your hand when you are ready."; // owner (worksheet section 1)
+        const string HubCompleteLine = "The whole wheel burns, initiate, every seat alight as it was in the days before he departed this place.\nYour journal holds what you have learned, and I would counsel you to read it well, for the shelf has stirred and something within those pages calls to you now."; // owner (worksheet section 1)
+        const string HubKey2Line = "Two Keys, seeker. He left twenty-one locks upon this place, and you have turned two of them.\nThat is enough for now. Rest, and let the Library remember what you have done."; // owner (worksheet section 6)
+        const string HubKey3Line = "Three Keys, initiate. The table is full and the Zodiac Wing has one last pattern to teach you.\nRest now, and let the Library remember what you have done."; // owner (worksheet section 11)
+        const string HubKey4Line = "Four Keys, seeker. Every pattern the wheel held, you hold now.\nRest, for the Chamber will want to see what you carry."; // owner (worksheet section 12)
         // Build D placeholder lines (owner writes; worksheet section 13).
         // Build T (owner, APK playtest, Sept 29): the opening's walk. Caspar sends the player to the Zodiac Wing; in the Wing he points to the Dial.
         public const string HubOpeningLine = "Our work begins in the Zodiac Wing. That door there. Go on, it will open for you."; // owner (Sept 29)
         public const string WingOpeningLine = "The Zodiac Wing. Mind the dust. The Dial is waiting for you; tap it when you are ready."; // owner (Sept 29)
-        const string HubKeyInHandLine = "You carry a Key the Chamber has not yet seen, acolyte. Its door stands open when you are ready."; // owner (worksheet section 13)
+        const string HubKeyInHandLine = "You carry a Key the Chamber has not yet seen, initiate. Its door stands open when you are ready."; // owner (worksheet section 13)
         const string HubKeysInHandLine = "You carry {0} Keys the Chamber has not yet seen. Its door stands open when you are ready."; // owner (worksheet section 13)
-        const string HubSpent2Line = "Two locks filled, acolyte. The first Book is one Key from opening, and I confess the air in this room has changed.\nThe shelves are taking their books back."; // owner (worksheet section 13)
-        const string HubSpent3Line = "Three locks turned, and the first Book breathes. He would not have believed it, acolyte, not in all his years.\nAnd look, there is light behind a sealed door now."; // owner (worksheet section 13)
-        const string HubWholeLine = "Four Keys spent, acolyte. The Zodiac Wing is whole, and the second Book has taken its first Key.\nWhat remains is sealed, for now. Rest, and let the Library settle into what you have given it."; // owner (worksheet section 13)
-        const string ChamberQuietLine = "The Books are quiet for now, acolyte. They will stir again when you carry the next Key."; // owner (worksheet section 13)
-        const string ChamberWholeLine = "The first Book open, the second begun. The Zodiac Wing is whole, acolyte.\nWhat remains is sealed, for now."; // owner (worksheet section 13)
-        const string ChamberBringLine = "Bring it to the Books."; // owner (worksheet section 13): "You hold a Key, acolyte. Bring it to the Books."
-        const string ChamberChooseLine = "Choose a lock, acolyte, and give it your Key."; // owner (worksheet section 13)
+        const string HubSpent2Line = "Two locks filled, seeker. The first Book is one Key from opening, and I confess the air in this room has changed.\nThe shelves are taking their books back."; // owner (worksheet section 13)
+        const string HubSpent3Line = "Three locks turned, and the first Book breathes. He would not have believed it, initiate, not in all his years.\nAnd look, there is light behind a sealed door now."; // owner (worksheet section 13)
+        const string HubWholeLine = "Four Keys spent, seeker. The Zodiac Wing is whole, and the second Book has taken its first Key.\nWhat remains is sealed, for now. Rest, and let the Library settle into what you have given it."; // owner (worksheet section 13)
+        const string ChamberQuietLine = "The Books are quiet for now, initiate. They will stir again when you carry the next Key."; // owner (worksheet section 13)
+        const string ChamberWholeLine = "The first Book open, the second begun. The Zodiac Wing is whole, seeker.\nWhat remains is sealed, for now."; // owner (worksheet section 13)
+        const string ChamberBringLine = "Bring it to the Books."; // owner (worksheet section 13): "You hold a Key, initiate. Bring it to the Books."
+        const string ChamberChooseLine = "Choose a lock, seeker, and give it your Key."; // owner (worksheet section 13)
         const string ChamberEndCard = "The Zodiac Wing is complete. The Library remembers, and the rest remains sealed, for now."; // owner (worksheet section 13); two lines at 330 wide
         bool ReducedMotion => Dial.Lesson.Dial.ReducedMotion;
         public SettingsMenu Settings { get; private set; } // Build U
@@ -953,7 +953,7 @@ namespace Ascendant.CelestialDial
             busy = true; int spent = Flow.LocksFilled; insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
             Slots.Paint(locks[spent - 1], Bone, 1f);
             bool opened = spent % SliceFlow.LocksPerBook == 0; int book = (spent - 1) / SliceFlow.LocksPerBook;
-            chamberLine = opened ? "The last lock turns, acolyte, and something inside the crystal stirs." : spent == 4 ? "The second Book takes its first Key, and the crystal trembles." : "Lock " + (spent % SliceFlow.LocksPerBook) + " of three turns. The Book accepts it and holds."; // owner (worksheet section 13)
+            chamberLine = opened ? "The last lock turns, seeker, and something inside the crystal stirs." : spent == 4 ? "The second Book takes its first Key, and the crystal trembles." : "Lock " + (spent % SliceFlow.LocksPerBook) + " of three turns. The Book accepts it and holds."; // owner (worksheet section 13)
             ShowChamberRoom(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? 1f : 1.4f);
             if (opened)
@@ -991,7 +991,7 @@ namespace Ascendant.CelestialDial
             chamberText.text = chamberLine;
         }
         // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
-        string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, acolyte. Bring them to the Books." : "You hold a Key, acolyte. " + ChamberBringLine); // owner (worksheet section 13)
+        string DefaultChamberLine() => Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, initiate. Bring them to the Books." : "You hold a Key, initiate. " + ChamberBringLine); // owner (worksheet section 13)
         void Restart() { if (busy) return; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); } // the slot in play (slot 1 if none), straight in, past the logo, the movie and the menu (owner, Oct 9)
         // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
         void JumpTo(string id)

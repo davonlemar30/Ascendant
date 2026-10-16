@@ -456,7 +456,7 @@ namespace Ascendant.CelestialDial
         {
             busy=true; int beginning=Lesson.Dial.Start; int steps=Lesson.Phase==LessonPhase.GlyphWheel ? Zodiac.Wrap(Lesson.Dial.Target-beginning) : Lesson.Dial.Forward;
             Lesson.Dial.PositionSilently(beginning); targetTurns=turns=beginning; LayoutRing();
-            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch me, acolyte. I search the wheel until the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+" is selected. There, you see how it is done." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
+            message.text=Lesson.Phase==LessonPhase.GlyphWheel ? "Watch me, pupil. I search the wheel until the symbol of "+Zodiac.Seats[Lesson.Dial.Target].Name+" is selected. There, you see how it is done." : "Watch. I start at "+Zodiac.Seats[beginning].Name+" and count each sign after it."; RefreshSeats(); Publish();
             yield return new WaitForSecondsRealtime(Beat);
             for(int n=1;n<=steps;n++)
             {
