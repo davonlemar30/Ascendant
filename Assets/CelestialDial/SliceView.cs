@@ -2802,6 +2802,7 @@ namespace Ascendant.CelestialDial
         {
             public float At, Seconds; public string Frame, How = "cut"; public float X, Top, Width, Height, SrcX = float.NaN, SrcY = float.NaN; public int From;
             public float PushTo, PushSeconds; public Vector2 PushView;
+            public string PushEase = "smooth"; public float PushDelay; public bool Carry; // the launch's descent (owner, Oct 10, 86bcgfke1): a push may wait PushDelay s, ease its own way, and Carry on into the next shots (the shot ends without waiting for it), so the move never stops between pictures
             public string[] Loop; public float LoopFrame; public bool Moving;
             public float SpinFrom, SpinTo, SpinSeconds; public string SpinEase = "smooth"; // the launch movie (Oct 9): the frame turns from SpinFrom to SpinTo degrees over SpinSeconds (eased "smooth", "in" or "out"); a full frame scaled just enough that no edge shows (Cover), a round layer as it is; reduced motion holds it still
             public int Sectors; public bool Over; public bool Below; public string FadeEase = "linear"; // Below: a layer that fades in under the layers showing and replaces none (Earth under the burning wheel); FadeEase: the fade's alpha curve (the logo's is smooth) // How "sweep" (round 4): a radial reveal of a round layer over Seconds, smooth, or in Sectors hard steps (the twelve symbols); reduced motion: a plain fade. Over: a full frame that comes in over the round layers (they go when it is in)
@@ -2828,6 +2829,7 @@ namespace Ascendant.CelestialDial
         static PrologueStep LoopIn(float at, string frame, string[] loop, float frameSeconds, float seconds) => new PrologueStep { At = at, Frame = frame, How = "loop", Loop = loop, LoopFrame = frameSeconds, Seconds = seconds };
         static PrologueStep InBetween(PrologueStep step) { step.Moving = true; return step; }
         static PrologueStep Pushed(PrologueStep step, float to, Vector2 view, float seconds) { step.PushTo = to; step.PushView = view; step.PushSeconds = seconds; return step; }
+        static PrologueStep Carried(PrologueStep step, string ease, float delay = 0) { step.Carry = true; step.PushEase = ease; step.PushDelay = delay; return step; }
         static PrologueStep Spun(PrologueStep step, float from, float to, float seconds, string ease = "smooth") { step.SpinFrom = from; step.SpinTo = to; step.SpinSeconds = seconds; step.SpinEase = ease; return step; }
         static PrologueStep Sweep(float at, string frame, float seconds, int sectors = 0) => new PrologueStep { At = at, Frame = frame, How = "sweep", Seconds = seconds, Sectors = sectors };
         static PrologueStep Over(PrologueStep step) { step.Over = true; return step; }
@@ -2878,6 +2880,33 @@ namespace Ascendant.CelestialDial
         public const float SkipX = 118, SkipY = 744, SkipWidth = 96, SkipHeight = 44; // the bottom right, clear of the gear (a working choice)
         // the camera's offset for a scale and a view: at scale s the frame can move (s - 1) x half its size each way and never show an edge
         public static Vector2 CameraOffset(float scale, Vector2 view) { scale = Mathf.Max(1, scale); return new Vector2(-Mathf.Clamp(view.x, -1, 1) * 180 * (scale - 1), Mathf.Clamp(view.y, -1, 1) * 400 * (scale - 1)); }
+        // Quiet motion in the prologue's backgrounds (owner, Oct 10: "little background things, glowing lights, clouds"; Oct 11, Claude's
+        // recommendation A on the owner's word, task 86bcgfke1; this build does the lights, the clouds follow as cut layers): each painted
+        // light breathes like the menu's window (the same sine, GlowAt), each a little out of step with the others; drawn in code over the
+        // approved pictures (nothing repainted), moving with its frame's push and panel. Reduced motion shows the pictures as they are, with no glow.
+        // Places measured on the 720 x 1600 art as shares across and down; size is the outer glow's width and height in layout px.
+        public static readonly (string slot, float x, float y, float w, float h, float phase)[] PrologueLights = {
+            ("prologue-city", .581f, .237f, 30, 72, 0), ("prologue-city", .931f, .622f, 56, 56, 1.3f), // the lit window, the streetlamp
+            ("prologue-desk", .955f, .441f, 96, 96, .6f),                                              // the desk lamp
+            ("prologue-street-above", .889f, .242f, 56, 56, 2.1f),                                     // the streetlamp
+            ("prologue-caspar-back", .844f, .255f, 56, 56, 1.7f), ("prologue-caspar-turn", .844f, .255f, 56, 56, 1.7f), // the streetlamp behind him, the same lamp in the same place as he turns (Jeffrey, #159 N2: it stays lit across the cut)
+            ("prologue-puzzled", .906f, .422f, 56, 56, 2.6f) };                                        // the lamp in the room behind the glass
+        // only in the shots option A names (city, desk wide, street, Caspar's back, the puzzled panel): never in the light flooding in, the push into
+        // his eyes or the launch movie, which stay as they are (Jeffrey, #159 B1); the turn shot's face and eyes frames carry no light
+        public static readonly string[] LitShots = { "city", "desk", "street", "puzzled", "turn" };
+        readonly List<(Image glow, float phase)> prologueLights = new List<(Image, float)>();
+        void AddPrologueLight(RectTransform frame, (string slot, float x, float y, float w, float h, float phase) light)
+        {
+            var r = Rect("Light", frame, (light.x - .5f) * 360, light.y * 800, light.w, light.h); var im = r.gameObject.AddComponent<Image>(); im.sprite = SoftSprite(); im.raycastTarget = false;
+            im.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, 0); prologueLights.Add((im, light.phase));
+        }
+        void UpdatePrologueLights()
+        {
+            bool lit = !prologueStill && !Flow.AtLaunch && prologueShot >= 0 && prologueShot < playing.Length && LitShots.Contains(playing[prologueShot].Id);
+            foreach (var (glow, phase) in prologueLights) glow.color = new Color(GlowColor.r, GlowColor.g, GlowColor.b, lit ? GlowAt(Time.unscaledTime + phase) : 0);
+        }
+        public float PrologueLightAlpha(string slot) => prologueLights.Where(l => l.glow.transform.parent != null && l.glow.transform.parent.name == slot).Select(l => l.glow.color.a).DefaultIfEmpty(-1).Max(); // fixture evidence
+        public int PrologueLightCount => prologueLights.Count;
         sealed class PrologueFrame { public string Slot; public RectTransform Rect; public CanvasGroup Group; public Image Image, Fill; public bool Layer; } // Fill: a swept layer's radial mask (round 4); Layer: a round layer, not a full frame
         RectTransform prologue, prologueCamera, prologuePanels; Image prologueDim; Button skipButton;
         readonly Dictionary<string, PrologueFrame> prologueFrames = new Dictionary<string, PrologueFrame>();
@@ -2909,6 +2938,7 @@ namespace Ascendant.CelestialDial
                 if (Slots.Dress(image, slot)) image.preserveAspect = layer; // a box smaller than the column (the logo, a round layer) draws its file whole, its shape kept
                 else if (slot.StartsWith("intro-") && layer) LayerPlaceholder(holder, slot); // a labelled circle on transparency, so the layering shows
                 else PlaceholderFrame(holder, slot); // the labelled placeholder until the art lands (the brief)
+                if (image.sprite != null) foreach (var light in PrologueLights.Where(l => l.slot == slot)) AddPrologueLight(r, light); // lit art only: a placeholder has no lamp to glow
                 r.gameObject.SetActive(false); prologueFrames[slot] = new PrologueFrame { Slot = slot, Rect = r, Group = group, Image = image, Fill = fill, Layer = layer };
             }
             var dim = Rect("Dim", stage, 0, 400, 360, 800); prologueDim = dim.gameObject.AddComponent<Image>(); prologueDim.color = new Color(0, 0, 0, 0); prologueDim.raycastTarget = false;
@@ -2956,6 +2986,7 @@ namespace Ascendant.CelestialDial
         {
             ResetPrologueStage(); prologueShot = 0; Publish();
             if (leadIn > 0) yield return new WaitForSecondsRealtime(leadIn);
+            var carried = new List<Func<bool>>(); // pushes that run on across shots (the launch's descent)
             for (int i = 0; i < playing.Length; i++)
             {
                 var shot = playing[i]; prologueShot = i; prologueStill = ReducedMotion; shotFrames.Clear(); // a change to reduced motion lands from the next shot (Ashantis)
@@ -2970,10 +3001,10 @@ namespace Ascendant.CelestialDial
                 while (true)
                 {
                     float t = Time.unscaledTime - start;
-                    while (next < shot.Steps.Length && shot.Steps[next].At <= t) { live.Add(RunStep(shot.Steps[next])); next++; Publish(); }
+                    while (next < shot.Steps.Length && shot.Steps[next].At <= t) { (shot.Steps[next].Carry ? carried : live).Add(RunStep(shot.Steps[next])); next++; Publish(); }
                     if (shot.Under) prologueDim.color = new Color(0, 0, 0, Mathf.Lerp(0, shot.UnderDim, Mathf.Clamp01(t / StillFade)));
                     else CameraAt(shot, Mathf.Clamp01(t / shot.Seconds));
-                    live.RemoveAll(step => step());
+                    live.RemoveAll(step => step()); carried.RemoveAll(step => step()); UpdatePrologueLights();
                     if (shot.WheelZoom) WheelZoomTo(prologueStill ? 1 : WheelZoomAt(Time.unscaledTime - zoomBegan, zoomSeconds));
                     if (Flow.AtLaunch && Time.unscaledTime >= launchPublishAt) { launchPublishAt = Time.unscaledTime + .25f; Publish(); } // the launch's pushes and turn move every frame: the web state follows them four times a second
                     if (t >= shot.Seconds && live.Count == 0) break;
@@ -3019,7 +3050,7 @@ namespace Ascendant.CelestialDial
             if (step.PushTo > 1 && !prologueStill) // the frame's own slow push-in (reduced motion holds it still)
             {
                 lastPushView = step.PushView;
-                push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed) / Mathf.Max(.01f, step.PushSeconds)), sc = Mathf.Lerp(1, step.PushTo, Mathf.SmoothStep(0, 1, k));
+                push = () => { if (frame.Rect == null) return true; float k = Mathf.Clamp01((Time.unscaledTime - pushed - step.PushDelay) / Mathf.Max(.01f, step.PushSeconds)), sc = Mathf.Lerp(1, step.PushTo, Eased(step.PushEase, k));
                     frame.Rect.localScale = new Vector3(sc, sc, 1); frame.Rect.anchoredPosition = new Vector2(0, -400) + CameraOffset(sc, step.PushView); return k >= 1; };
             }
             else if (spins)
@@ -3170,6 +3201,7 @@ namespace Ascendant.CelestialDial
         // Round 4 (owner, Oct 9): the wheel and Earth are round cut-out layers (360 x 360, centred on the screen) over one painted sky. The wheel
         // draws itself in pencil (a radial sweep reveals its lines, then its twelve symbols appear one at a time in zodiac order), comes alive
         // as the black behind becomes the sky, burns alive and starts to spin, and spins on as it fades away, leaving a level Earth (Oct 9).
+        public const float EarthSeconds = 2.4f, EarthPushTo = 1.2f; public static float EarthPushSeconds => TransformSeconds - BurnAway + EarthSeconds + DescentFade; // Earth's push (86bcgfke1): from the moment the burning wheel has gone, easing in, on through the calm Earth and the first descent's fade, so it never stops
         public const float DrawSeconds = 2.5f, GlyphStep = .12f, BurnSeconds = 3f, TransformSeconds = 4.5f, EarthIn = .3f, EarthFade = 2.6f, BurnAway = 3f; // the transform (owner, Oct 9: "it doenst blend that cleanly"): the burning wheel spins on and fades away over BurnAway while a level Earth fades in under it, from EarthIn over EarthFade
         // the sweeps' start and direction (Image.Origin360: 0 bottom, 1 right, 2 top, 3 left; the offset turns the start further, in degrees,
         // counter-clockwise), set once the art lane reports where its wheel starts and which way its signs run; working choices until then
@@ -3197,13 +3229,13 @@ namespace Ascendant.CelestialDial
             new PrologueShot { Id = "alive", WheelZoom = true, Line = "The wheel lights up in gold, and the dark fills with stars.", Seconds = 2.6f, Steps = new[] { FadeTo(0, "intro-stars", 2.4f), FadeTo(0, "intro-wheel-lit", 2f) } }, // it comes alive: the lines lit, the symbols glowing, the black become the starry sky
             new PrologueShot { Id = "burn", Line = "The wheel burns with golden fire and begins to spin.", Seconds = BurnSeconds, Steps = new[] { Spun(FadeTo(0, "intro-wheel-burning", 1.8f), 0, SpinAtBurnEnd, BurnSeconds, "in") } }, // it burns alive and glows, and starts to spin (the lit wheel under it turns with it while it fades in)
             new PrologueShot { Id = "transform", Line = "The fire turns to light. The wheel becomes Earth.", Seconds = TransformSeconds, Steps = new[] { Spun(Cut(0, "intro-wheel-burning"), SpinAtBurnEnd, SpinTurn, TransformSeconds, "out"),
-                FadeAway(0, "intro-wheel-burning", BurnAway), Beneath(FadeTo(EarthIn, "intro-earth", EarthFade)) } }, // it spins on and fades away, the ring of fire leaving a level, calm Earth behind (Earth never turns)
-            new PrologueShot { Id = "earth", Line = "Earth, seen from space.", Seconds = 2.4f, Steps = new[] { Pushed(Cut(0, "intro-earth"), 1.12f, ViewOn(.5f, .5f), 2.4f) } }, // the calm Earth, a slow push
+                FadeAway(0, "intro-wheel-burning", BurnAway), Beneath(Carried(Pushed(FadeTo(EarthIn, "intro-earth", EarthFade), EarthPushTo, ViewOn(.5f, .5f), EarthPushSeconds), "in", BurnAway - EarthIn)) } }, // it spins on and fades away, the ring of fire leaving a level, calm Earth behind (Earth never turns)
+            new PrologueShot { Id = "earth", Line = "Earth, seen from space.", Seconds = EarthSeconds }, // the calm Earth: its push began in the transform, once the burning wheel had gone (owner, Oct 10: "a tad bit sooner, so it's seamless")
             Descent("continents", "intro-continents", 1.6f, "North America at night."), Descent("america", "intro-america", 1.6f, "The United States at night."), Descent("newyork-state", "intro-newyork-state", 1.4f, "New York State."), // flying down
             Descent("newyork-city", "intro-newyork-city", 1.4f, "New York City, between its rivers."), Descent("brooklyn", "intro-brooklyn", 1.4f, "Brooklyn's rooftops at night."), Descent("block", "intro-block", 1.8f, "A street of apartment buildings, a few cars, lit shopfronts."),
-            new PrologueShot { Id = "window", Line = "One building. Every window is dark but one.", Seconds = 2.2f, Steps = new[] { Over(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f)) } }, // one building, every window dark but one (the opening's own city frame); then the fade to the menu
+            new PrologueShot { Id = "window", Line = "One building. Every window is dark but one.", Seconds = 2.2f, Steps = new[] { Over(Carried(Pushed(FadeTo(0, "prologue-city", 1.2f), 1.08f, ViewOn(.581f, .237f), 2.2f), "out")) } }, // it arrives moving and settles on the window // one building, every window dark but one (the opening's own city frame); then the fade to the menu
         };
-        static PrologueShot Descent(string id, string frame, float seconds, string line) => new PrologueShot { Id = id, Line = line, Seconds = seconds, Steps = new[] { Over(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds)) } }; // each comes in over what shows (the first over Earth)
+        static PrologueShot Descent(string id, string frame, float seconds, string line) => new PrologueShot { Id = id, Line = line, Seconds = seconds, Steps = new[] { Over(Carried(Pushed(FadeTo(0, frame, DescentFade), DescentPush, ViewOn(.5f, .5f), seconds + DescentFade), "linear")) } }; // each comes in over what shows (the first over Earth), pushing at one steady speed, and keeps pushing while the next fades in over it (86bcgfke1: no stop between pictures)
         // a round layer's placeholder (round 4): a labelled circle on transparency, the disc's outer radius 153 (306 of the 720 file), so the layering shows
         public const float LayerRadius = 153;
         void LayerPlaceholder(RectTransform r, string slot)
