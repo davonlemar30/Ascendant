@@ -1,13 +1,15 @@
 // Run against the real locally served Unity build. Requires Playwright; no production dependency.
 const DEFAULT_CHART="You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."; // owner, Oct 15 (86bcg8nft): the skip path's note (Claude's draft, owner writes)
-const DEFAULT_ON_PAGE="This is the default chart. Add your own birth details and your chart will follow them."; // "Your Birth" while the default stands in (Claude's draft, owner writes)
-// reach a given sun by the chart path with no time and no place: the default 7:19 PM and Bushwick fill in (owner, Oct 15), so the sun follows the date
+const DEFAULT_ON_PAGE="This is the default chart. A personal chart needs your date, time and place. Add all three and your chart will follow them."; // "Your Birth" while the default stands in (owner, Oct 16; Claude's draft for Dante, owner writes)
+const DEFAULT_NEED="You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. A personal chart needs your date, time and place. You can add all three in your journal later."; // an "I don't know" answer (owner, Oct 16; Claude's draft for Dante, owner writes)
+// reach a given sun by the chart path with all three given (owner, Oct 16: a personal chart needs date, time and place): the default chart's 7:19 PM and Bushwick, so the sun follows the date
 async function sunByDate(pg,date,sun){
   const send=c=>pg.evaluate(k=>window.ascendantDial.act(k),c);
   await send('birth:chart');await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   await send('birthdate:'+date);await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
-  await send('birthtime-unknown');await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);
-  await send('birthplace-unknown');await pg.waitForFunction(s=>window.ascendantDial.snapshot().sunSign===s&&window.ascendantDial.snapshot().birthStep==='done',sun);
+  await send('birthtime:19:19');await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);
+  await send('birthplace-search:Bushwick');await pg.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);
+  await send('birthplace:0');await pg.waitForFunction(s=>window.ascendantDial.snapshot().sunSign===s&&window.ascendantDial.snapshot().birthStep==='done',sun);
 }
 const playwright=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const engine=process.env.BROWSER==='webkit' ? playwright.webkit : playwright.chromium; // BROWSER=webkit approximates iPhone browsers, which all run WebKit
@@ -1123,7 +1125,7 @@ const path=require('path');
       check((await snap()).dialWake===Math.min(4,(await snap()).keys),'the Dial\'s wake-up: back to as earned, the Dial shows the Keys\' step at '+viewport.width); }
     // batch 2: DEV Mode's cusp-day sample (owner ruling, Oct 2 evening): a fresh opening on the cusp day, the name kept; Oct 15: the default time settles it, so no question
     await act('jump-cusp');await dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='birth'&&window.ascendantDial.snapshot().birthStep==='done',{},{timeout:120000});
-    { const c=await snap(); check(c.playerName==='Tester' && !c.canCusp && c.sunSign==='Taurus' && !c.resumed,'DEV Mode\'s cusp-day sample: the opening on the cusp day (London, Apr 20 1990, no birth time), not asked, the name kept, at '+viewport.width); }
+    { const c=await snap(); check(c.playerName==='Tester' && !c.canCusp && c.sunSign==='Scorpio' && c.note.includes('default chart') && !c.resumed,'DEV Mode\'s cusp-day sample: the opening on the cusp day (Apr 20 1990, no birth time) ends on the whole default chart (owner, Oct 16), not asked, the name kept, at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-cusp.png')});
     // Oct 7 (86bced0tc): DEV Mode's sample for each other path, a fresh opening at its first question, the name kept
     for(const [id,step] of [['no-time','done'],['no-place','done'],['neither','done'],['skip','done']]){ // owner, Oct 15: every sample ends on the chart, the default filling what is blank
@@ -1145,26 +1147,20 @@ const path=require('path');
   // owner, Oct 15: the skip path asks nothing; the default chart (Nov 4 1990, 7:19 PM, Bushwick) stands, told once
   await action('birth-skip');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');check(!(await recovery.evaluate(()=>window.ascendantDial.snapshot().canSignPick))&&!(await recovery.$('#sign-unknown')),'the skip path asks no sign');
   { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(r.bigThree.startsWith('\u2609 Scorpio \u00b7 \u263d ') && !r.bigThree.includes('unknown') && r.note.startsWith('Your sun sign is Scorpio, your moon sign ') && r.note.endsWith(DEFAULT_CHART) && r.sunKnown && r.canSliceContinue,'I\'ll skip it: the default chart, the note in full, no unknown: '+r.bigThree); }
-  // Oct 7: I don't know where keeps the time and works out what holds in every zone; the moon (if it could be two signs) and the rising are picked
+  // owner, Oct 16: I don't know where gives the whole default chart, never the player's date and time with a default place
   await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   await recovery.locator('#birthdate').fill('1990-05-10');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
   await recovery.locator('#birthtime').fill('14:30');await recovery.locator('#birthtime').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace&&window.ascendantDial.snapshot().canPlaceUnknown);
   await recovery.screenshot({path:path.join(out,'390-birth-place-step.png')});
   await action('place-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
   await recovery.screenshot({path:path.join(out,'390-birth-place-filled.png')});
-  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(!r.risingChosen && r.sunSign==='Taurus' && !r.bigThree.includes('unknown') && !r.bigThree.includes(' or ') && JSON.parse(r.birthRecord).birth.timeFrom===870 && JSON.parse(r.birthRecord).birth.place==='' && JSON.parse(r.birthRecord).filled.place!=='','86bcg8nft (2A): I don\'t know where: the time kept, a place drawn from the list (marked, shown nowhere), the rising worked out: '+r.bigThree); }
-  // the cusp day (owner ruling, Oct 2 evening); Oct 15: no birth time is not asked, the default time (7:19 PM) settles it
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); const rec=JSON.parse(r.birthRecord); check(!r.risingChosen && r.sunSign==='Scorpio' && !r.bigThree.includes('unknown') && !rec.birth.date && rec.birth.timeFrom===-1 && rec.birth.place==='' && rec.filled.date==='1990-11-04' && rec.filled.timeFrom===1159 && rec.filled.place==='Bushwick, NY, United States' && r.note.endsWith(DEFAULT_NEED),'owner, Oct 16: I don\'t know where gives the whole default chart (the date and time given are not kept), the note says a personal chart needs all three: '+r.bigThree); }
+  // the cusp day (owner ruling, Oct 2 evening); Oct 16: no birth time means no personal chart, so the whole default chart stands
   await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   await recovery.locator('#birthdate').fill('1990-04-20');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
-  await action('time-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);await recovery.locator('#birthplace').fill('London');
-  await recovery.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);await action('place-match-0');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
-  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(!r.canCusp && r.bigThree.startsWith('\u2609 Taurus \u00b7 ') && !r.bigThree.includes(' or ') && !r.bigThree.includes('unknown') && JSON.parse(r.birthRecord).filled.timeFrom>=0 && r.canSliceContinue,'owner, Oct 15: a cusp day with no birth time is not asked; the default time settles the sun: '+r.bigThree); }
-  // the owner, Oct 7 ("Ask, like the cusp Sun"): the moon's two signs are asked (no I'm not sure since 86bced0tc); a pick is the player's moon
-  await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
-  await recovery.locator('#birthdate').fill('1990-05-01');await recovery.locator('#birthdate').dispatchEvent('change');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthTime);
-  await action('time-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthPlace);await recovery.locator('#birthplace').fill('London');
-  await recovery.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[]).length>0);await action('place-match-0');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
-  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); check(/^\u2609 Taurus \u00b7 \u263d (Cancer|Leo) \u00b7 \u2191 /.test(r.bigThree) && !r.bigThree.includes('unknown') && !r.canMoon && r.canSliceContinue,'86bcg8nft: a day the moon changed sign is no longer asked; the drawn time settles it: '+r.bigThree); }
+  await action('time-unknown');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().birthStep==='done');
+  { const r=await recovery.evaluate(()=>window.ascendantDial.snapshot()); const rec=JSON.parse(r.birthRecord); check(!r.canCusp && r.bigThree.startsWith('\u2609 Scorpio \u00b7 ') && !r.bigThree.includes(' or ') && !r.bigThree.includes('unknown') && !rec.birth.date && rec.filled.timeFrom===1159 && rec.filled.place==='Bushwick, NY, United States' && r.note.endsWith(DEFAULT_NEED) && r.canSliceContinue,'owner, Oct 16: a cusp day with no birth time is not asked; the whole default chart stands: '+r.bigThree); }
+  // the owner, Oct 7 ("Ask, like the cusp Sun"): a day the moon changed sign is not asked once all three are given (owner, Oct 16)
   await action('change-birth');await action('birth-chart');await recovery.waitForFunction(()=>window.ascendantDial.snapshot().canBirthDate);
   await recovery.locator('#birthdate').fill('1990-05-01');await recovery.locator('#birthdate').dispatchEvent('change');
   // batch 2: the date, then the time, then the town picked from the bundled list; the chart is worked out once (Meeus; the mechanical checks hold it to JPL Horizons)

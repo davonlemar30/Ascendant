@@ -310,11 +310,13 @@ namespace Ascendant.CelestialDial
             Label(birthDate, "Your birth date: day, month, year", 0, 0, 320, 22, 14);
             dateField = TextBox(birthDate, "Date box", 0, 48, 200, 48, "DD/MM/YYYY", v => UseDate(v));
             dateHint = Label(birthDate, "Like 25/04/1990.", 0, 88, 320, 20, 12); dateHint.color = Muted;
+            Label(birthDate, SliceFlow.ChartRule, 0, 182, 320, 40, 12).color = Muted; // the rule (owner, Oct 16): all three, or the default chart
             MakeButton(birthDate, "Use this date", 0, 130, 200, 52, () => UseDate(dateField.text));
             birthTimeEntry = Rect("Time entry", birth, 0, 400, 360, 220);
             Label(birthTimeEntry, "Your birth time", 0, 0, 320, 22, 14);
             timeField = TextBox(birthTimeEntry, "Time box", 0, 48, 200, 48, "HH:MM", v => UseTime(v));
             Label(birthTimeEntry, "Like 14:30, or 2:30 pm.", 0, 88, 320, 20, 12).color = Muted;
+            Label(birthTimeEntry, "No time? You get the default chart.", 0, 246, 320, 20, 12).color = Muted; // Claude's draft for Dante (owner, Oct 16)
             MakeButton(birthTimeEntry, "Use this time", 0, 130, 200, 52, () => UseTime(timeField.text));
             timeUnknown = MakeButton(birthTimeEntry, "I don't know my birth time", 0, 192, 260, 52, () => { if (!busy && Flow.SetBirthTime(-1)) AfterBirthEntry(); });
             birthPlaceEntry = Rect("Place entry", birth, 0, 400, 360, 220);
@@ -866,7 +868,7 @@ namespace Ascendant.CelestialDial
             SaveSlots.Write(SaveSlots.InPlay, JsonUtility.ToJson(save)); Reload(true);
         }
         // DEV Mode (Oct 7, 86bced0tc): a fresh opening at a path's first question, the name kept: skip (the default chart), no-time
-        // (London, May 2 1990, no birth time) and no-place (May 10 1990, 2:30 pm, I don't know where), each now a chart with the default pieces for what is blank (owner, Oct 15),
+        // (London, May 2 1990, no birth time) and no-place (May 10 1990, 2:30 pm, I don't know where), each now the whole default chart, since a personal chart needs date, time and place (owner, Oct 16),
         // neither (Apr 20 1990, no time, no place: a cusp day, which the default time now settles with no question)
         void BirthOpening(string id) { if (busy || !SettingsMenu.BirthSamples.Any(b => b.id == id)) return; birthSampleFor = Flow.PlayerName; birthSampleId = id; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); }
         void OpenBirthOpening()
@@ -876,7 +878,7 @@ namespace Ascendant.CelestialDial
             if (id == "skip") Flow.ChooseBirth("skip");
             else if (id == "no-time") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 5, 2); Flow.SetBirthTime(-1); Flow.SetBirthPlace(Places.Find("London, Britain (UK)")); }
             else if (id == "no-place") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 5, 10); Flow.SetBirthTime(14 * 60 + 30); Flow.SetBirthPlace(null); }
-            else if (id == "neither") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 4, 20); Flow.SetBirthTime(-1); Flow.SetBirthPlace(null); } // a cusp day, which the default time and place settle (owner, Oct 15)
+            else if (id == "neither") { Flow.ChooseBirth("chart"); Flow.SetBirthDate(1990, 4, 20); Flow.SetBirthTime(-1); Flow.SetBirthPlace(null); } // a cusp day, which the whole default chart settles (owner, Oct 16)
             if (nameField != null) nameField.SetTextWithoutNotify(Flow.PlayerName); ShowBirth();
         }
         void CuspDay() { if (busy) return; cuspDayFor = Flow.PlayerName; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); }
@@ -898,9 +900,9 @@ namespace Ascendant.CelestialDial
         {
             switch (Flow.BirthStep)
             {
-                case "date": return " Enter your birth date: day, month and year.";
-                case "time": return " Enter your birth time, if you know it.";
-                case "place": return " Enter your birth town or city, then pick it. " + SliceFlow.NearestCity;
+                case "date": return " Enter your birth date: day, month and year. " + SliceFlow.ChartRule;
+                case "time": return " Enter your birth time. If you don't know it, you get the default chart.";
+                case "place": return " Enter your birth town or city, then pick it. " + SliceFlow.NearestCity + " If you don't know where, you get the default chart.";
                 case "rising-pick": return Flow.BirthChoice == "rising" ? " Choose your rising sign." : " " + SliceFlow.SkipRisingAsk;
                 case "cusp": return " " + Flow.CuspQuestion + (cuspWhyOpen ? " " + SliceFlow.CuspWhy : "");
                 case "moon": return " " + Flow.MoonQuestion;

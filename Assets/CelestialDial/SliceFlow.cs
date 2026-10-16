@@ -154,9 +154,9 @@ namespace Ascendant.CelestialDial
         // ---- The birth record (the birth-time build, owner, Oct 7: the recommendation on 86bceb6fq approved, comment 90140265369479) ----
         // Facts come from the player, the player's choices fill what the facts can't decide, and the game works out the rest (since 86bcg8nft, a missing piece is the default chart's, kept apart in Filled):
         // worked out (exact or stable) beats chosen, and chosen beats unknown; an uncertain point shows its options ("Pisces or Aries", Oct 3).
-        // The opening's question has two answers. "Yes, I know my birthday": the date, then the time (or "I don't know my birth time"), then the
-        // place (or "I don't know where"), the chart worked out from whatever is known, and on a cusp day the sun asked (Oct 2). "I'll skip it":
-        // the default chart (owner, Oct 15, 86bcg8nft): no questions. "Enter what I already know"
+        // The opening's question has two answers. "Yes, I know my birthday": the date, then the time, then the place, the chart worked out from
+        // all three. "I don't know my birth time" or "I don't know where" gives the whole default chart (owner, Oct 16: "The player has to know ALL of
+        // their details or else they MUST choose the default birth date."), never a mix. "I'll skip it": the default chart (owner, Oct 15, 86bcg8nft): no questions. "Enter what I already know"
         // and the random sun are retired (Oct 7). Whatever the facts leave open (the cusp, the moon, the rising) is picked, never "I'm not sure". Later, "Your Birth" in the journal adds a missing fact (the opening's boxes, in
         // order: date, time, place) or chooses the rising (Oct 3: no label, a hidden flag). Adding facts only narrows the window, so a point
         // already worked out keeps its sign; a choice gives way to a sign the facts decide; nothing already played changes.
@@ -202,38 +202,37 @@ namespace Ascendant.CelestialDial
         ChoiceRecord heldSun, heldMoon, heldRising;
         // ---- The default birth chart (owner, Oct 15, 86bcg8nft, replacing the Oct 9 random fill: "Making up details is out"): the player was
         // born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. It is the player's chart whenever the player skips the question or
-        // lacks a detail. Facts keeps only what the player gave; Filled keeps the default pieces standing in for the rest (the save's mark).
-        // The chart is worked out from the two together, so every record is whole: an exact sun, moon and rising. A real piece added later
-        // replaces its default one, and the chart may change. "Your Birth" shows the default pieces as the default, with Add.
+        // lacks any one of the date, the time and the place (owner, Oct 16). Facts is empty then and Filled keeps the whole default (the save's mark),
+        // so every record is whole: an exact sun, moon and rising. A personal chart added later (all three) replaces it, and the chart may change.
+        // "Your Birth" shows the default rows as the default, with Add. An older save may still hold a mix of the two; it is kept as it was.
         public BirthFacts Filled { get; private set; } = new BirthFacts();
         BirthFacts pendingFill;
         public const int DefaultYear = 1990, DefaultMonth = 11, DefaultDay = 4, DefaultMinute = 19 * 60 + 19; // 7:19 PM
         public const string DefaultPlaceName = "Bushwick, NY, United States"; // the bundled list's name for Bushwick, Brooklyn (40.69 N, 73.92 W; America/New_York, EST on Nov 4 1990)
         public const string DefaultTag = " (default)";
         public const string DefaultChartNote = "You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."; // Claude's draft, checked by Dante (owner writes)
-        public const string DefaultPartNote = "The default chart fills in what you left blank: {0}. You can add your own in your journal later."; // Claude's draft, checked by Dante (owner writes)
-        public const string DefaultOnPage = "This is the default chart. Add your own birth details and your chart will follow them."; // "Your Birth" while a default stands in: Claude's draft, checked by Dante (owner writes)
+        public const string DefaultNeedNote = "You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. A personal chart needs your date, time and place. You can add all three in your journal later."; // the opening's "I don't know" answers (owner, Oct 16): Claude's draft for Dante (owner writes)
+        public const string ChartRule = "A personal chart needs your date, time and place. If you don't know all three, you get the default chart."; // under the date and time boxes (owner, Oct 16): Claude's draft for Dante (owner writes)
+        public const string ChartStays = "Your chart stays as it is. A personal chart needs your date, time and place."; // "Your Birth", when an Add ends in "I don't know" (owner, Oct 16): Claude's draft for Dante (owner writes)
+        public const string DefaultOnPage = "This is the default chart. A personal chart needs your date, time and place. Add all three and your chart will follow them."; // "Your Birth" while a default stands in: Claude's draft, checked by Dante (owner writes)
         public static BirthFacts DefaultBirth()
         {
             var f = new BirthFacts(); f.SetDate(DefaultYear, DefaultMonth, DefaultDay); f.SetTime(DefaultMinute); f.SetPlace(Places.Find(DefaultPlaceName)); return f;
         }
-        bool Filling => !Amending || Filled.Any;
-        static BirthFacts Overlay(BirthFacts given, BirthFacts fill)
+        static bool Complete(BirthFacts f) => f.HasDate && f.HasTime && f.HasPlace;
+        // The player's ruling (owner, Oct 16, ClickUp 2kyd583p-25654): "The player has to know ALL of their details or else they MUST choose the default birth date."
+        // A personal chart needs the date, the time and the place. If any one is missing, the whole default chart stands, never a mix of the two.
+        void FillDefault()
         {
-            var r = given.Clone();
-            if (!r.HasDate) r.date = fill.date;
-            if (!r.HasTime) { r.timeFrom = fill.timeFrom; r.timeTo = fill.timeTo; }
-            if (!r.HasPlace) { r.place = fill.place; r.zone = fill.zone; r.latitude = fill.latitude; r.longitude = fill.longitude; }
-            return r;
+            var fill = DefaultBirth(); draft = new BirthFacts();
+            pending = BirthChart.Work(fill); pendingFill = fill;
         }
-        // the facts given, with every missing piece taken from the default chart; a cusp day never asks, since the default time and place settle it
-        void Fill()
+        // an answer of "I don't know" at the opening gives the whole default chart; on "Your Birth" the record stays as it is
+        void UseDefault(string unknown)
         {
-            var fill = DefaultBirth();
-            if (draft.HasDate) fill.date = "";
-            if (draft.HasTime) fill.timeFrom = fill.timeTo = -1;
-            if (draft.HasPlace) fill.SetPlace(null);
-            pending = BirthChart.Work(Overlay(draft, fill)); pendingFill = fill;
+            Logged?.Invoke(unknown); Answered();
+            if (Amending) { FinishAmending(new List<string> { ChartStays }); return; }
+            Logged?.Invoke("chart_worked_out"); FillDefault(); Commit();
         }
         // No unknown Big Three (owner, Oct 7, task 86bced0tc: "i dont want the player to have an unknown big three or sign during there play
         // thru"; "Yes, at the opening"): whatever the facts can't settle is asked, in the record's order (the sun, the moon, the rising), with
@@ -300,7 +299,7 @@ namespace Ascendant.CelestialDial
             BirthStep = BirthChoice == "chart" ? "date" : "";
             birthAnswers = BirthChoice == "" ? 0 : 1; // the answer to the birth question is the first of the birth's stars
             Logged?.Invoke("birth_choice:" + BirthChoice);
-            if (BirthChoice == "skip") { Fill(); Commit(); } // owner, Oct 15: skipping gives the default chart, with no more questions
+            if (BirthChoice == "skip") { FillDefault(); Commit(); } // owner, Oct 15: skipping gives the default chart, with no more questions
         }
         // the steps in order; on "Your Birth" only the facts still missing are asked
         static readonly string[] FactSteps = { "date", "time", "place" };
@@ -320,18 +319,20 @@ namespace Ascendant.CelestialDial
         public bool SetBirthTime(int minuteOfDay) // -1: "I don't know my birth time"
         {
             if (!OnFactStep("time") || minuteOfDay < -1 || minuteOfDay >= 24 * 60) return false;
-            draft.SetTime(minuteOfDay); Note = ""; Logged?.Invoke(minuteOfDay < 0 ? "birth_time_unknown" : "birth_time_entered"); Answered(); Advance("time"); return true;
+            Note = ""; if (minuteOfDay < 0) { UseDefault("birth_time_unknown"); return true; } // without the time there is no personal chart (owner, Oct 16)
+            draft.SetTime(minuteOfDay); Logged?.Invoke("birth_time_entered"); Answered(); Advance("time"); return true;
         }
         public bool SetBirthPlace(Place place) // null: "I don't know where"
         {
             if (!OnFactStep("place")) return false;
-            draft.SetPlace(place); Logged?.Invoke(place == null ? "birth_place_unknown" : "birth_place_entered"); Answered(); Advance("place"); return true;
+            if (place == null) { UseDefault("birth_place_unknown"); return true; } // without the place there is no personal chart (owner, Oct 16)
+            draft.SetPlace(place); Logged?.Invoke("birth_place_entered"); Answered(); Advance("place"); return true;
         }
         // the facts are in: work the chart out; on a cusp day ask the sun, unless the player already chose one of its two signs
         void Settle()
         {
-            if (Filling) { if (!Amending) Logged?.Invoke("chart_worked_out"); Fill(); Commit(); return; } // what is missing is the default chart's (owner, Oct 15)
-            pending = BirthChart.Work(draft); var sun = pending.Worked.Point("sun"); var chosen = ChoiceFor("sun");
+            if (!Complete(draft)) { UseDefault("birth_incomplete"); return; } // a personal chart needs all three (owner, Oct 16)
+            pending = BirthChart.Work(draft); pendingFill = new BirthFacts(); var sun = pending.Worked.Point("sun"); var chosen = ChoiceFor("sun"); // a personal chart replaces any default one
             if (sun != null && !sun.Settled && !(chosen != null && sun.signs.Contains(chosen.sign)))
             {
                 CuspFrom = pending.SunFrom; CuspTo = pending.SunTo; CuspNoon = pending.SunNoon; var zone = draft.AsPlace?.Zone ?? -1; CuspMinute = zone >= 0 ? BirthChart.LocalMinuteOf(pending.Ingress, zone) : -1;
@@ -380,9 +381,7 @@ namespace Ascendant.CelestialDial
             if (Filled.Any && MoonSign >= 0 && RisingSign >= 0)
             {
                 string three = "Your sun sign is " + Zodiac.Seats[SunSign].Name + ", your moon sign " + Zodiac.Seats[MoonSign].Name + ", and your rising sign " + Zodiac.Seats[RisingSign].Name + ". ";
-                if (!Facts.HasDate) return three + DefaultChartNote;
-                var parts = new List<string>(); if (!Facts.HasTime) parts.Add("7:19 PM"); if (!Facts.HasPlace) parts.Add("Bushwick, Brooklyn, New York");
-                return three + string.Format(DefaultPartNote, string.Join(" and ", parts));
+                return three + (BirthChoice == "chart" ? DefaultNeedNote : DefaultChartNote); // the skip path or an "I don't know" answer; never a mix (owner, Oct 16)
             }
             string Sign(int seat) => Zodiac.Seats[seat].Name; bool dated = Facts.HasDate, noTime = dated && !Facts.HasTime, noPlace = dated && Facts.HasTime && !Facts.HasPlace;
             string why = noPlace ? " Without a birth place, your rising sign stays unknown." : noTime ? " Without a birth time, your rising sign stays unknown." : " Your rising sign stays unknown."; // the second: Dante-checked (Oct 7)
