@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: aa84e52a4b8d24c47a8228157937cfeb
+guid: 9be0aa72c6c3444bbfc1b4a455698b09
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2748006469028850334
-    second: table-plate-gold_0
+      213: 4682485178342119373
+    second: table-tray-shut_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,7 +72,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 256
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: table-plate-gold_0
+      name: table-tray-shut_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 164
-        height: 88
+        width: 172
+        height: 96
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e9aa0f2f251e22620800000000000000
-      internalID: 2748006469028850334
+      spriteID: 987a24825fdd44e6b03417c55900d043
+      internalID: 4682485178342119373
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 81edaa8000284013855f08f5db2905b5
     internalID: 0
     vertices: []
     indices: 

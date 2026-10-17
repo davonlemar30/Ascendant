@@ -53,14 +53,10 @@ Sizes are the placeholder's rect on the 360 × 800 reference layout; the cap is 
 | `book-cover` | 140 × 140 | 512 | the book on the shelf, closed |
 | `book-page` | 140 × 140 | 512 | the book's open page behind each symbol |
 | `book-room` | 360 × 800 | 2048 | the Book of Symbols' screen: the Book open on a carved lectern in the Zodiac Wing's moonlight, two candles; behind today's layout (owner, Oct 7, 86bcex5kc 4A; 86bcf0x71) |
-| `table-room` | 360 × 800 | 2048 | the Elemental Table's screen: the Zodiac Wing's own lectern table from above, alive (owner's pick, Oct 8): gold inlay glowing from within, blackened iron fittings, a carved scorpion and phoenix on its header, dark mist; twelve slate squares on the cells, a wide left rail and header for the names, a tray on its front lip (86bcf0x71) |
+| `table-room` | 360 × 800 | 2048 | the Elemental Table's screen: the Zodiac Wing's own lectern table seen from above (owner's pick, Oct 8; edited in place Oct 16): thin gold rules in slate, flat blackened iron corners, a carved scorpion and phoenix on its header, dark mist; a shallow tray on its front lip that holds the twelve plates |
 | `table-well` | 86 × 48 | 256 | one slate square, cut from table-room's centre square and drawn at each of the twelve, so all twelve are identical; empty |
-| `table-plate` | 82 × 44 | 256 | a plain pale wooden plate, one per sign (owner's pick, Oct 8); the game burns its symbol and name in |
-| `table-plate-gold` | 82 × 44 | 256 | the same plate turned gold, when a sign is placed on the player's own (owner, Oct 7) |
-| `letter-fire` | 128 × 128 | 512 | a tileable fill of drawn flames and embers for the Table's live lettering (Shaders/LetterFill) |
-| `letter-earth` | 128 × 128 | 512 | a tileable fill of drawn moss and stone for the Table's live lettering |
-| `letter-air` | 128 × 128 | 512 | a tileable fill of drawn wind and cloud for the Table's live lettering |
-| `letter-water` | 128 × 128 | 512 | a tileable fill of drawn deep water for the Table's live lettering |
+| `table-plate` | 82 × 44 | 256 | a plain dark slate plate with a thin gold rim, one per sign (owner, Oct 16, board 4); the game engraves its symbol and, small beneath it, its name |
+| `table-tray-shut` | 360 × 174 | 2048 | the Table's tray slid shut once all twelve are placed (owner, Oct 16, board 5): table-room's tray band (layout top 310 to 484) with a lid of the tray's own wood and a small bronze pull; it slides down into place |
 | `emblem-aries` | 180 × 180 | 512 | the Aries symbol as a living emblem of fire, raised by the Book once it is answered (owner, Oct 8: the set approved) |
 | `emblem-taurus` | 180 × 180 | 512 | the Taurus symbol as a living emblem of earth, raised by the Book once it is answered (owner, Oct 8: the set approved) |
 | `emblem-gemini` | 180 × 180 | 512 | the Gemini symbol as a living emblem of air, raised by the Book once it is answered (owner, Oct 8: the set approved) |
@@ -292,7 +288,7 @@ Applied by [`Assets/Editor/CelestialDial/SlotImport.cs`](../../Assets/Editor/Cel
 - **Images:** Sprite (2D and UI), single, full-rect mesh, no mipmaps, alpha is transparency, sRGB, not readable, clamp, bilinear, no power-of-two scaling; **max size per slot** (the cap above); **compressed with crunch at quality 50** (the download shrinks several times over; the on-device format follows the WebGL texture setting, DXT by default). A side that is not a multiple of 4 is warned about.
 - **Sounds:** Vorbis at quality 0.5, optimized sample rate, preloaded; cues forced to mono and decompressed on load (no latency), the ambient loop stereo and compressed in memory.
 
-Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (224). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
+Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) added well under 1 MB to the WebGL build; the measured increase is in [VALIDATION.md](VALIDATION.md) under Build E. The set has grown with the manifest since: it now holds one image per image slot (220). Real art will cost more; the style page is where to judge a set before it goes in, and the build's `.data` size before and after is the number to watch.
 
 ## The test set and the style page
 
