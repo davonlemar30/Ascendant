@@ -110,6 +110,7 @@ namespace Ascendant.CelestialDial
             public string glyphMode = "", glyphChar = "", glyphTarget = "";
             public string[] glyphOptions;
             public string bookEmblem = ""; public int[] bookInk = new int[0]; public bool bookPages, bookRising, bookArt; public int bookInkDrawn; public string bookPicked = ""; public float[] bookInkBox = new float[0]; // the Book comes alive (owner, Oct 7-8): the emblem shown, each seat's ink (0, 1 faint, 2 full), the pages' look, the rise, the right plate
+            public bool bookRibbon; // the Quill Line (owner, Oct 17): the ink ribbon is on screen, carrying a right answer from its stone to the page
             public string screen = "wing", playerName = "", caspar = "", note = "";
             public string casparPose = ""; // Build P: the pose Caspar holds on a story screen; empty when no figure shows
             public float chatBoxHeight;
