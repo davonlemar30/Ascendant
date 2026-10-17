@@ -41,7 +41,7 @@ namespace Ascendant.CelestialDial
         Image glyphEmblem, bookRibbon; RectTransform bookCardRect, glyphPanel; readonly Text[] bookInk = new Text[12];
         readonly Image[] stoneGlow = new Image[4]; readonly Text[] stoneLabel = new Text[4];
         bool glyphDragging; Vector2 glyphDragHome; int glyphHoverSlot = -1;
-        int revealSeat = -1, revealSlot = -1, shownGlyph = -2; bool revealOwn, bookPagesShown, glyphRising; string[] revealNames = new string[4];
+        int revealSeat = -1, revealSlot = -1, shownGlyph = -2; bool revealOwn, revealCorrect, bookPagesShown, glyphRising; string[] revealNames = new string[4];
         public const float EmblemY = 186, EmblemSize = 185, CardY = 345, RiseFrom = 365, RiseSeconds = .45f, BookPagesSeconds = 2.2f;
         public static readonly Color DarkPlate = new Color(.34f, .32f, .32f), BookInk = new Color(.23f, .14f, .09f);
         public static readonly Color GlyphGold = new Color(.91f, .66f, .23f), StoneInk = new Color(.89f, .82f, .65f), StoneGlow = new Color(.94f, .75f, .35f); // the Quill Line: one gold for every waiting symbol, the stones' engraved names, the held light while a glyph is dragged over them
@@ -1287,7 +1287,7 @@ namespace Ascendant.CelestialDial
             bool correct = Dial.Lesson.AnswerGlyphName(seat);
             if (Dial.Lesson.GlyphNamed[target]) // answered, or shown after a second miss: it comes alive (owner, Oct 7: only after the answer)
             {
-                revealSeat = target; revealSlot = System.Array.IndexOf(options, target); revealOwn = correct && own;
+                revealSeat = target; revealSlot = System.Array.IndexOf(options, target); revealOwn = correct && own; revealCorrect = correct;
                 for (int i = 0; i < 4; i++) revealNames[i] = Zodiac.Seats[options[i]].Name;
             }
             glyphNote.text = Dial.Lesson.GlyphNameResult; Publish();
@@ -1315,7 +1315,7 @@ namespace Ascendant.CelestialDial
             var ink = InkSpots[InkPlace[seat]]; Vector2 inkAnchor = new Vector2(ink.x, -ink.y);
             int inkState = InkOf(seat); float inkAlpha = inkState == 2 ? InkFull : inkState == 1 ? InkFaint : 0f;
             var cardRT = (RectTransform)bookCardRect; Vector2 cardFrom = cardRT.anchoredPosition; Vector3 scaleFrom = cardRT.localScale;
-            if (ReducedMotion) { bookInk[seat].color = new Color(BookInk.r, BookInk.g, BookInk.b, inkAlpha); Publish(); yield return new WaitForSecondsRealtime(hold); }
+            if (ReducedMotion || !revealCorrect) { if (!revealCorrect && !ReducedMotion) StartCoroutine(GlyphFloatHome()); bookInk[seat].color = new Color(BookInk.r, BookInk.g, BookInk.b, inkAlpha); Publish(); yield return new WaitForSecondsRealtime(hold); } // the ribbon is a right answer's payoff (owner, Oct 17); a second miss's reveal just inks faintly
             else
             {
                 float shrink = .25f, fillSeconds = .45f;
