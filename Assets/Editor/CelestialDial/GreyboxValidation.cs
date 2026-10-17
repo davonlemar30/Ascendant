@@ -581,8 +581,7 @@ namespace Ascendant.Build
                 "a sign placed on the player's own is lit gold inlay with a soft light behind it; one placed with Caspar's help is the same gold, dull and unlit (owner, Oct 16, board 3 A)");
             Check(SliceView.FrameGold.r > SliceView.FrameGold.g && SliceView.FrameGold.g > SliceView.FrameGold.b && SliceView.TrayInk.r > SliceView.TrayInk.b && SliceView.TraySlideSeconds > 0 && SliceView.TraySlideSeconds <= 1,
                 "the frame's names are inlaid gold, the tray's plates are engraved in muted gold, and the tray slides shut in under a second (owner, Oct 16, board 5 A)");
-            var shader = Resources.Load<Shader>("Shaders/LetterFill");
-            Check(shader != null && shader.name == "Ascendant/LetterFill" && shader.isSupported, "the live lettering's shader ships under Resources (so the Web build carries it) and compiles");
+            Check(Resources.Load<Shader>("Shaders/LetterFill") == null, "the retired letter fills' shader is gone from Resources, so the Web build no longer carries it (owner, Oct 16, Revision 3)");
             Check(SliceView.InkPlace.OrderBy(x => x).SequenceEqual(Enumerable.Range(0, 12)) && !SliceView.InkPlace.SequenceEqual(Enumerable.Range(0, 12)) && SliceView.InkSpots.Length == 12 && SliceView.InkSpots.Distinct().Count() == 12
                 && SliceView.InkSpots.Take(6).All(p => p.x <= -24) && SliceView.InkSpots.Skip(6).All(p => p.x >= 24) && SliceView.InkSpots.All(p => Mathf.Abs(p.x) <= 126 && p.y >= 308 && p.y <= 388)
                 && new[] { SliceView.InkSpots.Take(6), SliceView.InkSpots.Skip(6) }.All(page => page.All(p => page.Where(q => q != p).Min(q => Vector2.Distance(p, q)) >= SliceView.InkSize + 2)),
