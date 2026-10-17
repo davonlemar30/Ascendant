@@ -55,16 +55,13 @@ namespace Ascendant.CelestialDial
             new ArtSlot("book-cover", 140, 140, 512, "the book on the shelf, closed"),
             new ArtSlot("book-page", 140, 140, 512, "the book's open page behind each symbol"),
             // The Table and the Book come alive (owner, Oct 7-8; task 86bcf0x71): the Book's room and the Table's carved top behind today's layouts,
-            // the Table's well and plates, the four fills its live lettering takes, and an emblem per sign that the Book raises once it is answered.
+            // the Table's well, its plate and its shut tray, and an emblem per sign that the Book raises once it is answered. The art pass
+            // (owner, Oct 16, boards 2-5 on the shipped painting): the gold plate and the four letter fills retired; a placed sign is gold inlay in the slate.
             new ArtSlot("book-room", 360, 800, 2048, "the Book of Symbols' screen: the Book lying open on a carved lectern in the Zodiac Wing's moonlight, two candles at its edge; behind today's layout (owner, Oct 7, 86bcex5kc 4A)"),
-            new ArtSlot("table-room", 360, 800, 2048, "the Elemental Table's screen: the Zodiac Wing's own lectern table seen from above, alive (owner's pick, Oct 8): its gold inlay glowing from within, blackened iron corner fittings, a carved scorpion and phoenix on its header, dark mist; twelve slate squares on the cells, a wide left rail and header for the names, a tray on its front lip for the plates"),
+            new ArtSlot("table-room", 360, 800, 2048, "the Elemental Table's screen: the Zodiac Wing's own lectern table seen from above (owner's pick, Oct 8; edited in place Oct 16): thin gold rules in slate, flat blackened iron corner fittings, a carved scorpion and phoenix on its header, dark mist; twelve slate squares on the cells, a wide left rail and header for the names, a shallow tray on its front lip that holds the twelve plates"),
             new ArtSlot("table-well", 86, 48, 256, "one slate square of the Table, cut from table-room's centre square and drawn at each of the twelve, so all twelve are identical; nothing inside it"),
-            new ArtSlot("table-plate", 82, 44, 256, "a plain pale wooden plate, one for each sign (owner's pick, Oct 8: pale plates); the game burns its symbol and name in"),
-            new ArtSlot("table-plate-gold", 82, 44, 256, "the same plate turned gold, when a sign is placed on the player's own (owner, Oct 7: it comes alive on a correct Seal)"),
-            new ArtSlot("letter-fire", 128, 128, 512, "a tileable fill of drawn flames and embers for the Table's live lettering"),
-            new ArtSlot("letter-earth", 128, 128, 512, "a tileable fill of drawn moss and stone for the Table's live lettering"),
-            new ArtSlot("letter-air", 128, 128, 512, "a tileable fill of drawn wind and cloud for the Table's live lettering"),
-            new ArtSlot("letter-water", 128, 128, 512, "a tileable fill of drawn deep water for the Table's live lettering"),
+            new ArtSlot("table-plate", 82, 44, 256, "a plain dark slate plate with a thin gold rim, one for each sign (owner, Oct 16, board 4); the game engraves its symbol and, small beneath it, its name"),
+            new ArtSlot("table-tray-shut", 360, 174, 2048, "the Table's tray slid shut once all twelve are placed (owner, Oct 16, board 5): table-room's tray band (layout top 310 to 484) with a lid of the tray's own wood and a small bronze pull; laid over the tray, it slides down into place"),
             new ArtSlot("emblem-aries", 180, 180, 512, "the Aries symbol as a living emblem of fire, rising from the Book once it is answered (owner, Oct 8: the set approved)"),
             new ArtSlot("emblem-taurus", 180, 180, 512, "the Taurus symbol as a living emblem of earth, rising from the Book once it is answered (owner, Oct 8: the set approved)"),
             new ArtSlot("emblem-gemini", 180, 180, 512, "the Gemini symbol as a living emblem of air, rising from the Book once it is answered (owner, Oct 8: the set approved)"),
