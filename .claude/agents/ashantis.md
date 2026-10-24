@@ -39,7 +39,7 @@ Post one comment on the task, and return the same text to whoever called you:
   - This follows the owner's rule for updates in `AGENTS.md` (owner, 2026-10-11).
 - **Rulings that apply** — links to the Decisions Log entries and specs that already answer part of the task, so nobody re-asks them. Link; don't restate them.
 
-Keep the whole comment under about 700 words. "Settled" is one line per call; when there are many, keep the ones the owner might question and fold the rest into one line ("plus N layout matches, listed on request").
+Keep the whole comment under about 700 words. "Settled" still lists every call, since Claude logs each one and Jeffrey checks them; keep each to one short line with its reason.
 
 ## Raw ideas
 
