@@ -854,7 +854,7 @@ namespace Ascendant.CelestialDial
         {
             if (busy || !Flow.CanBirthBack) return; bool toQuestion = Flow.BirthStep == "date" && !Flow.Amending;
             if (toQuestion) { ChooseBirth(""); return; } // the date's Back is the birth question again, as Change my answer gives it
-            Flow.BirthBack(); placeMatches.Clear(); FillStepFromDraft(); AfterBirthEntry();
+            Flow.BirthBack(); placeMatches.Clear(); AfterBirthEntry();
         }
         // a step opened again by Back shows its answer as given, ready to fix
         void FillStepFromDraft()
@@ -862,7 +862,7 @@ namespace Ascendant.CelestialDial
             var d = Flow.Draft;
             if (Flow.BirthStep == "date" && d.HasDate) dateField.SetTextWithoutNotify(d.Day.ToString("00") + "/" + d.Month.ToString("00") + "/" + d.Year);
             if (Flow.BirthStep == "time" && d.ExactTime) timeField.SetTextWithoutNotify((d.timeFrom / 60).ToString("00") + ":" + (d.timeFrom % 60).ToString("00"));
-            if (Flow.BirthStep == "place" && d.HasPlace) { placeField.SetTextWithoutNotify(d.place); placeMatches = Places.Search(d.place, placeMatchButtons.Length); }
+            if (Flow.BirthStep == "place" && d.HasPlace && placeMatches.Count == 0 ) { var given = Places.Find(d.place) ?? d.AsPlace; placeField.SetTextWithoutNotify(d.place); placeMatches = new List<Place> { given }; } // the place given, as the one match to pick again (Jeffrey, #164 B1: a search on the full name finds nothing)
         }
         void ConfirmBirth() { if (busy || !Flow.ConfirmBirth()) return; AfterBirthEntry(); }
         void PickCusp(int choice) { if (busy || !Flow.PickCuspSun(choice)) return; cuspWhyOpen = false; AfterBirthEntry(); }
@@ -917,7 +917,7 @@ namespace Ascendant.CelestialDial
         void AfterBirthEntry()
         {
             if (Flow.Screen == SliceScreen.Journal) { SyncLessonSun(); Save(); Sound.Play("page"); Show(); Publish(); return; }
-            ShowBirth(); Publish();
+            FillStepFromDraft(); ShowBirth(); Publish(); // a step reached again after Back shows its answer, going forward too (#164 B1)
         }
         // only lessons not yet played start from a sun that arrives or changes (Oct 7); nothing lit or earned moves
         void SyncLessonSun() { if (sunSent && (Dial.Lesson.Sun != Flow.LessonSun || Dial.Lesson.SunKnown != Flow.HasSunSign)) { Dial.Lesson.UpdateSun(Flow.LessonSun, Flow.HasSunSign); Dial.ForceRefresh(); } }
