@@ -504,7 +504,7 @@ const path=require('path');
     check(!(await state()).walking,'before the wheel is lit the shelf only says it is dark at '+viewport.width);
     await tap(-62,400);await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('dark and bare'),{},{timeout:5000}); // the table, on the canvas
     check(!(await state()).walking && !(await state()).gridOpen,'before the modality unit the table only says it is bare at '+viewport.width);
-    await tap(-138,292);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Wing room's doorway back, on the canvas
+    await tap(-135.75,292);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Wing room's doorway back, on the canvas
     check(true,'the Wing room\'s doorway back, tapped on the canvas, walks out to the Atrium at '+viewport.width);
     await page.waitForTimeout(400);await tap(0,310);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // and in again by the Wing's door
     check(true,'the Wing\'s door, tapped on the canvas, walks back in at '+viewport.width);
@@ -625,7 +625,7 @@ const path=require('path');
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
     check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'the book opens Part A: a symbol and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
-    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w)==='plain')&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols\' four names sit invisibly on their painted stones, no plate look ('+o.map(w=>lookOf(b,w)).join(', ')+'), and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
+    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w).startsWith('plain '))&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols\' four names sit invisibly on their painted stones, no plate look ('+o.map(w=>lookOf(b,w)).join(', ')+'), and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
       const s=await state();
@@ -646,7 +646,7 @@ const path=require('path');
         // each laid-out symbol against the Book's own art (720x1600, two art px to a layout px): its whole box is parchment, not the gutter, the page's edge, or the cover
         const art='data:image/png;base64,'+fs.readFileSync(path.join(__dirname,'..','Assets','CelestialDial','Resources','Art','book-room.png')).toString('base64');
         const share=await page.evaluate(async({src,box})=>{const i=new Image();i.src=src;await i.decode();const c=document.createElement('canvas');c.width=i.width;c.height=i.height;const g=c.getContext('2d');g.drawImage(i,0,0);const d=g.getImageData(0,0,c.width,c.height).data;
-          const parch=(x,y)=>{const k=(y*c.width+x)*4,R=d[k],G=d[k+1],B=d[k+2];return R>150&&G>105&&B>55&&R-B>30&&R+G+B>400;};
+          const parch=(x,y)=>{const k=(y*c.width+x)*4,R=d[k],G=d[k+1],B=d[k+2];return R>=150&&G>=95&&B>=45&&R-B>=70&&R>G&&G>B&&R+G+B>=330;}; // warm paper, candlelit or shaded (the Quill Line's painted page, Oct 24): every ink spot measures 100%; the desk 0%, the stones 1%, the cover's edge 11%, just outside the page 15%
           const out=[];for(let s=0;s<12;s++){const [x0,y0,x1,y1]=box.slice(s*4,s*4+4);let n=0,on=0;for(let y=Math.floor(y0*2);y<Math.ceil(y1*2);y++)for(let x=Math.floor((x0+180)*2);x<Math.ceil((x1+180)*2);x++){n++;if(x>=0&&y>=0&&x<c.width&&y<c.height&&parch(x,y))on++;}out.push(n?on/n:0);}return out;},{src:art,box:p.bookInkBox});
         check(p.bookInkBox.length===48 && share.every(x=>x>=.97),'every inked symbol sits wholly on the parchment (least '+Math.round(Math.min(...share)*100)+'% parchment under a symbol) at '+viewport.width); }
       if(n===4){
@@ -855,7 +855,7 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===3,{},{timeout:20000});await page.waitForTimeout(950);await page.screenshot({path:path.join(out,viewport.width+'-key3-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key3&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
     { const g=await state(); check(g.gridPlates[CELL(11)]==='gold' && g.gridGoldWhole[CELL(11)] && g.gridLive[CELL(11)],'the twelfth sign ends lit gold and whole, its lettering awake, after the Key 3 ceremony at '+viewport.width);
-      check(g.gridTrayShut,'with all twelve placed the empty tray is shut (with Reduced motion, at once; owner, Oct 16, board 5 A) at '+viewport.width); }
+      check(g.gridTrayShut,'with all twelve placed the empty tray slides shut (animated here; Reduced motion is off in this run; owner, Oct 16, board 5 A) at '+viewport.width); }
     check((await state()).keys===3 && (await state()).gridPlaced===12 && (await state()).gridComplete && !(await state()).canGridPick && events.filter(e=>e.event_name==='key3_earned').length===1 && (await state()).caspar.includes('Keeper Key 3 is yours'),'twelve seated earns Key 3 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-key3.png')});
     await semantic('leave-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
@@ -1235,7 +1235,7 @@ const path=require('path');
     { const s=await snap(); const g=s.journalBigThreeBox||[]; check(g.length===4 && g[3]>=44 && s.journalKeeper[1]===s.bigThree && s.bigThree.startsWith('☉ Scorpio · ☽ ') && !s.bigThree.includes('unknown'),'the record shows the default chart (the skip path\'s Scorpio sun, owner, Oct 15), with no unknown, its line a 44 px target, at '+viewport.width);
       await tap(g[0],g[1]); }
     await until(()=>window.ascendantDial.snapshot().journalView==='birth'&&!window.ascendantDial.snapshot().busy,5000);
-    { const s=await snap(); check(JSON.stringify(s.journalBirthRows)==='["Date: 4 November 1990 (default)","Time: 7:19 PM (default)","Place: Bushwick, NY, United States (default)"]' && s.journalBirthLines.join('|')===DEFAULT_ON_PAGE && !s.canBirthRising && s.canBirthAdd && s.canBirthAddTime && s.journalLink==='‹ Your Journal','owner, Oct 15: a canvas tap on the line opens "Your Birth": the default chart is shown as the default, each row with Add, and Add my birth time; the rising is worked out, so no rising choice, at '+viewport.width);
+    { const s=await snap(); check(JSON.stringify(s.journalBirthRows)==='["Date: 4 November 1990 (default)","Time: 7:19 PM (default)","Place: Bushwick, NY, United States (default)"]' && s.journalBirthLines.join(' ')===DEFAULT_ON_PAGE && !s.canBirthRising && s.canBirthAdd && s.canBirthAddTime && s.journalLink==='‹ Your Journal','owner, Oct 15: a canvas tap on the line opens "Your Birth": the default chart is shown as the default, each row with Add, and Add my birth time; the rising is worked out, so no rising choice, at '+viewport.width);
       check(s.buttons.filter(b=>b.includes(':frame:')).every(b=>{const wh=b.slice(b.lastIndexOf(':')+1).split('x');return +wh[1]>=44;}),'"Your Birth"\'s buttons each take a 44 px target at '+viewport.width); }
     await bp.screenshot({path:path.join(out,viewport.width+'-your-birth.png')});
     { const b=(await snap()).journalBirthBoxes; await tap(b[0],b[1]); } // Add, on the date's row
