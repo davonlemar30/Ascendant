@@ -40,7 +40,7 @@ namespace Ascendant.CelestialDial
         // on the page; the pages keep every symbol learned. Nothing shows an element, before or after the answer.
         Image glyphEmblem, bookRibbon; RectTransform bookCardRect, glyphPanel; readonly Text[] bookInk = new Text[12];
         readonly Image[] stoneGlow = new Image[4]; readonly Text[] stoneLabel = new Text[4];
-        bool glyphDragging; Vector2 glyphDragHome; int glyphHoverSlot = -1;
+        bool glyphDragging; int glyphHoverSlot = -1; static readonly Vector2 GlyphHome = new Vector2(95, -CardY); // the glyph's one home over the page (Jeffrey, #162 B1: never a drag's start, which a tap-only run never sets)
         int revealSeat = -1, revealSlot = -1, shownGlyph = -2; bool revealOwn, revealCorrect, bookPagesShown, glyphRising; string[] revealNames = new string[4];
         public const float EmblemY = 186, EmblemSize = 185, CardY = 345, RiseFrom = 365, RiseSeconds = .45f, BookPagesSeconds = 2.2f;
         public static readonly Color DarkPlate = new Color(.34f, .32f, .32f), BookInk = new Color(.23f, .14f, .09f);
@@ -1390,7 +1390,7 @@ namespace Ascendant.CelestialDial
         public bool GlyphDragBegin()
         {
             if (busy || glyphDragging || Dial.Lesson.Phase != LessonPhase.GlyphNames || Dial.Lesson.CurrentGlyph < 0) return false;
-            glyphDragging = true; glyphDragHome = ((RectTransform)bookCardRect).anchoredPosition; glyphHoverSlot = -1;
+            glyphDragging = true; glyphHoverSlot = -1;
             ((RectTransform)bookCardRect).localScale = Vector3.one * LiftScale;
             var shade = glyphCard.GetComponent<Shadow>(); if (shade == null) { shade = glyphCard.gameObject.AddComponent<Shadow>(); shade.effectDistance = new Vector2(3, -5); }
             shade.effectColor = new Color(0, 0, 0, .5f); Publish(); return true;
@@ -1419,20 +1419,21 @@ namespace Ascendant.CelestialDial
             if (!glyphDragging) return; glyphDragging = false; glyphHoverSlot = -1;
             for (int i = 0; i < 4; i++) stoneGlow[i].color = new Color(StoneGlow.r, StoneGlow.g, StoneGlow.b, 0f);
             var shade = glyphCard.GetComponent<Shadow>(); if (shade != null) shade.effectColor = new Color(0, 0, 0, 0);
-            if (isActiveAndEnabled && Flow.Screen == SliceScreen.Book) StartCoroutine(GlyphFloatHome()); else ((RectTransform)bookCardRect).localScale = Vector3.one;
+            if (isActiveAndEnabled && Flow.Screen == SliceScreen.Book) StartCoroutine(GlyphFloatHome()); else { var card = (RectTransform)bookCardRect; card.anchoredPosition = GlyphHome; card.localScale = Vector3.one; } // the Book closed mid-drag: home at once, so it reopens in place (Jeffrey, #162 B2)
         }
         IEnumerator GlyphFloatHome()
         {
             var rt = (RectTransform)bookCardRect; Vector2 from = rt.anchoredPosition; Vector3 fromScale = rt.localScale;
-            if (ReducedMotion) { rt.anchoredPosition = glyphDragHome; rt.localScale = Vector3.one; yield break; }
+            if ((from - GlyphHome).sqrMagnitude < .01f && fromScale == Vector3.one) yield break; // already home: a tap-only miss has nothing to float
+            if (ReducedMotion) { rt.anchoredPosition = GlyphHome; rt.localScale = Vector3.one; yield break; }
             float seconds = .25f;
             for (float t = 0; t < seconds; t += Time.unscaledDeltaTime)
             {
                 float k = Mathf.SmoothStep(0, 1, Mathf.Clamp01(t / seconds));
-                rt.anchoredPosition = Vector2.Lerp(from, glyphDragHome, k); rt.localScale = Vector3.Lerp(fromScale, Vector3.one, k);
+                rt.anchoredPosition = Vector2.Lerp(from, GlyphHome, k); rt.localScale = Vector3.Lerp(fromScale, Vector3.one, k);
                 yield return null;
             }
-            rt.anchoredPosition = glyphDragHome; rt.localScale = Vector3.one;
+            rt.anchoredPosition = GlyphHome; rt.localScale = Vector3.one;
         }
         void AnswerGlyphReview(int slot)
         {

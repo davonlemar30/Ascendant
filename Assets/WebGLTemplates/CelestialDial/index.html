@@ -117,7 +117,7 @@
     box('cusp-0',0,400,300,44);box('cusp-1',0,452,300,44);box('cusp-why',0,546,96,44); // the cusp question's answers and its Why?
     for(let i=0;i<3;i++)box('moon-'+i,0,400+i*52,300,44); // Oct 7: the Moon's options (two, rarely three)
     const hub=state&&state.screen==='hub', room=state&&state.screen==='wingroom';
-    box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,680,300,52);
+    box('walk-speed',-118,774,112,40);box('mute',0,774,112,40);box('enter-dial',0,624,300,52);box('enter-shelf',0,568,300,52);box('close-book',0,752,300,52); // the Quill Line's placement (Oct 17)
     box('leave-dial',0,768,216,44);{const g=(state&&state.gearAt)||[158,22+(state&&state.safeTop||0)];box('settings',g[0],g[1],44,44);} // note 10: the Dial's exit is its own button, and since the art pass (86bcex5kc 1A) the room's doorway back takes the tap; Platform fit, Part 1: the gear sits below the safe area's top band (state.safeTop)
     {const b=(state&&state.travelAt)||[-158,22+(state&&state.safeTop||0)];box('travel',b[0],b[1],44,44);const rows=(state&&state.travelRows)||[],ids={'The Grand Atrium':'atrium','The Zodiac Wing':'wing','The Crystal Book Chamber':'chamber'};rows.forEach((r,i)=>{const id=ids[r.split(',')[0]];if(id)box('travel-'+id,b[0]+135,b[1]+25+52+44*i,264,44);});} // the mini-menu (TravelMenu: the button mirrors the gear; the panel from 47, rows 44 apart from 52 into it)
     // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
@@ -145,7 +145,7 @@
     for(const id in POI)if(byId('poi-'+id))box('poi-'+id,POI[id][0],POI[id][1],POI[id][2],POI[id][3]);
     for(let i=0;i<4;i++)box('element-'+i,-78+(i%2)*156,300+Math.floor(i/2)*64,150,56);
     for(let i=0;i<3;i++)box('modality-'+i,0,300+i*64,300,56);
-    const gy=state&&state.glyphMode==='name'?340:300;for(let i=0;i<4;i++)box('glyph-name-'+i,-78+(i%2)*156,gy+Math.floor(i/2)*64,150,56);
+    const gy=state&&state.glyphMode==='name'?340:300;const STONES=[[-122.5,522.5,74,70],[-34,531.5,76,72],[50,540,74,70],[131,548.5,74,70]];for(let i=0;i<4;i++){if(state&&state.screen==='book')box('glyph-name-'+i,...STONES[i]);else box('glyph-name-'+i,-78+(i%2)*156,gy+Math.floor(i/2)*64,150,56);} // the Quill Line (Jeffrey, #162 N4): on the Book the four names are the painted stones (SliceView.StoneRects); Practice keeps its rows
     for(let i=0;i<12;i++)box('sign-'+i,-110+(i%3)*110,336+Math.floor(i/3)*58,100,52); // batch 2: the grid sits under its label (Your sun sign, moon, rising)
     // Build B: the table's cells and tiles sit where the canvas draws them.
     for(let i=0;i<12;i++){box('grid-cell-'+i,-72+(i%3)*92,128+Math.floor(i/3)*52,86,48);box('grid-sign-'+i,-129+(i%4)*86,342+Math.floor(i/4)*46,82,44);}
