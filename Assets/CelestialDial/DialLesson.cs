@@ -239,6 +239,7 @@ namespace Ascendant.CelestialDial
         public readonly bool[] NameRevealed = new bool[12];  // Level 2 in Part B shows the name on its seat
         public int GlyphIndex { get; private set; }          // next seat in zodiac order within the current part
         public int GlyphMisses { get; private set; }         // Part A misses on the current glyph
+        public string InputMethod = "DirectSeat"; // the Book's Quill Line (owner, Oct 17): a dragged glyph logs "Drag", as the Table's GridModel.InputMethod does
         public bool GlyphEvidence { get; private set; }      // any Level 0/1 answer in Part B (the central skill)
         public bool Key2Earned { get; private set; }
         // v0.3 revision, build 3: the difficulty ramp. After Key 2 the book and the wheel can be replayed; each clean replay
@@ -388,14 +389,14 @@ namespace Ascendant.CelestialDial
             {
                 bool eligible = GlyphMisses <= 1; // Level 0 or a Level 1 nudge
                 GlyphNamed[target] = true; Message = GlyphNameResult = "Yes. " + SignName(target) + ". That is correct"; // owner (worksheet section 4), as written
-                GlyphNamedEvent?.Invoke(target, true, eligible); Dial.Log("glyph_named", true, eligible, "DirectSeat");
+                GlyphNamedEvent?.Invoke(target, true, eligible); Dial.Log("glyph_named", true, eligible, InputMethod);
                 NextGlyphName(); ProgressCommitted?.Invoke(); return true;
             }
             GlyphMisses++;
             if (GlyphMisses == 1) { Message = GlyphNameResult = "Not that one. This symbol belongs to " + Zodiac.Article(Element(target)) + " " + Element(target) + " sign."; Dial.Log("hint_requested"); return false; }
             // Second miss: Level 2 reveals the name; no evidence; move on.
             GlyphNamed[target] = true; Message = GlyphNameResult = "This is the symbol of " + SignName(target) + ". Remember it.";
-            GlyphNamedEvent?.Invoke(target, false, false); Dial.Log("hint_escalated"); Dial.Log("glyph_named", false, false, "DirectSeat");
+            GlyphNamedEvent?.Invoke(target, false, false); Dial.Log("hint_escalated"); Dial.Log("glyph_named", false, false, InputMethod);
             NextGlyphName(); ProgressCommitted?.Invoke(); return false;
         }
         void NextGlyphName()

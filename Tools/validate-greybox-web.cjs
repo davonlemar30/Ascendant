@@ -20,7 +20,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=220,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=221,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
@@ -625,19 +625,19 @@ const path=require('path');
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
     check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'the book opens Part A: a symbol and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
-    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w).startsWith('plate'))&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'batch 2 (owner, Oct 2: bronze on the Book too): the Book of Symbols\' four names are plates ('+o.map(w=>lookOf(b,w)).join(', ')+') and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
+    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w)==='plain')&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols\' four names sit invisibly on their painted stones, no plate look ('+o.map(w=>lookOf(b,w)).join(', ')+'), and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
       const s=await state();
       const target=SIGNS.findIndex(name=>s.glyphChar===['\u2648','\u2649','\u264A','\u264B','\u264C','\u264D','\u264E','\u264F','\u2650','\u2651','\u2652','\u2653'][SIGNS.indexOf(name)]);
       const slot=s.glyphOptions.indexOf(SIGNS[target]);
       await semantic('glyph-name-'+slot);await page.waitForTimeout(200);
-      if(n===0){ // the Book comes alive (owner, Oct 7-8; 86bcf0x71): the answered symbol becomes its element's emblem, the right plate floats, then it inks the page
-        await page.waitForFunction(()=>window.ascendantDial.snapshot().bookEmblem!=='',{},{timeout:2000}).catch(()=>{});
-        const a=await state(); check(a.bookArt && a.bookEmblem==='emblem-'+SIGNS[target].toLowerCase() && a.bookPicked===SIGNS[target],'a right answer raises '+SIGNS[target]+'\'s emblem from the Book, its plate floating ('+a.bookEmblem+', '+a.bookPicked+'), at '+viewport.width);
+      if(n===0){ // the Quill Line (owner, Oct 17, Concept 1): a right answer carries the glyph into its stone and draws an ink ribbon to the page; no element colour, no element emblem
+        await page.waitForFunction(()=>window.ascendantDial.snapshot().bookRibbon,{},{timeout:2000}).catch(()=>{});
+        const a=await state(); check(a.bookArt && a.bookEmblem==='' && a.bookRibbon && a.bookPicked===SIGNS[target],'a right answer sends '+SIGNS[target]+'\'s symbol into its stone and draws the ink ribbon toward the page, no element emblem ('+a.bookEmblem+', picked '+a.bookPicked+'), at '+viewport.width);
         await page.screenshot({path:path.join(out,viewport.width+'-book-emblem.png')});
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-        const b=await state(); check(b.bookEmblem==='' && b.bookInk[target]===2 && b.bookInk.filter(x=>x>0).length===1,'then it sinks into the pages as ink, in full (answered on its own), and no other symbol is inked, at '+viewport.width);
+        const b=await state(); check(!b.bookRibbon && b.bookEmblem==='' && b.bookInk[target]===2 && b.bookInk.filter(x=>x>0).length===1,'the ribbon fades as the ink lands, in full (answered on its own), and no other symbol is inked, at '+viewport.width);
       }
       if(n===11){await page.waitForFunction(()=>window.ascendantDial.snapshot().bookPages,{},{timeout:15000});
         const p=await state(); check(p.bookPages && p.bookInk.every(x=>x>0),'the twelfth answer shows the full pages a moment, every symbol inked, before the room at '+viewport.width);
