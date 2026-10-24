@@ -504,7 +504,7 @@ const path=require('path');
     check(!(await state()).walking,'before the wheel is lit the shelf only says it is dark at '+viewport.width);
     await tap(-62,400);await page.waitForFunction(()=>window.ascendantDial.snapshot().caspar.includes('dark and bare'),{},{timeout:5000}); // the table, on the canvas
     check(!(await state()).walking && !(await state()).gridOpen,'before the modality unit the table only says it is bare at '+viewport.width);
-    await tap(-138,292);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Wing room's doorway back, on the canvas
+    await tap(-135.75,292);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // the Wing room's doorway back, on the canvas
     check(true,'the Wing room\'s doorway back, tapped on the canvas, walks out to the Atrium at '+viewport.width);
     await page.waitForTimeout(400);await tap(0,310);await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000}); // and in again by the Wing's door
     check(true,'the Wing\'s door, tapped on the canvas, walks back in at '+viewport.width);
@@ -625,7 +625,7 @@ const path=require('path');
     await semantic('poi-shelf');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='book'&&window.ascendantDial.snapshot().glyphMode==='name',{},{timeout:15000});
     check(!!(await state()).glyphChar && (await state()).glyphOptions.length===4,'the book opens Part A: a symbol and four names at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-a.png')});
-    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w)==='plain')&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols\' four names sit invisibly on their painted stones, no plate look ('+o.map(w=>lookOf(b,w)).join(', ')+'), and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
+    { const b=await looks(),o=(await state()).glyphOptions; check(o.every(w=>lookOf(b,w).startsWith('plain '))&&lookOf(b,'Close the Book').startsWith('rule')&&small(b).length===0,'the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols\' four names sit invisibly on their painted stones, no plate look ('+o.map(w=>lookOf(b,w)).join(', ')+'), and Close the Book is on its rule ('+lookOf(b,'Close the Book')+'), every target 44 px or more (under: '+(small(b).join(', ')||'none')+') at '+viewport.width); }
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphMode==='name'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
       const s=await state();
@@ -855,7 +855,7 @@ const path=require('path');
     await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===3,{},{timeout:20000});await page.waitForTimeout(950);await page.screenshot({path:path.join(out,viewport.width+'-key3-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key3&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
     { const g=await state(); check(g.gridPlates[CELL(11)]==='gold' && g.gridGoldWhole[CELL(11)] && g.gridLive[CELL(11)],'the twelfth sign ends lit gold and whole, its lettering awake, after the Key 3 ceremony at '+viewport.width);
-      check(g.gridTrayShut,'with all twelve placed the empty tray is shut (with Reduced motion, at once; owner, Oct 16, board 5 A) at '+viewport.width); }
+      check(g.gridTrayShut,'with all twelve placed the empty tray slides shut (animated here; Reduced motion is off in this run; owner, Oct 16, board 5 A) at '+viewport.width); }
     check((await state()).keys===3 && (await state()).gridPlaced===12 && (await state()).gridComplete && !(await state()).canGridPick && events.filter(e=>e.event_name==='key3_earned').length===1 && (await state()).caspar.includes('Keeper Key 3 is yours'),'twelve seated earns Key 3 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-key3.png')});
     await semantic('leave-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
