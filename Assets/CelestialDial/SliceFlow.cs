@@ -307,8 +307,26 @@ namespace Ascendant.CelestialDial
         void Advance(string after)
         {
             for (int i = Array.IndexOf(FactSteps, after) + 1; i < FactSteps.Length; i++) if (Asks(FactSteps[i])) { BirthStep = FactSteps[i]; return; }
+            if (!Amending) { BirthStep = "review"; Note = ""; Logged?.Invoke("birth_review"); return; } // the check, its own page (owner, Oct 23, 86bcgfkdv: B); "Your Birth" has no check (Ashantis, Oct 10)
             Settle();
         }
+        // ---- Back and the check (owner, Oct 23, 86bcgfkdv, option B: "give the check its own 'Is this right?' page after the place step"):
+        // Back steps to the step before, its answer still filled in, and the orb's star for it goes out; from the date it returns to the
+        // birth question. On "Your Birth", the first step keeps "‹ Your Journal" (Ashantis, Oct 10). The check names the date, the time and
+        // the place as "Your Birth" does; Yes works the chart out.
+        public const string ReviewQuestion = "Is this right?", ReviewConfirm = "Yes, that's right", BackWords = "\u2039 Back"; // Claude's drafts for Dante (owner writes)
+        static readonly string[] BackSteps = { "date", "time", "place", "review" };
+        public BirthFacts Draft => draft; // what the steps hold so far: the check's rows, and a step's answer filled in again on Back
+        int PreviousStep() { for (int j = Array.IndexOf(BackSteps, BirthStep) - 1; j >= 0; j--) if (Asks(BackSteps[j])) return j; return -1; }
+        public bool CanBirthBack => Screen == SliceScreen.Birth && BirthChoice == "chart" && Array.IndexOf(BackSteps, BirthStep) >= 0 && (!Amending || PreviousStep() >= 0);
+        public bool BirthBack()
+        {
+            if (!CanBirthBack) return false;
+            int j = PreviousStep(); if (j < 0) { Logged?.Invoke("birth_back:question"); ChooseBirth(""); return true; }
+            BirthStep = BackSteps[j]; Note = ""; if (!Amending && birthAnswers > 1) birthAnswers--; Logged?.Invoke("birth_back:" + BirthStep); return true;
+        }
+        public bool CanConfirmBirth => OnFactStep("review") && !Amending;
+        public bool ConfirmBirth() { if (!CanConfirmBirth) return false; Logged?.Invoke("birth_confirmed"); Settle(); return true; }
         bool OnFactStep(string step) => Screen == SliceScreen.Birth && BirthChoice == "chart" && BirthStep == step;
         public bool SetBirthDate(int year, int month, int day)
         {
