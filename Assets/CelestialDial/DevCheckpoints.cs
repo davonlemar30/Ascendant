@@ -29,7 +29,7 @@ namespace Ascendant.CelestialDial
             Must(flow.SkipPrologue() && flow.Continue(), "the name"); flow.ChooseBirth("chart"); // a checkpoint is a save: it never plays the prologue (Ashantis, Oct 8)
             // DEV Mode's sample chart (owner, Oct 2 evening): a real chart worked out for a sample birth with the player's sun sign (BirthChart.Sample)
             BirthChart.Sample(sun, out int year, out int month, out int day, out int minute, out var place);
-            Must(flow.SetBirthDate(year, month, day) && flow.SetBirthTime(minute) && flow.SetBirthPlace(place) && flow.SunSign == sun, "the sample chart keeps the sun sign");
+            Must(flow.SetBirthDate(year, month, day) && flow.SetBirthTime(minute) && flow.SetBirthPlace(place) && flow.ConfirmBirth() && flow.SunSign == sun, "the sample chart keeps the sun sign");
             Must(flow.Continue() && flow.Continue() && flow.AtHub && flow.AtriumStage == 1, "the Atrium's pages end in the Atrium at Stage 1");
             Must(flow.EnterWing() && flow.EnterDial(), "the walk to the Dial");
             lesson.SetSunSign(sun);

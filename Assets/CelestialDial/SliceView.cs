@@ -105,7 +105,7 @@ namespace Ascendant.CelestialDial
         readonly Button[] reviewGlyphButtons = new Button[4];
         InputField nameField, dateField, timeField, placeField;
         // batch 2 (owner, Oct 2 evening: the Big Three approved): the chart path's time and place steps, the known path's sign label and "I don't know"
-        RectTransform birthTimeEntry, birthPlaceEntry; Text signsLabel, birthHeading; Button timeUnknown, placeUnknown, birthCancel; readonly Button[] placeMatchButtons = new Button[4]; List<Place> placeMatches = new List<Place>();
+        RectTransform birthTimeEntry, birthPlaceEntry, birthReview; Text signsLabel, birthHeading; Button timeUnknown, placeUnknown, birthCancel, birthBack, birthConfirm; readonly Text[] reviewRows = new Text[3]; readonly Button[] placeMatchButtons = new Button[4]; List<Place> placeMatches = new List<Place>();
         // the cusp day (owner ruling, Oct 2 evening): the question, its two signs, and "Why?" with its reason (Oct 7: no "I'm not sure")
         RectTransform birthCusp; Text cuspQuestion, cuspWhy; Button cuspWhyLink; readonly Button[] cuspButtons = new Button[2]; bool cuspWhyOpen;
         RectTransform birthMoon; Text moonQuestion; readonly Button[] moonButtons = new Button[3]; // Oct 7: the Moon's options (two, rarely three), where the cusp question sits
@@ -310,13 +310,13 @@ namespace Ascendant.CelestialDial
             // the known path, the sun, then the moon and the rising sign. The lines are Claude's drafts (owner: "fine for now")
             birthDate = Rect("Date entry", birth, 0, 400, 360, 220);
             Label(birthDate, "Your birth date: day, month, year", 0, 0, 320, 22, 14);
-            dateField = TextBox(birthDate, "Date box", 0, 48, 200, 48, "DD/MM/YYYY", v => UseDate(v));
+            dateField = TextBox(birthDate, "Date box", 0, 48, 200, 48, "DD/MM/YYYY", v => { }); // only "Use this date" moves on: a tap outside the box, or Done, only closes the keyboard (owner, Oct 10 playtest; 86bcgfkdv)
             dateHint = Label(birthDate, "Like 25/04/1990.", 0, 88, 320, 20, 12); dateHint.color = Muted;
             Label(birthDate, SliceFlow.ChartRule, 0, 182, 320, 40, 12).color = Muted; // the rule (owner, Oct 16): all three, or the default chart
             MakeButton(birthDate, "Use this date", 0, 130, 200, 52, () => UseDate(dateField.text));
             birthTimeEntry = Rect("Time entry", birth, 0, 400, 360, 220);
             Label(birthTimeEntry, "Your birth time", 0, 0, 320, 22, 14);
-            timeField = TextBox(birthTimeEntry, "Time box", 0, 48, 200, 48, "HH:MM", v => UseTime(v));
+            timeField = TextBox(birthTimeEntry, "Time box", 0, 48, 200, 48, "HH:MM", v => { }); // only "Use this time" moves on (86bcgfkdv)
             Label(birthTimeEntry, "Like 14:30, or 2:30 pm.", 0, 88, 320, 20, 12).color = Muted;
             Label(birthTimeEntry, "No time? You get the default chart.", 0, 246, 320, 20, 12).color = Muted; // Claude's draft for Dante (owner, Oct 16)
             MakeButton(birthTimeEntry, "Use this time", 0, 130, 200, 52, () => UseTime(timeField.text));
@@ -337,6 +337,13 @@ namespace Ascendant.CelestialDial
             birthMoon = Rect("Moon question", birth, 0, 400, 360, 220);
             moonQuestion = Label(birthMoon, "", 0, 40, 320, 88, 14);
             for (int i = 0; i < moonButtons.Length; i++) { int choice = i; moonButtons[i] = MakeButton(birthMoon, "", 0, 110 + i * 52, 300, 44, () => PickMoonSign(choice)); }
+            birthReview = Rect("Review", birth, 0, 400, 360, 220); // the check (owner, Oct 23, 86bcgfkdv: B): the three facts as "Your Birth" words them, then Yes
+            for (int i = 0; i < reviewRows.Length; i++) reviewRows[i] = Label(birthReview, "", 0, 8 + i * 30, 320, 24, 15);
+            birthConfirm = MakeButton(birthReview, SliceFlow.ReviewConfirm, 0, 130, 200, 52, ConfirmBirth);
+            birthBack = MakeButton(birth, SliceFlow.BackWords, BirthBackX, LinkBaseline - GaramondLift * 14, LinkWidth, 22, BirthBack); birthBack.name = "Back link"; // the journal's "‹" link, top left (Ashantis, Oct 10)
+            { var feel = ButtonLook.Custom(birthBack, "link"); var label = feel.Label; label.font = ButtonLook.EngravedFont ?? font; label.fontSize = 14; label.alignment = TextAnchor.MiddleLeft; label.horizontalOverflow = HorizontalWrapMode.Overflow;
+              var lr = label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = lr.offsetMax = Vector2.zero; feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; ButtonLook.HitArea(birthBack, ButtonLook.MinTarget, ButtonLook.MinTarget);
+              birthBack.gameObject.AddComponent<SafeTop>().Clearance = JournalTitleClearance; }
             signsLabel = Label(birth, "", 0, 290, 320, 22, 14);
             birthSigns = Rect("Sign choices", birth, 0, 430, 360, 240);
             for (int i = 0; i < 12; i++) { int seat = i; MakeButton(birthSigns, Zodiac.Seats[i].Name, -110 + (i % 3) * 110, 26 + (i / 3) * 58, 100, 52, () => PickBirthSign(seat)); }
@@ -771,6 +778,8 @@ namespace Ascendant.CelestialDial
             else if (command.StartsWith("sign:") && int.TryParse(command.Substring(5), out int seat)) PickBirthSign(seat); // the skip path's sun, moon and rising, the facts' rising, or the rising changed on "Your Birth" (Oct 7)
             else if (command == "birthplace-unknown") { if (!busy && Flow.SetBirthPlace(null)) AfterBirthEntry(); } // "I don't know where" (Oct 7)
             else if (command == "birth-cancel") CancelBirthAmend();
+            else if (command == "birth-back") BirthBack(); // Oct 23 (86bcgfkdv): Back on each step, and the check's Yes
+            else if (command == "birth-confirm") ConfirmBirth();
             else if (command == "journal-birth") JournalBirthOpen();
             else if (command == "birth-add") BirthAdd(false);
             else if (command == "birth-add-time") BirthAdd(true);
@@ -853,6 +862,22 @@ namespace Ascendant.CelestialDial
         void PickPlace(int index) { if (busy || index < 0 || index >= placeMatches.Count || !Flow.SetBirthPlace(placeMatches[index])) return; placeMatches.Clear(); AfterBirthEntry(); }
         void PickBirthSign(int seat) { if (busy || !Flow.PickSign(seat)) return; AfterBirthEntry(); } // the skip path's sun, or the rising chosen on "Your Birth"
         void CancelBirthAmend() { if (busy || !Flow.CancelAmending()) return; AfterBirthEntry(); }
+        public const float BirthBackX = -180 + 16 + LinkWidth / 2; // the link's box, 16 in from the column's left, clear of the orb's stars
+        void BirthBack()
+        {
+            if (busy || !Flow.CanBirthBack) return; bool toQuestion = Flow.BirthStep == "date" && !Flow.Amending;
+            if (toQuestion) { ChooseBirth(""); return; } // the date's Back is the birth question again, as Change my answer gives it
+            Flow.BirthBack(); placeMatches.Clear(); AfterBirthEntry();
+        }
+        // a step opened again by Back shows its answer as given, ready to fix
+        void FillStepFromDraft()
+        {
+            var d = Flow.Draft;
+            if (Flow.BirthStep == "date" && d.HasDate) dateField.SetTextWithoutNotify(d.Day.ToString("00") + "/" + d.Month.ToString("00") + "/" + d.Year);
+            if (Flow.BirthStep == "time" && d.ExactTime) timeField.SetTextWithoutNotify((d.timeFrom / 60).ToString("00") + ":" + (d.timeFrom % 60).ToString("00"));
+            if (Flow.BirthStep == "place" && d.HasPlace && placeMatches.Count == 0 ) { var given = Places.Find(d.place) ?? d.AsPlace; placeField.SetTextWithoutNotify(d.place); placeMatches = new List<Place> { given }; } // the place given, as the one match to pick again (Jeffrey, #164 B1: a search on the full name finds nothing)
+        }
+        void ConfirmBirth() { if (busy || !Flow.ConfirmBirth()) return; AfterBirthEntry(); }
         void PickCusp(int choice) { if (busy || !Flow.PickCuspSun(choice)) return; cuspWhyOpen = false; AfterBirthEntry(); }
         void PickMoonSign(int choice) { if (busy || !Flow.PickMoon(choice)) return; AfterBirthEntry(); }
         void ToggleCuspWhy() { if (busy || Flow.BirthStep != "cusp") return; cuspWhyOpen = !cuspWhyOpen; ShowBirth(); Publish(); }
@@ -905,7 +930,7 @@ namespace Ascendant.CelestialDial
         void AfterBirthEntry()
         {
             if (Flow.Screen == SliceScreen.Journal) { SyncLessonSun(); Save(); Sound.Play("page"); Show(); Publish(); return; }
-            ShowBirth(); Publish();
+            FillStepFromDraft(); ShowBirth(); Publish(); // a step reached again after Back shows its answer, going forward too (#164 B1)
         }
         // only lessons not yet played start from a sun that arrives or changes (Oct 7); nothing lit or earned moves
         void SyncLessonSun() { if (sunSent && (Dial.Lesson.Sun != Flow.LessonSun || Dial.Lesson.SunKnown != Flow.HasSunSign)) { Dial.Lesson.UpdateSun(Flow.LessonSun, Flow.HasSunSign); Dial.ForceRefresh(); } }
@@ -919,15 +944,18 @@ namespace Ascendant.CelestialDial
                 case "rising-pick": return Flow.BirthChoice == "rising" ? " Choose your rising sign." : " " + SliceFlow.SkipRisingAsk;
                 case "cusp": return " " + Flow.CuspQuestion + (cuspWhyOpen ? " " + SliceFlow.CuspWhy : "");
                 case "moon": return " " + Flow.MoonQuestion;
+                case "review": return " " + string.Join(" ", reviewRows.Select(r => r.text + "."));
             }
             return "";
         }
         void ShowBirth()
         {
             bool chosen = Flow.BirthChoice != ""; string step = Flow.BirthStep; bool chart = Flow.BirthChoice == "chart", signs = step == "rising-pick", amending = Flow.Amending;
-            birthHeading.text = amending ? SliceFlow.BirthPageTitle : SliceFlow.BirthQuestion;
+            birthHeading.text = amending ? SliceFlow.BirthPageTitle : step == "review" ? SliceFlow.ReviewQuestion : SliceFlow.BirthQuestion;
             birthChoices.gameObject.SetActive(!chosen);
             birthDate.gameObject.SetActive(chart && step == "date"); birthTimeEntry.gameObject.SetActive(chart && step == "time"); birthPlaceEntry.gameObject.SetActive(chart && step == "place");
+            bool review = chart && step == "review"; birthReview.gameObject.SetActive(review); if (review) { var d = Flow.Draft; string[] names = { SliceFlow.DateRow, SliceFlow.TimeRow, SliceFlow.PlaceRow }, words = { BirthDateWords(d), BirthTimeWords(d), BirthPlaceWords(d) }; for (int i = 0; i < 3; i++) reviewRows[i].text = names[i] + ": " + words[i]; }
+            birthConfirm.interactable = !busy; birthBack.gameObject.SetActive(Flow.CanBirthBack); birthBack.interactable = !busy;
             birthSigns.gameObject.SetActive(signs); signsLabel.gameObject.SetActive(signs); // no "I'm not sure" since Oct 7 (86bced0tc): every missing sign is picked
             bool cusp = chart && step == "cusp"; birthCusp.gameObject.SetActive(cusp); cuspWhy.gameObject.SetActive(cusp && cuspWhyOpen);
             bool moon = chart && step == "moon"; birthMoon.gameObject.SetActive(moon);
@@ -1670,7 +1698,7 @@ namespace Ascendant.CelestialDial
             state.caspar = s == SliceScreen.Prologue ? (prologueShot >= 0 && prologueShot < PrologueShots.Length ? PrologueShots[prologueShot].Line : "") : // one plain line per shot (drafts for Dante)
                 Flow.AtLaunch ? (prologueShot >= 0 && prologueShot < LaunchShots.Length ? LaunchShots[prologueShot].Line ?? "" : "") : // the launch's spoken line per shot (owner, Oct 9)
                 s == SliceScreen.Identity ? "Who are you? Enter a name, then continue." :
-                s == SliceScreen.Birth ? (Flow.Amending ? SliceFlow.BirthPageTitle + "." : SliceFlow.BirthQuestion) + BirthAsk() :
+                s == SliceScreen.Birth ? (Flow.Amending ? SliceFlow.BirthPageTitle + "." : Flow.BirthStep == "review" ? SliceFlow.ReviewQuestion : SliceFlow.BirthQuestion) + BirthAsk() :
                 s == SliceScreen.Atrium ? atriumText.text : s == SliceScreen.AtriumReturn ? returnText.text :
                 s == SliceScreen.Chamber ? chamberText.text + (Flow.Ended ? " " + chamberEnd.text : "") :
                 s == SliceScreen.Hub ? hubText.text + " " + hubCaption.text :
@@ -1717,6 +1745,9 @@ namespace Ascendant.CelestialDial
             state.cuspTime = Flow.CuspMinute >= 0 ? SliceFlow.ClockTime(Flow.CuspMinute) : ""; state.cuspQuestion = s == SliceScreen.Birth ? Flow.CuspQuestion : ""; state.cuspWhy = state.canCusp && cuspWhyOpen; state.sunBasis = Flow.SunBasis;
             state.moonSign = Flow.MoonSign >= 0 ? Zodiac.Seats[Flow.MoonSign].Name : ""; state.risingSign = Flow.RisingSign >= 0 ? Zodiac.Seats[Flow.RisingSign].Name : ""; state.bigThree = Flow.BirthDone ? Flow.BigThreeLine : "";
             state.canChangeBirth = s == SliceScreen.Birth && !busy && Flow.BirthChoice != "" && !Flow.Amending;
+            state.canBirthBack = birthNow && Flow.CanBirthBack; state.canBirthConfirm = birthNow && Flow.CanConfirmBirth; state.birthReview = s == SliceScreen.Birth && birthStep == "review" ? reviewRows.Select(r => r.text).ToArray() : new string[0];
+            { var backTop = birthBack.GetComponent<SafeTop>(); state.birthBackAt = backTop != null ? new[] { backTop.At.x, backTop.At.y } : new float[0]; } // the link where it is drawn, below a phone's status bar
+            { var d = Flow.Draft; state.birthDraftDate = d.HasDate ? d.Year + "-" + d.Month.ToString("00") + "-" + d.Day.ToString("00") : ""; state.birthDraftTime = d.ExactTime ? (d.timeFrom / 60).ToString("00") + ":" + (d.timeFrom % 60).ToString("00") : ""; state.birthDraftPlace = d.HasPlace ? d.place : ""; } // Back fills the web's boxes too
             // the record's three parts, kept apart (Oct 7), and the hidden flag: test evidence only, never drawn
             state.risingChosen = Flow.RisingChosen; state.sunKnown = Flow.HasSunSign; state.openingPath = Flow.OpeningPath; state.saveVersion = SaveData.Current;
             state.lessonSun = Dial != null && Dial.Lesson != null ? Zodiac.Seats[Zodiac.Wrap(Dial.Lesson.Sun)].Name + (Dial.Lesson.SunKnown ? "" : " (starting sign)") : "";
@@ -4119,11 +4150,12 @@ namespace Ascendant.CelestialDial
             var r = Rect(name, parent, x, top, width, height); var image = r.gameObject.AddComponent<Image>(); image.color = PanelColor; image.raycastTarget = false; if (slot != null) Slots.Dress(image, slot);
             var label = Label(r, name, 0, height + 10, Mathf.Max(width, 110), 16, 10); label.color = Muted; label.horizontalOverflow = HorizontalWrapMode.Overflow; return r;
         }
+        public const float PlaceholderAlpha = .45f;
         InputField TextBox(Transform parent, string name, float x, float top, float width, float height, string placeholderText, Action<string> onEndEdit)
         {
             var box = Rect(name, parent, x, top, width, height); box.gameObject.AddComponent<Image>().color = Dim;
             var text = Label(box, "", 0, height / 2, width - 16, height - 8, 16); text.alignment = TextAnchor.MiddleLeft;
-            var placeholder = Label(box, placeholderText, 0, height / 2, width - 16, height - 8, 16); placeholder.alignment = TextAnchor.MiddleLeft; placeholder.color = Muted; placeholder.fontStyle = FontStyle.Italic;
+            var placeholder = Label(box, placeholderText, 0, height / 2, width - 16, height - 8, 16); placeholder.alignment = TextAnchor.MiddleLeft; placeholder.color = new Color(Muted.r, Muted.g, Muted.b, PlaceholderAlpha); placeholder.fontStyle = FontStyle.Italic; // fainter, so an empty box reads as empty (owner, Oct 10; 86bcgfkdv)
             var field = box.gameObject.AddComponent<InputField>(); field.textComponent = text; field.placeholder = placeholder; field.characterLimit = 24;
             field.onEndEdit.AddListener(v => onEndEdit(v));
             Dial.RegisterNavigation(field);

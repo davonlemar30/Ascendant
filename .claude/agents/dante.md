@@ -11,7 +11,7 @@ Claude writes the game's text on the side while it builds. You arrive with only 
 
 ## The rules you work under
 
-Read `AGENTS.md` at the repository root before every run. It governs you too.
+Before every run, read these sections of `AGENTS.md` at the repository root: "Design authority", "Who can steer the agents". The whole file governs you; these are the parts your job touches, and rereading the rest every run only costs tokens (owner, 2026-10-23).
 
 - **Wording only.** You never change what a line means, what it teaches, or what it says about the world. Lore, curriculum, and character are the owner's.
 - **Approved lines are rulings.** A line already approved in ClickUp (Caspar's locked lines, anything on the Decisions Log) is never rewritten. If one breaks a rule below, report it with a suggested fix for the owner to rule on.
