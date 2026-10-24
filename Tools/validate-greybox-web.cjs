@@ -20,7 +20,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=224,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=220,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
@@ -799,7 +799,7 @@ const path=require('path');
     await page.waitForTimeout(300);
     await tap(-129,344);await tap(-72,128);await tap(0,654); // the thumb path: the Aries tile, the Fire-cardinal cell, Seal on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().busy,{},{timeout:3000}).catch(()=>{});
-    { const g=await state(); check(g.busy && g.gridPlates[CELL(0)]==='gold' && !g.gridGoldWhole[CELL(0)],'without Reduced motion the gold spreads from the centre: not yet whole at the Seal at '+viewport.width); }
+    { const g=await state(); check(g.busy && g.gridPlates[CELL(0)]==='gold' && !g.gridGoldWhole[CELL(0)],'without Reduced motion the inlay wakes: its gold light not yet whole at the Seal at '+viewport.width); }
     await settled();
     check((await state()).gridPlaced===1 && events.some(e=>e.event_name==='grid_placed'&&e.evidence_eligible&&e.start_sign==='Aries'),'canvas taps seat Aries at Level 0 with evidence at '+viewport.width);
     await semantic('grid-sign-1');await semantic('grid-cell-'+CELL(8));await semantic('grid-seal'); // Taurus to Fire mutable: the row is wrong
@@ -816,8 +816,8 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-grid-ask.png')});
     await semantic('grid-cell-'+CELL(2));await semantic('grid-seal');await settled();
     check((await state()).gridPlaced===3 && !events.filter(e=>e.event_name==='grid_placed')[2].evidence_eligible,'a seating after asking earns no evidence at '+viewport.width);
-    // the Table comes alive (owner, Oct 7-8; 86bcf0x71): gold for a sign placed on the player's own, wood for one Caspar's rule placed; the lettering alive on both
-    { const g=await state(); check(g.gridArt && g.gridPlates[CELL(0)]==='gold' && g.gridPlates[CELL(1)]==='gold' && g.gridPlates[CELL(2)]==='wood' && [0,1,2].every(k=>g.gridLive[CELL(k)]) && g.gridPlates.filter(x=>x).length===3,'the Table comes alive: Aries and Taurus (on their own) gold, Gemini (after asking) wood, all three with live lettering (symbol and name, both edged), at '+viewport.width); }
+    // the Table comes alive (owner, Oct 7-8; 86bcf0x71; the art pass, Oct 16): lit gold inlay for a sign placed on the player's own, dull gold for one Caspar's rule placed; the lettering awake on both
+    { const g=await state(); check(g.gridArt && g.gridPlates[CELL(0)]==='gold' && g.gridPlates[CELL(1)]==='gold' && g.gridPlates[CELL(2)]==='dull' && [0,1,2].every(k=>g.gridLive[CELL(k)]) && g.gridPlates.filter(x=>x).length===3,'the Table comes alive: Aries and Taurus (on their own) lit gold inlay, Gemini (after asking) dull gold, all three with their symbol and name awake, at '+viewport.width); }
     // drag (owner, Oct 7: drag and tap): the Cancer plate dragged on the canvas from the tray into its well, then Seal
     { const scale=Math.min(viewport.width/360,viewport.height/800),X=x=>viewport.width/2+x*scale,Y=y=>(viewport.height-800*scale)/2+y*scale;
       await page.mouse.move(X(129),Y(342));await page.mouse.down();for(let k=1;k<=12;k++){await page.mouse.move(X(129+(-72-129)*k/12),Y(342+(284-342)*k/12));await page.waitForTimeout(16);}
@@ -827,7 +827,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-grid-drag.png')});
     await semantic('grid-seal');await page.waitForTimeout(250);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-gold.png')});await settled();
-    check((await state()).gridPlaced===4 && (await state()).gridPlates[CELL(3)]==='gold' && events.filter(e=>e.event_name==='grid_placed')[3].evidence_eligible,'the dragged plate seals like a tapped one and turns gold at '+viewport.width);
+    check((await state()).gridPlaced===4 && (await state()).gridPlates[CELL(3)]==='gold' && events.filter(e=>e.event_name==='grid_placed')[3].evidence_eligible,'the dragged plate seals like a tapped one and wakes as gold inlay at '+viewport.width);
     await seatSign(4);
     check((await state()).gridPlaced===5,'five seated at '+viewport.width);
     await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
@@ -836,25 +836,26 @@ const path=require('path');
     check((await state()).caspar.includes('already placed'),'the room says the table waits, part seated, at '+viewport.width);
     await semantic('poi-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='grid'&&window.ascendantDial.snapshot().canGridPick,{},{timeout:15000});
     check((await state()).avatarAt==='grid'&&(await state()).gridPlaced===5 && (await state()).caspar.includes('5 of twelve') && (await state()).gridCells[CELL(4)]==='Fire, fixed: Leo','tapping the table resumes it with its five seated signs at '+viewport.width);
-    { const g=await state(); check(g.gridPlates[CELL(0)]==='gold' && g.gridPlates[CELL(2)]==='wood' && g.gridPlates[CELL(4)]==='gold','after a reload the gold and wood plates read from the deck as they were at '+viewport.width); }
+    { const g=await state(); check(g.gridPlates[CELL(0)]==='gold' && g.gridPlates[CELL(2)]==='dull' && g.gridPlates[CELL(4)]==='gold','after a reload the lit and dull inlay read from the deck as they were at '+viewport.width); }
     await semantic('grid-sign-5');for(const wrong of [6,7,8]){await semantic('grid-cell-'+CELL(wrong));await semantic('grid-seal');await page.waitForTimeout(150);} // Virgo: three wrong cells
     await page.waitForFunction(()=>window.ascendantDial.snapshot().gridHintLevel===3||window.ascendantDial.snapshot().gridPlaced===6,{},{timeout:10000});
     await settled();
     check((await state()).gridPlaced===6 && (await state()).caspar.includes('Virgo is placed') && !events.filter(e=>e.event_name==='grid_placed')[5].evidence_eligible,'three wrong cells hand the sign to Caspar, who seats it without evidence at '+viewport.width);
-    check((await state()).gridPlates[CELL(5)]==='wood' && (await state()).gridLive[CELL(5)],'the sign Caspar placed stays wood, its lettering alive (owner, Oct 7, 1A), at '+viewport.width);
+    check((await state()).gridPlates[CELL(5)]==='dull' && (await state()).gridLive[CELL(5)],'the sign Caspar placed stays dull, unlit gold, its lettering awake (owner, Oct 16, board 3 A), at '+viewport.width);
     for(let seat=6;seat<8;seat++)await seatSign(seat);
     // Reduced motion (the brief: "Reduced motion throughout"): a correct Seal shows the gold whole and the lettering awake at once, with no spread
     await semantic('motion');await page.waitForFunction(()=>window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000});
     await semantic('grid-sign-8');await semantic('grid-cell-'+CELL(8));await semantic('grid-seal');await page.waitForTimeout(120);
-    { const g=await state(); check(g.busy && g.gridPlates[CELL(8)]==='gold' && g.gridGoldWhole[CELL(8)] && g.gridLive[CELL(8)],'with Reduced motion a correct Seal shows the gold whole and the lettering awake at once, inside the hold, at '+viewport.width); }
+    { const g=await state(); check(g.busy && g.gridPlates[CELL(8)]==='gold' && g.gridGoldWhole[CELL(8)] && g.gridLive[CELL(8)],'with Reduced motion a correct Seal shows the inlay\'s gold light whole and the lettering awake at once, inside the hold, at '+viewport.width); }
     await settled();
-    await seatSign(9);check((await state()).gridGoldWhole[CELL(9)],'with Reduced motion the next plate is gold too at '+viewport.width);
+    await seatSign(9);check((await state()).gridGoldWhole[CELL(9)],'with Reduced motion the next sign is lit gold too at '+viewport.width);
     await semantic('motion');await page.waitForFunction(()=>!window.ascendantDial.snapshot().reducedMotion,{},{timeout:5000});
     await seatSign(10);
     await semantic('grid-sign-11');await semantic('grid-cell-'+CELL(11));await semantic('grid-seal'); // the last seat without settling, so the capture lands mid-ceremony
     await page.waitForFunction(()=>window.ascendantDial.snapshot().keyCeremony===3,{},{timeout:20000});await page.waitForTimeout(950);await page.screenshot({path:path.join(out,viewport.width+'-key3-ceremony.png')}); // Build I: the Key rises
     await page.waitForFunction(()=>window.ascendantDial.snapshot().key3&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
-    { const g=await state(); check(g.gridPlates[CELL(11)]==='gold' && g.gridGoldWhole[CELL(11)] && g.gridLive[CELL(11)],'the twelfth plate ends gold and whole, its lettering awake, after the Key 3 ceremony at '+viewport.width); }
+    { const g=await state(); check(g.gridPlates[CELL(11)]==='gold' && g.gridGoldWhole[CELL(11)] && g.gridLive[CELL(11)],'the twelfth sign ends lit gold and whole, its lettering awake, after the Key 3 ceremony at '+viewport.width);
+      check(g.gridTrayShut,'with all twelve placed the empty tray is shut (with Reduced motion, at once; owner, Oct 16, board 5 A) at '+viewport.width); }
     check((await state()).keys===3 && (await state()).gridPlaced===12 && (await state()).gridComplete && !(await state()).canGridPick && events.filter(e=>e.event_name==='key3_earned').length===1 && (await state()).caspar.includes('Keeper Key 3 is yours'),'twelve seated earns Key 3 once at '+viewport.width);
     await page.screenshot({path:path.join(out,viewport.width+'-grid-key3.png')});
     await semantic('leave-grid');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
