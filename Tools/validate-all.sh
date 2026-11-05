@@ -30,7 +30,6 @@ idle() {
     die 'active Unity Editor owns this project'
   fi
 }
-[ -d Logs ] || mkdir -p Logs
 idle
 if lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1; then die "port $PORT already has a listener"; fi
 step "mechanical checks; evidence: $LOGS"
@@ -76,10 +75,10 @@ failed=0
 if wait "$suite_pid"; then :; else step 'FAIL: browser subprocess exited nonzero'; failed=1; fi
 suite_pid=
 report="$LOGS/browser/validation.txt"
-if [ ! -s "$report" ] || ! cmp -s "$report" <(sed '$ { /^$/d; }' "$LOGS/suite.log"); then
+if [ ! -s "$report" ] || ! python3 -c 'import pathlib,sys; sys.exit(pathlib.Path(sys.argv[1]).read_bytes().rstrip(b"\n") != pathlib.Path(sys.argv[2]).read_bytes().rstrip(b"\n"))' "$report" "$LOGS/suite.log"; then
   step 'FAIL: browser report missing, empty, or incomplete'; failed=1
 fi
-if ! grep -q '^PASS: ' "$report" 2>/dev/null || grep -Eq 'FAIL|Error' "$LOGS/suite.log"; then
+if ! grep -q '^PASS: ' "$report" 2>/dev/null || grep -qv '^PASS: ' "$report" 2>/dev/null || grep -Eq 'FAIL|Error' "$LOGS/suite.log"; then
   step 'FAIL: browser success evidence invalid'; failed=1
 fi
 if [ -n "$fixture_pid" ]; then

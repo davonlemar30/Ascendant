@@ -43,8 +43,8 @@ case "$CASE" in
  suite-missing) echo 'PASS: browser'; exit 0;;
  suite-truncated) echo 'PASS: browser' > "$EVIDENCE_DIR/validation.txt"; echo 'PASS: other'; exit 0;;
 esac
-printf 'PASS: browser\n' > "$EVIDENCE_DIR/validation.txt"
-cat "$EVIDENCE_DIR/validation.txt"
+printf 'PASS: browser' > "$EVIDENCE_DIR/validation.txt"
+cat "$EVIDENCE_DIR/validation.txt"; echo
 STUB
 chmod +x "$TEST_ROOT/bin/"*
 export PATH="$TEST_ROOT/bin:$PATH" UNITY="$TEST_ROOT/bin/unity-stub"
