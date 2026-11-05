@@ -169,8 +169,7 @@ jobs:
           test "$(cat Logs/served-identity.txt)" = "$BUILD_SHA"
           if [ "$DENSITY" = phone ]; then export DEVICE_SCALE=2 MOBILE=1; fi
           GREYBOX_URL=http://127.0.0.1:8790 EVIDENCE_DIR=Logs/browser node Tools/validate-greybox-web.cjs 2>&1 | tee Logs/browser.log
-          python3 Tools/check-validation-report.py Logs/browser/validation.txt
-          cmp Logs/browser/validation.txt <(sed '$ { /^$/d; }' Logs/browser.log)
+          python3 Tools/check-validation-report.py Logs/browser/validation.txt --browser-log Logs/browser.log
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -231,8 +230,7 @@ jobs:
           curl -fsS 'https://davonlemar30.github.io/Ascendant/build-identity.txt' > Logs/production-identity.txt
           test "$(cat Logs/production-identity.txt)" = "$BUILD_SHA"
           GREYBOX_URL=https://davonlemar30.github.io/Ascendant/ DEVICE_SCALE=2 MOBILE=1 EVIDENCE_DIR=Logs/production node Tools/validate-greybox-web.cjs 2>&1 | tee Logs/production.log
-          python3 Tools/check-validation-report.py Logs/production/validation.txt
-          cmp Logs/production/validation.txt <(sed '$ { /^$/d; }' Logs/production.log)
+          python3 Tools/check-validation-report.py Logs/production/validation.txt --browser-log Logs/production.log
       - name: Upload production evidence
         if: always()
         uses: actions/upload-artifact@v4
