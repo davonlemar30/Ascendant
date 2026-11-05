@@ -1166,7 +1166,7 @@ const path=require('path');
       ok((await snap()).birthStep===key && await input.inputValue()===edited,id+' Enter keeps the step and answer; only its button submits');
     };
     await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await skipPrologue(pg);
-    await pg.locator('#name').fill('Tester');await tap('next-screen');
+    await pg.locator('#name').fill('Tester');await pg.mouse.click(8,Math.floor(viewport.height/2));await frames();await tap('next-screen');
     await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirth);
     await tap('birth-chart');await step('date');
     await editAndBlur('birthdate','1990-05-10','1990-05-01','date');
