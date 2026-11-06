@@ -7,7 +7,7 @@ namespace Ascendant.CelestialDial
     public enum ItemState { Introduced, Practicing }
 
     // One atomic item per sign-element pair (Curriculum canon, Stage 0: all twelve enter the deck as Introduced).
-    public enum ItemKind { Element, Glyph, Modality, Grid, Opposite } // v0.3 adds twelve glyph items; Build A twelve sign ↔ modality items; Build B twelve sign → cell items; Build C six opposite pairs (Curriculum canon Stage 1).
+    public enum ItemKind { Element, Glyph, Modality, Grid, Opposite, PlanetGlyph, PlanetFunction, PlanetCompany } // v0.3 adds twelve glyph items; Build A twelve sign ↔ modality items; Build B twelve sign → cell items; Build C six opposite pairs (Curriculum canon Stage 1).
 
     [Serializable] // JsonUtility skips a nested class without this: the deck had not been saving since v0.3 (owner playtest, Sept 14).
     public sealed class ReviewItem
@@ -30,7 +30,7 @@ namespace Ascendant.CelestialDial
     {
         public static readonly int[] Ladder = { 1, 3, 7, 14, 30 };
         public const int BatchSize = 6; // "two minutes on entering the Library"; tuning variable
-        public const int Kinds = 5;
+        public const int Kinds = 8;
         public readonly ReviewItem[] Items = Enumerable.Range(0, 12 * Kinds).Select(i => new ReviewItem { seat = i % 12, kind = i / 12 }).ToArray();
         public ReviewItem Item(int seat, ItemKind kind) => Items[(int)kind * 12 + Zodiac.Wrap(seat)];
         // Deck as data (owner, Sept 15): the grid and opposite items are scheduled like the rest but have no practice form yet;
@@ -82,7 +82,8 @@ namespace Ascendant.CelestialDial
     [Serializable]
     public sealed class SaveData
     {
-        public const int Current = 5;
+        public const int Current = 6;
+        public ObservatorySave observatory = new ObservatorySave();
         public int version = Current; // 4: Build F writes sittings (reviewsChecked is read from older saves); 5: the birth record's three parts (owner, Oct 7)
         public string playerName = "";
         public int sunSign = -1;

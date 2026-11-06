@@ -260,6 +260,28 @@ namespace Ascendant.CelestialDial
             new ArtSlot("menu-rat-2", 48, 24, 256, "the menu's rat, run frame 2 of 4, framed as menu-rat-1"),
             new ArtSlot("menu-rat-3", 48, 24, 256, "the menu's rat, run frame 3 of 4, framed as menu-rat-1"),
             new ArtSlot("menu-rat-4", 48, 24, 256, "the menu's rat, run frame 4 of 4, framed as menu-rat-1"),
+            new ArtSlot("obs-room", 360, 800, 2048, "Stage 2 Observatory placeholder: obs-room"),
+            new ArtSlot("obs-light", 360, 800, 2048, "Stage 2 Observatory placeholder: obs-light"),
+            new ArtSlot("obs-orrery-frame", 300, 300, 1024, "Stage 2 Observatory placeholder: obs-orrery-frame"),
+            new ArtSlot("obs-rings", 300, 300, 1024, "Stage 2 Observatory placeholder: obs-rings"),
+            new ArtSlot("obs-sphere-moon", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-moon"),
+            new ArtSlot("obs-sphere-sun", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-sun"),
+            new ArtSlot("obs-sphere-mercury", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-mercury"),
+            new ArtSlot("obs-sphere-venus", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-venus"),
+            new ArtSlot("obs-sphere-mars", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-mars"),
+            new ArtSlot("obs-sphere-jupiter", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-jupiter"),
+            new ArtSlot("obs-sphere-saturn", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-saturn"),
+            new ArtSlot("obs-sphere-uranus", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-uranus"),
+            new ArtSlot("obs-sphere-neptune", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-neptune"),
+            new ArtSlot("obs-sphere-pluto", 48, 48, 256, "Stage 2 Observatory placeholder: obs-sphere-pluto"),
+            new ArtSlot("obs-sphere-dark", 32, 32, 256, "Stage 2 Observatory placeholder: obs-sphere-dark"),
+            new ArtSlot("obs-shell-worn", 360, 800, 2048, "Stage 2 Observatory placeholder: obs-shell-worn"),
+            new ArtSlot("obs-shell-restored", 360, 800, 2048, "Stage 2 Observatory placeholder: obs-shell-restored"),
+            new ArtSlot("obs-grime", 360, 800, 2048, "Stage 2 Observatory placeholder: obs-grime"),
+            new ArtSlot("obs-lectern-worn", 64, 100, 256, "Stage 2 Observatory placeholder: obs-lectern-worn"),
+            new ArtSlot("obs-lectern-restored", 64, 100, 256, "Stage 2 Observatory placeholder: obs-lectern-restored"),
+            new ArtSlot("obs-charts-worn", 100, 80, 256, "Stage 2 Observatory placeholder: obs-charts-worn"),
+            new ArtSlot("obs-charts-restored", 100, 80, 256, "Stage 2 Observatory placeholder: obs-charts-restored"),
         };
         public static readonly SoundSlot[] Sounds =
         {
@@ -327,6 +349,7 @@ namespace Ascendant.CelestialDial
             string key = Set + "/" + slot; if (images.TryGetValue(key, out var cached)) return cached;
             var sprite = Resources.Load<Sprite>(PathOf("Art", slot));
             if (sprite == null) { var texture = Resources.Load<Texture2D>(PathOf("Art", slot)); if (texture != null) sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(.5f, .5f), 100, 0, SpriteMeshType.FullRect); }
+            if(sprite==null && string.IsNullOrEmpty(Set) && slot.StartsWith("obs-")){sprite=Resources.Load<Sprite>("Art/test/"+slot);if(sprite==null){var t=Resources.Load<Texture2D>("Art/test/"+slot);if(t!=null)sprite=Sprite.Create(t,new Rect(0,0,t.width,t.height),new Vector2(.5f,.5f),100);}}
             images[key] = sprite; return sprite;
         }
         public static AudioClip Clip(string slot)

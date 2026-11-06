@@ -12,7 +12,7 @@ namespace Ascendant.CelestialDial
     // Travel only: Your journal stays a room button. Doors stay the main way to move; a row is the quick way. The panel wears the slim box.
     public sealed class TravelMenu : MonoBehaviour
     {
-        public static readonly (string id, string name)[] Rooms = { ("atrium", "The Grand Atrium"), ("wing", "The Zodiac Wing"), ("chamber", "The Crystal Book Chamber") };
+        public static readonly (string id, string name)[] Rooms = { ("atrium", "The Grand Atrium"), ("wing", "The Zodiac Wing"), ("chamber", "The Crystal Book Chamber"), ("observatory", "The Observatory") };
         public const string SealedName = "Sealed";
         // The concept's measures on the 360 x 800 layout: the button mirrors the gear (x -158, 22 from the top, 36 x 36); the panel's left edge
         // at 17, 280 wide, from 47 down; rows 44 apart from 52 into the panel, the icon at 29 and the name at 51 from its left, "here" at its right.
