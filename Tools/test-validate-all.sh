@@ -49,6 +49,11 @@ esac
 printf 'PASS: browser' > "$EVIDENCE_DIR/validation.txt"
 cat "$EVIDENCE_DIR/validation.txt"; echo
 STUB
+cat > "$TEST_ROOT/bin/ps" <<'STUB'
+#!/usr/bin/env bash
+[ "$CASE" != process-inspection ] || exit 2
+exec /bin/ps "$@"
+STUB
 chmod +x "$TEST_ROOT/bin/"*
 export PATH="$TEST_ROOT/bin:$PATH" UNITY="$TEST_ROOT/bin/unity-stub"
 PORT=$(python3 - <<'PY'
@@ -66,7 +71,7 @@ run() {
   printf 'PASS: %s (%s, exit %s)\n' "$CASE" "$expected" "$actual"; tail -n 2 "$TEST_ROOT/result.log"; pass=$((pass+1))
  else cat "$TEST_ROOT/result.log"; echo "FAIL: $CASE expected $expected, exit $actual"; exit 1; fi
 }
-for scenario in mechanical-missing suite-exit fixture-exit missing stale truncated suite-missing suite-truncated; do run "$scenario" fail; done
+for scenario in process-inspection mechanical-missing suite-exit fixture-exit missing stale truncated suite-missing suite-truncated; do run "$scenario" fail; done
 # A real unrelated listener must be refused and must survive the runner.
 python3 -m http.server "$PORT" --bind 127.0.0.1 > "$TEST_ROOT/listener.log" 2>&1 &
 listener=$!

@@ -26,7 +26,9 @@ trap 'exit 143' TERM
 idle() {
   [ ! -e Temp/UnityLockfile ] || die 'Unity project lock exists; close its Editor before validation'
   # Also refuse an Editor in the short window before it creates its lock.
-  if ps -axo command= | awk -v p="$PROJECT" 'index($0,"-projectPath " p) && /Unity/ && !/awk/ {found=1} END {exit !found}'; then
+  local project_processes
+  project_processes=$(ps -axo command=) || die 'cannot inspect active Unity processes'
+  if awk -v p="$PROJECT" 'index($0,"-projectPath " p) && /Unity/ && !/awk/ {found=1} END {exit !found}' <<< "$project_processes"; then
     die 'active Unity Editor owns this project'
   fi
 }
