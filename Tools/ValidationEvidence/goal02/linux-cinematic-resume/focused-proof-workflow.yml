@@ -1,0 +1,55 @@
+name: Web
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  cinematic-diagnostic:
+    if: github.ref == 'refs/heads/codex/release-gate-failure-proof'
+    name: Focused cinematic diagnosis (${{ matrix.density }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        density: [desktop, phone]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v5
+        with:
+          github-token: ${{ github.token }}
+          run-id: 42168038641
+          name: web-player
+          path: Builds/Web
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install browser tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/browser" playwright@1.56.1
+          "$RUNNER_TEMP/browser/node_modules/.bin/playwright" install --with-deps chrome
+      - name: Test existing artifact without building or deploying
+        env:
+          DENSITY: ${{ matrix.density }}
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/browser/node_modules/playwright
+        run: |
+          set -euo pipefail
+          test "$(cat Builds/Web/build-identity.txt)" = a7b253f121b7a3c7c096002e120377df51badce8
+          mkdir -p Logs
+          python3 -m http.server 8790 --directory Builds/Web --bind 127.0.0.1 > Logs/server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:8790/build-identity.txt > Logs/served-identity.txt; then break; fi
+            sleep 1
+          done
+          test "$(cat Logs/served-identity.txt)" = a7b253f121b7a3c7c096002e120377df51badce8
+          if [ "$DENSITY" = phone ]; then export DEVICE_SCALE=2 MOBILE=1; fi
+          GREYBOX_URL=http://127.0.0.1:8790 EVIDENCE_DIR=Logs/cinematic node Tools/validate-cinematics-web.cjs 2>&1 | tee Logs/cinematic.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: focused-cinematic-${{ matrix.density }}
+          path: Logs/
+          if-no-files-found: error

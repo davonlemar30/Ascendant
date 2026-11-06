@@ -1,0 +1,174 @@
+PASS: in the launch movie a canvas tap shows Skip and advances nothing at 390
+PASS: the launch: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 390
+PASS: the launch: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 390
+PASS: the wheel draws itself: the sweep has revealed 10% of its lines at 390
+PASS: the wheel zooms in slowly through draw (scale 0.814, up from 0.000) at 390
+PASS: the launch: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 390
+PASS: its symbols appear one at a time: 3 of 12 so far at 390
+PASS: the wheel zooms in slowly through glyphs (scale 0.937, up from 0.814) at 390
+PASS: the launch: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 390
+PASS: the wheel zooms in slowly through alive (scale 0.980, up from 0.937) at 390
+PASS: the launch: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 390
+PASS: the wheel spins: intro-wheel-burning turned -0.8 degrees, a round layer at its own size, at 390
+PASS: the launch: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 390
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:-168.69:0.91"]), which spins on and fades away, at 390
+PASS: the launch: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 390
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (24 states read) at 390
+PASS: after the transform only Earth is on stage at 390
+PASS: the push-in on intro-earth (scale 1.020) at 390
+PASS: the launch: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 390
+PASS: the launch: america (intro-america) on the launch movie, its spoken line announced ("The United States at night."), the semantic Skip offered, no gear, at 390
+PASS: the launch: newyork-state (intro-newyork-state) on the launch movie, its spoken line announced ("New York State."), the semantic Skip offered, no gear, at 390
+PASS: the launch: newyork-city (intro-newyork-city) on the launch movie, its spoken line announced ("New York City, between its rivers."), the semantic Skip offered, no gear, at 390
+PASS: the launch: brooklyn (intro-brooklyn) on the launch movie, its spoken line announced ("Brooklyn's rooftops at night."), the semantic Skip offered, no gear, at 390
+PASS: the push-in on intro-brooklyn (scale 1.004) at 390
+PASS: the launch: block (intro-block) on the launch movie, its spoken line announced ("A street of apartment buildings, a few cars, lit shopfronts."), the semantic Skip offered, no gear, at 390
+PASS: the launch: window (prologue-city) on the launch movie, its spoken line announced ("One building. Every window is dark but one."), the semantic Skip offered, no gear, at 390
+PASS: the push-in on prologue-city (scale 1.016) at 390
+PASS: a canvas tap shows Skip and advances nothing (shot 1, prologue-city) at 390
+PASS: Skip hides again after about 3 s (2.8 s) and the scene plays on at 390
+PASS: the opening scene: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered at 390
+PASS: the opening scene: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the opening scene: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook) at 390
+PASS: the opening scene: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones) at 390
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the flash: the busy guard holds and Skip waits it out at 390
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it at 390
+PASS: no runtime exceptions in focused cinematic diagnosis 390 reduced=false
+PASS: in the launch movie a canvas tap shows Skip and advances nothing at 360
+PASS: the launch: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 360
+PASS: the launch: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 360
+PASS: the wheel draws itself: the sweep has revealed 9% of its lines at 360
+PASS: the wheel zooms in slowly through draw (scale 0.813, up from 0.000) at 360
+PASS: the launch: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 360
+PASS: its symbols appear one at a time: 2 of 12 so far at 360
+PASS: the wheel zooms in slowly through glyphs (scale 0.931, up from 0.813) at 360
+PASS: the launch: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 360
+PASS: the wheel zooms in slowly through alive (scale 0.976, up from 0.931) at 360
+PASS: the launch: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 360
+PASS: the wheel spins: intro-wheel-burning turned -0.4 degrees, a round layer at its own size, at 360
+PASS: the launch: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 360
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:-170.76:0.90"]), which spins on and fades away, at 360
+PASS: the launch: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 360
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (26 states read) at 360
+PASS: after the transform only Earth is on stage at 360
+PASS: the push-in on intro-earth (scale 1.021) at 360
+PASS: the launch: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 360
+PASS: the launch: america (intro-america) on the launch movie, its spoken line announced ("The United States at night."), the semantic Skip offered, no gear, at 360
+PASS: the launch: newyork-state (intro-newyork-state) on the launch movie, its spoken line announced ("New York State."), the semantic Skip offered, no gear, at 360
+PASS: the launch: newyork-city (intro-newyork-city) on the launch movie, its spoken line announced ("New York City, between its rivers."), the semantic Skip offered, no gear, at 360
+PASS: the launch: brooklyn (intro-brooklyn) on the launch movie, its spoken line announced ("Brooklyn's rooftops at night."), the semantic Skip offered, no gear, at 360
+PASS: the push-in on intro-brooklyn (scale 1.007) at 360
+PASS: the launch: block (intro-block) on the launch movie, its spoken line announced ("A street of apartment buildings, a few cars, lit shopfronts."), the semantic Skip offered, no gear, at 360
+PASS: the launch: window (prologue-city) on the launch movie, its spoken line announced ("One building. Every window is dark but one."), the semantic Skip offered, no gear, at 360
+PASS: the push-in on prologue-city (scale 1.003) at 360
+PASS: a canvas tap shows Skip and advances nothing (shot 1, prologue-city) at 360
+PASS: Skip hides again after about 3 s (2.8 s) and the scene plays on at 360
+PASS: the opening scene: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered at 360
+PASS: the opening scene: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: the opening scene: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook) at 360
+PASS: the opening scene: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones) at 360
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the flash: the busy guard holds and Skip waits it out at 360
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it at 360
+PASS: no runtime exceptions in focused cinematic diagnosis 360 reduced=false
+PASS: the launch, reduced motion: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 390
+PASS: the launch, reduced motion: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: draw held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 390
+PASS: reduced motion: glyphs held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: alive held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: burn held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: transform held still and level, no sweep ([1,0,1]) at 390
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:0.00:0.89"]), which spins on and fades away, at 390
+PASS: the launch, reduced motion: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: earth held still and level, no sweep ([1,0,1]) at 390
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (21 states read) at 390
+PASS: after the transform only Earth is on stage at 390
+PASS: the launch, reduced motion: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: continents held still and level, no sweep ([1,0,1]) at 390
+PASS: the opening scene, reduced motion: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered, still from the first shot at 390
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: reduced motion: no writing loop, the notebook held (desk notebook) at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between (desk light light-up look headphones) at 390
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the flash: the busy guard holds and Skip waits it out at 390
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it (reduced motion) at 390
+PASS: no runtime exceptions in focused cinematic diagnosis 390 reduced=true
+PASS: the launch, reduced motion: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 360
+PASS: the launch, reduced motion: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: draw held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 360
+PASS: reduced motion: glyphs held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: alive held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: burn held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: transform held still and level, no sweep ([1,0,1]) at 360
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:0.00:0.90"]), which spins on and fades away, at 360
+PASS: the launch, reduced motion: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: earth held still and level, no sweep ([1,0,1]) at 360
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (21 states read) at 360
+PASS: after the transform only Earth is on stage at 360
+PASS: the launch, reduced motion: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: continents held still and level, no sweep ([1,0,1]) at 360
+PASS: the opening scene, reduced motion: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered, still from the first shot at 360
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: reduced motion: no writing loop, the notebook held (desk notebook) at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between (desk light light-up look headphones) at 360
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the flash: the busy guard holds and Skip waits it out at 360
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it (reduced motion) at 360
+PASS: no runtime exceptions in focused cinematic diagnosis 360 reduced=true

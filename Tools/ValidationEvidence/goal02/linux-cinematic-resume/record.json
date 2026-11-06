@@ -1,0 +1,31 @@
+{
+  "outcome": "STOPPED: full normal release clearance missing at authorized cutoff; PR169 open, unmerged",
+  "repair_source": "9361052922d088d73dc7f6283233e5b412d40362",
+  "bounded_start_utc": "2026-11-06T06:58:11Z",
+  "cutoff_utc": "2026-11-06T08:28:00Z",
+  "cancel_request_observed_utc": "2026-11-06T08:28:07Z",
+  "cancellation_result": "completed/cancelled",
+  "cancellation_log_utc": "2026-11-06T08:29:20.6201279Z",
+  "dispatches": [
+    42178429156,
+    42178485878,
+    42179392368
+  ],
+  "focused_pass_counts": {
+    "desktop": 174,
+    "phone": 174
+  },
+  "full_release_run": 42179392368,
+  "full_release_state_at_cutoff": "Build with Unity in progress; no fixture/browser execution; Release artifact cleared not reached",
+  "full_release_artifacts": 0,
+  "build_log_last_pre_cancel_utc": "2026-11-06T07:17:14.4165751Z",
+  "build_log_observation": "Last pre-cancellation line unloads unused serialized files after initial asset refresh. No cause established for the lack of further progress. The cancellation is not a gameplay assertion failure.",
+  "full_raw_log_sha256": "c9e1f5a6aaf0ae6e679a7e132ec521de69d0fab35827d265a9ae9125ebf69902",
+  "raw_log_source": "https://github.com/davonlemar30/Ascendant/actions/runs/42179392368/job/127765233198",
+  "game_tree_identical_hash": "513a2d9459fa3a525e114103aa0e3b1d02fbdd25",
+  "game_changes": false,
+  "assertions_removed_or_weakened": false,
+  "main_production_record": "https://github.com/davonlemar30/Ascendant/blob/042ec86cfa32476b7ae4ca7f820e94daf6caea9a/Tools/ValidationEvidence/observatory-art/production-8f24cf6/record.json",
+  "art_pr": "https://github.com/davonlemar30/Ascendant/pull/172",
+  "written_question": "May a separately bounded follow-up investigate the incomplete normal Linux rehearsal and attempt full clearance? No answer is needed to finish this authorized run:169 remains open and no further attempt starts."
+}

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,22 @@ namespace Ascendant.Build
         }
         static void Check(bool value,string text) { if(!value)throw new Exception(text);Report.Add("PASS: "+text); }
         static void ClearSlots() { for(int i=1;i<=SaveSlots.Count;i++)PlayerPrefs.DeleteKey(SaveSlots.Key(i));PlayerPrefs.DeleteKey(SaveSlots.LastKey);PlayerPrefs.Save(); }
-        static void Act(string command) => View.Dial.WebAction(command);
+        static bool waitingForPlayerFrame;
+        static void Act(string command)
+        {
+            if (command != "relaunch" && command != "rat") { View.Dial.WebAction(command); return; }
+            // A reload or rat starts a real-time animation immediately. From an Editor
+            // update, Time.unscaledTime can still belong to the previous player frame;
+            // the next frame can consume a short animation before the fixture observes it.
+            waitingForPlayerFrame = true;
+            View.StartCoroutine(ActOnPlayerFrame(command));
+        }
+        static IEnumerator ActOnPlayerFrame(string command)
+        {
+            yield return null;
+            try { View.Dial.WebAction(command); }
+            finally { waitingForPlayerFrame = false; nextAt = EditorApplication.timeSinceStartup + .1; }
+        }
         static void AnswerReview(bool captureGlyph)
         {
             var task=View.Flow.CurrentReview;if(task==null||task.done)return;
@@ -693,13 +709,18 @@ namespace Ascendant.Build
         {
             if(EditorApplication.isPaused){Debug.LogWarning("[SlicePlayValidation] Resuming paused Editor for fixture.");EditorApplication.isPaused=false;}
             EditorApplication.QueuePlayerLoopUpdate();
+            if (waitingForPlayerFrame) return;
             if(probe!=null){try{probe();}catch(Exception){}} // a check that watches every tick (the launch's wheel through the burn and the transform)
             if(waitFor!=null)
             {
                 bool met=false; try{met=View!=null && waitFor();}catch(Exception){}
-                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;return;}
-                if(EditorApplication.timeSinceStartup<waitLimit)return;
-                var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;if(waitThen>0)return;}
+                else
+                {
+                    if(EditorApplication.timeSinceStartup<waitLimit)return;
+                    var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+                }
+                // A zero-delay observation and its assertion share this Editor tick; a short frame must not advance between them.
             }
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
             var view=View; if(view!=null && (view.Busy || view.Dial.Busy) && !BusyStep)return; // Beats own the frame.

@@ -50,14 +50,40 @@ const path=require('path');
   const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
     let zoomSeen=0;
-    // the owner, Oct 9 ("fix that immediately"): a watcher in the page reads every state the game publishes through the burn and the transform
-    await pg.evaluate(()=>{window.__wheel={n:0,bad:[]};let last='';const tick=()=>{const s=window.ascendantDial?.snapshot();if(s&&(s.launchShotId==='burn'||s.launchShotId==='transform')){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
-      const ls=(s.launchLayers||[]).map(x=>x.split(':')),w=ls.filter(x=>x[0].startsWith('intro-wheel'));if(w.some(x=>Math.abs(((+x[1]-+w[0][1]+540)%360)-180)>.05))window.__wheel.bad.push(key);if(ls.some(x=>x[0]==='intro-earth'&&Math.abs(+x[1])>.05))window.__wheel.bad.push('earth turned: '+key);}}
-      if(!s||s.screen==='logo'||s.screen==='intro')requestAnimationFrame(tick);};requestAnimationFrame(tick);});
+    // Observe brief animated states inside the page; screenshots and RPCs can outlast a shot on Linux.
+    // A missing intermediate state or missing later shot still times out, including an animation that never finishes.
+    await pg.evaluate(({reduced,frames})=>{
+      window.__wheel={n:0,bad:[]};window.__launchSamples={};window.__launchPngs={};let last='';
+      const tick=()=>{const s=window.ascendantDial?.snapshot();
+        if(s&&(s.screen==='logo'||s.screen==='intro')){
+          const id=s.launchShotId,cam=s.launchCamera||[],ls=(s.launchLayers||[]).map(x=>x.split(':'));
+          const b=ls.find(x=>x[0]==='intro-wheel-burning');
+          let observed=cam.length===3&&s.launchFrame===frames[id];
+          if(!reduced&&['draw','glyphs'].includes(id))observed=observed&&cam[2]>0&&cam[2]<1&&(id!=='draw'||cam[2]>.05&&cam[2]<.95);
+          if(!reduced&&id==='alive')observed=observed&&cam[0]<1;
+          if(!reduced&&id==='burn')observed=observed&&Math.abs(cam[1])>.1;
+          if(id==='transform')observed=observed&&b&&+b[2]>0&&+b[2]<1&&ls.some(x=>x[0]==='intro-earth');
+          if(!reduced&&['earth','brooklyn','window'].includes(id))observed=observed&&cam[0]>1;
+          if(observed&&!window.__launchSamples[id]){window.__launchSamples[id]={state:s,skip:!document.getElementById('skip-prologue').disabled,said:document.getElementById('announcement').textContent,observedAt:performance.now()};window.__launchPngs[id]=document.getElementById('unity-canvas').toDataURL('image/png');}
+          if(id==='burn'||id==='transform'){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
+            const w=ls.filter(x=>x[0].startsWith('intro-wheel'));if(w.some(x=>Math.abs(((+x[1]-+w[0][1]+540)%360)-180)>.05))window.__wheel.bad.push(key);
+            if(ls.some(x=>x[0]==='intro-earth'&&Math.abs(+x[1])>.05))window.__wheel.bad.push('earth turned: '+key);}}
+        }
+        if(!s||s.screen==='logo'||s.screen==='intro')requestAnimationFrame(tick);
+      };requestAnimationFrame(tick);
+    },{reduced,frames:Object.fromEntries(LAUNCH.map(([id,frame])=>[id,frame]))});
+    // Input checks use a live, early stable window, never an archived phase after screenshots.
+    if(tap){
+      await pg.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.screen==='intro'&&s.launchShotId==='draw';},{},{timeout:20000});
+      const before=await snap();await tap(0,400);
+      await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const a=await snap();
+      check(a.skipShown&&a.screen==='intro'&&a.launchShot>=before.launchShot,'in the launch movie a canvas tap shows Skip and advances nothing at '+where);
+    }
     for(const [i,[id,frame,settle,line]] of LAUNCH.entries()){
-      await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
-      await pg.waitForTimeout(settle);
-      const s=await snap(),skip=await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo',said=await pg.locator('#announcement').textContent();
+      await pg.waitForFunction(k=>!!window.__launchSamples[k],id,{timeout:20000});
+      const sample=await pg.evaluate(k=>window.__launchSamples[k],id);
+      const s=sample.state,skip=sample.skip,cam=s.launchCamera||[],logo=id==='logo',said=sample.said;
+      fs.writeFileSync(path.join(out,prefix+'-observations.json'),JSON.stringify(await pg.evaluate(()=>window.__launchSamples),null,2));
       check(s.screen===(logo?'logo':'intro')&&s.launchShotId===id&&s.launchFrame===frame&&s.canSkip&&skip&&!s.gearShown&&s.caspar===line&&(line===''||said.includes(line))&&!s.canSliceContinue,'the launch'+(reduced?', reduced motion':'')+': '+id+' ('+frame+') on the '+(logo?'logo screen':'launch movie')+', its spoken line '+(line?'announced ("'+line+'")':'none')+', the semantic Skip offered, no gear, at '+where);
       if(reduced&&!logo)check(s.launchStill&&cam.length===3&&Math.abs(cam[0]-1)<.001&&Math.abs(cam[1])<.01&&Math.abs(cam[2]-1)<.001,'reduced motion: '+id+' held still and level, no sweep ('+JSON.stringify(cam)+') at '+where);
       if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
@@ -69,40 +95,65 @@ const path=require('path');
       if(id==='earth'){const w=await pg.evaluate(()=>window.__wheel);check(w&&w.n>=4&&w.bad.length===0,'through the burn and the transform every wheel layer turned at one angle and Earth never turned ('+(w?w.n:0)+' states read'+(w&&w.bad.length?'; '+w.bad.slice(0,3).join(' | '):'')+') at '+where);
         check(JSON.stringify(s.launchLayers.map(x=>x.split(':')[0]))==='["intro-earth"]','after the transform only Earth is on stage at '+where);}
       if(!reduced&&['earth','brooklyn','window'].includes(id))check(cam.length===3&&cam[0]>1&&Math.abs(cam[1])<.01,'the push-in on '+frame+' (scale '+(cam[0]||0).toFixed(3)+') at '+where);
-      await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+id+'.png')});
-      if(tap&&id==='continents'){await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const a=await snap();
-        check(a.skipShown&&a.screen==='intro'&&a.launchShot>=s.launchShot,'in the launch movie a canvas tap shows Skip and advances nothing at '+where);}
+      const image=await pg.evaluate(k=>window.__launchPngs[k],id);fs.writeFileSync(path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+id+'.png'),Buffer.from(image.split(',')[1],'base64'));
       if(id===stopAt)return;
     }
   };
   const skipPrologue=async pg=>{await newGame(pg);for(let n=0;n<5;n++){await pg.locator('#skip-prologue').evaluate(b=>b.click());try{await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:3000});return;}catch{}}throw Error('the semantic Skip did not leave the prologue');};
   const playPrologue=async(pg,prefix,reduced,where,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
+    await pg.evaluate(()=>{
+      window.__prologueSamples={};window.__prologuePngs={};window.__prologueLoop=null;window.__prologueLastByShot={};
+      const tick=()=>{const s=window.ascendantDial?.snapshot();
+        if(s&&s.screen==='prologue'){
+          window.__prologueLastByShot[s.prologueShot]=s;
+          const key=s.prologueShot+'/'+s.prologueFrame,said=document.getElementById('announcement').textContent;
+          if(s.caspar&&said.includes(s.caspar)){
+            window.__prologueSamples[key]={state:s,said,skip:!document.getElementById('skip-prologue').disabled,observedAt:performance.now()};
+            if(!window.__prologuePngs[key])window.__prologuePngs[key]=document.getElementById('unity-canvas').toDataURL('image/png');
+          }
+          const f=s.prologueShotFrames||[];
+          if(s.prologueShot===1&&f.includes('prologue-notebook-2')&&f.includes('prologue-notebook-3')&&f.lastIndexOf('prologue-notebook')>f.indexOf('prologue-notebook-3'))window.__prologueLoop=s;
+          if(s.prologueShot===6)window.__prologueFlash={state:s,skip:!document.getElementById('skip-prologue').disabled};
+        }
+        if(!s||s.screen==='prologue')requestAnimationFrame(tick);
+      };requestAnimationFrame(tick);
+    });
+    if(tap){
+      await pg.waitForFunction(()=>{const s=window.ascendantDial.snapshot();return s.prologueShot===0&&s.prologueFrame==='prologue-city';},{},{timeout:10000});
+      const s=await snap();await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const t0=Date.now(),a=await snap();
+      check(a.skipShown&&a.prologueShot===s.prologueShot&&a.prologueFrame===s.prologueFrame&&a.screen==='prologue','a canvas tap shows Skip and advances nothing (shot '+(a.prologueShot+1)+', '+a.prologueFrame+') at '+where);
+      await pg.screenshot({path:path.join(out,prefix+'-skip-shown.png')});
+      await pg.waitForFunction(()=>!window.ascendantDial.snapshot().skipShown,{},{timeout:6000});const held=Date.now()-t0;
+      check(held>2400&&held<4200&&(await snap()).screen==='prologue','Skip hides again after about 3 s ('+(held/1000).toFixed(1)+' s) and the scene plays on at '+where);
+    }
     for(const [i,[shot,frame,settle]] of PROLOGUE.entries()){
       const want=frame;
-      await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.prologueShot===k&&s.prologueFrame===f;},[shot,want],{timeout:25000});
-      await pg.waitForTimeout(settle);
-      const s=await snap(),said=await pg.locator('#announcement').textContent(),skip=await pg.locator('#skip-prologue').isEnabled();
+      const key=shot+'/'+want;await pg.waitForFunction(k=>!!window.__prologueSamples[k],key,{timeout:25000});
+      const observed=await pg.evaluate(k=>window.__prologueSamples[k],key),s=observed.state,said=observed.said,skip=observed.skip;
       const loopFrame=frame==='prologue-notebook'&&/^prologue-notebook(-[23])?$/.test(s.prologueFrame); // the writing loop may already have begun (it starts 0.7 s after the panel)
       check(s.screen==='prologue'&&s.prologueShot===shot&&(s.prologueFrame===want||(!reduced&&loopFrame))&&s.caspar!==''&&said.includes(s.caspar)&&s.canSkip&&skip&&!s.canSliceContinue&&!s.orbShown&&(!reduced||shot<1||s.prologueStill),'the opening scene'+(reduced?', reduced motion':'')+': shot '+(shot+1)+' ('+s.prologueShotId+'), '+want+', its spoken line announced ("'+s.caspar+'"), the semantic Skip offered'+(reduced&&shot===0?(s.prologueStill?', still from the first shot':', the first shot as it began'):'')+' at '+where);
-      await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png')});
+      const image=await pg.evaluate(k=>window.__prologuePngs[k],key);fs.writeFileSync(path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png'),Buffer.from(image.split(',')[1],'base64'));
       // the owner, Oct 9: slight animations as frame swaps; read from the frames the shot has shown, in order (the headphones' in-between lasts 0.14 s)
       if(shot===1&&frame==='prologue-notebook'){
-        await pg.waitForTimeout(1500);const seen=(await snap()).prologueShotFrames||[];const names=seen.map(f=>f.replace('prologue-','')).join(' ');
+        if(!reduced){
+          await pg.waitForFunction(()=>!!window.__prologuePngs['1/prologue-notebook-2'],{},{timeout:10000});
+          const image=await pg.evaluate(()=>window.__prologuePngs['1/prologue-notebook-2']);fs.writeFileSync(path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'b-desk-notebook-2.png'),Buffer.from(image.split(',')[1],'base64'));
+          await pg.waitForFunction(()=>!!window.__prologueLoop,{},{timeout:10000});
+        }
+        // Reduced motion must have no writing cycle throughout the whole shot, not merely before a delayed loop starts.
+        if(reduced)await pg.waitForFunction(()=>!!window.__prologueLastByShot[2],{},{timeout:15000});
+        const seen=reduced?(await pg.evaluate(()=>window.__prologueLastByShot[1])).prologueShotFrames:(await pg.evaluate(()=>window.__prologueLoop)).prologueShotFrames;const names=seen.map(f=>f.replace('prologue-','')).join(' ');
         check(reduced?JSON.stringify(seen)==='["prologue-desk","prologue-notebook"]':seen.includes('prologue-notebook-2')&&seen.includes('prologue-notebook-3')&&seen.lastIndexOf('prologue-notebook')>seen.indexOf('prologue-notebook-3'),(reduced?'reduced motion: no writing loop, the notebook held':'the hand writes: the loop runs notebook, -2, -3 and round')+' ('+names+') at '+where);
-        if(!reduced){await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueFrame==='prologue-notebook-2',{},{timeout:5000});await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'b-desk-notebook-2.png')});}}
+      }
       if(shot===2&&frame==='prologue-headphones'){
-        const seen=(await snap()).prologueShotFrames||[];const want3=['prologue-desk','prologue-light','prologue-light-up','prologue-look'].concat(reduced?[]:['prologue-headphones-mid']).concat(['prologue-headphones']);
+        const seen=s.prologueShotFrames||[];const want3=['prologue-desk','prologue-light','prologue-light-up','prologue-look'].concat(reduced?[]:['prologue-headphones-mid']).concat(['prologue-headphones']);
         check(JSON.stringify(seen)===JSON.stringify(want3),(reduced?'reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between':'shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down')+' ('+seen.map(f=>f.replace('prologue-','')).join(' ')+') at '+where);}
-      if(tap&&i===1){ // ruling 5: a tap anywhere shows Skip and never advances a shot; Skip hides again after about 3 s
-        await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const t0=Date.now(),a=await snap();
-        check(a.skipShown&&a.prologueShot===s.prologueShot&&a.prologueFrame===s.prologueFrame&&a.screen==='prologue','a canvas tap shows Skip and advances nothing (shot '+(a.prologueShot+1)+', '+a.prologueFrame+') at '+where);
-        await pg.screenshot({path:path.join(out,prefix+'-skip-shown.png')});
-        await pg.waitForFunction(()=>!window.ascendantDial.snapshot().skipShown,{},{timeout:6000});const held=Date.now()-t0;
-        check(held>2400&&held<4200&&(await snap()).screen==='prologue','Skip hides again after about 3 s ('+(held/1000).toFixed(1)+' s) and the scene plays on at '+where);}
+
     }
-    await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueShot===6,{},{timeout:25000});await pg.waitForTimeout(reduced?100:400); // the white blooming out of the glow
-    { const f=await snap(); check(f.prologueShotId==='flash'&&f.busy&&!f.canSkip&&!(await pg.locator('#skip-prologue').isEnabled()),'the flash: the busy guard holds and Skip waits it out at '+where);await pg.screenshot({path:path.join(out,prefix+'-'+String(PROLOGUE.length+1)+'-flash.png')}); }
+    await pg.waitForFunction(()=>!!window.__prologueFlash,{},{timeout:25000}); // observed atomically while the white bloom owns the busy guard
+    { const observed=await pg.evaluate(()=>window.__prologueFlash),f=observed.state; check(f.prologueShotId==='flash'&&f.busy&&!f.canSkip&&!observed.skip,'the flash: the busy guard holds and Skip waits it out at '+where);await pg.screenshot({path:path.join(out,prefix+'-'+String(PROLOGUE.length+1)+'-flash.png')}); }
+    fs.writeFileSync(path.join(out,prefix+'-observations.json'),JSON.stringify(await pg.evaluate(()=>({samples:window.__prologueSamples,loop:window.__prologueLoop,flash:window.__prologueFlash})),null,2));
     await pg.waitForFunction(()=>window.ascendantDial.snapshot().screen==='identity'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});await pg.waitForTimeout(reduced?200:600);
     { const e=await snap(); check(e.screen==='identity'&&e.prologueShot===-1&&e.orbShown&&e.orbStars===0&&e.canName,'the prologue ends in darkness, then WHO ARE YOU? with the orb above it'+(reduced?' (reduced motion)':'')+' at '+where);await pg.screenshot({path:path.join(out,prefix+'-'+String(PROLOGUE.length+2)+'-identity.png')}); }
   };
@@ -669,14 +720,20 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
-      const target=SIGNS.indexOf((await state()).glyphTarget);
-      await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
+      const target=SIGNS.indexOf((await state()).glyphTarget),placed=events.filter(e=>e.event_name==='glyph_placed').length;
+      await semantic('seat-'+target);
+      await page.waitForFunction(i=>{const s=window.ascendantDial.snapshot();return s.active&&!s.busy&&s.destination==='Selected: symbol '+s.glyphs[i];},target,{timeout:15000});
+      await semantic('seal');
+      // A real player frame must commit and finish the placement before the next action/reload.
+      // A fixed 300 ms can read the previous idle snapshot while SendMessage is still queued.
+      await page.waitForFunction(name=>{const s=window.ascendantDial.snapshot();return !s.busy&&(s.key2||s.glyphTarget!==name);},SIGNS[target],{timeout:20000});
+      check(events.filter(e=>e.event_name==='glyph_placed').length===placed+1,'each symbol placement commits once before continuing or reloading (placement '+(n+1)+') at '+viewport.width);
       if(n===4){
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
         await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
         await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-        check((await state()).glyphTarget==='Virgo','mid-placement reload resumes at Virgo after five committed placements at '+viewport.width);
+        { const restored=await state();if(restored.glyphTarget!=='Virgo')fs.writeFileSync(path.join(out,viewport.width+'-placement-resume-failure.json'),JSON.stringify({restored,events},null,2));check(restored.glyphTarget==='Virgo','mid-placement reload resumes at Virgo after five committed placements at '+viewport.width+' (actual '+restored.glyphTarget+')'); }
         await page.screenshot({path:path.join(out,viewport.width+'-symbol-placement-restored.png')});
       }
     }
