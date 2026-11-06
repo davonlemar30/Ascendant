@@ -1140,6 +1140,7 @@ const path=require('path');
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
     await devContext.close();
   }));
+  await require('./validate-opening-controls.cjs')({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART});
   const recoveryContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const recovery=await recoveryContext.newPage();
   await recovery.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
