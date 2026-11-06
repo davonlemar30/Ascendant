@@ -1,0 +1,42 @@
+PASS: the opening scene: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered at 390
+PASS: the opening scene: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: a canvas tap shows Skip and advances nothing (shot 2, prologue-desk) at 390
+PASS: Skip hides again after about 3 s (2.9 s) and the scene plays on at 390
+PASS: the opening scene: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook) at 390
+PASS: the opening scene: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones) at 390
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the flash: the busy guard holds and Skip waits it out at 390
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it at 390
+PASS: the opening scene: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered at 360
+PASS: the opening scene: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: a canvas tap shows Skip and advances nothing (shot 2, prologue-desk) at 360
+PASS: Skip hides again after about 3 s (3.0 s) and the scene plays on at 360
+PASS: the opening scene: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook) at 360
+PASS: the opening scene: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones) at 360
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the flash: the busy guard holds and Skip waits it out at 360
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it at 360
