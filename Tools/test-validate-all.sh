@@ -3,6 +3,7 @@
 set -euo pipefail
 SOURCE=$(cd "$(dirname "$0")" && pwd)
 TEST_ROOT=$(mktemp -d)
+TEST_ROOT=$(cd "$TEST_ROOT" && pwd -P)
 trap 'rm -rf "$TEST_ROOT"' EXIT
 mkdir -p "$TEST_ROOT/Tools" "$TEST_ROOT/bin" "$TEST_ROOT/Logs" "$TEST_ROOT/Temp"
 cp "$SOURCE/validate-all.sh" "$TEST_ROOT/Tools/"
@@ -79,6 +80,15 @@ touch "$TEST_ROOT/Temp/UnityLockfile"
 run active-editor-lock fail
 [ -f "$TEST_ROOT/Temp/UnityLockfile" ]
 rm "$TEST_ROOT/Temp/UnityLockfile"
+# A live process with Unity's project arguments is refused even before its lock exists.
+bash -c 'exec -a "Unity -projectPath $1" sleep 30' _ "$TEST_ROOT" &
+editor=$!
+trap 'kill "$editor" 2>/dev/null || true; rm -rf "$TEST_ROOT"' EXIT
+sleep .2
+run active-editor-process fail
+kill -0 "$editor"
+kill "$editor"; wait "$editor" 2>/dev/null || true
+trap 'rm -rf "$TEST_ROOT"' EXIT
 run clean pass
 ART_ONLY=1 run art-only pass
 grep -q 'fixture: SKIPPED' "$TEST_ROOT/result.log"
