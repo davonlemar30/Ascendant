@@ -103,9 +103,10 @@ const path=require('path');
   const playPrologue=async(pg,prefix,reduced,where,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
     await pg.evaluate(()=>{
-      window.__prologueSamples={};window.__prologuePngs={};window.__prologueLoop=null;
+      window.__prologueSamples={};window.__prologuePngs={};window.__prologueLoop=null;window.__prologueLastByShot={};
       const tick=()=>{const s=window.ascendantDial?.snapshot();
         if(s&&s.screen==='prologue'){
+          window.__prologueLastByShot[s.prologueShot]=s;
           const key=s.prologueShot+'/'+s.prologueFrame,said=document.getElementById('announcement').textContent;
           if(s.caspar&&said.includes(s.caspar)){
             window.__prologueSamples[key]={state:s,said,skip:!document.getElementById('skip-prologue').disabled,observedAt:performance.now()};
@@ -140,7 +141,9 @@ const path=require('path');
           const image=await pg.evaluate(()=>window.__prologuePngs['1/prologue-notebook-2']);fs.writeFileSync(path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'b-desk-notebook-2.png'),Buffer.from(image.split(',')[1],'base64'));
           await pg.waitForFunction(()=>!!window.__prologueLoop,{},{timeout:10000});
         }
-        const seen=reduced?s.prologueShotFrames:(await pg.evaluate(()=>window.__prologueLoop)).prologueShotFrames;const names=seen.map(f=>f.replace('prologue-','')).join(' ');
+        // Reduced motion must have no writing cycle throughout the whole shot, not merely before a delayed loop starts.
+        if(reduced)await pg.waitForFunction(()=>!!window.__prologueLastByShot[2],{},{timeout:15000});
+        const seen=reduced?(await pg.evaluate(()=>window.__prologueLastByShot[1])).prologueShotFrames:(await pg.evaluate(()=>window.__prologueLoop)).prologueShotFrames;const names=seen.map(f=>f.replace('prologue-','')).join(' ');
         check(reduced?JSON.stringify(seen)==='["prologue-desk","prologue-notebook"]':seen.includes('prologue-notebook-2')&&seen.includes('prologue-notebook-3')&&seen.lastIndexOf('prologue-notebook')>seen.indexOf('prologue-notebook-3'),(reduced?'reduced motion: no writing loop, the notebook held':'the hand writes: the loop runs notebook, -2, -3 and round')+' ('+names+') at '+where);
       }
       if(shot===2&&frame==='prologue-headphones'){
