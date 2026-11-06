@@ -51,7 +51,7 @@ namespace Ascendant.CelestialDial
             obsLeft=ObsButton(obsInstrument,"<",-115,370,50,44,()=>ObsChange(()=>Obs.Rotate(-1)));obsRight=ObsButton(obsInstrument,">",115,370,50,44,()=>ObsChange(()=>Obs.Rotate(1)));
             obsSeal=ObsButton(obsInstrument,"Seal",0,510,130,48,()=>ObsChange(()=>Obs.Seal()));obsAskCaspar=ObsButton(obsInstrument,"Ask Caspar",0,559,150,44,()=>ObsChange(()=>Obs.Ask()));
             var panel=Rect("Caspar",obsInstrument,0,675,328,170);panel.gameObject.AddComponent<Image>().color=PanelColor;
-            obsPose=Picture(obsInstrument,"caspar-explain",133,585,60,100);obsPose.raycastTarget=false;
+            obsPose=Picture(obsInstrument,"caspar-explain",133,585,60,100);obsPose.raycastTarget=false;obsPose.rectTransform.SetSiblingIndex(panel.GetSiblingIndex());
             obsMessage=Label(panel,"",0,75,304,130,14);obsMessage.resizeTextForBestFit=true;obsMessage.resizeTextMinSize=12;obsMessage.resizeTextMaxSize=14;
             // The retrograde mark uses bundled Garamond, which contains U+211E (fontTools preflight).
             obsMessage.font=Resources.Load<Font>("Fonts/EBGaramond-Bold");
