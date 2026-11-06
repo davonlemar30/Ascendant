@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace Ascendant.CelestialDial
 {
-    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal, Prologue, Logo, Intro, Menu, SaveSlots, Observatory, Corridor } // Prologue: the opening scene (owner, Oct 8, 86bcfhmha); then the launch (owner, Oct 9, 86bcg62x3): the logo screen, the launch movie, the main menu, the slot list; each appended, so no screen is renumbered
-    public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality, PlanetGlyph, PlanetFunction, PlanetCompany, TraditionalRuler, ModernRuler }
-    public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map, Practice, Quiz, Birth, Planets, Planet } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map; Oct 3: Practice's list and its question page; Oct 7: "Your Birth"
+    public enum SliceScreen { Identity, Birth, Atrium, Wing, AtriumReturn, Chamber, Hub, Practice, WingRoom, Book, Grid, ChamberRoom, Journal, Prologue, Logo, Intro, Menu, SaveSlots, Observatory, Corridor, Houses } // Prologue: the opening scene (owner, Oct 8, 86bcfhmha); then the launch (owner, Oct 9, 86bcg62x3): the logo screen, the launch movie, the main menu, the slot list; each appended, so no screen is renumbered
+    public enum ReviewMode { Dial, Tap, Glyph, TapModality, DialModality, PlanetGlyph, PlanetFunction, PlanetCompany, TraditionalRuler, ModernRuler, HouseTopic, HouseGroup, Angle }
+    public enum JournalView { Wheel, Sign, Title, Landing, Contents, Map, Practice, Quiz, Birth, Planets, Planet, Houses, House } // Build AA (owner, Sept 30): the Wheel and a page per sign met; batch 2 (owner, Oct 1): the title page, the landing, Contents and the Library Map; Oct 3: Practice's list and its question page; Oct 7: "Your Birth"
     public enum JournalLens { Element, Modality, Polarity, Opposites } // Build AA: the tabs that recolour the Wheel or the Table, each once learned
 
     [Serializable]
@@ -141,13 +141,15 @@ namespace Ascendant.CelestialDial
         public event Action<string> Logged;
         public readonly ObservatoryModel Observatory;
         public readonly CorridorModel Corridor;
+        public readonly HousesModel Houses;
         public SliceFlow() : this(null) { }
         public SliceFlow(Func<int> randomSeat) // the random sun is retired (owner, Oct 7); the seat source is ignored, kept so the checks construct as before
         {
             Observatory = new ObservatoryModel(this);
             Corridor = new CorridorModel(this);
+            Houses = new HousesModel(this);
             Deck.Logged += n => Logged?.Invoke(n);
-            Walk.Unlocked = id => id == "sealed-left" && ObservatoryOpen || id == "corridor-door" && CorridorOpen;
+            Walk.Unlocked = id => id == "sealed-left" && ObservatoryOpen || id == "corridor-door" && CorridorOpen || id == "houses-door" && HousesOpen;
             Walk.Logged += n => Logged?.Invoke(n);
         }
         // No in-game time (owner, Sept 13): the deck counts sittings. The sitting rule (owner, Sept 17): one entry to the practice
@@ -612,7 +614,7 @@ namespace Ascendant.CelestialDial
             Note = "";
             // Form is a test variable (Q05 decision 2): alternate compressed Dial and direct tap.
             for (int i = 0; i < due.Count && i < ReviewDeck.BatchSize; i++)
-                ReviewQueue.Add(new ReviewTask { seat = due[i].seat, mode = (int)(due[i].Kind == ItemKind.TraditionalRuler ? ReviewMode.TraditionalRuler : due[i].Kind == ItemKind.ModernRuler ? ReviewMode.ModernRuler : due[i].Kind == ItemKind.PlanetGlyph ? ReviewMode.PlanetGlyph : due[i].Kind == ItemKind.PlanetFunction ? ReviewMode.PlanetFunction : due[i].Kind == ItemKind.PlanetCompany ? ReviewMode.PlanetCompany : due[i].Kind == ItemKind.Glyph ? ReviewMode.Glyph : due[i].Kind == ItemKind.Modality ? (i % 2 == 0 ? ReviewMode.DialModality : ReviewMode.TapModality) : i % 2 == 0 ? ReviewMode.Dial : ReviewMode.Tap) });
+                ReviewQueue.Add(new ReviewTask { seat = due[i].seat, mode = (int)(due[i].Kind == ItemKind.HouseTopic ? ReviewMode.HouseTopic : due[i].Kind == ItemKind.HouseGroup ? ReviewMode.HouseGroup : due[i].Kind == ItemKind.Angle ? ReviewMode.Angle : due[i].Kind == ItemKind.TraditionalRuler ? ReviewMode.TraditionalRuler : due[i].Kind == ItemKind.ModernRuler ? ReviewMode.ModernRuler : due[i].Kind == ItemKind.PlanetGlyph ? ReviewMode.PlanetGlyph : due[i].Kind == ItemKind.PlanetFunction ? ReviewMode.PlanetFunction : due[i].Kind == ItemKind.PlanetCompany ? ReviewMode.PlanetCompany : due[i].Kind == ItemKind.Glyph ? ReviewMode.Glyph : due[i].Kind == ItemKind.Modality ? (i % 2 == 0 ? ReviewMode.DialModality : ReviewMode.TapModality) : i % 2 == 0 ? ReviewMode.Dial : ReviewMode.Tap) });
             Screen = SliceScreen.Practice; Logged?.Invoke("practice_started"); return true;
         }
         public bool PracticeDone => AtPractice && ReviewIndex >= ReviewQueue.Count;
@@ -651,7 +653,7 @@ namespace Ascendant.CelestialDial
         public SliceScreen JournalFrom { get; private set; } = SliceScreen.Hub;
         public bool AtJournal => Screen == SliceScreen.Journal;
         public bool Knows(ItemKind kind) => Deck.Items.Any(i => i.Kind == kind && i.entered);
-        public bool CanOpenJournal => (AtHub || AtWingRoom || AtChamberRoom || AtObservatory || AtCorridor) && JournalSigns.Count > 0;
+        public bool CanOpenJournal => (AtHub || AtWingRoom || AtChamberRoom || AtObservatory || AtCorridor || AtHouses) && JournalSigns.Count > 0;
         // Batch 2 (owner, Oct 1: the journal's architecture; 1b C, 1e A): the first-ever open shows the title page, once (saved); the first open
         // in each session shows the landing; after that the journal opens where it was left. A session is one run of the game.
         public bool JournalTitled { get; private set; }
@@ -734,15 +736,16 @@ namespace Ascendant.CelestialDial
             Logged?.Invoke("inscription:" + InscriptionId);
         }
         public IReadOnlyList<string> RecentInscriptions => recentLines;
-        public bool CanJournalContents => AtJournal && (JournalAt == JournalView.Landing || JournalAt == JournalView.Wheel || JournalAt == JournalView.Planets || JournalAt == JournalView.Planet || JournalAt == JournalView.Map);
+        public bool CanJournalContents => AtJournal && (JournalAt == JournalView.Landing || JournalAt == JournalView.Wheel || JournalAt == JournalView.Planets || JournalAt == JournalView.Planet || JournalAt == JournalView.Houses || JournalAt == JournalView.House || JournalAt == JournalView.Map);
         public bool JournalToContents() { if (!CanJournalContents) return false; JournalAt = JournalView.Contents; Logged?.Invoke("journal_contents"); return true; }
         public bool CanJournalHome => AtJournal && (JournalAt == JournalView.Contents || JournalAt == JournalView.Practice || JournalAt == JournalView.Birth); // "‹ Your Journal" on Contents, on Practice's list and on "Your Birth"
         public bool JournalToLanding() { if (!CanJournalHome) return false; JournalAt = JournalView.Landing; BirthLines = new List<string>(); Logged?.Invoke("journal_landing"); return true; }
-        public static readonly string[] Chapters = { "wheel", "map", "planets" };
+        public static readonly string[] Chapters = { "wheel", "map", "planets", "houses" };
+        public int SealedChapterCount=>Keys>=9?0:SealedChapters;
         public bool OpenChapter(string chapter)
         {
-            if (!CanJournalHome || !Chapters.Contains(chapter)) return false;
-            JournalAt = chapter == "wheel" ? JournalView.Wheel : chapter == "planets" ? JournalView.Planets : JournalView.Map; Logged?.Invoke("journal_chapter:" + chapter); return true;
+            if (!CanJournalHome || !Chapters.Contains(chapter) || chapter=="houses"&&Keys<9) return false;
+            JournalAt = chapter == "wheel" ? JournalView.Wheel : chapter == "planets" ? JournalView.Planets : chapter == "houses" ? JournalView.Houses : JournalView.Map; Logged?.Invoke("journal_chapter:" + chapter); return true;
         }
         // Practice (owner, Oct 3: step 4 approved as scoped; the board on 86bcbn6w6). The door opens the list of concepts learned, and only
         // those: a concept joins when its lesson finishes (the Elements at Key 1, the Symbols at Key 2, the Modalities with their lesson, the
@@ -753,7 +756,7 @@ namespace Ascendant.CelestialDial
         public bool ConceptLearned(PracticeConcept concept) => concept.unlock != "" && Learned(concept.unlock);
         public bool Learned(string unlock) // the lessons' order, shared by Practice and the inscription: "" is open from the start
         {
-            switch (unlock) { case "": return true; case "key1": return Keys >= 1; case "key2": return Keys >= 2; case "modalities": return ModalitiesComplete; case "key3": return Keys >= 3; case "key4": return Keys >= 4; case "key5": return Keys >= 5; case "key6": return Keys >= 6; case "key7": return Keys >= 7; case "key8": return Keys >= 8; case "wing": return WingWhole; default: return false; }
+            switch (unlock) { case "": return true; case "key1": return Keys >= 1; case "key2": return Keys >= 2; case "modalities": return ModalitiesComplete; case "key3": return Keys >= 3; case "key4": return Keys >= 4; case "key5": return Keys >= 5; case "key6": return Keys >= 6; case "key7": return Keys >= 7; case "key8": return Keys >= 8; case "key9": return Keys >= 9; case "key10": return Keys >= 10; case "wing": return WingWhole; default: return false; }
         }
         public List<PracticeConcept> PracticeConcepts => PracticeBook.Data.concepts.Where(ConceptLearned).ToList();
         public bool CanJournalPractice => AtJournal && JournalAt == JournalView.Landing && PracticeConcepts.Count > 0;
@@ -1000,7 +1003,7 @@ namespace Ascendant.CelestialDial
                 polarityShown = polarityShown, oppKnown = oppKnown != null ? (bool[])oppKnown.Clone() : new bool[Zodiac.OppositePairs], oppositesStarted = OppositesStarted, built = built, builderEvidence = builderEvidence, locksFilled = LocksFilled,
                 wheelComplete = WheelComplete, atriumStage = AtriumStage, keys = Keys, journalTitled = JournalTitled, glyphStage = GlyphStage, glyphIndex = GlyphIndex, cleanRuns = CleanRuns, deck = Deck.Items.Select(i => new ReviewItem { seat = i.seat, kind = i.kind, state = i.state, streak = i.streak, interval = i.interval, dueDay = i.dueDay, entered = i.entered }).ToArray(), sittings = Sittings, reviewsChecked = Sittings,
                 inscriptionsRecent = recentLines.ToArray(), inscriptionKeys = keysAtLanding, inscriptionWing = wingAtLanding, inscriptionSittings = sittingsAtLanding };
-            save.observatory = Observatory.Progress; save.corridor = Corridor.Progress; WriteBirth(save); return save;
+            save.observatory = Observatory.Progress; save.corridor = Corridor.Progress; save.houses = Houses.Progress; WriteBirth(save); return save;
         }
         // Resumes at the Hub (a second sitting). Only meaningful once the Key was earned and the Hub reached.
         public bool Restore(SaveData save)
@@ -1008,6 +1011,7 @@ namespace Ascendant.CelestialDial
             if (save == null || save.atriumStage < 2 || (save.version < 5 && save.sunSign < 0)) return false; // a version 4 save always had a sun; version 5 may not (Oct 7)
             Observatory.Restore(save.observatory,save.version);
             Corridor.Restore(save.corridor,save.version);
+            Houses.Restore(save.houses,save.version);
             PlayerName = save.playerName ?? ""; BirthChoice = "saved"; JournalTitled = save.journalTitled;
             ReadBirth(save); BirthStep = "done"; // read, never worked out again: only a fact added on "Your Birth" works it out
             KeyRevealed = save.keyEarned; KeyInserted = save.keyEarned; LocksFilled = Math.Max(save.locksFilled, save.keyEarned ? 1 : 0); Ended = save.keyEarned;

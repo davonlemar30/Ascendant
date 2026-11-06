@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     // v0.4 tap-to-move greybox (Q06 phase 2 lock, September 12): two walkable rooms, a placeholder marker,
     // straight-line walking at a fixed speed along a floor band, no pathfinding. Pure state, no Unity types.
-    public enum Room { None, Atrium, Wing, Chamber, Observatory, Corridor }
+    public enum Room { None, Atrium, Wing, Chamber, Observatory, Corridor, Houses }
 
     public sealed class PointOfInterest
     {
@@ -24,6 +24,7 @@ namespace Ascendant.CelestialDial
             new PointOfInterest("caspar", "Caspar", 76),   // stops beside him, not on him
             new PointOfInterest("sealed-left", "a sealed door", -120, false),
             new PointOfInterest("chamber-door", "the Crystal Book Chamber doorway", 120), // Build D: the third doorway; the Chamber is a room once the first visit is behind the player
+            new PointOfInterest("houses-door",HousesCopy.Title,150,false),
             new PointOfInterest("entry", "where you came in", 40),   // arrival spot from the Chamber; not shown as a point of interest
         };
         // Build D: the Chamber as a room. The Keeper walks between the doorway and the Books.
@@ -41,7 +42,8 @@ namespace Ascendant.CelestialDial
         };
         public static readonly PointOfInterest[] Observatory = {new PointOfInterest("atrium-door","the doorway back to the Atrium",-138),new PointOfInterest("orrery","the orrery",40),new PointOfInterest("corridor-door",CorridorCopy.Title,140,false)};
         public static readonly PointOfInterest[] Corridor = {new PointOfInterest("observatory-door","the doorway back to the Observatory",-138),new PointOfInterest("rulership-wheel",CorridorCopy.Wheel,40)};
-        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : room == Room.Observatory ? Observatory : room == Room.Corridor ? Corridor : Array.Empty<PointOfInterest>();
+        public static readonly PointOfInterest[] Houses = {new PointOfInterest("atrium-door","the doorway back to the Atrium",-138),new PointOfInterest("local-sky",HousesCopy.Instrument,40)};
+        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : room == Room.Observatory ? Observatory : room == Room.Corridor ? Corridor : room == Room.Houses ? Houses : Array.Empty<PointOfInterest>();
         public static PointOfInterest Find(Room room, string id) => Of(room).FirstOrDefault(p => p.Id == id);
         public static IEnumerable<PointOfInterest> Visible(Room room) => Of(room).Where(p => p.Id != "entry");
     }

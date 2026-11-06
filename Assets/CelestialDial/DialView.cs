@@ -94,6 +94,11 @@ namespace Ascendant.CelestialDial
 #endif
         [Serializable] public sealed class WebState
         {
+            public bool houses,housesOpen,housesPlaying,housesNext,housesRevealed,housesEvidence9,housesEvidence10;
+            public string housesPhase,housesPrompt,housesMessage;public int housesTarget,housesSelectedAngle,housesTurn,housesHint,housesRising,housesRequested,journalHouse;
+            public bool[] housesAngles,housesOverlays,housesAssigned,housesTopics,housesGroups;public int[] housesAscendants;
+            public string[] housesControlIds,housesControlLabels;public float[] housesControls;
+            public double housesExampleAsc,housesExampleMc;public int housesExampleRising=-1,housesExampleMcSign=-1,housesExampleMcHouse=-1;
             public bool corridor,corridorOpen,corridorPlaying,corridorNext,corridorRevealed,corridorEvidence7,corridorEvidence8;
             public string corridorPhase,corridorPrompt,corridorMessage;public int corridorPlanet,corridorRuledSign;public int corridorTarget,corridorTurn,corridorHint,corridorCards;
             public bool[] corridorTraditional,corridorModern,corridorDetriments;

@@ -293,6 +293,17 @@ namespace Ascendant.CelestialDial
             new ArtSlot("cor-cabinet-worn", 100, 80, 1024, "Rulership Corridor: cabinet-worn"),
             new ArtSlot("cor-cabinet-restored", 100, 80, 1024, "Rulership Corridor: cabinet-restored"),
 
+            new ArtSlot("hoh-room", 360, 800, 2048, "Hall of Houses: room"),
+            new ArtSlot("hoh-light", 360, 800, 2048, "Hall of Houses: light"),
+            new ArtSlot("hoh-shell-worn", 360, 800, 2048, "Hall of Houses: shell-worn"),
+            new ArtSlot("hoh-shell-restored", 360, 800, 2048, "Hall of Houses: shell-restored"),
+            new ArtSlot("hoh-grime", 360, 800, 2048, "Hall of Houses: grime"),
+            new ArtSlot("hoh-instrument", 310, 310, 1024, "Hall of Houses: instrument"),
+            new ArtSlot("hoh-lectern-worn", 64, 100, 1024, "Hall of Houses: lectern-worn"),
+            new ArtSlot("hoh-lectern-restored", 64, 100, 1024, "Hall of Houses: lectern-restored"),
+            new ArtSlot("hoh-bench-worn", 100, 80, 1024, "Hall of Houses: bench-worn"),
+            new ArtSlot("hoh-bench-restored", 100, 80, 1024, "Hall of Houses: bench-restored"),
+
         };
         public static readonly SoundSlot[] Sounds =
         {

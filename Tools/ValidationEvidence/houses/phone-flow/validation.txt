@@ -1,0 +1,420 @@
+PASS: Houses: starts at DEV key8
+PASS: Houses: spend Key 8 opens Hall door
+PASS: Houses: enabled 44px native target hoh-door
+PASS: Houses: Atrium door reaches Hall
+PASS: Houses: walking opens local sky
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-angle:0
+PASS: Houses: native drag places AC east at left
+PASS: Houses: angle placed 0
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-angle:1
+PASS: Houses: enabled 44px native target hoh-point:1
+PASS: Houses: angle placed 1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-angle:2
+PASS: Houses: enabled 44px native target hoh-point:2
+PASS: Houses: angle placed 2
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-angle:3
+PASS: Houses: enabled 44px native target hoh-point:3
+PASS: Houses: angle placed 3
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: overlay sign at east 0
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: overlay sign at east 1
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: overlay sign at east 2
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: helped overlays pause Key 9
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: overlay sign at east 0
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: overlay sign at east 1
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: overlay sign at east 2
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: independent overlay earns Key 9
+PASS: Houses: enabled 44px native target hoh-back
+PASS: Houses: spent Key 9
+PASS: Houses: lock 9 opens third Book
+PASS: Houses: enabled 44px native target hoh-door
+PASS: Houses: Atrium door reaches Hall
+PASS: Houses: walking opens local sky
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: three distinct Ascendants
+PASS: Houses: one Ascendant is personal rising sign
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 0
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 1
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 2
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 3
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 4
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 5
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 6
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 7
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-ask
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 8
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 1
+PASS: Houses: enabled 44px native target hoh-house:1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 7
+PASS: Houses: enabled 44px native target hoh-house:7
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 10
+PASS: Houses: enabled 44px native target hoh-house:10
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 4
+PASS: Houses: enabled 44px native target hoh-house:4
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 2
+PASS: Houses: enabled 44px native target hoh-house:2
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 8
+PASS: Houses: enabled 44px native target hoh-house:8
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 5
+PASS: Houses: enabled 44px native target hoh-house:5
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 11
+PASS: Houses: enabled 44px native target hoh-house:11
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 3
+PASS: Houses: enabled 44px native target hoh-house:3
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 9
+PASS: Houses: enabled 44px native target hoh-house:9
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 6
+PASS: Houses: enabled 44px native target hoh-house:6
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: topic axis order 12
+PASS: Houses: enabled 44px native target hoh-house:12
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:0
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:2
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:0
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:2
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:0
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:2
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:0
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-group:2
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: computed historical MC outside tenth house
+PASS: Houses: enabled 44px native target hoh-house:9
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: house versus sign factual answer
+PASS: Houses: enabled 44px native target hoh-card:1
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: helped house answers pause Key 10
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 0
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 1
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 2
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 3
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 4
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 5
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 6
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 7
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: enabled 44px native target hoh-right
+PASS: Houses: whole sign house assignment 8
+PASS: Houses: enabled 44px native target hoh-seal
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: replay retains completed topics
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: replay retains completed groups
+PASS: Houses: enabled 44px native target hoh-next
+PASS: Houses: independent house answer earns Key 10
+PASS: Houses: enabled 44px native target hoh-back
+PASS: Houses: Houses chapter replaces last sealed row
+PASS: Houses: enabled 44px native target house-page:1
+PASS: Houses: journal house 1
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:2
+PASS: Houses: journal house 2
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:3
+PASS: Houses: journal house 3
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:4
+PASS: Houses: journal house 4
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:5
+PASS: Houses: journal house 5
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:6
+PASS: Houses: journal house 6
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:7
+PASS: Houses: journal house 7
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:8
+PASS: Houses: journal house 8
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:9
+PASS: Houses: journal house 9
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:10
+PASS: Houses: journal house 10
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:11
+PASS: Houses: journal house 11
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: enabled 44px native target house-page:12
+PASS: Houses: journal house 12
+PASS: Houses: enabled 44px native target house-index
+PASS: Houses: Practice 9/0
+PASS: Houses: Practice has why
+PASS: Houses: Practice 9/1
+PASS: Houses: Practice has why
+PASS: Houses: Practice 9/2
+PASS: Houses: Practice has why
+PASS: Houses: Practice 9/3
+PASS: Houses: Practice has why
+PASS: Houses: Practice 9/4
+PASS: Houses: Practice has why
+PASS: Houses: Practice 9/5
+PASS: Houses: Practice has why
+PASS: Houses: six Practice cards 9
+PASS: Houses: Practice 10/0
+PASS: Houses: Practice has why
+PASS: Houses: Practice 10/1
+PASS: Houses: Practice has why
+PASS: Houses: Practice 10/2
+PASS: Houses: Practice has why
+PASS: Houses: Practice 10/3
+PASS: Houses: Practice has why
+PASS: Houses: Practice 10/4
+PASS: Houses: Practice has why
+PASS: Houses: Practice 10/5
+PASS: Houses: Practice has why
+PASS: Houses: six Practice cards 10
+PASS: Houses: spent Key 10
+PASS: Houses: Key 10 leaves three Books open
+PASS: Houses: enabled 44px native target hoh-door
+PASS: Houses: Atrium door reaches Hall
+PASS: Houses: walking opens local sky
+PASS: Houses: no browser exceptions 

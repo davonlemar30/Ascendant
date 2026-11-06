@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen; sequential jobs",
+  "style": "approved Observatory flat cel illustration, bone stone, brass, crimson, cool blue deepest shadows; no text or figures",
+  "source_images": {
+    "hoh-room": "exec-f35b73e6-a0bf-4bdb-b216-fc028773eb32.png",
+    "hoh-shell-worn": "exec-f4bf7f10-09a3-4b83-874b-abccfb030a96.png",
+    "hoh-shell-restored": "exec-64eaf78e-ab66-4a40-9fd8-5ad501251cf6.png",
+    "hoh-instrument": "exec-efc2571d-ee6c-44cb-b6b9-f6627656e3cc.png",
+    "hoh-light": "exec-0f44ba11-631c-4bdb-ba82-ea08d86f8dc2.png",
+    "hoh-grime": "exec-fc70bfe6-a267-4084-a409-fd81caa875a4.png",
+    "hoh-lectern-worn": "exec-02f47f30-1f61-4ade-b04f-c490ab93b6b6.png",
+    "hoh-lectern-restored": "exec-3f69d9d9-7e59-4c7d-9810-bd6315a4d79f.png",
+    "hoh-bench-worn": "exec-d8af5c3a-2cf1-430e-b2cf-ed48858782a5.png",
+    "hoh-bench-restored": "exec-8d4a6998-5718-4fa2-b70b-338b9184f634.png"
+  },
+  "conversion": "sips resampling to recorded exact dimensions; transparency preserved",
+  "layers": "Architecture only shell; separate instrument, lectern, bench, light and grime. Restored props edited from worn references preserving geometry."
+}

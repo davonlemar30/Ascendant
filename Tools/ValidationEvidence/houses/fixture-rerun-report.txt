@@ -1,0 +1,471 @@
+PASS: a launch opens on the logo screen: no gear, Skip ready for the screen reader and hidden on screen
+PASS: the launch: logo, studio-logo on the logo screen, Skip offered, no gear, its spoken line "TSG Games."
+PASS: the launch: draw, intro-wheel-pencil-lines on the movie, Skip offered, no gear, its spoken line "A zodiac wheel draws itself in pencil, then adds its twelve symbols."
+PASS: the wheel draws itself: the sweep has revealed 41% of its lines
+PASS: the pencil's glint rides the sweep's leading edge (285 degrees, on the ring 128 px out as the wheel zooms)
+PASS: the wheel zooms in slowly through draw (scale 0.854, up from 0.000)
+PASS: the first step shows one symbol (Aries)
+PASS: at half, six symbols (Aries to Virgo)
+PASS: the launch: glyphs, intro-wheel-pencil-glyphs on the movie, Skip offered, no gear, its spoken line none
+PASS: the glint is gone once the lines are drawn, and doesn't ride the symbols
+PASS: its symbols appear one at a time: 6 of 12 so far
+PASS: the wheel zooms in slowly through glyphs (scale 0.948, up from 0.854)
+PASS: the launch: alive, intro-wheel-lit on the movie, Skip offered, no gear, its spoken line "The wheel lights up in gold, and the dark fills with stars."
+PASS: the wheel zooms in slowly through alive (scale 0.992, up from 0.948)
+PASS: the launch: burn, intro-wheel-burning on the movie, Skip offered, no gear, its spoken line "The wheel burns with golden fire and begins to spin."
+PASS: the wheel spins (intro-wheel-burning turned -31.9 degrees), a round layer, at its own size
+PASS: the launch: transform, intro-earth on the movie, Skip offered, no gear, its spoken line "The fire turns to light. The wheel becomes Earth."
+PASS: the transform: Earth fades in level under the burning wheel (turned 122.9, alpha 0.63), which fades away
+PASS: the launch: earth, intro-earth on the movie, Skip offered, no gear, its spoken line "Earth, seen from space."
+PASS: through the burn and the transform every wheel layer on stage turned at one angle and Earth never turned (2274 ticks)
+PASS: after the transform only Earth is on stage (the burning wheel is gone)
+PASS: the push-in on intro-earth (scale 1.057), level
+PASS: the launch: continents, intro-continents on the movie, Skip offered, no gear, its spoken line "North America at night."
+PASS: the launch: america, intro-america on the movie, Skip offered, no gear, its spoken line "The United States at night."
+PASS: the launch: newyork-state, intro-newyork-state on the movie, Skip offered, no gear, its spoken line "New York State."
+PASS: the launch: newyork-city, intro-newyork-city on the movie, Skip offered, no gear, its spoken line "New York City, between its rivers."
+PASS: the launch: brooklyn, intro-brooklyn on the movie, Skip offered, no gear, its spoken line "Brooklyn's rooftops at night."
+PASS: the push-in on intro-brooklyn (scale 1.035), level
+PASS: the launch: block, intro-block on the movie, Skip offered, no gear, its spoken line "A street of apartment buildings, a few cars, lit shopfronts."
+PASS: the launch: window, prologue-city on the movie, Skip offered, no gear, its spoken line "One building. Every window is dark but one."
+PASS: the push-in on prologue-city (scale 1.056), level
+PASS: the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save, Continue and Load Game at half (the unavailable look); no gear
+PASS: the menu's buttons wear the Room look, 232 x 44, centred, 12 px apart from 496 down
+PASS: the menu stands on the owner's approved art (M1b's city, the Library Seal), the title centred 115 down
+PASS: the window's glow shows on the menu (alpha 0.50)
+PASS: it pulses slowly between 0.15 and 0.50 over a few seconds
+PASS: the rat (the art lane's run cycle) runs across the street (y 750.5, x -153), drawn behind the title and the buttons, taking no taps
+PASS: it moves along, facing its way (right, x -77)
+PASS: Settings works while the rat runs; with the panel open the rat and the glow step aside
+PASS: at 1280 x 800 the rat runs from past the street's edge to past the other (ends at 324: the bleed's 300 plus half the rat), clipped to the street (46)
+PASS: with no save, Load Game and Continue do nothing
+PASS: the menu's Settings opens the same panel without the in-game rows (Start over, Main menu): Sound: on, Reduced motion: off, Quit the game, Walk: normal, Jump to..., Close
+PASS: Close returns to the menu
+PASS: a first launch's New Game goes straight into slot 1 and the opening scene, Skip ready for the screen reader and hidden on screen, the gear back
+PASS: shot 1, city: prologue-city, its spoken line "Night in the city. The street is empty. One window is still lit."
+PASS: 86bcgfke1: the painted light breathes on prologue-city in city (alpha 0.49)
+PASS: the camera never goes below scale 1 (1.052)
+PASS: shot 2, desk: prologue-desk, its spoken line "A young man sits at his desk with his headphones on, writing in his notebook."
+PASS: 86bcgfke1: the painted light breathes on prologue-desk in desk (alpha 0.32)
+PASS: shot 2, desk: prologue-notebook, its spoken line "A young man sits at his desk with his headphones on, writing in his notebook."
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook notebook-2 notebook-3 notebook)
+PASS: shot 3, light: prologue-desk, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down."
+PASS: 86bcgfke1: no glow on prologue-desk in light (alpha 0.00)
+PASS: shot 3, light: prologue-light, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down."
+PASS: 86bcgfke1: no glow on prologue-light in light (alpha 0.00)
+PASS: shot 3, light: prologue-light-up, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down."
+PASS: shot 3, light: prologue-look, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down."
+PASS: shot 3, light: prologue-headphones, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down."
+PASS: shot 3 in order: desk, light, the head turned (light-up), the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones)
+PASS: shot 4, street: prologue-street-above, its spoken line "In the street below, a hooded figure stands with his back to us, inside a fading ring of light."
+PASS: the camera never goes below scale 1 (1.300)
+PASS: shot 4, street: prologue-street-above, its spoken line "In the street below, a hooded figure stands with his back to us, inside a fading ring of light."
+PASS: the camera never goes below scale 1 (1.300)
+PASS: shot 5, puzzled: prologue-puzzled, its spoken line "He stares down from his window, puzzled."
+PASS: shot 6, turn: prologue-caspar-back, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes."
+PASS: the camera never goes below scale 1 (1.000)
+PASS: shot 6, turn: prologue-caspar-turn, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes."
+PASS: the camera never goes below scale 1 (1.000)
+PASS: shot 6, turn: prologue-caspar-face, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes."
+PASS: the camera never goes below scale 1 (1.000)
+PASS: shot 6, turn: prologue-caspar-eyes, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes."
+PASS: the camera never goes below scale 1 (1.000)
+PASS: the push-in carries on into the eyes' close-up (scale 1.13)
+PASS: the flash holds the busy guard and Skip waits it out
+PASS: the prologue ends on WHO ARE YOU?, the orb above it with no stars yet
+PASS: the orb shows on WHO ARE YOU?
+PASS: the orb and its stars clear every word and control on WHO ARE YOU? (centre 91.5, reach 79)
+PASS: a 24 px top band moves the orb down by half of it, still centred in the band above the question (100.6)
+PASS: the orb shows on WHO ARE YOU? under a 24 px band
+PASS: the orb and its stars clear every word and control on WHO ARE YOU? under a 24 px band (centre 103.5, reach 79)
+PASS: name reaches the flow through the bridge
+PASS: birth prompt follows identity; the name's star has gathered round the orb
+PASS: the orb shows on the birth question
+PASS: the orb and its stars clear every word and control on the birth question (centre 91.5, reach 79)
+PASS: birth prompt blocks continue until a choice
+PASS: owner, Oct 15: I'll skip it asks nothing; the player has the default chart (Scorpio sun) and the note says so: Your sun sign is Scorpio, your moon sign Gemini, and your rising sign Gemini. You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later.
+PASS: the skip path ends with two stars: the name and the birth answer
+PASS: the answer can be changed, and takes the birth's star back
+PASS: the orb shows on the birth question, again
+PASS: the orb and its stars clear every word and control on the birth question, again (centre 91.5, reach 79)
+PASS: the orb shows on the date
+PASS: the orb and its stars clear every word and control on the date (centre 91.5, reach 79)
+PASS: the orb shows on the time
+PASS: the orb and its stars clear every word and control on the time (centre 91.5, reach 79)
+PASS: the orb shows on the place
+PASS: the orb and its stars clear every word and control on the place (centre 91.5, reach 79)
+PASS: owner, Oct 23 (86bcgfkdv, B): the check, its own page, before the chart is worked out
+PASS: owner, Oct 16: a cusp day with the time given is not asked; the time settles it and Continue opens: ☉ Taurus · ☽ Pisces · ↑ Libra
+PASS: five stars on the longest path: the name, the question, the date, the time, the place
+PASS: Jeffrey, #156 B1: the longest closing note (91 px, Sagittarius three times, with the longer default chart sentence, for an "I don't know" answer) is drawn whole between Change my answer and Continue; this one is 30 px
+PASS: all three given: a personal chart, and the note names no default: Your sun sign is Taurus, your moon sign Pisces, and your rising sign Libra.
+PASS: the orb shows on the record
+PASS: the orb and its stars clear every word and control on the record (centre 91.5, reach 79)
+PASS: white light leads to the atrium
+PASS: Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing, the Chamber shut
+PASS: Build U: the gear opens Settings over the Atrium
+PASS: the launch (Oct 9): in the game, Settings has Main menu in the player's section, above Testing: Sound: on, Reduced motion: off, Quit the game, Main menu, Walk: normal, Jump to..., Start over, Close
+PASS: before Key 1 (nothing saved yet), Main menu asks first: "Saving begins at your first Keeper Key. Go to the main menu?"
+PASS: Back keeps the game and returns to Settings
+PASS: Build U: the gear closes Settings again
+PASS: Platform fit, Part 1: a 24 px top band moves the Atrium's title and the gear down 24, the caption under the title 11 (title 24, gear 24, caption 11)
+PASS: Platform fit, Part 1: without a band the top row is back where it was
+PASS: the mini-menu: its button shows in the Atrium
+PASS: the mini-menu opens TRAVEL: the Atrium here, the Zodiac Wing, one Sealed row
+PASS: the mini-menu's Zodiac Wing row travels to the Wing
+PASS: in the Wing the mini-menu marks the Wing here
+PASS: the mini-menu's Atrium row comes back to the Atrium as it was
+PASS: Build T: in the Zodiac Wing Caspar points to the Dial
+PASS: atrium continues into the wing; the Dial is dormant and knows the sun sign
+PASS: Build Z: the Dial stands in its room; the candle is cut and the floor, shelf, chair and flat face are retired from the Dial screen
+PASS: seven intro beats reach the guided problem
+PASS: the family triangles lie on the Dial as light: Earth taught (the sun's family, guided), its triangle lit; every side breaks round the words (13 gaps, 83% shown, no light on a word); the corners on the hub ring
+PASS: guided family completes inside the slice
+PASS: six-seat lesson earns Key 1 inside the slice
+PASS: locked completion line precedes the reveal
+PASS: the Dial reveals the Key after completion
+PASS: Caspar's reveal line follows the locked line
+PASS: wing continues to the atrium return
+PASS: atrium return leads to the chamber
+PASS: insert waits for Caspar to finish
+PASS: a visible Continue turns the pages and Insert is not yet shown
+PASS: on the last page Continue gives way to Insert the Key
+PASS: one key fills one of three locks and ends the prototype
+PASS: the Chamber leads to the Hub in Stage 2 with a save written and twelve items ready for practice at once
+PASS: the marker stands where you came in
+PASS: a sealed door only says it is sealed
+PASS: each Atrium door is a tap target
+PASS: every invisible tap target keeps its mesh, so the raycaster sees it (5 on the Atrium)
+PASS: the desk is still a place to walk to
+PASS: the desk only speaks (Check the Seals is gone); the journal is in hand at the Atrium
+PASS: 1e A: the journal's first-ever open is the title page: Your Journal, KEEPER, "These pages fill as you learn."
+PASS: the landing's Keeper's record: KEEPER, ☉ Taurus · ☽ Pisces · ↑ Libra (the three picked, no unknown; no Keys line, 86bcgfkdy), and the owner's inscription for Tester: What's up, Tester. / I'm your journal, and I'll keep a record / of what you learn from the Library.
+PASS: the two doors, 238 x 120: Practice (it opens Practice, owner Oct 3) and Contents; the script lines in EB Garamond Italic
+PASS: the living inscription (Oct 7): the Oct 2 line writes itself as the title page finishes fading, and the doors work while it writes
+PASS: the line has written itself in full
+PASS: the Practice door opens the list of concepts learned: The Elements, its row 238 x 78; ‹ Your Journal at the top left
+PASS: a row starts its round: question 1 of 6, "Gemini and Libra are Air. Which sign makes three?", its 4 choices in 238 x 44 frames; ‹ Practice at the top left
+PASS: a right pick: the right answer gilded with its star, "That's it. Aquarius is Air, with Gemini and Libra.", then Next
+PASS: Next: question 2 of 6, waiting for a pick
+PASS: a wrong pick: marked in muted crimson with ×, the right one gilded, "Not quite. Capricorn is the next Earth sign, four signs after Virgo."
+PASS: ‹ Practice leaves the round at any time, back to the list
+PASS: ‹ Your Journal goes back to the landing
+PASS: Oct 7: the Big Three's line is a 44 px target on the landing
+PASS: the opening's complete personal chart is retained in Your Birth, with no default note or missing-detail controls
+PASS: the independent journal case reaches the birth question through the opening model
+PASS: the independent journal case chooses the approved default chart
+PASS: the default-chart case keeps Key 1 and has default facts separate from personal facts
+PASS: the independent journal case returns to the desk
+PASS: the default-chart Big Three line also opens Your Birth through a 44 px target
+PASS: 86bcg8nft (4A): "Your Birth": the default-chart details are tagged default with its note, each with Add, and Add my birth time; the rising is worked out, so no rising choice; actual rows: Date: 4 November 1990 (default) / Time: 7:19 PM (default) / Place: Bushwick, NY, United States (default); note: This is the default chart. A personal chart needs your date, time and place. Add all three and your chart will follow them.; Add=True; AddTime=True; Rising=False
+PASS: its buttons each take a 44 px target
+PASS: Add my birth time with no birthday asks the day first, and says why
+PASS: the facts decide, a line for each change: Your rising is Virgo. / Your moon is Taurus. / Your sun is Taurus. / Everything you've learned stays as it is.
+PASS: the lessons keep their sun, and the record is saved at once: version 5, the facts in, the choices retired
+PASS: the record reads the new chart: ☉ Taurus · ☽ Taurus · ↑ Virgo
+PASS: the Contents door: The Wheel, The Library Map, two Sealed rows; ‹ Your Journal at the top left
+PASS: Contents' three rows and its link each take taps over 44 px or more (The Wheel:row:238x104, The Library Map:row:238x104, The Planets:row:238x78, ‹ Your Journal:link:96x44)
+PASS: The Library Map: the plan, the rooms woken so far named (The Grand Atrium, The Zodiac Wing, The Crystal Book Chamber); ‹ Contents at the top left
+PASS: its title fits between the page's corner flourishes: 188 px at 27
+PASS: Contents opens the Wheel, ‹ Contents at its top left: twelve seats met, the due ones with a ribbon, no tab row, no Table yet, nothing framed (seats met,met,met,met,practising,met,met,met,practising,met,met,met; due 10; tabs 0; table False; framed '')
+PASS: a tap frames Aries and its preview reads: Fire
+PASS: Open the page: Aries with only its element (no symbol yet), the two other Fire signs as links, its ribbon pulled out (due)
+PASS: the Illumination shader loaded; no state word on the page, the fact is: Aries | ELEMENT | Fire | with | Leo | Sagittarius | Back to the Wheel | Close the journal
+PASS: a link opens Leo's page, which links back to Aries
+PASS: Back to the Wheel frames the sign last read
+PASS: the journal closes back to the Atrium where the Keeper stood
+PASS: the Wing room offers the journal too
+PASS: on the Dial the fork offers the lesson and practice; nothing starts until the player chooses
+PASS: practice opens at once as the first sitting with a compressed Dial item, headed as practice
+PASS: the Wing's Back button is not on the practice's Seal
+PASS: a reload during practice keeps the deck and the sitting: the same items are still ready
+PASS: back in the Wing room
+PASS: the fork again after the reload
+PASS: practice opens again after the reload, a second sitting
+PASS: a practice item is waiting
+PASS: a practice item is waiting
+PASS: a practice item is waiting
+PASS: a practice item is waiting
+PASS: a practice item is waiting
+PASS: a practice item is waiting
+PASS: six remembered; eligible answers advance their items
+PASS: back to the Dial after practice; the sitting was counted on entry
+PASS: the fork returns after practice
+PASS: the other six are due at the third sitting
+PASS: the third sitting completes
+PASS: the fork again
+PASS: with every item scheduled ahead the entry still counts a sitting; Caspar says nothing is due; the fork stays
+PASS: one sitting on, six items are due again
+PASS: an item waits for a wrong answer
+PASS: an item waits for a wrong answer
+PASS: an item waits for a wrong answer
+PASS: the third wrong answer closes the instrument: the Keeper is back in the room with the journal offered, not locked out
+PASS: the journal opens from the Wing room after the gate
+PASS: closing the journal returns to the room and clears the gate
+PASS: the fork is back after the gate
+PASS: re-entry is immediate with three fresh strikes and a new sitting
+PASS: an exit at any point
+PASS: leaving the Dial lands in the Zodiac Wing, not the Atrium (note 10)
+PASS: the room's own button returns to the Atrium
+PASS: tapping the Wing doorway walks the marker
+PASS: the doorway fades into the Wing room at its doorway
+PASS: before the modality unit the table is dark: a note, no walk
+PASS: the fork waits before the third family
+PASS: the Wing continues with the third family on the player's own
+PASS: the moment the whole wheel lights, all four triangles burn as ribbons of flame, the payoff at level B (mode: payoff)
+PASS: twelve seats lit with no second Key
+PASS: Build AB, the wheel lit: every name fits its band and every fact its tablet (names within 62, facts within 42)
+PASS: Build AB, the wheel lit: every name sits on the name band (r 146) and every fact on its window (r 118)
+PASS: Build AB, the wheel lit: each seat shows one fact, the newest it has learned: Fire,Earth,Air,Water,Fire,Earth,Air,Water,Fire,Earth,Air,Water
+PASS: Build AB, the wheel lit: the ring has turned with the seats (0.0 for 0.0), Aries sits under the pointer, and its facts read above the eye: Fire
+PASS: one more return completes v0.2
+PASS: the Wing button walks through the same doorway; the lit wheel wakes the shelf
+PASS: APK Session 2, bug 1: the waiting shelf's edge is a halo from its silhouette, wider than the shelf, with no Outline copying the picture
+PASS: the Dial before the book only points at the shelf
+PASS: back out to the Atrium
+PASS: and in again
+PASS: the shelf opens the book: Part A, and introduces the symbol items
+PASS: the live naming checkpoint stores the next card after three answers
+PASS: reload retains the first three named symbols
+PASS: mid-naming reload resumes on Cancer, not Aries
+PASS: the twelfth name closes the book and returns to the room
+PASS: the Dial runs Part B: names hidden, Aries first
+PASS: the live placement checkpoint stores three placed symbols
+PASS: reload retains three placed symbols
+PASS: mid-placement reload resumes at Cancer with Aries, Taurus, and Gemini placed
+PASS: twelve marks placed earns Key 2 once, with its Key ceremony (Build I)
+PASS: one more return: Key 2 in hand, the Atrium waits for it to be spent
+PASS: the Chamber doorway fades into the Chamber as a room, a Key in hand
+PASS: at the Books a Key can be spent
+PASS: Key 2 fills the second lock; the Book stays shut; nothing more to spend
+PASS: the return after spending takes the Atrium to Stage 4
+PASS: into the Wing room for practice
+PASS: the fork with the symbols entered
+PASS: a practice with the deck open begins
+PASS: a practice with the deck open completes
+PASS: back on the Dial
+PASS: back at the Hub with two Keys
+PASS: after Key 2 the shelf offers practice
+PASS: the first replay runs in order with the usual names
+PASS: the replayed book closes and hands to the wheel
+PASS: a clean replay is recorded once; Key 2 is not re-earned; the next replay is hard
+PASS: back at the Hub
+PASS: in the Wing room again
+PASS: the hard replay shuffles the order and keeps four distinct names including the answer
+PASS: the book can be closed mid-practice
+PASS: the fork before the second pattern
+PASS: after Key 2 the Dial opens the modality unit at the sun sign, three forward, and introduces twelve modality items
+PASS: Build AB, the modality unit opens: every name fits its band and every fact its tablet (names within 62, facts within 42)
+PASS: Build AB, the modality unit opens: every name sits on the name band (r 146) and every fact on its window (r 118)
+PASS: Build AB, the modality unit opens: each seat shows one fact, the newest it has learned: Fire,Fixed,Air,Water,Fire,Earth,Air,Water,Fire,Earth,Air,Water
+PASS: Build AB, the modality unit opens: the ring has turned with the seats (330.0 for 330.0), Taurus sits under the pointer, and its facts read above the eye: Earth · Fixed
+PASS: three modality families of four complete with no new Key
+PASS: Build AB, the modalities complete: every name fits its band and every fact its tablet (names within 62, facts within 42)
+PASS: Build AB, the modalities complete: every name sits on the name band (r 146) and every fact on its window (r 118)
+PASS: Build AB, the modalities complete: each seat shows one fact, the newest it has learned: Cardinal,Fixed,Mutable,Cardinal,Fixed,Mutable,Cardinal,Fixed,Mutable,Cardinal,Fixed,Mutable
+PASS: Build AB, the modalities complete: the ring has turned with the seats (0.0 for 0.0), Aries sits under the pointer, and its facts read above the eye: Fire · Cardinal
+PASS: back at the Hub with modality items ready
+PASS: a practice carries modality items within six sittings
+PASS: back at the Hub
+PASS: a reload keeps the modality unit complete
+PASS: the finished modality unit wakes the table in the Wing room
+PASS: the room button walks to the table and opens it; twelve sign → cell items enter the deck as data
+PASS: Aries seats at Level 0 with evidence
+PASS: a wrong row nudges with the element and offers Ask Caspar
+PASS: the right cell after one nudge seats Taurus as Level 1 evidence
+PASS: a wrong column nudges with the kind
+PASS: Ask Caspar states the rule once
+PASS: a seating after asking earns no evidence
+PASS: five seated; four eligible seatings made their items Practicing
+PASS: a reload mid-table keeps the five seated signs, the evidence, and the grid items as data
+PASS: in the Wing room after the reload, the table still open
+PASS: tapping the table resumes it with its seated signs
+PASS: three wrong cells hand the sign to Caspar
+PASS: Caspar seats it without evidence and the table stays open
+PASS: twelve seated earns Key 3 once, with its Key ceremony on the table (Build I)
+PASS: the game is idle only once the Key 3 ceremony is over (it follows the seating; Sept 25)
+PASS: the table closes back to the room
+PASS: back in the Atrium with Key 3 in hand
+PASS: the Chamber again
+PASS: a Key to spend
+PASS: Key 3 fills the third lock and Book 1 opens
+PASS: the return takes the Atrium to Stage 5 with three Keys spent
+PASS: a reload resumes at the Hub from the local save with three Keys spent, Book 1 open, and the full table
+PASS: in the Wing room with three Keys, the last pattern waiting
+PASS: the fork before the last pattern
+PASS: after Key 3 the Dial opens the polarity beat and introduces six pair items as data
+PASS: the second line shows every seat's side
+PASS: Build AB, polarity shown: every name fits its band and every fact its tablet (names within 62, facts within 42)
+PASS: Build AB, polarity shown: every name sits on the name band (r 146) and every fact on its window (r 118)
+PASS: Build AB, polarity shown: each seat shows one fact, the newest it has learned: Yang,Yin,Yang,Yin,Yang,Yin,Yang,Yin,Yang,Yin,Yang,Yin
+PASS: Build AB, polarity shown: the ring has turned with the seats (0.0 for 0.0), Aries sits under the pointer, and its facts read above the eye: Fire · Cardinal · Yang
+PASS: Build AB: at all 24 half-turns of the wheel, every name sits on the name band and every fact on its tablet, centred on its own segment of the turned ring (within 1 degree and 1.5 px) and turned upright
+PASS: Build AC: the framed sign's name is on the ribbon: Aries
+PASS: Build AB: no family line crosses the medallion on the Astrolabe
+PASS: Build AC (owner, Oct 1): the framed sign's name and facts ride the ribbon's arc, the challenge sits inside the eye's glass and makes room for a running count under it, and every name, facts line and count word fits its place
+PASS: the first pair is guided from the sun sign; the six-count has played
+PASS: the guided pair is known; the next is on the player's own
+PASS: a wrong turn nudges and offers Ask Caspar
+PASS: Ask Caspar gives the six-seat rule
+PASS: six pairs complete the last pattern
+PASS: Continue opens the builder on the sun sign's parts
+PASS: the right name hands to the wheel
+PASS: the opposite found, the share step asks what the two share
+PASS: tapping the element is nudged once
+PASS: the first sign is built unassisted; the second begins
+PASS: a wrong name is nudged
+PASS: the second sign reaches the wheel
+PASS: a wrong turn in the builder nudges
+PASS: and Ask Caspar gives the rule
+PASS: the share step again
+PASS: the second sign is built with help; the third begins
+PASS: two wrong names reveal the sign
+PASS: the last share step
+PASS: three signs built with one unassisted earns Key 4 once, with its Key ceremony (Build I)
+PASS: back in the Atrium with Key 4 in hand
+PASS: the Chamber, one last time
+PASS: the last Key to spend
+PASS: Key 4 fills Book 2's first lock: the Wing is whole
+PASS: the return takes the Atrium to Stage 6 with four Keys spent; the Wing's end card shows
+PASS: after the reloads (a new session) the journal opens on the landing
+PASS: at the Wing's end Aries' page holds every fact and six links; staged, it is in full colour in its gold-leaf ring
+PASS: staged back to introduced: line art in a silver ring
+PASS: the page title is in blackletter at the bigger size, and nothing else on the page is
+PASS: every title fits its line in blackletter: the twelve signs and the Wheel
+PASS: the Wheel at the Wing's end: the Table switch and all four tabs, Aries framed
+PASS: the switch lays the seats out as the Table
+PASS: the Opposites tab: Libra framed, its card reads what the pair shares: Libra and Aries: shares Cardinal · Yang; only the element differs: Air / Fire
+PASS: the Modality tab
+PASS: a reload resumes at the Hub from the local save with four Keys spent, the Books, the sides, the six pairs, and the pair items as data
+PASS: Start over wipes the save and begins again, with the opening scene (Ashantis, Oct 8)
+PASS: reduced motion on, mid-way through the first shot
+PASS: shot 1, city: prologue-city, its spoken line "Night in the city. The street is empty. One window is still lit.", reduced motion
+PASS: shot 2, desk: prologue-desk, its spoken line "A young man sits at his desk with his headphones on, writing in his notebook.", reduced motion
+PASS: reduced motion: shot 2 held still (scale 1), panels in place
+PASS: 86bcgfke1: no glow on prologue-desk in desk under reduced motion (alpha 0.00)
+PASS: shot 2, desk: prologue-notebook, its spoken line "A young man sits at his desk with his headphones on, writing in his notebook.", reduced motion
+PASS: reduced motion: shot 2 held still (scale 1), panels in place
+PASS: reduced motion: no writing loop, the notebook held (desk notebook)
+PASS: shot 3, light: prologue-desk, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down.", reduced motion
+PASS: reduced motion: shot 3 held still (scale 1), panels in place
+PASS: 86bcgfke1: no glow on prologue-desk in light under reduced motion (alpha 0.00)
+PASS: shot 3, light: prologue-light, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down.", reduced motion
+PASS: reduced motion: shot 3 held still (scale 1), panels in place
+PASS: 86bcgfke1: no glow on prologue-light in light under reduced motion (alpha 0.00)
+PASS: shot 3, light: prologue-light-up, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down.", reduced motion
+PASS: reduced motion: shot 3 held still (scale 1), panels in place
+PASS: shot 3, light: prologue-look, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down.", reduced motion
+PASS: reduced motion: shot 3 held still (scale 1), panels in place
+PASS: shot 3, light: prologue-headphones, its spoken line "A white-gold light floods his room. He looks up and pulls his headphones down.", reduced motion
+PASS: reduced motion: shot 3 held still (scale 1), panels in place
+PASS: reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between (desk light light-up look headphones)
+PASS: shot 4, street: prologue-street-above, its spoken line "In the street below, a hooded figure stands with his back to us, inside a fading ring of light.", reduced motion
+PASS: reduced motion: shot 4 held still (scale 1), panels in place
+PASS: shot 4, street: prologue-street-above, its spoken line "In the street below, a hooded figure stands with his back to us, inside a fading ring of light.", reduced motion
+PASS: reduced motion: shot 4 held still (scale 1), panels in place
+PASS: shot 5, puzzled: prologue-puzzled, its spoken line "He stares down from his window, puzzled.", reduced motion
+PASS: reduced motion: shot 5 held still (scale 1), panels in place
+PASS: shot 6, turn: prologue-caspar-back, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes.", reduced motion
+PASS: reduced motion: shot 6 held still (scale 1), panels in place
+PASS: shot 6, turn: prologue-caspar-turn, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes.", reduced motion
+PASS: reduced motion: shot 6 held still (scale 1), panels in place
+PASS: shot 6, turn: prologue-caspar-face, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes.", reduced motion
+PASS: reduced motion: shot 6 held still (scale 1), panels in place
+PASS: shot 6, turn: prologue-caspar-eyes, its spoken line "The hooded figure turns. The view pushes in on his white-gold eyes.", reduced motion
+PASS: reduced motion: shot 6 held still (scale 1), panels in place
+PASS: reduced motion: held still on the eyes' close-up
+PASS: the flash holds the busy guard and Skip waits it out
+PASS: under reduced motion the prologue still ends on WHO ARE YOU?
+PASS: small portrait viewport
+PASS: reduced motion on
+PASS: the launch: logo, studio-logo on the logo screen, Skip offered, no gear, its spoken line "TSG Games.", reduced motion
+PASS: the launch: draw, intro-wheel-pencil-lines on the movie, Skip offered, no gear, its spoken line "A zodiac wheel draws itself in pencil, then adds its twelve symbols.", reduced motion
+PASS: reduced motion: draw held still, level, at scale 1, with no sweep
+PASS: reduced motion: no glint
+PASS: the launch: glyphs, intro-wheel-pencil-glyphs on the movie, Skip offered, no gear, its spoken line none, reduced motion
+PASS: reduced motion: glyphs held still, level, at scale 1, with no sweep
+PASS: the glint is gone once the lines are drawn, and doesn't ride the symbols
+PASS: the launch: alive, intro-wheel-lit on the movie, Skip offered, no gear, its spoken line "The wheel lights up in gold, and the dark fills with stars.", reduced motion
+PASS: reduced motion: alive held still, level, at scale 1, with no sweep
+PASS: the launch: burn, intro-wheel-burning on the movie, Skip offered, no gear, its spoken line "The wheel burns with golden fire and begins to spin.", reduced motion
+PASS: reduced motion: burn held still, level, at scale 1, with no sweep
+PASS: the launch: transform, intro-earth on the movie, Skip offered, no gear, its spoken line "The fire turns to light. The wheel becomes Earth.", reduced motion
+PASS: reduced motion: transform held still, level, at scale 1, with no sweep
+PASS: the transform: Earth fades in level under the burning wheel (still, alpha 0.63), which fades away
+PASS: the launch: earth, intro-earth on the movie, Skip offered, no gear, its spoken line "Earth, seen from space.", reduced motion
+PASS: reduced motion: earth held still, level, at scale 1, with no sweep
+PASS: through the burn and the transform every wheel layer on stage turned at one angle and Earth never turned (2184 ticks)
+PASS: after the transform only Earth is on stage (the burning wheel is gone)
+PASS: the launch: continents, intro-continents on the movie, Skip offered, no gear, its spoken line "North America at night.", reduced motion
+PASS: reduced motion: continents held still, level, at scale 1, with no sweep
+PASS: in the launch movie a tap shows Skip and advances nothing
+PASS: Skip goes straight to the menu (reduced motion kept)
+PASS: reduced motion: the window's glow holds steady at 0.3
+PASS: reduced motion: no rat
+PASS: the run so far played on the Art folder and the sound hooks fired, files or not (last cue: page)
+PASS: ?art=test: the save resumes at the Hub with the test set, every slot with a file
+PASS: the Atrium takes its files: the shell, its light and grime, Caspar, the kit (desk, pennant, doors locked and unlocked, the name plates), the Keeper (Build N; the pennant since Build Q); missing: 
+PASS: the doorway plays the door cue from the test set (cues played: 1)
+PASS: the Wing room takes its files: the composed room (its Dial, table, chair, and shelf painted in, so no separate table file is drawn), its light, the Keeper (Build L; the shelf and the Dial's face are checked on the Dial screen next)
+PASS: the Dial takes its files: its room, its glow, the seats and the bracket (Build Z: the room replaces the face, floor markings, shelf, chair and candle there)
+PASS: back in the Atrium with the test set
+PASS: the Chamber takes its files: the shell, its light and grime, the locks, the kit (mechanism, candles, banners, crystals; Build O); missing: 
+PASS: the larger viewport again
+PASS: the same files at 390 wide
+PASS: a new session opens the journal on the landing (the title page showed once, and the save keeps it); its flourishes, door frames and emblems stand on their files
+PASS: Contents' emblems and its flourish stand on their files
+PASS: the Library Map's plan stands on its file
+PASS: at the Wing's end the Wheel stands on the book's files: the page and the wheel
+PASS: Aries at the Wing's end: every fact learned, six links, the picture from the test set, the ribbon from its file
+PASS: staged: Aries practiced with no streak, colour at 20%, its ribbon lying on the page (not due)
+PASS: staged: a streak of three, the gilt edge, the ribbon at the ladder's top and pulled out past the page's head (due), the colour a little faded
+PASS: staged: not due, full colour
+PASS: Illumination colours the picture from the deck (a shader, not a tint that keeps the hue): saturation 0.17 at 20%, 0.55 at full
+PASS: Aries's page fits: 11 lines, 6 links, panels end at 458
+PASS: Taurus's page fits: 11 lines, 6 links, panels end at 458
+PASS: Gemini's page fits: 11 lines, 6 links, panels end at 458
+PASS: Cancer's page fits: 11 lines, 6 links, panels end at 458
+PASS: Leo's page fits: 11 lines, 6 links, panels end at 458
+PASS: Virgo's page fits: 11 lines, 6 links, panels end at 458
+PASS: Libra's page fits: 11 lines, 6 links, panels end at 458
+PASS: Scorpio's page fits: 11 lines, 6 links, panels end at 458
+PASS: Sagittarius's page fits: 11 lines, 6 links, panels end at 458
+PASS: Capricorn's page fits: 11 lines, 6 links, panels end at 458
+PASS: Aquarius's page fits: 11 lines, 6 links, panels end at 458
+PASS: Pisces's page fits: 11 lines, 6 links, panels end at 458
+PASS: Build W: Jump to After Key 3 reloads into the Atrium, Keys 2 and 3 in hand
+PASS: Build W: from the checkpoint the Wing opens and the last pattern waits at the Dial
+PASS: ?style=test: the style page lists every slot on the test set, each with its source
+PASS: a sound slot plays from the style page
+PASS: the test mute toggle silences the game
+PASS: and back
+PASS: ?style: the style page on the Art folder lists every slot as file or placeholder; nothing is dressed without a file
+PASS: the prologue's frames take their files from the test set
+PASS: a tap shows Skip and advances nothing (shot 1, prologue-city; Continue does nothing either)
+PASS: Skip hides again after about 3 s (3.1 s) and the scene plays on
+PASS: another tap shows it again
+PASS: Skip goes straight to WHO ARE YOU?, the orb on its file
+PASS: the name's star on its file
+PASS: the orb shows on the birth question, test set
+PASS: the orb and its stars clear every word and control on the birth question, test set (centre 91.5, reach 79)
+PASS: the default skip path has two answered stars and no sign question, even after the retired sign command
+PASS: three stars after the name, personal-chart choice and date answers
+PASS: Main menu on the birth question asks first
+PASS: Main menu comes straight to the menu (no logo, no movie); with a save in slot 1 every button is available
+PASS: the menu's background and title take their files
+PASS: Load Game: the old save shows in slot 1 (Slot 1: Tester, Keeper Keys: 4, Taurus sun, Taurus moon, Virgo rising); the empty slots read Empty and are dimmed
+PASS: the rat never runs on the slot list; its window glows under the veil there (alpha 0.42)
+PASS: and it pulses there too (0.15 to 0.49)
+PASS: an empty slot does nothing in Load Game; Back returns to the menu
+PASS: New Game with a save opens the slot list, every slot available
+PASS: a filled slot asks first: "This replaces your saved game."
+PASS: Back keeps the save
+PASS: an empty slot starts the new game there: slot 2 is in play, slot 1 untouched
+PASS: Main menu over the opening scene asks first (nothing saved yet)
+PASS: the slot played last (2) holds nothing, so Continue falls back to slot 1
+PASS: Continue resumes slot 1 at the Hub, and slot 1 is in play again
+PASS: the menu with a save, on the owner's art
+PASS: after Key 1 Main menu goes straight to the menu (the game saves as it goes)
+PASS: confirming clears the slot at once and starts the new game there
+PASS: the fixture leaves no save and no set request behind
+PASS: no runtime errors: 
