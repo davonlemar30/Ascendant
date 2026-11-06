@@ -1,0 +1,30 @@
+{
+  "combinedSource": "bb80d87db7dd5fb0d92e1c7bf2ec59913d49b292",
+  "releaseRehearsalSameTree": "b937938e1a562b590c0c98d8b40ef9fc38791e71",
+  "journalExpectedRows": "3012c2ef60fc3b28fe2d94d7f344aa2cc1714c9b",
+  "timingHarness": "cd9f94162831bdbd1b8d93fd186e2a6b5ebd6b5a",
+  "mechanicalPass": 1028,
+  "webBytes": 47851853,
+  "webErrors": 0,
+  "webWarnings": 0,
+  "browser": {
+    "pass": 1041,
+    "fail": 0,
+    "viewports": "390,360",
+    "deviceScale": 2,
+    "mobile": true,
+    "exit": 0,
+    "reportMatchesStdout": true
+  },
+  "ladderExit": 1,
+  "ladderSeconds": 1753,
+  "fixture": "failed journal default expectation on complete personal chart",
+  "diagnosticOnlyRepeatExit": 1,
+  "rehearsal": {
+    "run": 42160687397,
+    "result": "cancelled during build after confirmed hard stop"
+  },
+  "merged": false,
+  "production": "not checked; no merge/deploy",
+  "part1": "not started; prerequisite gate closed"
+}
