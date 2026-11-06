@@ -128,13 +128,14 @@
     // Build F: the fork on the Dial's lower row; the practice exit where the table's exit sits on the wheel form, on the Back row on the tap forms; the journal in every room.
     const practiceDial=state&&state.screen==='practice'&&state.practiceMode==='dial';
     box('continue-lesson',-78,714,150,48);box('enter-practice',78,714,150,48);if(practiceDial)box('leave-practice',-72,714,128,48);else box('leave-practice',0,654,190,56);
-    if(hub)box('open-journal',0,680,300,52);else box('open-journal',0,774,216,44);box('close-journal',0,714,190,48);box('journal-prev',-122,654,64,56);box('journal-wheel',0,654,146,56);box('journal-next',122,654,64,56);
+    if(hub)box('open-journal',0,680,300,52);else if(state&&state.observatory&&!state.observatoryPlaying)box('open-journal',0,710,280,48);else box('open-journal',0,774,216,44);box('close-journal',0,714,190,48);box('journal-prev',-122,654,64,56);box('journal-wheel',0,654,146,56);box('journal-next',122,654,64,56);
     // Build AA (SliceView): the page's column centres at x 7; the wheel at y 296 (seats on radius 97.2, socket 1 at 9 o'clock); the Table's cells
     const J=7,table=state&&state.journalView==='table';
     for(let i=0;i<12;i++){if(table)box('journal-seat-'+i,J+30+(i%3-1)*70,202+(i%4)*66,46,46);else{const a=(180+i*30)*Math.PI/180;box('journal-seat-'+i,J+Math.cos(a)*97.2,296-Math.sin(a)*97.2,46,46);}}
     box('journal-view-wheel',J-36,119,72,24);box('journal-view-table',J+36,119,72,24);box('journal-open',J-4,529,108,22); // batch 2: the switch and the tabs a band lower (SliceView.SwitchY, TabsY)
     // batch 2 (SliceView): the landing's doors where the game reports them; Contents' rows; the link at the top left (88 from the left, 96 x 44)
     {const d=(state&&state.journalDoors)||[];if(d.length===8){box('journal-practice',d[0],d[1],d[2],d[3]);box('journal-contents',d[4],d[5],d[6],d[7]);}}
+    const jumpLabels={key1:'After Key 1',wheel:'The whole wheel lit',key2:'After Key 2',key3:'After Key 3',key4:'After Key 4',whole:'The Zodiac Wing whole',key5:'After Key 5',key6:'After Key 6',obswhole:'The Observatory whole'};for(const [id,label] of Object.entries(jumpLabels)){const i=(state?.settingsRows||[]).indexOf(label);if(i>=0&&state.jumpsShown)box('jump-'+id,0,state.settingsRowTops[i],232,44);}
     box('journal-chapter-wheel',J,200,238,104);box('journal-chapter-map',J,304,238,104);box('journal-chapter-planets',J,395,238,78);box('journal-landing',-44,84,96,44);box('journal-to-contents',-44,84,96,44);
     {const g=(state&&state.journalBigThreeBox)||[];if(g.length===4)box('journal-bigthree',g[0],g[1],g[2],g[3]);const b=(state&&state.journalBirthBoxes)||[];['birth-add-0','birth-add-1','birth-add-2','birth-rising','birth-add-time'].forEach((id,i)=>{if(b.length>=4*(i+1)&&b[4*i+2]>0)box(id,b[4*i],b[4*i+1],b[4*i+2],b[4*i+3]);});} // Oct 7: the Big Three's line and "Your Birth" where the game reports them
     {const r=(state&&state.journalPracticeRows)||[];for(let i=0;i<7;i++)if(r.length>=4*(i+1))box('practice-row-'+i,r[4*i],r[4*i+1],r[4*i+2],r[4*i+3]);const c=(state&&state.quizChoiceBoxes)||[];for(let i=0;i<4;i++)if(c.length>=4*(i+1))box('quiz-choice-'+i,c[4*i],c[4*i+1],c[4*i+2],c[4*i+3]);const q=(state&&state.quizButtons)||[];if(q.length===8){box('quiz-next',q[0],q[1],q[2],q[3]);box('quiz-back',q[4],q[5],q[6],q[7]);}}box('journal-to-practice',-44,84,96,44); // Oct 3: Practice's targets where the game reports them
@@ -248,7 +249,7 @@
   document.addEventListener('pointerdown',()=>semantic.classList.remove('kb'),true);
   document.addEventListener('keydown',e=>{if(e.key==='Tab'||e.key.startsWith('Arrow')||e.key==='Enter'||e.key===' ')semantic.classList.add('kb');
     if(e.target&&['name','birthdate','birthtime','birthplace'].includes(e.target.id))return;
-    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();if(!e.repeat)send(e.key==='ArrowRight'?'keyboard-forward':'keyboard-back');}
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();if(!e.repeat)send(state&&state.observatoryPlaying&&state.orreryPhase==='work'?(e.key==='ArrowRight'?'obs-right':'obs-left'):(e.key==='ArrowRight'?'keyboard-forward':'keyboard-back'));}
   });
   window.addEventListener('resize',layout);
   matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',e=>{pendingMotion=e.matches;if(e.matches)send('motion-on');});

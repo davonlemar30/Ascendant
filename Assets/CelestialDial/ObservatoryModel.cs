@@ -44,6 +44,7 @@ namespace Ascendant.CelestialDial
         public ObservatoryPhase Phase {get;private set;}
         public int Target {get;private set;}
         public int Selected {get;private set;}=-1;
+        public int[] TrayOrder {get;private set;}=Enumerable.Range(0,10).ToArray();
         public int Turn {get;private set;}
         public int Hint {get;private set;}
         public int Misses {get;private set;}
@@ -55,7 +56,7 @@ namespace Ascendant.CelestialDial
         public ObservatoryModel(SliceFlow f) {flow=f;}
         void Say(string id,string text) {CopyId=id;Message=text;}
         void Commit(){Changed?.Invoke();}
-        void Problem(int target){Target=target;Misses=Hint=0;Selected=-1;AwaitingNext=Reveal=false;}
+        void Problem(int target){Target=target;Misses=Hint=0;Selected=-1;AwaitingNext=Reveal=false;if(Phase==ObservatoryPhase.Names&&target>=0)flow.Deck.RecordLesson(target,false,flow.Sitting,ItemKind.PlanetGlyph);}
         public void Restore(ObservatorySave s,int version)
         {
             Progress=version>=6&&s!=null?s:new ObservatorySave();
@@ -81,6 +82,7 @@ namespace Ascendant.CelestialDial
                 case ObservatoryPhase.WorkIntro:if(Progress.worked.All(x=>x)&&!Progress.workEvidence)Array.Clear(Progress.worked,0,10);Phase=ObservatoryPhase.Work;Problem(First(Progress.worked));break;
                 case ObservatoryPhase.Paused5:Phase=ObservatoryPhase.WorkIntro;Say("U21PartB",ObservatoryCopy.U21PartB);break;
                 case ObservatoryPhase.RingsIntro:
+                    var random=new Random(flow.Sitting+flow.KeysSpent*17);TrayOrder=Enumerable.Range(0,10).OrderBy(i=>random.Next()).ToArray();
                     if(Progress.placed.All(x=>x)&&!Progress.ringEvidence){Array.Clear(Progress.placed,0,10);Array.Clear(Progress.banded,0,10);Progress.question=0;}
                     Phase=ObservatoryPhase.Rings;Problem(First(Progress.placed));if(Target<0)Advance();break;
                 case ObservatoryPhase.Retro:Phase=ObservatoryPhase.BandsIntro;Say("U22Bands",ObservatoryCopy.U22Bands);break;
@@ -103,9 +105,9 @@ namespace Ascendant.CelestialDial
         public bool Ask(){if(Phase!=ObservatoryPhase.Work||AwaitingNext||Hint>=2)return false;Hint=2;Say("U21BRule",ObservatoryCopy.U21BRule);Commit();return true;}
         public bool Seal()
         {
-            if(Phase!=ObservatoryPhase.Work||AwaitingNext)return false;
+            if(Phase!=ObservatoryPhase.Work||AwaitingNext||Hint==3&&Turn!=Target)return false;
             if(Turn==Target){Progress.worked[Target]=true;bool evidence=Hint<=1;Progress.workEvidence|=evidence;flow.Deck.RecordLesson(Target,evidence,flow.Sitting,ItemKind.PlanetFunction);AwaitingNext=true;Commit();return true;}
-            Misses++;if(Hint>=2){Hint=3;Reveal=true;Say("U21BShow",ObservatoryCopy.U21BShow.Replace("{verb}",Planets.All[Target].Work.Substring(3)).Replace("{planet}",Planets.Spoken(Target)));}
+            Misses++;if(Hint>=2){Hint=3;Reveal=true;flow.Deck.RecordLesson(Target,false,flow.Sitting,ItemKind.PlanetFunction);Say("U21BShow",ObservatoryCopy.U21BShow.Replace("{verb}",Planets.All[Target].Work.Substring(3)).Replace("{planet}",Planets.Spoken(Target)));}
             else if(Misses==1){Hint=1;Say("U21BNudge",ObservatoryCopy.U21BNudge);}else{Hint=2;Say("U21BRule",ObservatoryCopy.U21BRule);}Commit();return false;
         }
         public bool Ring(int ring)
@@ -137,7 +139,7 @@ namespace Ascendant.CelestialDial
             if(Phase==ObservatoryPhase.Names){int n=First(Progress.named);if(n>=0){Problem(n);return;}Phase=ObservatoryPhase.WorkIntro;Say("U21PartB",ObservatoryCopy.U21PartB);}
             else if(Phase==ObservatoryPhase.Work){int n=First(Progress.worked);if(n>=0){Problem(n);return;}if(Progress.workEvidence){flow.MarkObservatoryKey(5);Phase=ObservatoryPhase.Key5;Say("Key5Line",ObservatoryCopy.Key5Line);}else{Phase=ObservatoryPhase.Paused5;Say("Key5Paused",ObservatoryCopy.Key5Paused);}}
             else if(Phase==ObservatoryPhase.Rings){int n=First(Progress.placed);if(n>=0){Problem(n);return;}Progress.retro=true;Phase=ObservatoryPhase.Retro;Say("Retro",ObservatoryCopy.Retro);}
-            else if(Phase==ObservatoryPhase.Bands){int n=First(Progress.banded);if(n>=0){Problem(n);return;}Phase=ObservatoryPhase.Questions;Progress.question=0;Problem(0);}
+            else if(Phase==ObservatoryPhase.Bands){int n=First(Progress.banded);if(n>=0){Problem(n);return;}Phase=ObservatoryPhase.Questions;Problem(0);}
             else if(Phase==ObservatoryPhase.Questions){Progress.question++;if(Progress.question<2){Problem(0);return;}if(Progress.ringEvidence){flow.MarkObservatoryKey(6);Phase=ObservatoryPhase.Key6;Say("Key6Line",ObservatoryCopy.Key6Line);}else{Phase=ObservatoryPhase.Paused6;Say("Key6Paused",ObservatoryCopy.Key6Paused);}}
         }
     }

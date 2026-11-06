@@ -1028,7 +1028,7 @@ namespace Ascendant.CelestialDial
                 ShowChamberRoom(); Publish();
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 1.2f : 2.2f);
             }
-            if (Flow.WingWhole)
+            if (spent==4 || spent==6)
             {
                 chamberLine = Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : ChamberWholeLine; ShowChamberRoom(); Publish();
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 1f : 1.8f);
@@ -1054,7 +1054,7 @@ namespace Ascendant.CelestialDial
             chamberText.text = chamberLine;
         }
         // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
-        string DefaultChamberLine() => Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, initiate. Bring them to the Books." : "You hold a Key, initiate. " + ChamberBringLine); // owner (worksheet section 13)
+        string DefaultChamberLine() => Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : Flow.KeysSpent==5&&Flow.KeysInHand==0?ChamberQuietLine: Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, initiate. Bring them to the Books." : "You hold a Key, initiate. " + ChamberBringLine); // owner (worksheet section 13)
         void Restart() { if (busy) return; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); } // the slot in play (slot 1 if none), straight in, past the logo, the movie and the menu (owner, Oct 9)
         // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
         void JumpTo(string id)
@@ -1291,7 +1291,7 @@ namespace Ascendant.CelestialDial
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
                 yield return FadeTo(0);
             }
-            else if(id=="orrery") ObsStart();
+            else if(id=="orrery") ObsStart(true);
             else if (id == "desk") { Flow.ApproachDesk(); hubNote.text = Flow.Note; } // Build F: the desk is dressing; the journal is in the inventory
             else if (id == "caspar") { Flow.ApproachCaspar(); hubNote.text = Flow.Note; }
             else if (id == "dial") EnterDialNow();

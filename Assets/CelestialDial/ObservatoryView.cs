@@ -13,7 +13,7 @@ namespace Ascendant.CelestialDial
         RoomKit obsKit; Image obsLight,obsPose; Text obsMessage,obsAsk,obsGlyph,obsTitle,obsDetails,obsJournalGlyph;
         Button obsContinue,obsSeal,obsAskCaspar,obsLeft,obsRight,obsExit,obsJournalBack;
         readonly Button[] obsNames=new Button[4],obsSpheres=new Button[10],obsRingButtons=new Button[8],obsBands=new Button[4],obsPlanetPages=new Button[10];
-        readonly Text[] obsSphereGlyphs=new Text[10];
+        readonly Text[] obsSphereGlyphs=new Text[10],obsSphereBands=new Text[10];readonly Image[] obsRoomSpheres=new Image[10];
         bool obsPlaying,obsDoorBeat; int obsLastKey;
         ObservatoryModel Obs=>Flow.Observatory;
         static Font PlanetFont(int seat)=>Resources.Load<Font>(seat==0||seat>1&&seat<9?"Fonts/NotoSansSymbols":"Fonts/NotoSansSymbols2-Regular");
@@ -29,6 +29,8 @@ namespace Ascendant.CelestialDial
             var orrery=Block(obsRoom,"The orrery",40,300,200,200,"obs-orrery-frame");Tappable(orrery,()=>Walk("orrery"));
             ObsButton(obsRoom,"Your journal",0,710,280,48,OpenJournal);
             Picture(obsRoom,"caspar-explain",110,480,70,125);
+            for(int i=0;i<10;i++){float a=i*Mathf.PI*2/10;obsRoomSpheres[i]=Picture(obsRoom,"obs-sphere-"+Planets.All[i].Name.ToLowerInvariant(),40+Mathf.Sin(a)*76,300-Mathf.Cos(a)*76,28,28);}
+            for(int i=0;i<3;i++)Picture(obsRoom,"obs-sphere-dark",20+i*20,416,16,16);
             var first=Label(obsRoom,"",0,580,316,180,15); first.font=font;first.resizeTextForBestFit=true;first.resizeTextMinSize=13;first.resizeTextMaxSize=15;obsRoomLine=first;
             obsInstrument=ScreenPanel("Orrery","obs-room");
             obsTitle=Label(obsInstrument,"The Observatory",0,72,280,36,24);
@@ -36,7 +38,7 @@ namespace Ascendant.CelestialDial
             Picture(obsInstrument,"obs-orrery-frame",0,290,300,300);Picture(obsInstrument,"obs-rings",0,290,300,300);Picture(obsInstrument,"bracket",0,145,48,48);
             for(int i=0;i<8;i++){var ring=Rect("Orbit "+(i+1),obsInstrument,0,290,36+26*i,36+26*i).gameObject.AddComponent<Image>();ring.sprite=ChapterRingSprite();ring.color=new Color(Gilt.r,Gilt.g,Gilt.b,.6f);ring.raycastTarget=false;}
             obsGlyph=Label(obsInstrument,"",0,270,100,90,54);
-            for(int i=0;i<10;i++){int s=i;obsSpheres[i]=ObsButton(obsInstrument,"",0,0,48,48,()=>ObsChange(()=>Obs.Select(s)));obsSpheres[i].name="obs-sphere:"+i;Slots.Dress(obsSpheres[i].GetComponent<Image>(),"obs-sphere-"+Planets.All[i].Name.ToLowerInvariant());obsSphereGlyphs[i]=obsSpheres[i].GetComponentInChildren<Text>();PutPlanet(obsSphereGlyphs[i],i);}
+            for(int i=0;i<10;i++){int s=i;obsSpheres[i]=ObsButton(obsInstrument,"",0,0,48,48,()=>ObsChange(()=>Obs.Select(s)));obsSpheres[i].name="obs-sphere:"+i;Slots.Dress(obsSpheres[i].GetComponent<Image>(),"obs-sphere-"+Planets.All[i].Name.ToLowerInvariant());obsSphereGlyphs[i]=obsSpheres[i].GetComponentInChildren<Text>();PutPlanet(obsSphereGlyphs[i],i);obsSphereBands[i]=Label(obsSpheres[i].transform,"",0,56,65,18,10);obsSphereBands[i].color=Gilt;}
             for(int i=0;i<3;i++){var d=Picture(obsInstrument,"obs-sphere-dark",-25+i*25,440,20,20);d.raycastTarget=false;}
             for(int i=0;i<4;i++){int n=i;obsNames[i]=ObsButton(obsInstrument,"",-78+(i%2)*156,440+(i/2)*52,150,48,()=>ObsCard(n));obsNames[i].name="obs-card:"+i;obsBands[i]=ObsButton(obsInstrument,Planets.BandLabels[i],-78+(i%2)*156,440+(i/2)*52,150,48,()=>ObsChange(()=>Obs.Band(n)));obsBands[i].name="obs-band:"+i;}
             for(int i=0;i<8;i++){int ring=i+1;obsRingButtons[i]=ObsButton(obsInstrument,ring.ToString(),-114+(i%4)*76,175+(i/4)*50,70,46,()=>ObsChange(()=>Obs.Ring(ring)));obsRingButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(i<4?-145:145,-(180+(i%4)*55));obsRingButtons[i].GetComponent<RectTransform>().sizeDelta=new Vector2(48,44);obsRingButtons[i].name="obs-ring:"+ring;}
@@ -83,13 +85,13 @@ namespace Ascendant.CelestialDial
             else if(Obs.Phase==ObservatoryPhase.Questions)ObsChange(()=>Obs.AnswerQuestion(Obs.QuestionOrder[slot]));
         }
         void ObsClose(){if(busy)return;if(Flow.PlanetReview){LeavePractice();return;}obsPlaying=false;Show();Publish();}
-        void ObsStart(){if(!Flow.AtObservatory||busy)return;obsPlaying=Obs.Begin();ObsRefresh();}
+        void ObsStart(bool fromWalk=false){if(!Flow.AtObservatory||busy&&!fromWalk)return;obsPlaying=Obs.Begin();ObsRefresh();}
         void ShowObservatory()
         {
             if(obsRoom==null)return;
             bool on=Flow.AtObservatory,reviewing=Flow.PlanetReview;if(!on||!obsPlaying)obsLastKey=Flow.Keys;
             obsRoom.gameObject.SetActive(on&&!obsPlaying);obsInstrument.gameObject.SetActive(on&&obsPlaying||reviewing);
-            if(on&&!obsPlaying){ApplyKit(obsKit,true);obsRoomLine.text=Flow.ObservatoryWhole?ObservatoryCopy.HubObsWhole:Flow.Keys>=6?ObservatoryCopy.HubKey6:Flow.Keys>=5?Flow.KeysSpent>=5?ObservatoryCopy.HubSpent5:ObservatoryCopy.HubKey5:ObservatoryCopy.ObsFirst;if(!Obs.Progress.firstSeen){Obs.Progress.firstSeen=true;Save();}}
+            if(on&&!obsPlaying){ApplyKit(obsKit,true);for(int i=0;i<10;i++)obsRoomSpheres[i].color=Obs.Progress.named[i]?new Color(1,1,1,Flow.ObservatoryLevel>0?1:.55f):new Color(.15f,.15f,.18f);obsRoomLine.text=Flow.ObservatoryWhole?ObservatoryCopy.HubObsWhole:Flow.Keys>=6?ObservatoryCopy.HubKey6:Flow.Keys>=5?Flow.KeysSpent>=5?ObservatoryCopy.HubSpent5:ObservatoryCopy.HubKey5:ObservatoryCopy.ObsFirst;if(!Obs.Progress.firstSeen){Obs.Progress.firstSeen=true;Save();}}
             if(!on&&!reviewing)return;
             bool names=!reviewing&&Obs.Phase==ObservatoryPhase.Names,work=!reviewing&&Obs.Phase==ObservatoryPhase.Work,rings=!reviewing&&Obs.Phase==ObservatoryPhase.Rings,bands=!reviewing&&Obs.Phase==ObservatoryPhase.Bands,question=!reviewing&&Obs.Phase==ObservatoryPhase.Questions;
             var task=Flow.CurrentReview;bool rg=reviewing&&task.Mode==ReviewMode.PlanetGlyph,rf=reviewing&&task.Mode==ReviewMode.PlanetFunction,rc=reviewing&&task.Mode==ReviewMode.PlanetCompany;
@@ -100,11 +102,12 @@ namespace Ascendant.CelestialDial
             for(int i=0;i<10;i++)
             {
                 var b=obsSpheres[i];b.gameObject.SetActive(work||rings||bands);
-                float a=(i-(work?Obs.Turn:0))*Mathf.PI*2/10;var pos=work?new Vector2(Mathf.Sin(a)*120,290-Mathf.Cos(a)*120):new Vector2(-120+(i%5)*60,(rings?455:300)+(i/5)*60);
-                if(rings&&Obs.Progress.placed[i]){float angle=i==1?0:i==2?2.094f:i==3?4.189f:i*.61f;float radius=18+Planets.All[i].Ring*13;pos=new Vector2(Mathf.Sin(angle)*radius,290-Mathf.Cos(angle)*radius);}
+                float a=(i-(work?Obs.Turn:0))*Mathf.PI*2/10;var pos=work?new Vector2(Mathf.Sin(a)*120,290-Mathf.Cos(a)*120):new Vector2(-120+((rings?Array.IndexOf(Obs.TrayOrder,i):i)%5)*60,(rings?455:300)+((rings?Array.IndexOf(Obs.TrayOrder,i):i)/5)*60);
+                if((rings||bands)&&Obs.Progress.placed[i]){float angle=i==0?Mathf.PI:i==1?0:i==2?2.094f:i==3?4.189f:i*.61f;float radius=18+Planets.All[i].Ring*13;pos=new Vector2(Mathf.Sin(angle)*radius,290-Mathf.Cos(angle)*radius);}
                 b.GetComponent<RectTransform>().anchoredPosition=new Vector2(pos.x,-pos.y);
                 b.interactable=!busy&&!Obs.AwaitingNext&&(!rings||!Obs.Progress.placed[i])&&(!bands||!Obs.Progress.banded[i]);
                 b.GetComponent<Image>().raycastTarget=b.interactable;
+                obsSphereGlyphs[i].fontSize=(rings||bands)&&Obs.Progress.placed[i]?30:44;obsSphereBands[i].text=work&&Obs.Reveal&&i==Obs.Target?Planets.Sentence(i):bands&&Obs.Progress.banded[i]?Planets.BandLabels[Planets.All[i].Band]:"";
                 obsSphereGlyphs[i].color=Obs.Selected==i||work&&Obs.Turn==i?Gilt:Bone;
             }
             for(int i=0;i<4;i++)
@@ -113,15 +116,16 @@ namespace Ascendant.CelestialDial
                 string label=names?Planets.Sentence(Planets.Options(Obs.Target)[i]):question?Obs.Question.choices[Obs.QuestionOrder[i]]:rg||rf?Planets.Sentence(Flow.PlanetReviewOptions[i]):"";
                 b.GetComponentInChildren<Text>().text=label;b.GetComponentInChildren<Text>().resizeTextForBestFit=true;b.GetComponentInChildren<Text>().resizeTextMinSize=10;b.GetComponentInChildren<Text>().resizeTextMaxSize=15;
                 if(question){b.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,-(245+64*i));b.GetComponent<RectTransform>().sizeDelta=new Vector2(308,60);}else{b.GetComponent<RectTransform>().anchoredPosition=new Vector2(-78+(i%2)*156,-(440+(i/2)*52));b.GetComponent<RectTransform>().sizeDelta=new Vector2(150,48);}
+                b.GetComponent<Image>().color=(question&&Obs.AwaitingNext&&Obs.QuestionOrder[i]==Obs.Question.answer||names&&Obs.Reveal&&Planets.Options(Obs.Target)[i]==Obs.Target)?Gilt:Dim;
                 b.interactable=!busy&&(reviewing||!Obs.AwaitingNext);
                 obsBands[i].gameObject.SetActive(bands||rc);obsBands[i].interactable=!busy&&(reviewing||Obs.Selected>=0&&!Obs.AwaitingNext);
                 if(rc){obsBands[i].onClick.RemoveAllListeners();int n=i;obsBands[i].onClick.AddListener(()=>ObsCard(n));}else{obsBands[i].onClick.RemoveAllListeners();int n=i;obsBands[i].onClick.AddListener(()=>ObsChange(()=>Obs.Band(n)));obsBands[i].name="obs-band:"+i;}
             }
             for(int i=0;i<8;i++){obsRingButtons[i].gameObject.SetActive(rings);obsRingButtons[i].interactable=!busy&&Obs.Selected>=0&&!Obs.AwaitingNext;}
             obsLeft.gameObject.SetActive(work);obsRight.gameObject.SetActive(work);obsSeal.gameObject.SetActive(work);obsAskCaspar.gameObject.SetActive(work&&Obs.Hint<2&&!Obs.AwaitingNext);
-            obsLeft.interactable=obsRight.interactable=obsSeal.interactable=!busy&&!Obs.AwaitingNext;
+            obsLeft.interactable=obsRight.interactable=!busy&&!Obs.AwaitingNext;obsSeal.interactable=!busy&&!Obs.AwaitingNext&&(Obs.Hint<3||Obs.Turn==Obs.Target);
             obsContinue.gameObject.SetActive(!reviewing&&Obs.CanContinue);obsContinue.interactable=!busy;
-            if(work&&Obs.Reveal)obsAsk.text=Planets.All[Obs.Target].Work+"\n"+Planets.Sentence(Obs.Target);
+            
             if(bands&&Obs.Reveal&&Obs.Selected>=0)obsAsk.text=Planets.BandLabels[Planets.All[Obs.Selected].Band];
         }
         void UpdateObservatory()
