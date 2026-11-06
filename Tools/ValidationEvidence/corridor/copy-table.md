@@ -2,6 +2,7 @@ Codex draft (goal 03); owner rewrites. `{student}` alternates pupil / apprentice
 
 | ID | Draft |
 | --- | --- |
+| BackToObservatory | Back to the Observatory |
 | Title | The Rulership Corridor |
 | Door | The brass has answered, seeker. The Rulership Corridor is open. |
 | First | A long stretch of dust, {student}, and a wheel waiting for its planets. Tap the instrument when you are ready. |
