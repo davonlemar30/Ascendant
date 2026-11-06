@@ -99,11 +99,12 @@ const path=require('path');
     for(const [i,[shot,frame,settle]] of PROLOGUE.entries()){
       const want=frame;
       await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.prologueShot===k&&s.prologueFrame===f;},[shot,want],{timeout:25000});
-      await pg.waitForTimeout(settle);
+      await pg.waitForTimeout(tap&&i===1?0:settle);
       const s=await snap(),said=await pg.locator('#announcement').textContent(),skip=await pg.locator('#skip-prologue').isEnabled();
       const loopFrame=frame==='prologue-notebook'&&/^prologue-notebook(-[23])?$/.test(s.prologueFrame); // the writing loop may already have begun (it starts 0.7 s after the panel)
       check(s.screen==='prologue'&&s.prologueShot===shot&&(s.prologueFrame===want||(!reduced&&loopFrame))&&s.caspar!==''&&said.includes(s.caspar)&&s.canSkip&&skip&&!s.canSliceContinue&&!s.orbShown&&(!reduced||shot<1||s.prologueStill),'the opening scene'+(reduced?', reduced motion':'')+': shot '+(shot+1)+' ('+s.prologueShotId+'), '+want+', its spoken line announced ("'+s.caspar+'"), the semantic Skip offered'+(reduced&&shot===0?(s.prologueStill?', still from the first shot':', the first shot as it began'):'')+' at '+where);
-      await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png')});
+      // Tap near the beginning of the stable wide shot, before screenshot latency can cross its panel transition.
+      if(!(tap&&i===1))await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png')});
       // the owner, Oct 9: slight animations as frame swaps; read from the frames the shot has shown, in order (the headphones' in-between lasts 0.14 s)
       if(shot===1&&frame==='prologue-notebook'){
         if(!reduced){
@@ -121,6 +122,7 @@ const path=require('path');
         await tap(0,400);await pg.waitForFunction(()=>window.ascendantDial.snapshot().skipShown,{},{timeout:3000}).catch(()=>{});const t0=Date.now(),a=await snap();
         check(a.skipShown&&a.prologueShot===s.prologueShot&&a.prologueFrame===s.prologueFrame&&a.screen==='prologue','a canvas tap shows Skip and advances nothing (shot '+(a.prologueShot+1)+', '+a.prologueFrame+') at '+where);
         await pg.screenshot({path:path.join(out,prefix+'-skip-shown.png')});
+        fs.copyFileSync(path.join(out,prefix+'-skip-shown.png'),path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png'));
         await pg.waitForFunction(()=>!window.ascendantDial.snapshot().skipShown,{},{timeout:6000});const held=Date.now()-t0;
         check(held>2400&&held<4200&&(await snap()).screen==='prologue','Skip hides again after about 3 s ('+(held/1000).toFixed(1)+' s) and the scene plays on at '+where);}
     }
