@@ -1,0 +1,68 @@
+{
+  "candidate": "21d1f24464c257d7dadaa5b878451a95e272c4c6",
+  "parents": [
+    "75ad428402237f334331e7a3c687e71889fa1abf"
+  ],
+  "sources": {
+    "codex/validate-all-hardening": "2b3438497ab19a734b55a92bfb2a8cbfc9a56a87",
+    "codex/opening-controls": "2d43ac1eda9655a05708f48b68a29001eae7ada1",
+    "codex/release-gate": "747b554f60defa574debd96236293322c174c47f",
+    "codex/stage2-observatory": "470508a2e774c516f95c090002294d1c68c0eb1a"
+  },
+  "playerDifferenceFromStage2": "Only two authorized #168 fixes: HTML date/time submit pointer routing and 80px birth Back target.",
+  "harnessDifferenceFromStage2": "#167 hardened runner, #168 player-control test module, #169 release workflow/evidence verifier and player-frame relaunch synchronization.",
+  "mergePerformed": false,
+  "testedBrowserHarness": "54ecfe79538397c2c22f02b919c28f62321b521c",
+  "stage2PrHead": "69e7401a54b3c19c8662647646fdef9af7404c63",
+  "artifactIdentity": "validate-all.Zxyo9kl4",
+  "unity": "6000.3.24f1",
+  "buildBytes": 47848646,
+  "buildErrors": 0,
+  "buildWarnings": 0,
+  "mechanicalPass": 1028,
+  "fullBrowser": {
+    "pass": 1041,
+    "fail": 0,
+    "exit": 0,
+    "nativeOpeningChecks": 38,
+    "viewports": [
+      390,
+      360
+    ],
+    "deviceScale": 1,
+    "mobile": false,
+    "completeReportVerifiedAgainstStdout": true
+  },
+  "targetedObservatory": {
+    "desktopPass": 222,
+    "phonePass": 222,
+    "phoneViewport": "360x800",
+    "phoneDeviceScale": 2,
+    "phoneMobile": true,
+    "artifactSource": "bb09ddc"
+  },
+  "frozenWingComparisons": {
+    "pixelIdentical": 14,
+    "densities": [
+      "360x800 scale2 mobile",
+      "1280x800 scale1"
+    ],
+    "source": "470508a via combined21d1f24"
+  },
+  "fixture": {
+    "exit": 1,
+    "outcome": "STOPPED at existing unknown/default journal assertion, SlicePlayValidation.cs:208",
+    "assertionChanged": false,
+    "writtenQuestion": "May the assertion be updated to the approved default-chart rows and note, preserving all other checks?"
+  },
+  "fullLadderExit": 1,
+  "browserRepeatReason": [
+    "Approved new third chapter changes the target count from three to four; all >=44px requirements retained.",
+    "Approved new door beat must finish before resumed room actions; all assertions retained."
+  ],
+  "notTested": [
+    "Positive Linux release rehearsal remains stopped on existing animation timing failures and journal assertion; see PR169.",
+    "No physical Android device test.",
+    "No production deployment or check; nothing merged."
+  ]
+}
