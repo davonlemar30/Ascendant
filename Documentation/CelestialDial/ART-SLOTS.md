@@ -301,7 +301,7 @@ Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) ad
 
 ## Stage 2 Observatory test slots
 
-Manifest total: 243 art slots (221 existing + 22 Observatory). Concept mockups are outside the game.
+Manifest total: 253 art slots (221 existing + 22 Observatory + 10 Corridor). Concept mockups are outside the game.
 
 - `obs-room`: 360 × 800; test placeholder.
 - `obs-light`: 360 × 800; test placeholder.
@@ -325,3 +325,18 @@ Manifest total: 243 art slots (221 existing + 22 Observatory). Concept mockups a
 - `obs-lectern-restored`: 64 × 100; test placeholder.
 - `obs-charts-worn`: 100 × 80; test placeholder.
 - `obs-charts-restored`: 100 × 80; test placeholder.
+
+## Rulership Corridor (goal 03)
+
+Room, light, shell and grime use 360 × 800 rects; wheel 310 × 310; lectern 64 × 100; cabinet 100 × 80. All ten slots have final primary art; test files remain available in the test set. Dormant and awake mockups are full-bleed 720 × 1600. Hashes and dimensions: `Documentation/ConceptArt/Corridor-2026-11/art-audit.json`.
+
+- `cor-room`
+- `cor-light`
+- `cor-shell-worn`
+- `cor-shell-restored`
+- `cor-grime`
+- `cor-wheel`
+- `cor-lectern-worn`
+- `cor-lectern-restored`
+- `cor-cabinet-worn`
+- `cor-cabinet-restored`

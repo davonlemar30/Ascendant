@@ -282,6 +282,17 @@ namespace Ascendant.CelestialDial
             new ArtSlot("obs-lectern-restored", 64, 100, 256, "Stage 2 Observatory placeholder: obs-lectern-restored"),
             new ArtSlot("obs-charts-worn", 100, 80, 256, "Stage 2 Observatory placeholder: obs-charts-worn"),
             new ArtSlot("obs-charts-restored", 100, 80, 256, "Stage 2 Observatory placeholder: obs-charts-restored"),
+            new ArtSlot("cor-room", 360, 800, 2048, "Rulership Corridor: room"),
+            new ArtSlot("cor-light", 360, 800, 2048, "Rulership Corridor: light"),
+            new ArtSlot("cor-shell-worn", 360, 800, 2048, "Rulership Corridor: shell-worn"),
+            new ArtSlot("cor-shell-restored", 360, 800, 2048, "Rulership Corridor: shell-restored"),
+            new ArtSlot("cor-grime", 360, 800, 2048, "Rulership Corridor: grime"),
+            new ArtSlot("cor-wheel", 310, 310, 1024, "Rulership Corridor: wheel"),
+            new ArtSlot("cor-lectern-worn", 64, 100, 1024, "Rulership Corridor: lectern-worn"),
+            new ArtSlot("cor-lectern-restored", 64, 100, 1024, "Rulership Corridor: lectern-restored"),
+            new ArtSlot("cor-cabinet-worn", 100, 80, 1024, "Rulership Corridor: cabinet-worn"),
+            new ArtSlot("cor-cabinet-restored", 100, 80, 1024, "Rulership Corridor: cabinet-restored"),
+
         };
         public static readonly SoundSlot[] Sounds =
         {

@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     // v0.4 tap-to-move greybox (Q06 phase 2 lock, September 12): two walkable rooms, a placeholder marker,
     // straight-line walking at a fixed speed along a floor band, no pathfinding. Pure state, no Unity types.
-    public enum Room { None, Atrium, Wing, Chamber, Observatory }
+    public enum Room { None, Atrium, Wing, Chamber, Observatory, Corridor }
 
     public sealed class PointOfInterest
     {
@@ -39,8 +39,9 @@ namespace Ascendant.CelestialDial
             new PointOfInterest("dial", "the Dial", 40),
             new PointOfInterest("shelf", "the bookshelf", 157),   // v0.3 revision: Part A lives here once the wheel is lit
         };
-        public static readonly PointOfInterest[] Observatory = {new PointOfInterest("atrium-door","the doorway back to the Atrium",-138),new PointOfInterest("orrery","the orrery",40)};
-        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : room == Room.Observatory ? Observatory : Array.Empty<PointOfInterest>();
+        public static readonly PointOfInterest[] Observatory = {new PointOfInterest("atrium-door","the doorway back to the Atrium",-138),new PointOfInterest("orrery","the orrery",40),new PointOfInterest("corridor-door",CorridorCopy.Title,140,false)};
+        public static readonly PointOfInterest[] Corridor = {new PointOfInterest("observatory-door","the doorway back to the Observatory",-138),new PointOfInterest("rulership-wheel",CorridorCopy.Wheel,40)};
+        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : room == Room.Observatory ? Observatory : room == Room.Corridor ? Corridor : Array.Empty<PointOfInterest>();
         public static PointOfInterest Find(Room room, string id) => Of(room).FirstOrDefault(p => p.Id == id);
         public static IEnumerable<PointOfInterest> Visible(Room room) => Of(room).Where(p => p.Id != "entry");
     }

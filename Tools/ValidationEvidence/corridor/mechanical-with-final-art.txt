@@ -1,0 +1,1204 @@
+12 unique ordered signs
+Aries home and Pisces boundary
+same-element offset from 0
+four forward with zero start and wrap from 0
+inclusive-counting error rejected from 0
+same-element offset from 1
+four forward with zero start and wrap from 1
+inclusive-counting error rejected from 1
+same-element offset from 2
+four forward with zero start and wrap from 2
+inclusive-counting error rejected from 2
+same-element offset from 3
+four forward with zero start and wrap from 3
+inclusive-counting error rejected from 3
+same-element offset from 4
+four forward with zero start and wrap from 4
+inclusive-counting error rejected from 4
+same-element offset from 5
+four forward with zero start and wrap from 5
+inclusive-counting error rejected from 5
+same-element offset from 6
+four forward with zero start and wrap from 6
+inclusive-counting error rejected from 6
+same-element offset from 7
+four forward with zero start and wrap from 7
+inclusive-counting error rejected from 7
+same-element offset from 8
+four forward with zero start and wrap from 8
+inclusive-counting error rejected from 8
+same-element offset from 9
+four forward with zero start and wrap from 9
+inclusive-counting error rejected from 9
+same-element offset from 10
+four forward with zero start and wrap from 10
+inclusive-counting error rejected from 10
+same-element offset from 11
+four forward with zero start and wrap from 11
+inclusive-counting error rejected from 11
+selection and corrected overshoot do not submit: Drag
+equivalent evaluator and independent evidence: Drag
+selection and corrected overshoot do not submit: ForwardStep
+equivalent evaluator and independent evidence: ForwardStep
+selection and corrected overshoot do not submit: BackStep
+equivalent evaluator and independent evidence: BackStep
+selection and corrected overshoot do not submit: DirectSeat
+equivalent evaluator and independent evidence: DirectSeat
+selection and corrected overshoot do not submit: Keyboard
+equivalent evaluator and independent evidence: Keyboard
+selection and corrected overshoot do not submit: Accessible
+equivalent evaluator and independent evidence: Accessible
+direct tap frames without sealing
+Level 1 is neutral counting
+Level 1 eligible evidence
+first rejection stays in place with nudge
+second rejection stays in place at Level 2 without inertia
+counter never downgrades Level 2
+third rejection requests worked recovery
+automatic start and home emit no detent/frame events
+reduced motion disables inertia at Level 0
+all counting detents use identical event path
+guided family plus transfer start, no premature Key
+guided rule exposure is never independent evidence
+two completed families; six lit and six dormant
+Key 1 requires challenge completion and independent evidence
+completion returns home
+six-seat completion speaks the amended completion line
+Level 2 completion queues a different fresh Level 0 problem
+fresh equivalent can earn Key after assisted completion
+worked recovery resets to a fresh equivalent, encounter two
+third encounter uses final shared recovery slot
+cap pauses without a Key or extra fourth encounter
+demonstrations never create evidence
+optional third-family probe offered and accepted
+optional probe preserves the completed six-seat record
+optional probe does not award another Key
+answer log carries timing, attempt, relationship and seats
+the opening scene (owner, Oct 8): a new game starts at the prologue, with a default Keeper name
+the prologue plays on its own: Continue does nothing there
+nothing of the opening's questions answers on the prologue
+screen_entered:Prologue is logged once, on the same path as every screen
+the prologue's end reaches Identity, once
+Skip reaches Identity and says it was skipped
+a restored save resumes at the Hub and never sees the prologue
+Prologue is appended to the screens, so none is renumbered
+the skip path's stars: none on the name, one once it is continued, one for the birth answer, and no more (the default chart asks nothing, owner, Oct 15): 0,1,2
+Change my answer takes the birth's stars back, the name's stays
+the longest path (the date, time and place, with no more questions; a personal chart needs all three, owner, Oct 16) gathers all five stars
+a version 5 save restores (skip)
+"Your Birth" from the journal has no stars (the orb is the opening's)
+seven shots in the brief's order, the flash last
+the sixteen frames are the sixteen 360 x 800 slots, capped at 2048 (the owner's Oct 9 animation frames included)
+shot 2: once the notebook's panel has landed, the hand writes in a loop (notebook, -2, -3) at 4 frames a second to the shot's end
+shot 3: the head turns to the window (a 0.15 s crossfade 0.8 to 1 s after the light), the close-up, then the headphones fall look, mid, down 0.12 to 0.15 s apart (the mid frame skipped under reduced motion); the shot stays 9 s
+the prologue runs about 45-60 s: 49.85 s
+motion stays inside the frame: every scale 1 or more, every pan within the frame's edges, every panel inside the screen and showing a part inside its frame, every frame's own push at scale 1 or more
+shots 2 and 5 are comic panels that slide in (two on the desk's page; the puzzled look over the street, dimmed)
+the turn: back and three-quarter held still; on the face a slow push-in toward his eyes, which carries on through the crossfade to the eyes' close-up and on to the flash, where the white blooms out of the glow (no dimmed face)
+the pushes hold the measured points: the city's lit window (58.1%, 23.7%), his eyes on the face (56.6%, 21.3%), the glow on the close-up (50.7%, 47.1%)
+each shot has one plain spoken line: no dashes, none of the owner's banned words
+Skip is a 44 px target inside the screen
+the orb (120 x 120) and the star (16 x 16) are slots
+the orb, its stars and its bob fit the band above the question with no top band and with a 24 px one (centre 91.5, reach 79)
+eight star places evenly round the orb, the first at the top, clear of its body
+the stars fill the places in a spread order (top, bottom, right, left, then the diagonals), balanced at every count
+shot 2's panels sit clear of the gear and of Skip, a cutout's band included
+the launch's screens (Logo, Intro, Menu, SaveSlots) are appended after Prologue, so none is renumbered
+a launch opens on the logo screen (screen_entered:Logo, once); Continue, the prologue's Skip and the slot list do nothing there
+the logo gives way to the launch movie, and its end to the menu, each logged as every screen is
+one Skip on the logo screen goes to the menu
+the same Skip in the launch movie goes to the menu
+Load Game and New Game open the slot list for their purpose; Back returns to the menu
+Settings' Main menu comes straight to the menu, past the logo and the movie
+a game under way neither launches nor opens the menu in place (the menu reloads the scene)
+a fresh flow still starts at the prologue, where New Game, Start over and the DEV samples arrive
+the logo screen (owner, Oct 9: "a lil more screen time", "a nice fade in and fade out"): the Signature Crown Mark eases in over 1.2 s, holds 2.5 s ("shortened a bit before the fade out"), eases out over 1.2 s (4.9 s)
+the launch movie in the owner's order (round 4): darkness, the wheel drawing itself, its symbols, coming alive, burning alive, transforming into Earth, the calm Earth, then flying down: the continents, America, New York State, New York City, Brooklyn, the block, the one lit window: logo, dark, draw, glyphs, alive, burn, transform, earth, continents, america, newyork-state, newyork-city, brooklyn, block, window
+its frames in order end on the opening's own city frame, the one lit window (Oct 9: no in-between wheel-to-Earth frame)
+five round layers (360 x 360, 720 x 720 files, centred) over one painted sky, and the seven full frames of the sky and the descent; the single pencil frame and the baked wheel-to-Earth frame are gone (Oct 9)
+the studio's logo is a 320 x 320 slot on the black screen, drawn whole
+the launch movie runs about 30 s (round 4): 30.0 s
+no comic page and no flash in the launch; the camera itself holds still
+each launch shot's spoken line for the screen reader, exactly as the owner approved them (Oct 9), none for the dark and the symbols; nothing written on screen
+no sound for the launch (the sound hold): still the seven sound slots
+the wheel draws itself: a radial sweep reveals its lines over about 2.5 s, then its twelve symbols appear one at a time, 0.12 s apart
+the sweeps start at the Aries cusp (136.5 degrees, about 10:30) and run counter-clockwise, as the art lane measured
+each symbol falls inside its own 30 degree step from the cusp, Aries first: step k reveals Aries to the k-th sign
+the owner's slow zoom on the wheel: from 0.8 to 1 across the draw, the symbols and the coming alive, rising all the way, never past 1, stopping before the burn
+it comes alive: the lit layer crossfades in while the black behind becomes the starry sky
+it burns alive and starts to spin (easing in), and spins on through the transform, easing to a stop
+the spin keeps one speed where the burn meets the transform (-96.0 degrees a second)
+the transform (owner, Oct 9: "it doenst blend that cleanly"): the burning wheel spins on and fades away over 3 s while a level Earth fades in under it from 0.3 s over 2.6 s
+Earth never turns: no step spins intro-earth
+86bcgfke1 (A, lights): seven painted lights (one lamp seen in two frames) breathe on the menu window's sine, each out of step, only in the shots option A names (not the light flooding in, the eyes or the launch)
+86bcgfke1: Earth's push starts the moment the burning wheel has gone (3 s into the transform, not after a 1.6 s hold), eases in, and runs on through the calm Earth and the first descent's fade (at most 1.2)
+86bcgfke1: each descent frame comes in over what shows and pushes at one steady speed, still moving while the next fades in over it; the window arrives moving and settles
+a turned full frame scales just enough to cover the column (a round layer turns as it is)
+the last shot pushes toward the measured lit window (58.1% across, 23.7% down)
+the window's glow pulses slowly (a 3.5 s sine from 0.15 to 0.5, rising smoothly, never a blink); reduced motion holds it at 0.3
+the glow sits on menu-city's lit window, as measured (17.7 right of the middle, 274 down), about 3x its size
+the rat's run cycle: four 48 x 24 slots (96 x 48 files, cap 256)
+the rat runs on the street below the buttons (y 750.5), across the width in 2.2 s at 12 frames a second, first after 6 to 10 s idle, then every 15 to 30 s
+Jeffrey, #149 B1: the rat's run ends just past the screen's edge or the street's (the bleed, 300), whichever is nearer, at one speed on any width
+the menu reads Continue, New Game, Load Game, Settings (the boards' order)
+the menu's buttons: 232 x 44, centred, 12 px apart from 496 down, the last clear of the bottom
+the menu's slots: menu-city behind (360 x 800), menu-title near the top (the seal at 1.38:1, 270 wide, centred 115 down, its top about 16 px clear of the safe area, clear of the buttons)
+the slot list: three cards (44 px or more) under the title, Back below them
+the question's box holds its line and its two 44 px buttons (Start, Back)
+the launch's new words are plain Latin-1 (the web font draws nothing past it)
+three slots: slot 1 keeps today's key, slots 2 and 3 and the last-played slot take their own
+a first launch: every slot reads Empty, nothing to continue, slot 1 in play
+an old single save shows up in slot 1 as it stands (no migration): its name, Keeper Keys and Big Three
+Continue picks slot 1 when it is the only save
+Continue picks the slot played last (a number, no date); a card shows only the signs the save holds
+if the slot played last holds nothing to load, Continue falls back to the first that does
+a slot that would not load (as a reload today: before the Atrium's stage 2) reads Empty
+the slot number stays 1 to 3
+and never below 1
+clearing a slot clears that slot only
+the Big Three's words leave out what the save doesn't hold
+Skip leaves the prologue for the identity screen
+name trimmed; identity continues to birth prompt
+birth prompt requires a choice
+batch 2: the chart path takes the date, the time and the place, works out the sun, moon and rising signs, and unlocks Continue (☉ Taurus · ☽ Taurus · ↑ Virgo)
+owner, Oct 10 (86bcgfkdv): Back steps from the place to the time, the date and the birth question, each answer kept to fix and its star gone out
+owner, Oct 23 (86bcgfkdv, B): the check is its own page after the place; Back from it reopens the place, and Yes works the chart out
+Build T: the atrium continues to the Atrium at Stage 1, the Chamber shut; the Zodiac Wing, then the Dial; no key insertion outside the chamber
+Build T: in the first lesson the Dial and the Zodiac Wing can be left and entered again, Stage 1 kept
+wing needs the key reveal once before continuing; once Key 1 shows, Continue (not the exit) carries the opening on
+chamber is the last screen
+one key fills one lock of three and ends the prototype once
+owner, Oct 15 (86bcg8nft): I'll skip it asks nothing; the player has the default chart (November 4, 1990, 7:19 PM, Bushwick, Brooklyn): sun Scorpio, and an exact moon and rising: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+Oct 7: the known path is retired: choosing it opens nothing
+Oct 7: the random sun is retired
+sun sign date table covers every boundary and rejects bad input
+sun sign picks the guided, second, and optional families
+wing entrance starts with a dormant Dial and Caspar silent (the owner cut the repeated Wing line, Sept 29)
+first continue starts the wake beat, no input asked
+Dial awake, Caspar reacts
+simulated hesitation is automatic
+disbelief follows the hesitation
+teaching names the player's sun sign and lights it
+rule names the sun sign's family members
+guided problem starts at the sun sign and shows the count once
+count beat is shown once
+sun sign cannot change after the intro begins
+Fire family done; Caspar hands over Water
+second family starts at its first sign
+a Leo player also ends at six lit seats with the amended line
+first wrong seal shows no count
+second wrong seal shows the count once
+screen reader labels say selected
+twelve sign-element items enter the deck as Introduced and are ready at the next check; glyph items wait
+a Level 0/1 lesson answer makes the item Practicing and starts its streak
+an assisted lesson answer stays Introduced
+an eligible review success moves one interval forward: 1 to 3 sittings
+a miss steps back one interval and one streak step
+a miss at the first interval stays at one sitting with streak floor zero
+the ladder caps at 30 sittings
+an assisted correct review neither advances nor sets back
+after the ending, Continue reaches the Hub in Stage 2 and the deck opens
+no in-game time: the first practice already has items ready; the entry is the first sitting and a batch of six begins
+review alternates compressed Dial and direct tap
+a compressed Dial review success advances its item
+a direct-tap miss gives one nudge and a retry
+a correct tap after a nudge counts as correct but not as eligible evidence
+a Dial miss moves on
+two tap misses reveal the element and move on
+six items finish the practice with a summary; back to the Dial, the room, the Hub
+the Wing can be entered from the Hub through its room and left back to it
+twelve lit seats and one more return complete v0.2
+a saved session resumes at the Hub with deck, sittings, and stage
+a save from before the Hub does not resume
+Unit 1.1 continues with the third family at Level 0
+third family done; the fourth begins on its own
+twelve seats lit, four families, no Key
+the continuation awards no second Key and logs wheel_completed
+restored progress skips the intro and can continue
+a compressed review starts framed on the item's sign
+a correct review Seal reports eligible success and returns home
+review ends back in the prior phase and another can begin
+first review miss nudges and allows a retry
+second review miss reveals the answer and moves on
+the placeholder glyph font carries all twelve zodiac symbols
+glyph unit begins after the wheel is lit, Part A first
+every glyph offers four distinct names including its own
+a correct first tap names the glyph at Level 0
+first miss nudges without naming
+a correct tap after one nudge is Level 1 evidence
+second miss reveals the name, no evidence, and moves on
+Part B starts with names hidden, Aries asked first with the wheel away from it, labels that do not leak names, and the seat-of-sign relationship
+sealing on the target places the glyph and counts as evidence
+first wrong Seal in Part B nudges
+second wrong Seal reveals the name on its seat and in its label
+a Level 2 placement counts for completion, not evidence
+third wrong Seal in Part B asks for a demonstration
+the demonstration places the glyph without evidence and moves to the next mark
+twelve placed with at least one Level 0/1 answer earns Key 2 once
+twelve assisted placements pause cleanly without Key 2
+the deck holds twelve element, glyph, modality, and grid items; the modality and grid items wait
+glyph evidence advances only the glyph item
+starting the glyph unit introduces twelve glyph items
+Key 2 earned: in hand, the Atrium waits for it to be spent (Build D)
+spent in the Chamber, the return completes v0.3 at Stage 4
+element items are due before glyph items in the practice order
+a save carries Keys, glyph stage, and glyph items
+glyph items practice in the glyph form
+a glyph review nudges once then accepts the name
+restored Key 2 does not reopen the glyph unit
+restored Part A progress resumes at the next mark
+the Atrium offers the Wing doorway, the Chamber doorway, the desk, and Caspar plus one sealed door; the Wing offers the doorway back, the table, the Dial, and the shelf
+entering a room places the marker at a point of interest
+sealed doors and points in other rooms are not walkable
+walking to the desk starts a leg facing left
+a straight-line walk at the fixed speed arrives after distance over speed
+walking to where the marker already stands arrives on the first tick
+the walk bob rises only while walking
+reduced motion jumps to the point of interest
+the test speed toggle cycles normal to fast
+then slow
+then normal again
+the Chamber ending leads to the Atrium with the marker where you came in
+a sealed door only says it is sealed
+approaching Caspar logs the approach
+the Wing doorway leads into the Wing room at its doorway
+the Dial opens from the room and closes back to it
+before the wheel is lit the shelf is dark and the book does not open
+with the wheel lit the book opens from the room and closes back to it; the Dial does not open from inside the book
+a lit wheel with no symbols named is ready for the book, not the wheel
+naming all twelve in the book hands the unit to the wheel
+leaving the Wing room places the marker at the Atrium's Wing doorway
+the desk only speaks (Build F); practice opens on the Dial
+leaving practice returns to the Dial; the room and the Atrium follow
+a resumed session starts at the Atrium entry
+Ask Caspar is not offered before a first miss
+after a first miss the player may ask Caspar
+asking gives the Level 2 rule reminder once, with the count, and is not a miss
+a correct answer after asking is assisted: no evidence
+a miss after the asked reminder goes to the worked example, not a second reminder
+no Ask Caspar in the guided problem, which already carries the rule
+in the symbols, asking reveals the name on its seat
+a placement after asking earns no evidence toward Key 2
+hard options are four distinct names that include the answer for every seat
+hard options include both same-element signs
+after Key 2 the book replays, in order the first time
+the replayed Part A hands to the wheel
+the first replay keeps the Aries anchor
+a clean replay counts once, hardens the next, and never re-earns Key 2
+the hard replay shuffles all twelve and still offers the answer
+the hard replay drops the Aries anchor from the first hint
+review names are the usual set before a clean run
+after a clean run the review names harden and still include the answer
+the clean-run count survives a save
+the review deck survives the JSON save and reload with its due count and practicing items
+every Part B problem starts the wheel at least two seats from the answer
+every third sign shares a modality: Aries cardinal, Taurus fixed, Gemini mutable, Cancer cardinal
+a problem can ask for three seats forward
+four forward is wrong on a three-step problem
+three forward is right
+after Key 2 the modality unit opens guided at the sun sign with the three-count and names the family
+the guided family completes and the next kind starts on the player's own
+Ask Caspar in the modality unit gives the three-step rule
+three families of four complete the unit with no new Key
+lit modality seats say their kind to the screen reader
+starting the unit introduces twelve modality items, ready at the next check
+modality items practice as a three-step Dial item or a which-kind tap
+a which-kind tap nudges once then accepts the kind
+the save carries the modality unit
+and the lesson restores it complete
+closing the book mid-practice abandons the pass and leaves Key 2 and the next unit reachable
+each element-modality cell holds exactly one sign: Leo in Fire fixed, Pisces in Water mutable, Capricorn in Earth cardinal
+the table opens on the intro line and logs the unit start
+a sign in hand, then a cell: the readout names both and nothing has been sealed
+before a miss the player may change the sign in hand; the cell clears
+a right cell at Level 0 seats the sign with evidence and logs the placement
+a seated sign and its cell are out of play
+a first miss nudges with the element, marks the cell, locks the sign in hand, and offers Ask Caspar
+a second miss states the rule: element and kind
+a Level 2 seating counts for the table, not as evidence
+a wrong column nudges with the kind
+asking Caspar gives the rule once and is not a miss
+a seating after asking earns no evidence
+a miss after the asked rule asks Caspar to seat it
+the demonstration seats the sign without evidence and the table stays open
+three wrong cells reach the demonstration
+the third demonstration in one sitting pauses the table (the cap)
+coming back resumes the table with its seated signs and a fresh cap
+the last sign has one empty cell left, so it seats at Level 0 by elimination
+twelve seated with at least one Level 0/1 seating earns Key 3 once
+a full table only shows itself; Key 3 is never re-earned
+a restored full table with Key 3 shows itself full
+a restored half table resumes with its seated signs
+before the modality unit is complete the table is dark: a note, no screen
+entering the Dial clears the dark-object note
+with the modality unit complete the table opens from the room and closes back to it
+starting the table introduces twelve sign → cell items as data: scheduled, never in a review batch
+grid evidence advances only the grid item
+two Keys, one in hand: the Atrium stays at Stage 3 until it is spent
+with only grid items ready, practice has nothing to ask, says so, and still counts the sitting
+Keys 2 and 3 spent fill Book 1 and take the Atrium to Stage 5
+the save carries the table, Key 3, Stage 5, and the grid items as data
+fire and air are Yang, earth and water Yin (owner, Sept 17): the polarity follows the element
+opposites sit six seats on, share kind and side, and differ in element; six pairs named by their lower seat
+three forward is wrong on an opposite problem
+six forward is right
+without Key 3 the last pattern waits
+with Key 3 the unit opens on the polarity beat
+the second line names the older terms and the seats say their side
+the first pair is guided from the sun sign with the six-count
+a correct opposite names what the pair shares and what differs
+the guided pair is known; the next pair starts on the player's own
+a first miss nudges and offers Ask Caspar
+Ask Caspar gives the six-seat rule with the count
+a pair found after asking counts, not as evidence
+a third miss asks for the worked example
+the worked example marks the pair without evidence and moves on
+three worked examples in one sitting pause the last pattern
+coming back resumes at the missing pair with a fresh cap
+six pairs complete the last pattern
+Continue opens the builder: element and kind given, four names with the two same-element signs and a same-kind one
+Build V: the Dial asks for the sign built from its parts, not Caspar
+a wrong name of the right element is nudged with its kind
+Build V: Caspar answers a wrong name; the Dial only poses the problem
+the right name after one nudge hands to the wheel
+the opposite found, the share step asks what the two have in common
+tapping the element is nudged once
+the kind is shared; one more to find
+the side too: the first sign is built unassisted (one nudge per step stays Level 1)
+the second sign: Libra, from Air and cardinal
+two wrong names reveal the sign and hand to the wheel, assisted
+a third wrong turn in the builder asks for the worked example
+the worked example on the wheel still reaches the share step
+two wrong taps reveal the rule; the second sign counts as assisted
+the third sign: Sagittarius, from Fire and mutable
+three signs built
+three built with one unassisted earns Key 4 once; the unit closes
+a restored unit with six pairs known opens straight on the builder (a Leo sun builds Leo first)
+three signs built with every name revealed earn no Key
+the next visit clears the builder for another try
+a restored half-known pattern resumes at the next pair with the sides shown
+a restored builder resumes at the third sign
+starting the last pattern introduces six opposite-pair items as data, never in a batch
+a pair answer from either seat advances the pair's one item
+three Keys, two in hand: the Atrium waits
+three Keys spent: Book 1 open, Book 2 begun, the Wing whole, Stage 6
+the save carries the last pattern, the builder's progress, Key 4, and Stage 6
+and the lesson restores it with Key 4 held
+the Chamber is a room with the doorway back and the Books; the Atrium's right door is its doorway
+after the opening one lock is filled and no Key is in hand
+the Chamber opens as a room; nothing accepts a Key the player does not have
+leaving the Chamber places the marker at its doorway; no stage without a Key spent
+Key 2 earned: in hand, the Atrium at Stage 3 until it is spent
+Key 2 fills the second lock; the Book stays shut; no second spend without a Key
+the return after spending takes the Atrium to Stage 4
+Key 3 fills the third lock and Book 1 opens
+Stage 5 on the return
+Key 4 fills Book 2's first lock: the Wing is whole, no second Book open
+Stage 6 on the return
+the save carries the Keys spent and the Books
+a save from before Build D keeps its stage and holds its Keys in hand
+Platform fit, Part 1: on Android a built-in-font line that spills its box shrinks up to two points (12 to 10); overflowing lines and other fonts are untouched; off Android nothing changes
+Platform fit, Part 2: a full-screen layer reaches the master's 600 x 920: a 1200 x 1840 file draws whole; a 720 x 1600 painting continues outward in a 3 x 3 grid; a band on the column's top grows up and sideways only
+Batch 2: the approved bleed masters are in: the Grand Atrium, the Zodiac Wing and the Crystal Book Chamber, and their light and grime layers, each a 1200 x 1840 master
+Batch 2: the Dial's final art is in: its room is a 1200 x 1840 master in the worn, today's and bright looks, its glow 720 x 1600 in each, the turning ring has its worn and bright looks at 720 x 720, and the Wing's small Dial has its bright pair and its new worn pair at their slots' size
+Batch 2: the button art is in at its slots' size, and each look builds as the board shows it: a see-through hit area; the plate's frame with its notch and diamond whole and the word engraved (EB Garamond, the board's gold, SEAL at 31); the arrow (Next mirrored, no word); the rule's two lines and diamond; the room's frame and small gold capitals; pressed darkens (x .78) and sinks 1 px; unavailable is half; targets 44 px or more
+the Dial's wake-up: five steps from three looks (worn, halfway, today's, halfway, bright), each Dial layer with its worn and bright slot at its own size, the Wing's small Dial with its bright pair
+253 art slots with unique kebab-case names (lower-case letters, digits after the first letter, hyphens), a rect, a size cap at or above the rect, and a place
+seven sound slots: step, seal, miss, key, page, door, ambient
+Build P: six poses of Caspar, each a 264 x 468 slot, and the chat box with its plate
+Build P: every page of the opening and the return has its pose (wry, warm, solemn, explain; moved, explain)
+Build R: the Chamber's introduction has a pose per page (explain, solemn, calm), and his two lines after the first Key are moved and warm
+Build X: the gold chat box fits its line: 22 above (just under the plate), 30 below (clear of the bottom diamond), 50 more for a Continue inside, at least 76, at most its old height
+Build R: the instrument box fits its line: at least 60, header and foot around the line, never past its old height
+Build S: a paged line keeps a 22 row for its Continue and shows at most three lines a page
+Build S: each element named in Caspar's line takes its own colour, whole words only
+?style asks for the style page on the Art folder
+?art=test plays with the test set
+?style=test is the style page on the test set, other parameters and the hash ignored
+a set name keeps letters, digits, and hyphens only
+no URL: the Art folder, no style page
+Build H: one light overlay slot per room, full-screen
+the overlay's alpha: nothing at Stage 1, a quarter at Stage 2, then half plus the arc of 21 Keys spent - about .6 with the Wing whole, full only at the last lock (owner, Sept 27)
+the shipped test set has a file for every slot and the loader finds each one
+sources on the test set read 'test set'
+an unknown slot loads nothing and reads placeholder or silent
+a PNG in the slot folder imports as a sprite: no mipmaps, never crunched, the slot's size cap
+a WAV in the slot folder imports as Vorbis: cues mono and decompressed on load, the loop compressed in memory
+the test set is under 1 MB on disk: 742 KB
+the Art folder is the default set; its files, if any, are the owner's
+cues follow the model: a detent or a pick is a step, a right answer a seal, a wrong one a miss
+a first miss in the book or the builder is a miss, the Count button is not; Keys 2 to 4 sound when earned, Key 1 when it rises; nothing else sounds
+the mute toggle silences the listener and back
+Stage 2: drawn rings and radial tap/drop targets have the same ordinal positions
+Stage 2: ten distinct glyphs, pace rings including shared Sun/Mercury/Venus ring
+Stage 2: approved atomic works
+Stage 2: modern four companies
+Stage 2: four distinct names including answer 0
+Stage 2: four distinct names including answer 1
+Stage 2: four distinct names including answer 2
+Stage 2: four distinct names including answer 3
+Stage 2: four distinct names including answer 4
+Stage 2: four distinct names including answer 5
+Stage 2: four distinct names including answer 6
+Stage 2: four distinct names including answer 7
+Stage 2: four distinct names including answer 8
+Stage 2: four distinct names including answer 9
+Stage 2: every confusable twin included
+Stage 2: bundled font draws planet 0
+Stage 2: bundled font draws planet 1
+Stage 2: bundled font draws planet 2
+Stage 2: bundled font draws planet 3
+Stage 2: bundled font draws planet 4
+Stage 2: bundled font draws planet 5
+Stage 2: bundled font draws planet 6
+Stage 2: bundled font draws planet 7
+Stage 2: bundled font draws planet 8
+Stage 2: bundled font draws planet 9
+Stage 2: bundled Garamond draws retrograde; no added font
+Stage 2: restore Wing checkpoint
+Stage 2: Wing whole gets the door scene before entry
+Stage 2: symbols begin
+Stage 2: naming seat 0
+Stage 2: naming seat 1
+Stage 2: naming seat 2
+Stage 2: naming seat 3
+Stage 2: naming seat 4
+Stage 2: naming seat 5
+Stage 2: naming seat 6
+Stage 2: naming seat 7
+Stage 2: naming seat 8
+Stage 2: naming seat 9
+Stage 2: ten names lead to work
+Stage 2: first work miss, level 1
+Stage 2: level 1 earns evidence
+Stage 2: second work miss, rule level 2
+Stage 2: miss after level 2 reveals sphere
+Stage 2: Level 3 reconstruction accepts only the shown sphere, no further missed encounters
+Stage 2: level 3 is not evidence
+Stage 2: eligible work earns Key 5
+Stage 2: spend Key 5 and open ring lesson
+Stage 2: correct ring 0
+Stage 2: correct ring 1
+Stage 2: correct ring 2
+Stage 2: correct ring 3
+Stage 2: correct ring 4
+Stage 2: correct ring 5
+Stage 2: correct ring 6
+Stage 2: correct ring 7
+Stage 2: correct ring 8
+Stage 2: correct ring 9
+Stage 2: retrograde recognition beat, exact copy
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: two individuality cards follow companies
+Stage 2: wrong card explains and reshuffles
+Stage 2: second card miss reveals
+Stage 2: wrong card explains and reshuffles
+Stage 2: second card miss reveals
+Stage 2: eligible ring placement earns Key 6
+Stage 2: lock 6 opens Book 2, end state
+Stage 2: restore Wing checkpoint
+Stage 2: Wing whole gets the door scene before entry
+Stage 2: symbols begin
+Stage 2: naming seat 0
+Stage 2: naming seat 1
+Stage 2: naming seat 2
+Stage 2: naming seat 3
+Stage 2: naming seat 4
+Stage 2: naming seat 5
+Stage 2: naming seat 6
+Stage 2: naming seat 7
+Stage 2: naming seat 8
+Stage 2: naming seat 9
+Stage 2: ten names lead to work
+Stage 2: work seat 0
+Stage 2: work seat 1
+Stage 2: work seat 2
+Stage 2: work seat 3
+Stage 2: work seat 4
+Stage 2: work seat 5
+Stage 2: work seat 6
+Stage 2: work seat 7
+Stage 2: work seat 8
+Stage 2: work seat 9
+Stage 2: all assisted pauses without Key 5
+Stage 2: work seat 0
+Stage 2: work seat 1
+Stage 2: work seat 2
+Stage 2: work seat 3
+Stage 2: work seat 4
+Stage 2: work seat 5
+Stage 2: work seat 6
+Stage 2: work seat 7
+Stage 2: work seat 8
+Stage 2: work seat 9
+Stage 2: replay Part B earns permanent Key 5
+Stage 2: spend Key 5 and open ring lesson
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: first ring miss nudges
+Stage 2: second ring miss gives rule
+Stage 2: third miss seats sphere, two reappearances maximum
+Stage 2: retrograde recognition beat, exact copy
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: first company miss nudges
+Stage 2: second company miss reveals without evidence
+Stage 2: two individuality cards follow companies
+Stage 2: wrong card explains and reshuffles
+Stage 2: second card miss reveals
+Stage 2: wrong card explains and reshuffles
+Stage 2: second card miss reveals
+Stage 2: all assisted rings pause without Key 6
+Stage 2: DEV key5 through real model calls, JSON roundtrip
+Stage 2: DEV key6 through real model calls, JSON roundtrip
+Stage 2: DEV obswhole through real model calls, JSON roundtrip
+Stage 2: v5 key2 keeps every Wing item and waits for door scene
+Stage 2: v5 whole keeps every Wing item and waits for door scene
+Stage 2: PlanetGlyph uses only the Dial's existing sitting fork
+Stage 2: independent PlanetGlyph review records eligible evidence, Keys unchanged
+Stage 2: PlanetFunction uses only the Dial's existing sitting fork
+Stage 2: independent PlanetFunction review records eligible evidence, Keys unchanged
+Stage 2: PlanetCompany uses only the Dial's existing sitting fork
+Stage 2: independent PlanetCompany review records eligible evidence, Keys unchanged
+Stage 2: old Practice questions default to no planet glyph
+Stage 2: two new Practice concepts, twelve exact questions
+Stage 2: complete ask/why and Next fit new Practice page: Which planet's work is to feel?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which planet's work is to feel?
+Stage 2: complete ask/why and Next fit new Practice page: Whose symbol is this?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Whose symbol is this?
+Stage 2: complete ask/why and Next fit new Practice page: Whose symbol is this?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Whose symbol is this?
+Stage 2: complete ask/why and Next fit new Practice page: Which planet's work is to structure?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which planet's work is to structure?
+Stage 2: complete ask/why and Next fit new Practice page: Do the planets make things happen to us?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Do the planets make things happen to us?
+Stage 2: complete ask/why and Next fit new Practice page: Mercury is retrograde. What is going on?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Mercury is retrograde. What is going on?
+Stage 2: complete ask/why and Next fit new Practice page: Which of these crosses a sign fastest?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which of these crosses a sign fastest?
+Stage 2: complete ask/why and Next fit new Practice page: Saturn. Which company is it in?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Saturn. Which company is it in?
+Stage 2: complete ask/why and Next fit new Practice page: The four companies (the lights, personal, social, outer) are what?
+Stage 2: wrapped choices fit 44px frame at minimum11px: The four companies (the lights, personal, social, outer) are what?
+Stage 2: complete ask/why and Next fit new Practice page: Why does a Pluto sign alone say little about one person?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Why does a Pluto sign alone say little about one person?
+Stage 2: complete ask/why and Next fit new Practice page: Two children are born a week apart. Which is most likely to differ between them?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Two children are born a week apart. Which is most likely to differ between them?
+Stage 2: complete ask/why and Next fit new Practice page: Someone says Pluto is their sign's hidden self. What's the trouble with that?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Someone says Pluto is their sign's hidden self. What's the trouble with that?
+Stage 2: complete ask/why and Next fit new Practice page: Which sign does the Moon rule?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which sign does the Moon rule?
+Stage 2: complete ask/why and Next fit new Practice page: Which two signs does Mercury rule?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which two signs does Mercury rule?
+Stage 2: complete ask/why and Next fit new Practice page: Which two signs does Venus rule?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which two signs does Venus rule?
+Stage 2: complete ask/why and Next fit new Practice page: Which planet traditionally rules Scorpio?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which planet traditionally rules Scorpio?
+Stage 2: complete ask/why and Next fit new Practice page: Does rulership say a planet is always in its ruled sign?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Does rulership say a planet is always in its ruled sign?
+Stage 2: complete ask/why and Next fit new Practice page: What comes after the lights in the traditional wheel?
+Stage 2: wrapped choices fit 44px frame at minimum11px: What comes after the lights in the traditional wheel?
+Stage 2: complete ask/why and Next fit new Practice page: Where is the Sun in detriment?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Where is the Sun in detriment?
+Stage 2: complete ask/why and Next fit new Practice page: Which are Mercury's detriment signs?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which are Mercury's detriment signs?
+Stage 2: complete ask/why and Next fit new Practice page: Which planet is Aquarius's modern ruler?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which planet is Aquarius's modern ruler?
+Stage 2: complete ask/why and Next fit new Practice page: Which planet is Pisces' modern ruler?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which planet is Pisces' modern ruler?
+Stage 2: complete ask/why and Next fit new Practice page: Has modern rulership made traditional rulership obsolete?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Has modern rulership made traditional rulership obsolete?
+Stage 2: complete ask/why and Next fit new Practice page: Which statement keeps Scorpio's two rulerships clear?
+Stage 2: wrapped choices fit 44px frame at minimum11px: Which statement keeps Scorpio's two rulerships clear?
+Stage 2: seven concept rows fit the page
+Corridor: complete canon traditional rulership table
+Corridor: three modern rulers, no replacement of traditional rulers
+Corridor: detriment equals opposite of ruled signs for Moon
+Corridor: detriment equals opposite of ruled signs for Sun
+Corridor: detriment equals opposite of ruled signs for Mercury
+Corridor: detriment equals opposite of ruled signs for Venus
+Corridor: detriment equals opposite of ruled signs for Mars
+Corridor: detriment equals opposite of ruled signs for Jupiter
+Corridor: detriment equals opposite of ruled signs for Saturn
+Corridor: restore six spent Keys
+Corridor: back arch opens only after Key 6 spent
+Corridor: traditional wheel begins
+Corridor: place traditional sign 3
+Corridor: place traditional sign 4
+Corridor: place traditional sign 2
+Corridor: place traditional sign 5
+Corridor: place traditional sign 1
+Corridor: place traditional sign 6
+Corridor: place traditional sign 0
+Corridor: place traditional sign 7
+Corridor: place traditional sign 8
+Corridor: place traditional sign 11
+Corridor: place traditional sign 9
+Corridor: place traditional sign 10
+Corridor: independent placements earn Key 7
+Corridor: Key 7 spends into Book 3 first lock
+Corridor: modern ruler beside traditional 10
+Corridor: modern ruler beside traditional 11
+Corridor: modern ruler beside traditional 7
+Corridor: detriment uses a traditional ruled sign 0
+Corridor: detriment Seal 0
+Corridor: detriment uses a traditional ruled sign 1
+Corridor: detriment Seal 1
+Corridor: detriment uses a traditional ruled sign 2
+Corridor: detriment Seal 2
+Corridor: detriment uses a traditional ruled sign 3
+Corridor: detriment Seal 3
+Corridor: detriment uses a traditional ruled sign 4
+Corridor: detriment Seal 4
+Corridor: detriment uses a traditional ruled sign 5
+Corridor: detriment Seal 5
+Corridor: four distinct ruler explanations
+Corridor: four distinct ruler explanations
+Corridor: four distinct ruler explanations
+Corridor: independent detriment earns Key 8
+Corridor: lock 8, lower Observatory lit, Book 3 remains sealed
+Corridor: restore six spent Keys
+Corridor: back arch opens only after Key 6 spent
+Corridor: traditional wheel begins
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: first placement miss nudges
+Corridor: second placement miss gives rule
+Corridor: third placement miss places token, two reappearances
+Corridor: reveals never award Key 7
+Corridor: traditional wheel begins
+Corridor: place traditional sign 3
+Corridor: place traditional sign 4
+Corridor: place traditional sign 2
+Corridor: place traditional sign 5
+Corridor: place traditional sign 1
+Corridor: place traditional sign 6
+Corridor: place traditional sign 0
+Corridor: place traditional sign 7
+Corridor: place traditional sign 8
+Corridor: place traditional sign 11
+Corridor: place traditional sign 9
+Corridor: place traditional sign 10
+Corridor: replay independent work earns Key 7
+Corridor: Key 7 spends into Book 3 first lock
+Corridor: modern ruler beside traditional 10
+Corridor: modern ruler beside traditional 11
+Corridor: modern ruler beside traditional 7
+Corridor: detriment uses a traditional ruled sign 0
+Corridor: detriment Seal 0
+Corridor: detriment uses a traditional ruled sign 1
+Corridor: detriment Seal 1
+Corridor: detriment uses a traditional ruled sign 2
+Corridor: detriment Seal 2
+Corridor: detriment uses a traditional ruled sign 3
+Corridor: detriment Seal 3
+Corridor: detriment uses a traditional ruled sign 4
+Corridor: detriment Seal 4
+Corridor: detriment uses a traditional ruled sign 5
+Corridor: detriment Seal 5
+Corridor: four distinct ruler explanations
+Corridor: four distinct ruler explanations
+Corridor: four distinct ruler explanations
+Corridor: level 2 detriments never award Key 8
+Corridor: replay detriments can earn permanent Key 8
+Corridor: restore six spent Keys
+Corridor: back arch opens only after Key 6 spent
+Corridor: traditional wheel begins
+Corridor: place traditional sign 3
+Corridor: place traditional sign 4
+Corridor: place traditional sign 2
+Corridor: place traditional sign 5
+Corridor: place traditional sign 1
+Corridor: place traditional sign 6
+Corridor: place traditional sign 0
+Corridor: place traditional sign 7
+Corridor: place traditional sign 8
+Corridor: place traditional sign 11
+Corridor: place traditional sign 9
+Corridor: place traditional sign 10
+Corridor: first detriment miss gives level 1
+Corridor: second detriment miss gives level 2
+Corridor: third detriment miss reveals reconstruction
+Corridor: revealed detriment has no further wrong attempts
+Corridor: reconstruction is never evidence
+Corridor: DEV key7 uses real model calls and JSON roundtrip
+Corridor: sign journal rulers unlocked at Key 7
+Corridor: DEV key8 uses real model calls and JSON roundtrip
+Corridor: sign journal rulers unlocked at Key 7
+Corridor: v6 migration retains every existing deck item, chart and Observatory field
+Corridor: ruler cards use existing practice sitting
+Corridor: ruler review records independent evidence
+Corridor: ruler cards use existing practice sitting
+Corridor: ruler review records independent evidence
+Corridor: two six-question Practice concepts with explanations
+committed checkpoint restores its flow
+Part A answer 1 checkpoints the next card and deck evidence
+committed checkpoint restores its flow
+Part A answer 2 checkpoints the next card and deck evidence
+committed checkpoint restores its flow
+Part A answer 3 checkpoints the next card and deck evidence
+committed checkpoint restores its flow
+Part A answer 4 checkpoints the next card and deck evidence
+committed checkpoint restores its flow
+Part A answer 5 checkpoints the next card and deck evidence
+committed checkpoint restores its flow
+the last naming answer restores directly into Part B without repeating cards
+committed checkpoint restores its flow
+Part B answer 1 restores placed symbols, next target, and deck evidence
+committed checkpoint restores its flow
+Part B answer 2 restores placed symbols, next target, and deck evidence
+committed checkpoint restores its flow
+Part B answer 3 restores placed symbols, next target, and deck evidence
+committed checkpoint restores its flow
+Part B answer 4 restores placed symbols, next target, and deck evidence
+committed checkpoint restores its flow
+Part B answer 5 restores placed symbols, next target, and deck evidence
+committed checkpoint restores its flow
+element answer 1 restores lit seats, family completion, and deck evidence
+committed checkpoint restores its flow
+element answer 2 restores lit seats, family completion, and deck evidence
+committed checkpoint restores its flow
+element answer 3 restores lit seats, family completion, and deck evidence
+committed checkpoint restores its flow
+element answer 4 restores lit seats, family completion, and deck evidence
+committed checkpoint restores its flow
+modality answer 1 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 2 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 3 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 4 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 5 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 6 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 7 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 8 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+modality answer 9 restores seats, families, and eligible evidence
+committed checkpoint restores its flow
+opposite answer 1 restores the known pair and eligible evidence
+committed checkpoint restores its flow
+opposite answer 2 restores the known pair and eligible evidence
+committed checkpoint restores its flow
+opposite answer 3 restores the known pair and eligible evidence
+committed checkpoint restores its flow
+opposite answer 4 restores the known pair and eligible evidence
+committed checkpoint restores its flow
+opposite answer 5 restores the known pair and eligible evidence
+committed checkpoint restores its flow
+opposite answer 6 restores the known pair and eligible evidence
+committed checkpoint restores its flow
+builder sign 1 restores its committed count and evidence
+committed checkpoint restores its flow
+builder sign 2 restores its committed count and evidence
+committed checkpoint restores its flow
+builder sign 3 restores its committed count and evidence
+committed checkpoint restores its flow
+the final builder transition checkpoints Key 4 before presentation polling
+table seating 1 restores placement and deck evidence
+table seating 2 restores placement and deck evidence
+table seating 3 restores placement and deck evidence
+table seating 4 restores placement and deck evidence
+table seating 5 restores placement and deck evidence
+table seating 6 restores placement and deck evidence
+table seating 7 restores placement and deck evidence
+table seating 8 restores placement and deck evidence
+table seating 9 restores placement and deck evidence
+table seating 10 restores placement and deck evidence
+table seating 11 restores placement and deck evidence
+table seating 12 restores placement and deck evidence
+the final seating checkpoints Key 3 before presentation polling
+the first Key reveal immediately records one earned Key
+symbol Part A leaves every element item untouched
+Build I: the symbol challenge names its target on the wheel, fixed while the wheel turns, and Caspar does not pose it
+symbol placement 1 is a correct wheel answer
+symbol placement 2 is a correct wheel answer
+symbol placement 3 is a correct wheel answer
+symbol placement 4 is a correct wheel answer
+symbol placement 5 is a correct wheel answer
+symbol placement 6 is a correct wheel answer
+symbol placement 7 is a correct wheel answer
+symbol placement 8 is a correct wheel answer
+symbol placement 9 is a correct wheel answer
+symbol placement 10 is a correct wheel answer
+symbol placement 11 is a correct wheel answer
+symbol placement 12 is a correct wheel answer
+symbol Part B (twelve answer_correct events on the wheel) leaves every element, modality, grid, and opposite item untouched
+symbol answers advance all twelve symbol items
+element-family answers leave every symbol, modality, grid, and opposite item untouched
+independent element answers advance element items
+Build I: the modality challenge is the wheel's own line
+modality answers move only modality items
+opposite and builder answers move only the six pair items
+table seatings move only grid items
+a compressed Dial review answer records no lesson evidence of any kind
+on the first visit nothing has entered the deck: no fork, no journal
+a unit begun and not complete is in progress after a reload (Part B mid-way, a modality family mid-way); a lit wheel or a finished unit is not, so the fork can show
+at the Hub the journal is in hand; practice waits for the Dial
+practice is offered on the Dial, not in the room
+entering practice counts one sitting and asks up to six due items
+leaving at once keeps every item due at the same sitting
+re-entering counts another sitting
+two answered move up the ladder; leaving early leaves the other ten due now
+with nothing due the entry still counts a sitting and Caspar says so
+fresh strikes on every entry
+the third wrong answer across the practice, on any form, gates the instrument
+the gate closes the instrument into the room, journal offered, nobody locked out
+re-entry is immediate with three fresh strikes and a new sitting
+before the symbols the journal has the Element tab only, and the twelve signs met
+the journal opens from the room (its first-ever open, the title page, then the landing); Contents leads to the Wheel
+Cancer's symbol, answered in the lesson, is on its page and its seat is no longer only met; back to the Wheel
+reading the journal changes no deck field; closing returns to the room and clears the gate note
+the journal opens from the Atrium and the Chamber too
+the table and the opposites show in the journal as data: the Table view, the Polarity and Opposites tabs (the modalities were skipped here, so no Modality tab)
+the desk is dressing: it only speaks
+the save carries the sitting count both ways (version 7)
+an older save's completed batches count as sittings
+liveness: thirty entries, twelve items answered correctly every time; every item reaches the last interval, the clock ticks on every entry, and the empty entries never stall it
+the audit's stall: with every item scheduled ahead, the empty entry still moves the clock and the next entry finds the first six due again
+batch 2: the journal's first-ever open is the title page, then the landing; the Wheel is a chapter, reached through Contents
+Build AA: the Wheel: the twelve signs met, the Element tab only, no Table yet, nothing framed
+nothing not yet learned can be switched on; no seat past the twelfth; no page to turn on the Wheel
+a tap frames Leo; its preview reads only what is learned: Fire
+the preview opens Leo's page: its element and the two signs that share it (Aries, Sagittarius); no link for what is not learned
+a link opens Aries' page; pages turn in zodiac order; Back to the Wheel frames the sign last read
+the journal closes back to the Atrium
+a page grows as the player learns: Libra's modality, polarity and opposite (its pair's item), its symbol
+at the Wing's end the Table and all four tabs are there (the journal reopens where it was left, the Wheel, in the same session)
+the switch and the tabs change the view, each once
+Libra's links: the other Air signs, the other Cardinal signs, its opposite; Caspar's words for the polarities (worksheet section 12); what a pair shares
+the seats: Aries at 9 o'clock on the wheel; on the Table, Leo at Fire and Fixed, Capricorn at Earth and Cardinal, Pisces at Water and Mutable
+no two seats' 46 px tap targets overlap, on the wheel or the Table
+closed
+no journal string carries a state word (the play fixture reads the screen itself)
+Illumination: an introduced sign is line art at about a third of its ink, no colour, a silver ring (met); its ribbon is at its shortest
+a first streak brings the colour to 40% at full ink, a gold ring (practising)
+70% at a streak of two
+full colour at three and on: the gold-leaf ring (mastered), today's gilt edge
+due for practice, the colour fades a little; the gold stays
+Ribbons: Leo's is three rungs long and pulled out (due for practice); Virgo's is not pulled out
+the table and the opposites are data only (never asked in practice), so they never pull a ribbon out or lengthen it
+using every part of the journal changes no deck field
+Build AA's slots: the page, cover, ribbon, the wheel and the two seat rings, a 200 × 200 picture per sign; the contents page and the fact plate retired
+the Illumination shader is under Resources, so the Web build carries it, and clips a seat's picture round itself (_Round): a UI Mask would draw a copy of the material and freeze its colour
+no journal picture sits under a UI Mask (Illumination's live values would not reach the screen); the only Mask is the launch movie's radial sweep on its two pencil layers (round 4)
+the journal's titles have their blackletter font (UnifrakturMaguntia) under Resources with its license, carrying every letter of the 17 titles
+every plain-font string the journal adds is Latin-1, so the Web player's built-in font draws it
+the owner's mixed strength: resting and teaching at level A (lines 34%, glow 10%, stars 55%; the taught triangle 70%, glow 55%, bloom 20%; its seats 80%), the flame payoff at level B (88%); dust 65% of resting on the worn Dial
+the light's shader (a screen blend: nothing under a line darkens) ships under Resources and compiles
+each triangle joins its own family's three seats (Fire: Aries, Leo, Sagittarius; Earth, Air and Water the same)
+a curved word's box is tested on its own arc: the ribbon's bend undone exactly
+the taught triangle follows the lesson for a Taurus player: Earth while it is guided, none between, Fire, none at Key 1, then Air and Water in the continuation; the payoff fires once, as the whole wheel lights (1, 1, -1, 0, 0, -1, 2, 3, -1)
+a save already past it never plays the payoff again, and teaches no family
+1e A: the journal's first-ever open shows the title page, and nothing on it leads anywhere; it counts as shown only once it lands (#128 N6)
+closed (or quit) during the title page, the next open shows the title page again, then the Oct 2 line, so it is never lost (Jeffrey, #128 N6; #131 N5)
+its beat ends on the landing: the Contents door opens, and the Practice door opens Practice (owner, Oct 3), with no count (its line, a draft: "What you know")
+Contents, and ‹ Your Journal back to the landing
+a row per chapter (the Wheel, the Library Map; a Sealed row opens nothing); each chapter links back to Contents
+a sign's page goes back to the Wheel, as before, not to Contents
+1b C: later in the same session the journal opens where it was left
+the inscription is the owner's line word for word (Oct 2 evening), the saved name in its slot
+the inscription's own line breaks keep its words exactly: "I'm your journal, and I'll keep a record" / "of what you learn from the Library."
+a new session from the save: the first open is the landing; the title page never shows again
+a save from before this build shows the title page once
+EB Garamond Italic ships under Resources and carries every script line; EB Garamond Bold carries the upright ones, ‹ included
+Noto Sans Symbols 2 ships with the sun (U+2609) for the Keeper's record; each font has its SIL Open Font License beside it
+both new fonts are static, with no variation table (a variable font drew blank on the Web on Sept 12)
+the landing's, Contents' and the Library Map's eight files are in: the door frame and the plan at 2x their boxes, the emblems and the flourish at 3x
+the links' 44 px target ends above the Wheel / Table switch, the switch above the tabs, the tabs above the wheel
+with KEEPER, the Big Three and three lines of inscription (no Keys line since Oct 11, 86bcgfkdy), the Contents door ends at 526, clear of the page's lower ornaments and of Close the journal
+the inscription's 23 lines live in data (Resources/Journal/inscriptions.json), each with a stable id and marked a draft: 8 any time,  3 after the first Key, 3 once the Wing is whole, 3 for an absence, 6 on the sun
+each group opens with its lesson: the Key lines at Key 1, the Wing's once it is whole; the sun lines with the Elements, the Symbols, the Modalities, the Table and the Opposites, and one any time (Practice's order)
+nothing on screen counts: no inscription line has a digit, so no number, date or "since" (Oct 7, no clock)
+every line fills in the name and the sun's element, modality and opposite for all twelve signs, and draws in EB Garamond Italic
+every line takes three lines at most at 244 px, for Davon and for Keeper and every sun (the tallest takes 3), so the doors stay where #110 put them
+with a 24-character name every group keeps lines; those that would take a fourth line sit out for that name (none)
+the ink: each letter fades over 0.15 s, 35 ms apart, with a rest at a comma or a full stop; a line takes 2.0 to 3.5 s, starting 0.3 s after the landing
+the first-ever open: the line stays blank under the title page, then the Oct 2 line, word for word, as the journal's first words; it is never counted among the recent lines
+the save keeps only the last five lines' ids and the Keys, the sittings and the Wing at the last landing; no date
+the next visit lands on a line from the groups unlocked so far (any-every-page), never the Oct 2 line again
+a line holds for the whole visit: back from Contents, or the journal closed and opened again, shows the same line
+over thirty visits it never repeats one of the last five lines; at one Key only the Key lines, the any-time lines and the Elements' and any-time sun lines come round (13 different)
+a group that has just unlocked goes first: a Key line after the Key count rises, the Wing's line once it turns whole (the later milestone, when both happened)
+after 3 sittings or more since the last landing an absence line leads (a working choice for "a few"); after 2 it does not; a just-unlocked line takes the slot first
+absence lines are never drawn otherwise: twenty visits with no sittings between show none
+a save from before this build announces nothing on its first landing (no absence, no Key line first: any key); today's Keys and sittings become the starting point
+a save with no inscription fields reads as no landing yet
+an older save with no sun (a #123 declined sun) never gets a sun line
+a line the record can't fit in three lines for this name sits out of this player's pool
+with no saved name the line says Keeper
+a name goes in last, as typed, so it never pulls in the sun's words (Jeffrey, #128 N1)
+the tap that finishes the line ends at 682, above Close the journal (Jeffrey, #128 B1)
+the 18 come-alive slots are in the manifest and every one has its file: the Book's room and its ink ribbon, the Table's top, the well, the plate, the shut tray, and an emblem for each of the twelve signs
+the gold plate and the four letter fills are retired, from the manifest and the Art folder (owner, Oct 16, board 3 A)
+an emblem per sign, square, named for its sign (emblem-aries ... emblem-pisces)
+a sign placed on the player's own is lit gold inlay with a soft light behind it; one placed with Caspar's help is the same gold, dull and unlit (owner, Oct 16, board 3 A)
+the frame's names are inlaid gold, the tray's plates are engraved in muted gold, and the tray slides shut in under a second (owner, Oct 16, board 5 A)
+the retired letter fills' shader is gone from Resources, so the Web build no longer carries it (owner, Oct 16, Revision 3)
+the Book's ink: twelve places on the open LEFT page only, scattered and clear of each other, and a sign's place is not its wheel order (owner, Oct 7, 2A; owner, Oct 17, Concept 1)
+a symbol learned alone inks fully, one shown with help faintly (1A); a question rises from the pages to its place
+a dragged glyph's answer logs Drag, as the Table's drag does (owner, Oct 7: drag and tap; the Quill Line, owner, Oct 17)
+a dragged plate's well logs Drag and a tap logs DirectCell; the drag grades the same (owner, Oct 7: drag and tap)
+Practice's data (Resources/Practice/questions.json): the Elements, the Symbols, the Modalities, the Elemental Table and the Opposites, each with its name, its line on the list, the lesson that unlocks it and the line that ends its round
+an answer is followed by "That's it." or "Not quite.", then its why (the board's drafts)
+six questions a concept, 30 in all: each with an ask, two to four different choices, the right one among them, and its why
+only the Symbols draw a sign's symbol above a question
+the right answers agree with the game's own data: 28 of 30 questions checked against the signs' elements, modalities, polarities, opposites and symbols; read by hand: Which modality begins each season? | Which modality holds steady and does not waver?
+at Key 1 the Practice door opens the list: the Elements only; ‹ Your Journal leads back
+a concept's row starts its round: question 1 of 6, waiting for a pick (no row past the list)
+each answer is marked once: right reads "That's it." and a wrong pick "Not quite.", each with its why; the choices are the question's own, the right one where the game says
+the round asks each of the six once, then ends with the journal's line: "That's all I have on the elements for now. Come back whenever you like."
+Back to Practice returns to the list, and ‹ Your Journal to the landing
+practising changes nothing in the save or the deck: no score, no streak, no spaced review
+each round comes in a fresh order, the choices shuffled (4 different openings in 4 rounds)
+‹ Practice leaves a round at any time; the next round starts afresh
+the list grows as each lesson finishes: the Symbols at Key 2, the Modalities with their lesson, the Table at Key 3, the Opposites at Key 4 (2, 3, 4, 5)
+before the first lesson finishes, nothing is listed and the door is unavailable
+every line of Practice's copy draws in the journal's fonts (the italic for the asks, the whys and the lines; EB Garamond Bold for the names and the choices)
+the list's names and lines fit their 210 px (widest 184 and 195), and every choice its frame (widest 122 of 178)
+every ask takes two lines or fewer, every why three, every round's end three; the tallest question ("Which sign does this symbol belong to?") ends its Next at 595, inside the page's border (595), its choices 47 apart at the closest
+five rows end at 538, above the page's lower ornaments; the rows, the choices and Next take 44 px or more
+Meeus 25.b: the sun on 1992 Oct 13.0 TD with VSOP87 (higher accuracy): R 0.99760775 and 199.90606° (199.906094)
+Meeus 47.a: the moon's sixty terms sum to -1127527 and put it at 133.162655° on 1992 Apr 12, 0h TD
+Meeus 12.a and 12.b: sidereal time on 1987 Apr 10 at 0h and 19:21 UT
+against JPL Horizons at twelve moments from 1901 to 2026: the sun within 0.0001°, the moon within 0.0022° (the 2008 equinox included)
+the rising sign's formula agrees with a search of the eastern horizon to 0.005°, from 45° S to 60° N
+the bundled list: 34,152 places of 15,000 people or more (GeoNames), each with its place and one of 356 time zones
+a search finds the biggest place first, with or without its accents: Portland, OR, United States; São Paulo, Brazil; New York City, NY, United States
+a birth's local time becomes UT with the clocks of its year, as Python's zoneinfo has them: 21 cases, a skipped hour, a repeated one, Berlin's 1945 double summer time, Kathmandu's +5:45 and Caracas's -4:30 included
+a published chart comes out right: Honolulu, Aug 4 1961 at 19:24, Leo sun, Gemini moon, Aquarius rising
+with no birth time (owner, A) the rising sign is unknown, and the moon is not worked out on a day it changed sign: London, May 2 1990 keeps a Leo moon; May 1 runs Cancer to Leo
+a cusp day: London, Apr 20 1990, the sun entered Taurus at 08:27 UT (JPL Horizons' minute), 9:27 am on London's summer clock
+owner, Oct 16: a cusp day with no time (Apr 20 1990) gives the whole default chart, with no question and none of the player's date kept: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+the save keeps the whole default apart from the facts, both ways (the mark, shown nowhere)
+DEV Mode's cusp-day sample is still a cusp day (London, Apr 20 1990, no birth time) for the older-save question
+DEV Mode's sample chart (owner, Oct 2 evening) is a real chart for each sun sign: a 1990 birth mid-sign, at noon in London
+DEV Mode's Jump to... carries the sample chart in its save, the player's sun sign kept
+the save keeps the chart with the birth data it came from, and reads it back without working it out again: ☉ Taurus · ☽ Taurus · ↑ Virgo
+a save from before this build shows the sun only (owner, A): ☉ Taurus · ☽ unknown · ↑ unknown
+no birth time (owner, Oct 16): the whole default chart stands, never a mix, and the note says why: Your sun sign is Scorpio, your moon sign Gemini, and your rising sign Gemini. You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. A personal chart needs your date, time and place. You can add all three in your journal later.
+the day's two moons are kept: London, May 1 1990 runs from Cancer into Leo; May 2 holds Leo all day; a known time works out one moon
+owner, Oct 16: a day the moon changed sign is not asked once all three are given; the time settles it: ☉ Taurus · ☽ Leo · ↑ Virgo
+owner, Oct 3: an older save's moon that changed sign that day shows both, as before: ☉ Taurus · ☽ Cancer or Leo · ↑ unknown
+the save keeps both moons and reads them back; a version 4 save from before #116 is converted once and its chart worked out again from its facts (Oct 7), so its moon now shows both signs
+owner, Oct 7: the longest three-option moon ("☉ Sagittarius · ☽ Sagittarius, Capricorn or Aquarius · ↑ unknown", 312 px at 11) fits inside the page's border at its own 9 px floor: 272 px of 274
+the longest such line ("☉ Sagittarius · ☽ Sagittarius or Capricorn · ↑ unknown", 386 px at 17) fits the page's calm column at 11 px (269 of 274); this one is 296 px at 17
+the Big Three's glyphs: ☉ in Noto Sans Symbols 2, ☽ in the zodiac font's set (with the twelve signs), ↑ in EB Garamond
+the bundled zones run from UTC-11.5 to UTC+14: a birth with no place could be in any of them
+an exact time and a place: every point exact, one degree each
+a time with no place: no rising (never invented), the sun stable in Taurus across every zone, the moon's options include London's (Scorpio or Sagittarius)
+no time: the whole local day; no time and no place: the day in every zone, a wider window that keeps every sign the narrower one could be; no date: nothing worked out at all
+an uncertain point reads as its options, "or" before the last
+owner, Oct 16: I don't know where gives the whole default chart (Bushwick, 7:19 PM, November 4 1990), not the player's date and time with a default place: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+version 5 keeps the facts, the default pieces and the chart apart (owner, Oct 16: all three given, so no default piece), writes the flat copies, and reads the record back: ☉ Taurus · ☽ Aquarius · ↑ Virgo
+a version 4 known-path save keeps its signs as the player's choices, entered: ☉ Leo · ☽ Scorpio · ↑ unknown
+the random sun's save keeps its sun, tagged assigned; a save from before #110, legacy
+a version 4 chart-path save moves its facts over and works the chart out again; the cusp's pick stays a choice: ☉ Taurus · ☽ Aquarius or Pisces · ↑ unknown
+where the saved sign and the maths disagree, the saved sign wins (Oct 3: never change data already calculated)
+a version 5 save restores (skip)
+86bcg8nft (4A): the skip path's drawn pieces survive the save; "Your Birth" still reads unknown with Add (the facts hold none), and the Big Three shows like any other: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+Add my birth time with no birthday asks the day first, with the journal's line; going back changes nothing
+Add: the opening's boxes for whatever is missing, in order (open call 2), then back to the page
+86bcg8nft (5A): the real details replace the drawn ones and the chart follows, a line for each sign that changed: Your rising is Virgo. / Your moon is Taurus. / Your sun is Taurus. / Everything you've learned stays as it is.
+nothing played changes: the Keys, the sittings and every deck item are as they were; with every fact in, Add and the rising choice are gone
+an older skip-path save restores
+an older save keeps its three picks (owner, Oct 7: "Leave them"); Change my rising still works there, with "Leo it is."
+a version 5 save restores (chart)
+a time unknown gives the default chart (Scorpio); a real day, 8 am and London (before the 9:27 change) replace it with an Aries sun and a worked-out rising: Your moon is Aquarius. / Your sun is Aries. / Everything you've learned stays as it is.
+a version 5 save restores (skip)
+going back before the steps finish leaves the record as it was: Scorpio, the default pieces kept, no facts
+a real day with the time unknown, on "Your Birth", changes nothing: the default chart stays whole and the page says a personal chart needs all three: Your chart stays as it is. A personal chart needs your date, time and place.
+a version 5 save restores (chart)
+the moon from the default chart gives way to the Leo the real birth time works out (5A): Your rising is Virgo. / Your moon is Leo. / Your sun is Taurus. / Everything you've learned stays as it is.
+a version 5 save restores (chart)
+a time with no place: the whole default stands, and Add asks all three again
+a #123 save with a declined sun still reads: no sun, the lessons from Aries, the record as it was
+an older save with an "or" moon and no rising: an Add answered "I don't know" changes nothing and says why (owner, Oct 16: all three or the default)
+the same Add, answered with the time (the date and the place were already given): all three are in, the moon and rising are worked out, and no unknown is left: Your rising is Virgo. / Your moon is Aquarius. / Everything you've learned stays as it is.
+with no sun, Caspar names Aries as the starting sign: We shall start from Aries, the first sign on the wheel. Aries is a Fire sign.
+In your world, the sun sign is the one most people know. Your birthday would tell us yours, and your journal keeps a place for it.
+a sun that arrives later is the start for lessons not yet played
+Goal 03: eleven checkpoints, in play order (owner, Sept 29)
+Build W: the 1-Key checkpoint restores its flow
+Build W: after Key 1, the Atrium at Stage 2, six seats lit, Key 1 in the Chamber (the opening inserts it), the two independent answers proven, as a played run leaves them [name=Tester sun=4 keys=1 locks=1 stage=2 wheel=False lit=6 hub=True inHand=0 proven=2]
+Build W: the whole wheel lit, the Atrium at Stage 3, the Book waiting
+Build W: the 2-Key checkpoint restores its flow
+Build W: after Key 2, Key 2 in hand, the symbols proven, the second pattern waiting
+Build W: the 3-Key checkpoint restores its flow
+Build W: after Key 3, Keys 2 and 3 in hand, the Table full, the last pattern waiting
+Build W: the 4-Key checkpoint restores its flow
+Build W: after Key 4, three Keys in hand, nothing more spent
+Build W: the 4-Key checkpoint restores its flow
+Build W: the Zodiac Wing whole, all four Keys spent, the Atrium at Stage 6
+Build W: from after Key 4 the Chamber takes a Key: the checkpoint plays on
+Build W: from after Key 2 the Dial opens: the checkpoint plays on
+Build Z: the Dial's room and its glow are full-screen slots; the Wing Dial's open eye has a slot per state; the candle slot stays (the opening's and the Chamber's)
+Build Z: the approved art is in the Art folder: the room, its glow, the seat, the face, and the Wing Dial closed and open
+Build Z: the room and its glow register on the column; since batch 2 the room is a 1200 x 1840 master with the 360 x 800 column at twice the layout in its centre, and the glow, a radial fill over the column only, keeps its 720 x 1600 file
+Build Z: each open Wing Dial is the same canvas as its closed piece, so the eye opens in place; the manifest gives each Wing Dial file at half size
+Build AB: the turning ring and its glow are 360 x 360 slots drawn at twice the size; the frame is a 72 x 88 wedge (Build AC)
+Build AB: the names bend along the band (ArcText); a name has about 62 px of recess, a fact 42 px of window (Build AC)
+Build Z: the Dial's serif, EB Garamond Bold, ships with its open licence
+Build Z: every line the eye can show is Latin-1 (the web font rule)
+Build Z: "Next Fire after Aries" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (14 px, 1 lines)
+Build Z: "Next Cardinal after Aries" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Aries" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Find the symbol of / Aries" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Aries" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Earth after Taurus" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Fixed after Taurus" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Taurus" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Find the symbol of / Taurus" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Taurus" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Air after Gemini" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 1 lines)
+Build Z: "Next Mutable after Gemini" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Gemini" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Find the symbol of / Gemini" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Gemini" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Water after Cancer" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Cardinal after Cancer" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Cancer" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Find the symbol of / Cancer" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Cancer" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Fire after Leo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Next Fixed after Leo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (14 px, 1 lines)
+Build Z: "Across from Leo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Find the symbol of / Leo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Leo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Earth after Virgo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 1 lines)
+Build Z: "Next Mutable after Virgo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Virgo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Find the symbol of / Virgo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Virgo" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Air after Libra" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (14 px, 1 lines)
+Build Z: "Next Cardinal after Libra" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Libra" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Find the symbol of / Libra" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Libra" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Water after Scorpio" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Fixed after Scorpio" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Scorpio" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Find the symbol of / Scorpio" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Scorpio" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: "Next Fire after Sagittarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Mutable after Sagittarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Sagittarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Find the symbol of / Sagittarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Sagittarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (14 px, 1 lines)
+Build Z: "Next Earth after Capricorn" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Cardinal after Capricorn" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Capricorn" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 1 lines)
+Build Z: "Find the symbol of / Capricorn" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Capricorn" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (14 px, 1 lines)
+Build Z: "Next Air after Aquarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Fixed after Aquarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Aquarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 1 lines)
+Build Z: "Find the symbol of / Aquarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Aquarius" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Next Water after Pisces" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Next Mutable after Pisces" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Across from Pisces" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (15 px, 1 lines)
+Build Z: "Find the symbol of / Pisces" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (13 px, 2 lines)
+Build Z: "Your sign: Pisces" fits inside the eye's glass (Build AB: 128 x 34) on at most two lines at 13 px or more (16 px, 1 lines)
+Build Z: the eye's smallest line is 13 px ("Next Cardinal after Aries")
+Build AC: while a count runs every challenge folds onto one line across the glass (140 x 14) at 10 px or more; the smallest is 10 px ("Next Mutable after Sagittarius")
+Build AC: every count word fits its line inside the eye (128 px)
+Build AC: the longest name (63 px at 14) and the longest facts line (113 px at 11) ride the ribbon's arc within its plain face (120 and 116 px)
+Build Z: the save carries the patterns whose reveal has played; a new save has none
+Build Z: the reveal is about two seconds of small built motions; the Wing Dial's eye opens in under half a second
+no line of the game's C# hides statements behind a // comment

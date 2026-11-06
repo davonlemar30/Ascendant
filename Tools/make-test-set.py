@@ -50,6 +50,8 @@ IMAGES = [
 ]
 IMAGES += [('obs-room', 180, 400), ('obs-light', 180, 400), ('obs-orrery-frame', 300, 300), ('obs-rings', 300, 300), ('obs-sphere-moon', 48, 48), ('obs-sphere-sun', 48, 48), ('obs-sphere-mercury', 48, 48), ('obs-sphere-venus', 48, 48), ('obs-sphere-mars', 48, 48), ('obs-sphere-jupiter', 48, 48), ('obs-sphere-saturn', 48, 48), ('obs-sphere-uranus', 48, 48), ('obs-sphere-neptune', 48, 48), ('obs-sphere-pluto', 48, 48), ('obs-sphere-dark', 32, 32), ('obs-shell-worn', 180, 400), ('obs-shell-restored', 180, 400), ('obs-grime', 180, 400), ('obs-lectern-worn', 64, 100), ('obs-lectern-restored', 64, 100), ('obs-charts-worn', 100, 80), ('obs-charts-restored', 100, 80)]
 
+IMAGES += [('cor-room', 180, 400), ('cor-light', 180, 400), ('cor-shell-worn', 180, 400), ('cor-shell-restored', 180, 400), ('cor-grime', 180, 400), ('cor-wheel', 310, 310), ('cor-lectern-worn', 64, 100), ('cor-lectern-restored', 64, 100), ('cor-cabinet-worn', 100, 80), ('cor-cabinet-restored', 100, 80)]
+
 ROUND = {"dial-face", "floor-markings", "mechanism", "orb", "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs", "intro-wheel-lit", "intro-wheel-burning", "intro-earth"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
     "A": ("010", "101", "111", "101", "101"), "B": ("110", "101", "110", "101", "110"), "C": ("011", "100", "100", "100", "011"),

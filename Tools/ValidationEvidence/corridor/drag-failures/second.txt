@@ -1,0 +1,149 @@
+PASS: Corridor: starts from DEV obswhole, six spent Keys
+PASS: Corridor: walk sealed-left reaches observatory
+PASS: Corridor: native control enabled cor-door
+PASS: Corridor: 44px target cor-door
+PASS: Corridor: back arch reaches Corridor
+PASS: Corridor: walk to wheel opens instrument
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 0
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 0
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 0
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 1
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 1
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 1
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 2
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 2
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 2
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 2
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 2
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 2
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 3
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 3
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 3
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 3
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 3
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 3
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:1
+PASS: Corridor: 44px target cor-sign:1
+PASS: Corridor: placement hint 1 for 4
+PASS: Corridor: native control enabled cor-sign:1
+PASS: Corridor: 44px target cor-sign:1
+PASS: Corridor: placement hint 2 for 4
+PASS: Corridor: native control enabled cor-sign:1
+PASS: Corridor: 44px target cor-sign:1
+PASS: Corridor: placement hint 3 for 4
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:1
+PASS: Corridor: 44px target cor-sign:1
+PASS: Corridor: placement hint 1 for 4
+PASS: Corridor: native control enabled cor-sign:1
+PASS: Corridor: 44px target cor-sign:1
+PASS: Corridor: placement hint 2 for 4
+PASS: Corridor: native control enabled cor-sign:1
+PASS: Corridor: 44px target cor-sign:1
+PASS: Corridor: placement hint 3 for 4
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 5
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 5
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 5
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 5
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 5
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 5
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 6
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 6
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 6
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 1 for 6
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 2 for 6
+PASS: Corridor: native control enabled cor-sign:0
+PASS: Corridor: 44px target cor-sign:0
+PASS: Corridor: placement hint 3 for 6
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: all revealed placements pause Key 7
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: native control enabled cor-next
+PASS: Corridor: 44px target cor-next
+PASS: Corridor: classical tray order 0
+FAIL: Error: native drag seats Moon in Cancer
+    at check (/Users/damusthadon/Documents/Ascendant-worktrees/codex-corridor/Tools/validate-corridor-web.cjs:6:39)
+    at /Users/damusthadon/Documents/Ascendant-worktrees/codex-corridor/Tools/validate-corridor-web.cjs:32:197
