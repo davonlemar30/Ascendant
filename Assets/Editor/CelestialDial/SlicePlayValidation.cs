@@ -47,17 +47,17 @@ namespace Ascendant.Build
         static bool waitingForPlayerFrame;
         static void Act(string command)
         {
-            if (command != "relaunch") { View.Dial.WebAction(command); return; }
-            // A scene reload starts its real-time movie immediately. From an Editor
+            if (command != "relaunch" && command != "rat") { View.Dial.WebAction(command); return; }
+            // A reload or rat starts a real-time animation immediately. From an Editor
             // update, Time.unscaledTime can still belong to the previous player frame;
-            // the next frame then consumes the logo before the fixture can observe it.
+            // the next frame can consume a short animation before the fixture observes it.
             waitingForPlayerFrame = true;
-            View.StartCoroutine(RelaunchOnPlayerFrame());
+            View.StartCoroutine(ActOnPlayerFrame(command));
         }
-        static IEnumerator RelaunchOnPlayerFrame()
+        static IEnumerator ActOnPlayerFrame(string command)
         {
             yield return null;
-            try { View.Dial.WebAction("relaunch"); }
+            try { View.Dial.WebAction(command); }
             finally { waitingForPlayerFrame = false; nextAt = EditorApplication.timeSinceStartup + .1; }
         }
         static void AnswerReview(bool captureGlyph)
