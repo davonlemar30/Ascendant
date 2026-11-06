@@ -44,7 +44,7 @@ const path=require('path');
       await pg.waitForTimeout(250);}
     throw Error('New Game did not reach the opening scene');};
   const relaunch=async pg=>{await pg.reload();await toMenu(pg);await pg.waitForFunction(()=>window.ascendantDial.snapshot().canMenuContinue,{},{timeout:5000});await press(pg,'menu-continue');
-    await pg.waitForFunction(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='hub'&&s.resumed&&!s.busy;},{},{timeout:60000});};
+    await pg.waitForFunction(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='hub'&&s.resumed&&!s.busy&&(!s.wingWhole||s.observatoryOpen);},{},{timeout:60000});};
   const rowAt=(s,w)=>{const i=(s.settingsRows||[]).findIndex(r=>r.startsWith(w));if(i<0)throw Error('no Settings row '+w+' in '+JSON.stringify(s.settingsRows));return s.settingsRowTops[i];}; // a Settings row's centre down the layout, as the web state reports it
   // the logo and the launch movie played through: each shot's frame captured once it has come up (until stopAt, if given)
   const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
@@ -939,6 +939,7 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-wing-whole.png')});
     await semantic('poi-atrium-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='hub'&&window.ascendantDial.snapshot().atriumStage===6&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
     check((await state()).caspar.includes('Four Keys spent') && !(await state()).caspar.includes('Stirring'),'the return takes the Atrium to Stage 6 with four Keys spent; no caption repeats itself (note 9) at '+viewport.width);
+    await page.waitForFunction(()=>window.ascendantDial.snapshot().observatoryOpen&&!window.ascendantDial.snapshot().busy,{},{timeout:30000}); // The approved new door beat finishes before the next room action.
     await page.waitForFunction(()=>{const l=window.ascendantDial.snapshot().lightAlpha;return l>0.59&&l<0.6;},{},{timeout:5000});
     check((await state()).lightAlpha>0.59&&(await state()).lightAlpha<0.6,'the light overlay sits at half plus four of 21 locks once the Wing is whole; full light waits for the last Book (owner, Sept 27) at '+viewport.width); // Build H, rekeyed to the arc
     await page.screenshot({path:path.join(out,viewport.width+'-hub-key4.png')});
@@ -1001,7 +1002,7 @@ const path=require('path');
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await mp.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await mp.mouse.down();await frames(2);await mp.mouse.up();await frames(2);};
     const until=(f,t=15000,a)=>mp.waitForFunction(f,a,{timeout:t});
     const onMenu=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='menu'&&!s.busy;});await mp.waitForTimeout(300);};
-    const onHub=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='hub'&&s.resumed&&!s.busy;},60000);await mp.waitForTimeout(300);};
+    const onHub=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='hub'&&s.resumed&&!s.busy&&(!s.wingWhole||s.observatoryOpen);},60000);await mp.waitForTimeout(300);};
     const onPrologue=async()=>{await until(()=>{const s=window.ascendantDial?.snapshot();return s&&s.screen==='prologue'&&!s.busy;},30000);await mp.waitForTimeout(300);};
     await mp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await toMenu(mp);
     await send('jump:key1');await onHub(); // a save under today's key, nothing else
@@ -1060,7 +1061,7 @@ const path=require('path');
     const snap=()=>dev.evaluate(()=>window.ascendantDial.snapshot());const act=async(id)=>dev.locator('#'+id).evaluate(b=>b.click());
     const frames=async n=>{for(let i=0;i<n;i++)await dev.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>r())));};
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await dev.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await dev.mouse.down();await frames(2);await dev.mouse.up();await frames(2);};
-    const resumed=()=>dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,{},{timeout:120000});
+    const resumed=()=>dev.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy&&(!window.ascendantDial.snapshot().wingWhole||window.ascendantDial.snapshot().observatoryOpen),{},{timeout:120000});
     await dev.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
     await skipPrologue(dev);
     await dev.locator('#name').fill('Tester');await dev.locator('#name').dispatchEvent('change');await dev.waitForFunction(()=>window.ascendantDial.snapshot().playerName==='Tester');
@@ -1220,7 +1221,7 @@ const path=require('path');
     const frames=n=>bp.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await bp.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await bp.mouse.down();await frames(2);await bp.mouse.up();await frames(2);};
     const until=(f,t=15000)=>bp.waitForFunction(f,{},{timeout:t});
-    const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);
+    const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy&&(!window.ascendantDial.snapshot().wingWhole||window.ascendantDial.snapshot().observatoryOpen),120000);
     const landing=async()=>{await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,8000);};
     await bp.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');await skipPrologue(bp);
     await bp.locator('#name').fill('Tester');await bp.locator('#name').dispatchEvent('change');await until(()=>window.ascendantDial.snapshot().playerName==='Tester');
@@ -1268,7 +1269,7 @@ const path=require('path');
     const frames=n=>ip.evaluate(k=>new Promise(done=>{const step=i=>i<=0?done():requestAnimationFrame(()=>step(i-1));step(k);}),n);
     const tap=async(x,y)=>{const scale=Math.min(viewport.width/360,viewport.height/800);await ip.mouse.move(viewport.width/2+x*scale,(viewport.height-800*scale)/2+y*scale);await frames(2);await ip.mouse.down();await frames(2);await ip.mouse.up();await frames(2);};
     const until=(f,t=15000)=>ip.waitForFunction(f,{},{timeout:t});
-    const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);
+    const resumed=()=>until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy&&(!window.ascendantDial.snapshot().wingWhole||window.ascendantDial.snapshot().observatoryOpen),120000);
     const visit=async()=>{await send('reload');await ip.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});await resumed();};
     const landing=async()=>{await act('open-journal');await until(()=>window.ascendantDial.snapshot().journalView==='landing'&&!window.ascendantDial.snapshot().busy,8000);};
     const inscription=s=>(s.journalKeeper||[]).slice(2);
@@ -1374,7 +1375,7 @@ const path=require('path');
       for(let n=0;n<8&&(await snap()).screen==='atrium';n++){await act('next-screen');await pg.waitForTimeout(150);}
       await until(()=>window.ascendantDial.snapshot().screen==='hub'&&!window.ascendantDial.snapshot().busy);
       await act('jump-key1');await pg.waitForFunction(()=>!window.ascendantDial?.snapshot()?.resumed,{},{timeout:30000}).catch(()=>{});
-      await until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy,120000);await pg.waitForTimeout(900);
+      await until(()=>window.ascendantDial?.snapshot()?.screen==='hub'&&window.ascendantDial.snapshot().resumed&&!window.ascendantDial.snapshot().busy&&(!window.ascendantDial.snapshot().wingWhole||window.ascendantDial.snapshot().observatoryOpen),120000);await pg.waitForTimeout(900);
       filled(await margins('atrium'),'Atrium');
       const s=await snap(),g=s.gearAt,t=s.travelAt,phone=w/h<=9/16+.01;
       check(['atrium','atrium-light'].every(n=>(s.masters||[]).includes(n)),'Batch 2: at '+name+' the Atrium and its light draw their masters whole ('+(s.masters||[]).join(', ')+')');
