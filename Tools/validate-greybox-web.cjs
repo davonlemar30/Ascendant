@@ -682,14 +682,20 @@ const path=require('path');
     await page.screenshot({path:path.join(out,viewport.width+'-glyphs-b.png')});
     for(let n=0;n<12;n++){
       await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:20000});
-      const target=SIGNS.indexOf((await state()).glyphTarget);
-      await semantic('seat-'+target);await semantic('seal');await page.waitForTimeout(300);
+      const target=SIGNS.indexOf((await state()).glyphTarget),placed=events.filter(e=>e.event_name==='glyph_placed').length;
+      await semantic('seat-'+target);
+      await page.waitForFunction(i=>{const s=window.ascendantDial.snapshot();return s.active&&!s.busy&&s.destination==='Selected: symbol '+s.glyphs[i];},target,{timeout:15000});
+      await semantic('seal');
+      // A real player frame must commit and finish the placement before the next action/reload.
+      // A fixed 300 ms can read the previous idle snapshot while SendMessage is still queued.
+      await page.waitForFunction(name=>{const s=window.ascendantDial.snapshot();return !s.busy&&(s.key2||s.glyphTarget!==name);},SIGNS[target],{timeout:20000});
+      check(events.filter(e=>e.event_name==='glyph_placed').length===placed+1,'each symbol placement commits once before continuing or reloading (placement '+(n+1)+') at '+viewport.width);
       if(n===4){
         await page.waitForFunction(()=>!window.ascendantDial.snapshot().busy);
         await relaunch(page); // a page reload: the launch, Skip, Continue (the launch, Oct 9)
         await semantic('poi-wing-door');await page.waitForFunction(()=>window.ascendantDial.snapshot().screen==='wingroom'&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
         await semantic('poi-dial');await page.waitForFunction(()=>window.ascendantDial.snapshot().glyphWheel&&window.ascendantDial.snapshot().active&&!window.ascendantDial.snapshot().busy,{},{timeout:15000});
-        check((await state()).glyphTarget==='Virgo','mid-placement reload resumes at Virgo after five committed placements at '+viewport.width);
+        { const restored=await state();if(restored.glyphTarget!=='Virgo')fs.writeFileSync(path.join(out,viewport.width+'-placement-resume-failure.json'),JSON.stringify({restored,events},null,2));check(restored.glyphTarget==='Virgo','mid-placement reload resumes at Virgo after five committed placements at '+viewport.width+' (actual '+restored.glyphTarget+')'); }
         await page.screenshot({path:path.join(out,viewport.width+'-symbol-placement-restored.png')});
       }
     }
