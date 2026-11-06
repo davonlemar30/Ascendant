@@ -195,7 +195,8 @@ namespace Ascendant.Build
             // Owner approved the broader test-only repair: exercise default/Add separately from the personal opening above.
             // Keep earned progress and inscription history; seed only the second case's birth record through the normal model API.
             Steps.Enqueue(()=>{Act("close-journal");var save=View.Flow.CaptureProgress(View.Dial.Lesson,View.Grid);var birth=new SliceFlow();birth.SetName(View.Flow.PlayerName);
-                Check(birth.SkipPrologue() && birth.Continue() && birth.ChooseBirth("skip"),"the independent journal case chooses the approved default chart through the opening model");
+                Check(birth.SkipPrologue() && birth.Continue(),"the independent journal case reaches the birth question through the opening model");birth.ChooseBirth("skip");
+                Check(birth.BirthDone && birth.Filled.Any && !birth.Facts.Any,"the independent journal case chooses the approved default chart");
                 birth.WriteBirth(save);PlayerPrefs.SetString(SliceView.SaveKey,JsonUtility.ToJson(save));PlayerPrefs.Save();Act("reload");});
             Until(()=>View.Resumed && View.Flow.Screen==SliceScreen.Hub && !View.Busy,30,"the default-chart journal case to reload");
             Steps.Enqueue(()=>{Check(View.Flow.Keys==1 && View.Flow.Filled.Any && !View.Flow.Facts.Any && View.Flow.SunSign==7,"the default-chart case keeps Key 1 and has default facts separate from personal facts");Act("walk:desk");});
