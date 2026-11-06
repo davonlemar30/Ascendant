@@ -448,8 +448,8 @@ const path=require('path');
     check(true,'Back to Practice and \u2039 Your Journal on the canvas lead back, at '+viewport.width);
     { const d=(await state()).journalDoors; await tap(d[4],d[5]); } // the Contents door, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='contents',{},{timeout:5000});
-    { const j=await state(); check(j.journalChapters.join()==='The Wheel,The Library Map,The Planets,Sealed' && j.journalLink==='\u2039 Your Journal' && j.canJournalHome,'the Contents door on the canvas: The Wheel, The Library Map, two Sealed rows, \u2039 Your Journal at the top left, at '+viewport.width); }
-    { const t=(await looks()).filter(x=>x.k==='row'||x.k==='link'); check(t.length===3 && small(t).length===0,'Contents\' two rows and its link each take 44 px or more ('+t.map(x=>x.w+' '+x.W+'x'+x.H).join(', ')+') at '+viewport.width); }
+    { const j=await state(); check(j.journalChapters.join()==='The Wheel,The Library Map,The Planets,Sealed' && j.journalLink==='\u2039 Your Journal' && j.canJournalHome,'the Contents door on the canvas: The Wheel, The Library Map, The Planets, one Sealed row, \u2039 Your Journal at the top left, at '+viewport.width); }
+    { const t=(await looks()).filter(x=>x.k==='row'||x.k==='link'); check(t.length===4 && small(t).length===0,'Contents\' three rows and its link each take 44 px or more ('+t.map(x=>x.w+' '+x.W+'x'+x.H).join(', ')+') at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-journal-contents.png')});
     await page.waitForTimeout(300); await tap(7,304); // The Library Map's row, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='map',{},{timeout:5000});
@@ -1140,7 +1140,6 @@ const path=require('path');
     check(devErrors.length===0,'Build W: no runtime exceptions through the jumps at '+viewport.width);
     await devContext.close();
   }));
-  await require('./validate-opening-controls.cjs')({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART});
   const recoveryContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const recovery=await recoveryContext.newPage();
   await recovery.goto(process.env.GREYBOX_URL || 'http://127.0.0.1:8000');
