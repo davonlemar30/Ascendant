@@ -41,7 +41,9 @@ import pathlib, re, sys
 log, report = map(pathlib.Path, sys.argv[1:])
 lines = report.read_text().splitlines()
 counts = re.findall(r'\[GreyboxValidation\] PASS: (\d+) checks\.', log.read_text())
-sys.exit(not lines or any(not line.strip() for line in lines) or counts != [str(len(lines))])
+# Check descriptions may contain embedded newlines. The completion marker is
+# emitted only after WriteAllLines finishes; require at least its item count.
+sys.exit(not lines or not report.read_bytes().endswith(b'\n') or len(counts) != 1 or len(lines) < int(counts[0]))
 CHECK
 cp Logs/greybox-mechanical-validation.txt "$LOGS/mechanical-report.txt"
 step 'WebGL build'
