@@ -1,0 +1,19 @@
+{
+  "candidate": "21d1f24464c257d7dadaa5b878451a95e272c4c6",
+  "parents": [
+    "75ad428402237f334331e7a3c687e71889fa1abf"
+  ],
+  "sources": {
+    "codex/validate-all-hardening": "2b3438497ab19a734b55a92bfb2a8cbfc9a56a87",
+    "codex/opening-controls": "2d43ac1eda9655a05708f48b68a29001eae7ada1",
+    "codex/release-gate": "747b554f60defa574debd96236293322c174c47f",
+    "codex/stage2-observatory": "470508a2e774c516f95c090002294d1c68c0eb1a"
+  },
+  "playerDifferenceFromStage2": "Only two authorized #168 fixes: HTML date/time submit pointer routing and 80px birth Back target.",
+  "harnessDifferenceFromStage2": "#167 hardened runner, #168 player-control test module, #169 release workflow/evidence verifier and player-frame relaunch synchronization.",
+  "mergePerformed": false,
+  "browserHarnessCorrection": "d73847c389ae91760cf91bb1a3bb1b6af3b9cd13",
+  "correction": "Expected third journal chapter plus its link: four targets, all remain >=44px; #168 shared controls coverage retained.",
+  "artifactIdentity": "validate-all.Zxyo9kl4",
+  "fixtureOutcome": "FAIL: unchanged pre-existing unknown/default journal assertion, SlicePlayValidation.cs:208; no complete passing fixture claimed."
+}
