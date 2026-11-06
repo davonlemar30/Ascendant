@@ -1,0 +1,22 @@
+{
+  "tool": "built-in image_gen",
+  "sequential": true,
+  "requestedSize": [
+    720,
+    1600
+  ],
+  "references": [
+    "../References/style-2026-09-24/ref-capricorn-doorway.webp",
+    "../References/style-2026-09-24/ref-scorpio-cafe.webp"
+  ],
+  "dormant": {
+    "scene": "Tall old Library lower Observatory, dull brass orrery with eight concentric orbital rings, ten dark planet spheres under dust and three further small dark outer-edge spheres; doorway back, lectern and restrained star charts; cool blue-charcoal moonlight, quiet and abandoned; big simple shapes readable at360x800. No characters, UI, text or particles. Owner concept approval only, not final game art.",
+    "style": "Western hand-drawn feature (Prince of Egypt, Iron Giant, Atlantis, Treasure Planet, Sinbad); clean dark-brown outlines, flat fills, one hard-edged shadow and rim light; deep shadow masses, one motivated key light; collected, not cluttered. Charcoal #1C1A1F, line #2B1C16, amber #E3A34A, crimson #7C2A32, bone #EADCC3, cool blue #3A5578. No photorealism, 3D gloss, soft airbrush, reflective floors, anime, clutter or ornate filigree."
+  },
+  "awake": {
+    "reference": "observatory-dormant-draft.png",
+    "scene": "Same room, camera, composition, architecture, doorway and instrument identity. Warm amber key light, polished brass, ten spheres lit, three outer spheres dark and unlabeled; star charts on the lectern. No characters, UI, text or particles. Owner concept approval only, not final game art.",
+    "style": "Western hand-drawn feature (Prince of Egypt, Iron Giant, Atlantis, Treasure Planet, Sinbad); clean dark-brown outlines, flat fills, one hard-edged shadow and rim light; deep shadow masses, one motivated key light; collected, not cluttered. Charcoal #1C1A1F, line #2B1C16, amber #E3A34A, crimson #7C2A32, bone #EADCC3, cool blue #3A5578. No photorealism, 3D gloss, soft airbrush, reflective floors, anime, clutter or ornate filigree."
+  },
+  "normalization": "Owner explicitly authorized local proportional resize and charcoal padding; originals retained in workspace."
+}

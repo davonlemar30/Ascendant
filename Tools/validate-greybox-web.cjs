@@ -20,7 +20,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=221,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=243,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.
@@ -448,7 +448,7 @@ const path=require('path');
     check(true,'Back to Practice and \u2039 Your Journal on the canvas lead back, at '+viewport.width);
     { const d=(await state()).journalDoors; await tap(d[4],d[5]); } // the Contents door, on the canvas
     await page.waitForFunction(()=>window.ascendantDial.snapshot().journalView==='contents',{},{timeout:5000});
-    { const j=await state(); check(j.journalChapters.join()==='The Wheel,The Library Map,Sealed,Sealed' && j.journalLink==='\u2039 Your Journal' && j.canJournalHome,'the Contents door on the canvas: The Wheel, The Library Map, two Sealed rows, \u2039 Your Journal at the top left, at '+viewport.width); }
+    { const j=await state(); check(j.journalChapters.join()==='The Wheel,The Library Map,The Planets,Sealed' && j.journalLink==='\u2039 Your Journal' && j.canJournalHome,'the Contents door on the canvas: The Wheel, The Library Map, two Sealed rows, \u2039 Your Journal at the top left, at '+viewport.width); }
     { const t=(await looks()).filter(x=>x.k==='row'||x.k==='link'); check(t.length===3 && small(t).length===0,'Contents\' two rows and its link each take 44 px or more ('+t.map(x=>x.w+' '+x.W+'x'+x.H).join(', ')+') at '+viewport.width); }
     await page.screenshot({path:path.join(out,viewport.width+'-journal-contents.png')});
     await page.waitForTimeout(300); await tap(7,304); // The Library Map's row, on the canvas
@@ -1073,7 +1073,7 @@ const path=require('path');
     await tap(0,rowAt(await snap(),'Jump to'));await dev.waitForFunction(()=>window.ascendantDial.snapshot().jumpsShown,{},{timeout:5000}).catch(()=>{});
     check((await snap()).settingsOpen&&(await snap()).jumpsShown,'Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at '+viewport.width);
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-jump.png')});
-    await tap(0,311);await resumed(); // the fifth row: After Key 4 (Oct 7: the list is four rows taller with the opening's samples, its top 92 px higher)
+    await tap(0,rowAt(await snap(),"After Key 4"));await resumed(); // the fifth row: After Key 4 (Oct 7: the list is four rows taller with the opening's samples, its top 92 px higher)
     { const s=await snap(); check(s.keys===4&&s.keysInHand===3&&s.locksFilled===1&&s.atriumStage===3&&s.playerName==='Tester'&&s.sunSign==='Leo','Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at '+viewport.width); }
     await dev.screenshot({path:path.join(out,viewport.width+'-dev-key4.png')});
     const expect={key1:s=>s.keys===1&&s.keysInHand===0&&s.locksFilled===1&&s.atriumStage===2&&!s.wheelComplete,

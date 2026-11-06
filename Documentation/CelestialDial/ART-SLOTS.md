@@ -298,3 +298,30 @@ Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) ad
 - `?art=test` on the web build plays the game with the test set in every slot; the Editor menu **Ascendant › Greybox › Play with the test art set** does the same.
 - `?style` shows the style page on the Art and Audio folders (the owner's files), `?style=test` on the test set; **Ascendant › Greybox › Play the style page** in the Editor. The page lists every slot with its size and source (`file`, `placeholder`, `test set`; sounds `file`, `silent`, `test set`), a thumbnail of each image, and a button per sound that plays it. The semantic layer carries the same list for a screen reader and for the browser suite.
 - With no query and no menu, the game plays on the Art folder, which is the owner's; the shipped test set is never used unless asked for.
+
+## Stage 2 Observatory test slots
+
+Manifest total: 243 art slots (221 existing + 22 Observatory). Concept mockups are outside the game.
+
+- `obs-room`: 360 × 800; test placeholder.
+- `obs-light`: 360 × 800; test placeholder.
+- `obs-orrery-frame`: 300 × 300; test placeholder.
+- `obs-rings`: 300 × 300; test placeholder.
+- `obs-sphere-moon`: 48 × 48; test placeholder.
+- `obs-sphere-sun`: 48 × 48; test placeholder.
+- `obs-sphere-mercury`: 48 × 48; test placeholder.
+- `obs-sphere-venus`: 48 × 48; test placeholder.
+- `obs-sphere-mars`: 48 × 48; test placeholder.
+- `obs-sphere-jupiter`: 48 × 48; test placeholder.
+- `obs-sphere-saturn`: 48 × 48; test placeholder.
+- `obs-sphere-uranus`: 48 × 48; test placeholder.
+- `obs-sphere-neptune`: 48 × 48; test placeholder.
+- `obs-sphere-pluto`: 48 × 48; test placeholder.
+- `obs-sphere-dark`: 32 × 32; test placeholder.
+- `obs-shell-worn`: 360 × 800; test placeholder.
+- `obs-shell-restored`: 360 × 800; test placeholder.
+- `obs-grime`: 360 × 800; test placeholder.
+- `obs-lectern-worn`: 64 × 100; test placeholder.
+- `obs-lectern-restored`: 64 × 100; test placeholder.
+- `obs-charts-worn`: 100 × 80; test placeholder.
+- `obs-charts-restored`: 100 × 80; test placeholder.

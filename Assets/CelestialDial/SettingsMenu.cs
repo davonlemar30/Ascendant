@@ -28,7 +28,7 @@ namespace Ascendant.CelestialDial
         public Vector2 GearAt => gear != null && gear.GetComponent<SafeTop>() != null ? gear.GetComponent<SafeTop>().At : new Vector2(158, 22); // Part 2: where the gear sits (x from the column's centre, y down from its top)
         public Transform Gear => gear != null ? gear.transform : null; // batch 2: the gear's button, for the web state's list of buttons
         public bool GearShown { get => gear != null && gear.gameObject.activeSelf; set { if (gear != null) gear.gameObject.SetActive(value); if (!value) Close(); } }
-        Canvas canvas; RectTransform menu, mainPanel, jumpPanel, askPanel; Button gear; Text sound, motion, walk, wakeRow, askLine; Font font;
+        Canvas canvas; RectTransform menu, mainPanel, jumpPanel, askPanel,jumpViewport; Button gear; Text sound, motion, walk, wakeRow, askLine; Font font;
         RectTransform soundRow, motionRow, quitRow, mainMenuRow, testingLabel, walkRow, jumpRow, overRow, closeRow;
         public bool Asking => askPanel != null && askPanel.gameObject.activeSelf;
         public string AskLine => askLine != null ? askLine.text : "";
@@ -72,12 +72,17 @@ namespace Ascendant.CelestialDial
             jumpPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
             var jumpTitle = Label(jumpPanel, "J U M P   T O", 0, 24, 240, 18, 12); jumpTitle.color = Gold; jumpTitle.fontStyle = FontStyle.Bold;
             float jy = 62;
-            foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), 40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
+            foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), id=="key5"||id=="key6"||id=="obswhole"?44:40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
             var cusp = Row(jumpPanel, jy, () => CuspDay?.Invoke(), 40); cusp.text = "A cusp day (the opening)"; cusp.transform.parent.name = "Jump cusp"; jy += 46; // the cusp-day sample (owner, Oct 2 evening): the opening's question
             foreach (var (id, label) in BirthSamples) { string sample = id; var row = Row(jumpPanel, jy, () => BirthOpening?.Invoke(sample), 40); row.text = label; row.transform.parent.name = "Jump birth " + id; jy += 46; } // Oct 7: each path's first question
             wakeRow = Row(jumpPanel, jy, () => CycleWake?.Invoke(), 40); wakeRow.transform.parent.name = "Dial wake"; jy += 46; // DEV Mode: a tap steps the Dial's look (first visit, Key 1 to Key 4), then back to as earned
             var back = Row(jumpPanel, jy + 10, ShowMain); back.text = "Back"; back.color = Gold;
-            jumpPanel.gameObject.SetActive(false);
+            if(jumpHeight>740){
+                jumpViewport=Rect("Jump viewport",menu,0,400,280,740);jumpViewport.gameObject.AddComponent<RectMask2D>();var hit=jumpViewport.gameObject.AddComponent<Image>();hit.color=Color.clear;hit.canvasRenderer.cullTransparentMesh=false;
+                jumpPanel.SetParent(jumpViewport,false);jumpPanel.anchorMin=jumpPanel.anchorMax=new Vector2(.5f,1);jumpPanel.pivot=new Vector2(.5f,1);jumpPanel.anchoredPosition=Vector2.zero;
+                var scroll=jumpViewport.gameObject.AddComponent<ScrollRect>();scroll.viewport=jumpViewport;scroll.content=jumpPanel;scroll.horizontal=false;scroll.vertical=true;scroll.movementType=ScrollRect.MovementType.Clamped;scroll.inertia=false;scroll.onValueChanged.AddListener(v=>Changed?.Invoke());
+            }
+            SetJumpVisible(false);
             // the launch (Oct 9): Main menu's question before Key 1, in place of the main box (as Jump to's list): the line, Main menu, Back
             askPanel = Rect("Ask box", menu, 0, 400, 280, 238);
             var askImage = askPanel.gameObject.AddComponent<Image>(); askImage.sprite = Slots.InstrumentBoxSprite(); askImage.type = Image.Type.Sliced; askImage.pixelsPerUnitMultiplier = 2;
@@ -105,14 +110,15 @@ namespace Ascendant.CelestialDial
         static void Place(RectTransform row, float y) => row.anchoredPosition = new Vector2(0, -y);
         // the rows of the box showing, as words and as their centres down the 360 x 800 layout (the web state; the checks tap them)
         public string[] RowWords => ShownRows().Select(b => b.GetComponentInChildren<Text>().text).ToArray();
-        public float[] RowTops { get { var box = ShownBox(); return box == null ? new float[0] : ShownRows().Select(b => Mathf.Round((400 - box.sizeDelta.y / 2 - ((RectTransform)b.transform).anchoredPosition.y) * 100) / 100).ToArray(); } }
+        public float[] RowTops { get { var box = ShownBox(); return box == null ? new float[0] : ShownRows().Select(b => Mathf.Round((JumpsShown&&jumpViewport!=null?400+(canvas.pixelRect.center.y-b.transform.position.y)/canvas.scaleFactor:400 - box.sizeDelta.y / 2 - ((RectTransform)b.transform).anchoredPosition.y) * 100) / 100).ToArray(); } }
         RectTransform ShownBox() => !Open ? null : Asking ? askPanel : JumpsShown ? jumpPanel : mainPanel;
         IEnumerable<Button> ShownRows() { var box = ShownBox(); return box == null ? Enumerable.Empty<Button>() : box.GetComponentsInChildren<Button>().Where(b => b.transform.parent == box && b.GetComponentInChildren<Text>() != null); }
-        public void Ask(string line) { if (!Open) Toggle(); askLine.text = line; mainPanel.gameObject.SetActive(false); jumpPanel.gameObject.SetActive(false); askPanel.gameObject.SetActive(true); Changed?.Invoke(); }
-        public void ShowJumps() { mainPanel.gameObject.SetActive(false); jumpPanel.gameObject.SetActive(true); Changed?.Invoke(); }
-        public void ShowMain() { jumpPanel.gameObject.SetActive(false); if (askPanel != null) askPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); Changed?.Invoke(); }
+        public void Ask(string line) { if (!Open) Toggle(); askLine.text = line; mainPanel.gameObject.SetActive(false); SetJumpVisible(false); askPanel.gameObject.SetActive(true); Changed?.Invoke(); }
+        void SetJumpVisible(bool on){jumpPanel.gameObject.SetActive(on);if(jumpViewport!=null)jumpViewport.gameObject.SetActive(on);}
+        public void ShowJumps() { mainPanel.gameObject.SetActive(false); SetJumpVisible(true); Changed?.Invoke(); }
+        public void ShowMain() { SetJumpVisible(false); if (askPanel != null) askPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); Changed?.Invoke(); }
         public void Toggle() { if (Open) Close(); else { Open = true; menu.gameObject.SetActive(true); Refresh(); Changed?.Invoke(); } }
-        public void Close() { if (!Open) return; Open = false; menu.gameObject.SetActive(false); if (jumpPanel != null) { jumpPanel.gameObject.SetActive(false); mainPanel.gameObject.SetActive(true); } if (askPanel != null) askPanel.gameObject.SetActive(false); Changed?.Invoke(); }
+        public void Close() { if (!Open) return; Open = false; menu.gameObject.SetActive(false); if (jumpPanel != null) { SetJumpVisible(false); mainPanel.gameObject.SetActive(true); } if (askPanel != null) askPanel.gameObject.SetActive(false); Changed?.Invoke(); }
         public void Refresh()
         {
             if (sound == null) return;
