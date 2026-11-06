@@ -1,0 +1,19 @@
+PASS: player-control coverage at 390: birthdate editing and click-away keep the step and edited answer
+PASS: player-control coverage at 390: birthdate Enter keeps the step and answer; only its button submits
+PASS: player-control coverage at 390: Use this date commits the edited date
+PASS: player-control coverage at 390: birthtime editing and click-away keep the step and edited answer
+PASS: player-control coverage at 390: birthtime Enter keeps the step and answer; only its button submits
+PASS: player-control coverage at 390: Use this time commits the edited time
+PASS: player-control coverage at 390: place editing and blur wait for a match selection
+PASS: player-control coverage at 390: place Enter keeps the search and waits for a match selection
+PASS: player-control coverage at 390: review shows all edited facts before computing the chart
+PASS: player-control coverage at 390: Back restores the selected place in its input
+PASS: player-control coverage at 390: Back restores the time in its input
+PASS: player-control coverage at 390: Back restores the date in its input
+PASS: player-control coverage at 390: forward again retains the reviewed answers
+PASS: player-control coverage at 390: Yes commits the reviewed chart
+PASS: player-control coverage at 390: the committed birth record keeps the reviewed date, time and place
+PASS: player-control coverage at 390: Back from date returns to the path question
+PASS: player-control coverage at 390: skip asks no facts or signs and uses the approved default chart
+PASS: player-control coverage at 390: Change my answer returns from skip to the path question
+PASS: player-control coverage at 390: no runtime exceptions

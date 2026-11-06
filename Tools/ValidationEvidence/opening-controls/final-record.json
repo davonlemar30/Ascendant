@@ -1,0 +1,35 @@
+{
+  "playerCommit": "476e9be",
+  "mutationCommit": "3665fc2 (local only; never pushed)",
+  "restoredCommit": "32bc63f",
+  "finalBuild": {
+    "mechanical": 810,
+    "bytes": 47808663,
+    "errors": 0,
+    "warnings": 0
+  },
+  "desktop": {
+    "views": [
+      "1280x800",
+      "390"
+    ],
+    "pass": 38
+  },
+  "phone": {
+    "views": [
+      "390",
+      "360"
+    ],
+    "deviceScale": 2,
+    "mobile": true,
+    "pass": 38
+  },
+  "mutation": {
+    "exit": 1,
+    "finding": "change listener submitted initial date and hid input before explicit submission"
+  },
+  "restored": {
+    "pass": 19,
+    "exit": 0
+  }
+}

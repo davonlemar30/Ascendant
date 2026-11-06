@@ -346,7 +346,7 @@ namespace Ascendant.CelestialDial
             birthReview = Rect("Review", birth, 0, 400, 360, 220); // the check (owner, Oct 23, 86bcgfkdv: B): the three facts as "Your Birth" words them, then Yes
             for (int i = 0; i < reviewRows.Length; i++) reviewRows[i] = Label(birthReview, "", 0, 8 + i * 30, 320, 24, 15);
             birthConfirm = MakeButton(birthReview, SliceFlow.ReviewConfirm, 0, 130, 200, 52, ConfirmBirth);
-            birthBack = MakeButton(birth, SliceFlow.BackWords, BirthBackX, LinkBaseline - GaramondLift * 14, LinkWidth, 22, BirthBack); birthBack.name = "Back link"; // the journal's "‹" link, top left (Ashantis, Oct 10)
+            birthBack = MakeButton(birth, SliceFlow.BackWords, BirthBackX, LinkBaseline - GaramondLift * 14, BirthBackWidth, 22, BirthBack); birthBack.name = "Back link"; // the journal's "‹" link, top left (Ashantis, Oct 10)
             { var feel = ButtonLook.Custom(birthBack, "link"); var label = feel.Label; label.font = ButtonLook.EngravedFont ?? font; label.fontSize = 14; label.alignment = TextAnchor.MiddleLeft; label.horizontalOverflow = HorizontalWrapMode.Overflow;
               var lr = label.rectTransform; lr.anchorMin = Vector2.zero; lr.anchorMax = Vector2.one; lr.offsetMin = lr.offsetMax = Vector2.zero; feel.LabelUp = GiltInk; feel.LabelDown = GiltDown; ButtonLook.HitArea(birthBack, ButtonLook.MinTarget, ButtonLook.MinTarget);
               birthBack.gameObject.AddComponent<SafeTop>().Clearance = JournalTitleClearance; }
@@ -880,7 +880,7 @@ namespace Ascendant.CelestialDial
         void PickPlace(int index) { if (busy || index < 0 || index >= placeMatches.Count || !Flow.SetBirthPlace(placeMatches[index])) return; placeMatches.Clear(); AfterBirthEntry(); }
         void PickBirthSign(int seat) { if (busy || !Flow.PickSign(seat)) return; AfterBirthEntry(); } // the skip path's sun, or the rising chosen on "Your Birth"
         void CancelBirthAmend() { if (busy || !Flow.CancelAmending()) return; AfterBirthEntry(); }
-        public const float BirthBackX = -180 + 16 + LinkWidth / 2; // the link's box, 16 in from the column's left, clear of the orb's stars
+        public const float BirthBackWidth = 80, BirthBackX = -180 + 16 + BirthBackWidth / 2; // the link's box, 16 in from the column's left, clear of the orb's stars
         void BirthBack()
         {
             if (busy || !Flow.CanBirthBack) return; bool toQuestion = Flow.BirthStep == "date" && !Flow.Amending;
