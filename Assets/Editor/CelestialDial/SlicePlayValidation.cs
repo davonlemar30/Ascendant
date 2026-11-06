@@ -188,6 +188,20 @@ namespace Ascendant.Build
             // the birth-time build (owner, Oct 7): the Big Three's line opens "Your Birth"; a rising chosen, then the facts added in the opening's
             // boxes; back on the page a line for each change; the lessons keep their sun (Taurus both ways) and the record is saved
             Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();var box=snap.journalBigThreeBox??new float[0];Check(box.Length==4 && box[3]>=44 && snap.canBirthPage,"Oct 7: the Big Three's line is a 44 px target on the landing");Act("journal-birth");});
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();
+                Check(snap.journalView=="birth" && snap.journalBirthRows.SequenceEqual(new[]{"Date: 20 April 1990","Time: 7:19 PM","Place: London, Britain (UK)"}) && snap.journalBirthLines.Length==0 && snap.journalLink==SliceFlow.BackToJournal && !snap.canBirthAdd && !snap.canBirthAddTime && !snap.canBirthRising,
+                    "the opening's complete personal chart is retained in Your Birth, with no default note or missing-detail controls");
+                Capture("slice-390-your-birth-personal.png");});
+            // Owner approved the broader test-only repair: exercise default/Add separately from the personal opening above.
+            // Keep earned progress and inscription history; seed only the second case's birth record through the normal model API.
+            Steps.Enqueue(()=>{Act("close-journal");var save=View.Flow.CaptureProgress(View.Dial.Lesson,View.Grid);var birth=new SliceFlow();birth.SetName(View.Flow.PlayerName);
+                Check(birth.SkipPrologue() && birth.Continue() && birth.ChooseBirth("skip"),"the independent journal case chooses the approved default chart through the opening model");
+                birth.WriteBirth(save);PlayerPrefs.SetString(SliceView.SaveKey,JsonUtility.ToJson(save));PlayerPrefs.Save();Act("reload");});
+            Until(()=>View.Resumed && View.Flow.Screen==SliceScreen.Hub && !View.Busy,30,"the default-chart journal case to reload");
+            Steps.Enqueue(()=>{Check(View.Flow.Keys==1 && View.Flow.Filled.Any && !View.Flow.Facts.Any && View.Flow.SunSign==7,"the default-chart case keeps Key 1 and has default facts separate from personal facts");Act("walk:desk");});
+            Steps.Enqueue(()=>{Check(View.Flow.Walk.At=="desk" && !View.Busy,"the independent journal case returns to the desk");Act("open-journal");});
+            Until(()=>View.Dial.Snapshot().journalView=="landing" && !View.Busy,10,"the default-chart journal landing");
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.canBirthPage && snap.journalBigThreeBox.Length==4 && snap.journalBigThreeBox[3]>=44,"the default-chart Big Three line also opens Your Birth through a 44 px target");Act("journal-birth");});
             Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();var lines=string.Join(" ",snap.journalBirthLines??new string[0]);
                 Check(snap.journalView=="birth" && snap.journalBirthRows.SequenceEqual(new[]{"Date: 4 November 1990 (default)","Time: 7:19 PM (default)","Place: Bushwick, NY, United States (default)"}) && lines==SliceFlow.DefaultOnPage && snap.journalLink==SliceFlow.BackToJournal && snap.canBirthAdd && snap.canBirthAddTime && !snap.canBirthRising,
                     "86bcg8nft (4A): \"Your Birth\": the default-chart details are tagged default with its note, each with Add, and Add my birth time; the rising is worked out, so no rising choice; actual rows: "+string.Join(" / ",snap.journalBirthRows)+"; note: "+lines+"; Add="+snap.canBirthAdd+"; AddTime="+snap.canBirthAddTime+"; Rising="+snap.canBirthRising);
