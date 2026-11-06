@@ -49,6 +49,8 @@ async function run({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART}) {
     await pg.waitForFunction(()=>(window.ascendantDial.snapshot().placeMatches||[])[0]==='London, Britain (UK)');
     await pg.mouse.click(8,Math.floor(viewport.height/2));await frames();
     ok((await snap()).birthStep==='place' && await pg.locator('#birthplace').inputValue()==='Londo','place editing and blur wait for a match selection');
+    await pg.locator('#birthplace').focus();await pg.locator('#birthplace').press('Enter');await frames();await pg.waitForTimeout(300);
+    ok((await snap()).birthStep==='place'&&await pg.locator('#birthplace').inputValue()==='Londo','place Enter keeps the search and waits for a match selection');
     await tap('place-match-0');await step('review');
     const rows=['Date: 1 May 1990','Time: 2:30 PM','Place: London, Britain (UK)'];
     let s=await snap();ok(s.birthHeading==='Is this right?'&&JSON.stringify(s.birthReview)===JSON.stringify(rows)&&s.canBirthConfirm&&!s.sunSign,'review shows all edited facts before computing the chart');
@@ -63,6 +65,8 @@ async function run({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART}) {
     ok(JSON.stringify((await snap()).birthReview)===JSON.stringify(rows),'forward again retains the reviewed answers');
     await tap('birth-confirm');await step('done');
     s=await snap();ok(s.bigThree==='\u2609 Taurus \u00b7 \u263d Leo \u00b7 \u2191 Virgo'&&s.canSliceContinue,'Yes commits the reviewed chart');
+    const kept=JSON.parse(s.birthRecord||'{}');
+    ok(kept.birth?.date==='1990-05-01'&&kept.birth?.timeFrom===870&&kept.birth?.place==='London, Britain (UK)','the committed birth record keeps the reviewed date, time and place');
     await tap('change-birth');await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirth);
     await tap('birth-chart');await step('date');await tap('birth-back');
     ok((await snap()).canBirth,'Back from date returns to the path question');
