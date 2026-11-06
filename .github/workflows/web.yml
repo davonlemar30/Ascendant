@@ -101,7 +101,7 @@ jobs:
       - name: Remove old evidence
         run: |
           mkdir -p Logs
-          rm -f Logs/slice-play-validation.txt Logs/release-fixture.log
+          rm -f Logs/slice-play-validation.txt Logs/release-fixture-completion.txt
       # manualExit prevents -quit from ending Play Mode before its report.
       # enableGpu runs with graphics under game-ci's Xvfb, never -nographics.
       - name: Play the slice in Unity 6000.3.24f1
@@ -116,9 +116,9 @@ jobs:
           manualExit: true
           enableGpu: true
           versioning: None
-          customParameters: -batchmode -sliceAutoExit -sliceStep 1.5 -logFile Logs/release-fixture.log
+          customParameters: -batchmode -sliceAutoExit -sliceStep 1.5 -releaseFixtureEvidence
       - name: Require complete fixture evidence
-        run: python3 Tools/check-validation-report.py Logs/slice-play-validation.txt --fixture-log Logs/release-fixture.log
+        run: python3 Tools/check-validation-report.py Logs/slice-play-validation.txt --fixture-log Logs/release-fixture-completion.txt
       - name: Upload fixture evidence
         if: always()
         uses: actions/upload-artifact@v4
