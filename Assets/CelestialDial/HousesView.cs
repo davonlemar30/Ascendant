@@ -10,7 +10,7 @@ namespace Ascendant.CelestialDial
     {
         RectTransform hohRoom,hohInstrument,hohJournal,hohArchPanel;
         RoomKit hohKit,hohDoorKit;Image hohWheel,hohMc,hohMcRay;
-        Text hohPrompt,hohMessage,hohReadout,hohRoomLine,hohDetails,hohJournalNumber;
+        Text hohPrompt,hohMessage,hohReadout,hohRoomLine,hohDetails,hohJournalNumber,hohMcLabel;
         readonly Text[] hohSignLabels=new Text[12],hohHouseNumbers=new Text[12];
         readonly Button[] hohAngles=new Button[4],hohPoints=new Button[4],hohNumbers=new Button[12],hohGroups=new Button[3],hohCards=new Button[4],hohHousePages=new Button[12];
         Button hohNext,hohBack,hohLeft,hohRight,hohSeal,hohAsk,hohArch,hohJournalBack,hohNeedsJournal;
@@ -44,7 +44,7 @@ namespace Ascendant.CelestialDial
             hohWheel=Picture(hohInstrument,"hoh-instrument",0,324,310,310);
             HohLine(hohInstrument,"Horizon",new Vector2(-143,324),new Vector2(143,324),Gilt);HohLine(hohInstrument,"Meridian",new Vector2(0,181),new Vector2(0,467),Gilt);
             for(int i=0;i<12;i++){
-                hohSignLabels[i]=Label(hohInstrument,Zodiac.Seats[i].Glyph,0,0,34,32,25);hohSignLabels[i].font=Dial.GlyphFont;hohSignLabels[i].color=Gilt;
+                hohSignLabels[i]=Label(hohInstrument,Zodiac.Seats[i].Glyph,0,0,34,32,25);hohSignLabels[i].font=Dial.GlyphFont;hohSignLabels[i].horizontalOverflow=HorizontalWrapMode.Overflow;hohSignLabels[i].verticalOverflow=VerticalWrapMode.Overflow;hohSignLabels[i].color=Gilt;
                 hohHouseNumbers[i]=Label(hohInstrument,(i+1).ToString(),0,0,25,23,13);hohHouseNumbers[i].color=SilverInk;
                 int house=i+1;hohNumbers[i]=CorButton(hohInstrument,house.ToString(),"hoh-house:"+house,-114+(i%4)*76,500+(i/4)*48,70,44,()=>HohChange(()=>Hoh.PickHouse(house)));
                 hohHousePages[i]=null;
@@ -57,7 +57,7 @@ namespace Ascendant.CelestialDial
             }
             for(int i=0;i<3;i++){int group=i;hohGroups[i]=CorButton(hohInstrument,Houses.Groups[i],"hoh-group:"+i,-106+i*106,540,100,44,()=>HohChange(()=>Hoh.PickGroup(group)));hohGroups[i].GetComponentInChildren<Text>().fontSize=14;}
             hohReadout=Label(hohInstrument,"",0,325,180,80,15);hohReadout.resizeTextForBestFit=true;hohReadout.resizeTextMinSize=12;hohReadout.resizeTextMaxSize=15;
-            hohMc=Picture(hohInstrument,"orb-star",0,0,18,18);hohMc.color=Gilt;hohMcRay=HohLine(hohInstrument,"MC connector",new Vector2(0,171),new Vector2(0,220),Gilt);
+            hohMc=Rect("MC point",hohInstrument,0,0,10,10).gameObject.AddComponent<Image>();hohMc.color=Gilt;hohMc.raycastTarget=false;hohMc.rectTransform.localRotation=Quaternion.Euler(0,0,45);hohMcLabel=Label(hohInstrument,HousesCopy.MC,0,0,32,24,13);hohMcLabel.color=Gilt;hohMcRay=HohLine(hohInstrument,"MC connector",new Vector2(0,171),new Vector2(0,220),Gilt);
             hohLeft=CorButton(hohInstrument,"<","hoh-left",-90,506,52,44,()=>HohChange(()=>Hoh.Rotate(-1)));hohRight=CorButton(hohInstrument,">","hoh-right",90,506,52,44,()=>HohChange(()=>Hoh.Rotate(1)));
             hohSeal=CorButton(hohInstrument,CorridorCopy.Seal,"hoh-seal",0,555,130,44,()=>HohChange(()=>Hoh.Seal()));hohAsk=CorButton(hohInstrument,CorridorCopy.Ask,"hoh-ask",0,600,150,44,()=>HohChange(()=>Hoh.Ask()));
             var panel=Rect("Hall teaching",hohInstrument,0,695,328,137);panel.gameObject.AddComponent<Image>().color=PanelColor;hohMessage=Label(panel,"",0,65,306,125,15);hohMessage.resizeTextForBestFit=true;hohMessage.resizeTextMinSize=12;hohMessage.resizeTextMaxSize=15;
@@ -88,15 +88,15 @@ namespace Ascendant.CelestialDial
                 if(example){int n=Houses.HouseOf(Hoh.Example.Rising,i);hohHouseNumbers[i].text=n.ToString();hohHouseNumbers[i].rectTransform.anchoredPosition=new Vector2(-Mathf.Cos(a)*92,-(324+Mathf.Sin(a)*92));}
                 hohNumbers[i].gameObject.SetActive(topics||example);hohNumbers[i].interactable=!busy&&!Hoh.AwaitingNext;
             }
-            hohWheel.rectTransform.localRotation=Quaternion.Euler(0,0,overlay||house?Hoh.Turn*30:0);
+            hohWheel.rectTransform.localRotation=Quaternion.identity;
             for(int i=0;i<4;i++){
                 hohAngles[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(-99+i*66,-526);hohAngles[i].gameObject.SetActive(angles&&!Hoh.Progress.angles[i]);hohAngles[i].interactable=!busy&&!Hoh.AwaitingNext&&(Hoh.Misses==0||Hoh.SelectedAngle==i);hohAngles[i].GetComponent<Image>().color=Hoh.SelectedAngle==i?Gilt:Dim;
                 hohPoints[i].gameObject.SetActive(angles||overlay||example);hohPoints[i].GetComponentInChildren<Text>().text=angles?Houses.Points[i]+(Hoh.Progress.angles[i]?" "+Houses.Angles[i]:""):Houses.Angles[i];hohPoints[i].interactable=angles&&!busy&&!Hoh.AwaitingNext;
                 bool card=review||distinction;var choices=review?Flow.HousesReviewChoices:distinction?Hoh.DistinctionChoices:new string[0];hohCards[i].gameObject.SetActive(card&&i<choices.Length);hohCards[i].interactable=!busy&&(review||!Hoh.AwaitingNext);hohCards[i].GetComponentInChildren<Text>().text=i<choices.Length?choices[i]:"";
             }
             for(int i=0;i<3;i++){hohGroups[i].gameObject.SetActive(groups);hohGroups[i].interactable=!busy&&!Hoh.AwaitingNext;}
-            hohMc.gameObject.SetActive(example);hohMcRay.gameObject.SetActive(example);
-            if(example){float a=(float)(Hoh.Example.Midheaven-Hoh.Example.Ascendant)*Mathf.Deg2Rad;Vector2 end=new Vector2(-Mathf.Cos(a)*135,324+Mathf.Sin(a)*135),start=new Vector2(0,171);hohMc.rectTransform.anchoredPosition=new Vector2(end.x,-end.y);hohMcRay.rectTransform.anchoredPosition=new Vector2((start.x+end.x)/2,-(start.y+end.y)/2);hohMcRay.rectTransform.sizeDelta=new Vector2(Vector2.Distance(start,end),2);hohMcRay.rectTransform.localRotation=Quaternion.Euler(0,0,-Mathf.Atan2(end.y-start.y,end.x-start.x)*Mathf.Rad2Deg);}
+            hohMc.gameObject.SetActive(example);hohMcRay.gameObject.SetActive(example);hohMcLabel.gameObject.SetActive(example);
+            if(example){float a=(float)(Hoh.Example.Midheaven-Hoh.Example.Ascendant)*Mathf.Deg2Rad;Vector2 end=new Vector2(-Mathf.Cos(a)*135,324+Mathf.Sin(a)*135),start=new Vector2(0,171);hohMc.rectTransform.anchoredPosition=new Vector2(end.x,-end.y);hohMcLabel.rectTransform.anchoredPosition=new Vector2(end.x+20,-end.y-12);hohMcRay.rectTransform.anchoredPosition=new Vector2((start.x+end.x)/2,-(start.y+end.y)/2);hohMcRay.rectTransform.sizeDelta=new Vector2(Vector2.Distance(start,end),2);hohMcRay.rectTransform.localRotation=Quaternion.Euler(0,0,-Mathf.Atan2(end.y-start.y,end.x-start.x)*Mathf.Rad2Deg);}
             hohLeft.gameObject.SetActive(overlay||house);hohRight.gameObject.SetActive(overlay||house);hohSeal.gameObject.SetActive(overlay||house);hohAsk.gameObject.SetActive((overlay||house)&&Hoh.Hint<2&&!Hoh.AwaitingNext);hohLeft.interactable=hohRight.interactable=!busy&&!Hoh.AwaitingNext;hohSeal.interactable=!busy&&!Hoh.AwaitingNext&&(Hoh.Hint<3||Hoh.Turn==Hoh.WheelAnswer);
             hohNext.gameObject.SetActive(!review&&Hoh.CanContinue);hohNext.interactable=!busy;hohNeedsJournal.gameObject.SetActive(!review&&Hoh.Phase==HousesPhase.NeedsRising);
         }

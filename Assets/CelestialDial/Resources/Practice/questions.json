@@ -890,7 +890,7 @@
         "Partners"
       ],
       "answer": 0,
-      "why": "The twelfth house covers retreat, solitude and what is hidden. That gives it a topic rather than a verdict."
+      "why": "The twelfth house covers retreat, solitude and what is hidden. These are topics of the twelfth house."
     },
     {
       "ask": "Can the MC fall outside the tenth whole-sign house?",
@@ -903,7 +903,7 @@
         "Only if every house is less than thirty degrees."
       ],
       "answer": 0,
-      "why": "The unnamed London example puts the computed MC in the ninth whole-sign house. The ninth, tenth and eleventh are examples, rather than a limit."
+      "why": "The unnamed London example puts the computed MC in the ninth whole-sign house. The ninth, tenth and eleventh are examples of whole-sign houses the MC can occupy."
     },
     {
       "ask": "Which set contains the angular houses?",

@@ -743,7 +743,7 @@ namespace Ascendant.CelestialDial
         }
         void PlaceAvatar()
         {
-            var walk = Flow.Walk; float band = walk.Room == Room.Chamber ? ChamberBandY : walk.Room == Room.Corridor ? 536f : BandY;
+            var walk = Flow.Walk; float band = walk.Room == Room.Chamber ? ChamberBandY : walk.Room == Room.Corridor ? 536f : walk.Room == Room.Houses ? 548f : BandY;
             avatar.anchoredPosition = new Vector2(walk.X, -(band + 6 - 22 * KeeperScale) + walk.Bob); // the feet stay at band + 6 whatever the scale
             avatarHead.anchoredPosition = new Vector2(walk.Facing * 2, -7);
             if (avatarArt.gameObject.activeSelf) { avatarArt.sprite = walk.Walking && ((int)(walk.Traveled / 14f)) % 2 == 1 ? keeperWalk : keeperIdle; avatarArt.rectTransform.localScale = new Vector3(walk.Facing, 1, 1); } // one frame per step, the walk bob's own rhythm
