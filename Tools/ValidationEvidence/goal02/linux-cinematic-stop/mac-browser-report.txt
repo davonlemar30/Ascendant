@@ -1,0 +1,1065 @@
+PASS: the launch (owner, Oct 9): a page load opens on the logo screen, no gear, Skip offered to the screen reader and hidden on screen, at 360
+PASS: the launch (owner, Oct 9): a page load opens on the logo screen, no gear, Skip offered to the screen reader and hidden on screen, at 390
+PASS: the launch: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 390
+PASS: the launch: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 360
+PASS: the launch: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 360
+PASS: the wheel draws itself: the sweep has revealed 14% of its lines at 360
+PASS: the wheel zooms in slowly through draw (scale 0.819, up from 0.000) at 360
+PASS: the launch: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 390
+PASS: the wheel draws itself: the sweep has revealed 15% of its lines at 390
+PASS: the wheel zooms in slowly through draw (scale 0.821, up from 0.000) at 390
+PASS: the launch: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 360
+PASS: its symbols appear one at a time: 1 of 12 so far at 360
+PASS: the wheel zooms in slowly through glyphs (scale 0.931, up from 0.819) at 360
+PASS: the launch: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 390
+PASS: its symbols appear one at a time: 2 of 12 so far at 390
+PASS: the wheel zooms in slowly through glyphs (scale 0.933, up from 0.821) at 390
+PASS: the launch: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 360
+PASS: the wheel zooms in slowly through alive (scale 0.977, up from 0.931) at 360
+PASS: the launch: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 390
+PASS: the wheel zooms in slowly through alive (scale 0.978, up from 0.933) at 390
+PASS: the launch: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 360
+PASS: the wheel spins: intro-wheel-burning turned -0.9 degrees, a round layer at its own size, at 360
+PASS: the launch: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 390
+PASS: the wheel spins: intro-wheel-burning turned -1.4 degrees, a round layer at its own size, at 390
+PASS: the launch: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 390
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:-170.49:0.91"]), which spins on and fades away, at 390
+PASS: the launch: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 360
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:-171.84:0.90"]), which spins on and fades away, at 360
+PASS: the launch: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 360
+PASS: the launch: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 390
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (26 states read) at 360
+PASS: after the transform only Earth is on stage at 360
+PASS: the push-in on intro-earth (scale 1.020) at 360
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (27 states read) at 390
+PASS: after the transform only Earth is on stage at 390
+PASS: the push-in on intro-earth (scale 1.020) at 390
+PASS: the launch: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 360
+PASS: the launch: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 390
+PASS: in the launch movie a canvas tap shows Skip and advances nothing at 390
+PASS: in the launch movie a canvas tap shows Skip and advances nothing at 360
+PASS: the launch: america (intro-america) on the launch movie, its spoken line announced ("The United States at night."), the semantic Skip offered, no gear, at 390
+PASS: the launch: america (intro-america) on the launch movie, its spoken line announced ("The United States at night."), the semantic Skip offered, no gear, at 360
+PASS: the launch: newyork-state (intro-newyork-state) on the launch movie, its spoken line announced ("New York State."), the semantic Skip offered, no gear, at 360
+PASS: the launch: newyork-state (intro-newyork-state) on the launch movie, its spoken line announced ("New York State."), the semantic Skip offered, no gear, at 390
+PASS: the launch: newyork-city (intro-newyork-city) on the launch movie, its spoken line announced ("New York City, between its rivers."), the semantic Skip offered, no gear, at 390
+PASS: the launch: newyork-city (intro-newyork-city) on the launch movie, its spoken line announced ("New York City, between its rivers."), the semantic Skip offered, no gear, at 360
+PASS: the launch: brooklyn (intro-brooklyn) on the launch movie, its spoken line announced ("Brooklyn's rooftops at night."), the semantic Skip offered, no gear, at 390
+PASS: the push-in on intro-brooklyn (scale 1.001) at 390
+PASS: the launch: brooklyn (intro-brooklyn) on the launch movie, its spoken line announced ("Brooklyn's rooftops at night."), the semantic Skip offered, no gear, at 360
+PASS: the push-in on intro-brooklyn (scale 1.006) at 360
+PASS: the launch: block (intro-block) on the launch movie, its spoken line announced ("A street of apartment buildings, a few cars, lit shopfronts."), the semantic Skip offered, no gear, at 390
+PASS: the launch: block (intro-block) on the launch movie, its spoken line announced ("A street of apartment buildings, a few cars, lit shopfronts."), the semantic Skip offered, no gear, at 360
+PASS: the launch: window (prologue-city) on the launch movie, its spoken line announced ("One building. Every window is dark but one."), the semantic Skip offered, no gear, at 360
+PASS: the push-in on prologue-city (scale 1.013) at 360
+PASS: the launch: window (prologue-city) on the launch movie, its spoken line announced ("One building. Every window is dark but one."), the semantic Skip offered, no gear, at 390
+PASS: the push-in on prologue-city (scale 1.014) at 390
+PASS: the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save Continue and Load Game at half; no gear, at 360
+PASS: the menu's buttons wear the Room look at 232 x 44 (room 232x44, room 232x44, room 232x44, room 232x44) at 360
+PASS: the movie fades to the menu: Continue, New Game, Load Game, Settings; with no save Continue and Load Game at half; no gear, at 390
+PASS: the menu's buttons wear the Room look at 232 x 44 (room 232x44, room 232x44, room 232x44, room 232x44) at 390
+PASS: the screen reader's menu offers New Game and Settings (focus on New Game, or kept by the canvas after a canvas tap: unity-canvas) at 360
+PASS: the menu stands on the owner's approved art (M1b's city, the Library Seal), the title centred 115 down, at 360
+PASS: the screen reader's menu offers New Game and Settings (focus on New Game, or kept by the canvas after a canvas tap: unity-canvas) at 390
+PASS: the menu stands on the owner's approved art (M1b's city, the Library Seal), the title centred 115 down, at 390
+PASS: no vertical scroll on the menu at 360
+PASS: no vertical scroll on the menu at 390
+PASS: the window's glow pulses on the menu (0.42, 0.44, 0.15, between 0.15 and 0.5) at 390
+PASS: the window's glow pulses on the menu (0.34, 0.44, 0.15, between 0.15 and 0.5) at 360
+PASS: the rat runs across the street (x -113, y 750.5, facing right) at 390
+PASS: the rat runs across the street (x -111, y 750.5, facing right) at 360
+PASS: a canvas tap on the running rat (x -43, y 750) does nothing: it takes no taps, at 360
+PASS: a canvas tap on the running rat (x -95, y 750) does nothing: it takes no taps, at 390
+PASS: while the rat runs a canvas tap on Settings still lands, and the rat and the glow step aside, at 360
+PASS: while the rat runs a canvas tap on Settings still lands, and the rat and the glow step aside, at 390
+PASS: screen_entered:Logo, :Intro and :Menu are logged as every screen is, with the movie's end, at 360
+PASS: screen_entered:Logo, :Intro and :Menu are logged as every screen is, with the movie's end, at 390
+PASS: with no save Load Game does nothing on the canvas at 360
+PASS: with no save Load Game does nothing on the canvas at 390
+PASS: the menu's Settings (a canvas tap) opens the same panel without Start over and Main menu (Sound: on, Reduced motion: off, Walk: normal, Jump to..., Close) at 360
+PASS: the menu's Settings (a canvas tap) opens the same panel without Start over and Main menu (Sound: on, Reduced motion: off, Walk: normal, Jump to..., Close) at 390
+PASS: the opening scene (owner, Oct 8): New Game on a first launch (a canvas tap) goes straight into slot 1 and the prologue, seven shots, Skip offered to the screen reader and hidden on screen, the gear back, at 390
+PASS: the opening scene (owner, Oct 8): New Game on a first launch (a canvas tap) goes straight into slot 1 and the prologue, seven shots, Skip offered to the screen reader and hidden on screen, the gear back, at 360
+PASS: no vertical scroll on the prologue at 390
+PASS: no vertical scroll on the prologue at 360
+PASS: the opening scene: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered at 360
+PASS: the opening scene: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered at 390
+PASS: the opening scene: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the opening scene: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: a canvas tap shows Skip and advances nothing (shot 2, prologue-desk) at 390
+PASS: a canvas tap shows Skip and advances nothing (shot 2, prologue-desk) at 360
+PASS: Skip hides again after about 3 s (3.0 s) and the scene plays on at 390
+PASS: Skip hides again after about 3 s (3.0 s) and the scene plays on at 360
+PASS: the opening scene: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the opening scene: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook) at 390
+PASS: the hand writes: the loop runs notebook, -2, -3 and round (desk notebook notebook-2 notebook-3 notebook) at 360
+PASS: the opening scene: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones) at 390
+PASS: shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down (desk light light-up look headphones-mid headphones) at 360
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 390
+PASS: the opening scene: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the flash: the busy guard holds and Skip waits it out at 390
+PASS: the flash: the busy guard holds and Skip waits it out at 360
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it at 390
+PASS: screen_entered:Prologue is logged, then the end and Identity, at 390
+PASS: no vertical scroll on identity at 390
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it at 360
+PASS: screen_entered:Prologue is logged, then the end and Identity, at 360
+PASS: no vertical scroll on identity at 360
+PASS: the orb: the name's star gathers on the birth question at 390
+PASS: the orb: the name's star gathers on the birth question at 360
+PASS: birth prompt waits for a choice at 390
+PASS: Oct 7: the opening's question has two answers (the known path and the random sun retired) at 390
+PASS: birth prompt waits for a choice at 360
+PASS: Oct 7: the opening's question has two answers (the known path and the random sun retired) at 360
+PASS: the orb: three stars once the date is in (the name, the question, the date) at 390
+PASS: the orb: three stars once the date is in (the name, the question, the date) at 360
+PASS: Change my answer: the published stars drop at once to the name's (1 counted, 1 shown) at 390
+PASS: Change my answer: the published stars drop at once to the name's (1 counted, 1 shown) at 360
+PASS: I'll skip it asks no sign, at 360
+PASS: I'll skip it asks no sign, at 390
+PASS: the orb: two stars once the skip path is answered (the name, the answer) at 390
+PASS: the orb: two stars once the skip path is answered (the name, the answer) at 360
+PASS: owner, Oct 15: the default chart: a Scorpio sun, a moon and rising worked out, the note says so once: ☉ Scorpio · ☽ Gemini · ↑ Gemini at 390
+PASS: owner, Oct 15: the default chart: a Scorpio sun, a moon and rising worked out, the note says so once: ☉ Scorpio · ☽ Gemini · ↑ Gemini at 360
+PASS: owner, Oct 16: a real day with the default 7:19 PM and Bushwick given is a personal chart, five stars, and the note names no default: Your sun sign is Taurus, your moon sign Taurus, and your rising sign Scorpio. at 360
+PASS: owner, Oct 16: a real day with the default 7:19 PM and Bushwick given is a personal chart, five stars, and the note names no default: Your sun sign is Taurus, your moon sign Taurus, and your rising sign Scorpio. at 390
+PASS: 0.2 s into the white light the orb and its five stars still show over the birth screen at 360
+PASS: 0.2 s into the white light the orb and its five stars still show over the birth screen at 390
+PASS: Batch 2 (the masters approved, Oct 2): the Grand Atrium draws its 1200 x 1840 master whole (atrium, atrium-grime, atrium-light) at 360
+PASS: Build P: Caspar stands wry behind the chat box on the opening's first page at 360
+PASS: Build X: the opening's chat box fits its first page (149.5 of 240) at 360
+PASS: Batch 2 (the masters approved, Oct 2): the Grand Atrium draws its 1200 x 1840 master whole (atrium, atrium-grime, atrium-light) at 390
+PASS: Build P: Caspar stands wry behind the chat box on the opening's first page at 390
+PASS: Build X: the opening's chat box fits its first page (148.44549560546875 of 240) at 390
+PASS: Build X: a canvas tap on Continue, at the fitted box's bottom, turns the page at 360
+PASS: Build X: a canvas tap on Continue, at the fitted box's bottom, turns the page at 390
+PASS: Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at 360
+PASS: Build T: the opening ends in the Atrium at Stage 1, Caspar pointing to the Zodiac Wing at 390
+PASS: batch 2 (3c C, 3d); the art pass (86bcex5kc 1A): in the Atrium the Zodiac Wing's door takes the tap and its button is gone, the gear and the mini-menu button take 44 x 44 (plain 44x44, plain 44x44), and every target is 44 px or more (under: none) at 360
+PASS: batch 2 (3c C, 3d); the art pass (86bcex5kc 1A): in the Atrium the Zodiac Wing's door takes the tap and its button is gone, the gear and the mini-menu button take 44 x 44 (plain 44x44, plain 44x44), and every target is 44 px or more (under: none) at 390
+PASS: Build X: the Atrium's chat box fits Caspar's two lines (79.5 of 120) at 360
+PASS: Build X: the Atrium's chat box fits Caspar's two lines (79.01422119140625 of 120) at 390
+PASS: Build E: the page hook fired on Caspar's pages, file or not, at 360
+PASS: Build E: the page hook fired on Caspar's pages, file or not, at 390
+PASS: Build U: a tap on the gear opens Settings; a web page offers no Quit at 360
+PASS: Build U: a tap on the gear opens Settings; a web page offers no Quit at 390
+PASS: the launch (Oct 9): in the game Settings has Main menu in the player's section, above Testing (Sound: on, Reduced motion: off, Main menu, Walk: normal, Jump to..., Start over, Close) at 360
+PASS: the launch (Oct 9): in the game Settings has Main menu in the player's section, above Testing (Sound: on, Reduced motion: off, Main menu, Walk: normal, Jump to..., Start over, Close) at 390
+PASS: before Key 1 (nothing saved yet) the Main menu row asks first ("Saving begins at your first Keeper Key. Go to the main menu?") at 360
+PASS: before Key 1 (nothing saved yet) the Main menu row asks first ("Saving begins at your first Keeper Key. Go to the main menu?") at 390
+PASS: Back keeps the game, back on Settings, at 390
+PASS: Back keeps the game, back on Settings, at 360
+PASS: Build U: the Sound row turns the sound off at 390
+PASS: Build U: the Sound row turns the sound off at 360
+PASS: Build U: the Reduced motion row works from Settings at 390
+PASS: Build U: the Reduced motion row works from Settings at 360
+PASS: Build U: Close shuts Settings, both settings back as they were at 390
+PASS: Build U: Close shuts Settings, both settings back as they were at 360
+PASS: Platform fit, Part 1: with a 24 px top band the gear moves below it, its tap and semantic box with it, at 360 (band 24, old spot false, new spot true, box 46.0 for 46.0)
+PASS: Platform fit, Part 1: with a 24 px top band the gear moves below it, its tap and semantic box with it, at 390 (band 24, old spot false, new spot true, box 48.5 for 48.5)
+PASS: Platform fit, Part 1: the web page has no top band of its own, so the top row stays where it was at 360
+PASS: Build T: the Chamber button waits for Key 1 at 360
+PASS: Platform fit, Part 1: the web page has no top band of its own, so the top row stays where it was at 390
+PASS: Build T: the Chamber button waits for Key 1 at 390
+PASS: Build T: before Key 1 the Chamber door only says it is sealed at 390
+PASS: Build T: before Key 1 the Chamber door only says it is sealed at 360
+PASS: the mini-menu: its button shows in the Atrium at 390
+PASS: the mini-menu: its button shows in the Atrium at 360
+PASS: the mini-menu: a tap on its button opens TRAVEL: the Atrium here, the Zodiac Wing, one Sealed row (the Chamber waits for Key 1): ["The Grand Atrium, here","The Zodiac Wing","Sealed"] at 390
+PASS: the mini-menu: a tap on its button opens TRAVEL: the Atrium here, the Zodiac Wing, one Sealed row (the Chamber waits for Key 1): ["The Grand Atrium, here","The Zodiac Wing","Sealed"] at 360
+PASS: the mini-menu: the Sealed row is no door at 390
+PASS: the mini-menu: the Sealed row is no door at 360
+PASS: the mini-menu: a tap off the panel closes it at 390
+PASS: the mini-menu: a tap off the panel closes it at 360
+PASS: the mini-menu: a tap on the Zodiac Wing row travels there at 360
+PASS: batch 2 (3c C, 3d): the Zodiac Wing's buttons wear the room look (The Dial: room 300x52), and Return to the Atrium is gone: the doorway back takes the tap (86bcex5kc 1A), every target 44 px or more (under: none) at 360
+PASS: the mini-menu: in the Wing the Wing is here, and the semantic rows sit on the panel's rows at 360
+PASS: the mini-menu: a tap on the Zodiac Wing row travels there at 390
+PASS: batch 2 (3c C, 3d): the Zodiac Wing's buttons wear the room look (The Dial: room 300x52), and Return to the Atrium is gone: the doorway back takes the tap (86bcex5kc 1A), every target 44 px or more (under: none) at 390
+PASS: the mini-menu: in the Wing the Wing is here, and the semantic rows sit on the panel's rows at 390
+PASS: the mini-menu: the Atrium row brings the Keeper back, the Atrium as it was at 360
+PASS: the mini-menu: the Atrium row brings the Keeper back, the Atrium as it was at 390
+PASS: Build T: in the Zodiac Wing Caspar points to the Dial at 360
+PASS: Build T: in the Zodiac Wing Caspar points to the Dial at 390
+PASS: Build Z: in the Zodiac Wing the Dial rests with its eye closed at 360
+PASS: Build Z: in the Zodiac Wing the Dial rests with its eye closed at 390
+PASS: Build AB: the Wing Dial's eye is seen open on screen as the Keeper goes to it (0% blue glass shut, 79% open) at 360
+PASS: Build AB: the Wing Dial's eye is seen open on screen as the Keeper goes to it (0% blue glass shut, 81% open) at 390
+PASS: Build T: Leave the Dial shows from the first lesson on (tappable once the wheel's opening beat settles) at 390
+PASS: Build T: Leave the Dial shows from the first lesson on (tappable once the wheel's opening beat settles) at 360
+PASS: the Dial is dormant on arrival, Caspar silent (the owner cut his repeated Wing line) at 390
+PASS: the Dial is dormant on arrival, Caspar silent (the owner cut his repeated Wing line) at 360
+PASS: no query: the game plays on the Art folder, no style page at 390
+PASS: no query: the game plays on the Art folder, no style page at 360
+PASS: Build Z: the Wing Dial opened its eye as the Keeper came to it at 360
+PASS: Build Z: the Dial arrives in its room, asleep: no glow, the eye empty, no reveal yet at 360
+PASS: Build Z: the Wing Dial opened its eye as the Keeper came to it at 390
+PASS: Build Z: the Dial arrives in its room, asleep: no glow, the eye empty, no reveal yet at 390
+PASS: Build Z: mid-reveal the glow has swept part of the ring (0.36) at 360
+PASS: Build Z: mid-reveal the glow has swept part of the ring (0.37) at 390
+PASS: Build Z: the reveal ends with the whole ring lit, the elements marked played at 360
+PASS: Build Z: the reveal ends with the whole ring lit, the elements marked played at 390
+PASS: no vertical scroll at 360
+PASS: no vertical scroll at 390
+PASS: the Dial has woken and the guided problem began at 360
+PASS: Build Z: the Dial poses its challenge in the eye (14 px) and names the framed sign above it at 360
+PASS: Build Z: the box wears the Dial's blue exactly when the Dial speaks (caspar) at 360
+PASS: batch 2, step 5: the family triangles on the worn Dial in the Web build: Earth taught, its triangle lit, every side breaking round the words (13 gaps, 82% shown, no light on a word), the corners on the hub ring at 360
+PASS: the Dial has woken and the guided problem began at 390
+PASS: Build Z: the Dial poses its challenge in the eye (13 px) and names the framed sign above it at 390
+PASS: Build Z: the box wears the Dial's blue exactly when the Dial speaks (caspar) at 390
+PASS: batch 2, step 5: the family triangles on the worn Dial in the Web build: Earth taught, its triangle lit, every side breaking round the words (13 gaps, 82% shown, no light on a word), the corners on the hub ring at 390
+PASS: Build T: Leave the Dial, tapped mid-challenge in the first lesson, lands in the Zodiac Wing at 360
+PASS: Build Z: back in the room the Dial's eye has closed again at 360
+PASS: Build T: Leave the Dial, tapped mid-challenge in the first lesson, lands in the Zodiac Wing at 390
+PASS: Build Z: back in the room the Dial's eye has closed again at 390
+PASS: Build T: back at the Dial the same problem is waiting at 360
+PASS: 12 semantic seats and effective target floor at 360
+PASS: Build AC follow-up: the twelve semantic seat boxes sit on the seats the Dial draws (radius 123, 58 x 66 along by across the ring, upright) with Taurus framed at 360
+PASS: Build T: back at the Dial the same problem is waiting at 390
+PASS: the wheel shows its own challenge and there is no Count button (Build I) at 360
+PASS: 12 semantic seats and effective target floor at 390
+PASS: Build AC follow-up: the twelve semantic seat boxes sit on the seats the Dial draws (radius 123, 58 x 66 along by across the ring, upright) with Taurus framed at 390
+PASS: the wheel shows its own challenge and there is no Count button (Build I) at 390
+PASS: actual pointer drag advances four detents at 360
+PASS: a drag does not submit at 360
+PASS: Build AC follow-up: the twelve semantic seat boxes sit on the seats the Dial draws (radius 123, 58 x 66 along by across the ring, upright) with Virgo framed at 360
+PASS: actual pointer drag advances four detents at 390
+PASS: a drag does not submit at 390
+PASS: Build AC follow-up: the twelve semantic seat boxes sit on the seats the Dial draws (radius 123, 58 x 66 along by across the ring, upright) with Virgo framed at 390
+PASS: semantic direct selection at 360
+PASS: semantic direct selection at 390
+PASS: batch 2 (3b C): the Dial's buttons are bronze: SEAL plate 146x56, Previous arrow-previous 64x56, Next arrow-next 64x56, Leave the Dial rule 216x44, every target 44 px or more (under: none) at 360
+PASS: batch 2 (3b C): the Dial's buttons are bronze: SEAL plate 146x56, Previous arrow-previous 64x56, Next arrow-next 64x56, Leave the Dial rule 216x44, every target 44 px or more (under: none) at 390
+PASS: pointer step overshoot and correction at 390
+PASS: pointer step overshoot and correction at 360
+PASS: keyboard steps share selected destination at 360
+PASS: keyboard steps share selected destination at 390
+PASS: six-seat completion and conditional Key at 360
+PASS: six-seat completion and conditional Key at 390
+PASS: Dial reveals the Key with the locked reveal line at 390
+PASS: key_revealed event at 390
+PASS: Dial reveals the Key with the locked reveal line at 360
+PASS: key_revealed event at 360
+PASS: one Key event at 390
+PASS: guided answers stay ineligible at 390
+PASS: one Key event at 360
+PASS: guided answers stay ineligible at 360
+PASS: optional probe events at 390
+PASS: optional probe events at 360
+PASS: Build P: Caspar is moved by the Keeper Key on the return's first page at 390
+PASS: Build P: Caspar is moved by the Keeper Key on the return's first page at 360
+PASS: Build R: Caspar stands behind the Chamber's box, explaining, on its first page at 390
+PASS: the Key cannot be inserted before Caspar finishes at 390
+PASS: Build R: Caspar stands behind the Chamber's box, explaining, on its first page at 360
+PASS: the Key cannot be inserted before Caspar finishes at 360
+PASS: a visible Continue turns Caspar's pages in the Chamber at 390
+PASS: a visible Continue turns Caspar's pages in the Chamber at 360
+PASS: one Key fills one lock and the amended ending plays at 390
+PASS: Build R: after the first Key he steps away and the Chamber stays in view at 390
+PASS: chamber events at 390
+PASS: one Key fills one lock and the amended ending plays at 360
+PASS: Build R: after the first Key he steps away and the Chamber stays in view at 360
+PASS: chamber events at 360
+PASS: no vertical scroll at the ending at 360
+PASS: no vertical scroll at the ending at 390
+PASS: the Chamber leads to the Hub in Stage 2 with twelve items ready for practice at once, no in-game time, and the Stirring caption said once, at 360
+PASS: the Chamber leads to the Hub in Stage 2 with twelve items ready for practice at once, no in-game time, and the Stirring caption said once, at 390
+PASS: Build N: the Atrium kit at Stage 2: pieces still worn, grime in place, the sealed door locked and the Wing and Chamber doors unlocked at 360
+PASS: Build N: the Atrium kit at Stage 2: pieces still worn, grime in place, the sealed door locked and the Wing and Chamber doors unlocked at 390
+PASS: the light overlay follows the stage: a quarter at Stage 2 at 390
+PASS: the light overlay follows the stage: a quarter at Stage 2 at 360
+PASS: the Atrium lists its points of interest, the Chamber doorway among them, with the marker where you came in at 390
+PASS: the Atrium lists its points of interest, the Chamber doorway among them, with the marker where you came in at 360
+PASS: a sealed door only says it is sealed at 360
+PASS: a sealed door only says it is sealed at 390
+PASS: tapping Caspar walks the marker to him at 360
+PASS: tapping Caspar walks the marker to him at 390
+PASS: no vertical scroll at the Hub at 360
+PASS: no vertical scroll at the Hub at 390
+PASS: the test sound toggle mutes from the Atrium and says so at 390
+PASS: the test sound toggle mutes from the Atrium and says so at 360
+PASS: Check the Seals is gone from the page; the journal has a control at 390
+PASS: Check the Seals is gone from the page; the journal has a control at 360
+PASS: the desk only speaks; the journal is in hand at the Atrium at 390
+PASS: the desk only speaks; the journal is in hand at the Atrium at 360
+PASS: the journal's first-ever open is the title page (Your Journal, KEEPER, These pages fill as you learn.) at 390
+PASS: the journal's first-ever open is the title page (Your Journal, KEEPER, These pages fill as you learn.) at 360
+PASS: the landing's Keeper's record: KEEPER, ☉ Taurus · ☽ Taurus · ↑ Scorpio (the sun as given; no Keys line, 86bcgfkdy), and the owner's inscription with the saved name (What's up, Tester. / I'm your journal, and I'll keep a record / of what you learn from the Library.) at 390
+PASS: two doors: Practice (it opens Practice, owner Oct 3) and Contents, at 390
+PASS: the living inscription (Oct 7): the Oct 2 line writes itself as the title page finishes fading, and the doors work while it writes, at 390
+PASS: the landing's Keeper's record: KEEPER, ☉ Taurus · ☽ Taurus · ↑ Scorpio (the sun as given; no Keys line, 86bcgfkdy), and the owner's inscription with the saved name (What's up, Tester. / I'm your journal, and I'll keep a record / of what you learn from the Library.) at 360
+PASS: two doors: Practice (it opens Practice, owner Oct 3) and Contents, at 360
+PASS: the living inscription (Oct 7): the Oct 2 line writes itself as the title page finishes fading, and the doors work while it writes, at 360
+PASS: the inscription draws in EB Garamond Italic in the Web build: 8.4% light ink on its lines at 360
+PASS: the inscription draws in EB Garamond Italic in the Web build: 8.4% light ink on its lines at 390
+PASS: the Practice door on the canvas opens the list of concepts learned: The Elements, ‹ Your Journal at the top left, at 360
+PASS: its row and its link each take 44 px or more (The Elements 238x78, ‹ Your Journal 96x44) at 360
+PASS: the Practice door on the canvas opens the list of concepts learned: The Elements, ‹ Your Journal at the top left, at 390
+PASS: its row and its link each take 44 px or more (The Elements 238x78, ‹ Your Journal 96x44) at 390
+PASS: a row starts its round: question 1 of 6, its choices in their frames, ‹ Practice at the top left, at 360
+PASS: every choice takes 44 px or more (238x44, 238x44, 238x44, 238x44) at 360
+PASS: a row starts its round: question 1 of 6, its choices in their frames, ‹ Practice at the top left, at 390
+PASS: every choice takes 44 px or more (238x44, 238x44, 238x44, 238x44) at 390
+PASS: a right pick on the canvas: "That's it. Pisces is Water, with Cancer and Scorpio.", at 360
+PASS: a right pick on the canvas: "That's it. Taurus is Earth, with Virgo and Capricorn.", at 390
+PASS: a wrong pick on the canvas: "Not quite. Aquarius is Air, with Gemini and Libra.", at 360
+PASS: a wrong pick on the canvas: "Not quite. Aquarius is Air, with Gemini and Libra.", at 390
+PASS: after six, the round ends with the journal's line ("That's all I have on the elements for now. Come back whenever you like.") and Back to Practice, at 360
+PASS: after six, the round ends with the journal's line ("That's all I have on the elements for now. Come back whenever you like.") and Back to Practice, at 390
+PASS: Back to Practice and ‹ Your Journal on the canvas lead back, at 360
+PASS: Back to Practice and ‹ Your Journal on the canvas lead back, at 390
+PASS: the Contents door on the canvas: The Wheel, The Library Map, The Planets, one Sealed row, ‹ Your Journal at the top left, at 360
+PASS: Contents' three rows and its link each take 44 px or more (The Wheel 238x104, The Library Map 238x104, The Planets 238x78, ‹ Your Journal 96x44) at 360
+PASS: the Contents door on the canvas: The Wheel, The Library Map, The Planets, one Sealed row, ‹ Your Journal at the top left, at 390
+PASS: Contents' three rows and its link each take 44 px or more (The Wheel 238x104, The Library Map 238x104, The Planets 238x78, ‹ Your Journal 96x44) at 390
+PASS: the Library Map on the canvas: the plan, the three rooms woken so far named, ‹ Contents at the top left, at 360
+PASS: the Library Map on the canvas: the plan, the three rooms woken so far named, ‹ Contents at the top left, at 390
+PASS: ‹ Contents and ‹ Your Journal on the canvas lead back, at 360
+PASS: ‹ Contents and ‹ Your Journal on the canvas lead back, at 390
+PASS: Contents opens the Wheel, ‹ Contents at its top left: twelve signs met, the due ones flagged, no tabs or Table yet, at 360 (view wheel; seats met,met,met,met,practising,met,practising,met,practising,met,met,met; due 9; tabs 0; caspar: Your journal. The Wheel. Aries, met, ready for practice; Taurus, met, ready for practice; Gemini, met, ready for practice; Cancer, met, ready for practice; Leo, practising; Virgo, met, ready for practice; Libra, practising; Scorpio, met, ready for practice; Sagittarius, practising; Capricorn, met, ready for practice; Aquarius, met, ready for practice; Pisces, met, ready for practice.)
+PASS: the journal's titles are drawn in blackletter in the Web build (owner, Sept 26) at 360
+PASS: the blackletter title draws in the Web build: 21% gold in its box on the Wheel at 360
+PASS: no vertical scroll in the journal at 360
+PASS: Contents opens the Wheel, ‹ Contents at its top left: twelve signs met, the due ones flagged, no tabs or Table yet, at 390 (view wheel; seats met,met,met,met,practising,met,practising,met,practising,met,met,met; due 9; tabs 0; caspar: Your journal. The Wheel. Aries, met, ready for practice; Taurus, met, ready for practice; Gemini, met, ready for practice; Cancer, met, ready for practice; Leo, practising; Virgo, met, ready for practice; Libra, practising; Scorpio, met, ready for practice; Sagittarius, practising; Capricorn, met, ready for practice; Aquarius, met, ready for practice; Pisces, met, ready for practice.)
+PASS: the journal's titles are drawn in blackletter in the Web build (owner, Sept 26) at 390
+PASS: the blackletter title draws in the Web build: 22% gold in its box on the Wheel at 390
+PASS: no vertical scroll in the journal at 390
+PASS: a canvas tap frames Aries; its preview reads Fire, at 360
+PASS: a canvas tap frames Aries; its preview reads Fire, at 390
+PASS: Open the page on the canvas: Aries with only its element, the two other Fire signs as links, its ribbon pulled out (due), no state word on screen, at 360
+PASS: Open the page on the canvas: Aries with only its element, the two other Fire signs as links, its ribbon pulled out (due), no state word on screen, at 390
+PASS: a link on the canvas opens Leo's page, which links back, at 360
+PASS: the arrow on the canvas turns to the next sign at 360
+PASS: Back to the Wheel on the canvas frames the sign last read, at 360
+PASS: a link on the canvas opens Leo's page, which links back, at 390
+PASS: the journal closes back to the Atrium, the marker where it stood, on a canvas tap at 360
+PASS: the arrow on the canvas turns to the next sign at 390
+PASS: Back to the Wheel on the canvas frames the sign last read, at 390
+PASS: the journal closes back to the Atrium, the marker where it stood, on a canvas tap at 390
+PASS: the Wing doorway fades into the Wing room with the Dial, the doorway back, a dark shelf, and a dark table at 360
+PASS: Build M: the Wing kit shows the Keys earned so far, worn pieces and grime still in place, the light by Keys at 360
+PASS: room events at 360
+PASS: the Wing doorway fades into the Wing room with the Dial, the doorway back, a dark shelf, and a dark table at 390
+PASS: Build M: the Wing kit shows the Keys earned so far, worn pieces and grime still in place, the light by Keys at 390
+PASS: room events at 390
+PASS: Build M: before they wake, the shelf and the table lie worn at 360
+PASS: before the wheel is lit the shelf only says it is dark at 360
+PASS: Build M: before they wake, the shelf and the table lie worn at 390
+PASS: before the wheel is lit the shelf only says it is dark at 390
+PASS: before the modality unit the table only says it is bare at 360
+PASS: before the modality unit the table only says it is bare at 390
+PASS: the Wing room's doorway back, tapped on the canvas, walks out to the Atrium at 360
+PASS: the Wing room's doorway back, tapped on the canvas, walks out to the Atrium at 390
+PASS: the Wing's door, tapped on the canvas, walks back in at 360
+PASS: the Wing's door, tapped on the canvas, walks back in at 390
+PASS: the Dial opens once the marker reaches it, on the fork: the lesson or practice, nothing started, Back still offered, at 360
+PASS: Build R: the Dial's box fits its short line (no empty space) at 360
+PASS: the Dial opens once the marker reaches it, on the fork: the lesson or practice, nothing started, Back still offered, at 390
+PASS: Build R: the Dial's box fits its short line (no empty space) at 390
+PASS: a canvas tap on the fork opens practice as the first sitting: six items, headed as practice, an exit on the item, no Back over the Seal at 360
+PASS: Build S: the Dial's long line shows page 1 of 3 ("Before you turn the wheel, know this: the signs are not scattered without purpose."), the whole line still in the state at 360
+PASS: a canvas tap on the fork opens practice as the first sitting: six items, headed as practice, an exit on the item, no Back over the Seal at 390
+PASS: Build S: the Dial's long line shows page 1 of 3 ("Before you turn the wheel, know this: the signs are not scattered without purpose."), the whole line still in the state at 390
+PASS: Build S: a tap on the box's Continue turns to the next page and the wheel stays live at 360
+PASS: Build S: a tap on the box's Continue turns to the next page and the wheel stays live at 390
+PASS: Build S: the pages name Fire and Water in their colours at 360
+PASS: Build S: the pages name Fire and Water in their colours at 390
+PASS: a reload during practice keeps the deck, its ready count, and the sitting at 390
+PASS: a reload during practice keeps the deck, its ready count, and the sitting at 360
+PASS: practice after the reload is the second sitting at 360
+PASS: practice after the reload is the second sitting at 390
+PASS: the practice's Seal answers a canvas tap; nothing covers it at 360
+PASS: the practice's Seal answers a canvas tap; nothing covers it at 390
+PASS: six remembered through compressed Dial and direct tap at 360
+PASS: practice and sitting events at 360
+PASS: six remembered through compressed Dial and direct tap at 390
+PASS: practice and sitting events at 390
+PASS: the other six are due at the third sitting at 390
+PASS: the other six are due at the third sitting at 360
+PASS: with every item scheduled ahead the entry still counts a sitting; Caspar says nothing is due; the fork stays at 390
+PASS: with every item scheduled ahead the entry still counts a sitting; Caspar says nothing is due; the fork stays at 360
+PASS: one sitting on, six items are due again, fresh strikes at 360
+PASS: one sitting on, six items are due again, fresh strikes at 390
+PASS: the third wrong answer closes the instrument into the room, the journal offered, nobody locked out, at 390
+PASS: the third wrong answer closes the instrument into the room, the journal offered, nobody locked out, at 360
+PASS: re-entry is immediate with fresh strikes and a new sitting at 390
+PASS: re-entry is immediate with fresh strikes and a new sitting at 360
+PASS: leaving the Dial lands in the Zodiac Wing, not the Atrium; the room offers the way back (note 10) at 390
+PASS: leaving the Dial lands in the Zodiac Wing, not the Atrium; the room offers the way back (note 10) at 360
+PASS: the lesson continues from the fork at 360
+PASS: the lesson continues from the fork at 390
+PASS: Unit 1.1 continues on the player's own, no level numbers on screen, at 360
+PASS: Unit 1.1 continues on the player's own, no level numbers on screen, at 390
+PASS: the moment the whole wheel lights, all four triangles burn as flame (level B) at 360
+PASS: the moment the whole wheel lights, all four triangles burn as flame (level B) at 390
+PASS: then the flames burn down into the resting lines at 390
+PASS: then the flames burn down into the resting lines at 360
+PASS: twelve seats lit with no second Key at 390
+PASS: twelve seats lit with no second Key at 360
+PASS: one more return completes v0.2, the marker back at the Wing doorway at 360
+PASS: one more return completes v0.2, the marker back at the Wing doorway at 390
+PASS: the lit wheel wakes the bookshelf as a point of interest at 360
+PASS: the lit wheel wakes the bookshelf as a point of interest at 390
+PASS: Build Y: the waking shelf glows itself (its own file lit, edge hugging it), no portal ring, at 360
+PASS: Build Y: the waking shelf glows itself (its own file lit, edge hugging it), no portal ring, at 390
+PASS: APK Session 2, bug 1: the waking shelf's edge is a halo drawn from its silhouette, with no shifted copies of the picture (no smear), at 390
+PASS: APK Session 2, bug 1: the waking shelf's edge is a halo drawn from its silhouette, with no shifted copies of the picture (no smear), at 360
+PASS: the Dial before the book only points at the shelf at 360
+PASS: the Dial before the book only points at the shelf at 390
+PASS: Build M: the shelf stands restored once the book of symbols wakes, before its lesson at 390
+PASS: Build M: the shelf stands restored once the book of symbols wakes, before its lesson at 360
+PASS: the book opens Part A: a symbol and four names at 390
+PASS: the book opens Part A: a symbol and four names at 360
+PASS: the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols' four names sit invisibly on their painted stones, no plate look (plain 74x70, plain 76x72, plain 74x70, plain 74x70), and Close the Book is on its rule (rule 300x52), every target 44 px or more (under: none) at 390
+PASS: the Quill Line (owner, Oct 17, Concept 1): the Book of Symbols' four names sit invisibly on their painted stones, no plate look (plain 74x70, plain 76x72, plain 74x70, plain 74x70), and Close the Book is on its rule (rule 300x52), every target 44 px or more (under: none) at 360
+PASS: a right answer sends Aries's symbol into its stone and draws the ink ribbon toward the page, no element emblem (, picked Aries), at 390
+PASS: a right answer sends Aries's symbol into its stone and draws the ink ribbon toward the page, no element emblem (, picked Aries), at 360
+PASS: the ribbon fades as the ink lands, in full (answered on its own), and no other symbol is inked, at 390
+PASS: the ribbon fades as the ink lands, in full (answered on its own), and no other symbol is inked, at 360
+PASS: mid-naming reload resumes at Virgo after five committed cards at 390
+PASS: mid-naming reload resumes at Virgo after five committed cards at 360
+PASS: the twelfth answer shows the full pages a moment, every symbol inked, before the room at 390
+PASS: the twelfth answer shows the full pages a moment, every symbol inked, before the room at 360
+PASS: all twelve inked symbols are really drawn on the pages (12 laid out) at 360
+PASS: all twelve inked symbols are really drawn on the pages (12 laid out) at 390
+PASS: every inked symbol sits wholly on the parchment (least 100% parchment under a symbol) at 390
+PASS: every inked symbol sits wholly on the parchment (least 100% parchment under a symbol) at 360
+PASS: the twelfth name closes the book and returns to the room at 360
+PASS: the twelfth name closes the book and returns to the room at 390
+PASS: Part B hides every name, labels included, at 390
+PASS: Part B hides every name, labels included, at 360
+PASS: Build Z: the symbols open with their own reveal; the eye asks for the symbol and nothing above it names a sign at 390
+PASS: Build Z: the symbols open with their own reveal; the eye asks for the symbol and nothing above it names a sign at 360
+PASS: Part B readouts do not name the sign under the bracket; the center holds the target name (Build I) at 390
+PASS: Part B readouts do not name the sign under the bracket; the center holds the target name (Build I) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 1) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 1) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 2) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 2) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 3) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 3) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 4) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 4) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 5) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 5) at 390
+PASS: mid-placement reload resumes at Virgo after five committed placements at 390 (actual Virgo)
+PASS: mid-placement reload resumes at Virgo after five committed placements at 360 (actual Virgo)
+PASS: each symbol placement commits once before continuing or reloading (placement 6) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 7) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 6) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 7) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 8) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 9) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 8) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 10) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 9) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 11) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 10) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 12) at 390
+PASS: each symbol placement commits once before continuing or reloading (placement 11) at 360
+PASS: each symbol placement commits once before continuing or reloading (placement 12) at 360
+PASS: twelve symbols placed earns Key 2 once at 390
+PASS: twelve symbols placed earns Key 2 once at 360
+PASS: one more return: Key 2 in hand, the Atrium waits for it to be spent at 390
+PASS: one more return: Key 2 in hand, the Atrium waits for it to be spent at 360
+PASS: the Chamber doorway fades into the Chamber as a room (Key 2) at 390
+PASS: the Chamber doorway fades into the Chamber as a room (Key 2) at 360
+PASS: Key 2 fills the second lock; the Book stays shut; nothing more to spend at 390
+PASS: Key 2 fills the second lock; the Book stays shut; nothing more to spend at 360
+PASS: Build O on the arc: two Keys spent light the mechanism and two candles; the rest of the Chamber waits for later Books at 360
+PASS: Build O on the arc: two Keys spent light the mechanism and two candles; the rest of the Chamber waits for later Books at 390
+PASS: the return after spending takes the Atrium to Stage 4 at 360
+PASS: the return after spending takes the Atrium to Stage 4 at 390
+PASS: after Key 2 the book tests again, in order the first time, at 360
+PASS: after Key 2 the book tests again, in order the first time, at 390
+PASS: a clean replay is recorded once and the next one is hard; Key 2 is not re-earned at 360
+PASS: a clean replay is recorded once and the next one is hard; Key 2 is not re-earned at 390
+PASS: the hard replay shuffles the order and keeps four distinct names at 360
+PASS: the hard replay shuffles the order and keeps four distinct names at 390
+PASS: with Key 2 in hand the Dial glows in the Wing room: a unit waits there (Build I) at 360
+PASS: with Key 2 in hand the Dial glows in the Wing room: a unit waits there (Build I) at 390
+PASS: after Key 2 the Dial opens the modality unit at the sun sign, three forward, at 360
+PASS: after Key 2 the Dial opens the modality unit at the sun sign, three forward, at 390
+PASS: three modality families of four complete with no new Key at 390
+PASS: three modality families of four complete with no new Key at 360
+PASS: a practice carries modality items within six sittings at 390
+PASS: a practice carries modality items within six sittings at 360
+PASS: a reload keeps the modality unit complete, and the table has woken at 360
+PASS: a reload keeps the modality unit complete, and the table has woken at 390
+PASS: the finished modality unit wakes the table with a room button at 390
+PASS: Build M: the table stands restored the moment it wakes, before its lesson at 390
+PASS: the finished modality unit wakes the table with a room button at 360
+PASS: Build M: the table stands restored the moment it wakes, before its lesson at 360
+PASS: the room button walks to the table and opens it: twelve tiles, twelve empty cells, the intro line at 360
+PASS: the room button walks to the table and opens it: twelve tiles, twelve empty cells, the intro line at 390
+PASS: every row and column name sits on the table's wood (least 99% wood under a name) at 360
+PASS: no vertical scroll at the table at 360
+PASS: batch 2 (owner, Oct 2: bronze on the Table too; 3d: 44 px): the Table's SEAL is a plate (plate 146x56), Leave the Table is on its rule (rule 128x48), and its twelve sign tiles are 44 px tall, every target 44 px or more (under: none) at 360
+PASS: every row and column name sits on the table's wood (least 99% wood under a name) at 390
+PASS: no vertical scroll at the table at 390
+PASS: batch 2 (owner, Oct 2: bronze on the Table too; 3d: 44 px): the Table's SEAL is a plate (plate 146x56), Leave the Table is on its rule (rule 128x48), and its twelve sign tiles are 44 px tall, every target 44 px or more (under: none) at 390
+PASS: twelve semantic cells at the target floor, labeled by element and kind, at 360
+PASS: twelve semantic cells at the target floor, labeled by element and kind, at 390
+PASS: without Reduced motion the inlay wakes: its gold light not yet whole at the Seal at 360
+PASS: without Reduced motion the inlay wakes: its gold light not yet whole at the Seal at 390
+PASS: canvas taps seat Aries at Level 0 with evidence at 360
+PASS: a wrong row nudges with the element, marks the cell, and offers Ask Caspar at 360
+PASS: canvas taps seat Aries at Level 0 with evidence at 390
+PASS: a wrong row nudges with the element, marks the cell, and offers Ask Caspar at 390
+PASS: the right cell after one nudge seats Taurus as Level 1 evidence at 360
+PASS: a wrong column nudges with the kind at 360
+PASS: Ask Caspar states the rule once at 360
+PASS: the right cell after one nudge seats Taurus as Level 1 evidence at 390
+PASS: a wrong column nudges with the kind at 390
+PASS: Ask Caspar states the rule once at 390
+PASS: a seating after asking earns no evidence at 360
+PASS: the Table comes alive: Aries and Taurus (on their own) lit gold inlay, Gemini (after asking) dull gold, all three with their symbol and name awake, at 360
+PASS: a seating after asking earns no evidence at 390
+PASS: the Table comes alive: Aries and Taurus (on their own) lit gold inlay, Gemini (after asking) dull gold, all three with their symbol and name awake, at 390
+PASS: a plate dragged over a well lights it: Cancer over Water, cardinal, at 360
+PASS: let go over the well, the plate sits in it until Seal, and the choice is logged as a drag, at 360
+PASS: a plate dragged over a well lights it: Cancer over Water, cardinal, at 390
+PASS: let go over the well, the plate sits in it until Seal, and the choice is logged as a drag, at 390
+PASS: the dragged plate seals like a tapped one and wakes as gold inlay at 360
+PASS: the dragged plate seals like a tapped one and wakes as gold inlay at 390
+PASS: five seated at 360
+PASS: five seated at 390
+PASS: a reload mid-table keeps the five seated signs at 360
+PASS: a reload mid-table keeps the five seated signs at 390
+PASS: the room says the table waits, part seated, at 360
+PASS: the room says the table waits, part seated, at 390
+PASS: tapping the table resumes it with its five seated signs at 360
+PASS: after a reload the lit and dull inlay read from the deck as they were at 360
+PASS: tapping the table resumes it with its five seated signs at 390
+PASS: after a reload the lit and dull inlay read from the deck as they were at 390
+PASS: three wrong cells hand the sign to Caspar, who seats it without evidence at 360
+PASS: the sign Caspar placed stays dull, unlit gold, its lettering awake (owner, Oct 16, board 3 A), at 360
+PASS: three wrong cells hand the sign to Caspar, who seats it without evidence at 390
+PASS: the sign Caspar placed stays dull, unlit gold, its lettering awake (owner, Oct 16, board 3 A), at 390
+PASS: with Reduced motion a correct Seal shows the inlay's gold light whole and the lettering awake at once, inside the hold, at 360
+PASS: with Reduced motion a correct Seal shows the inlay's gold light whole and the lettering awake at once, inside the hold, at 390
+PASS: with Reduced motion the next sign is lit gold too at 360
+PASS: with Reduced motion the next sign is lit gold too at 390
+PASS: the twelfth sign ends lit gold and whole, its lettering awake, after the Key 3 ceremony at 360
+PASS: with all twelve placed the empty tray slides shut (animated here; Reduced motion is off in this run; owner, Oct 16, board 5 A) at 360
+PASS: twelve seated earns Key 3 once at 360
+PASS: the twelfth sign ends lit gold and whole, its lettering awake, after the Key 3 ceremony at 390
+PASS: with all twelve placed the empty tray slides shut (animated here; Reduced motion is off in this run; owner, Oct 16, board 5 A) at 390
+PASS: twelve seated earns Key 3 once at 390
+PASS: back in the Atrium with Key 3 in hand at 360
+PASS: back in the Atrium with Key 3 in hand at 390
+PASS: the Chamber doorway fades into the Chamber as a room (Key 3) at 360
+PASS: the Chamber doorway fades into the Chamber as a room (Key 3) at 390
+PASS: Key 3 fills the third lock and Book 1 opens at 360
+PASS: the art pass (86bcex5kc 1A): in the Chamber the doorway back takes the tap and Return to the Atrium is gone at 360
+PASS: Key 3 fills the third lock and Book 1 opens at 390
+PASS: the art pass (86bcex5kc 1A): in the Chamber the doorway back takes the tap and Return to the Atrium is gone at 390
+PASS: the art pass (86bcex5kc 1A): from Stage 2 the Atrium has no Zodiac Wing or Chamber button; both doors take the tap at 360
+PASS: the return takes the Atrium to Stage 5 with three Keys spent; the Stirring caption is not repeated (note 9) at 360
+PASS: the art pass (86bcex5kc 1A): from Stage 2 the Atrium has no Zodiac Wing or Chamber button; both doors take the tap at 390
+PASS: the return takes the Atrium to Stage 5 with three Keys spent; the Stirring caption is not repeated (note 9) at 390
+PASS: a reload resumes at the Hub from the local save with three Keys spent, Book 1 open, the full table, and the clean run at 360
+PASS: a reload resumes at the Hub from the local save with three Keys spent, Book 1 open, the full table, and the clean run at 390
+PASS: with three Keys the room points at the wheel's last pattern at 360
+PASS: with three Keys the room points at the wheel's last pattern at 390
+PASS: after Key 3 the Dial opens the polarity beat; Leave the Dial stays on its own row, clear of the beat's Continue (Build T) at 360
+PASS: the second line shows every seat's side, in words, at 360
+PASS: after Key 3 the Dial opens the polarity beat; Leave the Dial stays on its own row, clear of the beat's Continue (Build T) at 390
+PASS: the second line shows every seat's side, in words, at 390
+PASS: the first pair is guided from the sun sign with the six-count at 360
+PASS: the first pair is guided from the sun sign with the six-count at 390
+PASS: the guided pair is known; the next is on the player's own at 360
+PASS: a wrong turn nudges; Ask Caspar gives the six-seat rule at 360
+PASS: the guided pair is known; the next is on the player's own at 390
+PASS: a wrong turn nudges; Ask Caspar gives the six-seat rule at 390
+PASS: a pair found after asking counts, not as evidence, at 360
+PASS: a pair found after asking counts, not as evidence, at 390
+PASS: six pairs complete the last pattern at 360
+PASS: six pairs complete the last pattern at 390
+PASS: Build Z: each of the five patterns has played its reveal once at 360
+PASS: Build V: the Dial, not Caspar, asks for the sign built from its parts at 360
+PASS: Continue opens the builder on the sun sign's parts: four names (Leave the Dial on its own row below them), at 360
+PASS: four semantic names at the target floor at 360
+PASS: Build Z: each of the five patterns has played its reveal once at 390
+PASS: Build V: the Dial, not Caspar, asks for the sign built from its parts at 390
+PASS: Continue opens the builder on the sun sign's parts: four names (Leave the Dial on its own row below them), at 390
+PASS: four semantic names at the target floor at 390
+PASS: the right name hands to the wheel at 360
+PASS: the right name hands to the wheel at 390
+PASS: the opposite found, the share step asks what the two share at 360
+PASS: the opposite found, the share step asks what the two share at 390
+PASS: the first sign is built unassisted; the second begins at 360
+PASS: the first sign is built unassisted; the second begins at 390
+PASS: a wrong name is nudged; the right one hands to the wheel at 360
+PASS: a wrong name is nudged; the right one hands to the wheel at 390
+PASS: the second sign is built with help; the third begins at 360
+PASS: the second sign is built with help; the third begins at 390
+PASS: two wrong names reveal the sign at 360
+PASS: two wrong names reveal the sign at 390
+PASS: three signs built with one unassisted earns Key 4 once at 360
+PASS: three signs built with one unassisted earns Key 4 once at 390
+PASS: back in the Atrium with Key 4 in hand at 360
+PASS: back in the Atrium with Key 4 in hand at 390
+PASS: the Chamber doorway fades into the Chamber as a room (Key 4) at 360
+PASS: the Chamber doorway fades into the Chamber as a room (Key 4) at 390
+PASS: Key 4 fills Book 2's first lock: the Wing is whole, with the closing line and the end card at 360
+PASS: Key 4 fills Book 2's first lock: the Wing is whole, with the closing line and the end card at 390
+PASS: the return takes the Atrium to Stage 6 with four Keys spent; no caption repeats itself (note 9) at 360
+PASS: the return takes the Atrium to Stage 6 with four Keys spent; no caption repeats itself (note 9) at 390
+PASS: the light overlay sits at half plus four of 21 locks once the Wing is whole; full light waits for the last Book (owner, Sept 27) at 360
+PASS: the light overlay sits at half plus four of 21 locks once the Wing is whole; full light waits for the last Book (owner, Sept 27) at 390
+PASS: a reload resumes at the Hub from the local save with four Keys spent, the Wing whole, the sides, and the six pairs at 360
+PASS: Build N on the arc: with the Wing whole the Atrium holds 9 of 20 pieces and its grime; the rest waits for the other six Books (owner, Sept 27) at 360
+PASS: a reload resumes at the Hub from the local save with four Keys spent, the Wing whole, the sides, and the six pairs at 390
+PASS: Build N on the arc: with the Wing whole the Atrium holds 9 of 20 pieces and its grime; the rest waits for the other six Books (owner, Sept 27) at 390
+PASS: Build N: the Wing door swings open as the Keeper reaches it at 360
+PASS: Build M: with four Keys every Wing kit piece is restored, the grime gone, the light full at 360
+PASS: Start over wipes the save and plays the opening scene again (Ashantis, Oct 8) at 360
+PASS: no browser runtime exceptions at 360
+PASS: Build N: the Wing door swings open as the Keeper reaches it at 390
+PASS: Build M: with four Keys every Wing kit piece is restored, the grime gone, the light full at 390
+PASS: Start over wipes the save and plays the opening scene again (Ashantis, Oct 8) at 390
+PASS: no browser runtime exceptions at 390
+PASS: the launch, reduced motion: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 360
+PASS: the launch, reduced motion: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 390
+PASS: the launch, reduced motion: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: draw held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: draw held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 360
+PASS: reduced motion: glyphs held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 390
+PASS: reduced motion: glyphs held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: alive held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: alive held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: burn held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: burn held still and level, no sweep ([1,0,1]) at 390
+PASS: the launch, reduced motion: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: transform held still and level, no sweep ([1,0,1]) at 360
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:0.00:0.90"]), which spins on and fades away, at 360
+PASS: the launch, reduced motion: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: transform held still and level, no sweep ([1,0,1]) at 390
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:0.00:0.90"]), which spins on and fades away, at 390
+PASS: the launch, reduced motion: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: earth held still and level, no sweep ([1,0,1]) at 360
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (22 states read) at 360
+PASS: after the transform only Earth is on stage at 360
+PASS: the launch, reduced motion: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: earth held still and level, no sweep ([1,0,1]) at 390
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (21 states read) at 390
+PASS: after the transform only Earth is on stage at 390
+PASS: the launch, reduced motion: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 360
+PASS: reduced motion: continents held still and level, no sweep ([1,0,1]) at 360
+PASS: the launch, reduced motion: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 390
+PASS: reduced motion: continents held still and level, no sweep ([1,0,1]) at 390
+PASS: a canvas tap in the launch movie shows Skip at 360
+PASS: a canvas tap in the launch movie shows Skip at 390
+PASS: a canvas tap on Skip goes straight to the menu, reduced motion kept, at 360
+PASS: a canvas tap on Skip goes straight to the menu, reduced motion kept, at 390
+PASS: reduced motion: the window's glow holds steady at 0.3 and the rat never runs at 360
+PASS: reduced motion: the window's glow holds steady at 0.3 and the rat never runs at 390
+PASS: the page's reduced-motion setting reaches the game during the prologue at 360
+PASS: the page's reduced-motion setting reaches the game during the prologue at 390
+PASS: the opening scene, reduced motion: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered, still from the first shot at 360
+PASS: the opening scene, reduced motion: shot 1 (city), prologue-city, its spoken line announced ("Night in the city. The street is empty. One window is still lit."), the semantic Skip offered, still from the first shot at 390
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-desk, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 2 (desk), prologue-notebook, its spoken line announced ("A young man sits at his desk with his headphones on, writing in his notebook."), the semantic Skip offered at 360
+PASS: reduced motion: no writing loop, the notebook held (desk notebook) at 390
+PASS: reduced motion: no writing loop, the notebook held (desk notebook) at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-desk, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-light-up, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-look, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 3 (light), prologue-headphones, its spoken line announced ("A white-gold light floods his room. He looks up and pulls his headphones down."), the semantic Skip offered at 390
+PASS: reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between (desk light light-up look headphones) at 390
+PASS: reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between (desk light light-up look headphones) at 360
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 4 (street), prologue-street-above, its spoken line announced ("In the street below, a hooded figure stands with his back to us, inside a fading ring of light."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 5 (puzzled), prologue-puzzled, its spoken line announced ("He stares down from his window, puzzled."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-back, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-turn, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-face, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 360
+PASS: the opening scene, reduced motion: shot 6 (turn), prologue-caspar-eyes, its spoken line announced ("The hooded figure turns. The view pushes in on his white-gold eyes."), the semantic Skip offered at 390
+PASS: the flash: the busy guard holds and Skip waits it out at 360
+PASS: the flash: the busy guard holds and Skip waits it out at 390
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it (reduced motion) at 360
+PASS: the prologue ends in darkness, then WHO ARE YOU? with the orb above it (reduced motion) at 390
+PASS: the gear opens Settings over the prologue, and its tap does not count as the tap that shows Skip, at 360
+PASS: the gear opens Settings over the prologue, and its tap does not count as the tap that shows Skip, at 390
+PASS: closing Settings leaves the prologue playing, Skip still hidden, at 360
+PASS: closing Settings leaves the prologue playing, Skip still hidden, at 390
+PASS: a canvas tap shows Skip at 360
+PASS: a canvas tap shows Skip at 390
+PASS: a canvas tap on Skip goes straight to WHO ARE YOU? at 360
+PASS: no runtime exceptions through the opening scene at 360
+PASS: a canvas tap on Skip goes straight to WHO ARE YOU? at 390
+PASS: no runtime exceptions through the opening scene at 390
+PASS: with a save every menu button is available, Continue on slot 1 (focus on Continue) at 360
+PASS: with a save every menu button is available, Continue on slot 1 (focus on Continue) at 390
+PASS: Load Game (a canvas tap): the old single save shows up in slot 1 (Slot 1: Tester, Keeper Keys: 1, Taurus sun, Virgo moon, Leo rising); the empty slots read Empty, dimmed, at 390
+PASS: Load Game (a canvas tap): the old single save shows up in slot 1 (Slot 1: Tester, Keeper Keys: 1, Taurus sun, Virgo moon, Leo rising); the empty slots read Empty, dimmed, at 360
+PASS: the screen reader's slot list names each slot's card at 390
+PASS: the screen reader's slot list names each slot's card at 360
+PASS: an empty slot does nothing in Load Game at 390
+PASS: an empty slot does nothing in Load Game at 360
+PASS: the rat never runs on the slot list at 390
+PASS: the rat never runs on the slot list at 360
+PASS: on the slot list the window's glow shows under the veil and pulses (0.18, 0.34, 0.45) at 390
+PASS: on the slot list the window's glow shows under the veil and pulses (0.18, 0.35, 0.44) at 360
+PASS: Back returns to the menu at 360
+PASS: Back returns to the menu at 390
+PASS: New Game with a save opens the slot list, every slot available, at 360
+PASS: New Game with a save opens the slot list, every slot available, at 390
+PASS: a filled slot asks first ("This replaces your saved game.", announced) at 390
+PASS: a filled slot asks first ("This replaces your saved game.", announced) at 360
+PASS: Back on the question keeps the save at 390
+PASS: Back on the question keeps the save at 360
+PASS: an empty slot starts the new game there (slot 2, the opening scene) at 390
+PASS: an empty slot starts the new game there (slot 2, the opening scene) at 360
+PASS: Main menu over the opening scene asks first at 390
+PASS: Main menu over the opening scene asks first at 360
+PASS: Main menu comes straight to the menu; the slot played last (2) holds nothing, so Continue falls back to slot 1, at 390
+PASS: Main menu comes straight to the menu; the slot played last (2) holds nothing, so Continue falls back to slot 1, at 360
+PASS: Continue (a canvas tap) resumes slot 1 at the Hub, slot 1 in play again, at 390
+PASS: Continue (a canvas tap) resumes slot 1 at the Hub, slot 1 in play again, at 360
+PASS: in the game Settings shows Main menu and Start over (Sound: on, Reduced motion: off, Main menu, Walk: normal, Jump to..., Start over, Close) at 390
+PASS: in the game Settings shows Main menu and Start over (Sound: on, Reduced motion: off, Main menu, Walk: normal, Jump to..., Start over, Close) at 360
+PASS: after Key 1 Main menu goes straight to the menu, with no question (the game saves as it goes), at 390
+PASS: after Key 1 Main menu goes straight to the menu, with no question (the game saves as it goes), at 360
+PASS: Start on the question replaces slot 1 and starts the new game there at 390
+PASS: Start on the question replaces slot 1 and starts the new game there at 360
+PASS: replacing cleared slot 1 at once: no save left, Continue and Load Game at half again, at 390
+PASS: no runtime exceptions through the menu and the slots at 390
+PASS: replacing cleared slot 1 at once: no save left, Continue and Load Game at half again, at 360
+PASS: no runtime exceptions through the menu and the slots at 360
+PASS: at 1280 x 800 the rat starts past the visible street (x -324; the street shows to 300, the run ends at 324)
+PASS: it crosses the whole street and leaves past the far edge (last seen at x 313)
+PASS: at the same speed as on the column: the longer run takes 3.49 s (3.49 s expected)
+PASS: no runtime exceptions at 1280 x 800
+PASS: Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at 360
+PASS: Build W: Settings, Testing, Jump to... opens the checkpoint list on the canvas at 390
+PASS: Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at 360
+PASS: Build W: a canvas tap on After Key 4 reloads into the Atrium, three Keys in hand, nothing more spent, the player kept at 390
+PASS: Build W: the checkpoint key1 lands with its Keys and stage at 360
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint key1 the Dial shows step 1 for 1 Keys earned (worn + today) at 360
+PASS: Build W: the checkpoint key1 lands with its Keys and stage at 390
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint key1 the Dial shows step 1 for 1 Keys earned (worn + today) at 390
+PASS: Build W: the checkpoint wheel lands with its Keys and stage at 360
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint wheel the Dial shows step 1 for 1 Keys earned (worn + today) at 360
+PASS: Build W: the checkpoint wheel lands with its Keys and stage at 390
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint wheel the Dial shows step 1 for 1 Keys earned (worn + today) at 390
+PASS: Build W: the checkpoint key2 lands with its Keys and stage at 360
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint key2 the Dial shows step 2 for 2 Keys earned (today) at 360
+PASS: Build W: the checkpoint key2 lands with its Keys and stage at 390
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint key2 the Dial shows step 2 for 2 Keys earned (today) at 390
+PASS: Build W: from after Key 2 the Dial offers the next lesson and practice at 360
+PASS: Build W: from after Key 2 the Dial offers the next lesson and practice at 390
+PASS: Build W: the checkpoint key3 lands with its Keys and stage at 360
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint key3 the Dial shows step 3 for 3 Keys earned (today + bright) at 360
+PASS: the mini-menu: after Key 3 TRAVEL lists the three rooms and one Sealed row: ["The Grand Atrium, here","The Zodiac Wing","The Crystal Book Chamber","Sealed"] at 360
+PASS: Build W: the checkpoint key3 lands with its Keys and stage at 390
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint key3 the Dial shows step 3 for 3 Keys earned (today + bright) at 390
+PASS: the mini-menu: after Key 3 TRAVEL lists the three rooms and one Sealed row: ["The Grand Atrium, here","The Zodiac Wing","The Crystal Book Chamber","Sealed"] at 390
+PASS: the mini-menu: from the Wing the Chamber row goes through the Atrium to the Chamber at 360
+PASS: the mini-menu: from the Wing the Chamber row goes through the Atrium to the Chamber at 390
+PASS: the mini-menu: and back to the Wing, no Key spent on the way, at 360
+PASS: the mini-menu: and back to the Wing, no Key spent on the way, at 390
+PASS: the mini-menu: an instrument keeps its own exit (no Travel button on the Dial) at 360
+PASS: the mini-menu: an instrument keeps its own exit (no Travel button on the Dial) at 390
+PASS: Build W: the checkpoint whole lands with its Keys and stage at 360
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint whole the Dial shows step 4 for 4 Keys earned (bright) at 360
+PASS: Build W: the checkpoint whole lands with its Keys and stage at 390
+PASS: the Dial's wake-up (86bcbn6w6 2a A): after the checkpoint whole the Dial shows step 4 for 4 Keys earned (bright) at 390
+PASS: at the Wing's end the Keeper's record has no Keys or Books line (owner, Oct 11, 86bcgfkdy); Oct 7: the jumps keep the player's own birth record (the three picked), the sample only stands in for none: ☉ Leo · ☽ Aquarius · ↑ Capricorn at 360
+PASS: at the Wing's end the Keeper's record has no Keys or Books line (owner, Oct 11, 86bcgfkdy); Oct 7: the jumps keep the player's own birth record (the three picked), the sample only stands in for none: ☉ Leo · ☽ Aquarius · ↑ Capricorn at 390
+PASS: Build AA: at the Wing's end the journal shows the Table switch and all four tabs at 360
+PASS: Build AA: the Table switch on the canvas lays the seats out as the Table at 360
+PASS: Build AA: at the Wing's end the journal shows the Table switch and all four tabs at 390
+PASS: Build AA: the Table switch on the canvas lays the seats out as the Table at 390
+PASS: Build AA: the Opposites tab on the canvas: Libra framed, its card reads what the pair shares, at 360
+PASS: Build AA: the Opposites tab on the canvas: Libra framed, its card reads what the pair shares, at 390
+PASS: the Dial's wake-up: DEV Mode's step 0 blends worn at 360
+PASS: the Dial's wake-up: DEV Mode's step 0 blends worn at 390
+PASS: batch 2: at step 0 the Dial draws dial-room-worn as masters, and no look stands in (dial-room-worn) at 360
+PASS: the Dial's wake-up: DEV Mode's step 1 blends worn + today at 360
+PASS: batch 2: at step 0 the Dial draws dial-room-worn as masters, and no look stands in (dial-room-worn) at 390
+PASS: the Dial's wake-up: DEV Mode's step 1 blends worn + today at 390
+PASS: batch 2: at step 1 the Dial draws dial-room-worn, dial-room as masters, and no look stands in (dial-room, dial-room-worn) at 360
+PASS: batch 2: at step 1 the Dial draws dial-room-worn, dial-room as masters, and no look stands in (dial-room, dial-room-worn) at 390
+PASS: the Dial's wake-up: DEV Mode's step 2 blends today at 360
+PASS: the Dial's wake-up: DEV Mode's step 2 blends today at 390
+PASS: batch 2: at step 2 the Dial draws dial-room as masters, and no look stands in (dial-room) at 360
+PASS: batch 2: at step 2 the Dial draws dial-room as masters, and no look stands in (dial-room) at 390
+PASS: the Dial's wake-up: DEV Mode's step 3 blends today + bright at 360
+PASS: the Dial's wake-up: DEV Mode's step 3 blends today + bright at 390
+PASS: batch 2: at step 3 the Dial draws dial-room, dial-room-bright as masters, and no look stands in (dial-room, dial-room-bright) at 360
+PASS: batch 2: at step 3 the Dial draws dial-room, dial-room-bright as masters, and no look stands in (dial-room, dial-room-bright) at 390
+PASS: the Dial's wake-up: DEV Mode's step 4 blends bright at 360
+PASS: the Dial's wake-up: DEV Mode's step 4 blends bright at 390
+PASS: batch 2: at step 4 the Dial draws dial-room-bright as masters, and no look stands in (dial-room-bright) at 360
+PASS: the Dial's wake-up: back to as earned, the Dial shows the Keys' step at 360
+PASS: batch 2: at step 4 the Dial draws dial-room-bright as masters, and no look stands in (dial-room-bright) at 390
+PASS: the Dial's wake-up: back to as earned, the Dial shows the Keys' step at 390
+PASS: DEV Mode's cusp-day sample: the opening on the cusp day (Apr 20 1990, no birth time) ends on the whole default chart (owner, Oct 16), not asked, the name kept, at 360
+PASS: DEV Mode's cusp-day sample: the opening on the cusp day (Apr 20 1990, no birth time) ends on the whole default chart (owner, Oct 16), not asked, the name kept, at 390
+PASS: DEV Mode's no-time sample: the opening settled on the default chart (done), the name kept, at 360
+PASS: DEV Mode's no-time sample: the opening settled on the default chart (done), the name kept, at 390
+PASS: DEV Mode's no-place sample: the opening settled on the default chart (done), the name kept, at 360
+PASS: DEV Mode's no-place sample: the opening settled on the default chart (done), the name kept, at 390
+PASS: DEV Mode's neither sample: the opening settled on the default chart (done), the name kept, at 360
+PASS: DEV Mode's neither sample: the opening settled on the default chart (done), the name kept, at 390
+PASS: DEV Mode's skip sample: the opening settled on the default chart (done), the name kept, at 360
+PASS: DEV Mode's skip sample: the opening settled on the default chart (done), the name kept, at 390
+PASS: Settings' Start over opens on the opening scene at 360
+PASS: Build W: no runtime exceptions through the jumps at 360
+PASS: Settings' Start over opens on the opening scene at 390
+PASS: Build W: no runtime exceptions through the jumps at 390
+PASS: player-control coverage at 360: birthdate editing and click-away keep the step and edited answer
+PASS: player-control coverage at 390: birthdate editing and click-away keep the step and edited answer
+PASS: player-control coverage at 390: birthdate Enter keeps the step and answer; only its button submits
+PASS: player-control coverage at 360: birthdate Enter keeps the step and answer; only its button submits
+PASS: player-control coverage at 360: Use this date commits the edited date
+PASS: player-control coverage at 390: Use this date commits the edited date
+PASS: player-control coverage at 360: birthtime editing and click-away keep the step and edited answer
+PASS: player-control coverage at 390: birthtime editing and click-away keep the step and edited answer
+PASS: player-control coverage at 360: birthtime Enter keeps the step and answer; only its button submits
+PASS: player-control coverage at 390: birthtime Enter keeps the step and answer; only its button submits
+PASS: player-control coverage at 360: Use this time commits the edited time
+PASS: player-control coverage at 390: Use this time commits the edited time
+PASS: player-control coverage at 360: place editing and blur wait for a match selection
+PASS: player-control coverage at 390: place editing and blur wait for a match selection
+PASS: player-control coverage at 360: place Enter keeps the search and waits for a match selection
+PASS: player-control coverage at 390: place Enter keeps the search and waits for a match selection
+PASS: player-control coverage at 360: review shows all edited facts before computing the chart
+PASS: player-control coverage at 390: review shows all edited facts before computing the chart
+PASS: player-control coverage at 390: Back restores the selected place in its input
+PASS: player-control coverage at 360: Back restores the selected place in its input
+PASS: player-control coverage at 390: Back restores the time in its input
+PASS: player-control coverage at 360: Back restores the time in its input
+PASS: player-control coverage at 390: Back restores the date in its input
+PASS: player-control coverage at 360: Back restores the date in its input
+PASS: player-control coverage at 390: forward again retains the reviewed answers
+PASS: player-control coverage at 360: forward again retains the reviewed answers
+PASS: player-control coverage at 390: Yes commits the reviewed chart
+PASS: player-control coverage at 390: the committed birth record keeps the reviewed date, time and place
+PASS: player-control coverage at 360: Yes commits the reviewed chart
+PASS: player-control coverage at 360: the committed birth record keeps the reviewed date, time and place
+PASS: player-control coverage at 390: Back from date returns to the path question
+PASS: player-control coverage at 360: Back from date returns to the path question
+PASS: player-control coverage at 390: skip asks no facts or signs and uses the approved default chart
+PASS: player-control coverage at 360: skip asks no facts or signs and uses the approved default chart
+PASS: player-control coverage at 360: Change my answer returns from skip to the path question
+PASS: player-control coverage at 360: no runtime exceptions
+PASS: player-control coverage at 390: Change my answer returns from skip to the path question
+PASS: player-control coverage at 390: no runtime exceptions
+PASS: the skip path asks no sign
+PASS: I'll skip it: the default chart, the note in full, no unknown: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+PASS: owner, Oct 10 (86bcgfkdv): a date typed and left (a tap outside the box) does not move on; only Use this date does
+PASS: a time typed and left does not move on either; only Use this time does
+PASS: owner, Oct 16: I don't know where gives the whole default chart (the date and time given are not kept), the note says a personal chart needs all three: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+PASS: owner, Oct 16: a cusp day with no birth time is not asked; the whole default chart stands: ☉ Scorpio · ☽ Gemini · ↑ Gemini
+PASS: typing a town lists the matches from the bundled list, the biggest first (London)
+PASS: the check names the date, the time and the place before the chart is worked out: ["Date: 1 May 1990","Time: 2:30 PM","Place: London, Britain (UK)"]
+PASS: Back from the check: the place step, its answer filled in, its star gone out (4)
+PASS: Back again: the time, as given
+PASS: a birth date, time and place work out the chart in the browser: ☉ Taurus · ☽ Leo · ↑ Virgo (London, May 1 1990, 14:30)
+PASS: OS reduced-motion preference reaches Unity
+PASS: first browser rejection stays in place at Level 1 and offers Ask Caspar
+PASS: Ask Caspar gives the rule once with the count and the ring returns
+PASS: a miss after the asked rule goes to the Level 3 demo, which resets to a fresh Level 0 problem
+PASS: browser recovery cap pauses without awarding Key
+PASS: no unknown in the record; the jump keeps the player's record and the lessons start from the default chart's sun, at 360
+PASS: no unknown in the record; the jump keeps the player's record and the lessons start from the default chart's sun, at 390
+PASS: the Dial's idle face names the default chart's sun as the player's sign: Your sign: Scorpio at 360
+PASS: the Dial's idle face names the default chart's sun as the player's sign: Your sign: Scorpio at 390
+PASS: the record shows the default chart (the skip path's Scorpio sun, owner, Oct 15), with no unknown, its line a 44 px target, at 390
+PASS: the record shows the default chart (the skip path's Scorpio sun, owner, Oct 15), with no unknown, its line a 44 px target, at 360
+PASS: owner, Oct 15: a canvas tap on the line opens "Your Birth": the default chart is shown as the default, each row with Add, and Add my birth time; the rising is worked out, so no rising choice, at 360
+PASS: "Your Birth"'s buttons each take a 44 px target at 360
+PASS: owner, Oct 15: a canvas tap on the line opens "Your Birth": the default chart is shown as the default, each row with Add, and Add my birth time; the rising is worked out, so no rising choice, at 390
+PASS: "Your Birth"'s buttons each take a 44 px target at 390
+PASS: owner, Oct 15: the real details replace the default ones and decide: a line for each sign that changed, the Key kept, the lessons now from Taurus: Your rising is Virgo. / Your moon is Taurus. / Your sun is Taurus. / Everything you've learned stays as it is. at 360
+PASS: owner, Oct 15: the real details replace the default ones and decide: a line for each sign that changed, the Key kept, the lessons now from Taurus: Your rising is Virgo. / Your moon is Taurus. / Your sun is Taurus. / Everything you've learned stays as it is. at 390
+PASS: after a reload the record reads the saved chart: ☉ Taurus · ☽ Taurus · ↑ Virgo at 390
+PASS: after a reload the record reads the saved chart: ☉ Taurus · ☽ Taurus · ↑ Virgo at 360
+PASS: an old known save converts once, its signs kept as the player's choices: ☉ Leo · ☽ Scorpio · ↑ unknown at 390
+PASS: an old known save converts once, its signs kept as the player's choices: ☉ Leo · ☽ Scorpio · ↑ unknown at 360
+PASS: an old chosen save converts once, its signs kept as the player's choices: ☉ Capricorn · ☽ unknown · ↑ unknown at 390
+PASS: an old chosen save converts once, its signs kept as the player's choices: ☉ Capricorn · ☽ unknown · ↑ unknown at 360
+PASS: an old legacy save converts once, its signs kept as the player's choices: ☉ Gemini · ☽ unknown · ↑ unknown at 360
+PASS: an old legacy save converts once, its signs kept as the player's choices: ☉ Gemini · ☽ unknown · ↑ unknown at 390
+PASS: an old chart-path save moves its facts over and works the chart out again, the cusp's pick kept: ☉ Taurus · ☽ Aquarius or Pisces · ↑ unknown at 360
+PASS: Oct 7: no runtime exceptions through "Your Birth" and the conversions at 360
+PASS: an old chart-path save moves its facts over and works the chart out again, the cusp's pick kept: ☉ Taurus · ☽ Aquarius or Pisces · ↑ unknown at 390
+PASS: Oct 7: no runtime exceptions through "Your Birth" and the conversions at 390
+PASS: a fresh save's first-ever open writes the Oct 2 line, word for word, at 390
+PASS: a fresh save's first-ever open writes the Oct 2 line, word for word, at 360
+PASS: the next visit lands on a new line (sun-element: Taurus, Earth. That's the page I check the most. Don't tell the others.), three lines at most, no number; the screen reader hears it whole while it writes, at 360
+PASS: the next visit lands on a new line (key-a-page-or-two: You earn a Key, I gain a page or two. I'm not complaining.), three lines at most, no number; the screen reader hears it whole while it writes, at 390
+PASS: a tap on the page finishes the line at once, at 360
+PASS: a tap on the page finishes the line at once, at 390
+PASS: back from Contents the same line shows, already written; the line holds for the visit, at 360
+PASS: back from Contents the same line shows, already written; the line holds for the visit, at 390
+PASS: a canvas tap on Close the journal closes it from the landing, at 360
+PASS: a canvas tap on Close the journal closes it from the landing, at 390
+PASS: opened again in the same visit, the same line, written, at 360
+PASS: opened again in the same visit, the same line, written, at 390
+PASS: the visit after brings a different line (any-read-twice); with Reduced motion it shows whole at once, at 360
+PASS: the visit after brings a different line (any-fuller); with Reduced motion it shows whole at once, at 390
+PASS: a game closed during the first-ever title page shows the title page and the Oct 2 line next time, at 360
+PASS: Oct 7: no runtime exceptions through the inscription's visits at 360
+PASS: a game closed during the first-ever title page shows the title page and the Oct 2 line next time, at 390
+PASS: Oct 7: no runtime exceptions through the inscription's visits at 390
+PASS: ?art=test plays the game with a file in every slot at 360
+PASS: the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at 360
+PASS: ?art=test plays the game with a file in every slot at 390
+PASS: the three light overlays resolve from the test set and stay dark in the opening (Stage 1) at 390
+PASS: no vertical scroll with the test set at 360
+PASS: no vertical scroll with the test set at 390
+PASS: a page turn plays the page cue from the test set at 360
+PASS: a page turn plays the page cue from the test set at 390
+PASS: a wheel step plays the step cue from the test set at 390
+PASS: a wheel step plays the step cue from the test set at 360
+PASS: ?style=test shows the style page on the test set with 243 art and 7 sound slots and no game controls
+PASS: every slot lists its source on the test set
+PASS: the semantic layer lists every art slot with its source and a button per sound slot
+PASS: no vertical scroll on the style page on the test set
+PASS: a sound slot plays from the style page
+PASS: the test mute toggle works from the style page
+PASS: ?style shows the style page on the Art folder with 243 art and 7 sound slots and no game controls
+PASS: every slot lists its source on the Art folder
+PASS: the semantic layer lists every art slot with its source and a button per sound slot
+PASS: no vertical scroll on the style page on the Art folder
+PASS: Part 2: at 9-19.5 (360 x 780) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Part 2: at 9-20 (360 x 800) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Batch 2: at 9-20 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 9-20 the gear and the mini-menu button sit at the screen's top corners (a phone): gear [158,22], button [-158,22]
+PASS: Batch 2: at 9-19.5 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 9-19.5 the gear and the mini-menu button sit at the screen's top corners (a phone): gear [162.6199951171875,22], button [-162.6199951171875,22]
+PASS: Part 2: at 9-19.5 the semantic gear sits on the gear
+PASS: Part 2: at 9-20 the semantic gear sits on the gear
+PASS: Part 2: at 9-21 (360 x 840) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 29.9, bar 13%; bottom spread 6.9, bar 3%)
+PASS: Part 2: at 9-16 (360 x 640) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 16.1, bar 5%; right spread 16.8, bar 7%)
+PASS: Batch 2: at 9-21 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 9-21 the gear and the mini-menu button sit at the screen's top corners (a phone): gear [158,2], button [-158,2]
+PASS: Batch 2: at 9-16 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 9-16 the gear and the mini-menu button sit at the screen's top corners (a phone): gear [203,22], button [-203,22]
+PASS: Part 2: at 9-21 the semantic gear sits on the gear
+PASS: Part 2: at 9-16 the semantic gear sits on the gear
+PASS: Part 2: at 9-21 a tap on the gear opens Settings
+PASS: Part 2: at 9-20 a tap on the gear opens Settings
+PASS: Part 2: at 9-19.5 a tap on the gear opens Settings
+PASS: Part 2: at 9-16 a tap on the gear opens Settings
+PASS: Part 2: at 9-21 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 9-20 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 9-19.5 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 9-16 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 9-16 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 9-19.5 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 9-21 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 9-20 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 9-20 (360 x 800) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Part 2: at 9-16 (360 x 640) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 19.6, bar 0%; right spread 22.8, bar 0%)
+PASS: Part 2: at 9-19.5 (360 x 780) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Part 2: at 9-21 (360 x 840) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 29.9, bar 0%; bottom spread 18.8, bar 0%)
+PASS: Batch 2: at 9-20 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Batch 2: at 9-16 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Batch 2: at 9-19.5 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Batch 2: at 9-21 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Part 2: at 9-19.5 (360 x 780) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Part 2: at 9-21 (360 x 840) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 34.7, bar 1%; bottom spread 20.6, bar 0%)
+PASS: Part 2: at 9-16 (360 x 640) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 24.0, bar 1%; right spread 26.4, bar 1%)
+PASS: Part 2: at 9-20 (360 x 800) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Batch 2: at 9-21 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Batch 2: at 9-19.5 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Batch 2: at 9-16 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Batch 2: at 9-20 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Part 2: at 9-16 (360 x 640) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 43.8, bar 0%; right spread 16.2, bar 1%)
+PASS: Part 2: no runtime errors at 9-16
+PASS: Part 2: at 9-19.5 (360 x 780) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Part 2: no runtime errors at 9-19.5
+PASS: Part 2: at 9-20 (360 x 800) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (none: the column fills the screen)
+PASS: Part 2: no runtime errors at 9-20
+PASS: Part 2: at 9-21 (360 x 840) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 45.6, bar 3%; bottom spread 0.7, bar 0%)
+PASS: Part 2: no runtime errors at 9-21
+PASS: Part 2: at 9-23 (360 x 920) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 27.0, bar 11%; bottom spread 7.5, bar 1%)
+PASS: Batch 2: at 9-23 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 9-23 the gear and the mini-menu button sit at the screen's top corners (a phone): gear [158,-38], button [-158,-38]
+PASS: Part 2: at 9-23 the semantic gear sits on the gear
+PASS: Part 2: at 9-23 a tap on the gear opens Settings
+PASS: Part 2: at 9-23 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 9-23 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 9-23 (360 x 920) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 27.2, bar 1%; bottom spread 19.3, bar 0%)
+PASS: Batch 2: at 9-23 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Part 2: at 9-23 (360 x 920) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 27.2, bar 1%; bottom spread 19.8, bar 0%)
+PASS: Batch 2: at 9-23 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Part 2: at 9-23 (360 x 920) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (top spread 39.9, bar 3%; bottom spread 1.8, bar 0%)
+PASS: Part 2: no runtime errors at 9-23
+PASS: Part 2: at 10-16 (500 x 800) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 9.2, bar 5%; right spread 9.6, bar 6%)
+PASS: Batch 2: at 10-16 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 10-16 the gear and the mini-menu button sit at the column's corners (a tablet keeps the column): gear [158,22], button [-158,22]
+PASS: Part 2: at 10-16 the semantic gear sits on the gear
+PASS: Part 2: at 3-4 (600 x 800) the Atrium's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 8.2, bar 6%; right spread 8.6, bar 6%)
+PASS: Batch 2: at 3-4 the Atrium and its light draw their masters whole (atrium, atrium-grime, atrium-light)
+PASS: Part 2: at 3-4 the gear and the mini-menu button sit at the column's corners (a tablet keeps the column): gear [158,22], button [-158,22]
+PASS: Part 2: at 3-4 the semantic gear sits on the gear
+PASS: Part 2: at 10-16 a tap on the gear opens Settings
+PASS: Part 2: at 3-4 a tap on the gear opens Settings
+PASS: Part 2: at 10-16 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 3-4 a tap on the mini-menu button opens TRAVEL
+PASS: Part 2: at 3-4 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 10-16 the Zodiac Wing door takes its canvas tap in the column
+PASS: Part 2: at 10-16 (500 x 800) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 24.8, bar 0%; right spread 18.5, bar 0%)
+PASS: Batch 2: at 10-16 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Part 2: at 3-4 (600 x 800) the Zodiac Wing's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 22.5, bar 0%; right spread 17.2, bar 0%)
+PASS: Batch 2: at 3-4 the Zodiac Wing and its light draw their masters whole (wing, wing-grime, wing-light)
+PASS: Part 2: at 10-16 (500 x 800) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 22.2, bar 1%; right spread 21.7, bar 1%)
+PASS: Batch 2: at 10-16 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Part 2: at 3-4 (600 x 800) the Dial's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 22.0, bar 1%; right spread 21.1, bar 0%)
+PASS: Batch 2: at 3-4 the Dial's room draws its masters whole, worn and today's blended at Key 1 (dial-room, dial-room-worn)
+PASS: Part 2: at 10-16 (500 x 800) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 42.1, bar 0%; right spread 1.6, bar 0%)
+PASS: Part 2: no runtime errors at 10-16
+PASS: Part 2: at 3-4 (600 x 800) the journal's art reaches every edge, with no bar of the canvas's own colour in any margin (left spread 38.4, bar 0%; right spread 1.7, bar 0%)
+PASS: Part 2: no runtime errors at 3-4
