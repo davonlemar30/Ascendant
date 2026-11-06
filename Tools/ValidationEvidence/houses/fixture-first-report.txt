@@ -1,0 +1,4 @@
+FAIL: System.Exception: timed out waiting for the launch's logo (studio-logo)
+  at Ascendant.Build.SlicePlayValidation.Check (System.Boolean value, System.String text) [0x0001f] in /Users/damusthadon/Documents/Ascendant-worktrees/codex-hall-of-houses/Assets/Editor/CelestialDial/SlicePlayValidation.cs:44 
+  at Ascendant.Build.SlicePlayValidation+<>c__DisplayClass41_0.<Tick>b__0 () [0x00000] in /Users/damusthadon/Documents/Ascendant-worktrees/codex-hall-of-houses/Assets/Editor/CelestialDial/SlicePlayValidation.cs:702 
+  at Ascendant.Build.SlicePlayValidation.Tick () [0x00130] in /Users/damusthadon/Documents/Ascendant-worktrees/codex-hall-of-houses/Assets/Editor/CelestialDial/SlicePlayValidation.cs:707 

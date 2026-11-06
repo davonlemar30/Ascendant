@@ -2,6 +2,11 @@ namespace Ascendant.CelestialDial
 {
     public static class HousesCopy
     {
+        public const string Journal = "Your journal"; // Codex draft (goal 03); owner rewrites
+        public const string Seal = "Seal"; // Codex draft (goal 03); owner rewrites
+        public const string Ask = "Ask Caspar"; // Codex draft (goal 03); owner rewrites
+        public const string Continue = "Continue"; // Codex draft (goal 03); owner rewrites
+        public const string Back = "Back"; // Codex draft (goal 03); owner rewrites
         public const string Topic1 = "self", Journal1 = "self, body, how you meet the world"; // Codex draft (goal 03); owner rewrites
         public const string Topic2 = "possessions", Journal2 = "money, possessions, what you value"; // Codex draft (goal 03); owner rewrites
         public const string Topic3 = "communication", Journal3 = "communication, siblings, short trips"; // Codex draft (goal 03); owner rewrites

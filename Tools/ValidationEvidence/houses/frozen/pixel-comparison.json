@@ -1,0 +1,658 @@
+[
+  {
+    "capture": "baseline-1280-obs-bands.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-bandsintro.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-card-0.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-card-1.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-dormant.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-key5-room.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-key5.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-key6-room.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-key6.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-0.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-1.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-2.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-3.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-4.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-5.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-6.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-7.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-8.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-name-9.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-namesintro.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-retro.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-rings.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-ringsintro.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-0.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-1.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-2.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-3.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-4.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-5.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-6.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-7.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-8.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-work-9.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-obs-workintro.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-key1.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-key2.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-key3.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-key4.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-obswhole.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-wheel.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-1280-wing-whole.png",
+    "size": [
+      1280,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-bands.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-bandsintro.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-card-0.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-card-1.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-dormant.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-key5-room.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-key5.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-key6-room.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-key6.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-0.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-1.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-2.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-3.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-4.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-5.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-6.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-7.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-8.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-name-9.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-namesintro.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-retro.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-rings.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-ringsintro.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-0.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-1.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-2.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-3.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-4.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-5.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-6.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-7.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-8.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-work-9.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-obs-workintro.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-key1.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-key2.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-key3.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-key4.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-obswhole.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-wheel.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  },
+  {
+    "capture": "baseline-360-wing-whole.png",
+    "size": [
+      360,
+      800
+    ],
+    "identical": true
+  }
+]

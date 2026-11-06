@@ -2,6 +2,11 @@ Codex draft (goal 03); owner rewrites. `{student}` alternates pupil / apprentice
 
 | ID | Draft |
 | --- | --- |
+| Journal | Your journal |
+| Seal | Seal |
+| Ask | Ask Caspar |
+| Continue | Continue |
+| Back | Back |
 | Title | The Hall of Houses |
 | BackToAtrium | The Grand Atrium |
 | Door | Another plate has answered, seeker. The Hall of Houses is open. |

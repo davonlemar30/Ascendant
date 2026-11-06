@@ -1,0 +1,11 @@
+PASS: Corridor room opens
+PASS: angle hint 1
+PASS: angle hint 2
+PASS: angle hint 3
+PASS: overlay hint 1
+PASS: overlay hint 2
+PASS: overlay hint 3
+PASS: independent later overlay earns Key 9
+PASS: Book 3 opens at lock 9
+PASS: worked example computed MC is in ninth house
+PASS: no browser runtime exceptions

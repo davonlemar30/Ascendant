@@ -1,0 +1,2107 @@
+{
+  "source": "397e2b5c9210b549540c69905e9c84af8d13d102",
+  "artifact_sha256": "7971de1967d64069156f67345d5212f4fc9ce6aa4937a9119c7594bff012a4d8",
+  "archive_directory": "/Users/damusthadon/Documents/Ascendant-worktrees/codex-hall-of-houses/Tools/ValidationEvidence/houses/full-browser",
+  "files": [
+    {
+      "file": "1280-menu-rat.png",
+      "bytes": 1658259,
+      "sha256": "346ed18e0799cb080308c12c41b38878fc1852787fcb02ce58929dd8a62767b5"
+    },
+    {
+      "file": "360-art-atrium.png",
+      "bytes": 133870,
+      "sha256": "1842a9ce52632e41e5714284d125abc883a04457321bc3276c8019915a2ea94a"
+    },
+    {
+      "file": "360-art-dial-guided.png",
+      "bytes": 490340,
+      "sha256": "5fe9477a06c8d316e6591f0ac94ff6e42d56eecd953fb72ebe8de0c01c693c14"
+    },
+    {
+      "file": "360-art-dial.png",
+      "bytes": 188569,
+      "sha256": "1e9b75a79dfca4d37a21cbaa804cf54757e7d1955d49993d93effdd32b5ea12c"
+    },
+    {
+      "file": "360-art-prologue-city.png",
+      "bytes": 64146,
+      "sha256": "4243217c5eb14218498be54cbfda43b74ca2c9f1fc681cb121bcff7e8d89bc65"
+    },
+    {
+      "file": "360-atrium-kit-stage2.png",
+      "bytes": 1353868,
+      "sha256": "c961d5466089c6518d524962d2b004c9330eda4daefef29521e1b79ba034b210"
+    },
+    {
+      "file": "360-atrium-kit-wing-whole.png",
+      "bytes": 1360077,
+      "sha256": "e1dd1827892aae41d52f4b77a641412c38415b0ec3807993af43f6d61a056452"
+    },
+    {
+      "file": "360-atrium.png",
+      "bytes": 1209645,
+      "sha256": "442c4ad989f980ec7304eb49f174e23867d5764712ba0526cb7d5c5b0626ebb8"
+    },
+    {
+      "file": "360-birth-changed.png",
+      "bytes": 80363,
+      "sha256": "4072e10a9f63ae2db3726af705f7749c092bc7bd2ff08d0c4700fa3371a3247e"
+    },
+    {
+      "file": "360-birth-chart-date.png",
+      "bytes": 96851,
+      "sha256": "52a4149ee5a7b249f93b873302f31ae5ed815e4ef2b4ee0150bdb5c021fab94b"
+    },
+    {
+      "file": "360-birth-skip-done.png",
+      "bytes": 104332,
+      "sha256": "00b96432d033f5939127fa69722c345103b1ea2bcfc725971275e6268c3f3013"
+    },
+    {
+      "file": "360-birth-skip.png",
+      "bytes": 111415,
+      "sha256": "ea6ea2f900287cf5d067611df40e7010cdca5bee4a7e170a837f4dd660ff8c67"
+    },
+    {
+      "file": "360-birth-white-light.png",
+      "bytes": 44032,
+      "sha256": "972e15f5a489494040eb482c151af6b821b814f155ee452d26c29af291e3f9c2"
+    },
+    {
+      "file": "360-birth.png",
+      "bytes": 81120,
+      "sha256": "cc9f5c30c15ae1925d09cf06cfa91faeee708ff3af93aa8e85134bb904ce0225"
+    },
+    {
+      "file": "360-book-emblem.png",
+      "bytes": 856174,
+      "sha256": "b8aab35d2a611bd7cf8ba6800cf0b67c7c95221a40ea22122230d5402f092851"
+    },
+    {
+      "file": "360-book-opens.png",
+      "bytes": 1331893,
+      "sha256": "aca430478df4ce870f228e3070ac4ba56117c6758b11379674defde135588a5e"
+    },
+    {
+      "file": "360-book-pages.png",
+      "bytes": 883821,
+      "sha256": "d5f1d5597cade6957f60042e0c403232ff6ddba0142f81032a44bb6cc496abb3"
+    },
+    {
+      "file": "360-builder-name.png",
+      "bytes": 1301417,
+      "sha256": "bddaee1df1ee16dfd706d96b438805c43dfa26eba32223b144fd9055584a544a"
+    },
+    {
+      "file": "360-builder-share.png",
+      "bytes": 1307838,
+      "sha256": "bd8ed4208d72a6902f2d820b2e0d6122bb9c4c08aea22f6c3c5a742c170d1a6b"
+    },
+    {
+      "file": "360-buttons-dial.png",
+      "bytes": 1257081,
+      "sha256": "86ee68bb5be2347c8585ad60d3998125c36e47b048b19f7696bd51d1dcf54a93"
+    },
+    {
+      "file": "360-buttons-table.png",
+      "bytes": 489065,
+      "sha256": "cc8e26e1399a6c8f0a28cd7b9b4c1239b0c773df0071a4801fd460433bb421d5"
+    },
+    {
+      "file": "360-chamber-end.png",
+      "bytes": 1189685,
+      "sha256": "3efb3726ddcdf7f41f5adbf71c01549e6a205fa74a95122d64080bfed125d81d"
+    },
+    {
+      "file": "360-chamber-lock2.png",
+      "bytes": 1323170,
+      "sha256": "c3bbaab48a48aa539c0e39ed84f0fb94efb20468ade1a1a832545d2d997b21ec"
+    },
+    {
+      "file": "360-chamber.png",
+      "bytes": 1237952,
+      "sha256": "4a645a3e4314cf9e71f820005a5c2a743d2bb5d1d3fd8970f858691f5b4c2fb7"
+    },
+    {
+      "file": "360-complete.png",
+      "bytes": 1145493,
+      "sha256": "ca016ab7b520a02f4d59334a6c94d4008efc5894159db8cab59fea7e04ea6826"
+    },
+    {
+      "file": "360-dev-cusp.png",
+      "bytes": 110954,
+      "sha256": "e9813883209c4b13c06fa5067d2f33eec9487062151f77afac49733705af262c"
+    },
+    {
+      "file": "360-dev-jump.png",
+      "bytes": 435666,
+      "sha256": "bca1cca09e8f9d19291f1ace53153271345986dc17ee2f3d37526684e671e923"
+    },
+    {
+      "file": "360-dev-key4.png",
+      "bytes": 1424542,
+      "sha256": "a9bc02a11cd35f19fb7b69a01d9469c992c184e87cee5f5db9630e1247a95114"
+    },
+    {
+      "file": "360-dial-page2.png",
+      "bytes": 1306567,
+      "sha256": "e00fad09c91cc7148f86782d93374c7be96c219e8af77cccf3f0297d8962ceb6"
+    },
+    {
+      "file": "360-dial-pages.png",
+      "bytes": 1318810,
+      "sha256": "6761d520fe7d2a78364f51494370391aa4cf8d897513f97bdd3c7db3a6a16956"
+    },
+    {
+      "file": "360-dial-speaks.png",
+      "bytes": 1301417,
+      "sha256": "bddaee1df1ee16dfd706d96b438805c43dfa26eba32223b144fd9055584a544a"
+    },
+    {
+      "file": "360-dial-wake-0.png",
+      "bytes": 1224804,
+      "sha256": "198fe436331b64f6e59ad341ec44d14acfdcdd55e6bd765b1f37221237d66e53"
+    },
+    {
+      "file": "360-dial-wake-1.png",
+      "bytes": 1310754,
+      "sha256": "dc38a955cf9e06debc747cdcbe1223b2fe6f280beaafceaa64a8acea0764acb4"
+    },
+    {
+      "file": "360-dial-wake-2.png",
+      "bytes": 1258090,
+      "sha256": "508daf318501f930ed80bb2ff786a376c573270f90d08bc7f2f2d5413eeca4ee"
+    },
+    {
+      "file": "360-dial-wake-3.png",
+      "bytes": 1337448,
+      "sha256": "cc1a509f175adf55e504f41ba2b7b26c411d7b20b4b4bba5ac89642aed6a1e9e"
+    },
+    {
+      "file": "360-dial-wake-4.png",
+      "bytes": 1311279,
+      "sha256": "0cd2eac09d4ca6caa1b9f7e9f360fb4f51dba46f2a3128d960a536cb32dd0c97"
+    },
+    {
+      "file": "360-drag-state.json",
+      "bytes": 39244,
+      "sha256": "446e35001e4f605912dc7851855876e29d7b6fb71540e2faffc5d146b0cca3e6"
+    },
+    {
+      "file": "360-drag.png",
+      "bytes": 1250292,
+      "sha256": "935ac61eec2b95c04935884fdadcd555fbd602a90811b9bf4690100d4c8f7396"
+    },
+    {
+      "file": "360-encounter.png",
+      "bytes": 1123544,
+      "sha256": "5ace47dfdcd62b09a1382d87e5c1fccfe018e2f0999c10b5810eea42a02eb36f"
+    },
+    {
+      "file": "360-events.json",
+      "bytes": 530365,
+      "sha256": "0d5e355dc75661319c317a101c8a777f70156b75dc83c5d079f70693e1da41b7"
+    },
+    {
+      "file": "360-eye-challenge.png",
+      "bytes": 1249659,
+      "sha256": "2a5f41e2e0830916283c55a5d24d50c6ed028e240633968ccd666976ce884ed8"
+    },
+    {
+      "file": "360-eye-symbols.png",
+      "bytes": 1273680,
+      "sha256": "a00ab0f148e9156deca33bec24244f07562f6f1bcc2b68f4173c5cdc99deeeaa"
+    },
+    {
+      "file": "360-fork.png",
+      "bytes": 1281105,
+      "sha256": "48bfcc686055374e2ea7546f2a9669c3c985e9fa51cce674f9141295ad07aa04"
+    },
+    {
+      "file": "360-gate.png",
+      "bytes": 1642752,
+      "sha256": "76ae5feec51eba9e8b28fd34679fcd6147bba626ecc92bef5b24ab3ca00bddbe"
+    },
+    {
+      "file": "360-glyphs-a.png",
+      "bytes": 857764,
+      "sha256": "e760ecf5fcea86367d1fc2416d996f6c32769e358382d6b633fa9def05a603c7"
+    },
+    {
+      "file": "360-glyphs-b.png",
+      "bytes": 1273680,
+      "sha256": "a00ab0f148e9156deca33bec24244f07562f6f1bcc2b68f4173c5cdc99deeeaa"
+    },
+    {
+      "file": "360-grid-ask.png",
+      "bytes": 493859,
+      "sha256": "20aa35f980ff8d1f97901a0551199680aee876144f3525298f7a4bf381a8dc34"
+    },
+    {
+      "file": "360-grid-drag.png",
+      "bytes": 485455,
+      "sha256": "2a65c39b144f98a420d2d8dde7df92eefdbfe4e1d741df105c93d67a32e42f18"
+    },
+    {
+      "file": "360-grid-gold.png",
+      "bytes": 559209,
+      "sha256": "869a35aa4c608a7a85fa14a5077e97a9024c2bc3e111c23e826dc5d0b9ef2d33"
+    },
+    {
+      "file": "360-grid-key3.png",
+      "bytes": 596403,
+      "sha256": "c13789926a1570ed39ef0e38b38c9069146597e6159ea2907171ea62eaf98e7a"
+    },
+    {
+      "file": "360-grid-miss.png",
+      "bytes": 497829,
+      "sha256": "b74fa78329300d6202f5025d811759e82ca0e3ee8069454428e7879eab1d37f7"
+    },
+    {
+      "file": "360-grid.png",
+      "bytes": 489065,
+      "sha256": "cc8e26e1399a6c8f0a28cd7b9b4c1239b0c773df0071a4801fd460433bb421d5"
+    },
+    {
+      "file": "360-hub-complete.png",
+      "bytes": 1408332,
+      "sha256": "a53ac85206790e70c2a53d7c6d634583e1728c579f4185d153f2929ca2c228b3"
+    },
+    {
+      "file": "360-hub-key-in-hand.png",
+      "bytes": 1425488,
+      "sha256": "21e2690c3f592d8f0cc8ed07ccf54a527f80de956e2fc6b49554dc5eb032330f"
+    },
+    {
+      "file": "360-hub-key3.png",
+      "bytes": 1424556,
+      "sha256": "f102f6151064a11ad83797ce8656c91b58fc6fbfff5887f159c83ba82320c6ba"
+    },
+    {
+      "file": "360-hub-key4.png",
+      "bytes": 1361223,
+      "sha256": "8f996517e4eb5b377b0e32e931e63df9b59e9f67f6b27dd9f10fbaec9abf80c1"
+    },
+    {
+      "file": "360-hub.png",
+      "bytes": 1356187,
+      "sha256": "00539acc0d985a9b27164a2bf84e9472ee10dd8b4dd9e4a69b1db8fa72e2bb5e"
+    },
+    {
+      "file": "360-identity.png",
+      "bytes": 83597,
+      "sha256": "8dbd96054bdc3343c4686b046f03e870367b5346a2658e4de3bba4bcc8668f9e"
+    },
+    {
+      "file": "360-inscription-writing.png",
+      "bytes": 826957,
+      "sha256": "a7d7fe141249f1bfe2ae06e8bc2075e01314112db18dcb0db6324161cc58ce3b"
+    },
+    {
+      "file": "360-inscription-written.png",
+      "bytes": 842942,
+      "sha256": "62a26e1325d426b67706550f9e64140d4e119dd453666a6eaf867a6da588c237"
+    },
+    {
+      "file": "360-journal-contents.png",
+      "bytes": 828507,
+      "sha256": "c58d352ef3d17345c31e33755442389af7c567457def9d00b1400831f8f7b77c"
+    },
+    {
+      "file": "360-journal-landing.png",
+      "bytes": 853946,
+      "sha256": "61a5c816508cae0b942569ba216475372a4a1fedb716e120346ab6b7bf06f1b7"
+    },
+    {
+      "file": "360-journal-map.png",
+      "bytes": 853492,
+      "sha256": "d5f00ffb379fd7aa5da8a5b442a5231cb23e375937784f18351d21016e0bd16b"
+    },
+    {
+      "file": "360-journal-opposites.png",
+      "bytes": 997904,
+      "sha256": "44a0c446b17ac8170fe2997f392262e65b98e57191f303cda055d3f5eec5b086"
+    },
+    {
+      "file": "360-journal-practice.png",
+      "bytes": 764931,
+      "sha256": "66a5fc0eeb9379c58e2caf7d483d25ecea95072c115f9538cde3abc311cffdcb"
+    },
+    {
+      "file": "360-journal-preview.png",
+      "bytes": 993427,
+      "sha256": "58aaf4fa08fd6ac20cf75c169df5cbbe7a9c3c4a9b7ae170bd6a71afeb278637"
+    },
+    {
+      "file": "360-journal-sign.png",
+      "bytes": 772981,
+      "sha256": "8c5785973976842a744c451ce74da82758d9de8c39d8b7e83dee75bcf3ce00ff"
+    },
+    {
+      "file": "360-journal-table.png",
+      "bytes": 820552,
+      "sha256": "c555056fc59d8dae705490b03c7a3d145c822f9a13aff3a0c7554e0ba9ebf844"
+    },
+    {
+      "file": "360-journal-title.png",
+      "bytes": 770429,
+      "sha256": "dac6432f97eedfefcc9b88dd1b8e8bad9aa30bf4e750400454cb787df6aada65"
+    },
+    {
+      "file": "360-journal-wheel.png",
+      "bytes": 991067,
+      "sha256": "2ca5d9842f1ceff9b5e4687a8a261ffec8606a6f0ef84e994c49dfe6a0026085"
+    },
+    {
+      "file": "360-key2-ceremony.png",
+      "bytes": 1282819,
+      "sha256": "faaf9c9e410ea64597626d37a99fa99095d94d79d7477f1e94b1e79075e710b1"
+    },
+    {
+      "file": "360-key2.png",
+      "bytes": 1290291,
+      "sha256": "f766969aa548adf16256fad6110b82ff0a3527932bab6367cb862729b0a38a4f"
+    },
+    {
+      "file": "360-key3-ceremony.png",
+      "bytes": 612651,
+      "sha256": "a729aee7d19bf27eac2b85f3a9cb22a57c9d47cb428b1387786eb0ef27452c19"
+    },
+    {
+      "file": "360-key4-ceremony.png",
+      "bytes": 1302280,
+      "sha256": "d7baad7f3223912cd0ba34573224b7c496edee70360731abf779f9f59972046e"
+    },
+    {
+      "file": "360-key4.png",
+      "bytes": 1311067,
+      "sha256": "e0288c189fffefec744c4fb1cfff24db7e77382b22e96d8007ddb49a27ea153c"
+    },
+    {
+      "file": "360-launch-01-logo.png",
+      "bytes": 319356,
+      "sha256": "49bb56fdde6e2bd9aa759da3e9c4e145e5743c65dd28874f514d6d5fdd2cf6c8"
+    },
+    {
+      "file": "360-launch-02-draw.png",
+      "bytes": 172284,
+      "sha256": "c7dc6f6bc1c767001e7dd2f673bab6e3ffa8bf8d282fcaf91ec022e2fa6a2374"
+    },
+    {
+      "file": "360-launch-03-glyphs.png",
+      "bytes": 482561,
+      "sha256": "ad07dd2af338d6d5337aeda05611f890a134a88e862158b0ea19c75dc4f5bde8"
+    },
+    {
+      "file": "360-launch-04-alive.png",
+      "bytes": 1204748,
+      "sha256": "07ccf6c2953a592b25cd17d86dde1ccaffe229a5ad27605cc022f764239dd82a"
+    },
+    {
+      "file": "360-launch-05-burn.png",
+      "bytes": 1324731,
+      "sha256": "a2d23f9b8819bba3e1bac5fb4370be0923210571212019b6b904a57e229e580e"
+    },
+    {
+      "file": "360-launch-06-transform.png",
+      "bytes": 1314116,
+      "sha256": "323f4af0d4651efb1087a42f10de019fa8d0fc13ee1945ac90e0d4bc0843a145"
+    },
+    {
+      "file": "360-launch-07-earth.png",
+      "bytes": 1094180,
+      "sha256": "097aa80578e5a913eb2d164be1e28f9d87f3b5a79776ea72f10af0da7ac0bbc2"
+    },
+    {
+      "file": "360-launch-08-continents.png",
+      "bytes": 1416271,
+      "sha256": "26700173cb309ab69aa26ca8f98745b9c4c5959e3ef87aa42c903bda0119b50b"
+    },
+    {
+      "file": "360-launch-09-america.png",
+      "bytes": 1405741,
+      "sha256": "73fc9a5a05e0eb59c7d21e5bf6f64ae32c298cc5a646ea15eb40a9ab40a26461"
+    },
+    {
+      "file": "360-launch-10-newyork-state.png",
+      "bytes": 1518448,
+      "sha256": "65b9a5bc9ca41a11181665b184af2421b8cc874a0716cc9fc24bbe9563e4b75e"
+    },
+    {
+      "file": "360-launch-11-newyork-city.png",
+      "bytes": 1713205,
+      "sha256": "2ee3b794216b0b9585bfe0b9572b79d578a8256cc408b31413c97566d64ced45"
+    },
+    {
+      "file": "360-launch-12-brooklyn.png",
+      "bytes": 1732377,
+      "sha256": "ecac7128b4d39eb39246251689b7d05d0e94010a1472e5de4f098404f3ad382d"
+    },
+    {
+      "file": "360-launch-13-block.png",
+      "bytes": 1568366,
+      "sha256": "9fbbebcc888079a6813d5eacca5daf2bf47fb2aa875b82074b26262a388e60fe"
+    },
+    {
+      "file": "360-launch-14-window.png",
+      "bytes": 1402649,
+      "sha256": "8c052abb0fbff9fb1f53003971c8c2c0ed6869f1a2dea1956724fbed7ad3a936"
+    },
+    {
+      "file": "360-launch-reduced-01-logo.png",
+      "bytes": 318120,
+      "sha256": "96574f9356a51a39852bfeaddd9bd9d2ceb22b6c440f01c2c6c9cd6c889c30ff"
+    },
+    {
+      "file": "360-launch-reduced-02-draw.png",
+      "bytes": 418221,
+      "sha256": "2abf86634bd098fb40ebee16e5e5e7a1681d9970f660b456e5b0462aa9167412"
+    },
+    {
+      "file": "360-launch-reduced-03-glyphs.png",
+      "bytes": 493815,
+      "sha256": "57008bf291386c275a3f3e9a531b49f95bbf3febb7c67d3eb89b3aa815d57b5b"
+    },
+    {
+      "file": "360-launch-reduced-04-alive.png",
+      "bytes": 1211191,
+      "sha256": "e3a6277f7713c83bd19c456a7ccbef5a67bf9e216074c150303831550c55d50a"
+    },
+    {
+      "file": "360-launch-reduced-05-burn.png",
+      "bytes": 1312903,
+      "sha256": "c665485a97c81e7eb7c4d37734649fd5cc7a79ed98c49730cf34308e1b9c1495"
+    },
+    {
+      "file": "360-launch-reduced-06-transform.png",
+      "bytes": 1291732,
+      "sha256": "c6980f5db023e7f6be14fa73371dcb34b5338a7975a46206396b573d847b4e59"
+    },
+    {
+      "file": "360-launch-reduced-07-earth.png",
+      "bytes": 1025289,
+      "sha256": "abe9e62d401c32f07416a259147365143a3f4f4ce1d13183e4c393957dc7daac"
+    },
+    {
+      "file": "360-launch-reduced-08-continents.png",
+      "bytes": 1402815,
+      "sha256": "5bda7617c02a35d00f8cc79ae539acf688e533fabe86b4778de8f4bf643e66dd"
+    },
+    {
+      "file": "360-launch-skip.png",
+      "bytes": 1411851,
+      "sha256": "ccd6c816b7d00ac23e58f649fdd41aa45345c290802e042620f2d314e240adab"
+    },
+    {
+      "file": "360-menu-fresh.png",
+      "bytes": 984646,
+      "sha256": "94def487de2f650b9ab7d51f6537e18063c7bd49d52e1ff9733c03cccbac4026"
+    },
+    {
+      "file": "360-menu-rat.png",
+      "bytes": 985036,
+      "sha256": "77ea2d76fb6de6fa33c00408c28346316c2e612be45e1b087d52687c2ea17490"
+    },
+    {
+      "file": "360-menu-save.png",
+      "bytes": 960445,
+      "sha256": "a4ccbc4f85e0000c0603c2fd4d72c5f93941ddb6ddd33002bf2c8d66f348f16b"
+    },
+    {
+      "file": "360-menu-settings.png",
+      "bytes": 629795,
+      "sha256": "9939ab0c1c234332b147bae89f9154f42a56795e5858ad960b0d538285e3da5c"
+    },
+    {
+      "file": "360-modalities-complete.png",
+      "bytes": 1245911,
+      "sha256": "52458bdad2e06aec4653347222838b4a458ac11c179c038717f1141fd5209089"
+    },
+    {
+      "file": "360-modalities.png",
+      "bytes": 1333240,
+      "sha256": "f3606594135c243aaad44dc836a34c29a5d69712c584060d2a826d34a33561b9"
+    },
+    {
+      "file": "360-nothing-due.png",
+      "bytes": 1279920,
+      "sha256": "5c00ca58f4ac79dbe8c3873491673e5449e119e50b5da1b24b82527ea51acdf8"
+    },
+    {
+      "file": "360-opening-hub.png",
+      "bytes": 1157582,
+      "sha256": "0089e3522bbcb8b1f38b076d309fcc3cdecf40c0e71e8cc3e4f1262e8a021dad"
+    },
+    {
+      "file": "360-opening-wing.png",
+      "bytes": 1535866,
+      "sha256": "7815453a2a15db4ff80a128186c318edbca52e27f22b861cdad3aa7bbe7453bf"
+    },
+    {
+      "file": "360-opposites-complete.png",
+      "bytes": 1326657,
+      "sha256": "640f268abc7b2a21aa62892cc76d99db7b13d20b68b8a7386b473501ffa5c496"
+    },
+    {
+      "file": "360-opposites.png",
+      "bytes": 1358573,
+      "sha256": "0575e5f0501b5e14c64ac6434980034e13852c4d6370298ad2050b6d946aec21"
+    },
+    {
+      "file": "360-player-controls-review.png",
+      "bytes": 92405,
+      "sha256": "eeb17608412c960f9739fd6759a080787a78fa98091babb731c0c687201fef3f"
+    },
+    {
+      "file": "360-polarity-shown.png",
+      "bytes": 1313839,
+      "sha256": "ae7fd53ad347599ecdf198fd8ff1af0f3f0949a6345f1ad44eb044e9f778b4ee"
+    },
+    {
+      "file": "360-polarity.png",
+      "bytes": 1320681,
+      "sha256": "587703565c5c131d4736bda018c38c332cc0cf064b1b254d06d160e106335f48"
+    },
+    {
+      "file": "360-practice-clean.png",
+      "bytes": 1236395,
+      "sha256": "54d9eef61b16130d93d0898dcd61504b055d07c027b983954663218ce5435fd1"
+    },
+    {
+      "file": "360-practice-dial.png",
+      "bytes": 1318810,
+      "sha256": "6761d520fe7d2a78364f51494370391aa4cf8d897513f97bdd3c7db3a6a16956"
+    },
+    {
+      "file": "360-practice-done.png",
+      "bytes": 45747,
+      "sha256": "52326ee49fc3820cf4fab2a8e70ebe213e0e45bda0a7a248675d795d707a1429"
+    },
+    {
+      "file": "360-practice-end.png",
+      "bytes": 777545,
+      "sha256": "423a3878b89fd9a5e4aed8a56fe4904113f19b29f2e1f4aaf38a9b81dcbc2ab6"
+    },
+    {
+      "file": "360-practice-hard.png",
+      "bytes": 855124,
+      "sha256": "18d4c10979315e2596eae3db91eee2897f782c4ee5e7ff73010d2654447f1e76"
+    },
+    {
+      "file": "360-practice-modality.png",
+      "bytes": 147831,
+      "sha256": "0aaf79185c36900444d719702c193a1e29a151d7295bec8334ed5b5cf20bc3d4"
+    },
+    {
+      "file": "360-practice-question.png",
+      "bytes": 754867,
+      "sha256": "4d8622acac640eb6a4f78a51a6b0f28bc12aa001ab94f79086e6172941f2d360"
+    },
+    {
+      "file": "360-practice-right.png",
+      "bytes": 789958,
+      "sha256": "3ee9a3a0a64ab56781f682f1e88f2c9e029977f431dfaa99bb20eeaf3aef0424"
+    },
+    {
+      "file": "360-practice-tap.png",
+      "bytes": 107098,
+      "sha256": "560708eb7f3bbceedac53ad451e4789586b575646fef71c466b20940c30ae9ae"
+    },
+    {
+      "file": "360-practice-wrong.png",
+      "bytes": 783176,
+      "sha256": "0b353e64688ba7b1ba97f13b15fbf989703c05c1dc6cb8a952c5472862463305"
+    },
+    {
+      "file": "360-prologue-01-city-city.png",
+      "bytes": 1182820,
+      "sha256": "e6ad872c7b8e3fd86eabda513e32dcaed6a05f25cee8eaa4e5f22426c37b0103"
+    },
+    {
+      "file": "360-prologue-02-desk-desk.png",
+      "bytes": 301482,
+      "sha256": "337bf3f21caf66d98c028c3c0572e11ea1d48ed313f86bc8e9d7ea30df7b5536"
+    },
+    {
+      "file": "360-prologue-03-desk-notebook.png",
+      "bytes": 697363,
+      "sha256": "8be5caab03e3c095a93900a9562708eb2e6b87fad65b8c9042302f803c1cb83d"
+    },
+    {
+      "file": "360-prologue-03b-desk-notebook-2.png",
+      "bytes": 697380,
+      "sha256": "6e6741dcacc167c5a8eba21490829bb9c0110c71ac087c9f3c216bb023d5126d"
+    },
+    {
+      "file": "360-prologue-04-light-desk.png",
+      "bytes": 759021,
+      "sha256": "28e92e38d3a9e68292f6e75c58fd4e18460ec1214e1aa4b135297b997b199dd6"
+    },
+    {
+      "file": "360-prologue-05-light-light.png",
+      "bytes": 954792,
+      "sha256": "321e9a9d3493218562beef98d237070d879d326a4b66029b5f6b1e5c55d18820"
+    },
+    {
+      "file": "360-prologue-06-light-light-up.png",
+      "bytes": 945717,
+      "sha256": "a7eeb4c710628c9aeba1be430448df8c6d54be9bff3deca185d6a80f6bb678f4"
+    },
+    {
+      "file": "360-prologue-07-light-look.png",
+      "bytes": 731421,
+      "sha256": "11f87f4123d34399eee0c38b646febc2ef8c1a35eba9a0e2036524407fffd316"
+    },
+    {
+      "file": "360-prologue-08-light-headphones.png",
+      "bytes": 744181,
+      "sha256": "6b7c833c775162fdde57b55b0ca3ec1d403da9722cc20008eecbc1ff9070afbd"
+    },
+    {
+      "file": "360-prologue-09-street-street-above.png",
+      "bytes": 1426636,
+      "sha256": "dc0f810f60a27f421560d783327236ab7e62dc4ec90f87e01e41550a3ab1171a"
+    },
+    {
+      "file": "360-prologue-10-street-street-above.png",
+      "bytes": 1419109,
+      "sha256": "0374e3bb53ec1b53e8362b99518427d3454758673404f8c0b92da896cfda9664"
+    },
+    {
+      "file": "360-prologue-11-puzzled-puzzled.png",
+      "bytes": 1009551,
+      "sha256": "852ad9ef0e2aa9f72ebf6d26ac5997af214d84e1e73de74d75ebcf128f32d4eb"
+    },
+    {
+      "file": "360-prologue-12-turn-caspar-back.png",
+      "bytes": 1121181,
+      "sha256": "858e86f161d19f58337ef1450b658ca9888229ea9336bac4bb271ab30dafe9e3"
+    },
+    {
+      "file": "360-prologue-13-turn-caspar-turn.png",
+      "bytes": 1128217,
+      "sha256": "fbf7def5cfec590bfa8dd41346965f9ce825ce90f7f7772b8fa68c3c614bd1ab"
+    },
+    {
+      "file": "360-prologue-14-turn-caspar-face.png",
+      "bytes": 1436623,
+      "sha256": "b93e2c904f167264bf5e5b927a365e89620fac8b0efe39ca5f61869933b3faf7"
+    },
+    {
+      "file": "360-prologue-15-turn-caspar-eyes.png",
+      "bytes": 1130717,
+      "sha256": "a6406e328fcb06dd00e24aacb7be417eaf400f671c075f8c2a2c7a57d7ce76dd"
+    },
+    {
+      "file": "360-prologue-16-flash.png",
+      "bytes": 350030,
+      "sha256": "401f5332575ed0c96bf41e71d72b5862e8df1d1446cb02f1af5df3d609763a86"
+    },
+    {
+      "file": "360-prologue-17-identity.png",
+      "bytes": 83232,
+      "sha256": "2b56ed21742b9ffeb707c42cd9d30c7419b5b304e47da0e89c44d7bf2f4f9a69"
+    },
+    {
+      "file": "360-prologue-main-menu-ask.png",
+      "bytes": 410327,
+      "sha256": "d7d050565431325ce617a943125690d1b43aac85a0626bd9bb113d945b21bfa5"
+    },
+    {
+      "file": "360-prologue-reduced-01-city-city.png",
+      "bytes": 974907,
+      "sha256": "1a636609b6d7c89139d472d8a25d42a9486cd3281d76f6519e1084c5bb14e620"
+    },
+    {
+      "file": "360-prologue-reduced-02-desk-desk.png",
+      "bytes": 296777,
+      "sha256": "11c2e592b7abb7243dd6c1a15ceb836ec0806f4d02196079a7be977dd489e218"
+    },
+    {
+      "file": "360-prologue-reduced-03-desk-notebook.png",
+      "bytes": 705302,
+      "sha256": "22b69fe17772ee8e74cda988b5ba31ab780706882c9fb59e986d9e207fdab735"
+    },
+    {
+      "file": "360-prologue-reduced-04-light-desk.png",
+      "bytes": 759021,
+      "sha256": "28e92e38d3a9e68292f6e75c58fd4e18460ec1214e1aa4b135297b997b199dd6"
+    },
+    {
+      "file": "360-prologue-reduced-05-light-light.png",
+      "bytes": 954792,
+      "sha256": "321e9a9d3493218562beef98d237070d879d326a4b66029b5f6b1e5c55d18820"
+    },
+    {
+      "file": "360-prologue-reduced-06-light-light-up.png",
+      "bytes": 945717,
+      "sha256": "a7eeb4c710628c9aeba1be430448df8c6d54be9bff3deca185d6a80f6bb678f4"
+    },
+    {
+      "file": "360-prologue-reduced-07-light-look.png",
+      "bytes": 731421,
+      "sha256": "11f87f4123d34399eee0c38b646febc2ef8c1a35eba9a0e2036524407fffd316"
+    },
+    {
+      "file": "360-prologue-reduced-08-light-headphones.png",
+      "bytes": 832288,
+      "sha256": "d355ddf4c1cfd4352f73510d284f6fdea98bee6073f4bb076124e31d0e5d0a18"
+    },
+    {
+      "file": "360-prologue-reduced-09-street-street-above.png",
+      "bytes": 1264417,
+      "sha256": "e3189f864d760ec4123c4cb5f6de9076b0ba4d0a53d55634b653a523fd9ed0b2"
+    },
+    {
+      "file": "360-prologue-reduced-10-street-street-above.png",
+      "bytes": 1264417,
+      "sha256": "e3189f864d760ec4123c4cb5f6de9076b0ba4d0a53d55634b653a523fd9ed0b2"
+    },
+    {
+      "file": "360-prologue-reduced-11-puzzled-puzzled.png",
+      "bytes": 963254,
+      "sha256": "4e65b15fa662e27ef9e870e2b941d1c69deee5732525305ec28859e8cac1b5b6"
+    },
+    {
+      "file": "360-prologue-reduced-12-turn-caspar-back.png",
+      "bytes": 1117071,
+      "sha256": "4d2f006bea917f31e0fee6575b669b405a21980187b24d44cd552165de4aa838"
+    },
+    {
+      "file": "360-prologue-reduced-13-turn-caspar-turn.png",
+      "bytes": 1123906,
+      "sha256": "790d035d229fad5fa60057df6a19f10dffcc2f1ce5e152e67b4ea4922240c58c"
+    },
+    {
+      "file": "360-prologue-reduced-14-turn-caspar-face.png",
+      "bytes": 1140207,
+      "sha256": "96a714785f97625c7ac0ef6d4ed422a214f4676b09daa6bf609dcab7d91712b4"
+    },
+    {
+      "file": "360-prologue-reduced-15-turn-caspar-eyes.png",
+      "bytes": 925816,
+      "sha256": "1d3eb22a8af6a35f8a31081c31eb042511d023242eb6f80f81476883a62b7116"
+    },
+    {
+      "file": "360-prologue-reduced-16-flash.png",
+      "bytes": 6714,
+      "sha256": "c46339235ceeebc8916eec512802e9e7b9044845f872c539b09ced58454f05ae"
+    },
+    {
+      "file": "360-prologue-reduced-17-identity.png",
+      "bytes": 74088,
+      "sha256": "6936d2c4568cf0973ac875773ee975e3aad47b8649ff6f93d5b281b39e706e1b"
+    },
+    {
+      "file": "360-prologue-settings.png",
+      "bytes": 324057,
+      "sha256": "9983fad09b6e53c2f7ceb49b47893e50809ac762c5fade14adda2f86d13a2be1"
+    },
+    {
+      "file": "360-prologue-skip-shown.png",
+      "bytes": 304050,
+      "sha256": "4464203147dfa16aed4a6dd4f966ca26ab986edc89f7824a196c222a1ad74262"
+    },
+    {
+      "file": "360-reveal-sweep.png",
+      "bytes": 1070482,
+      "sha256": "b815c28c70fa09be2b0abcfd4e676524a93e671455f1497adbe4380bc0584906"
+    },
+    {
+      "file": "360-safe-band.png",
+      "bytes": 1156644,
+      "sha256": "4b92efec45b355d60c7091cc03cf20bab293fe2275b277eca4d4ad931aface75"
+    },
+    {
+      "file": "360-settings-in-game.png",
+      "bytes": 757127,
+      "sha256": "cf7c645f1447d37de36bf600e9648a8059c28bc8362a064dfe25c3ca89a23052"
+    },
+    {
+      "file": "360-settings-main-menu-ask.png",
+      "bytes": 845017,
+      "sha256": "3912e01c0e3c87a8776a353133792ad61011c669a3a75de0e7f8e995ab62b4b2"
+    },
+    {
+      "file": "360-settings.png",
+      "bytes": 666533,
+      "sha256": "0b3a00c9d7524a6d65166055441f8cd88028978c645aaacfb92b9fa4b4068ac0"
+    },
+    {
+      "file": "360-shelf-glow.png",
+      "bytes": 1592019,
+      "sha256": "b5947241dfb462baa4cd9ebbb371c2d043126c6f54689d55d87e22fbae88dcd9"
+    },
+    {
+      "file": "360-slots-confirm.png",
+      "bytes": 472991,
+      "sha256": "8dfc2d480d1723b878e519a928727aa4d9cfd737c6f2d93a88db1bf63536c906"
+    },
+    {
+      "file": "360-slots-load.png",
+      "bytes": 680906,
+      "sha256": "f82d63b840c4c41061a25305c4eda6d5d5fe674bbc7fc56e1f83d71ad466444a"
+    },
+    {
+      "file": "360-slots-new.png",
+      "bytes": 623114,
+      "sha256": "1bae56b9a73b82e9a89889e9fd67e2a68823b9bc5ea64d831aa005fadd8d9caa"
+    },
+    {
+      "file": "360-steps-state.json",
+      "bytes": 50253,
+      "sha256": "dc032f2d5d63f41a401f8c87a26ae3b281ea5270f680008cfa46b17f96995b99"
+    },
+    {
+      "file": "360-steps.png",
+      "bytes": 1282524,
+      "sha256": "b6f78437d97d1ef88fc40a623d0d11904005efd770a78c27f39c77d37b003178"
+    },
+    {
+      "file": "360-symbol-naming-restored.png",
+      "bytes": 869034,
+      "sha256": "81066cc36c3a6110e880e580a66e1ca41dd5c50c5c80179fed9077a6cd00c600"
+    },
+    {
+      "file": "360-symbol-placement-restored.png",
+      "bytes": 1275101,
+      "sha256": "c646a59e9c677bda322376a2c1c0ea64a30a0811eccdfc0e0e7df46cf111c7de"
+    },
+    {
+      "file": "360-travel-atrium.png",
+      "bytes": 1033283,
+      "sha256": "a3b7d41421ca2f3beaf4d9fb52733fb3d5694b36273c13ecabab9ff4294b83e0"
+    },
+    {
+      "file": "360-travel-chamber.png",
+      "bytes": 1325797,
+      "sha256": "7f4d27be6228db43f83c71874a5b1bf5712269402c574e4fd9f7a019842709ab"
+    },
+    {
+      "file": "360-travel-wing.png",
+      "bytes": 1383707,
+      "sha256": "777f037ee4548dfa5ab0070622987433ae29f3db7530d72d8ab6c5efc90c813a"
+    },
+    {
+      "file": "360-triangles-payoff.png",
+      "bytes": 1292727,
+      "sha256": "5c1dcb44fe6e7cd1e6f8d84dad621ad1ee957fbe8445143ea2347427a353d144"
+    },
+    {
+      "file": "360-triangles-teaching.png",
+      "bytes": 1249659,
+      "sha256": "2a5f41e2e0830916283c55a5d24d50c6ed028e240633968ccd666976ce884ed8"
+    },
+    {
+      "file": "360-walk.png",
+      "bytes": 1353561,
+      "sha256": "4e4477870bf227207fa10b7d0fa6da4ee52343850712f4e8a52505adcc92f22a"
+    },
+    {
+      "file": "360-wing-eye-opening.png",
+      "bytes": 1540338,
+      "sha256": "0c29f58302f57626a281d2b7e5eb2d5a3869bd33a8fdfebc13f86ac6b00576ac"
+    },
+    {
+      "file": "360-wing-kit-early.png",
+      "bytes": 1640408,
+      "sha256": "59f9cfec66b074e14c8b83d2ebda7b43a3a5905939ab190e185d093839bef760"
+    },
+    {
+      "file": "360-wing-lit.png",
+      "bytes": 1272399,
+      "sha256": "4c74290dcdbddaac9d4a62c86349965df90f76d200c6556b5936badab2cfa484"
+    },
+    {
+      "file": "360-wing-room-dial-glow.png",
+      "bytes": 1535649,
+      "sha256": "19926b52efe6d2a254c282be68b4eb5719b8f7a329490c7bd40e845cd889a478"
+    },
+    {
+      "file": "360-wing-room-stage6.png",
+      "bytes": 1395246,
+      "sha256": "9e15d1e54787946563cb8eb6f76f673a153b1cbba9b0791e9cfeb575b5f1e812"
+    },
+    {
+      "file": "360-wing-room-table.png",
+      "bytes": 1487534,
+      "sha256": "1c0a78210af6041a66ea1ffff9f6c2ce0a24ba2b23e308ce480b9d7794ef51b1"
+    },
+    {
+      "file": "360-wing-room.png",
+      "bytes": 1641096,
+      "sha256": "605d8b7f92d796ca3f56343e06776a96b1675e65c0bb252c53292329f03bd18d"
+    },
+    {
+      "file": "360-wing-whole.png",
+      "bytes": 1344755,
+      "sha256": "8126bccaeeb8294402c614e7bab94b17c9305445153997dbb1555f6359083459"
+    },
+    {
+      "file": "360-your-birth-added.png",
+      "bytes": 806617,
+      "sha256": "a17a1a15bc71adc9fad5c28bf6a6de986c896231c6076895018aed9ef7b82a8d"
+    },
+    {
+      "file": "360-your-birth.png",
+      "bytes": 812737,
+      "sha256": "767e3be2c2ef5683dc5638d9069e600a6a6023326c75103a618520b60045707d"
+    },
+    {
+      "file": "390-art-atrium.png",
+      "bytes": 161319,
+      "sha256": "d914fc6ffff4d005291b9a03307ac5b12e879734ad1de76ce121b94ccdded229"
+    },
+    {
+      "file": "390-art-dial-guided.png",
+      "bytes": 587182,
+      "sha256": "c454e3b737cde38ab677e390c085bda50fc016d64616d67455294e6bfa3abd81"
+    },
+    {
+      "file": "390-art-dial.png",
+      "bytes": 257939,
+      "sha256": "d99d683e7734f3b516d7dc4ba5985de7aa520051bc45d69d0faebe8e2dd16f4d"
+    },
+    {
+      "file": "390-art-prologue-city.png",
+      "bytes": 71073,
+      "sha256": "96898be2e1248f134f04d84a03ebf5089621cb9026d0b3b6ac1cae5f5abadc43"
+    },
+    {
+      "file": "390-atrium-kit-stage2.png",
+      "bytes": 1511510,
+      "sha256": "d54ac865948fd0d2c76fb790f0649b1367df7b145c9eb7ba5176173406190727"
+    },
+    {
+      "file": "390-atrium-kit-wing-whole.png",
+      "bytes": 1588374,
+      "sha256": "ed8bbd402d24378fa63998d403858c52bcc5017da8d1b565a206ac367c6e11f0"
+    },
+    {
+      "file": "390-atrium.png",
+      "bytes": 1504317,
+      "sha256": "f3ef06827562fe8b28c59c6276d824c0933fc5521a30d23d465b9c0e857e9280"
+    },
+    {
+      "file": "390-birth-changed.png",
+      "bytes": 91166,
+      "sha256": "263f3c684048e86a42a77d84d805110189dcf95c3b286f88fda50938d72c84ac"
+    },
+    {
+      "file": "390-birth-chart-date.png",
+      "bytes": 117184,
+      "sha256": "2b0453c980687afa873d413379dd864ca5319c279ea5b87076a5699855c6dc7d"
+    },
+    {
+      "file": "390-birth-place-filled.png",
+      "bytes": 47944,
+      "sha256": "38ff16a7ea41264ed57d3b87ad68a8554b4e7515b7775d74279bd8637b2cd02b"
+    },
+    {
+      "file": "390-birth-place-step.png",
+      "bytes": 43733,
+      "sha256": "6c4b2c3ebef33b851e8aecc734bfb038eb82eebd104e906702ac86020363b144"
+    },
+    {
+      "file": "390-birth-review.png",
+      "bytes": 42359,
+      "sha256": "521818a6aa2c4300f9d9ca99e9948dafa6847b0f0e6a1aa37567b8487b194acd"
+    },
+    {
+      "file": "390-birth-skip-done.png",
+      "bytes": 130575,
+      "sha256": "9c22c018376a0246f9acfe9798e9d5fc29ace7ca4c9e6074587119a06f248014"
+    },
+    {
+      "file": "390-birth-skip.png",
+      "bytes": 130526,
+      "sha256": "70e12633d12e0ec5dd98d41a6b954e3f9203f70fe3fb6a222dc58bafb5dbfd7f"
+    },
+    {
+      "file": "390-birth-white-light.png",
+      "bytes": 49884,
+      "sha256": "4f3daab7186b14b94fccc60ccc056bce5f8bcca0d82edaed66ebaf5749dafc72"
+    },
+    {
+      "file": "390-birth.png",
+      "bytes": 91277,
+      "sha256": "3718bb4b57f0e9b0ac7c7a258648a664f123df7777bd3982b54f7575b564def3"
+    },
+    {
+      "file": "390-book-emblem.png",
+      "bytes": 1190776,
+      "sha256": "12289544fac94e92b5f43d4cee65c5e0666b191c8debcac0a972967c6023e594"
+    },
+    {
+      "file": "390-book-opens.png",
+      "bytes": 1421920,
+      "sha256": "1a53686ad69a277a65a857d73f8e6106a871b0c12c7b3ee9880cc5d1ee312227"
+    },
+    {
+      "file": "390-book-pages.png",
+      "bytes": 1232982,
+      "sha256": "86a5ef773f523d033b443591a874aafd87070d7735cecf828ce2fba562ed3976"
+    },
+    {
+      "file": "390-builder-name.png",
+      "bytes": 1663097,
+      "sha256": "2f3fc6b13b9aeda64baf1004f80950cff06ae80471c50ca4a51cd1d4b86cdd01"
+    },
+    {
+      "file": "390-builder-share.png",
+      "bytes": 1663265,
+      "sha256": "3be3dc4c47e4502f603d5d09dd8e36db91aead4a967e71893657d6561190811e"
+    },
+    {
+      "file": "390-buttons-dial.png",
+      "bytes": 1533952,
+      "sha256": "70a4832e38f6474f104d6ecfbfb3227ce08583c066043f88a1c6fc8ef15cb9cf"
+    },
+    {
+      "file": "390-buttons-table.png",
+      "bytes": 653397,
+      "sha256": "f5cab7e7c6ddb96b2fc289aab7110578393e5e529b05cf2abd46dc329d23e2d0"
+    },
+    {
+      "file": "390-chamber-end.png",
+      "bytes": 1375958,
+      "sha256": "00f800aad8f6fab3295d8836ea16b7bbfd9c087485bc803c475f0d564da1a233"
+    },
+    {
+      "file": "390-chamber-lock2.png",
+      "bytes": 1412743,
+      "sha256": "f2529646fd7295c1b3722f3829c897f503b3533cd39706e58ad1b336d6d80e18"
+    },
+    {
+      "file": "390-chamber.png",
+      "bytes": 1428127,
+      "sha256": "33a895777cc70c9b7dc84618a2c69c8f2e0ad11d1f4bcfa60a910066bd52749a"
+    },
+    {
+      "file": "390-complete.png",
+      "bytes": 1461106,
+      "sha256": "98fc99cf028a3c3b0b5140969f0c018f44fe865c0b54a3c5789d46ab024233cd"
+    },
+    {
+      "file": "390-dev-cusp.png",
+      "bytes": 137394,
+      "sha256": "e0e29585a474e151dac4510ac1bc48e917dbd143d2715087057a9e6fc1fa975e"
+    },
+    {
+      "file": "390-dev-jump.png",
+      "bytes": 530506,
+      "sha256": "2dd6fd6a7d2ad80f6c2592693603f630415816e9cebe1effacdd3d2ff2a734f6"
+    },
+    {
+      "file": "390-dev-key4.png",
+      "bytes": 1574338,
+      "sha256": "5c7f12a2bc6efdf81b6521a3bf5c7f443970956455168582bf2bbd59b67c3b0b"
+    },
+    {
+      "file": "390-dial-page2.png",
+      "bytes": 1611944,
+      "sha256": "d9ddcedc7a819ab66847534b1b77a672b6a21893f118a42044613639c590a73b"
+    },
+    {
+      "file": "390-dial-pages.png",
+      "bytes": 1635202,
+      "sha256": "e77a468f9ce4b0bb908da69f5b69b8b4770bca5705ab226052c556b59b20abae"
+    },
+    {
+      "file": "390-dial-speaks.png",
+      "bytes": 1663097,
+      "sha256": "2f3fc6b13b9aeda64baf1004f80950cff06ae80471c50ca4a51cd1d4b86cdd01"
+    },
+    {
+      "file": "390-dial-wake-0.png",
+      "bytes": 1566441,
+      "sha256": "67eab664b643de4c93b31a9fb8cb5b1d1162b11fc8403c806c6e16c879aa04d0"
+    },
+    {
+      "file": "390-dial-wake-1.png",
+      "bytes": 1634155,
+      "sha256": "37758009344036b68dfce5633ec4709eda2260d17a3b9f5090df57d1f83d7de4"
+    },
+    {
+      "file": "390-dial-wake-2.png",
+      "bytes": 1635275,
+      "sha256": "bdb24694f1de5c9944bdeb2dfa385b2ac79cf1acd01841d9653ff6c9dfc46af4"
+    },
+    {
+      "file": "390-dial-wake-3.png",
+      "bytes": 1659206,
+      "sha256": "63ff62400694044c9c863206bfeb4364b42be3c1eaf4c854f64e5d270c51d4fe"
+    },
+    {
+      "file": "390-dial-wake-4.png",
+      "bytes": 1657166,
+      "sha256": "aa4a2814440466fd3f23fd43ace4789d4b32922340664c17eae6650dac2fa91c"
+    },
+    {
+      "file": "390-drag-state.json",
+      "bytes": 39367,
+      "sha256": "9aa50cdf4723452ca59b2e26bde69ab8a30652111ae9cc903f2a6d848755cd47"
+    },
+    {
+      "file": "390-drag.png",
+      "bytes": 1566876,
+      "sha256": "09a9a547b40abd75c21e8b0f60d96d73373e8f49d81d24d6869c781424d1ac85"
+    },
+    {
+      "file": "390-encounter.png",
+      "bytes": 1506012,
+      "sha256": "e068f8430ab77998c9d4d251d204e96ee55363524fdeb062acd0b978f9673aed"
+    },
+    {
+      "file": "390-events.json",
+      "bytes": 530283,
+      "sha256": "4ef142608d585e00bc2aaa7e802dd5aeb6ab1fa0234eefdfe99fc0fac82da906"
+    },
+    {
+      "file": "390-eye-challenge.png",
+      "bytes": 1567646,
+      "sha256": "d5488dca25961508af23b451185e49f200fb9beb4c6d357bd273e32fc4c52483"
+    },
+    {
+      "file": "390-eye-symbols.png",
+      "bytes": 1623831,
+      "sha256": "338d269eaf55b0055072dbc6b100e3c8488bce516f3cb3e53a00bc45b84b2998"
+    },
+    {
+      "file": "390-fork.png",
+      "bytes": 1612651,
+      "sha256": "1d6324b3f8f427445a1bd403833b13dda2f9a84c6aad8e2ca1ac0857c0597367"
+    },
+    {
+      "file": "390-gate.png",
+      "bytes": 1759852,
+      "sha256": "e2d1c66fcccba0593915a658e4d34a54c84d88960419c564f762bffb8c91d738"
+    },
+    {
+      "file": "390-glyphs-a.png",
+      "bytes": 1183721,
+      "sha256": "2a2e56b7fedf742be74c86a7a4db0654d58d1096253aa6946af554798934b5f6"
+    },
+    {
+      "file": "390-glyphs-b.png",
+      "bytes": 1623831,
+      "sha256": "338d269eaf55b0055072dbc6b100e3c8488bce516f3cb3e53a00bc45b84b2998"
+    },
+    {
+      "file": "390-grid-ask.png",
+      "bytes": 697697,
+      "sha256": "7f67cfe4acfbb665a085b5db5cea2b23c8e0e40dc04bf960c6bdfac6450b191c"
+    },
+    {
+      "file": "390-grid-drag.png",
+      "bytes": 688915,
+      "sha256": "c09164a8c31cd56e2226d6c439a68b7164913184c049a58c46e7f64d62516a46"
+    },
+    {
+      "file": "390-grid-gold.png",
+      "bytes": 731009,
+      "sha256": "7fbae4afc0b45fe8d928b992bcef9c327d696c8c930d05ff5e4f832ecd5f6b26"
+    },
+    {
+      "file": "390-grid-key3.png",
+      "bytes": 776576,
+      "sha256": "4bf4ca2c8a378ea942de99b361204856913760e712fa88a7eedbe3fbdb0d897d"
+    },
+    {
+      "file": "390-grid-miss.png",
+      "bytes": 710042,
+      "sha256": "5d336ca439aac848c67480d66ac9c84e69cb00e583847a63861a6935607f54ca"
+    },
+    {
+      "file": "390-grid.png",
+      "bytes": 653397,
+      "sha256": "f5cab7e7c6ddb96b2fc289aab7110578393e5e529b05cf2abd46dc329d23e2d0"
+    },
+    {
+      "file": "390-hub-complete.png",
+      "bytes": 1566893,
+      "sha256": "2088a3de00420cc57da487fdcdefc6ec5e27730f55fca5e6d6cf8f1a04397e99"
+    },
+    {
+      "file": "390-hub-key-in-hand.png",
+      "bytes": 1576335,
+      "sha256": "fdaebf34361ac751ff57f115f0db4eaaa9aa1d5ca8c1fa0ba75a7b40b7bbf5c4"
+    },
+    {
+      "file": "390-hub-key3.png",
+      "bytes": 1566906,
+      "sha256": "7230ca63d5bac0c4cd17fd7b4abddae24c84a4747ed170f24afa243472219259"
+    },
+    {
+      "file": "390-hub-key4.png",
+      "bytes": 1590298,
+      "sha256": "7772d5b88c8b779f79da58e68a2c78bf20f7bb04d65ce8d0c3f9f5b201a57b72"
+    },
+    {
+      "file": "390-hub.png",
+      "bytes": 1517228,
+      "sha256": "fd393d12e00535b459baaa32b596f4fe140385b4c6cf920d20a7365e9b308392"
+    },
+    {
+      "file": "390-identity.png",
+      "bytes": 95319,
+      "sha256": "ec9c486793990af584ecbe027bc1586c7c3137abb3d72882f007fd2885b7ec76"
+    },
+    {
+      "file": "390-inscription-writing.png",
+      "bytes": 1107588,
+      "sha256": "7c7e236b9eb7a98de6a330c0b0be3f860cf5ef2cf6cb1ffeacc0ebfabdce9094"
+    },
+    {
+      "file": "390-inscription-written.png",
+      "bytes": 1126907,
+      "sha256": "c23e462dbc072956e837d74292a04cff9fb22fa6440dc6b392668c82ade0cab9"
+    },
+    {
+      "file": "390-journal-contents.png",
+      "bytes": 1136323,
+      "sha256": "28a45eb9322cbcc81773c938792a9a671b662d8ee4d5e3c98212b21d4baab8e3"
+    },
+    {
+      "file": "390-journal-landing.png",
+      "bytes": 1134187,
+      "sha256": "de9b22ffcfe7d3d019da3c64cc1dc37e075eba20aae3fd1e73f187cc439875a0"
+    },
+    {
+      "file": "390-journal-map.png",
+      "bytes": 1195627,
+      "sha256": "0b23d3fde3a7ff4924d14130cccf675e024498a7441563e297438778f9d84217"
+    },
+    {
+      "file": "390-journal-opposites.png",
+      "bytes": 1269203,
+      "sha256": "26abde669cc7162614955203731ee02c036e5a1a4a8b829bf7ee6ed6cc24af8d"
+    },
+    {
+      "file": "390-journal-practice.png",
+      "bytes": 1080117,
+      "sha256": "fa55afc4e004adf52c0f92f3c3d083d19268720c3a96c7c4955467311c09bbed"
+    },
+    {
+      "file": "390-journal-preview.png",
+      "bytes": 1269732,
+      "sha256": "31ab0da3d14c92a9eced446feb3f64ba9cb6fcfaec5b3bdd6275d71f7b436e92"
+    },
+    {
+      "file": "390-journal-sign.png",
+      "bytes": 1059417,
+      "sha256": "15324a320765cd74f9951bb223954019ec7dd7c876d5498ccead0d0ac5087638"
+    },
+    {
+      "file": "390-journal-table.png",
+      "bytes": 1076312,
+      "sha256": "035662d5fe662dcbaa096ca48f2269b9bc89184cb27b20269dd411cf0f35a533"
+    },
+    {
+      "file": "390-journal-title.png",
+      "bytes": 1083160,
+      "sha256": "cecbe9ce1f325305b289b441e8f314382e2af0c28ee6fa30fcaae448d2d0b34b"
+    },
+    {
+      "file": "390-journal-wheel.png",
+      "bytes": 1289048,
+      "sha256": "579b929d0663a9090e0d24ac66dc64292b5b1f872b710b505c33a4210b70d190"
+    },
+    {
+      "file": "390-key2-ceremony.png",
+      "bytes": 1589295,
+      "sha256": "e9b34da5976c64613a0873d94513af1b7b743ebe90879db906873bb682ba7658"
+    },
+    {
+      "file": "390-key2.png",
+      "bytes": 1606502,
+      "sha256": "cc9a8af1590c888185acdc9e7dc5b35b044dd61a9840f116e4e3f456079d5629"
+    },
+    {
+      "file": "390-key3-ceremony.png",
+      "bytes": 790599,
+      "sha256": "8e828797982f16f9a6d0226fb754dc1a17915e428646a9f87d5ce825ff79fe31"
+    },
+    {
+      "file": "390-key4-ceremony.png",
+      "bytes": 1610024,
+      "sha256": "7e2630483d06d294d46340cfe805e65da30c141c5c5955d20e241b206084ee15"
+    },
+    {
+      "file": "390-key4.png",
+      "bytes": 1623230,
+      "sha256": "68ea00dea98ff34209fc0cbca2f8e3fd0219e0488c9e0c1fb84f093922595747"
+    },
+    {
+      "file": "390-launch-01-logo.png",
+      "bytes": 340856,
+      "sha256": "05f9056c07b9211fce4e11491e227d01c54061517961df59792826859f97e3d4"
+    },
+    {
+      "file": "390-launch-02-draw.png",
+      "bytes": 182735,
+      "sha256": "74857c5f3fcbf1802e84d20d185bcdcca09b37c3cf71d694a313e2a442c4086c"
+    },
+    {
+      "file": "390-launch-03-glyphs.png",
+      "bytes": 527295,
+      "sha256": "c838e47b67aff9f0295f130013738aceb37c0aa9436ac0ddcd4b801b219d8a89"
+    },
+    {
+      "file": "390-launch-04-alive.png",
+      "bytes": 1401314,
+      "sha256": "1a6935fe177044fbce071859d2ad221251ff880d28652c32c6f9644154621362"
+    },
+    {
+      "file": "390-launch-05-burn.png",
+      "bytes": 1606835,
+      "sha256": "c920f5c70b200764d2b6da18666d0df2cae6f94457fb06799283bf1bc885491a"
+    },
+    {
+      "file": "390-launch-06-transform.png",
+      "bytes": 1585820,
+      "sha256": "9d1122ea41a7ac0d0d501b15efa07d09c4654007ce817f996bd9f4d5b1f3f08b"
+    },
+    {
+      "file": "390-launch-07-earth.png",
+      "bytes": 1344843,
+      "sha256": "7354cf1271a87f09b63270915740e167fc7597322f75205172bb8f30107c0741"
+    },
+    {
+      "file": "390-launch-08-continents.png",
+      "bytes": 1494812,
+      "sha256": "a890a00ef58612cc545237fd80f007ea78e0ea846486fd3cdd4fce1f69775c6f"
+    },
+    {
+      "file": "390-launch-09-america.png",
+      "bytes": 1525938,
+      "sha256": "a5b7070b41cee62e7e2db96dabc1518c8700c8e2cb421041ae49369a5b1b3df6"
+    },
+    {
+      "file": "390-launch-10-newyork-state.png",
+      "bytes": 1657177,
+      "sha256": "045b3cecefb045af245bf00ad88b886b92c0f4ce420f84379321d6e1dc438259"
+    },
+    {
+      "file": "390-launch-11-newyork-city.png",
+      "bytes": 1863637,
+      "sha256": "9c1d2bb8aa115617267bb661aa22f02f6daf8b370f815f1528986985923a3da8"
+    },
+    {
+      "file": "390-launch-12-brooklyn.png",
+      "bytes": 1870453,
+      "sha256": "a8ebee619478572385228c8f92423bdeb8849ca95e8f5a30bb57650f23f0738f"
+    },
+    {
+      "file": "390-launch-13-block.png",
+      "bytes": 1647778,
+      "sha256": "6e3e42090cdc17b04790b7adf9968964d32d402a42c1b715d52b878368ba4e86"
+    },
+    {
+      "file": "390-launch-14-window.png",
+      "bytes": 1473888,
+      "sha256": "babf1fa6dfe543f4147b39a170dc403fcf3f2728ccac8b6189050bac88944488"
+    },
+    {
+      "file": "390-launch-reduced-01-logo.png",
+      "bytes": 351054,
+      "sha256": "fda048225b9bc9aa25136ac9da16685bcde17e77933424130d445bc822c795ea"
+    },
+    {
+      "file": "390-launch-reduced-02-draw.png",
+      "bytes": 528600,
+      "sha256": "da919af96210f58bc57f7a9aec90a9503ac1e21bbb5dce6e8d5b240d39ed449d"
+    },
+    {
+      "file": "390-launch-reduced-03-glyphs.png",
+      "bytes": 619257,
+      "sha256": "79daa9ecbf67dee445a6dda54cfd68156b391c659a23e11bfe681b12ddef6d8b"
+    },
+    {
+      "file": "390-launch-reduced-04-alive.png",
+      "bytes": 1400359,
+      "sha256": "e2ee8ace74ec414101f7e983685eed91d0828f4f3dcf533473fc59aa207be86e"
+    },
+    {
+      "file": "390-launch-reduced-05-burn.png",
+      "bytes": 1575976,
+      "sha256": "80918dcc5dabfde1d2512636d92d01d290e4606c68787bd99bd5e0af21a22e39"
+    },
+    {
+      "file": "390-launch-reduced-06-transform.png",
+      "bytes": 1559216,
+      "sha256": "71ddc4674f2c4976b3ba14d6040f25fca9062a9c48332d3879fb73c39b378f2f"
+    },
+    {
+      "file": "390-launch-reduced-07-earth.png",
+      "bytes": 1333480,
+      "sha256": "f23e1e53f3809778fa9d28871052ac64ae141c3cb6baaac61e1f7de95354307e"
+    },
+    {
+      "file": "390-launch-reduced-08-continents.png",
+      "bytes": 1506550,
+      "sha256": "f025f42c9525a5a8b63f5f7cab5dc3ad7cdf56312c5634aa24a9c2146a768073"
+    },
+    {
+      "file": "390-launch-skip.png",
+      "bytes": 1435517,
+      "sha256": "2f70e6d40b57834a7dbc0897f865113e5b79e3ceca546cb2ed6e6fdba3e4eab0"
+    },
+    {
+      "file": "390-menu-fresh.png",
+      "bytes": 1264990,
+      "sha256": "3e23bf346aa5d4b3052d3500f1702468f5528608406ec735c6d73699e0785511"
+    },
+    {
+      "file": "390-menu-rat.png",
+      "bytes": 1265993,
+      "sha256": "f9c6352d002105bd8499b20fae1722defc33f1478a00a3e627b251b9219db4a4"
+    },
+    {
+      "file": "390-menu-save.png",
+      "bytes": 1232562,
+      "sha256": "d518d2cedee974a6057b78652b142517f18ecc4c2596939d4661f9089686e507"
+    },
+    {
+      "file": "390-menu-settings.png",
+      "bytes": 737276,
+      "sha256": "8d51786e07ed6a8855e415a1b5f4df057830bf5c1504f2390fc6f0dbb42ac397"
+    },
+    {
+      "file": "390-modalities-complete.png",
+      "bytes": 1609580,
+      "sha256": "697f8878050561ef1cc8abb6d25d6352fe5bfce15164986cc9e9dfc5bd130e1c"
+    },
+    {
+      "file": "390-modalities.png",
+      "bytes": 1668299,
+      "sha256": "fc3f53df1bb397e34224bb6355eef6d39db4ac883128e6619ede3e7437bfd414"
+    },
+    {
+      "file": "390-nothing-due.png",
+      "bytes": 1611123,
+      "sha256": "0ea9d26417729e563db1a93766d673541176f6a68573a6f929920742648b1023"
+    },
+    {
+      "file": "390-opening-hub.png",
+      "bytes": 1429560,
+      "sha256": "c6618249c30207fbdfe33de443fe565df6f2f59337ad084dc81f31937bc5324d"
+    },
+    {
+      "file": "390-opening-wing.png",
+      "bytes": 1761025,
+      "sha256": "8e7c8b08b0db72f3bbed1dee10f4fb802728d7600567d85803d74a19de208d01"
+    },
+    {
+      "file": "390-opposites-complete.png",
+      "bytes": 1639781,
+      "sha256": "6213a1f7f030d700ba71cc9c17bae190769cf5532a4194b88d2021886acdd40c"
+    },
+    {
+      "file": "390-opposites.png",
+      "bytes": 1675528,
+      "sha256": "ba526a82704ca12982310fd20f27c006d521936e3d741476dd11807a9317ca17"
+    },
+    {
+      "file": "390-player-controls-review.png",
+      "bytes": 113223,
+      "sha256": "4c00b8258088f648688e0250dba01a9dbc87ff064820f2fe809f476459e46126"
+    },
+    {
+      "file": "390-polarity-shown.png",
+      "bytes": 1622286,
+      "sha256": "fc2709bb2c0c05639d2a3b029623eb19e24f806a3f7bae7bafd97d11d6dfe88b"
+    },
+    {
+      "file": "390-polarity.png",
+      "bytes": 1631758,
+      "sha256": "c4fe66f3c2975ffb64d4973d73eba26f950efd5750620fdd4675d856cef0ef9f"
+    },
+    {
+      "file": "390-practice-clean.png",
+      "bytes": 1603977,
+      "sha256": "8898795ba3e6a43474d99485a5fc66af0d3f1db5dc52909af81921be001927a3"
+    },
+    {
+      "file": "390-practice-dial.png",
+      "bytes": 1635202,
+      "sha256": "e77a468f9ce4b0bb908da69f5b69b8b4770bca5705ab226052c556b59b20abae"
+    },
+    {
+      "file": "390-practice-done.png",
+      "bytes": 56375,
+      "sha256": "48c3a69979fc2a93dfe1749bd834d554db8bb3ca899eb19f41b0042030bdacc6"
+    },
+    {
+      "file": "390-practice-end.png",
+      "bytes": 1085662,
+      "sha256": "9adb256e75b4e37ced173995eaca62a03523ed52046a9d3538bc3fc25471b649"
+    },
+    {
+      "file": "390-practice-hard.png",
+      "bytes": 1183143,
+      "sha256": "b72cc2591f36aa4fcb948ae0ece60f7eab13cad9d44c245665f5e11ae811d1df"
+    },
+    {
+      "file": "390-practice-modality.png",
+      "bytes": 187872,
+      "sha256": "9bbf432b2c8a88aee200c065e309a8f487be0728b29498d1ca74b77d0cadcb73"
+    },
+    {
+      "file": "390-practice-question.png",
+      "bytes": 1030323,
+      "sha256": "a9eb4cc86edc19d199aa7e7e119116bad69c4a1e7d37e76463c380b9c548e7d4"
+    },
+    {
+      "file": "390-practice-right.png",
+      "bytes": 1077764,
+      "sha256": "b96c1776aabdcbb1b5930640520b8e468f78d12ea6a30ad611bd35813d8dad80"
+    },
+    {
+      "file": "390-practice-tap.png",
+      "bytes": 186569,
+      "sha256": "85d2c850fcafb0df7d1637a6d5e35c146673fe16732beeb48335d4f6dc3bc6c3"
+    },
+    {
+      "file": "390-practice-wrong.png",
+      "bytes": 1066855,
+      "sha256": "038c56d0a0376c97e9805e3a58659a0701c352366210d59a197e747606aceaba"
+    },
+    {
+      "file": "390-prologue-01-city-city.png",
+      "bytes": 1284299,
+      "sha256": "1cfb796e82ab442d856c4b884b9017c542e896a269753228ece9638ca912186f"
+    },
+    {
+      "file": "390-prologue-02-desk-desk.png",
+      "bytes": 413939,
+      "sha256": "1ab887eaea3aeb7dbce9bdb4001305fcb05ec97af08c3a7561d5789af7bfcd07"
+    },
+    {
+      "file": "390-prologue-03-desk-notebook.png",
+      "bytes": 944951,
+      "sha256": "af13a99b98062898d141eb2a3b8e54d023c973be0a716e288a4bb78862903453"
+    },
+    {
+      "file": "390-prologue-03b-desk-notebook-2.png",
+      "bytes": 944263,
+      "sha256": "de70f20214e1a7f7ae703d328781549ef64759149f4e3aa4af809df64b4d4974"
+    },
+    {
+      "file": "390-prologue-04-light-desk.png",
+      "bytes": 1064807,
+      "sha256": "aafbeacb825b3edaa2bc0efd497e44da640be4f16940ea68266e880576aa35c7"
+    },
+    {
+      "file": "390-prologue-05-light-light.png",
+      "bytes": 1310738,
+      "sha256": "b4d18b63c8917d200a744c10124fc68f4fb0478396542880ea3c0a464ff61f28"
+    },
+    {
+      "file": "390-prologue-06-light-light-up.png",
+      "bytes": 1301008,
+      "sha256": "af8e61f9964532af8ffacc56e4d5e2593e705d6c3e6bd150127876d64081050b"
+    },
+    {
+      "file": "390-prologue-07-light-look.png",
+      "bytes": 994280,
+      "sha256": "c0887d42b8d6f127b0ee492a64008475022f94ce9a8ebe45e853618b1f743174"
+    },
+    {
+      "file": "390-prologue-08-light-headphones.png",
+      "bytes": 1005699,
+      "sha256": "8e509acaf1197ab1d16bb490789a41693ccc7b6ea9ddc6e230987e8433575db5"
+    },
+    {
+      "file": "390-prologue-09-street-street-above.png",
+      "bytes": 1553795,
+      "sha256": "d5dca2c6e1a87d1db9e854f013d9b605aea19049ec976fd2b88bd4be59905753"
+    },
+    {
+      "file": "390-prologue-10-street-street-above.png",
+      "bytes": 1543800,
+      "sha256": "e0edb4429a554e791015d590673f45381e857146f1e1c5bf5ba12617c8e7dcce"
+    },
+    {
+      "file": "390-prologue-11-puzzled-puzzled.png",
+      "bytes": 1183581,
+      "sha256": "0bd5927d1f62b37050088dd2392faeb38bdc01242e0d44f760a4d516903f0d5d"
+    },
+    {
+      "file": "390-prologue-12-turn-caspar-back.png",
+      "bytes": 1564241,
+      "sha256": "4684157c34a12893a5567179af326c2f7c068e26118f702c6086afa12b3dd4b7"
+    },
+    {
+      "file": "390-prologue-13-turn-caspar-turn.png",
+      "bytes": 1580440,
+      "sha256": "e98a56652ff3aa80b096fdf5996c95a82ae8153a6d1fe187af765fc9e98cd3d0"
+    },
+    {
+      "file": "390-prologue-14-turn-caspar-face.png",
+      "bytes": 1562691,
+      "sha256": "0dd2743cd986dd803ab91d67cde66dc44c55a1d2321b409d3062b02d87e7ccab"
+    },
+    {
+      "file": "390-prologue-15-turn-caspar-eyes.png",
+      "bytes": 1225328,
+      "sha256": "87e010c17ecce11f0ae338a3d296c30ae27cfcabc5d47321038ec496e06a7d99"
+    },
+    {
+      "file": "390-prologue-16-flash.png",
+      "bytes": 378475,
+      "sha256": "766671033d4d864318d4de8062833e2ba031a8982f900996843c3557748a486d"
+    },
+    {
+      "file": "390-prologue-17-identity.png",
+      "bytes": 95121,
+      "sha256": "fb68a856316fa59108011476365f57ac78d3c744f100ca734698b50927c07480"
+    },
+    {
+      "file": "390-prologue-main-menu-ask.png",
+      "bytes": 441078,
+      "sha256": "6cd527cf613ef670f8fae8b4fa6ba4508edbfb9865d67ace215061281cd0433e"
+    },
+    {
+      "file": "390-prologue-reduced-01-city-city.png",
+      "bytes": 1308985,
+      "sha256": "c589aecd21749e6b499e89773b4d09c0ccda5edf2861eed24647401338d3ccab"
+    },
+    {
+      "file": "390-prologue-reduced-02-desk-desk.png",
+      "bytes": 413340,
+      "sha256": "8c239825bbac694f2f1c3b6cca97159f5fad1f2cb49e6633fbb477920d8a8f83"
+    },
+    {
+      "file": "390-prologue-reduced-03-desk-notebook.png",
+      "bytes": 955910,
+      "sha256": "d51f1565dd883ab766629344d8e14a5f929078424ea8a6301e68089413d01d2a"
+    },
+    {
+      "file": "390-prologue-reduced-04-light-desk.png",
+      "bytes": 1064807,
+      "sha256": "aafbeacb825b3edaa2bc0efd497e44da640be4f16940ea68266e880576aa35c7"
+    },
+    {
+      "file": "390-prologue-reduced-05-light-light.png",
+      "bytes": 1310738,
+      "sha256": "b4d18b63c8917d200a744c10124fc68f4fb0478396542880ea3c0a464ff61f28"
+    },
+    {
+      "file": "390-prologue-reduced-06-light-light-up.png",
+      "bytes": 1301008,
+      "sha256": "af8e61f9964532af8ffacc56e4d5e2593e705d6c3e6bd150127876d64081050b"
+    },
+    {
+      "file": "390-prologue-reduced-07-light-look.png",
+      "bytes": 994280,
+      "sha256": "c0887d42b8d6f127b0ee492a64008475022f94ce9a8ebe45e853618b1f743174"
+    },
+    {
+      "file": "390-prologue-reduced-08-light-headphones.png",
+      "bytes": 1023891,
+      "sha256": "c5834542389a6eadf8c07e96922613b0ffd90bfe994a4aae9192807e3a265e90"
+    },
+    {
+      "file": "390-prologue-reduced-09-street-street-above.png",
+      "bytes": 1650546,
+      "sha256": "767459fed74c4ad5db78260eb3897d4005724c06d3ad893957cead63e118de5d"
+    },
+    {
+      "file": "390-prologue-reduced-10-street-street-above.png",
+      "bytes": 1650546,
+      "sha256": "767459fed74c4ad5db78260eb3897d4005724c06d3ad893957cead63e118de5d"
+    },
+    {
+      "file": "390-prologue-reduced-11-puzzled-puzzled.png",
+      "bytes": 1220368,
+      "sha256": "af9458b19d4f48a4ceae1008cf62a0356dd4811e09f759528aa1507e3a0bb98e"
+    },
+    {
+      "file": "390-prologue-reduced-12-turn-caspar-back.png",
+      "bytes": 1563014,
+      "sha256": "254b0d70bacd2700858925ffc57b2bbaf968f82906cb040bc1078c2fd7cf0563"
+    },
+    {
+      "file": "390-prologue-reduced-13-turn-caspar-turn.png",
+      "bytes": 1579218,
+      "sha256": "0708617baf1c51da08cd8996f681e26825117f59808b52c566c40478d2df6302"
+    },
+    {
+      "file": "390-prologue-reduced-14-turn-caspar-face.png",
+      "bytes": 1600943,
+      "sha256": "04c26bc763fd3f76b0000398a4e6a2d4d0d294cb70201bee79a28579c2b64451"
+    },
+    {
+      "file": "390-prologue-reduced-15-turn-caspar-eyes.png",
+      "bytes": 1289475,
+      "sha256": "9ea612665a1b5014650e1bcbff3c572f4c64dfa48ff51b64e1b8d187a7ede866"
+    },
+    {
+      "file": "390-prologue-reduced-16-flash.png",
+      "bytes": 7078,
+      "sha256": "10601c9c4d775496fe9ae0c957515adc629f8aad09cb51c27401b71a841dec24"
+    },
+    {
+      "file": "390-prologue-reduced-17-identity.png",
+      "bytes": 95097,
+      "sha256": "951d74b8304dba5adc18382c75d8044d562a4ee724f4e809a30d82629d76ad60"
+    },
+    {
+      "file": "390-prologue-settings.png",
+      "bytes": 322689,
+      "sha256": "ce548c10ed9cc4df4f17b28f0d5e0a22bb279d0bf25913cd2c8e20f7639f3dd6"
+    },
+    {
+      "file": "390-prologue-skip-shown.png",
+      "bytes": 417595,
+      "sha256": "5d73e052ed564b49f4d945edf1e5091ee75b618e05c9fe0ba454f4232b60ba64"
+    },
+    {
+      "file": "390-recovery-cap.png",
+      "bytes": 520116,
+      "sha256": "10c2e35b8217943801060c78291c0e795df27feb2e7922bb20857860d183a5d5"
+    },
+    {
+      "file": "390-rejected.png",
+      "bytes": 527066,
+      "sha256": "886313df8ddb967eb1f3fb86113978e408b46e9312f296d1f2f6f4980335f295"
+    },
+    {
+      "file": "390-reveal-sweep.png",
+      "bytes": 1425346,
+      "sha256": "3efe0b89d96133937626c02a39a3a3eab67356ea039f37b6c9f245753b27ba73"
+    },
+    {
+      "file": "390-safe-band.png",
+      "bytes": 1429962,
+      "sha256": "d98918694669cee62531e926d45a184dc59cba57ee8957a0da2405f51b21f0c1"
+    },
+    {
+      "file": "390-settings-in-game.png",
+      "bytes": 854497,
+      "sha256": "6cc928527dc4ef838961e1ab5a3d75aa36db1e98f818c5ef2829a231f866aa71"
+    },
+    {
+      "file": "390-settings-main-menu-ask.png",
+      "bytes": 1010539,
+      "sha256": "f49f8cfa38b72f72dbee22fb616b7ade72c6b6c9d1c29d7faf5ac3f861e44aec"
+    },
+    {
+      "file": "390-settings.png",
+      "bytes": 793256,
+      "sha256": "41e543e8c0ad97d09ec272aad47b24732d43797559d37a71d0bb91a16255f186"
+    },
+    {
+      "file": "390-shelf-glow.png",
+      "bytes": 1724331,
+      "sha256": "768f2e8a2a8e29b6246240098cc98bdafcd9e4e74ee79fcc0e88c2e7c1d1d35d"
+    },
+    {
+      "file": "390-slots-confirm.png",
+      "bytes": 546748,
+      "sha256": "d802748e903495b6ecc5e90a779586bd9bc784aadb722d1bee6b76c2f7951a67"
+    },
+    {
+      "file": "390-slots-load.png",
+      "bytes": 811702,
+      "sha256": "a9e164407769d17781d08525ab6b7f5e1f667eb8fa1fda7fdf35371ad37657ef"
+    },
+    {
+      "file": "390-slots-new.png",
+      "bytes": 740233,
+      "sha256": "aaee23ed99cf808647e27db5b3b955a763dbc0390783c22d9660001043b2eba7"
+    },
+    {
+      "file": "390-steps-state.json",
+      "bytes": 50355,
+      "sha256": "cd499dc7987d816014d5aa8a88b24eaa30f6cf2495e572dce52120231a060101"
+    },
+    {
+      "file": "390-steps.png",
+      "bytes": 1619793,
+      "sha256": "a1fee5be6a4a120bb8b0b0c1b231669929169af273c251b30923335dde218f9e"
+    },
+    {
+      "file": "390-style-test.png",
+      "bytes": 301009,
+      "sha256": "42bf6be900c70b955663c0ceaa642382f25d7df39d953d436526ffd94ae5727e"
+    },
+    {
+      "file": "390-style.png",
+      "bytes": 507437,
+      "sha256": "ff0a7540bfc24afb761f0e1783d014526b6af96bab732bd184d0b744f24eb9a9"
+    },
+    {
+      "file": "390-symbol-naming-restored.png",
+      "bytes": 1194374,
+      "sha256": "31e6f1c121533144bf70b4408d2e197b0033206e37a1d47520277274ebaefb9a"
+    },
+    {
+      "file": "390-symbol-placement-restored.png",
+      "bytes": 1624813,
+      "sha256": "b003c4b665d95d8dd6c7b48a3b45baa68bf0f0887dc7d81fc9fab1d1320e13b5"
+    },
+    {
+      "file": "390-travel-atrium.png",
+      "bytes": 1283672,
+      "sha256": "80c96017d20130441ff491d0ab41af5bc8bac6cdc3d6e1cfa13e14cbf017c217"
+    },
+    {
+      "file": "390-travel-chamber.png",
+      "bytes": 1415005,
+      "sha256": "ae477938817aca68eeeff25e89341f503c6cc74705210b8d348be59e0c7d40da"
+    },
+    {
+      "file": "390-travel-wing.png",
+      "bytes": 1583259,
+      "sha256": "265f4aeb823558edd6742ace58117aaf6ffdb53e2e365c67cddbddf10118d87c"
+    },
+    {
+      "file": "390-triangles-payoff.png",
+      "bytes": 1604221,
+      "sha256": "31eef4748a393b47774136973556c875dd1a8c73cde834edca8d226624f09c55"
+    },
+    {
+      "file": "390-triangles-teaching.png",
+      "bytes": 1567646,
+      "sha256": "d5488dca25961508af23b451185e49f200fb9beb4c6d357bd273e32fc4c52483"
+    },
+    {
+      "file": "390-walk.png",
+      "bytes": 1509383,
+      "sha256": "68273ae41c10c2827f912ac51eca870eb086a7778837c70fb90667accbfe42ec"
+    },
+    {
+      "file": "390-wing-eye-opening.png",
+      "bytes": 1763775,
+      "sha256": "190e3d672af40d4293074c77bc171bdb0368d9ea8f1b14079c74075bab2dfedc"
+    },
+    {
+      "file": "390-wing-kit-early.png",
+      "bytes": 1759852,
+      "sha256": "01fe16203996b8321c67ddecb1365c1c68ec64725c5b43cf0d7b297f62c9bc3c"
+    },
+    {
+      "file": "390-wing-lit.png",
+      "bytes": 1586043,
+      "sha256": "70821ef6c239395c4654de758b6f15bb181e910458e11365448e0733f403aae1"
+    },
+    {
+      "file": "390-wing-room-dial-glow.png",
+      "bytes": 1662944,
+      "sha256": "324b3c670f1f9752eb4bc908ed84c0ec08774e6d9464bf58becc417c87d7980c"
+    },
+    {
+      "file": "390-wing-room-stage6.png",
+      "bytes": 1598740,
+      "sha256": "c2891d05d3bb16f51fd653f9d5fb958bf25f07f2ba6c0988c5cda98061db8f96"
+    },
+    {
+      "file": "390-wing-room-table.png",
+      "bytes": 1628329,
+      "sha256": "a461a2aac846f458d486638db8412335ce7066e52d68df4bf236ca52c227b31c"
+    },
+    {
+      "file": "390-wing-room.png",
+      "bytes": 1760634,
+      "sha256": "b4338821194e1b0b54fdf0e7f8dcfc3d89e9b6aa7337d9cd29c468ed2ca77a20"
+    },
+    {
+      "file": "390-wing-whole.png",
+      "bytes": 1433916,
+      "sha256": "2a0e18931eb141190593c151dd857e290ad08dcd92bf857a4559aceb79db81c9"
+    },
+    {
+      "file": "390-your-birth-added.png",
+      "bytes": 1120087,
+      "sha256": "1c47150a118cc40524da0297bc123d07e0d5669a888e246d535a2e4405248ae4"
+    },
+    {
+      "file": "390-your-birth.png",
+      "bytes": 1107490,
+      "sha256": "5eedd6ba1e5d692f83bdc633604bff265389e3a15fadfd636d3a34586cf869e7"
+    },
+    {
+      "file": "shape-10-16-atrium.png",
+      "bytes": 3158788,
+      "sha256": "e85229017968cba6f7717eea4c77758a0962b23ff11f48324d76de3619076390"
+    },
+    {
+      "file": "shape-10-16-dial.png",
+      "bytes": 3304824,
+      "sha256": "715bd39516a2cf3667f82ae38443ab9d6c62ae7acf8c59e39c517eca26e33a3c"
+    },
+    {
+      "file": "shape-10-16-journal.png",
+      "bytes": 1855702,
+      "sha256": "bce8bc9dc94e1a2dc2fed0b51f7ab745bec04bf11781bd60ce60e98ee5dead38"
+    },
+    {
+      "file": "shape-10-16-travel.png",
+      "bytes": 2865024,
+      "sha256": "08d3018df98ef5a8d254272a940e9a9abdf454252e0632292b5b86334e0fca0f"
+    },
+    {
+      "file": "shape-10-16-wing.png",
+      "bytes": 3603178,
+      "sha256": "8d26c8bc2a7541c0c0470ede062cb0d0edaf3ccf8a3f21325f84e80f7fedb85a"
+    },
+    {
+      "file": "shape-3-4-atrium.png",
+      "bytes": 3583412,
+      "sha256": "95bb0fb2634fa752d8a3ef447f3ebe377965f66c2ae261ad15c93fa83df84636"
+    },
+    {
+      "file": "shape-3-4-dial.png",
+      "bytes": 3710094,
+      "sha256": "dd2aab0f0853adb3aa51342faffa1d62e867826a215b3fba2e6d0555b58f3668"
+    },
+    {
+      "file": "shape-3-4-journal.png",
+      "bytes": 1926508,
+      "sha256": "780620f0ccc3d734025c2ccc67f19bb86d284e5c636256965148212b8f4010c9"
+    },
+    {
+      "file": "shape-3-4-travel.png",
+      "bytes": 3287831,
+      "sha256": "f63511c491e90c56f7048561741ddd468b5742acc3986d6e8b03ee7cdb3e13e2"
+    },
+    {
+      "file": "shape-3-4-wing.png",
+      "bytes": 4037059,
+      "sha256": "1f00519d4054759328f0cb6128192a310dbfe6169914d5f193ed2e38578c15af"
+    },
+    {
+      "file": "shape-9-16-atrium.png",
+      "bytes": 1987348,
+      "sha256": "397c38a0fdae8becc60d374ac4e945e97663dcf217b095b18a8536f6b0c84540"
+    },
+    {
+      "file": "shape-9-16-dial.png",
+      "bytes": 2206258,
+      "sha256": "c25f5dd029fa91c161241bc7408b9728e31494dfaa530a8a89c77ea04ff8f3a4"
+    },
+    {
+      "file": "shape-9-16-journal.png",
+      "bytes": 1297044,
+      "sha256": "ce2572f0b50e69c41d138c073f03f65be9b2926c2472f73c84eedfbf97dff575"
+    },
+    {
+      "file": "shape-9-16-travel.png",
+      "bytes": 1783271,
+      "sha256": "3a5dcc3ffda13963b586b22ca0352b52545148be0af6427a57c6d073dadd5eb1"
+    },
+    {
+      "file": "shape-9-16-wing.png",
+      "bytes": 2198456,
+      "sha256": "2b61665637f8fed4383fcac0236affb799df1c52ab26bf74fa77a9cfa9836f63"
+    },
+    {
+      "file": "shape-9-19.5-atrium.png",
+      "bytes": 2305167,
+      "sha256": "77b0be0950ed007ec6611f526e83f968aeb29876050b9b2055885f59fe718d36"
+    },
+    {
+      "file": "shape-9-19.5-dial.png",
+      "bytes": 2603996,
+      "sha256": "a88e8e2d5eb606faaba5d24ec8ec1477fda4596754c1c6b8fa6631ad2e668d30"
+    },
+    {
+      "file": "shape-9-19.5-journal.png",
+      "bytes": 1668477,
+      "sha256": "aad29596c2dba46ae89d6b516fe07c5daf101e12dd6cc0f4774089ed556446f0"
+    },
+    {
+      "file": "shape-9-19.5-travel.png",
+      "bytes": 2019192,
+      "sha256": "8bba1f3af3764c149051ef31a20e91796882b2aa2c0684ec7c6730622dca2087"
+    },
+    {
+      "file": "shape-9-19.5-wing.png",
+      "bytes": 2643017,
+      "sha256": "4df237bc9fa0347001b549efc3f9f4b20cff4de9480d468dd1360e42ec3660a3"
+    },
+    {
+      "file": "shape-9-20-atrium.png",
+      "bytes": 2383139,
+      "sha256": "6a7950bbe23cc42dd1476d712cd04c7f9d4a6e0eb919505f9293adc1651e475f"
+    },
+    {
+      "file": "shape-9-20-dial.png",
+      "bytes": 2617786,
+      "sha256": "20dc583b789209ee31e7c2aefaab3868695a685f709269398456215681adda9c"
+    },
+    {
+      "file": "shape-9-20-journal.png",
+      "bytes": 1743564,
+      "sha256": "902b40c911a19e264ebe05bcb8aa8f161e3fbe12c56556b33790234e606b8200"
+    },
+    {
+      "file": "shape-9-20-travel.png",
+      "bytes": 2084116,
+      "sha256": "40bf4a55c525484c59588ab495f74f33b061470ffc14b044a6bf6b3380abf17a"
+    },
+    {
+      "file": "shape-9-20-wing.png",
+      "bytes": 2855710,
+      "sha256": "7345f86fcb31009d8f74b3c0f694ba63f7eaf9c3921557578999362bd96dcdd1"
+    },
+    {
+      "file": "shape-9-21-atrium.png",
+      "bytes": 2492448,
+      "sha256": "c2864ec0660b79a75e24aecbc8d85f244b05df7afab1128624556232f26a1f78"
+    },
+    {
+      "file": "shape-9-21-dial.png",
+      "bytes": 2692695,
+      "sha256": "a5b9e3bf5ce1060653fa9b02310029d13526e5a613e51b82e037568056ef1606"
+    },
+    {
+      "file": "shape-9-21-journal.png",
+      "bytes": 1755768,
+      "sha256": "49e9b54301f8d2c94c5dde862c79038e7bc18b9282ee3af8ed984705897c1c7f"
+    },
+    {
+      "file": "shape-9-21-travel.png",
+      "bytes": 2188351,
+      "sha256": "c968fe04d9fad741c36a7ebe27ddd27665e92681c02c0e7c4072c9220d53b38e"
+    },
+    {
+      "file": "shape-9-21-wing.png",
+      "bytes": 2967119,
+      "sha256": "c854c59c7f1efc274ac062a5bbf19dbb3a6c124bf12a58734551f9cf1e038bb2"
+    },
+    {
+      "file": "shape-9-23-atrium.png",
+      "bytes": 2679796,
+      "sha256": "e47c6842ebe027eb08f6c601b562715db1fb5ec66e1a49129f9a24f7d44bbbc5"
+    },
+    {
+      "file": "shape-9-23-dial.png",
+      "bytes": 2816294,
+      "sha256": "7aeb3466081a572bcaa0c3b9ce57098b36430510b80bda0dd42767d34e6edbd0"
+    },
+    {
+      "file": "shape-9-23-journal.png",
+      "bytes": 1777046,
+      "sha256": "67a11c84d0f43beebb444ad134e40f20ecb0ff07e81825e27d768164015ef122"
+    },
+    {
+      "file": "shape-9-23-travel.png",
+      "bytes": 2366581,
+      "sha256": "897bd91e05f1762888360ed92497bd8e4f700542ce297cc1feb5c8941c03f5b7"
+    },
+    {
+      "file": "shape-9-23-wing.png",
+      "bytes": 3173811,
+      "sha256": "dc5580c6a65c3200b959adf6c6bc9390f8382e80e79a4ca2a6ead66d77076ae6"
+    },
+    {
+      "file": "validation.txt",
+      "bytes": 110610,
+      "sha256": "d2cd8a8d5007e0b7b7679b6fa74d7c003c3edf9bbec45c665c4edbdef53d58bb"
+    }
+  ]
+}

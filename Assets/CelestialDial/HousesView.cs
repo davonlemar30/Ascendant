@@ -33,7 +33,7 @@ namespace Ascendant.CelestialDial
             var stem=Rect("Local sky pedestal",hohRoom,40,494,26,84);stem.gameObject.AddComponent<Image>().color=new Color(.45f,.31f,.12f);Frame(stem,new Color(.16f,.1f,.08f));
             var foot=Rect("Local sky base",hohRoom,40,538,64,16);foot.gameObject.AddComponent<Image>().color=new Color(.55f,.38f,.15f);Frame(foot,new Color(.16f,.1f,.08f));
             hohRoomLine=Label(hohRoom,"",0,610,310,140,16);hohRoomLine.resizeTextForBestFit=true;hohRoomLine.resizeTextMinSize=13;hohRoomLine.resizeTextMaxSize=16;
-            CorButton(hohRoom,CorridorCopy.Journal,"hoh-journal",0,715,280,48,OpenJournal);
+            CorButton(hohRoom,HousesCopy.Journal,"hoh-journal",0,715,280,48,OpenJournal);
             // The Atrium kit has only its three shipped doors. The brief authorizes this next door on the right wall.
             hohArchPanel=Rect("Hall door kit",hub,0,400,360,800);
             hohDoorKit=new RoomKit{Prefix="akit-",Container=hohArchPanel,Placements=new KitPlacement[0],Grime=new[]{0f},Veil=new[]{0f},Level=()=>0,RestoredNow=p=>false,DoorUnlocked=id=>Flow.HousesOpen};
@@ -59,10 +59,10 @@ namespace Ascendant.CelestialDial
             hohReadout=Label(hohInstrument,"",0,325,180,80,15);hohReadout.resizeTextForBestFit=true;hohReadout.resizeTextMinSize=12;hohReadout.resizeTextMaxSize=15;
             hohMc=Rect("MC point",hohInstrument,0,0,10,10).gameObject.AddComponent<Image>();hohMc.color=Gilt;hohMc.raycastTarget=false;hohMc.rectTransform.localRotation=Quaternion.Euler(0,0,45);hohMcLabel=Label(hohInstrument,HousesCopy.MC,0,0,32,24,13);hohMcLabel.color=Gilt;hohMcRay=HohLine(hohInstrument,"MC connector",new Vector2(0,171),new Vector2(0,220),Gilt);
             hohLeft=CorButton(hohInstrument,"<","hoh-left",-90,506,52,44,()=>HohChange(()=>Hoh.Rotate(-1)));hohRight=CorButton(hohInstrument,">","hoh-right",90,506,52,44,()=>HohChange(()=>Hoh.Rotate(1)));
-            hohSeal=CorButton(hohInstrument,CorridorCopy.Seal,"hoh-seal",0,555,130,44,()=>HohChange(()=>Hoh.Seal()));hohAsk=CorButton(hohInstrument,CorridorCopy.Ask,"hoh-ask",0,600,150,44,()=>HohChange(()=>Hoh.Ask()));
+            hohSeal=CorButton(hohInstrument,HousesCopy.Seal,"hoh-seal",0,555,130,44,()=>HohChange(()=>Hoh.Seal()));hohAsk=CorButton(hohInstrument,HousesCopy.Ask,"hoh-ask",0,600,150,44,()=>HohChange(()=>Hoh.Ask()));
             var panel=Rect("Hall teaching",hohInstrument,0,695,328,137);panel.gameObject.AddComponent<Image>().color=PanelColor;hohMessage=Label(panel,"",0,65,306,125,15);hohMessage.resizeTextForBestFit=true;hohMessage.resizeTextMinSize=12;hohMessage.resizeTextMaxSize=15;
-            hohNext=CorButton(hohInstrument,CorridorCopy.Continue,"hoh-next",80,774,140,44,()=>HohChange(()=>Hoh.Continue()));hohBack=CorButton(hohInstrument,CorridorCopy.Back,"hoh-back",-90,774,120,44,HohClose);
-            hohNeedsJournal=CorButton(hohInstrument,CorridorCopy.Journal,"hoh-journal",0,525,240,48,OpenJournal);
+            hohNext=CorButton(hohInstrument,HousesCopy.Continue,"hoh-next",80,774,140,44,()=>HohChange(()=>Hoh.Continue()));hohBack=CorButton(hohInstrument,HousesCopy.Back,"hoh-back",-90,774,120,44,HohClose);
+            hohNeedsJournal=CorButton(hohInstrument,HousesCopy.Journal,"hoh-journal",0,525,240,48,OpenJournal);
             BuildHouseJournal();Hoh.Changed+=Save;hohRoom.gameObject.SetActive(false);hohInstrument.gameObject.SetActive(false);
         }
         void HohStart(bool fromWalk=false){if(!Flow.AtHouses||busy&&!fromWalk)return;hohPlaying=Hoh.Begin();HohRefresh();}
