@@ -1,0 +1,6 @@
+Error: reduced motion: no writing loop, the notebook held (desk light light-up look headphones) at 390
+    at check (/Users/damusthadon/Documents/Ascendant-worktrees/codex-production-8f24cf6/Tools/validate-greybox-web.cjs:24:46)
+    at playPrologue (/Users/damusthadon/Documents/Ascendant-worktrees/codex-production-8f24cf6/Tools/validate-greybox-web.cjs:92:9)
+    at async /Users/damusthadon/Documents/Ascendant-worktrees/codex-production-8f24cf6/Tools/validate-greybox-web.cjs:981:5
+    at async Promise.all (index 0)
+    at async /Users/damusthadon/Documents/Ascendant-worktrees/codex-production-8f24cf6/Tools/validate-greybox-web.cjs:963:3

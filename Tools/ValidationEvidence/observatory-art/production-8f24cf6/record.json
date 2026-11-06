@@ -1,0 +1,16 @@
+{
+  "suiteSource": "8f24cf6f5b7ecd4943d4a31cd41ee40a33948e07",
+  "deployRun": 42176532471,
+  "deploy": "success",
+  "url": "https://davonlemar30.github.io/Ascendant/",
+  "viewports": "390,360",
+  "deviceScale": 2,
+  "mobile": true,
+  "exit": 1,
+  "failure": "reduced motion: no writing loop, the notebook held (desk light light-up look headphones) at390",
+  "location": "Tools/validate-greybox-web.cjs:92",
+  "deployedDataSHA256": "e1dfd0f93459159ab39be671af3dca8aacefacc44773d3dbbd036de4bf74a1ac",
+  "dataMatchesPagesArtifact": true,
+  "completePassReport": false,
+  "notes": "Suite is main8f owncopy; no timing edits/retries applied. Failure observes subsequentlightshotframes; do not claim successfulproductionpass."
+}

@@ -1,0 +1,1 @@
+PASS: phone360x800 scale2 normal-motion Observatory door reveal captured while busy and doorSeen

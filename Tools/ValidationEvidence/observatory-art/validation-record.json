@@ -1,0 +1,61 @@
+{
+  "base": "8f24cf6f5b7ecd4943d4a31cd41ee40a33948e07",
+  "artCommit": "3b0145dd513a1763670f2e20d1c91752191c11f5",
+  "buildIdentity": "observatory-art-8f24cf6-final-palettes",
+  "dataSHA256": "18fc50d2b23bee05b93e621e36521db199189c97309d846165de5960f6765026",
+  "mechanical": {
+    "exit": 0,
+    "checks": 1028,
+    "artSlots": 243
+  },
+  "webBuild": {
+    "exit": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "stage2": {
+    "phone": {
+      "exit": 0,
+      "checks": 222,
+      "viewport": [
+        360,
+        800
+      ],
+      "deviceScaleFactor": 2,
+      "mobile": true
+    },
+    "desktop": {
+      "exit": 0,
+      "checks": 222,
+      "viewport": [
+        1280,
+        800
+      ],
+      "deviceScaleFactor": 1,
+      "mobile": false
+    }
+  },
+  "frozenWing": {
+    "exit": 0,
+    "stateChecks": 40,
+    "exactPixelComparisons": 14,
+    "allIdentical": true
+  },
+  "captures": {
+    "extra": {
+      "exit": 0,
+      "viewport": [
+        360,
+        800
+      ],
+      "deviceScaleFactor": 2
+    },
+    "doorReveal": {
+      "exit": 0,
+      "normalMotion": true
+    }
+  },
+  "initialDesktopAttempt": "Chrome stalled before first evidence, node/Chrome owned processes terminated; no result claimed. Unchanged sequential retry passed222.",
+  "fixture": "not run: art-only owner rule",
+  "ci": "Required PR checks tracked on the PR; pending when this evidence was committed."
+}

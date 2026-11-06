@@ -1,0 +1,40 @@
+PASS: owned baseline artifact identity at 360
+PASS: frozen Wing kit baseline key1 at 360
+PASS: frozen Wing kit baseline wheel at 360
+PASS: frozen Wing kit baseline key2 at 360
+PASS: frozen Wing kit baseline key3 at 360
+PASS: frozen Wing kit baseline key4 at 360
+PASS: frozen Wing kit baseline whole at 360
+PASS: owned baseline artifact identity at 1280
+PASS: frozen Wing kit baseline key1 at 1280
+PASS: frozen Wing kit baseline wheel at 1280
+PASS: frozen Wing kit baseline key2 at 1280
+PASS: frozen Wing kit baseline key3 at 1280
+PASS: frozen Wing kit baseline key4 at 1280
+PASS: frozen Wing kit baseline whole at 1280
+PASS: owned current artifact identity at 360
+PASS: frozen Wing kit current key1 at 360
+PASS: frozen Wing kit current wheel at 360
+PASS: frozen Wing kit current key2 at 360
+PASS: frozen Wing kit current key3 at 360
+PASS: frozen Wing kit current key4 at 360
+PASS: frozen Wing kit current whole at 360
+PASS: frozen Wing kit current obswhole at 360
+PASS: native name choice for quote preview 0
+PASS: native name choice for quote preview 1
+PASS: native name choice for quote preview 2
+PASS: native name choice for quote preview 3
+PASS: native name choice for quote preview 4
+PASS: native name choice for quote preview 5
+PASS: native name choice for quote preview 6
+PASS: native name choice for quote preview 7
+PASS: native name choice for quote preview 8
+PASS: native name choice for quote preview 9
+PASS: owned current artifact identity at 1280
+PASS: frozen Wing kit current key1 at 1280
+PASS: frozen Wing kit current wheel at 1280
+PASS: frozen Wing kit current key2 at 1280
+PASS: frozen Wing kit current key3 at 1280
+PASS: frozen Wing kit current key4 at 1280
+PASS: frozen Wing kit current whole at 1280
+PASS: frozen Wing kit current obswhole at 1280
