@@ -45,6 +45,7 @@ namespace Ascendant.Build
         }
         static void ValidateObservatory()
         {
+            Check(new float[]{20,75,95,109,123,137,151,165}.Select(SliceView.ObservatoryRingAt).SequenceEqual(Enumerable.Range(1,8))&&SliceView.ObservatoryRingAt(190)==-1,"Stage 2: drawn rings and radial tap/drop targets have the same ordinal positions");
             Check(Planets.All.Length==10&&Planets.All.Select(p=>p.Glyph).Distinct().Count()==10&&Planets.All.Select(p=>p.Ring).SequenceEqual(new[]{1,2,2,2,3,4,5,6,7,8}),"Stage 2: ten distinct glyphs, pace rings including shared Sun/Mercury/Venus ring");
             Check(Planets.All.Select(p=>p.Work).SequenceEqual(new[]{"to feel","to be","to think","to value","to act","to expand","to structure","to awaken","to dissolve","to transform"}),"Stage 2: approved atomic works");
             Check(Planets.All.Select(p=>p.Band).SequenceEqual(new[]{0,0,1,1,1,2,2,3,3,3}),"Stage 2: modern four companies");

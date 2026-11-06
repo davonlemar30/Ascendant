@@ -10,15 +10,20 @@ namespace Ascendant.CelestialDial
     {
         public static Vector4 PlanetQuizLayout(bool mark,int asks,int choices,int whys){float first=mark?220:175,top=first+20*(Mathf.Max(1,asks)-1)+24;return new Vector4(first,top,46,top+46*(choices-1)+44+24+18*(Mathf.Max(1,whys)-1)+26);}
         RectTransform obsRoom,obsInstrument,obsJournal;
-        RoomKit obsKit; Image obsLight,obsPose,obsHubCaspar,obsRoomPose;bool obsGreetingSet;string obsGreeting=""; Text obsMessage,obsAsk,obsGlyph,obsTitle,obsDetails,obsJournalGlyph;
+        RoomKit obsKit; Image obsLight,obsPose,obsHubCaspar,obsRoomPose,obsBracket;bool obsGreetingSet;string obsGreeting=""; Text obsMessage,obsAsk,obsGlyph,obsTitle,obsDetails,obsJournalGlyph;
         Button obsContinue,obsSeal,obsAskCaspar,obsLeft,obsRight,obsExit,obsJournalBack;
         readonly Button[] obsNames=new Button[4],obsSpheres=new Button[10],obsRingButtons=new Button[8],obsBands=new Button[4],obsPlanetPages=new Button[10];
+        readonly Outline[] obsCardEdges=new Outline[4];
         readonly Text[] obsSphereGlyphs=new Text[10],obsSphereBands=new Text[10];readonly Image[] obsRoomSpheres=new Image[10];
         bool obsPlaying,obsDoorBeat; int obsLastKey;
         ObservatoryModel Obs=>Flow.Observatory;
         static Font PlanetFont(int seat)=>Resources.Load<Font>(seat==0||seat>1&&seat<9?"Fonts/NotoSansSymbols":"Fonts/NotoSansSymbols2-Regular");
         static void PutPlanet(Text text,int seat,int size=44){text.font=PlanetFont(seat);text.text=Planets.All[seat].Glyph;text.fontSize=size;text.horizontalOverflow=HorizontalWrapMode.Overflow;text.verticalOverflow=VerticalWrapMode.Overflow;}
         Button ObsButton(Transform p,string name,float x,float y,float w,float h,Action a){var b=MakeButton(p,name,x,y,w,h,()=>a());b.GetComponent<Image>().canvasRenderer.cullTransparentMesh=false;return b;}
+        static readonly float[] ObsOrbitRadii={20,75,95,109,123,137,151,165};
+        static readonly float[] ObsOrbitAngles={180,0,120,240,60,180,300,240,140,20};
+        public static int ObservatoryRingAt(float radius){if(radius>180)return -1;int best=0;for(int i=1;i<8;i++)if(Mathf.Abs(radius-ObsOrbitRadii[i])<Mathf.Abs(radius-ObsOrbitRadii[best]))best=i;return best+1;}
+        bool ObsDropRing(PointerEventData data){Vector2 p;if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(obsInstrument,data.position,null,out p))return false;int ring=ObservatoryRingAt(new Vector2(p.x,110-p.y).magnitude);if(ring<1)return false;Obs.Ring(ring);return true;}
         void BuildObservatory()
         {
             obsLastKey=Flow.Keys;
@@ -35,13 +40,14 @@ namespace Ascendant.CelestialDial
             obsInstrument=ScreenPanel("Orrery","obs-room");
             obsTitle=Label(obsInstrument,"The Observatory",0,72,280,36,24);
             obsAsk=Label(obsInstrument,"",0,117,312,52,19);obsAsk.resizeTextForBestFit=true;obsAsk.resizeTextMinSize=13;obsAsk.resizeTextMaxSize=19;
-            Picture(obsInstrument,"obs-orrery-frame",0,290,300,300);Picture(obsInstrument,"obs-rings",0,290,300,300);Picture(obsInstrument,"bracket",0,145,48,48);
-            for(int i=0;i<8;i++){var ring=Rect("Orbit "+(i+1),obsInstrument,0,290,36+26*i,36+26*i).gameObject.AddComponent<Image>();ring.sprite=ChapterRingSprite();ring.color=new Color(Gilt.r,Gilt.g,Gilt.b,.6f);ring.raycastTarget=false;}
+            Picture(obsInstrument,"obs-orrery-frame",0,290,300,300);Picture(obsInstrument,"obs-rings",0,290,300,300);obsBracket=Picture(obsInstrument,"bracket",0,145,48,48);
+            for(int i=0;i<8;i++){var ring=Rect("Orbit "+(i+1),obsInstrument,0,290,2*ObsOrbitRadii[i],2*ObsOrbitRadii[i]).gameObject.AddComponent<Image>();ring.sprite=ChapterRingSprite();ring.color=new Color(Gilt.r,Gilt.g,Gilt.b,.6f);ring.raycastTarget=false;}
             obsGlyph=Label(obsInstrument,"",0,270,100,90,54);
             for(int i=0;i<10;i++){int s=i;obsSpheres[i]=ObsButton(obsInstrument,"",0,0,48,48,()=>ObsChange(()=>Obs.Select(s)));obsSpheres[i].name="obs-sphere:"+i;Slots.Dress(obsSpheres[i].GetComponent<Image>(),"obs-sphere-"+Planets.All[i].Name.ToLowerInvariant());obsSphereGlyphs[i]=obsSpheres[i].GetComponentInChildren<Text>();PutPlanet(obsSphereGlyphs[i],i);obsSphereBands[i]=Label(obsSpheres[i].transform,"",0,56,65,18,10);obsSphereBands[i].color=Gilt;}
-            for(int i=0;i<3;i++){var d=Picture(obsInstrument,"obs-sphere-dark",-25+i*25,440,20,20);d.raycastTarget=false;}
-            for(int i=0;i<4;i++){int n=i;obsNames[i]=ObsButton(obsInstrument,"",-78+(i%2)*156,440+(i/2)*52,150,48,()=>ObsCard(n));obsNames[i].name="obs-card:"+i;obsBands[i]=ObsButton(obsInstrument,Planets.BandLabels[i],-78+(i%2)*156,440+(i/2)*52,150,48,()=>ObsChange(()=>Obs.Band(n)));obsBands[i].name="obs-band:"+i;}
-            for(int i=0;i<8;i++){int ring=i+1;obsRingButtons[i]=ObsButton(obsInstrument,ring.ToString(),-114+(i%4)*76,175+(i/4)*50,70,46,()=>ObsChange(()=>Obs.Ring(ring)));obsRingButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(i<4?-145:145,-(180+(i%4)*55));obsRingButtons[i].GetComponent<RectTransform>().sizeDelta=new Vector2(48,44);obsRingButtons[i].name="obs-ring:"+ring;}
+            var ringHit=Rect("Ring touch surface",obsInstrument,0,290,330,330);var ringImage=ringHit.gameObject.AddComponent<Image>();ringImage.color=Color.clear;ringImage.canvasRenderer.cullTransparentMesh=false;ringHit.SetAsFirstSibling();var ringEvents=ringHit.gameObject.AddComponent<EventTrigger>();var ringClick=new EventTrigger.Entry{eventID=EventTriggerType.PointerClick};ringClick.callback.AddListener(d=>{if(!busy&&Obs.Phase==ObservatoryPhase.Rings&&Obs.Selected>=0&&!Obs.AwaitingNext){ObsDropRing((PointerEventData)d);ObsRefresh();}});ringEvents.triggers.Add(ringClick);
+            for(int i=0;i<3;i++){var d=Picture(obsInstrument,"obs-sphere-dark",-145+i*25,440,20,20);d.raycastTarget=false;}
+            for(int i=0;i<4;i++){int n=i;obsNames[i]=ObsButton(obsInstrument,"",-78+(i%2)*156,440+(i/2)*52,150,48,()=>ObsCard(n));obsNames[i].name="obs-card:"+i;obsCardEdges[i]=obsNames[i].gameObject.AddComponent<Outline>();obsCardEdges[i].effectColor=GiltInk;obsCardEdges[i].effectDistance=Vector2.one;obsCardEdges[i].enabled=false;obsBands[i]=ObsButton(obsInstrument,Planets.BandLabels[i],-78+(i%2)*156,440+(i/2)*52,150,48,()=>ObsChange(()=>Obs.Band(n)));obsBands[i].name="obs-band:"+i;}
+            for(int i=0;i<8;i++){int ring=i+1;obsRingButtons[i]=ObsButton(obsInstrument,ring.ToString(),-114+(i%4)*76,175+(i/4)*50,70,46,()=>ObsChange(()=>Obs.Ring(ring)));obsRingButtons[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(i<4?-155:155,-(180+(i%4)*55));obsRingButtons[i].GetComponent<RectTransform>().sizeDelta=new Vector2(44,44);obsRingButtons[i].GetComponent<Image>().color=Color.clear;obsRingButtons[i].name="obs-ring:"+ring;}
             obsLeft=ObsButton(obsInstrument,"<",-115,370,50,44,()=>ObsChange(()=>Obs.Rotate(-1)));obsRight=ObsButton(obsInstrument,">",115,370,50,44,()=>ObsChange(()=>Obs.Rotate(1)));
             obsSeal=ObsButton(obsInstrument,"Seal",0,510,130,48,()=>ObsChange(()=>Obs.Seal()));obsAskCaspar=ObsButton(obsInstrument,"Ask Caspar",0,559,150,44,()=>ObsChange(()=>Obs.Ask()));
             var panel=Rect("Caspar",obsInstrument,0,675,328,170);panel.gameObject.AddComponent<Image>().color=PanelColor;
@@ -53,6 +59,7 @@ namespace Ascendant.CelestialDial
             obsExit=ObsButton(obsInstrument,"Back",-90,770,120,44,ObsClose);
             obsContinue.name="obs-next";obsExit.name="obs-back";obsSeal.name="obs-seal";obsAskCaspar.name="obs-ask";obsLeft.name="obs-left";obsRight.name="obs-right";
             for(int i=0;i<10;i++)ObsDrag(i);
+            obsAsk.transform.SetAsLastSibling();
             BuildPlanetJournal();Obs.Changed+=ObsCommitted;
             obsRoom.gameObject.SetActive(false);obsInstrument.gameObject.SetActive(false);
         }
@@ -63,7 +70,7 @@ namespace Ascendant.CelestialDial
             void Hook(EventTriggerType type,Action<PointerEventData> action){var e=new EventTrigger.Entry{eventID=type};e.callback.AddListener(d=>action((PointerEventData)d));trigger.triggers.Add(e);}
             Hook(EventTriggerType.BeginDrag,d=>{if(!busy&&Obs.Phase==ObservatoryPhase.Rings)Obs.Select(seat);});
             Hook(EventTriggerType.Drag,d=>{if(busy||Obs.Phase!=ObservatoryPhase.Rings||Obs.Selected!=seat||Obs.Progress.placed[seat])return;Vector2 p;if(RectTransformUtility.ScreenPointToLocalPointInRectangle(obsInstrument,d.position,null,out p))button.GetComponent<RectTransform>().anchoredPosition=new Vector2(p.x,p.y-400);});
-            Hook(EventTriggerType.EndDrag,d=>{if(busy||Obs.Phase!=ObservatoryPhase.Rings||Obs.Selected!=seat)return;for(int i=0;i<8;i++)if(RectTransformUtility.RectangleContainsScreenPoint(obsRingButtons[i].GetComponent<RectTransform>(),d.position,null)){Obs.Ring(i+1);break;}ObsRefresh();});
+            Hook(EventTriggerType.EndDrag,d=>{if(busy||Obs.Phase!=ObservatoryPhase.Rings||Obs.Selected!=seat)return;bool rank=false;for(int i=0;i<8;i++)if(RectTransformUtility.RectangleContainsScreenPoint(obsRingButtons[i].GetComponent<RectTransform>(),d.position,null)){Obs.Ring(i+1);rank=true;break;}if(!rank)ObsDropRing(d);ObsRefresh();});
         }
         void ObsCommitted(){Save();}
         void ObsChange(Func<bool> action){if(busy)return;action();ObsRefresh();}
@@ -97,6 +104,7 @@ namespace Ascendant.CelestialDial
             bool names=!reviewing&&Obs.Phase==ObservatoryPhase.Names,work=!reviewing&&Obs.Phase==ObservatoryPhase.Work,rings=!reviewing&&Obs.Phase==ObservatoryPhase.Rings,bands=!reviewing&&Obs.Phase==ObservatoryPhase.Bands,question=!reviewing&&Obs.Phase==ObservatoryPhase.Questions;
             var task=Flow.CurrentReview;bool rg=reviewing&&task.Mode==ReviewMode.PlanetGlyph,rf=reviewing&&task.Mode==ReviewMode.PlanetFunction,rc=reviewing&&task.Mode==ReviewMode.PlanetCompany;
             obsTitle.text="The Observatory";
+            obsAsk.font=question?journalItalic:font;obsAsk.color=question?SilverInk:Bone;obsMessage.font=question?journalItalic:Resources.Load<Font>("Fonts/EBGaramond-Bold");
             obsAsk.text=rg||names?"Whose symbol is this?":rf?Planets.All[task.seat].Work:rc?Planets.Sentence(task.seat):work?Planets.All[Obs.Target].Work:question?Obs.Question.ask:"";
             obsGlyph.gameObject.SetActive(names||rg||rc);if(names||rg||rc)PutPlanet(obsGlyph,reviewing?task.seat:Obs.Target,54);
             obsMessage.text=reviewing?Flow.Note:Obs.Message;var pose=Slots.Image("caspar-"+(reviewing?"explain":ObservatoryCopy.Pose(Obs.CopyId)));obsPose.sprite=pose;obsPose.gameObject.SetActive(pose!=null);
@@ -104,7 +112,7 @@ namespace Ascendant.CelestialDial
             {
                 var b=obsSpheres[i];b.gameObject.SetActive(work||rings||bands);
                 float a=(i-(work?Obs.Turn:0))*Mathf.PI*2/10;var pos=work?new Vector2(Mathf.Sin(a)*120,290-Mathf.Cos(a)*120):new Vector2(-120+((rings?Array.IndexOf(Obs.TrayOrder,i):i)%5)*60,(rings?455:300)+((rings?Array.IndexOf(Obs.TrayOrder,i):i)/5)*60);
-                if((rings||bands)&&Obs.Progress.placed[i]){float angle=i==0?Mathf.PI:i==1?0:i==2?2.094f:i==3?4.189f:i*.61f;float radius=18+Planets.All[i].Ring*13;pos=new Vector2(Mathf.Sin(angle)*radius,290-Mathf.Cos(angle)*radius);}
+                if((rings||bands)&&Obs.Progress.placed[i]){float angle=ObsOrbitAngles[i]*Mathf.Deg2Rad;float radius=ObsOrbitRadii[Planets.All[i].Ring-1];pos=new Vector2(Mathf.Sin(angle)*radius,290-Mathf.Cos(angle)*radius);}
                 b.GetComponent<RectTransform>().anchoredPosition=new Vector2(pos.x,-pos.y);
                 b.interactable=!busy&&!Obs.AwaitingNext&&(!rings||!Obs.Progress.placed[i])&&(!bands||!Obs.Progress.banded[i]);
                 b.GetComponent<Image>().raycastTarget=b.interactable;
@@ -115,15 +123,15 @@ namespace Ascendant.CelestialDial
             {
                 var b=obsNames[i];b.gameObject.SetActive(names||question||rg||rf);
                 string label=names?Planets.Sentence(Planets.Options(Obs.Target)[i]):question?Obs.Question.choices[Obs.QuestionOrder[i]]:rg||rf?Planets.Sentence(Flow.PlanetReviewOptions[i]):"";
-                b.GetComponentInChildren<Text>().text=label;b.GetComponentInChildren<Text>().resizeTextForBestFit=true;b.GetComponentInChildren<Text>().resizeTextMinSize=10;b.GetComponentInChildren<Text>().resizeTextMaxSize=15;
+                b.GetComponentInChildren<Text>().text=label;b.GetComponentInChildren<Text>().resizeTextForBestFit=true;b.GetComponentInChildren<Text>().resizeTextMinSize=10;b.GetComponentInChildren<Text>().resizeTextMaxSize=question?18:15;var cardLabel=b.GetComponentInChildren<Text>();cardLabel.font=question?ButtonLook.EngravedFont:font;cardLabel.color=question?GiltInk:Bone;cardLabel.rectTransform.sizeDelta=question?new Vector2(300,52):new Vector2(146,44);cardLabel.rectTransform.anchoredPosition=new Vector2(0,-(question?30:24));obsCardEdges[i].enabled=question;
                 if(question){b.GetComponent<RectTransform>().anchoredPosition=new Vector2(0,-(245+64*i));b.GetComponent<RectTransform>().sizeDelta=new Vector2(308,60);}else{b.GetComponent<RectTransform>().anchoredPosition=new Vector2(-78+(i%2)*156,-(440+(i/2)*52));b.GetComponent<RectTransform>().sizeDelta=new Vector2(150,48);}
-                b.GetComponent<Image>().color=(question&&Obs.AwaitingNext&&Obs.QuestionOrder[i]==Obs.Question.answer||names&&Obs.Reveal&&Planets.Options(Obs.Target)[i]==Obs.Target)?Gilt:Dim;
+                b.GetComponent<Image>().color=question&&Obs.AwaitingNext&&Obs.QuestionOrder[i]==Obs.Question.answer?new Color(.23f,.19f,.15f,.92f):names&&Obs.Reveal&&Planets.Options(Obs.Target)[i]==Obs.Target?Gilt:Dim;
                 b.interactable=!busy&&(reviewing||!Obs.AwaitingNext);
-                obsBands[i].gameObject.SetActive(bands||rc);obsBands[i].interactable=!busy&&(reviewing||Obs.Selected>=0&&!Obs.AwaitingNext);
+                obsBands[i].gameObject.SetActive(bands||rc);obsBands[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(-78+(i%2)*156,-(512+(i/2)*52));obsBands[i].GetComponent<RectTransform>().sizeDelta=new Vector2(150,44);obsBands[i].interactable=!busy&&(reviewing||Obs.Selected>=0&&!Obs.AwaitingNext);
                 if(rc){obsBands[i].onClick.RemoveAllListeners();int n=i;obsBands[i].onClick.AddListener(()=>ObsCard(n));}else{obsBands[i].onClick.RemoveAllListeners();int n=i;obsBands[i].onClick.AddListener(()=>ObsChange(()=>Obs.Band(n)));obsBands[i].name="obs-band:"+i;}
             }
             for(int i=0;i<8;i++){obsRingButtons[i].gameObject.SetActive(rings);obsRingButtons[i].interactable=!busy&&Obs.Selected>=0&&!Obs.AwaitingNext;}
-            obsLeft.gameObject.SetActive(work);obsRight.gameObject.SetActive(work);obsSeal.gameObject.SetActive(work);obsAskCaspar.gameObject.SetActive(work&&Obs.Hint<2&&!Obs.AwaitingNext);
+            obsBracket.gameObject.SetActive(work);obsLeft.gameObject.SetActive(work);obsRight.gameObject.SetActive(work);obsSeal.gameObject.SetActive(work);obsAskCaspar.gameObject.SetActive(work&&Obs.Hint<2&&!Obs.AwaitingNext);
             obsLeft.interactable=obsRight.interactable=!busy&&!Obs.AwaitingNext;obsSeal.interactable=!busy&&!Obs.AwaitingNext&&(Obs.Hint<3||Obs.Turn==Obs.Target);
             obsContinue.gameObject.SetActive(!reviewing&&Obs.CanContinue);obsContinue.interactable=!busy;
 
@@ -159,6 +167,7 @@ namespace Ascendant.CelestialDial
         {
             if(Flow.AtObservatory)s.caspar=(obsPlaying?obsAsk.text+" "+Obs.Message:obsRoomLine.text).Trim();if(Flow.AtJournal&&(Flow.JournalAt==JournalView.Planets||Flow.JournalAt==JournalView.Planet))s.caspar=journalTitle.text+". "+obsDetails.text;if(Flow.PlanetReview)s.caspar=obsAsk.text+" "+obsMessage.text;
             s.observatory=Flow.AtObservatory;s.observatoryPlaying=obsPlaying&&s.observatory;s.observatoryOpen=Flow.ObservatoryOpen;s.observatoryDoorSeen=Obs.Progress.doorSeen;s.observatoryWhole=Flow.ObservatoryWhole;s.observatoryLevel=Flow.ObservatoryLevel;
+            s.orreryRingRadii=ObsOrbitRadii;
             s.orreryCardLabels=obsNames.Select(b=>b.GetComponentInChildren<Text>().text).ToArray();s.orreryQuestionOrder=Obs.QuestionOrder;
             s.orreryPhase=Obs.Phase.ToString().ToLowerInvariant();s.orreryTarget=Obs.Target;s.orrerySelected=Obs.Selected;s.orreryTurn=Obs.Turn;s.orreryHint=Obs.Hint;s.orreryMisses=Obs.Misses;s.orreryNext=Obs.CanContinue&&!busy;s.orreryRevealed=Obs.Reveal;s.orreryPlaced=Obs.Progress.placed;s.orreryNamed=Obs.Progress.named;s.orreryWorked=Obs.Progress.worked;s.orreryBanded=Obs.Progress.banded;s.orreryEvidence5=Obs.Progress.workEvidence;s.orreryEvidence6=Obs.Progress.ringEvidence;s.orreryMessage=Obs.Message;s.orreryWork=Obs.Target>=0?Planets.All[Obs.Target].Work:"";s.orreryGlyphs=Planets.All.Select(p=>p.Glyph).ToArray();s.orreryNames=Planets.All.Select(p=>p.Name).ToArray();
             var controls=(obsInstrument.gameObject.activeInHierarchy?obsInstrument.GetComponentsInChildren<Button>():obsJournal.gameObject.activeInHierarchy?obsJournal.GetComponentsInChildren<Button>():new Button[0]).Where(b=>b.gameObject.activeInHierarchy&&b.interactable&&!busy).ToArray();s.observatoryControlLabels=controls.Select(b=>b.GetComponentInChildren<Text>()!=null?b.GetComponentInChildren<Text>().text:b.name).ToArray();s.observatoryControlIds=controls.Select(b=>b.name).ToArray();s.orreryControls=controls.SelectMany(b=>PageBox(b)).ToArray();
