@@ -17,7 +17,15 @@ async function run({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART}) {
       if(!Number.isFinite(box.x)||!Number.isFinite(box.y))throw Error('player-control: missing laid-out target '+id);
       await pg.mouse.move(box.x,box.y);await frames();await pg.mouse.down();await frames();await pg.mouse.up();await frames();
     };
-    const step=key=>pg.waitForFunction(k=>{const s=window.ascendantDial.snapshot();return s.screen==='birth'&&s.birthStep===k&&!s.busy;},key);
+    const step=async key=>{
+      try{await pg.waitForFunction(k=>{const s=window.ascendantDial.snapshot();return s.screen==='birth'&&s.birthStep===k&&!s.busy;},key);}
+      catch(error){
+        const state=await snap();const inputs=await pg.locator('#semantic input').evaluateAll(list=>list.map(e=>({id:e.id,value:e.value,hidden:e.hidden})));
+        fs.writeFileSync(path.join(out,viewport.width+'-failure-state.json'),JSON.stringify({expectedStep:key,state,inputs},null,2));
+        await pg.screenshot({path:path.join(out,viewport.width+'-failure.png')});
+        throw Error('player-control: expected '+key+', observed '+state.screen+'/'+state.birthStep+'; note: '+state.note+'; '+error.message);
+      }
+    };
     const ok=(value,text)=>check(value,'player-control coverage at '+viewport.width+': '+text);
     const editAndBlur=async(id,first,edited,key)=>{
       const input=pg.locator('#'+id);await input.fill(first);await input.fill(edited);
@@ -74,7 +82,7 @@ if(require.main===module){
     const browser=await playwright.chromium.launch({headless:true,channel:'chrome'});
     const out=process.env.EVIDENCE_DIR||'Logs/OpeningControls';fs.mkdirSync(out,{recursive:true});
     const report=[];
-    const check=(value,text)=>{if(!value)throw Error(text);report.push('PASS: '+text);};
+    const check=(value,text)=>{if(!value)throw Error(text);report.push('PASS: '+text);console.log('PASS: '+text);};
     const VIEWPORTS=(process.env.VIEWPORTS||'1280x800,390').split(',').map(v=>v==='390'?{width:390,height:844}:v==='360'?{width:360,height:800}:{width:+v.split('x')[0],height:+v.split('x')[1]});
     const skipPrologue=async pg=>{
       await pg.waitForFunction(()=>!!window.ascendantDial?.snapshot()?.screen,{},{timeout:120000});
@@ -90,7 +98,7 @@ if(require.main===module){
     };
     try{
       await run({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART:"You have the default chart: born November 4, 1990, at 7:19 PM, in Bushwick, Brooklyn, New York. You can add your own birth details in your journal later."});
-      fs.writeFileSync(path.join(out,'validation.txt'),report.join('\n'));console.log(report.join('\n'));
-    }finally{await browser.close();}
+      fs.writeFileSync(path.join(out,'validation.txt'),report.join('\n'));
+    }catch(error){fs.writeFileSync(path.join(out,'partial-report.txt'),report.join('\n')+'\nFAIL: '+error.message);throw error;}finally{await browser.close();}
   })().catch(error=>{console.error(error);process.exitCode=1;});
 }
