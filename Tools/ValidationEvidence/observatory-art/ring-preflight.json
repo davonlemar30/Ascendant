@@ -1,0 +1,50 @@
+[
+  {
+    "radius": 20.0,
+    "angles": 180,
+    "maxCenterErrorDisplayPx": 2.2529702970297016,
+    "meanError": 0.7666917751427147
+  },
+  {
+    "radius": 75.0,
+    "angles": 180,
+    "maxCenterErrorDisplayPx": 3.9693094629156036,
+    "meanError": 1.6543184643012814
+  },
+  {
+    "radius": 95.0,
+    "angles": 180,
+    "maxCenterErrorDisplayPx": 4.32757009345795,
+    "meanError": 1.763192882760522
+  },
+  {
+    "radius": 109.0,
+    "angles": 180,
+    "maxCenterErrorDisplayPx": 4.476074614760748,
+    "meanError": 1.7724653365573708
+  },
+  {
+    "radius": 123.0,
+    "angles": 180,
+    "maxCenterErrorDisplayPx": 4.45943708609272,
+    "meanError": 1.7511050461570608
+  },
+  {
+    "radius": 137.0,
+    "angles": 180,
+    "maxCenterErrorDisplayPx": 4.75373134328359,
+    "meanError": 1.7534884837078468
+  },
+  {
+    "radius": 151.0,
+    "angles": 174,
+    "maxCenterErrorDisplayPx": 4.434856175972925,
+    "meanError": 1.7714626205341915
+  },
+  {
+    "radius": 165.0,
+    "angles": 90,
+    "maxCenterErrorDisplayPx": 4.921635434412252,
+    "meanError": 1.9749662737394507
+  }
+]

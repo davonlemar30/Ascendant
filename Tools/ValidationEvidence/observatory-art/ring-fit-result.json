@@ -1,0 +1,15 @@
+{
+  "radii": [
+    20.0,
+    75.0,
+    95.0,
+    109.0,
+    123.0,
+    137.0,
+    151.0,
+    165.0
+  ],
+  "maxPaintedPixelDistanceDisplay": 1.736172951750504,
+  "paintedPixels": 56321,
+  "method": "each generated brass annulus centered/rescaled to game radius; clipped to6sourcepx band; existinggamecirclescontinuetheouterarcs"
+}

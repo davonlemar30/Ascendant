@@ -1,0 +1,288 @@
+[
+  {
+    "asset": "obs-charts-restored",
+    "size": [
+      200,
+      160
+    ],
+    "sha256": "35dca383d887d432fb5c75a953f938845b4fb8d0c88cbd8cf64457fa1a0cb735",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-charts-worn",
+    "size": [
+      200,
+      160
+    ],
+    "sha256": "267309b4bbb1569c04c66bf2da24e215697aa265eee716e1b8b425e455b79a59",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-grime",
+    "size": [
+      720,
+      1600
+    ],
+    "sha256": "1d0137fcbd47bb86781853e847d2629ad7eea95b7c5f1d6c3594103cf6238c9f",
+    "alphaRange": [
+      0,
+      153
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-lectern-restored",
+    "size": [
+      128,
+      200
+    ],
+    "sha256": "e45482c5a883ac170d27f3ee9c2aa3cf254241eaeb7b91c0a3796e5ad66e2896",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-lectern-worn",
+    "size": [
+      128,
+      200
+    ],
+    "sha256": "f5db5cf75e45dc0a9e462ff84ac9b58ea16a02c2ed03394a114b3944bca561fc",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-light",
+    "size": [
+      720,
+      1600
+    ],
+    "sha256": "cb67b3dc7d6d25cf638c63483fa27ba0fe9004138c490732da7eb39b6135144f",
+    "alphaRange": [
+      0,
+      147
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-orrery-frame",
+    "size": [
+      600,
+      600
+    ],
+    "sha256": "f50adf2342bf80c320167d8f261012c1a19857eef8adc75d2d915425d4c3ed74",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-rings",
+    "size": [
+      600,
+      600
+    ],
+    "sha256": "cb443ff1a05854fa505d7f136821fb689e3dbceb86998698b37194bbf0227bfa",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-room",
+    "size": [
+      720,
+      1600
+    ],
+    "sha256": "4fd72494a2f778e298ae1b45ddd290fbe86ac1c5cca40b64016b9d153cf861fc",
+    "alphaRange": [
+      255,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-shell-restored",
+    "size": [
+      720,
+      1600
+    ],
+    "sha256": "5909dcf8d381cdcb4dd532dea6e17fb0d0e65875bd7874e6ee6e8e27687aa7c1",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-shell-worn",
+    "size": [
+      720,
+      1600
+    ],
+    "sha256": "47e0757d3cacb771d7f816ec8962dd7befefdaea76e0ebbb5e295672be910046",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-dark",
+    "size": [
+      64,
+      64
+    ],
+    "sha256": "83a50678fad769d5aadf32cef3124f4fb6b0f2ded4260102c7de471cc51cb237",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-jupiter",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "53f17296767da22264d97327638fe2cfb642344cd9db6e91be3f9c01914a2790",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-mars",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "ae318851d7f8482926a4d3fe90888044b6a545d149044eb7d2141417700c3490",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-mercury",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "9435a83ce468a708c546ce0dd3f52de8b6d26726de4ef0624dbe546fd1341389",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-moon",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "64b7eb1525c48dbd56f2f6fbee896e3c61917f3e87646d4883403365f57525ff",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-neptune",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "dddde78562f91dfcb7288959fd57add02c877e58fc77d6dae3dbb9bbcd5a003d",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-pluto",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "773e709d66b9bf2dc73be90984aada2ceadab143490e1291228ef720d4c72f6d",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-saturn",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "8977983bb60cfe618a4467b754d2a6558818a0f858f63a3cf98614afd6d2a1b6",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-sun",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "3fb9edb83ee949e927a534051d0179935aa7462c1c1b1483c6fd19210014713b",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-uranus",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "34430b83b5586e0f3cd7e70dac254af9dfc69ad76770c9497e06611953bce8f0",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  },
+  {
+    "asset": "obs-sphere-venus",
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "ab2f608d3d81c807fa2062d8b396ab9bc3a55399480965b2945c4a0c40b8b450",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "metadata": true
+  }
+]

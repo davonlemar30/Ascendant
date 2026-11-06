@@ -1,0 +1,22 @@
+{
+  "viewport": [
+    360,
+    800
+  ],
+  "deviceScaleFactor": 2,
+  "center": [
+    180,
+    290
+  ],
+  "radii": [
+    20,
+    75,
+    95,
+    109,
+    123,
+    137,
+    151,
+    165
+  ],
+  "method": "Evidence-only browser SVG; actual game ring radii read from current snapshot; game files unchanged."
+}

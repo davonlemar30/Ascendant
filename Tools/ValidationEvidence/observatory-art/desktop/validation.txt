@@ -1,0 +1,222 @@
+PASS: Stage 2: Wing whole door scene finishes and opens Observatory at 1280x800
+PASS: Stage 2: walkable dormant room, orrery, journal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 0 at 1280x800
+PASS: Stage 2: four native name choices 0 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 1 at 1280x800
+PASS: Stage 2: four native name choices 1 at 1280x800
+PASS: Stage 2: 44px native target obs-card:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 2 at 1280x800
+PASS: Stage 2: four native name choices 2 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 3 at 1280x800
+PASS: Stage 2: four native name choices 3 at 1280x800
+PASS: Stage 2: 44px native target obs-card:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 4 at 1280x800
+PASS: Stage 2: four native name choices 4 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 5 at 1280x800
+PASS: Stage 2: four native name choices 5 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 6 at 1280x800
+PASS: Stage 2: four native name choices 6 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 7 at 1280x800
+PASS: Stage 2: four native name choices 7 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 8 at 1280x800
+PASS: Stage 2: four native name choices 8 at 1280x800
+PASS: Stage 2: 44px native target obs-card:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: symbol seat order 9 at 1280x800
+PASS: Stage 2: four native name choices 9 at 1280x800
+PASS: Stage 2: 44px native target obs-card:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 0 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:0 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 1 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:1 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 2 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:2 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 3 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:3 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 4 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:4 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 5 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:5 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 6 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:6 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 7 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:7 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 8 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:8 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: work target 9 at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:9 at 1280x800
+PASS: Stage 2: 44px native target obs-seal at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: Key 5 ceremony, evidence at 1280x800
+PASS: Stage 2: 44px native target obs-back at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:0 at 1280x800
+PASS: Stage 2: drag a sphere to its ring at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:1 at 1280x800
+PASS: Stage 2: tap the actual drawn shared ring at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:2 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:2 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:3 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:2 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:4 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:3 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:5 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:4 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:6 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:5 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:7 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:6 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:8 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:7 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:9 at 1280x800
+PASS: Stage 2: 44px native target obs-ring:8 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: all ring placements and retrograde beat at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:0 at 1280x800
+PASS: Stage 2: 44px native target obs-band:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:1 at 1280x800
+PASS: Stage 2: 44px native target obs-band:0 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:2 at 1280x800
+PASS: Stage 2: 44px native target obs-band:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:3 at 1280x800
+PASS: Stage 2: 44px native target obs-band:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:4 at 1280x800
+PASS: Stage 2: 44px native target obs-band:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:5 at 1280x800
+PASS: Stage 2: 44px native target obs-band:2 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:6 at 1280x800
+PASS: Stage 2: 44px native target obs-band:2 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:7 at 1280x800
+PASS: Stage 2: 44px native target obs-band:3 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:8 at 1280x800
+PASS: Stage 2: 44px native target obs-band:3 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: 44px native target obs-sphere:9 at 1280x800
+PASS: Stage 2: 44px native target obs-band:3 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: individuality card 0 at 1280x800
+PASS: Stage 2: 44px native target obs-card:1 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: individuality card 1 at 1280x800
+PASS: Stage 2: 44px native target obs-card:2 at 1280x800
+PASS: Stage 2: 44px native target obs-next at 1280x800
+PASS: Stage 2: Key 6 ceremony with ring evidence at 1280x800
+PASS: Stage 2: 44px native target obs-back at 1280x800
+PASS: Stage 2: planet index fills as introduced at 1280x800
+PASS: Stage 2: 44px native target planet-page:0 at 1280x800
+PASS: Stage 2: planet journal 0 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:1 at 1280x800
+PASS: Stage 2: planet journal 1 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:2 at 1280x800
+PASS: Stage 2: planet journal 2 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:3 at 1280x800
+PASS: Stage 2: planet journal 3 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:4 at 1280x800
+PASS: Stage 2: planet journal 4 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:5 at 1280x800
+PASS: Stage 2: planet journal 5 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:6 at 1280x800
+PASS: Stage 2: planet journal 6 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:7 at 1280x800
+PASS: Stage 2: planet journal 7 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:8 at 1280x800
+PASS: Stage 2: planet journal 8 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: 44px native target planet-page:9 at 1280x800
+PASS: Stage 2: planet journal 9 at 1280x800
+PASS: Stage 2: 44px native target planet-index at 1280x800
+PASS: Stage 2: both learned Practice concepts at 1280x800
+PASS: Stage 2: new Practice question 5/0 at 1280x800
+PASS: Stage 2: Practice explanation and Next 5/0 at 1280x800
+PASS: Stage 2: new Practice question 5/1 at 1280x800
+PASS: Stage 2: Practice explanation and Next 5/1 at 1280x800
+PASS: Stage 2: new Practice question 5/2 at 1280x800
+PASS: Stage 2: Practice explanation and Next 5/2 at 1280x800
+PASS: Stage 2: new Practice question 5/3 at 1280x800
+PASS: Stage 2: Practice explanation and Next 5/3 at 1280x800
+PASS: Stage 2: new Practice question 5/4 at 1280x800
+PASS: Stage 2: Practice explanation and Next 5/4 at 1280x800
+PASS: Stage 2: new Practice question 5/5 at 1280x800
+PASS: Stage 2: Practice explanation and Next 5/5 at 1280x800
+PASS: Stage 2: all six questions complete 5 at 1280x800
+PASS: Stage 2: new Practice question 6/0 at 1280x800
+PASS: Stage 2: Practice explanation and Next 6/0 at 1280x800
+PASS: Stage 2: new Practice question 6/1 at 1280x800
+PASS: Stage 2: Practice explanation and Next 6/1 at 1280x800
+PASS: Stage 2: new Practice question 6/2 at 1280x800
+PASS: Stage 2: Practice explanation and Next 6/2 at 1280x800
+PASS: Stage 2: new Practice question 6/3 at 1280x800
+PASS: Stage 2: Practice explanation and Next 6/3 at 1280x800
+PASS: Stage 2: new Practice question 6/4 at 1280x800
+PASS: Stage 2: Practice explanation and Next 6/4 at 1280x800
+PASS: Stage 2: new Practice question 6/5 at 1280x800
+PASS: Stage 2: Practice explanation and Next 6/5 at 1280x800
+PASS: Stage 2: all six questions complete 6 at 1280x800
+PASS: Stage 2: player spends Key 6 and opens second Book at 1280x800
+PASS: Stage 2: Stage 2 end state in Atrium at 1280x800
+PASS: Stage 2: DEV obswhole opens Book 2, other progression stops at 1280x800
+PASS: Stage 2: Wing kit stays at four Keys after whole at 1280x800
+PASS: Stage 2: Wing kit stays at four Keys after obswhole at 1280x800
+PASS: Stage 2: no browser runtime exceptions at 1280x800 
