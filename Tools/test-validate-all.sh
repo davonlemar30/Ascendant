@@ -19,7 +19,9 @@ while [ $# -gt 0 ]; do
  shift
 done
 case "$method" in
-*GreyboxValidation*) echo '[GreyboxValidation] PASS: 1 checks.' > "$log";;
+*GreyboxValidation*)
+ echo '[GreyboxValidation] PASS: 1 checks.' > "$log"
+ [ "$CASE" = mechanical-missing ] || echo 'mechanical check' > Logs/greybox-mechanical-validation.txt;;
 *WebBuild*)
  mkdir -p "$build/Build"
  for file in index.html Build/Web.loader.js Build/Web.framework.js.unityweb Build/Web.data.unityweb Build/Web.wasm.unityweb; do echo stub > "$build/$file"; done
@@ -63,7 +65,7 @@ run() {
   printf 'PASS: %s (%s, exit %s)\n' "$CASE" "$expected" "$actual"; tail -n 2 "$TEST_ROOT/result.log"; pass=$((pass+1))
  else cat "$TEST_ROOT/result.log"; echo "FAIL: $CASE expected $expected, exit $actual"; exit 1; fi
 }
-for scenario in suite-exit fixture-exit missing stale truncated suite-missing suite-truncated; do run "$scenario" fail; done
+for scenario in mechanical-missing suite-exit fixture-exit missing stale truncated suite-missing suite-truncated; do run "$scenario" fail; done
 # A real unrelated listener must be refused and must survive the runner.
 python3 -m http.server "$PORT" --bind 127.0.0.1 > "$TEST_ROOT/listener.log" 2>&1 &
 listener=$!

@@ -36,6 +36,14 @@ step "mechanical checks; evidence: $LOGS"
 rm -f Logs/greybox-mechanical-validation.txt
 "$UNITY" -batchmode -nographics -quit -projectPath "$PROJECT" -executeMethod Ascendant.Build.GreyboxValidation.Run -logFile "$LOGS/mechanical.log" || die 'mechanical subprocess failed'
 grep -Eq '\[GreyboxValidation\] PASS: [1-9][0-9]* checks\.' "$LOGS/mechanical.log" || die 'mechanical completion evidence missing'
+python3 - "$LOGS/mechanical.log" Logs/greybox-mechanical-validation.txt <<'CHECK' || die 'mechanical report missing, empty, or incomplete'
+import pathlib, re, sys
+log, report = map(pathlib.Path, sys.argv[1:])
+lines = report.read_text().splitlines()
+counts = re.findall(r'\[GreyboxValidation\] PASS: (\d+) checks\.', log.read_text())
+sys.exit(not lines or any(not line.strip() for line in lines) or counts != [str(len(lines))])
+CHECK
+cp Logs/greybox-mechanical-validation.txt "$LOGS/mechanical-report.txt"
 step 'WebGL build'
 idle
 # Isolate output so an old successful build cannot stand in for this invocation.
