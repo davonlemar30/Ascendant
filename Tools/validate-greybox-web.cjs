@@ -50,22 +50,32 @@ const path=require('path');
   const playLaunch=async(pg,prefix,reduced,where,stopAt,tap)=>{
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
     let zoomSeen=0;
-    // the owner, Oct 9 ("fix that immediately"): a watcher in the page reads every state the game publishes through the burn and the transform
-    await pg.evaluate(()=>{window.__wheel={n:0,bad:[],glyphSample:null};let last='';const tick=()=>{const s=window.ascendantDial?.snapshot();if(s&&s.launchShotId==='glyphs'&&s.launchCamera?.[2]>0&&s.launchCamera[2]<1&&!window.__wheel.glyphSample)window.__wheel.glyphSample={state:s,skip:!document.getElementById('skip-prologue').disabled,said:document.getElementById('announcement').textContent};if(s&&(s.launchShotId==='burn'||s.launchShotId==='transform')){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
-      const ls=(s.launchLayers||[]).map(x=>x.split(':')),w=ls.filter(x=>x[0].startsWith('intro-wheel'));if(w.some(x=>Math.abs(((+x[1]-+w[0][1]+540)%360)-180)>.05))window.__wheel.bad.push(key);if(ls.some(x=>x[0]==='intro-earth'&&Math.abs(+x[1])>.05))window.__wheel.bad.push('earth turned: '+key);}}
-      if(!s||s.screen==='logo'||s.screen==='intro')requestAnimationFrame(tick);};requestAnimationFrame(tick);});
+    // Observe brief animated states inside the page; screenshots and RPCs can outlast a shot on Linux.
+    // A missing intermediate state or missing later shot still times out, including an animation that never finishes.
+    await pg.evaluate(({reduced,frames})=>{
+      window.__wheel={n:0,bad:[]};window.__launchSamples={};let last='';
+      const tick=()=>{const s=window.ascendantDial?.snapshot();
+        if(s&&(s.screen==='logo'||s.screen==='intro')){
+          const id=s.launchShotId,cam=s.launchCamera||[],ls=(s.launchLayers||[]).map(x=>x.split(':'));
+          const b=ls.find(x=>x[0]==='intro-wheel-burning');
+          let observed=cam.length===3&&s.launchFrame===frames[id];
+          if(!reduced&&['draw','glyphs'].includes(id))observed=observed&&cam[2]>0&&cam[2]<1&&(id!=='draw'||cam[2]>.05&&cam[2]<.95);
+          if(!reduced&&id==='burn')observed=observed&&Math.abs(cam[1])>.1;
+          if(id==='transform')observed=observed&&b&&+b[2]>0&&+b[2]<1&&ls.some(x=>x[0]==='intro-earth');
+          if(!reduced&&['earth','brooklyn','window'].includes(id))observed=observed&&cam[0]>1;
+          if(observed&&!window.__launchSamples[id])window.__launchSamples[id]={state:s,skip:!document.getElementById('skip-prologue').disabled,said:document.getElementById('announcement').textContent,observedAt:performance.now()};
+          if(id==='burn'||id==='transform'){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
+            const w=ls.filter(x=>x[0].startsWith('intro-wheel'));if(w.some(x=>Math.abs(((+x[1]-+w[0][1]+540)%360)-180)>.05))window.__wheel.bad.push(key);
+            if(ls.some(x=>x[0]==='intro-earth'&&Math.abs(+x[1])>.05))window.__wheel.bad.push('earth turned: '+key);}}
+        }
+        if(!s||s.screen==='logo'||s.screen==='intro')requestAnimationFrame(tick);
+      };requestAnimationFrame(tick);
+    },{reduced,frames:Object.fromEntries(LAUNCH.map(([id,frame])=>[id,frame]))});
     for(const [i,[id,frame,settle,line]] of LAUNCH.entries()){
-      // Capture the brief glyph sweep in-page: screenshots and RPCs can outlast it on Linux.
-      // The subsequent alive/earth waits still require the animation to finish.
-      let sample=null;
-      if(!reduced&&id==='glyphs'){
-        await pg.waitForFunction(()=>!!window.__wheel.glyphSample,{},{timeout:20000});
-        sample=await pg.evaluate(()=>window.__wheel.glyphSample);
-      }else{
-        await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
-        await pg.waitForTimeout(settle);
-      }
-      const s=sample?sample.state:await snap(),skip=sample?sample.skip:await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo',said=sample?sample.said:await pg.locator('#announcement').textContent();
+      await pg.waitForFunction(k=>!!window.__launchSamples[k],id,{timeout:20000});
+      const sample=await pg.evaluate(k=>window.__launchSamples[k],id);
+      const s=sample.state,skip=sample.skip,cam=s.launchCamera||[],logo=id==='logo',said=sample.said;
+      fs.writeFileSync(path.join(out,prefix+'-observations.json'),JSON.stringify(await pg.evaluate(()=>window.__launchSamples),null,2));
       check(s.screen===(logo?'logo':'intro')&&s.launchShotId===id&&s.launchFrame===frame&&s.canSkip&&skip&&!s.gearShown&&s.caspar===line&&(line===''||said.includes(line))&&!s.canSliceContinue,'the launch'+(reduced?', reduced motion':'')+': '+id+' ('+frame+') on the '+(logo?'logo screen':'launch movie')+', its spoken line '+(line?'announced ("'+line+'")':'none')+', the semantic Skip offered, no gear, at '+where);
       if(reduced&&!logo)check(s.launchStill&&cam.length===3&&Math.abs(cam[0]-1)<.001&&Math.abs(cam[1])<.01&&Math.abs(cam[2]-1)<.001,'reduced motion: '+id+' held still and level, no sweep ('+JSON.stringify(cam)+') at '+where);
       if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
