@@ -7,7 +7,7 @@ namespace Ascendant.Build
     // ☽ (U+263D), which the font carries. Run once after changing the set (batch: -executeMethod Ascendant.Build.FontSetup.Apply).
     public static class FontSetup
     {
-        public const string SymbolFont = "Assets/CelestialDial/Resources/Fonts/NotoSansSymbols.ttf", SymbolSet = "♈♉♊♋♌♍♎♏♐♑♒♓☽";
+        public const string SymbolFont = "Assets/CelestialDial/Resources/Fonts/NotoSansSymbols.ttf", SymbolSet = "♈♉♊♋♌♍♎♏♐♑♒♓☽☿♀♂♃♄♅♆";
         [MenuItem("Ascendant/Greybox/Bake the symbol font's characters")]
         public static void Apply()
         {

@@ -1,0 +1,31 @@
+{
+  "targetedSource": "bb09ddc",
+  "finalPlayerSource": "470508a2e774c516f95c090002294d1c68c0eb1a",
+  "finalDifference": "Caspar pose drawn before dialogue panel; frozen-motion capture tool only otherwise. Combined build tests final player source.",
+  "targeted": {
+    "desktop": {
+      "viewport": "1280x800",
+      "deviceScale": 1,
+      "mobile": false,
+      "pass": 222
+    },
+    "phone": {
+      "viewport": "360x800",
+      "deviceScale": 2,
+      "mobile": true,
+      "pass": 222
+    }
+  },
+  "targetArtifact": "stage2-bb09ddc-47848428",
+  "unity": "6000.3.24f1",
+  "buildBytes": 47848428,
+  "mechanicalPass": 1028,
+  "errors": 0,
+  "warnings": 0,
+  "limitations": [
+    "Final full browser regression is running. Slice fixture failed unchanged pre-existing unknown/default journal assertion.",
+    "No Android device or production release performed."
+  ],
+  "frozenWingPixelComparisons": 14,
+  "longDialoguePreviews": "5 captures of final player source; work/ring/company introduction and retrograde readable, Caspar behind panel"
+}

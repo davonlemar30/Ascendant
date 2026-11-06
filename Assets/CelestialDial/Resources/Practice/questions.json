@@ -395,6 +395,182 @@
      "why": "Taurus and Scorpio are opposites, and both are Fixed."
     }
    ]
-  }
- ]
+  },
+{
+  "id": "planets",
+  "name": "The Planets",
+  "line": "Ten symbols, ten works",
+  "unlock": "key5",
+  "end": "That's all I have on the planets for now. Come back whenever you like.",
+  "questions": [
+    {
+      "ask": "Which planet's work is to feel?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "The Moon",
+        "Venus",
+        "Neptune",
+        "The Sun"
+      ],
+      "answer": 0,
+      "why": "The Moon is the feeling planet: moods, needs, what comforts you."
+    },
+    {
+      "ask": "Whose symbol is this?",
+      "glyph": -1,
+      "planet": 5,
+      "choices": [
+        "Jupiter",
+        "Neptune",
+        "Saturn",
+        "Mars"
+      ],
+      "answer": 0,
+      "why": "Jupiter's symbol looks like a 4 with a long tail. Neptune's is a trident."
+    },
+    {
+      "ask": "Whose symbol is this?",
+      "glyph": -1,
+      "planet": 2,
+      "choices": [
+        "Mercury",
+        "Venus",
+        "Mars",
+        "The Moon"
+      ],
+      "answer": 0,
+      "why": "Mercury wears a small crescent on top of the circle and cross that Venus carries."
+    },
+    {
+      "ask": "Which planet's work is to structure?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Saturn",
+        "Jupiter",
+        "Mars",
+        "Pluto"
+      ],
+      "answer": 0,
+      "why": "Saturn builds the walls and the deadlines. Jupiter is the one that widens them."
+    },
+    {
+      "ask": "Do the planets make things happen to us?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "No. Astrology reads them as describing what is going on.",
+        "Yes, their pull pushes events along.",
+        "Only the Sun and the Moon do.",
+        "Only when they are retrograde."
+      ],
+      "answer": 0,
+      "why": "Astrology treats the planets as a language for describing. Pointing at a planet explains nothing about why something happened."
+    },
+    {
+      "ask": "Mercury is retrograde. What is going on?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Seen from Earth, Mercury seems to move backward for a few weeks.",
+        "Mercury is breaking phones and computers.",
+        "Mercury has stopped moving.",
+        "Mercury has left its orbit."
+      ],
+      "answer": 0,
+      "why": "℞ describes the view from Earth. Mercury keeps its course the whole time."
+    }
+  ]
+},
+{
+  "id": "pace",
+  "name": "Pace and Company",
+  "line": "Swift planets, slow planets",
+  "unlock": "key6",
+  "end": "That's all I have on pace and company for now. Come back whenever you like.",
+  "questions": [
+    {
+      "ask": "Which of these crosses a sign fastest?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "The Moon",
+        "The Sun",
+        "Mars",
+        "Jupiter"
+      ],
+      "answer": 0,
+      "why": "The Moon takes about two and a half days to cross a sign."
+    },
+    {
+      "ask": "Saturn. Which company is it in?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Social",
+        "Personal",
+        "Outer",
+        "The lights"
+      ],
+      "answer": 0,
+      "why": "Jupiter and Saturn are the social pair, in the modern grouping."
+    },
+    {
+      "ask": "The four companies (the lights, personal, social, outer) are what?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "A modern teaching convention",
+        "The oldest rule in astrology",
+        "Sorted by the planets' sizes",
+        "A law of astronomy"
+      ],
+      "answer": 0,
+      "why": "Older traditions worked with seven visible bodies and did not use these groups."
+    },
+    {
+      "id": "Q-Pluto",
+      "ask": "Why does a Pluto sign alone say little about one person?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Pluto stays in a sign for twelve years or more, so a whole generation shares it.",
+        "Pluto is too far away to matter.",
+        "Pluto only matters for Scorpios.",
+        "Pluto has no symbol of its own."
+      ],
+      "answer": 0,
+      "why": "The slow planets mark generations. They speak about one person mainly when they touch that person's own lights and angles."
+    },
+    {
+      "id": "Q-Week",
+      "ask": "Two children are born a week apart. Which is most likely to differ between them?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Their Moon sign",
+        "Their Saturn sign",
+        "Their Neptune sign",
+        "Their Pluto sign"
+      ],
+      "answer": 0,
+      "why": "The Moon changes sign every two or three days. The others stay put for years."
+    },
+    {
+      "ask": "Someone says Pluto is their sign's hidden self. What's the trouble with that?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Everyone born across many years shares that Pluto sign.",
+        "Pluto only affects Scorpios.",
+        "Pluto has no symbol.",
+        "Nothing. That's exactly right."
+      ],
+      "answer": 0,
+      "why": "Pluto is generational. One person's chart reads it through the faster planets and the angles."
+    }
+  ]
+}
+]
 }

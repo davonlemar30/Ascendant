@@ -1,0 +1,76 @@
+{
+  "allIdentical": true,
+  "comparisons": [
+    {
+      "width": 360,
+      "checkpoint": "key1",
+      "differenceBox": null
+    },
+    {
+      "width": 360,
+      "checkpoint": "wheel",
+      "differenceBox": null
+    },
+    {
+      "width": 360,
+      "checkpoint": "key2",
+      "differenceBox": null
+    },
+    {
+      "width": 360,
+      "checkpoint": "key3",
+      "differenceBox": null
+    },
+    {
+      "width": 360,
+      "checkpoint": "key4",
+      "differenceBox": null
+    },
+    {
+      "width": 360,
+      "checkpoint": "whole",
+      "differenceBox": null
+    },
+    {
+      "width": 360,
+      "checkpoint": "whole versus obswhole",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "key1",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "wheel",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "key2",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "key3",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "key4",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "whole",
+      "differenceBox": null
+    },
+    {
+      "width": 1280,
+      "checkpoint": "whole versus obswhole",
+      "differenceBox": null
+    }
+  ],
+  "method": "Pillow ImageChops.difference on RGB browser screenshot pixels. Reduced motion enabled identically for both artifacts, no image resizing or normalization."
+}
