@@ -1,0 +1,32 @@
+{
+  "combinedSource": "71e5441be7e61f9da641bc4250396ebb8be9ecff",
+  "sameTreeReleaseSource": "a7b253f",
+  "local": {
+    "ladderExit": 0,
+    "ladderSeconds": 1548,
+    "mechanicalPass": 1028,
+    "fixturePass": 471,
+    "browserPass": 1065,
+    "browserFail": 0,
+    "viewports": "390,360",
+    "deviceScale": 2,
+    "mobile": true,
+    "browserReportMatchesStdout": true,
+    "webBytes": 47849252,
+    "webErrors": 0,
+    "webWarnings": 0
+  },
+  "linux": {
+    "run": 42168038641,
+    "build": "success",
+    "fixture": "failure: half-glyph frame",
+    "phoneBrowser": "failure: launch canvas tap",
+    "desktopBrowser": "failure: prologue-light frame",
+    "releaseClearance": "skipped",
+    "deploy": "skipped",
+    "production": "skipped"
+  },
+  "stop": "repeated-attempt/time hard stop; written question in question.md",
+  "mergeCount": 0,
+  "part1": "not started; Part0 prerequisite unmet"
+}

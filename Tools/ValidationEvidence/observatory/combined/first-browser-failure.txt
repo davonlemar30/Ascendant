@@ -1,0 +1,5 @@
+Error: Contents' two rows and its link each take 44 px or more (The Wheel 238x104, The Library Map 238x104, The Planets 238x78, ‹ Your Journal 96x44) at 360
+    at check (/Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Tools/validate-greybox-web.cjs:24:46)
+    at /Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Tools/validate-greybox-web.cjs:452:69
+    at async Promise.all (index 1)
+    at async /Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Tools/validate-greybox-web.cjs:112:3

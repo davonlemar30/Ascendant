@@ -10,6 +10,7 @@ namespace Ascendant.CelestialDial
     [Serializable] public sealed class PracticeQuestion
     {
         public string ask = "", why = "";
+        public int planet = -1;
         public int glyph = -1;      // a sign's mark drawn above the ask (0 Aries ... 11 Pisces), or -1
         public string[] choices = new string[0];
         public int answer;          // the right choice's place in choices (the game shuffles them)

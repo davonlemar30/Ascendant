@@ -1,0 +1,4 @@
+FAIL: System.Exception: 86bcg8nft (4A): "Your Birth": the default-chart details are tagged default with its note, each with Add, and Add my birth time; the rising is worked out, so no rising choice; actual rows: Date: 20 April 1990 / Time: 7:19 PM / Place: London, Britain (UK); note: ; Add=False; AddTime=False; Rising=False
+  at Ascendant.Build.SlicePlayValidation.Check (System.Boolean value, System.String text) [0x0001f] in /Users/damusthadon/Documents/Ascendant-worktrees/codex-goal02-proof/Assets/Editor/CelestialDial/SlicePlayValidation.cs:45 
+  at Ascendant.Build.SlicePlayValidation+<>c.<QueueChecks>b__19_83 () [0x0002b] in /Users/damusthadon/Documents/Ascendant-worktrees/codex-goal02-proof/Assets/Editor/CelestialDial/SlicePlayValidation.cs:208 
+  at Ascendant.Build.SlicePlayValidation.Tick () [0x00138] in /Users/damusthadon/Documents/Ascendant-worktrees/codex-goal02-proof/Assets/Editor/CelestialDial/SlicePlayValidation.cs:708 

@@ -47,17 +47,17 @@ namespace Ascendant.Build
         static bool waitingForPlayerFrame;
         static void Act(string command)
         {
-            if (command != "relaunch") { View.Dial.WebAction(command); return; }
-            // A scene reload starts its real-time movie immediately. From an Editor
+            if (command != "relaunch" && command != "rat") { View.Dial.WebAction(command); return; }
+            // A reload or rat starts a real-time animation immediately. From an Editor
             // update, Time.unscaledTime can still belong to the previous player frame;
-            // the next frame then consumes the logo before the fixture can observe it.
+            // the next frame can consume a short animation before the fixture observes it.
             waitingForPlayerFrame = true;
-            View.StartCoroutine(RelaunchOnPlayerFrame());
+            View.StartCoroutine(ActOnPlayerFrame(command));
         }
-        static IEnumerator RelaunchOnPlayerFrame()
+        static IEnumerator ActOnPlayerFrame(string command)
         {
             yield return null;
-            try { View.Dial.WebAction("relaunch"); }
+            try { View.Dial.WebAction(command); }
             finally { waitingForPlayerFrame = false; nextAt = EditorApplication.timeSinceStartup + .1; }
         }
         static void AnswerReview(bool captureGlyph)
@@ -204,9 +204,24 @@ namespace Ascendant.Build
             // the birth-time build (owner, Oct 7): the Big Three's line opens "Your Birth"; a rising chosen, then the facts added in the opening's
             // boxes; back on the page a line for each change; the lessons keep their sun (Taurus both ways) and the record is saved
             Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();var box=snap.journalBigThreeBox??new float[0];Check(box.Length==4 && box[3]>=44 && snap.canBirthPage,"Oct 7: the Big Three's line is a 44 px target on the landing");Act("journal-birth");});
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();
+                Check(snap.journalView=="birth" && snap.journalBirthRows.SequenceEqual(new[]{"Date: 20 April 1990","Time: 7:19 PM","Place: London, Britain (UK)"}) && snap.journalBirthLines.Length==0 && snap.journalLink==SliceFlow.BackToJournal && !snap.canBirthAdd && !snap.canBirthAddTime && !snap.canBirthRising,
+                    "the opening's complete personal chart is retained in Your Birth, with no default note or missing-detail controls");
+                Capture("slice-390-your-birth-personal.png");});
+            // Owner approved the broader test-only repair: exercise default/Add separately from the personal opening above.
+            // Keep earned progress and inscription history; seed only the second case's birth record through the normal model API.
+            Steps.Enqueue(()=>{Act("close-journal");var save=View.Flow.CaptureProgress(View.Dial.Lesson,View.Grid);var birth=new SliceFlow();birth.SetName(View.Flow.PlayerName);
+                Check(birth.SkipPrologue() && birth.Continue(),"the independent journal case reaches the birth question through the opening model");birth.ChooseBirth("skip");
+                Check(birth.BirthDone && birth.Filled.Any && !birth.Facts.Any,"the independent journal case chooses the approved default chart");
+                birth.WriteBirth(save);PlayerPrefs.SetString(SliceView.SaveKey,JsonUtility.ToJson(save));PlayerPrefs.Save();Act("reload");});
+            Until(()=>View.Resumed && View.Flow.Screen==SliceScreen.Hub && !View.Busy,30,"the default-chart journal case to reload");
+            Steps.Enqueue(()=>{Check(View.Flow.Keys==1 && View.Flow.Filled.Any && !View.Flow.Facts.Any && View.Flow.SunSign==7,"the default-chart case keeps Key 1 and has default facts separate from personal facts");Act("walk:desk");});
+            Steps.Enqueue(()=>{Check(View.Flow.Walk.At=="desk" && !View.Busy,"the independent journal case returns to the desk");Act("open-journal");});
+            Until(()=>View.Dial.Snapshot().journalView=="landing" && !View.Busy,10,"the default-chart journal landing");
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.canBirthPage && snap.journalBigThreeBox.Length==4 && snap.journalBigThreeBox[3]>=44,"the default-chart Big Three line also opens Your Birth through a 44 px target");Act("journal-birth");});
             Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();var lines=string.Join(" ",snap.journalBirthLines??new string[0]);
-                Check(snap.journalView=="birth" && snap.journalBirthRows.SequenceEqual(new[]{"Date: unknown","Time: unknown","Place: unknown"}) && lines=="" && snap.journalLink==SliceFlow.BackToJournal && snap.canBirthAdd && snap.canBirthAddTime && !snap.canBirthRising,
-                    "86bcg8nft (4A): \"Your Birth\": the drawn details still read unknown, each with Add, and Add my birth time; the rising is worked out, so no rising choice");
+                Check(snap.journalView=="birth" && snap.journalBirthRows.SequenceEqual(new[]{"Date: 4 November 1990 (default)","Time: 7:19 PM (default)","Place: Bushwick, NY, United States (default)"}) && lines==SliceFlow.DefaultOnPage && snap.journalLink==SliceFlow.BackToJournal && snap.canBirthAdd && snap.canBirthAddTime && !snap.canBirthRising,
+                    "86bcg8nft (4A): \"Your Birth\": the default-chart details are tagged default with its note, each with Add, and Add my birth time; the rising is worked out, so no rising choice; actual rows: "+string.Join(" / ",snap.journalBirthRows)+"; note: "+lines+"; Add="+snap.canBirthAdd+"; AddTime="+snap.canBirthAddTime+"; Rising="+snap.canBirthRising);
                 Check(snap.buttons.Where(b=>b.Contains(":frame:")).All(b=>{var wh=b.Substring(b.LastIndexOf(':')+1).Split('x');return int.Parse(wh[1])>=44;}),"its buttons each take a 44 px target");Capture("slice-390-your-birth.png");});
             Steps.Enqueue(()=>Act("birth-add-time"));
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth && View.Flow.BirthStep=="date" && View.Flow.Note==SliceFlow.NeedDayAndPlace,"Add my birth time with no birthday asks the day first, and says why");Act("birthdate:1990-04-25");Act("birthtime:14:30");Act("birthplace-search:London");});
@@ -219,10 +234,10 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>Act("journal-landing"));
             Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalView=="landing" && snap.journalKeeper[1]=="\u2609 Taurus \u00b7 \u263d Taurus \u00b7 \u2191 Virgo","the record reads the new chart: "+snap.journalKeeper[1]);});
             Steps.Enqueue(()=>Act("journal-contents"));
-            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalView=="contents" && snap.journalChapters.SequenceEqual(new[]{SliceFlow.WheelTitle,SliceFlow.MapTitle,SliceFlow.SealedChapter,SliceFlow.SealedChapter}) && snap.journalLink==SliceFlow.BackToJournal && snap.canJournalHome && !snap.canJournalContents,"the Contents door: The Wheel, The Library Map, two Sealed rows; \u2039 Your Journal at the top left");
-                var targets=snap.buttons.Where(b=>b.Contains(":row:")||b.Contains(":link:")).ToList();Check(targets.Count==3 && targets.All(b=>{var wh=b.Substring(b.LastIndexOf(':')+1).Split('x');return int.Parse(wh[0])>=44 && int.Parse(wh[1])>=44;}),"Contents' two rows and its link each take taps over 44 px or more ("+string.Join(", ",targets)+")");Capture("slice-390-journal-contents.png");});
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalView=="contents" && snap.journalChapters.SequenceEqual(new[]{SliceFlow.WheelTitle,SliceFlow.MapTitle,"The Planets",SliceFlow.SealedChapter}) && snap.journalLink==SliceFlow.BackToJournal && snap.canJournalHome && !snap.canJournalContents,"the Contents door: The Wheel, The Library Map, two Sealed rows; \u2039 Your Journal at the top left");
+                var targets=snap.buttons.Where(b=>b.Contains(":row:")||b.Contains(":link:")).ToList();Check(targets.Count==4 && targets.All(b=>{var wh=b.Substring(b.LastIndexOf(':')+1).Split('x');return int.Parse(wh[0])>=44 && int.Parse(wh[1])>=44;}),"Contents' three rows and its link each take taps over 44 px or more ("+string.Join(", ",targets)+")");Capture("slice-390-journal-contents.png");});
             Steps.Enqueue(()=>Act("journal-chapter:map"));
-            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalView=="map" && snap.journalMapRooms.SequenceEqual(TravelMenu.Rooms.Select(r=>r.name)) && snap.journalLink==SliceFlow.BackToContents && snap.canJournalContents,"The Library Map: the plan, the rooms woken so far named ("+string.Join(", ",snap.journalMapRooms)+"); \u2039 Contents at the top left");
+            Steps.Enqueue(()=>{var snap=View.Dial.Snapshot();Check(snap.journalView=="map" && snap.journalMapRooms.SequenceEqual(new[]{"The Grand Atrium","The Zodiac Wing","The Crystal Book Chamber"}) && snap.journalLink==SliceFlow.BackToContents && snap.canJournalContents,"The Library Map: the plan, the rooms woken so far named ("+string.Join(", ",snap.journalMapRooms)+"); \u2039 Contents at the top left");
                 var title=GameObject.Find("Journal").GetComponentsInChildren<UnityEngine.UI.Text>(false).FirstOrDefault(t=>t.font!=null && t.font.name=="UnifrakturMaguntia" && t.text==SliceFlow.MapTitle);Check(title!=null && title.preferredWidth<=SliceView.TitleRoom+.5f && title.fontSize<SliceView.TitleSize,"its title fits between the page's corner flourishes: "+(title!=null?title.preferredWidth.ToString("0")+" px at "+title.fontSize:"missing"));Capture("slice-390-journal-map.png");});
             Steps.Enqueue(()=>Act("journal-contents"));
             Steps.Enqueue(()=>Act("journal-chapter:wheel"));
@@ -534,7 +549,8 @@ namespace Ascendant.Build
             Steps.Enqueue(()=>{double shown=EditorApplication.timeSinceStartup-tappedAt;Check(!View.Dial.Snapshot().skipShown && View.Flow.AtPrologue && shown>2.7 && shown<4.2,"Skip hides again after about 3 s ("+shown.ToString("0.0")+" s) and the scene plays on");Act("prologue-tap");Check(View.SkipShown,"another tap shows it again");Act("skip-prologue");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Identity && !View.Busy && View.OrbShown && Slots.IsDressed("orb") && View.PrologueShotIndex==-1,"Skip goes straight to WHO ARE YOU?, the orb on its file");Act("name:Tester");Act("next-screen");});
             Steps.Enqueue(()=>{Check(View.Flow.Screen==SliceScreen.Birth && View.OrbStarsLit==1 && Slots.IsDressed("orb-star"),"the name's star on its file");OrbClear("the birth question, test set");Capture("slice-390-art-birth-orb.png");Act("birth:skip");Act("sign:1");});
-            Steps.Enqueue(()=>{Check(View.OrbStarsLit==3,"three stars after two answers");Capture("slice-390-art-birth-orb-3.png");});
+            Steps.Enqueue(()=>{Check(View.OrbStarsLit==2 && View.Flow.OpeningAnswers==2 && View.Flow.SunSign==7 && !View.Dial.Snapshot().canSignPick,"the default skip path has two answered stars and no sign question, even after the retired sign command");Capture("slice-390-art-birth-orb-2.png");Act("birth:");Act("birth:chart");Act("birthdate:1990-04-25");});
+            Steps.Enqueue(()=>{Check(View.OrbStarsLit==3 && View.Flow.OpeningAnswers==3 && View.Flow.BirthStep=="time","three stars after the name, personal-chart choice and date answers");Capture("slice-390-art-birth-orb-3.png");});
             // The launch's slots (owner, Oct 9; round 3): the Wing-whole save back in slot 1 (an old single save, under today's key), then Main menu
             // from the birth question (nothing saved yet: it asks), the slot lists, the question before a filled slot is replaced, a new game in an
             // empty slot, and Continue falling back to the slot that holds a save; the menu's files from the test set
@@ -698,9 +714,13 @@ namespace Ascendant.Build
             if(waitFor!=null)
             {
                 bool met=false; try{met=View!=null && waitFor();}catch(Exception){}
-                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;return;}
-                if(EditorApplication.timeSinceStartup<waitLimit)return;
-                var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;if(waitThen>0)return;}
+                else
+                {
+                    if(EditorApplication.timeSinceStartup<waitLimit)return;
+                    var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+                }
+                // A zero-delay observation and its assertion share this Editor tick; a short frame must not advance between them.
             }
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
             var view=View; if(view!=null && (view.Busy || view.Dial.Busy) && !BusyStep)return; // Beats own the frame.

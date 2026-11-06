@@ -1,0 +1,6 @@
+page.waitForFunction: Timeout 15000ms exceeded.
+    at /Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Tools/validate-greybox-web.cjs:950:48
+    at async /Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Tools/validate-greybox-web.cjs:112:3 {
+  log: [],
+  name: 'TimeoutError'
+}

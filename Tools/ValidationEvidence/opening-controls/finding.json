@@ -1,0 +1,77 @@
+{
+  "playerSource": "origin/main 49c61f8",
+  "localRunnerCommit": "8c0685d",
+  "testCommit": "bdb33e9",
+  "cases": [
+    {
+      "case": "production-phone",
+      "expectedStep": "time",
+      "observed": {
+        "screen": "birth",
+        "birthStep": "date",
+        "birthDraftDate": "",
+        "canBirthDate": true,
+        "canBirthTime": false,
+        "busy": false
+      },
+      "inputs": [
+        {
+          "id": "name",
+          "value": "Tester",
+          "hidden": true
+        },
+        {
+          "id": "birthdate",
+          "value": "1990-05-01",
+          "hidden": false
+        },
+        {
+          "id": "birthtime",
+          "value": "",
+          "hidden": true
+        },
+        {
+          "id": "birthplace",
+          "value": "",
+          "hidden": true
+        }
+      ],
+      "result": "FAIL: timed out after Use this date; 2 earlier player-control assertions passed"
+    },
+    {
+      "case": "local-desktop",
+      "expectedStep": "time",
+      "observed": {
+        "screen": "birth",
+        "birthStep": "date",
+        "birthDraftDate": "",
+        "canBirthDate": true,
+        "canBirthTime": false,
+        "busy": false
+      },
+      "inputs": [
+        {
+          "id": "name",
+          "value": "Tester",
+          "hidden": true
+        },
+        {
+          "id": "birthdate",
+          "value": "1990-05-01",
+          "hidden": false
+        },
+        {
+          "id": "birthtime",
+          "value": "",
+          "hidden": true
+        },
+        {
+          "id": "birthplace",
+          "value": "",
+          "hidden": true
+        }
+      ],
+      "result": "FAIL: timed out after Use this date; 2 earlier player-control assertions passed"
+    }
+  ]
+}

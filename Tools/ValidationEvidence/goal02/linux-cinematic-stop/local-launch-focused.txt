@@ -1,0 +1,52 @@
+PASS: the launch: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 390
+PASS: the launch: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 390
+PASS: the wheel draws itself: the sweep has revealed 13% of its lines at 390
+PASS: the wheel zooms in slowly through draw (scale 0.818, up from 0.000) at 390
+PASS: the launch: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 390
+PASS: its symbols appear one at a time: 1 of 12 so far at 390
+PASS: the wheel zooms in slowly through glyphs (scale 0.928, up from 0.818) at 390
+PASS: the launch: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 390
+PASS: the wheel zooms in slowly through alive (scale 0.976, up from 0.928) at 390
+PASS: the launch: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 390
+PASS: the wheel spins: intro-wheel-burning turned -1.3 degrees, a round layer at its own size, at 390
+PASS: the launch: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 390
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:-170.49:0.90"]), which spins on and fades away, at 390
+PASS: the launch: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 390
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (28 states read) at 390
+PASS: after the transform only Earth is on stage at 390
+PASS: the push-in on intro-earth (scale 1.020) at 390
+PASS: the launch: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 390
+PASS: the launch: america (intro-america) on the launch movie, its spoken line announced ("The United States at night."), the semantic Skip offered, no gear, at 390
+PASS: the launch: newyork-state (intro-newyork-state) on the launch movie, its spoken line announced ("New York State."), the semantic Skip offered, no gear, at 390
+PASS: the launch: newyork-city (intro-newyork-city) on the launch movie, its spoken line announced ("New York City, between its rivers."), the semantic Skip offered, no gear, at 390
+PASS: the launch: brooklyn (intro-brooklyn) on the launch movie, its spoken line announced ("Brooklyn's rooftops at night."), the semantic Skip offered, no gear, at 390
+PASS: the push-in on intro-brooklyn (scale 1.005) at 390
+PASS: the launch: block (intro-block) on the launch movie, its spoken line announced ("A street of apartment buildings, a few cars, lit shopfronts."), the semantic Skip offered, no gear, at 390
+PASS: the launch: window (prologue-city) on the launch movie, its spoken line announced ("One building. Every window is dark but one."), the semantic Skip offered, no gear, at 390
+PASS: the push-in on prologue-city (scale 1.011) at 390
+PASS: the launch: logo (studio-logo) on the logo screen, its spoken line announced ("TSG Games."), the semantic Skip offered, no gear, at 360
+PASS: the launch: draw (intro-wheel-pencil-lines) on the launch movie, its spoken line announced ("A zodiac wheel draws itself in pencil, then adds its twelve symbols."), the semantic Skip offered, no gear, at 360
+PASS: the wheel draws itself: the sweep has revealed 5% of its lines at 360
+PASS: the wheel zooms in slowly through draw (scale 0.807, up from 0.000) at 360
+PASS: the launch: glyphs (intro-wheel-pencil-glyphs) on the launch movie, its spoken line none, the semantic Skip offered, no gear, at 360
+PASS: its symbols appear one at a time: 2 of 12 so far at 360
+PASS: the wheel zooms in slowly through glyphs (scale 0.933, up from 0.807) at 360
+PASS: the launch: alive (intro-wheel-lit) on the launch movie, its spoken line announced ("The wheel lights up in gold, and the dark fills with stars."), the semantic Skip offered, no gear, at 360
+PASS: the wheel zooms in slowly through alive (scale 0.979, up from 0.933) at 360
+PASS: the launch: burn (intro-wheel-burning) on the launch movie, its spoken line announced ("The wheel burns with golden fire and begins to spin."), the semantic Skip offered, no gear, at 360
+PASS: the wheel spins: intro-wheel-burning turned -0.4 degrees, a round layer at its own size, at 360
+PASS: the launch: transform (intro-earth) on the launch movie, its spoken line announced ("The fire turns to light. The wheel becomes Earth."), the semantic Skip offered, no gear, at 360
+PASS: the transform: Earth fades in level under the burning wheel (["intro-earth:0.00:0.00","intro-wheel-burning:-171.84:0.90"]), which spins on and fades away, at 360
+PASS: the launch: earth (intro-earth) on the launch movie, its spoken line announced ("Earth, seen from space."), the semantic Skip offered, no gear, at 360
+PASS: through the burn and the transform every wheel layer turned at one angle and Earth never turned (26 states read) at 360
+PASS: after the transform only Earth is on stage at 360
+PASS: the push-in on intro-earth (scale 1.020) at 360
+PASS: the launch: continents (intro-continents) on the launch movie, its spoken line announced ("North America at night."), the semantic Skip offered, no gear, at 360
+PASS: the launch: america (intro-america) on the launch movie, its spoken line announced ("The United States at night."), the semantic Skip offered, no gear, at 360
+PASS: the launch: newyork-state (intro-newyork-state) on the launch movie, its spoken line announced ("New York State."), the semantic Skip offered, no gear, at 360
+PASS: the launch: newyork-city (intro-newyork-city) on the launch movie, its spoken line announced ("New York City, between its rivers."), the semantic Skip offered, no gear, at 360
+PASS: the launch: brooklyn (intro-brooklyn) on the launch movie, its spoken line announced ("Brooklyn's rooftops at night."), the semantic Skip offered, no gear, at 360
+PASS: the push-in on intro-brooklyn (scale 1.009) at 360
+PASS: the launch: block (intro-block) on the launch movie, its spoken line announced ("A street of apartment buildings, a few cars, lit shopfronts."), the semantic Skip offered, no gear, at 360
+PASS: the launch: window (prologue-city) on the launch movie, its spoken line announced ("One building. Every window is dark but one."), the semantic Skip offered, no gear, at 360
+PASS: the push-in on prologue-city (scale 1.010) at 360

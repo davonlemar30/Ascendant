@@ -1,142 +1,15 @@
-# Builds the Unity Web (WebGL) player from source and deploys it to GitHub Pages.
-#
-#   push to main / manual run on main  -> build + release checks + deploy to https://<owner>.github.io/Ascendant/
-#   manual run on a feature branch     -> release rehearsal, no deployment
-#   pull requests targeting main       -> build only (artifact is produced, nothing is deployed)
-#
-# Requires the repository secrets UNITY_LICENSE, UNITY_EMAIL and UNITY_PASSWORD (Unity Personal
-# activation performed by game-ci). Pull requests from forks cannot read secrets, so their builds
-# stop at license activation; that is expected.
 name: Web
-
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
-# One run per ref: superseded PR builds are cancelled, an in-flight main deployment is not.
-concurrency:
-  group: web-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 permissions:
   contents: read
-
+  actions: read
 jobs:
-  build:
-    name: Build Web player
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v7
-
-      - name: Cache Unity Library
-        uses: actions/cache@v6
-        with:
-          path: Library
-          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-WebGL-
-
-      # The Unity version comes from ProjectSettings/ProjectVersion.txt (unityVersion: auto).
-      # Build entry point: Assets/Editor/Build/WebBuild.cs (same one used for local CLI builds).
-      - name: Build with Unity
-        uses: game-ci/unity-builder@adaf7cd8f42fd48fbbf2d4f5f67ca30d87f819f1 # v5.0.1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          targetPlatform: WebGL
-          buildName: Web
-          buildMethod: Ascendant.Build.WebBuild.Build
-          versioning: None
-
-      # Gzip + decompression fallback (Player Settings) names the payload files *.unityweb so a
-      # static host needs no Content-Encoding headers. Fail early if any required file is missing.
-      - name: Verify build output
-        run: |
-          set -euo pipefail
-          out=build/WebGL/Web
-          for f in index.html Build/Web.loader.js Build/Web.framework.js.unityweb \
-                   Build/Web.data.unityweb Build/Web.wasm.unityweb; do
-            test -f "$out/$f" || { echo "::error::Missing required Web build file: $out/$f"; exit 1; }
-          done
-          ls -la "$out" "$out/Build"
-
-      - name: Stamp artifact identity
-        env:
-          BUILD_SHA: ${{ github.sha }}
-        run: |
-          # game-ci's container creates root-owned output; only this generated artifact changes owner.
-          sudo chown -R "$(id -u):$(id -g)" build/WebGL/Web
-          printf '%s\n' "$BUILD_SHA" > build/WebGL/Web/build-identity.txt
-
-      - name: Upload testable Web artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-player
-          path: build/WebGL/Web
-          if-no-files-found: error
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: build/WebGL/Web
-
-
-  fixture:
-    name: Release slice fixture
-    if: github.event_name != 'pull_request'
-    needs: build
+  cinematic-diagnostic:
+    if: github.ref == 'refs/heads/codex/release-gate-failure-proof'
+    name: Focused cinematic diagnosis (${{ matrix.density }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/cache@v6
-        with:
-          path: Library
-          key: Library-Fixture-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: Library-Fixture-
-      - name: Remove old evidence
-        run: |
-          mkdir -p Logs
-          rm -f Logs/slice-play-validation.txt Logs/release-fixture-completion.txt
-      # manualExit prevents -quit from ending Play Mode before its report.
-      # enableGpu runs with graphics under game-ci's Xvfb, never -nographics.
-      - name: Play the slice in Unity 6000.3.24f1
-        uses: game-ci/unity-builder@adaf7cd8f42fd48fbbf2d4f5f67ca30d87f819f1
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          targetPlatform: StandaloneLinux64
-          buildMethod: Ascendant.Build.SlicePlayValidation.Begin
-          manualExit: true
-          enableGpu: true
-          versioning: None
-          customParameters: -batchmode -sliceAutoExit -sliceStep 1.5 -releaseFixtureEvidence
-      - name: Require complete fixture evidence
-        run: python3 Tools/check-validation-report.py Logs/slice-play-validation.txt --fixture-log Logs/release-fixture-completion.txt
-      - name: Upload fixture evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-fixture
-          path: Logs/
-          if-no-files-found: warn
-
-  # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest moved to 26.04.
-  browser:
-    name: Release browser (${{ matrix.density }})
-    if: github.event_name != 'pull_request'
-    needs: build
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -145,6 +18,8 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/download-artifact@v5
         with:
+          github-token: ${{ github.token }}
+          run-id: 42168038641
           name: web-player
           path: Builds/Web
       - uses: actions/setup-node@v6
@@ -154,14 +29,13 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/browser" playwright@1.56.1
           "$RUNNER_TEMP/browser/node_modules/.bin/playwright" install --with-deps chrome
-      - name: Check the produced artifact
+      - name: Test existing artifact without building or deploying
         env:
-          BUILD_SHA: ${{ github.sha }}
           DENSITY: ${{ matrix.density }}
           PLAYWRIGHT_MODULE: ${{ runner.temp }}/browser/node_modules/playwright
         run: |
           set -euo pipefail
-          test "$(cat Builds/Web/build-identity.txt)" = "$BUILD_SHA"
+          test "$(cat Builds/Web/build-identity.txt)" = a7b253f121b7a3c7c096002e120377df51badce8
           mkdir -p Logs
           python3 -m http.server 8790 --directory Builds/Web --bind 127.0.0.1 > Logs/server.log 2>&1 &
           server=$!
@@ -170,75 +44,12 @@ jobs:
             if curl -fsS http://127.0.0.1:8790/build-identity.txt > Logs/served-identity.txt; then break; fi
             sleep 1
           done
-          test "$(cat Logs/served-identity.txt)" = "$BUILD_SHA"
+          test "$(cat Logs/served-identity.txt)" = a7b253f121b7a3c7c096002e120377df51badce8
           if [ "$DENSITY" = phone ]; then export DEVICE_SCALE=2 MOBILE=1; fi
-          GREYBOX_URL=http://127.0.0.1:8790 EVIDENCE_DIR=Logs/browser node Tools/validate-greybox-web.cjs 2>&1 | tee Logs/browser.log
-          python3 Tools/check-validation-report.py Logs/browser/validation.txt --browser-log Logs/browser.log
-      - name: Upload browser evidence
+          GREYBOX_URL=http://127.0.0.1:8790 EVIDENCE_DIR=Logs/cinematic node Tools/validate-cinematics-web.cjs 2>&1 | tee Logs/cinematic.log
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: release-browser-${{ matrix.density }}
+          name: focused-cinematic-${{ matrix.density }}
           path: Logs/
-          if-no-files-found: warn
-
-  release-ready:
-    name: Release artifact cleared
-    if: github.event_name != 'pull_request'
-    needs: [build, fixture, browser]
-    runs-on: ubuntu-24.04
-    steps:
-      # A workflow_dispatch on a feature branch rehearses this barrier, never deploys.
-      - run: echo "The artifact passed its fixture and both browser densities."
-
-  deploy:
-    name: Deploy to GitHub Pages
-    # Only main publishes the production Pages site; PR builds stop at the artifact above.
-    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    needs: [build, release-ready]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      pages: write    # create the Pages deployment
-      id-token: write # OIDC token deploy-pages uses to prove the deployment's origin
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v5
-
-  production:
-    name: Check published player
-    needs: deploy
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: '22'
-      - name: Install browser tooling
-        run: |
-          npm install --prefix "$RUNNER_TEMP/browser" playwright@1.56.1
-          "$RUNNER_TEMP/browser/node_modules/.bin/playwright" install --with-deps chrome
-      # This runs AFTER publication. A failure here cannot prevent publication.
-      - name: Check production identity and phone flow after publishing
-        env:
-          BUILD_SHA: ${{ github.sha }}
-          PLAYWRIGHT_MODULE: ${{ runner.temp }}/browser/node_modules/playwright
-        run: |
-          set -euo pipefail
-          mkdir -p Logs
-          curl -fsS 'https://davonlemar30.github.io/Ascendant/build-identity.txt' > Logs/production-identity.txt
-          test "$(cat Logs/production-identity.txt)" = "$BUILD_SHA"
-          GREYBOX_URL=https://davonlemar30.github.io/Ascendant/ DEVICE_SCALE=2 MOBILE=1 EVIDENCE_DIR=Logs/production node Tools/validate-greybox-web.cjs 2>&1 | tee Logs/production.log
-          python3 Tools/check-validation-report.py Logs/production/validation.txt --browser-log Logs/production.log
-      - name: Upload production evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-phone
-          path: Logs/
-          if-no-files-found: warn
+          if-no-files-found: error
