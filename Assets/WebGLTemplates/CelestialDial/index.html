@@ -103,7 +103,7 @@
   function syncObservatory(){
     document.querySelectorAll("[data-observatory]").forEach(b=>b.disabled=true);
     const ids=state?.observatoryControlIds||[],r=state?.orreryControls||[];
-    ids.forEach((action,i)=>{const id="control-"+action.replace(":","-");let b=byId(id);if(!b){b=document.createElement("button");b.id=id;b.dataset.observatory="1";b.onclick=()=>send(action);byId("semantic").appendChild(b);}b.textContent=action;b.disabled=false;box(id,r[4*i],r[4*i+1],r[4*i+2],r[4*i+3]);});
+    ids.forEach((action,i)=>{const id="control-"+action.replace(":","-");let b=byId(id);if(!b){b=document.createElement("button");b.id=id;b.dataset.observatory="1";b.onclick=()=>send(action);byId("semantic").appendChild(b);}b.textContent=(state.observatoryControlLabels||[])[i]||action;b.disabled=false;box(id,r[4*i],r[4*i+1],r[4*i+2],r[4*i+3]);});
   }
   function layout(){syncObservatory();
     // Semantic focus targets follow the selected seat orientation and the canvas reference layout.

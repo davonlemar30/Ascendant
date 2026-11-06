@@ -72,7 +72,7 @@ namespace Ascendant.CelestialDial
             jumpPanel.gameObject.AddComponent<Button>().transition = Selectable.Transition.None;
             var jumpTitle = Label(jumpPanel, "J U M P   T O", 0, 24, 240, 18, 12); jumpTitle.color = Gold; jumpTitle.fontStyle = FontStyle.Bold;
             float jy = 62;
-            foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), 40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
+            foreach (var (id, label) in DevCheckpoints.All) { string target = id; var row = Row(jumpPanel, jy, () => Jump?.Invoke(target), id=="key5"||id=="key6"||id=="obswhole"?44:40); row.text = label; row.transform.parent.name = "Jump " + id; jy += 46; }
             var cusp = Row(jumpPanel, jy, () => CuspDay?.Invoke(), 40); cusp.text = "A cusp day (the opening)"; cusp.transform.parent.name = "Jump cusp"; jy += 46; // the cusp-day sample (owner, Oct 2 evening): the opening's question
             foreach (var (id, label) in BirthSamples) { string sample = id; var row = Row(jumpPanel, jy, () => BirthOpening?.Invoke(sample), 40); row.text = label; row.transform.parent.name = "Jump birth " + id; jy += 46; } // Oct 7: each path's first question
             wakeRow = Row(jumpPanel, jy, () => CycleWake?.Invoke(), 40); wakeRow.transform.parent.name = "Dial wake"; jy += 46; // DEV Mode: a tap steps the Dial's look (first visit, Key 1 to Key 4), then back to as earned

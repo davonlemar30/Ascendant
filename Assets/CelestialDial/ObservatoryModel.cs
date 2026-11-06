@@ -96,9 +96,9 @@ namespace Ascendant.CelestialDial
         {
             if(Phase!=ObservatoryPhase.Names||AwaitingNext||seat<0||seat>=10)return false;
             bool right=seat==Target;
-            if(!right&&++Misses<2){Say("U21Nudge",ObservatoryCopy.U21Nudge);Commit();return false;}
+            if(!right&&++Misses<2){Hint=1;Say("U21Nudge",ObservatoryCopy.U21Nudge);Commit();return false;}
             flow.Deck.RecordLesson(Target,right&&Misses<=1,flow.Sitting,ItemKind.PlanetGlyph);Progress.named[Target]=true;
-            Reveal=!right;AwaitingNext=true;if(!right)Say("U21Reveal",ObservatoryCopy.U21Reveal.Replace("{planet}",Planets.Spoken(Target)));Commit();return right;
+            Reveal=!right;if(Reveal)Hint=3;AwaitingNext=true;if(!right)Say("U21Reveal",ObservatoryCopy.U21Reveal.Replace("{planet}",Planets.Spoken(Target)));Commit();return right;
         }
         public bool Select(int seat){if(AwaitingNext||seat<0||seat>=10)return false;if(Phase==ObservatoryPhase.Work){Turn=seat;Commit();return true;}if(Phase!=ObservatoryPhase.Rings&&Phase!=ObservatoryPhase.Bands)return false;if((Phase==ObservatoryPhase.Rings?Progress.placed:Progress.banded)[seat]||(Misses>0&&Selected!=seat))return false;if(Selected!=seat)Problem(seat);Selected=seat;Commit();return true;}
         public bool Rotate(int delta){return Phase==ObservatoryPhase.Work&&!AwaitingNext&&Select(Planets.Wrap(Turn+delta));}
@@ -123,7 +123,7 @@ namespace Ascendant.CelestialDial
             int s=Selected;bool right=band==Planets.All[s].Band;
             if(!right&&++Misses<2){Hint=1;Say("U22BandNudge",ObservatoryCopy.U22BandNudge);Commit();return false;}
             Progress.banded[s]=true;flow.Deck.RecordLesson(s,right&&Misses<=1,flow.Sitting,ItemKind.PlanetCompany);
-            Reveal=!right;AwaitingNext=true;if(!right)Say("U22BandReveal",ObservatoryCopy.U22BandReveal.Replace("{Planet}",Planets.Sentence(s)).Replace("{company}",Planets.SpokenCompanies[Planets.All[s].Band]));Commit();return right;
+            Reveal=!right;if(Reveal)Hint=3;AwaitingNext=true;if(!right)Say("U22BandReveal",ObservatoryCopy.U22BandReveal.Replace("{Planet}",Planets.Sentence(s)).Replace("{company}",Planets.SpokenCompanies[Planets.All[s].Band]));Commit();return right;
         }
         public PracticeQuestion Question=>PracticeBook.Data.concepts.First(c=>c.id=="pace").questions[Progress.question==0?4:3];
         public int[] QuestionOrder=>Enumerable.Range(0,4).OrderBy(n=>(n+Misses+Progress.question+1)%4).ToArray();
@@ -131,7 +131,7 @@ namespace Ascendant.CelestialDial
         {
             if(Phase!=ObservatoryPhase.Questions||AwaitingNext||originalChoice<0||originalChoice>3)return false;
             bool right=originalChoice==Question.answer;
-            if(!right){Misses++;Message=Question.why;if(Misses<2){Commit();return false;}Reveal=true;}
+            if(!right){Misses++;Hint=Misses==1?2:3;Message=Question.why;if(Misses<2){Commit();return false;}Reveal=true;}
             AwaitingNext=true;Message=Question.why;Commit();return right;
         }
         void Advance()

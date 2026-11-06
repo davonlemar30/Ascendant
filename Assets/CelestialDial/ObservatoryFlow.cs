@@ -19,6 +19,7 @@ namespace Ascendant.CelestialDial
         public bool PlanetIndex(){if(!AtJournal||JournalAt!=JournalView.Planet)return false;JournalAt=JournalView.Planets;return true;}
         public bool PlanetReview=>AtPractice&&CurrentReview!=null&&(int)CurrentReview.Mode>=(int)ReviewMode.PlanetGlyph;
         public int[] PlanetReviewOptions=>PlanetReview?Planets.Options(CurrentReview.seat,Sittings):new int[0];
+        public void ClearPlanetReviewNote(){if(PlanetReview)Note="";}
         public bool AnswerPlanetReview(int slot)
         {
             var t=CurrentReview;if(!PlanetReview||t.done||slot<0||slot>3)return false;

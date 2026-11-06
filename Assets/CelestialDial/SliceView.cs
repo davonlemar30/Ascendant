@@ -476,6 +476,7 @@ namespace Ascendant.CelestialDial
             var casparHead = Rect("Caspar head", hub, 100, 366, 18, 18); var casparHeadImage = casparHead.gameObject.AddComponent<Image>(); casparHeadImage.color = Muted; casparHeadImage.raycastTarget = false;
             Label(hub, "Caspar", 100, 452, 60, 14, 10).color = Muted;
             var casparTap = Rect("Caspar, tap to walk", hub, 100, 402, 64, 112); /* Build L: a head taller than the 100 px Keeper, feet where they were (458) */ var casparTapImage = casparTap.gameObject.AddComponent<Image>(); casparTapImage.color = new Color(0, 0, 0, 0); Tappable(casparTap, () => Walk("caspar"));
+            obsHubCaspar=casparTapImage;
             if (Slots.Dress(casparTapImage, "caspar")) { casparMark.gameObject.SetActive(false); casparHead.gameObject.SetActive(false); } // Build E: his figure takes the file; the tap rect is his slot
             var lamp1 = Rect("Lamp", hub, -64, 150, 8, 22); lampOne = lamp1.gameObject.AddComponent<Image>(); lampOne.color = LampLit; lampOne.raycastTarget = false; Slots.Dress(lampOne, "lamp");
             var lamp2 = Rect("Lamp", hub, 64, 150, 8, 22); lampTwo = lamp2.gameObject.AddComponent<Image>(); lampTwo.color = LampDark; lampTwo.raycastTarget = false; Slots.Dress(lampTwo, "lamp");
@@ -1052,6 +1053,7 @@ namespace Ascendant.CelestialDial
             chamberEnd.gameObject.SetActive(Flow.WingWhole && !busy); chamberEnd.text = Flow.ObservatoryWhole ? ObservatoryCopy.ChamberObsCard : ChamberEndCard; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -250); // between the mechanism and the Books, clear of the Keeper; the first visit's card sits lower
             if (string.IsNullOrEmpty(chamberLine)) chamberLine = DefaultChamberLine();
             chamberText.text = chamberLine;
+            if(Flow.ObservatoryWhole)ChamberPose("moved");
         }
         // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
         string DefaultChamberLine() => Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : Flow.KeysSpent==5&&Flow.KeysInHand==0?ChamberQuietLine: Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, initiate. Bring them to the Books." : "You hold a Key, initiate. " + ChamberBringLine); // owner (worksheet section 13)
@@ -1466,7 +1468,7 @@ namespace Ascendant.CelestialDial
         void StartReviewItem()
         {
             var task = Flow.CurrentReview;
-            reviewNote.text = "";
+            reviewNote.text = "";if(Flow.PlanetReview)Flow.ClearPlanetReviewNote();
             if (task == null) { Show(); Publish(); return; }
             if (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality)
             {
@@ -1685,6 +1687,7 @@ namespace Ascendant.CelestialDial
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
             endCard.text = Flow.ObservatoryWhole ? ObservatoryCopy.ChamberObsCard : Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber awaits them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber awaits them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber awaits them." : "The whole wheel burns. The symbols await you next."; // owner (worksheet sections 1 and 13)
+            ObservatoryHubPose();
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.Keys >= 2);
         }
@@ -1946,7 +1949,7 @@ namespace Ascendant.CelestialDial
             // Build D
             state.keysInHand = Flow.KeysInHand; state.keysSpent = Flow.KeysSpent; state.booksOpen = Flow.BooksOpen; state.wingWhole = Flow.WingWhole;
             state.canEnterChamber = s == SliceScreen.Hub && Flow.CanEnterChamber && !busy; state.canLeaveChamber = s == SliceScreen.ChamberRoom && !busy; state.atBooks = s == SliceScreen.ChamberRoom && walk.At == "books";
-            if (s == SliceScreen.ChamberRoom) state.caspar = chamberText.text + (Flow.WingWhole && !busy ? " " + ChamberEndCard : "");
+            if (s == SliceScreen.ChamberRoom) state.caspar = chamberText.text + (Flow.WingWhole && !busy ? " " + (Flow.ObservatoryWhole?ObservatoryCopy.ChamberObsCard:ChamberEndCard) : "");
             state.canCloseBook = s == SliceScreen.Book && !busy;
             if (s == SliceScreen.Book && !partA) state.caspar = Dial.Lesson.Message;
             if (roomScreen && !busy) state.note = hubNote.text;
@@ -2655,7 +2658,7 @@ namespace Ascendant.CelestialDial
             foreach(var t in quizAsk)t.fontSize=stage2?17:19;foreach(var t in quizFeedback)t.fontSize=stage2?14:16;
             var q = Flow.QuizQuestion; bool over = Flow.QuizOver, answered = !over && Flow.QuizPicked >= 0;
             quizCounter.text = Flow.QuizCounter; quizCounter.gameObject.SetActive(!over);
-            bool planetMark=!over&&q!=null&&q.planet>=0&&q.planet<10; bool mark = planetMark || !over && q != null && q.glyph >= 0 && q.glyph < 12; quizGlyph.gameObject.SetActive(mark); if(planetMark)PutPlanet(quizGlyph,q.planet,44);else {quizGlyph.font=Dial.GlyphFont;quizGlyph.text=mark?Zodiac.Seats[q.glyph].Glyph:"";}
+            bool planetMark=!over&&q!=null&&q.planet>=0&&q.planet<10; bool mark = planetMark || !over && q != null && q.glyph >= 0 && q.glyph < 12; quizGlyph.gameObject.SetActive(mark); if(planetMark)PutPlanet(quizGlyph,q.planet,44);else {quizGlyph.fontSize=36;quizGlyph.font=Dial.GlyphFont;quizGlyph.text=mark?Zodiac.Seats[q.glyph].Glyph:"";}
             var ask = over || q == null ? new List<string>() : BalancedWords(quizAsk[0], q.ask, QuizAskWidth);
             int whyLines = over || q == null ? 1 : Mathf.Max(BalancedWords(quizFeedback[0], PracticeBook.Data.right + " " + q.why, QuizAskWidth).Count, BalancedWords(quizFeedback[0], PracticeBook.Data.wrong + " " + q.why, QuizAskWidth).Count);
             var layout = stage2 ? PlanetQuizLayout(mark,ask.Count,Flow.QuizChoices.Length,whyLines) : QuizLayout(mark, ask.Count, Flow.QuizChoices.Length, whyLines); float first = layout.x, step = layout.z; // the ask's first baseline: 197, or 223 under a sign's symbol

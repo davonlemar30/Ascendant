@@ -96,7 +96,7 @@ namespace Ascendant.CelestialDial
         {
             public bool observatory,observatoryPlaying,observatoryOpen,observatoryDoorSeen,observatoryWhole,orreryNext,orreryRevealed,orreryEvidence5,orreryEvidence6,planetRetro;
             public int observatoryLevel,orreryTarget,orrerySelected,orreryTurn,orreryHint,orreryMisses,planetPage;
-            public string orreryPhase="",orreryMessage="",orreryWork="",planetDetails=""; public int[] orreryQuestionOrder; public string[] orreryCardLabels,observatoryControlIds,orreryGlyphs,orreryNames; public bool[] orreryPlaced,orreryNamed,orreryWorked,orreryBanded,planetMet; public float[] orreryControls,planetInks;
+            public string orreryPhase="",orreryMessage="",orreryWork="",planetDetails=""; public int[] orreryQuestionOrder; public string[] orreryCardLabels,observatoryControlLabels,observatoryControlIds,orreryGlyphs,orreryNames; public bool[] orreryPlaced,orreryNamed,orreryWorked,orreryBanded,planetMet; public float[] orreryControls,planetInks;
             public string message, destination, start, phase, count, challenge; // Build I: challenge = the line the wheel shows
             public string[] seats;
             public bool active, canContinue, canOptional, reducedMotion, keyEarned, dormant, introAuto, busy, review, wheelComplete, canAsk;
