@@ -12,7 +12,7 @@ namespace Ascendant.CelestialDial
         public static readonly (string id, string label)[] All =
         {
             ("key1", "After Key 1"), ("wheel", "The whole wheel lit"), ("key2", "After Key 2"),
-            ("key3", "After Key 3"), ("key4", "After Key 4"), ("whole", "The Zodiac Wing whole"), ("key5","After Key 5"), ("key6","After Key 6"), ("obswhole","The Observatory whole"),
+            ("key3", "After Key 3"), ("key4", "After Key 4"), ("whole", "The Zodiac Wing whole"), ("key5","After Key 5"), ("key6","After Key 6"), ("obswhole","The Observatory whole"), ("key7","After Key 7"), ("key8","After Key 8"),
         };
         public static bool Known(string id) => All.Any(c => c.id == id);
 
@@ -96,7 +96,16 @@ namespace Ascendant.CelestialDial
             obs.Continue();obs.Continue();for(int i=0;i<10;i++){obs.Select(i);obs.Band(Planets.All[i].Band);obs.Continue();}
             for(int i=0;i<2;i++){obs.AnswerQuestion(obs.Question.answer);obs.Continue();}
             Must(flow.Keys==6,"Key 6 earned");if(id=="key6")return Stop();
-            Must(flow.LeaveObservatory()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.BooksOpen==2,"second Book open");return Stop();
+            Must(flow.LeaveObservatory()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.BooksOpen==2,"second Book open");if(id=="obswhole")return Stop();
+            Must(flow.EnterObservatory()&&flow.RevealCorridorDoor()&&flow.EnterCorridor()&&flow.Corridor.Begin()&&flow.Corridor.Continue(),"the Corridor opens");
+            var cor=flow.Corridor;
+            foreach(var pair in Rulership.Traditional)foreach(int sign in pair){Must(cor.Place(sign),"traditional place "+sign);cor.Continue();}
+            Must(flow.Keys==7,"Key 7 earned");if(id=="key7")return Stop();
+            Must(flow.LeaveCorridor()&&flow.LeaveObservatory()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.EnterObservatory()&&flow.EnterCorridor()&&cor.Begin()&&cor.Continue(),"Key 7 spent, modern rulers open");
+            foreach(int sign in Rulership.ModernSigns){Must(cor.Place(sign),"modern place "+sign);cor.Continue();}
+            cor.Continue();for(int i=0;i<6;i++){cor.Select(cor.DetrimentAnswer);Must(cor.Seal(),"detriment "+i);cor.Continue();}
+            cor.Continue();for(int i=0;i<3;i++){Must(cor.AnswerCard(System.Array.IndexOf(cor.CardOrder,0)),"ruler card "+i);cor.Continue();}
+            Must(flow.Keys==8,"Key 8 earned");return Stop();
         }
         static void Answer(DialLesson lesson)
         {

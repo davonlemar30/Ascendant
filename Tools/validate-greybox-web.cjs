@@ -20,7 +20,7 @@ const path=require('path');
   const out=process.env.EVIDENCE_DIR || 'Logs/WebEvidence';fs.mkdirSync(out,{recursive:true});
   const browser=await engine.launch(process.env.BROWSER==='webkit' ? {headless:true} : {headless:true,channel:'chrome'});
   const report=[];
-  const ART_SLOTS=243,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
+  const ART_SLOTS=253,SOUND_SLOTS=7,MENU_TITLE_Y=115; // the manifest's slots (Slots.cs); the style checks' messages read the numbers they assert (declared first: the art-set check reads it too)
   function check(value,text){if(!value)throw Error(text);report.push('PASS: '+text);}
   // The opening scene (owner, Oct 8, 86bcfhmha): a new game opens on the prologue. Most runs leave it through the screen reader's Skip; the
   // main run plays it through once, every shot and frame captured, and its own block plays it under reduced motion and skips with a canvas tap.

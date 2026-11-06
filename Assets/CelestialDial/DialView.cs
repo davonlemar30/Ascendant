@@ -94,6 +94,10 @@ namespace Ascendant.CelestialDial
 #endif
         [Serializable] public sealed class WebState
         {
+            public bool corridor,corridorOpen,corridorPlaying,corridorNext,corridorRevealed,corridorEvidence7,corridorEvidence8;
+            public string corridorPhase,corridorPrompt,corridorMessage;public int corridorPlanet,corridorRuledSign;public int corridorTarget,corridorTurn,corridorHint,corridorCards;
+            public bool[] corridorTraditional,corridorModern,corridorDetriments;
+            public string[] corridorControlIds,corridorControlLabels;public float[] corridorControls;
             public bool observatory,observatoryPlaying,observatoryOpen,observatoryDoorSeen,observatoryWhole,orreryNext,orreryRevealed,orreryEvidence5,orreryEvidence6,planetRetro;
             public int observatoryLevel,orreryTarget,orrerySelected,orreryTurn,orreryHint,orreryMisses,planetPage;
             public string orreryPhase="",orreryMessage="",orreryWork="",planetDetails=""; public int[] orreryQuestionOrder; public string[] orreryCardLabels,observatoryControlLabels,observatoryControlIds,orreryGlyphs,orreryNames; public bool[] orreryPlaced,orreryNamed,orreryWorked,orreryBanded,planetMet; public float[] orreryRingRadii,orreryControls,planetInks;

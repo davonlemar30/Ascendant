@@ -1,0 +1,1193 @@
+fileFormatVersion: 2
+guid: a9d6246b606ed4a6baf6423e93f1a562
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1819550519010038861
+    second: cor-grime_0
+  - first:
+      213: -8991718464958434525
+    second: cor-grime_1
+  - first:
+      213: -338218915617490202
+    second: cor-grime_2
+  - first:
+      213: 7242061881141550655
+    second: cor-grime_3
+  - first:
+      213: 2832604676789731858
+    second: cor-grime_4
+  - first:
+      213: -7135177950634748580
+    second: cor-grime_5
+  - first:
+      213: -6615698183313748419
+    second: cor-grime_6
+  - first:
+      213: -6057320443989030589
+    second: cor-grime_7
+  - first:
+      213: -3630415180356658126
+    second: cor-grime_8
+  - first:
+      213: 6659367773565048749
+    second: cor-grime_9
+  - first:
+      213: 5992416551229856102
+    second: cor-grime_10
+  - first:
+      213: -3878931363335153320
+    second: cor-grime_11
+  - first:
+      213: 7836994670511255992
+    second: cor-grime_12
+  - first:
+      213: 1700265983529089048
+    second: cor-grime_13
+  - first:
+      213: 703542824355423073
+    second: cor-grime_14
+  - first:
+      213: 3214898788208654139
+    second: cor-grime_15
+  - first:
+      213: -8339183986630874060
+    second: cor-grime_16
+  - first:
+      213: 8290026576471060817
+    second: cor-grime_17
+  - first:
+      213: 7631075508055633286
+    second: cor-grime_18
+  - first:
+      213: 1645719726551142626
+    second: cor-grime_19
+  - first:
+      213: -5088264887138359580
+    second: cor-grime_20
+  - first:
+      213: 3504439024973404247
+    second: cor-grime_21
+  - first:
+      213: -8236823056859167480
+    second: cor-grime_22
+  - first:
+      213: -1319096576793688170
+    second: cor-grime_23
+  - first:
+      213: -5173560365122417301
+    second: cor-grime_24
+  - first:
+      213: 7075567494741473221
+    second: cor-grime_25
+  - first:
+      213: 7780791311798703498
+    second: cor-grime_26
+  - first:
+      213: -3194567903206192369
+    second: cor-grime_27
+  - first:
+      213: -1002549001291378660
+    second: cor-grime_28
+  - first:
+      213: -1358682808354643936
+    second: cor-grime_29
+  - first:
+      213: -5012343069175671952
+    second: cor-grime_30
+  - first:
+      213: 6017951423330091788
+    second: cor-grime_31
+  - first:
+      213: 2115199358966045261
+    second: cor-grime_32
+  - first:
+      213: 6306158011133355986
+    second: cor-grime_33
+  - first:
+      213: -5263700098255194905
+    second: cor-grime_34
+  - first:
+      213: -8138455626438653152
+    second: cor-grime_35
+  - first:
+      213: 8544668032514215924
+    second: cor-grime_36
+  - first:
+      213: -7969868383904238145
+    second: cor-grime_37
+  - first:
+      213: -2218256029009015982
+    second: cor-grime_38
+  - first:
+      213: -8487651443981880894
+    second: cor-grime_39
+  - first:
+      213: 6863304825896378980
+    second: cor-grime_40
+  - first:
+      213: -531458402402881593
+    second: cor-grime_41
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: cor-grime_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1155
+        width: 367
+        height: 445
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4498708e87504910800000000000000
+      internalID: 1819550519010038861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_1
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 1151
+        width: 31
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 323f4df32bff63380800000000000000
+      internalID: -8991718464958434525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_2
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 1258
+        width: 79
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ea3d4e20b76e4bf0800000000000000
+      internalID: -338218915617490202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_3
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 1272
+        width: 13
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3ed6da29e8f08460800000000000000
+      internalID: 7242061881141550655
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_4
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 1197
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 212892d12fe6f4720800000000000000
+      internalID: 2832604676789731858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_5
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 1117
+        width: 234
+        height: 414
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c55573b2571cafc90800000000000000
+      internalID: -7135177950634748580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_6
+      rect:
+        serializedVersion: 2
+        x: 686
+        y: 1189
+        width: 24
+        height: 145
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3e0362cd815034a0800000000000000
+      internalID: -6615698183313748419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 866
+        width: 88
+        height: 219
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3498255362310fba0800000000000000
+      internalID: -6057320443989030589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_8
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 865
+        width: 8
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23cd7a3d0ac2e9dc0800000000000000
+      internalID: -3630415180356658126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_9
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 873
+        width: 244
+        height: 264
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da7570c05b3da6c50800000000000000
+      internalID: 6659367773565048749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_10
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 881
+        width: 168
+        height: 103
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6691a3aaa17592350800000000000000
+      internalID: 5992416551229856102
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_11
+      rect:
+        serializedVersion: 2
+        x: 615
+        y: 858
+        width: 42
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 859594cf9744b2ac0800000000000000
+      internalID: -3878931363335153320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_12
+      rect:
+        serializedVersion: 2
+        x: 621
+        y: 917
+        width: 6
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b1f372712992cc60800000000000000
+      internalID: 7836994670511255992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_13
+      rect:
+        serializedVersion: 2
+        x: 621
+        y: 905
+        width: 10
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8187ee357ee889710800000000000000
+      internalID: 1700265983529089048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_14
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 909
+        width: 86
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 163eaf1a87c73c900800000000000000
+      internalID: 703542824355423073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_15
+      rect:
+        serializedVersion: 2
+        x: 643
+        y: 823
+        width: 45
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b37b2042a6d9d9c20800000000000000
+      internalID: 3214898788208654139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_16
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 837
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43cad38d854454c80800000000000000
+      internalID: -8339183986630874060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_17
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 846
+        width: 9
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 151fa15bf371c0370800000000000000
+      internalID: 8290026576471060817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_18
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 775
+        width: 21
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68de6df4eb607e960800000000000000
+      internalID: 7631075508055633286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_19
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 795
+        width: 32
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e01fe43f55c6d610800000000000000
+      internalID: 1645719726551142626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_20
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 775
+        width: 20
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e6660f3b0ad269b0800000000000000
+      internalID: -5088264887138359580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_21
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 752
+        width: 17
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7585e84d9b442a030800000000000000
+      internalID: 3504439024973404247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_22
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 568
+        width: 67
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8058922021de0bd80800000000000000
+      internalID: -8236823056859167480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_23
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 466
+        width: 336
+        height: 328
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69747cbf6a0a1bde0800000000000000
+      internalID: -1319096576793688170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 297
+        width: 300
+        height: 449
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6d86d43242d338b0800000000000000
+      internalID: -5173560365122417301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_25
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 740
+        width: 22
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c7bd540627713260800000000000000
+      internalID: 7075567494741473221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_26
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 606
+        width: 27
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a851533497ceafb60800000000000000
+      internalID: 7780791311798703498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_27
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 618
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0bc786ea6d9aa3d0800000000000000
+      internalID: -3194567903206192369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_28
+      rect:
+        serializedVersion: 2
+        x: 625
+        y: 591
+        width: 25
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c10da1cbefa3612f0800000000000000
+      internalID: -1002549001291378660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_29
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 590
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02067953f2df42de0800000000000000
+      internalID: -1358682808354643936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_30
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 577
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 073946df884907ab0800000000000000
+      internalID: -5012343069175671952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_31
+      rect:
+        serializedVersion: 2
+        x: 650
+        y: 560
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c03852f5fee048350800000000000000
+      internalID: 6017951423330091788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_32
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 472
+        width: 29
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4a1e443c92ba5d10800000000000000
+      internalID: 2115199358966045261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_33
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 489
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d76617bc49f38750800000000000000
+      internalID: 6306158011133355986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_34
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 462
+        width: 18
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e47f4f16a493f6b0800000000000000
+      internalID: -5263700098255194905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_35
+      rect:
+        serializedVersion: 2
+        x: 603
+        y: 293
+        width: 95
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02b48d52ab56e0f80800000000000000
+      internalID: -8138455626438653152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_36
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 217
+        width: 31
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ff45a1dd42c49670800000000000000
+      internalID: 8544668032514215924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_37
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 720
+        height: 291
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb575c65ee6556190800000000000000
+      internalID: -7969868383904238145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_38
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 262
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25b8c0af4eb2731e0800000000000000
+      internalID: -2218256029009015982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_39
+      rect:
+        serializedVersion: 2
+        x: 119
+        y: 251
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c1f0203bfdc53a80800000000000000
+      internalID: -8487651443981880894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_40
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 242
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46227c4306b5f3f50800000000000000
+      internalID: 6863304825896378980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cor-grime_41
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 202
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7cf21e71661ef98f0800000000000000
+      internalID: -531458402402881593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

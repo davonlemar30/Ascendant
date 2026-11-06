@@ -1,0 +1,152 @@
+{
+  "tool": "built-in image_gen",
+  "slots": 10,
+  "artifacts": [
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-cabinet-restored.png",
+      "size": [
+        512,
+        400
+      ],
+      "md5": "4789702ca13055b90e9adb658b0f4909",
+      "bytes": 199356,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-cabinet-worn.png",
+      "size": [
+        512,
+        400
+      ],
+      "md5": "bda1fd3ebe33fee8af6c6562f73964fc",
+      "bytes": 198124,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-grime.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "d97c3ef681817750b01c0c4fb4afe04b",
+      "bytes": 143695,
+      "alpha": [
+        0,
+        163
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-lectern-restored.png",
+      "size": [
+        512,
+        800
+      ],
+      "md5": "91e0350fd1c4e7b03e89eae7a6115c4b",
+      "bytes": 302175,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-lectern-worn.png",
+      "size": [
+        512,
+        800
+      ],
+      "md5": "8cbdecbeb618b76f90731d64ecc4138b",
+      "bytes": 320864,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-light.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "b5484c2a8006e71f890daf2dd9a9dd09",
+      "bytes": 675987,
+      "alpha": [
+        0,
+        235
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-room.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "1dd4c12c655070196f5d99651d8d247e",
+      "bytes": 1218609,
+      "alpha": null
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-shell-restored.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "4f999a0ec9228a90b30a9517518e84d3",
+      "bytes": 1081171,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-shell-worn.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "2812bcee26d2cea2b5982ff5d5367f84",
+      "bytes": 979944,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/cor-wheel.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "md5": "fe616c0b30eea151ec1b9fd26e225252",
+      "bytes": 1260886,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Documentation/ConceptArt/Corridor-2026-11/corridor-dormant.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "a0dfe588c6cbbe02b24dbee8ca14451c",
+      "bytes": 1346720
+    },
+    {
+      "file": "Documentation/ConceptArt/Corridor-2026-11/corridor-awake.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "d2ac73a179de8494dfb018e63391007b",
+      "bytes": 1462881
+    }
+  ],
+  "normalization": "Full-bleed resampling to slot canvases; cor-room source center-cropped from 1003x1568 to 706x1568, then resized to 720x1600 without padding. Transparent alpha retained. Wall plaques are blank for fact-checked code glyphs."
+}

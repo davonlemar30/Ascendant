@@ -571,6 +571,180 @@
       "why": "Pluto is generational. One person's chart reads it through the faster planets and the angles."
     }
   ]
+},
+{
+  "id": "rulers",
+  "name": "Rulers",
+  "line": "The traditional wheel",
+  "unlock": "key7",
+  "end": "The traditional wheel is ready whenever you return.",
+  "questions": [
+    {
+      "ask": "Which sign does the Moon rule?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Cancer",
+        "Leo",
+        "Capricorn",
+        "Aquarius"
+      ],
+      "answer": 0,
+      "why": "The Moon rules Cancer in the traditional scheme."
+    },
+    {
+      "ask": "Which two signs does Mercury rule?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Gemini and Virgo",
+        "Cancer and Leo",
+        "Aries and Scorpio",
+        "Capricorn and Aquarius"
+      ],
+      "answer": 0,
+      "why": "Mercury rules Gemini and Virgo."
+    },
+    {
+      "ask": "Which two signs does Venus rule?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Taurus and Libra",
+        "Gemini and Virgo",
+        "Sagittarius and Pisces",
+        "Aries and Scorpio"
+      ],
+      "answer": 0,
+      "why": "Venus rules Taurus and Libra."
+    },
+    {
+      "ask": "Which planet traditionally rules Scorpio?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Mars",
+        "Pluto",
+        "Venus",
+        "Saturn"
+      ],
+      "answer": 0,
+      "why": "Mars rules Scorpio traditionally. Pluto is its modern ruler in a convention that traditional practitioners do not all adopt."
+    },
+    {
+      "ask": "Does rulership say a planet is always in its ruled sign?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Rulership names a relationship with a sign.",
+        "Yes, a ruler stays there.",
+        "Only the Moon stays there.",
+        "Only Saturn stays there."
+      ],
+      "answer": 0,
+      "why": "Rulership assigns planets to signs; it makes no claim that the planet is always there."
+    },
+    {
+      "ask": "What comes after the lights in the traditional wheel?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Mercury, Venus, Mars, Jupiter, Saturn",
+        "Saturn, Jupiter, Mars, Venus, Mercury",
+        "Uranus, Neptune, Pluto",
+        "Venus, Moon, Sun, Mars, Pluto"
+      ],
+      "answer": 0,
+      "why": "The traditional scheme moves outward in speed order around the Cancer and Leo axis."
+    }
+  ]
+},
+{
+  "id": "detriment",
+  "name": "Detriment and modern rulers",
+  "line": "Opposite places and modern plaques",
+  "unlock": "key8",
+  "end": "The brass will hold these places until your next visit.",
+  "questions": [
+    {
+      "ask": "Where is the Sun in detriment?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Aquarius",
+        "Leo",
+        "Cancer",
+        "Virgo"
+      ],
+      "answer": 0,
+      "why": "The Sun rules Leo. Aquarius is opposite Leo."
+    },
+    {
+      "ask": "Which are Mercury's detriment signs?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Sagittarius and Pisces",
+        "Gemini and Virgo",
+        "Taurus and Libra",
+        "Cancer and Leo"
+      ],
+      "answer": 0,
+      "why": "Mercury rules Gemini and Virgo. Their opposites are Sagittarius and Pisces."
+    },
+    {
+      "ask": "Which planet is Aquarius's modern ruler?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Uranus",
+        "Neptune",
+        "Pluto",
+        "Mars"
+      ],
+      "answer": 0,
+      "why": "Uranus rules Aquarius in a modern convention that traditional practitioners do not all adopt. Saturn remains its traditional ruler."
+    },
+    {
+      "ask": "Which planet is Pisces' modern ruler?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Neptune",
+        "Uranus",
+        "Pluto",
+        "Venus"
+      ],
+      "answer": 0,
+      "why": "Neptune rules Pisces in the modern convention. Jupiter is its traditional ruler."
+    },
+    {
+      "ask": "Has modern rulership made traditional rulership obsolete?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Traditional rulership continues alongside the modern convention.",
+        "Yes, the older rulers were removed.",
+        "Only the lights still have traditional rulerships.",
+        "Scorpio has only Pluto."
+      ],
+      "answer": 0,
+      "why": "Traditional practitioners do not all adopt modern rulers. The traditional scheme remains in use."
+    },
+    {
+      "ask": "Which statement keeps Scorpio's two rulerships clear?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Mars is traditional; Pluto is a modern convention.",
+        "Pluto is its only ruler.",
+        "Mars is its modern ruler.",
+        "Neptune is its traditional ruler."
+      ],
+      "answer": 0,
+      "why": "Mars traditionally rules Aries and Scorpio. Pluto is placed beside Mars in Scorpio as a modern convention."
+    }
+  ]
 }
 ]
 }

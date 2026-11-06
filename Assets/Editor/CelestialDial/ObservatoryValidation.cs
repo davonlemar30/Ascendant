@@ -67,7 +67,7 @@ namespace Ascendant.Build
                 var review=new SliceFlow();Check(review.Restore(save)&&review.EnterWing()&&review.EnterDial()&&review.EnterPractice()&&review.Sittings==1&&review.PlanetReview,"Stage 2: "+kind+" uses only the Dial's existing sitting fork");int slot=kind==ItemKind.PlanetCompany?Planets.All[2].Band:Array.IndexOf(review.PlanetReviewOptions,2);Check(review.AnswerPlanetReview(slot)&&review.PracticeDone&&review.Deck.Item(2,kind).State==ItemState.Practicing&&review.Keys==6,"Stage 2: independent "+kind+" review records eligible evidence, Keys unchanged");
             }
             Check(PracticeBook.Data.concepts.Take(5).SelectMany(c=>c.questions).All(q=>q.planet==-1),"Stage 2: old Practice questions default to no planet glyph");
-            Check(PracticeBook.Data.concepts.Length==7&&PracticeBook.Data.concepts.Skip(5).All(c=>c.questions.Length==6),"Stage 2: two new Practice concepts, twelve exact questions");
+            Check(PracticeBook.Data.concepts.Take(7).Count()==7&&PracticeBook.Data.concepts.Skip(5).Take(2).All(c=>c.questions.Length==6),"Stage 2: two new Practice concepts, twelve exact questions");
             ValidatePlanetPracticeGeometry();
             Check(SliceView.PracticeRowTop+58*7<=SliceView.PageOrnamentTop,"Stage 2: seven concept rows fit the page");
         }
