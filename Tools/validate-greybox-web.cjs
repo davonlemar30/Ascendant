@@ -60,6 +60,7 @@ const path=require('path');
           const b=ls.find(x=>x[0]==='intro-wheel-burning');
           let observed=cam.length===3&&s.launchFrame===frames[id];
           if(!reduced&&['draw','glyphs'].includes(id))observed=observed&&cam[2]>0&&cam[2]<1&&(id!=='draw'||cam[2]>.05&&cam[2]<.95);
+          if(!reduced&&id==='alive')observed=observed&&cam[0]<1;
           if(!reduced&&id==='burn')observed=observed&&Math.abs(cam[1])>.1;
           if(id==='transform')observed=observed&&b&&+b[2]>0&&+b[2]<1&&ls.some(x=>x[0]==='intro-earth');
           if(!reduced&&['earth','brooklyn','window'].includes(id))observed=observed&&cam[0]>1;
