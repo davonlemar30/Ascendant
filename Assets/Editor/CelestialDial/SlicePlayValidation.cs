@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,7 +44,22 @@ namespace Ascendant.Build
         }
         static void Check(bool value,string text) { if(!value)throw new Exception(text);Report.Add("PASS: "+text); }
         static void ClearSlots() { for(int i=1;i<=SaveSlots.Count;i++)PlayerPrefs.DeleteKey(SaveSlots.Key(i));PlayerPrefs.DeleteKey(SaveSlots.LastKey);PlayerPrefs.Save(); }
-        static void Act(string command) => View.Dial.WebAction(command);
+        static bool waitingForPlayerFrame;
+        static void Act(string command)
+        {
+            if (command != "relaunch") { View.Dial.WebAction(command); return; }
+            // A scene reload starts its real-time movie immediately. From an Editor
+            // update, Time.unscaledTime can still belong to the previous player frame;
+            // the next frame then consumes the logo before the fixture can observe it.
+            waitingForPlayerFrame = true;
+            View.StartCoroutine(RelaunchOnPlayerFrame());
+        }
+        static IEnumerator RelaunchOnPlayerFrame()
+        {
+            yield return null;
+            try { View.Dial.WebAction("relaunch"); }
+            finally { waitingForPlayerFrame = false; nextAt = EditorApplication.timeSinceStartup + .1; }
+        }
         static void AnswerReview(bool captureGlyph)
         {
             var task=View.Flow.CurrentReview;if(task==null||task.done)return;
@@ -677,6 +693,7 @@ namespace Ascendant.Build
         {
             if(EditorApplication.isPaused){Debug.LogWarning("[SlicePlayValidation] Resuming paused Editor for fixture.");EditorApplication.isPaused=false;}
             EditorApplication.QueuePlayerLoopUpdate();
+            if (waitingForPlayerFrame) return;
             if(probe!=null){try{probe();}catch(Exception){}} // a check that watches every tick (the launch's wheel through the burn and the transform)
             if(waitFor!=null)
             {

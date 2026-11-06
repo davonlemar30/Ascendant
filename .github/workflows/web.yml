@@ -92,7 +92,7 @@ jobs:
     name: Release slice fixture
     if: github.event_name != 'pull_request'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
@@ -130,11 +130,12 @@ jobs:
           path: Logs/
           if-no-files-found: warn
 
+  # Playwright 1.56.1 supports Ubuntu 24.04; ubuntu-latest moved to 26.04.
   browser:
     name: Release browser (${{ matrix.density }})
     if: github.event_name != 'pull_request'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -189,7 +190,7 @@ jobs:
     name: Release artifact cleared
     if: github.event_name != 'pull_request'
     needs: [build, fixture, browser]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # A workflow_dispatch on a feature branch rehearses this barrier, never deploys.
       - run: echo "The artifact passed its fixture and both browser densities."
@@ -215,7 +216,7 @@ jobs:
   production:
     name: Check published player
     needs: deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
