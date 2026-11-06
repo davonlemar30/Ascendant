@@ -1,0 +1,613 @@
+[
+  {
+    "job": 1,
+    "asset": "obs-room",
+    "prompt": "Use case: stylized-concept. Production game background plate, exactly 720 by 1600 pixels, full-bleed tall 9:20 composition. Reference image1 is approved Observatory mood/composition; do NOT copy its letterboxing or its painted props. Reference image2 is shipped neighboring Library architecture for shared visual family.\nPaint ONLY the empty architecture of a round domed observatory hall in an ancient scholarly Library. NO orrery, NO mechanical instrument, NO lectern, NO loose star charts, NO globes, NO planet spheres, NO people, NO text. Walls, dome ribs, arches, shelving and crimson banners only. The composition must fill every edge with artwork, no borders/padding. Cool blue-charcoal moonlight, a moonlit glass dome overhead, ONE light shaft falling toward the clear instrument position. Deep shadow masses about40% of frame, dark brown architectural outlines, simple flat cel-shaded surfaces, no texture or soft rendering. Sparse grouped books on wall shelves, collected rather than cluttered.\nGeometry in this720x1600 frame: the instrument is later drawn centered at x440,y600 in a200x200 logical-pixel slot (source bounds x240..640,y400..800). Leave that area visually calm and empty. Floor/wall seam around y700; instrument's later base rests near y800. A narrow dark arch for the doorway back at far left, centerx84,y584, clear opening about100x280 source pixels. Right wall has calm empty area x460..660,y480..640 for separate charts; lower left has empty floor x96..224,y660..860 for separate lectern. Large quiet stone floor continues to the bottom edge; a very subtle floor-ring inlay may center around x440,y850, but no pedestal/instrument. Dome fills upper frame, drawn architecture rather than black bands.\nStyle: a cartoon drawn and lit like a big-budget hand-drawn animated feature (The Prince of Egypt, The Iron Giant, Atlantis, Treasure Planet, Sinbad). Clean dark-brown outlines on architecture and props; flat fills with one hard-edged shadow tone and occasional rim; cel shading. No photorealism, stone/marble texture, 3D glossy rendering, soft airbrushed forms, glossy floors, ornate filigree or clutter. One dominant cool hue #3A5578 with shadows #1C1A1F, line #2B1C16, muted crimson#7C2A32, tiny bone#EADCC3 accents, dull brass. Readable at360x800. Architecture ONLY, empty focal space, no painted instrument, no characters.\n",
+    "source": "001-room-source.png",
+    "md5": "7f94deff215afb96d0de2e73d75fd2f3",
+    "sourceSize": [
+      841,
+      1870
+    ],
+    "status": "rejected: wall/floor staging too low for fixed instrument",
+    "fit": "sips -z1600 720; full bleed, no padding"
+  },
+  {
+    "job": 2,
+    "asset": "obs-room",
+    "prompt": "Edit this empty Observatory plate for the game's fixed geometry. Keep the SAME illustrated architecture, palette, moonlight direction, line weight, banners, books, flat cel shading and full-bleed9:20 frame. Change ONLY its vertical staging: raise the floor/wall junction to43% down the frame, so the floor occupies the lower57%. The small doorway on the far left must have its center at36.5% frameheight and11.7% framewidth; its opening runs from27.5% to45.5% down. The large rear arch is an architectural niche, still empty. Keep the future instrument region atx61%,y37.5% clear; no instrument is painted. Keep the moonlit dome in the top quarter, compress the wall height as needed. No second doorway added; no props, no text, no people, no lectern, no spheres, no charts. This is an architecture-only production plate, full-bleed720x1600 proportions with no bands. Maintain charcoal/coolblue shadows about40% area, one shaft, darkbrown outlines, flat fills and hard shadow planes. No photographic texture,3D rendering or glossy floor.\n",
+    "source": "002-obs-room-source.png",
+    "md5": "90d94e09b85983e7a6345de0fec96ced",
+    "sourceSize": [
+      841,
+      1870
+    ],
+    "mode": "RGB",
+    "alphaRange": null,
+    "distinctFromAllEarlier": true,
+    "status": "chosen: full-bleed geometry-adjusted architecture",
+    "canvas": [
+      720,
+      1600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  },
+  {
+    "job": 3,
+    "asset": "obs-shell-worn",
+    "prompt": "Create a transparent full-frame architectural overlay aligned EXACTLY to the attached Observatory plate, keeping every column, arch, banner, bookcase and dome rib in exactly the same position and proportions. This is obs-shell-worn. Output9:20 portrait with TRUE transparent background (RGBA), same frame. Extract ONLY thin structural architecture: column faces and bases at the sides, arches' stone outlines, dome ribs, wood shelf frames, book spines and crimson banners. Remove flat wall interiors, sky/glass, floor, door openings and all atmosphere to transparent. Leave the entire lower floor transparent. No instrument/orrery, lectern, charts, spheres, people or text. No new objects. Slight dust and dull brass, dark blue-charcoal, restrained tarnish; same silhouettes as restored objects will have, no displaced/broken shapes. Flat cel shading, clean warm dark-brown outlines, hard-edged shadow masses, one moonlit rim. Palettecharcoal#1C1A1F,line#2B1C16,coolblue#3A5578,mutedcrimson#7C2A32,dullbrass. No photographictexture,3Dgloss,softshading or filigree. Most of the canvas must be genuinely transparent so the background, grime and light behind it remain visible. Maintain exact composition from image1.\n",
+    "source": "003-obs-shell-worn-source.png",
+    "md5": "f3b6f52cabacdd1ef982763e7c1c8c71",
+    "sourceSize": [
+      841,
+      1870
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: transparent structural architecture",
+    "canvas": [
+      720,
+      1600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  },
+  {
+    "job": 4,
+    "asset": "obs-shell-restored",
+    "prompt": "Edit the attached transparent structural Observatory overlay into its RESTORED state. Keep EXACTLY the same canvas size, every silhouette, geometry, position, outline and transparency opening; keep the full lower floor area completely transparent. Change only condition and lighting: stone trim cleaned, brass edges polished dull gold, crimson banners richly legible, books orderly with a little bone/gold edge definition, one restrained amber rim from upper right with cool blue remaining in deepest shadows. Do not fill the transparent holes, do not paint sky/walls/floor, do not add anything. No instrument, no planets, no lectern, no charts, no people, no text. Flat cel-shaded cartoon with dark-brown outlines (#2B1C16),one flat base/one hard shadow and thin rim; shadows#1C1A1F,coolblue#3A5578,amber#E3A34A,crimson#7C2A32,bone#EADCC3. No texture, soft form shading,3D/gloss or ornate filigree. TRUE RGBAalpha, full9:20 architecture mask, all original pixel positions maintained.\n",
+    "source": "004-obs-shell-restored-source.png",
+    "md5": "68143f64597492236088e27358671c94",
+    "sourceSize": [
+      841,
+      1870
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: restored same-pose architecture with amber rims",
+    "canvas": [
+      720,
+      1600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  },
+  {
+    "job": 5,
+    "asset": "obs-grime",
+    "prompt": "Game overlay obs-grime, true transparent RGBA, full9:20 portrait canvas aligned to image1's Observatory. ONLY drawn dust, a few cobwebs stretched across upper side corners and shelf corners, muted tarnish smudges around arch/column edges. No background, no architecture, no props or objects, no instrument, no text. Keep the middle instrument area x33%-89%,y25%-50% largely clear for gameplay, and the lower floormostlytransparent. Large restrained haze patches at far sides, drawn specks and2-3simple webstrands, never photographic grain/noise. Basecharcoal#1C1A1F,coolgrayblue#3A5578,subtlebrown#2B1C16; NO white giant spiderwebs. Mostly transparent image, low-opacity dust across10-20% area; the room underneath must remain visible. Flat outlined/cel illustration matching the reference, no photographictexture, no3Drender, no ornatepatterns. Preserve framing EXACTLY; this is an overlay only to fade away with restoration.\n",
+    "source": "005-obs-grime-source.png",
+    "md5": "3ad63dd6ed9232af62011768f09b8fc5",
+    "sourceSize": [
+      841,
+      1870
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      246
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "rejected: generator redrew pale architecture instead of isolated grime",
+    "canvas": [
+      720,
+      1600
+    ]
+  },
+  {
+    "job": 6,
+    "asset": "obs-grime",
+    "prompt": "An isolated transparent game VFX texture, portrait9:20, 720x1600proportions. TRANSPARENCY is the image: at least80percent of the canvas is empty transparent. Paint only three small thin dusty cobweb corners near top-left,top-right and left-middle edge, a handful of simple flat dusty specks clustered at the far edges, and faint cool-charcoal dust wisps on the side edges. Nothing in the central60percent. Dark blue-gray web strands NOT white, low-opacity brown-gray dust. No room, no walls, no floor, no dome, no door, no arches, no background of any kind, no geometric framework, no objects, no text. Clean hand-drawn darkbrown lines, flat cel-shaded dust shapes, notphotographic/noise. This image will be layered over a dark blue room, and must not contain any depiction of that room. TrueRGBAalpha checker-free emptybackground, a delicate dusty corner overlay only. No smoke cloud or broadopaquehaze.\n",
+    "source": "006-obs-grime-source.png",
+    "md5": "ce48aa2fdcbc8816b6bc2974e43fec98",
+    "sourceSize": [
+      1003,
+      1568
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: isolated transparent dust and cobweb edges",
+    "canvas": [
+      720,
+      1600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "RGBA alpha multiplied by 0.60, RGB preserved; resized to720x1600."
+  },
+  {
+    "job": 7,
+    "asset": "obs-light",
+    "prompt": "An isolated transparent GAME LIGHT OVERLAY only, not a scene. Tall9:20 canvas720x1600proportions. A single broad diagonal amber light shaft enters from the upper-right atx82%,y0%, slopes leftward down to x46%,y60%, and widens into a gentle warm amber pool across the lower floor half. The right-facing edge has a thin gold rim, the far-left third and deep corner shadows remain entirely transparent. A warm translucent wash covers the lower55% subtly, strongest aroundx60%,y65%. Color amber#E3A34A with small pale bone#EADCC3 highlight, never flat orange. Most pixels partly/completely transparent; soft gradients allowed ONLY for this AIR/LIGHT, no objects. Do not paint room, dome, architecture, walls, floor lines, columns, moons, instruments, shapes of props, people or text. No background plate; trueRGBAalpha; isolated shaft and airglow to overlay an existing blue-charcoal room. Preserve cool shadows by keeping corners clear. The overlay should not contain dust particles or glitter. One motivated light shaft, understated cinematic light, no lensflare.\n",
+    "source": "007-obs-light-source.png",
+    "md5": "bf0e3462760c07a423d03271ba519092",
+    "sourceSize": [
+      1003,
+      1568
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      253
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: transparent single warm shaft and pool",
+    "canvas": [
+      720,
+      1600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "RGBA alpha multiplied by0.58 to match shipped Wing overlay strength; resized720x1600."
+  },
+  {
+    "job": 8,
+    "asset": "obs-orrery-frame",
+    "prompt": "Production game prop on TRUE transparent RGBA background, squarecanvas. A front-on circular astronomical orrery SUPPORT FRAME on a small stepped brass pedestal, empty open middle. NO planets, NO spheres, NO orbit rings inside, NO glyphs or writing. Clean circular outer structural rim radius about44%canvaswidth, center at50%width/45%height, slim two support feet and simple three-step base atbottom. The central80%circle must be transparent so separategame ringsand spheres show through. The frame's rim may have four simple structural brackets atcardinal points but noornatefiligree. Library hand-drawn animated-feature style: darkwarmbrown#2B1C16outline, flat dull-goldbrass#B17A37, one harddeepcharcoalshadow#1C1A1F and thinamber#E3A34Arim onupper-right faces; coolblue#3A5578inshadow. One keylightupperright, no3Drender or glossy/painterlytexture. Strong readable silhouette at200x200 and300x300. A small drawn hard-edged contactshadow beneath base. It is an ancient scholarly instrument, polished but restrained; no backgroundfloor orroom. Matchtheattachedroom'sdarkoutlinedcelstyleandlights. Keepbaseinsidecanvaswithtransparentmargin; circularrim centered horizontally.\n",
+    "source": "008-obs-orrery-frame-source.png",
+    "md5": "fc8669bdc26beb0c0e19bc6b9c533f59",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: bronze frame; circular head mechanically centered",
+    "canvas": [
+      600,
+      600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Circular head shifted +8,+55 source pixels on600canvas; lower120source-pixel base compressed to65 and placed at+8,+535."
+  },
+  {
+    "job": 9,
+    "asset": "obs-rings",
+    "prompt": "Edit this exact ring geometry into finished Orrery orbit art. It is a transparent600x600circleguide: center300,300; ring radii40,150,190,218,246,274,302,330sourcepixels (display20,75,95,109,123,137,151,165). KEEP EVERY CENTERLINE EXACTLY, including the cropped outer arcs at the canvas edges. Do not move or respace circles, no perspective/ellipse, no extra rings. Keep true transparent background and exact square framing. Only change the flat lines into slender drawn antique-brass etchings: darkbrownoutline#2B1C16,flatdullgold#B88945,one hardshadowtone#574331,thinamberrim#E3A34Afromupperright. Total band thickness about4sourcepixels, elegant and readable at300x300. Same clean outlined cel style as the Library, no photographictexture,3Dgloss,ornatefiligree,decorations,stars,labels,glyphs,planets orbase. These are mechanical concentric circles, same shared center with clear transparent gaps. Outer rings are deliberately partial arcs at image boundaries because game-drawn rings continue them. Finished2Dhand-drawnfeature-qualityinstrument lines, exactgeometry prioritized.\n",
+    "source": "009-obs-rings-source.png",
+    "md5": "bffa0d96cf94b63af34b2f76096cc24c",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: generated brass etchings on exact radial guide",
+    "canvas": [
+      600,
+      600
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated brass annuli cut and individually centered/scaled to game radii; each clipped to6source-pixel band. See ring-fit.json and evidence/ring-fit-result.json."
+  },
+  {
+    "job": 10,
+    "asset": "obs-sphere-moon",
+    "prompt": "Production sprite of one MOON sphere, centered in a square canvas with true transparent RGBA background. A perfectly round plain pale-silver moon ball, filling86% ofcanvaswidth, centered exactly50%,50%, no tail orpedestal. Clean darkbrown#2B1C16outeroutline. Flat pale-silverbluebase#BEC9D2 on upper-right, ONE large hard-edged charcoal-slate shadow#465363 covering lower-left55% and center so a separate pale glyph will remain readable. A thin bonewhite rim on the upper-right edge, no glossywhiteglint. Absolutely no glyph, text, symbol, orbit ring, cratertexture, face, stars, background or aura. Stylized flat cel-shaded hand-drawn animated feature prop, no3Drendering, no soft formgradient, no photographictexture. The ball must read at48x48pixels with a game-drawn whiteglyph over its centraldarkshadow. MatchLibrarynightlightingfromupperright. Crisp alpha edges, modesttransparentmargin.\n",
+    "source": "010-obs-sphere-moon-source.png",
+    "md5": "623c3854f70a218d2d2f2d9da015902d",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after deterministic4-colorpalette fitting; raw gradient not shipped",
+    "canvas": [
+      96,
+      96
+    ],
+    "palette": [
+      "#C4CFD8",
+      "#465363",
+      "#EADCC3",
+      "#2B1C16"
+    ],
+    "processing": "Clean source010 silhouette/alpha retained; RGB quantized to fixed base#C4CFD8, shadow#465363, rim#EADCC3, outline#2B1C16; alpha restored separately.",
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below."
+  },
+  {
+    "job": 11,
+    "asset": "obs-sphere-moon",
+    "prompt": "Change ONLY the rendering of this sphere to strict flat cel shading. Keep exact circle geometry, shadow boundary, position, transparency and outline. Replace every soft gradient with uniform solid flat colors: entire lit upper-right shape EXACT solid pale silver#C4CFD8; entire lower-left shadow EXACT solid slate#465363; outline#2B1C16; a single narrow solid bone#EADCC3rim atupperright. FOUR colors total excluding edgeantialiasing. Absolutely no gradient, mottling,texture, glossyhighlight or3Dshading ANYWHERE on the ball. Like a perfectly clean2Dvectoranimated-film cel, ONEflatbase and ONEhardflatshadow. No glyph,text,orbit,planetdetails,craters,background or objects. TrueRGBAtransparencyunchanged. This is the Moon sphere for a48pxgame button with game-drawnwhiteglyph; the center must retain itsdarkshadow.\n",
+    "source": "011-obs-sphere-moon-source.png",
+    "md5": "26cb8f9e6523d45ceb1ca7f116a37503",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "rejected: edit retained soft shading and introduced alpha blemish",
+    "canvas": [
+      96,
+      96
+    ]
+  },
+  {
+    "job": 12,
+    "asset": "obs-sphere-moon",
+    "prompt": "A flat vector-style2D game icon, square transparent canvas. One plain silver circular token representing the Moon as a lit sphere. The circle fills86%canvas, centered. Use ONLY four completely uniform solid fills: pale silver#C4CFD8 upper-right field, slate#465363 lower-left curved hardshadowfield, darkbrown#2B1C16outeroutline andthinbone#EADCC3rim. Shadow boundary is a single smooth diagonal S-curve, centerdarkslate. EXACTLY solidpaintareas, absolutely no colorgradient inside eitherfield. This is a flat screenprintedanimationcel, not a renderedball. No craters, no glyphs, no text, no symbols, noface, no shine spots, no3D, no texture, no glow, no background. Only this clean outlinedfour-colorcircle on trueRGBAalpha with transparentcorners. Crisp minimalcartooncelillustration, uniformfills throughout, readable at48px.\n",
+    "source": "012-obs-sphere-moon-source.png",
+    "md5": "abacd9c4e15a41cdab09f3bcf20f705a",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "rejected: fill gradients persist; use deterministic palette fit of clean first source",
+    "canvas": [
+      96,
+      96
+    ]
+  },
+  {
+    "job": 13,
+    "asset": "obs-sphere-sun",
+    "prompt": "Edit ONLY the color/material identity of the attached flat2D sphere into the SUN sphere. Keep the same round silhouette, centered placement, hard shadow boundary, transparentmargin and darkbrownoutline. Gold litfield#C99A42, deepochreshadow#62441E, narrowbone#EADCC3rim atupperright. ONEflatbase + ONEhardflatshadow, uniform solid fills, no gradients. No rays, flames, corona, glyph, dot, symbol or text: it is a simple golden ball, the game draws the Sun glyph. Crisp hand-drawncel-style Libraryprop, no3D/photorealtexture/gloss. Shadow covers center/lowerleft so a paleglyph canread. TrueRGBAbackground unchanged.\n",
+    "source": "013-obs-sphere-sun-source.png",
+    "md5": "0df8b9f15575544dcad3402cd90bb6db",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette alpha and palette fitting",
+    "canvas": [
+      96,
+      96
+    ],
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json.",
+    "derivedGeometry": "010-obs-sphere-moon-source.png",
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below."
+  },
+  {
+    "job": 14,
+    "asset": "obs-sphere-mercury",
+    "prompt": "One MERCURY sphere sprite, squarecanvas TRUEtransparentRGBA, centeredroundball filling86%width. Slate-gray litface#7E8996, deep coolslate shadow#38424E, narrow silverrim#B8C3CC atupperright, darkwarmbrownoutline#2B1C16. Large ONEhard-edged lowerleftshadow coveringcenter. Strictflatcelshading,uniformsolidpaintareas,no3Drender,no gradients,no photographictexture. No glyphs, text, craters, stars, orbit,gloss,background orpedestal. Match the clean simple sphere construction of the attached Moon but Mercury's slate-grey color is distinct. Fully opaque ball interior with no holes; cleanalphaoutsideonly. Readable48pxgameprop for a paleoverlayglyph.\n",
+    "source": "014-obs-sphere-mercury-source.png",
+    "md5": "608ed700c952cb608db78aff686f4c6e",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 15,
+    "asset": "obs-sphere-venus",
+    "prompt": "One VENUS sphere sprite. Match the attached Moon's simple round silhouette, centered squarecanvas, harddiagonalS-shapedshadow and true transparentmargin. Replace color/material with pale green-copper: uniformlitbase#8EAF9E, deepverdigrisshadow#38584E, narrowbonegreenrim#C9D6B4, warmdarkbrownoutline#2B1C16. ONEflatbase and ONEflat hard-edgedshadow, no gradients/gloss/texture/3Drender. No glyphs, symbols, text, craters, stars, rings, people orbackground. Fully opaque sphere interior without holes, alphaonlyoutsideball. Readable48pxgameprop, keep center darkenough for palegameglyph.\n",
+    "source": "015-obs-sphere-venus-source.png",
+    "md5": "10fa678516bb7f505fe0e01f14173554",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette alpha and flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 16,
+    "asset": "obs-sphere-mars",
+    "prompt": "One MARS sphere sprite: change the attached Moon's material to RUST RED. Same centeredroundsilhouette, squaretransparentcanvas and hardS-shaped shadow boundary. Uniformrustlitbase#AC513C, deepred-brownshadow#512F2B, thinwarmrim#D99461atupperright, darkbrownoutline#2B1C16. No markings, glyph,text,craters,stars,ring,background orprops. Flatcelshadedonebaseonehardshadow, no gradients/soft3Dshading/texture/gloss. Completely solidopaqueinteriorwithtransparentcornersonly. Readable48pxgameball for palegame-drawnglyph.\n",
+    "source": "016-obs-sphere-mars-source.png",
+    "md5": "a035ecd8eecd26d58db749a7a3ab0454",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 17,
+    "asset": "obs-sphere-jupiter",
+    "prompt": "One JUPITER sphere sprite, centered squarecanvas trueRGBAtransparentbackground. Same roundoutlineandhardshadow construction asreference, but TAN with THREE broad simple gentlycurving horizontalbrown bands. Litbase#BE9F78, bandtan#9D7758, shadow#685445 coveringcenter/lowerleft, narrowbone#EADCC3rimupperright, brownoutline#2B1C16. Cleanflatcelplanes, not3Dgloss orairbrushedshading. Onlythreewidebands, no smallweathertexture orrealisticcloudmarbling. No glyph,text,symbol,stars,orbit,pedestalorbackground. Ballfills86%width, fullyopaquewithnoholes, transparentcorners. Readableat48px,largeplaincenterfieldfor gameglyph.\n",
+    "source": "017-obs-sphere-jupiter-source.png",
+    "md5": "a54f7cd7a16aecdc26c118b2a9f68dc7",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: generated broad tan bands with palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated band/ring geometry retained; nearest fixed five-color palette without dithering; original resized alpha restored with CopyOpacity."
+  },
+  {
+    "job": 18,
+    "asset": "obs-sphere-saturn",
+    "prompt": "One SATURN sphere sprite on trueRGBAtransparent squarecanvas. Pale gold roundball centered50%,50% and occupying68%canvaswidth, with a THIN simple inclined ring extending to90%canvaswidth. Ring passes behind upper-left and in front lower-right, slender and clean, no labels or divisions. Ball:uniformpalegold#C4B27B litupperright, oneharddarkgoldshadow#6F6039 lowerleft andcenter, narrowbone#EADCC3rim, darkbrown#2B1C16outline. Ring flatdullgold#AE8541 with onehardshadow underside, notshiny3D. MatchattachedMoon's clean cel silhouette andhardshadow style. No glyphs,text,stars,background,craters,texture or gradients. Fullyopaqueballinterior(noholes), transparentoutsideball/ring. Readat48px withgamewhiteglyphovercenter.\n",
+    "source": "018-obs-sphere-saturn-source.png",
+    "md5": "aad8de2d8d753951d0f5ff0511152560",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen: generated ring silhouette with flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated band/ring geometry retained; nearest fixed five-color palette without dithering; original resized alpha restored with CopyOpacity."
+  },
+  {
+    "job": 19,
+    "asset": "obs-sphere-uranus",
+    "prompt": "One URANUS sphere sprite. Same attachedMoon roundcenteredsilhouetteandhardshadowconstruction, squaretransparentcanvas. Pale CYAN litfield#8ABEC5, deepblue-cyanshadow#3B616F, thin palerim#D4E7DE upperright, darkbrownoutline#2B1C16. ExactlyONEflatbaseplusONEhardshadow coveringcenter/lowerleft, solidfills notgradient, no texture/gloss/3D. No rings,glyphs,symbols,text,stars,backgroundorcraters. Opaque ballinterior, trueRGBAoutsideonly. Readable48pxgamepropunderwhiteglyph.\n",
+    "source": "019-obs-sphere-uranus-source.png",
+    "md5": "0ca85962334e92a793359ae737232859",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 20,
+    "asset": "obs-sphere-neptune",
+    "prompt": "One NEPTUNE sphere sprite matching the attachedMoon's centeredroundsilhouette, hardlowerleftshadow andthinupperrightrim ontrueRGBAtransparent squarecanvas. DEEP BLUE litbase#3A5E9B, navyshadow#21334E, pale bluerim#91B6D0, brownoutline#2B1C16. Keepfullyopaqueballinterior andcleartransparentcorners. StrictONEflatbaseONEhardshadow, no gradients/texture/3D/gloss. No rings, symbols,text,glyphs,stars,background,cratersorprops. Clearcentraldarkfieldfor a palegameglyph, readable48px.\n",
+    "source": "020-obs-sphere-neptune-source.png",
+    "md5": "926011e7927738ac12d34b1b4815a333",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 21,
+    "asset": "obs-sphere-pluto",
+    "prompt": "One PLUTO sphere sprite matching attached Moon's round centered silhouette, hard lower-left shadow and thin upper-right rim, transparent RGBA square. Muted violet-gray lit base #776D87, dark violet shadow #3A3449, pale lavender rim #AAA0B9, brown outline #2B1C16. One flat base, one hard shadow. No gradients, texture, gloss, rings, glyphs, symbols, text, background, or craters. Opaque interior, transparent corners. Readable at 48 pixels with a pale glyph added by game.\n",
+    "source": "021-obs-sphere-pluto-source.png",
+    "md5": "b52d5475ff6173f10690337bdbf74a4e",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette flat-palette fit",
+    "canvas": [
+      96,
+      96
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 22,
+    "asset": "obs-sphere-dark",
+    "prompt": "One dark dormant sphere sprite matching the attached Moon round centered silhouette and hard lower-left shadow, thin upper-right rim. True RGBA transparent outside, opaque interior. Charcoal lit field #34333B, deep shadow #1C1A1F, faint gray rim #666573, dark brown outline #2B1C16. Exactly one flat base and one hard shadow. No gradients, glow, texture, gloss, rings, glyphs, symbols, text, stars, craters or background. Very restrained dormant game prop readable at 32 pixels.\n",
+    "source": "022-obs-sphere-dark-source.png",
+    "md5": "fef567d47459668ffe06aaabb7bfdeda",
+    "sourceSize": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen after same-silhouette flat-palette fit",
+    "canvas": [
+      64,
+      64
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Generated edit confirms approved color; clean source010 common round silhouette and alpha retained. RGB recolored with alpha disabled, then original alpha restored separately. This removes gradient/alpha blemishes from generated edit. See sphere-fitting.py and palettes.json."
+  },
+  {
+    "job": 23,
+    "asset": "obs-lectern-worn",
+    "prompt": "One worn wooden astronomer's lectern game prop, isolated on true transparent RGBA background. Tall narrow 128:200 composition, entire silhouette with safe margin. Slight three-quarter front view looking gently down, sloping blank rectangular reading top on a sturdy narrow column and stepped broad foot. Empty surface: no book, paper, text, glyphs or symbols. Dusty dark reddish walnut, tarnished brass corner fittings, small dusty patches, dark brown #2B1C16 confident ink outlines. Strict flat cel illustration: one flat base per material, one hard-edged cool charcoal shadow covering about half, tiny muted bone upper-right rim. Deep cool shadow masses. No gradients, texture, 3D, gloss, photorealism, ground plane, room or background. One small hard contact shadow attached at foot only. Compatible with attached cool Observatory room palette; draw ONLY separate lectern, no architecture.\n",
+    "source": "023-obs-lectern-worn-source.png",
+    "md5": "64d07554214654b69d192b8b807ef395",
+    "sourceSize": [
+      1003,
+      1568
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen",
+    "canvas": [
+      128,
+      200
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  },
+  {
+    "job": 24,
+    "asset": "obs-lectern-restored",
+    "prompt": "Restore the attached worn lectern. Keep EXACT same pose, silhouette, dimensions, blank sloping top, column, foot, brass fittings, camera angle, transparent canvas and placement. Remove all dust, chips, scratches and tarnish. Clean warm dark walnut and polished amber brass; one hard cool shadow on left/lower planes, tiny upper-right rim. Strict FLAT cel color fields, no gradients or texture. Dark brown ink outlines. No glow, new ornaments, books, text, glyphs, background or ground. Same object in same pose, now clean and lit. True RGBA transparent exterior, opaque interior.\n",
+    "source": "024-obs-lectern-restored-source.png",
+    "md5": "f94ea24745e5620cef76541468460894",
+    "sourceSize": [
+      1003,
+      1568
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen",
+    "canvas": [
+      128,
+      200
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  },
+  {
+    "job": 25,
+    "asset": "obs-charts-worn",
+    "prompt": "A separate worn wall-mounted star-chart prop for a cel illustrated night library. Landscape 5:4 canvas, two adjacent framed parchment panels joined as one object, entire silhouette visible with margin, true RGBA transparent exterior. Front view with extremely slight perspective. Dull tarnished brass frame, dusty pale bone parchment shaded cool slate, dark brown #2B1C16 ink outline. On paper ONLY small scattered star dots connected by a few fine simple constellation lines and one plain circle diagram. No letters, numbers, zodiac glyphs, words, labels, figures, faces or recognizable writing. One flat base per material, one hard cool shadow, thin upper-right rim. Deep shadow along left/bottom. Flat cel, no gradients, photographic texture, 3D or gloss. No room, wall, lectern, instrument, floor or backdrop. Readable as a chart at 100x80 game pixels.\n",
+    "source": "025-obs-charts-worn-source.png",
+    "md5": "ee3bd8f4a5e17be102d094017eea0010",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen",
+    "canvas": [
+      200,
+      160
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  },
+  {
+    "job": 26,
+    "asset": "obs-charts-restored",
+    "prompt": "Restore attached twin star-chart prop while keeping EXACT same silhouette, pose, two frames, attachment tabs, camera angle, dot positions, constellation lines and circle diagram. Same transparent canvas and placement. Remove dust and tarnish, replace torn parchment edges with clean same-outline bone parchment, polished amber brass frame, clean dark brown lines. Flat cel with ONE flat base per material, ONE hard cool shadow and a narrow upper-right rim; NO gradients or texture, gloss or 3D. No text, words, labels, glyphs, additional stars, figures, room, wall or background. Opaque parchment inside, true RGBA transparent outside.\n",
+    "source": "026-obs-charts-restored-source.png",
+    "md5": "755ae73aecb28ea2710ee497a56bccf4",
+    "sourceSize": [
+      1402,
+      1122
+    ],
+    "mode": "RGBA",
+    "alphaRange": [
+      0,
+      255
+    ],
+    "distinctFromAllEarlier": true,
+    "status": "chosen",
+    "canvas": [
+      200,
+      160
+    ],
+    "fit": "Native sips resized source to stated slot canvas; ImageMagick applied only the explicit fitting below.",
+    "processing": "Source resized to exact slot canvas; no lettering added."
+  }
+]
