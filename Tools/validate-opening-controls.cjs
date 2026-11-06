@@ -35,6 +35,7 @@ async function run({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART}) {
       await input.focus();await input.press('Enter');await frames();await pg.waitForTimeout(300);
       ok((await snap()).birthStep===key && await input.inputValue()===edited,id+' Enter keeps the step and answer; only its button submits');
     };
+    try {
     await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8000');await skipPrologue(pg);
     await pg.locator('#name').fill('Tester');await pg.mouse.click(8,Math.floor(viewport.height/2));await frames();await tap('next-screen');
     await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirth);
@@ -75,7 +76,14 @@ async function run({browser,VIEWPORTS,out,check,skipPrologue,DEFAULT_CHART}) {
     await tap('change-birth');await pg.waitForFunction(()=>window.ascendantDial.snapshot().canBirth);
     ok((await snap()).canBirth,'Change my answer returns from skip to the path question');
     ok(errors.length===0,'no runtime exceptions'+(errors.length?': '+errors.join('; '):''));
-    await context.close();
+    } catch(error) {
+      try {
+        const file=path.join(out,viewport.width+'-failure-state.json');
+        if(!fs.existsSync(file))fs.writeFileSync(file,JSON.stringify({state:await snap(),inputs:await pg.locator('#semantic input').evaluateAll(list=>list.map(e=>({id:e.id,value:e.value,hidden:e.hidden})))},null,2));
+        await pg.screenshot({path:path.join(out,viewport.width+'-failure.png')});
+      } catch(captureError) { console.error('Failure capture: '+captureError.message); }
+      throw error;
+    } finally { await context.close(); }
   }));
 }
 module.exports=run;
@@ -85,6 +93,7 @@ if(require.main===module){
     const playwright=require(process.env.PLAYWRIGHT_MODULE||'playwright');
     const browser=await playwright.chromium.launch({headless:true,channel:'chrome'});
     const out=process.env.EVIDENCE_DIR||'Logs/OpeningControls';fs.mkdirSync(out,{recursive:true});
+    fs.rmSync(path.join(out,'validation.txt'),{force:true});
     const report=[];
     const check=(value,text)=>{if(!value)throw Error(text);report.push('PASS: '+text);console.log('PASS: '+text);};
     const VIEWPORTS=(process.env.VIEWPORTS||'1280x800,390').split(',').map(v=>v==='390'?{width:390,height:844}:v==='360'?{width:360,height:800}:{width:+v.split('x')[0],height:+v.split('x')[1]});
