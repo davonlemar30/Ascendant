@@ -1,0 +1,7 @@
+[0s] mechanical checks; evidence: /Users/damusthadon/Documents/Ascendant-worktrees/codex-goal02-proof/Logs/validate-all.EKGvP1WP
+[30s] WebGL build
+[346s] browser suite
+[346s] slice fixture starting: hands off the mouse until completion
+[1753s] FAIL: fixture subprocess exited nonzero
+[1753s] FAIL: fixture report missing, stale, empty, or incomplete
+[1753s] FAIL: validation failed (evidence: /Users/damusthadon/Documents/Ascendant-worktrees/codex-goal02-proof/Logs/validate-all.EKGvP1WP)
