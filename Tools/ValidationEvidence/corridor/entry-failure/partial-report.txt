@@ -1,0 +1,9 @@
+PASS: Corridor: starts from DEV obswhole, six spent Keys
+PASS: Corridor: walk sealed-left reaches observatory
+PASS: Corridor: native control enabled cor-door
+PASS: Corridor: 44px target cor-door
+FAIL: page.waitForFunction: Timeout 30000ms exceeded.
+    at wait (/Users/damusthadon/Documents/Ascendant-worktrees/codex-corridor/Tools/validate-corridor-web.cjs:11:25)
+    at idle (/Users/damusthadon/Documents/Ascendant-worktrees/codex-corridor/Tools/validate-corridor-web.cjs:12:17)
+    at enter (/Users/damusthadon/Documents/Ascendant-worktrees/codex-corridor/Tools/validate-corridor-web.cjs:17:216)
+    at async /Users/damusthadon/Documents/Ascendant-worktrees/codex-corridor/Tools/validate-corridor-web.cjs:18:144

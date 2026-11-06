@@ -5,7 +5,7 @@ const fs=require('fs'),path=require('path'),pw=require(process.env.PLAYWRIGHT_MO
  const browser=await pw.chromium.launch({headless:true,channel:'chrome'}),report=[];let pg;
  const check=(ok,line)=>{if(!ok)throw Error(line);report.push('PASS: Corridor: '+line);};
  try{
- const ctx=await browser.newContext({viewport:{width:360,height:800},deviceScaleFactor:2,isMobile:true,hasTouch:true});pg=await ctx.newPage();const errors=[];pg.on('pageerror',e=>errors.push(e.message));
+ const ctx=await browser.newContext({viewport:{width:360,height:800},deviceScaleFactor:2,isMobile:true,hasTouch:true});pg=await ctx.newPage();const errors=[];pg.on('pageerror',e=>{errors.push(e.message);fs.appendFileSync(path.join(out,'runtime-errors.txt'),e.stack+'\n');});
  await pg.goto(process.env.GREYBOX_URL||'http://127.0.0.1:8791');await pg.waitForFunction(()=>window.ascendantDial?.snapshot()?.screen,{},{timeout:120000});
  const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot()),act=async c=>{await pg.evaluate(x=>window.ascendantDial.act(x),c);await pg.waitForTimeout(100);};
  const wait=async f=>pg.waitForFunction(f,{},{timeout:30000});

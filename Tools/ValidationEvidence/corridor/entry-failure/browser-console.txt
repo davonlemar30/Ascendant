@@ -1,0 +1,272 @@
+log: You can reduce startup time if you configure your web server to add "Content-Encoding: gzip" response header when serving "Build/Web.framework.js.unityweb" file.
+log: You can reduce startup time if you configure your web server to add "Content-Encoding: gzip" response header when serving "Build/Web.wasm.unityweb" file.
+error: Failed to load resource: the server responded with a status of 404 (File not found)
+log: You can reduce startup time if you configure your web server to add "Content-Encoding: gzip" response header when serving "Build/Web.data.unityweb" file.
+log: [UnityCache] 'http://127.0.0.1:8791/Build/Web.data.unityweb' successfully downloaded and stored in the browser cache
+log: [UnityMemory] Configuration Parameters - Can be set up in boot.config
+
+log:     "memorysetup-allocator-temp-initial-block-size-main=262144"
+
+log:     "memorysetup-allocator-temp-initial-block-size-worker=262144"
+
+log:     "memorysetup-temp-allocator-size-audio-worker=65536"
+
+log:     "memorysetup-remapper-allocator-initial-capacity=32768"
+
+log:     "memorysetup-temp-allocator-size-background-worker=32768"
+
+log:     "memorysetup-bucket-allocator-granularity=16"
+
+log:     "memorysetup-bucket-allocator-bucket-count=8"
+
+log:     "memorysetup-bucket-allocator-block-size=4194304"
+
+log:     "memorysetup-bucket-allocator-block-count=1"
+
+log:     "memorysetup-main-allocator-block-size=16777216"
+
+log:     "memorysetup-thread-allocator-block-size=16777216"
+
+log:     "memorysetup-gfx-main-allocator-block-size=16777216"
+
+log:     "memorysetup-gfx-thread-allocator-block-size=16777216"
+
+log:     "memorysetup-cache-allocator-block-size=4194304"
+
+log:     "memorysetup-typetree-allocator-block-size=2097152"
+
+log:     "memorysetup-profiler-bucket-allocator-granularity=16"
+
+log:     "memorysetup-profiler-bucket-allocator-bucket-count=8"
+
+log:     "memorysetup-profiler-bucket-allocator-block-size=4194304"
+
+log:     "memorysetup-profiler-bucket-allocator-block-count=1"
+
+log:     "memorysetup-profiler-allocator-block-size=16777216"
+
+log:     "memorysetup-profiler-editor-allocator-block-size=1048576"
+
+log:     "memorysetup-temp-allocator-size-main=4194304"
+
+log:     "memorysetup-job-temp-allocator-block-size=2097152"
+
+log:     "memorysetup-job-temp-allocator-block-size-background=1048576"
+
+log:     "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+
+log: Input System module state changed to: Initialized.
+
+log: [Physics::Module] Initialized fallback backend.
+
+log: [Physics::Module] Id: 0xdecafbad
+
+log: Loading player data from data.unity3d
+
+log: Initialize engine version: 6000.3.24f1 (4e7b9b5b6244)
+
+log: [Subsystems] Discovering subsystems at path UnitySubsystems
+
+log: Creating WebGL 2.0 context.
+log: Renderer: WebKit WebGL
+
+log: Vendor:   WebKit
+
+log: Version:  OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))
+
+log: GLES:     3
+
+log:  EXT_clip_control EXT_color_buffer_float EXT_color_buffer_half_float EXT_conservative_depth EXT_depth_clamp EXT_disjoint_timer_query_webgl2 EXT_float_blend EXT_polygon_offset_clamp EXT_render_snorm EXT_texture_compression_bptc EXT_texture_compression_rgtc EXT_texture_filter_anisotropic EXT_texture_mirror_clamp_to_edge EXT_texture_norm16 KHR_parallel_shader_compile NV_shader_noperspective_interpolation OES_draw_buffers_indexed OES_sample_variables OES_shader_multisample_interpolation OES_texture_float_linear WEBGL_blend_func_extended WEBGL_clip_cull_distance WEBGL_compressed_texture_astc WEBGL_compressed_texture_etc WEBGL_compressed_texture_etc1 WEBGL_compressed_texture_pvrtc WEBGL_compressed_texture_s3tc WEBGL_compressed_texture_s3tc_srgb WEBGL_debug_renderer_info WEBGL_debug_shaders WEBGL_lose_context WEBGL_multi_draw WEBGL_polygon_mode WEBGL_provoking_vertex WEBGL_render_shared_exponent WEBGL_stencil_texturing GL_EXT_clip_control GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_conservative_
+
+log: depth GL_EXT_depth_clamp GL_EXT_disjoint_timer_query_webgl2 GL_EXT_float_blend GL_EXT_polygon_offset_clamp GL_EXT_render_snorm GL_EXT_texture_compression_bptc GL_EXT_texture_compression_rgtc GL_EXT_texture_filter_anisotropic GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_KHR_parallel_shader_compile GL_NV_shader_noperspective_interpolation GL_OES_draw_buffers_indexed GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_texture_float_linear GL_WEBGL_blend_func_extended GL_WEBGL_clip_cull_distance GL_WEBGL_compressed_texture_astc GL_WEBGL_compressed_texture_etc GL_WEBGL_compressed_texture_etc1 GL_WEBGL_compressed_texture_pvrtc GL_WEBGL_compressed_texture_s3tc GL_WEBGL_compressed_texture_s3tc_srgb GL_WEBGL_debug_renderer_info GL_WEBGL_debug_shaders GL_WEBGL_lose_context GL_WEBGL_multi_draw GL_WEBGL_polygon_mode GL_WEBGL_provoking_vertex GL_WEBGL_render_shared_exponent GL_WEBGL_stencil_texturing
+
+warning: WebGL: INVALID_ENUM: getInternalformatParameter: invalid internalformat
+warning: WebGL: INVALID_ENUM: getInternalformatParameter: invalid internalformat
+warning: WebGL: INVALID_ENUM: getInternalformatParameter: invalid internalformat
+warning: WebGL: INVALID_ENUM: getInternalformatParameter: invalid internalformat
+warning: WebGL: INVALID_ENUM: getInternalformatParameter: invalid internalformat
+warning: WebGL: INVALID_ENUM: getInternalformatParameter: invalid internalformat
+log: OPENGL LOG: Creating OpenGL ES 3.0 graphics device ; Context level  <OpenGL ES 3.0> ; Context handle 1
+
+log: [Physics::Module] Selected backend.
+
+log: [Physics::Module] Name: PhysX
+
+log: [Physics::Module] Id: 0xf2b8ea05
+
+log: [Physics::Module] SDK Version: 4.1.2
+
+log: [Physics::Module] Integration Version: 1.0.0
+
+log: [Physics::Module] Threading Mode: Single-Threaded
+
+log: ERROR: Shader 
+log: Hidden/CoreSRP/CoreCopy shader is not supported on this GPU (none of subshaders/fallbacks are suitable)
+
+log: ERROR: Shader 
+log: Hidden/Universal/HDRDebugView shader is not supported on this GPU (none of subshaders/fallbacks are suitable)
+
+log: Input System initialize...
+
+log: UnloadTime: 1.400000 ms
+
+log: [CelestialDial] {"event_name":"screen_entered_logo","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":0.28400000000000005,"movement_count":0,"evidence_eligible":false}
+
+warning: Releasing render texture that is set to be RenderTexture.active!
+
+log: Audio context resumed after 0.449 seconds.
+warning: Manual synchronization of Unity Application.persistentDataPath via JS_FileSystem_Sync() is deprecated and will be later removed in a future Unity version. The persistent data directory will be automatically synchronized instead on file modification. Pass config.autoSyncPersistentDataPath = true; to configuration in createUnityInstance() to opt in to the new behavior.
+log: [CelestialDial] jumped to checkpoint obswhole
+
+log: UnloadTime: 9.400000 ms
+
+log: [CelestialDial] {"event_name":"room_entered_atrium","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":3.003,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"session_resumed","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":3.0040000000000006,"movement_count":0,"evidence_eligible":false}
+
+log: Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+
+log: Unloading 53 unused Assets to reduce memory usage. Loaded Objects now: 13802.
+
+log: Total: 16.700000 ms (FindLiveObjects: 0.700000 ms CreateObjectMapping: 0.200000 ms MarkObjects: 15.600000 ms  DeleteObjects: 0.200000 ms)
+
+
+log: [CelestialDial] {"event_name":"walk_started_sealed-left","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":3.242,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"walk_arrived_sealed-left","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":3.2460000000000006,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"screen_entered_observatory","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":3.2650000000000007,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"room_entered_observatory","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":3.266,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"walk_started_corridor-door","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":4.863,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"walk_arrived_corridor-door","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":4.868,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"screen_entered_corridor","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":4.882,"movement_count":0,"evidence_eligible":false}
+
+log: [CelestialDial] {"event_name":"room_entered_corridor","problem_id":0,"start_seat":0,"start_sign":"Aries","requested_relationship":"forward_offset_4","selected_destination":0,"destination_sign":"Aries","correctness":false,"input_method":"slice","hint_level":0,"attempt_number":0,"response_time":4.882,"movement_count":0,"evidence_eligible":false}
+
+error: Uncaught exception from main loop:
+error: RuntimeError: null function
+    at wasm://wasm/0beb9196:wasm-function[99954]:0x1990fd6
+    at wasm://wasm/0beb9196:wasm-function[26419]:0x87dfaa
+    at wasm://wasm/0beb9196:wasm-function[136647]:0x281dc42
+    at invoke_iii (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:443098)
+    at wasm://wasm/0beb9196:wasm-function[83102]:0x15bfd41
+    at wasm://wasm/0beb9196:wasm-function[74934]:0x13a9303
+    at wasm://wasm/0beb9196:wasm-function[99512]:0x1942949
+    at wasm://wasm/0beb9196:wasm-function[99779]:0x197ae82
+    at wasm://wasm/0beb9196:wasm-function[98823]:0x19004bf
+    at wasm://wasm/0beb9196:wasm-function[98794]:0x18f9790
+    at wasm://wasm/0beb9196:wasm-function[99499]:0x194092f
+    at wasm://wasm/0beb9196:wasm-function[100044]:0x1994361
+    at wasm://wasm/0beb9196:wasm-function[93313]:0x17d74d3
+    at wasm://wasm/0beb9196:wasm-function[109877]:0x1b80b5e
+    at wasm://wasm/0beb9196:wasm-function[111338]:0x1ba1db5
+    at wasm://wasm/0beb9196:wasm-function[136640]:0x281dbeb
+    at invoke_iiii (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:443692)
+    at wasm://wasm/0beb9196:wasm-function[111322]:0x1ba0d93
+    at wasm://wasm/0beb9196:wasm-function[1230]:0x13516c
+    at wasm://wasm/0beb9196:wasm-function[132891]:0x2749b69
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df304e
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df3100
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df3100
+    at wasm://wasm/0beb9196:wasm-function[115608]:0x1df2f84
+    at wasm://wasm/0beb9196:wasm-function[115529]:0x1deb2b0
+    at wasm://wasm/0beb9196:wasm-function[115521]:0x1de87dc
+    at wasm://wasm/0beb9196:wasm-function[114979]:0x1db763a
+    at wasm://wasm/0beb9196:wasm-function[132249]:0x26e5f12
+    at wasm://wasm/0beb9196:wasm-function[132249]:0x26e5f87
+    at wasm://wasm/0beb9196:wasm-function[136356]:0x27edd54
+    at wasm://wasm/0beb9196:wasm-function[136643]:0x281dc14
+    at blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:24694
+    at _JS_CallAsLongAsNoExceptionsSeen (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:24708)
+    at wasm://wasm/0beb9196:wasm-function[136357]:0x27ede69
+    at wasm://wasm/0beb9196:wasm-function[136643]:0x281dc14
+    at browserIterationFunc (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:115911)
+    at callUserCallback (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:98273)
+    at Object.runIter (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:99640)
+    at Browser_mainLoop_runner (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:115437)
+error: Halting program.
+log: Invoking error handler due to
+RuntimeError: null function
+at wasm://wasm/0beb9196:wasm-function[99954]:0x1990fd6
+    at wasm://wasm/0beb9196:wasm-function[26419]:0x87dfaa
+    at wasm://wasm/0beb9196:wasm-function[136647]:0x281dc42
+    at invoke_iii (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:443098)
+    at wasm://wasm/0beb9196:wasm-function[83102]:0x15bfd41
+    at wasm://wasm/0beb9196:wasm-function[74934]:0x13a9303
+    at wasm://wasm/0beb9196:wasm-function[99512]:0x1942949
+    at wasm://wasm/0beb9196:wasm-function[99779]:0x197ae82
+    at wasm://wasm/0beb9196:wasm-function[98823]:0x19004bf
+    at wasm://wasm/0beb9196:wasm-function[98794]:0x18f9790
+    at wasm://wasm/0beb9196:wasm-function[99499]:0x194092f
+    at wasm://wasm/0beb9196:wasm-function[100044]:0x1994361
+    at wasm://wasm/0beb9196:wasm-function[93313]:0x17d74d3
+    at wasm://wasm/0beb9196:wasm-function[109877]:0x1b80b5e
+    at wasm://wasm/0beb9196:wasm-function[111338]:0x1ba1db5
+    at wasm://wasm/0beb9196:wasm-function[136640]:0x281dbeb
+    at invoke_iiii (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:443692)
+    at wasm://wasm/0beb9196:wasm-function[111322]:0x1ba0d93
+    at wasm://wasm/0beb9196:wasm-function[1230]:0x13516c
+    at wasm://wasm/0beb9196:wasm-function[132891]:0x2749b69
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df304e
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df3100
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df3100
+    at wasm://wasm/0beb9196:wasm-function[115608]:0x1df2f84
+    at wasm://wasm/0beb9196:wasm-function[115529]:0x1deb2b0
+    at wasm://wasm/0beb9196:wasm-function[115521]:0x1de87dc
+    at wasm://wasm/0beb9196:wasm-function[114979]:0x1db763a
+    at wasm://wasm/0beb9196:wasm-function[132249]:0x26e5f12
+    at wasm://wasm/0beb9196:wasm-function[132249]:0x26e5f87
+    at wasm://wasm/0beb9196:wasm-function[136356]:0x27edd54
+    at wasm://wasm/0beb9196:wasm-function[136643]:0x281dc14
+    at blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:24694
+    at _JS_CallAsLongAsNoExceptionsSeen (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:24708)
+    at wasm://wasm/0beb9196:wasm-function[136357]:0x27ede69
+    at wasm://wasm/0beb9196:wasm-function[136643]:0x281dc14
+    at browserIterationFunc (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:115911)
+    at callUserCallback (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:98273)
+    at Object.runIter (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:99640)
+    at Browser_mainLoop_runner (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:115437)
+PAGEERROR RuntimeError: null function
+    at wasm://wasm/0beb9196:wasm-function[99954]:0x1990fd6
+    at wasm://wasm/0beb9196:wasm-function[26419]:0x87dfaa
+    at wasm://wasm/0beb9196:wasm-function[136647]:0x281dc42
+    at invoke_iii (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:443098)
+    at wasm://wasm/0beb9196:wasm-function[83102]:0x15bfd41
+    at wasm://wasm/0beb9196:wasm-function[74934]:0x13a9303
+    at wasm://wasm/0beb9196:wasm-function[99512]:0x1942949
+    at wasm://wasm/0beb9196:wasm-function[99779]:0x197ae82
+    at wasm://wasm/0beb9196:wasm-function[98823]:0x19004bf
+    at wasm://wasm/0beb9196:wasm-function[98794]:0x18f9790
+    at wasm://wasm/0beb9196:wasm-function[99499]:0x194092f
+    at wasm://wasm/0beb9196:wasm-function[100044]:0x1994361
+    at wasm://wasm/0beb9196:wasm-function[93313]:0x17d74d3
+    at wasm://wasm/0beb9196:wasm-function[109877]:0x1b80b5e
+    at wasm://wasm/0beb9196:wasm-function[111338]:0x1ba1db5
+    at wasm://wasm/0beb9196:wasm-function[136640]:0x281dbeb
+    at invoke_iiii (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:443692)
+    at wasm://wasm/0beb9196:wasm-function[111322]:0x1ba0d93
+    at wasm://wasm/0beb9196:wasm-function[1230]:0x13516c
+    at wasm://wasm/0beb9196:wasm-function[132891]:0x2749b69
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df304e
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df3100
+    at wasm://wasm/0beb9196:wasm-function[115609]:0x1df3100
+    at wasm://wasm/0beb9196:wasm-function[115608]:0x1df2f84
+    at wasm://wasm/0beb9196:wasm-function[115529]:0x1deb2b0
+    at wasm://wasm/0beb9196:wasm-function[115521]:0x1de87dc
+    at wasm://wasm/0beb9196:wasm-function[114979]:0x1db763a
+    at wasm://wasm/0beb9196:wasm-function[132249]:0x26e5f12
+    at wasm://wasm/0beb9196:wasm-function[132249]:0x26e5f87
+    at wasm://wasm/0beb9196:wasm-function[136356]:0x27edd54
+    at wasm://wasm/0beb9196:wasm-function[136643]:0x281dc14
+    at blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:24694
+    at _JS_CallAsLongAsNoExceptionsSeen (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:24708)
+    at wasm://wasm/0beb9196:wasm-function[136357]:0x27ede69
+    at wasm://wasm/0beb9196:wasm-function[136643]:0x281dc14
+    at browserIterationFunc (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:115911)
+    at callUserCallback (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:98273)
+    at Object.runIter (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:99640)
+    at Browser_mainLoop_runner (blob:http://127.0.0.1:8791/91a4fb97-6b29-49a2-be93-fec2aa06ed2c:9:115437)

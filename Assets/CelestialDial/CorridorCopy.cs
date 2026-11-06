@@ -37,6 +37,7 @@ namespace Ascendant.CelestialDial
         public const string Hub8 = "Eight Keys, seeker. Bring the new one to the Books."; // Codex draft (goal 03); owner rewrites
         public const string End = "Eight locks turned, initiate. The Observatory's lower level is lit."; // Codex draft (goal 03); owner rewrites
         public const string Wheel = "The rulership wheel"; // Codex draft (goal 03); owner rewrites
+        public const string BackToObservatory = "The Observatory"; // Codex draft (goal 03); owner rewrites
         public const string Back = "Back"; // Codex draft (goal 03); owner rewrites
         public const string Continue = "Continue"; // Codex draft (goal 03); owner rewrites
         public const string Seal = "Seal"; // Codex draft (goal 03); owner rewrites

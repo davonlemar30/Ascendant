@@ -1944,7 +1944,7 @@ namespace Ascendant.CelestialDial
             var walk = Flow.Walk;
             state.room = !roomScreen ? "" : walk.Room == Room.Atrium ? "atrium" : walk.Room == Room.Wing ? "wing" : walk.Room==Room.Observatory?"observatory":walk.Room==Room.Corridor?"corridor":"chamber";
             state.avatarX = walk.X; state.walking = walk.Walking; state.walkTarget = walk.TargetId; state.avatarAt = walk.At; state.walkSpeed = walk.SpeedName;
-            var pois = roomScreen ? Rooms.Visible(walk.Room).ToArray() : new PointOfInterest[0];
+            var pois = roomScreen ? Rooms.Visible(walk.Room).Where(p=>p.Id!="corridor-door"||Flow.KeysSpent>=6).ToArray() : new PointOfInterest[0];
             FillObservatory(state); FillCorridor(state);
             state.pois = pois.Select(p => p.Id).ToArray(); state.poiLabels = pois.Select(p => (p.Walkable ? "Walk to " : "") + p.Label).ToArray();
             state.canWalk = roomScreen && !busy; state.canEnterDial = s == SliceScreen.WingRoom && !busy; state.canEnterShelf = s == SliceScreen.WingRoom && Flow.WheelComplete && !busy;

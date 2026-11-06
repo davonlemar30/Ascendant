@@ -23,10 +23,10 @@ namespace Ascendant.CelestialDial
         {
             corLastKey=Flow.Keys;
             corRoom=ScreenPanel("Corridor","cor-room");var light=LightOverlay(corRoom,"cor-light");lightOverlays.Remove(light);
-            corKit=BuildKit(corRoom,"cor-",new[]{new KitPlacement("shell",0,800,1),new KitPlacement("lectern",110,470,1),new KitPlacement("cabinet",-105,440,2)},"cor-grime",light,new[]{1f,.7f,.4f,.2f,0},new[]{.5f,.4f,.25f,.1f,0},new[]{0f,.25f,.5f,.75f,1f},()=>Flow.CorridorLevel,p=>Flow.CorridorLevel>=p.Key);
+            corKit=BuildKit(corRoom,"cor-",new[]{new KitPlacement("shell",0,800,1),new KitPlacement("lectern",110,470,1,.25f),new KitPlacement("cabinet",-105,440,2,.4f)},"cor-grime",light,new[]{1f,.7f,.4f,.2f,0},new[]{.5f,.4f,.25f,.1f,0},new[]{0f,.25f,.5f,.75f,1f},()=>Flow.CorridorLevel,p=>Flow.CorridorLevel>=p.Key);
             FinishKit(corRoom,corKit);
-            var back=Block(corRoom,"Observatory doorway",-138,300,48,140,"door-open");Tappable(back,()=>Walk("observatory-door"));
-            corRoomWheel=Picture(corRoom,"cor-wheel",40,340,190,190);Tappable(corRoomWheel.rectTransform,()=>Walk("rulership-wheel"));
+            var back=Picture(corRoom,"door-open",-138,300,48,140);back.name="walk:observatory-door";Tappable(back.rectTransform,()=>Walk("observatory-door"));
+            corRoomWheel=Picture(corRoom,"cor-wheel",40,340,190,190);corRoomWheel.name="walk:rulership-wheel";Tappable(corRoomWheel.rectTransform,()=>Walk("rulership-wheel"));
             var stem=Rect("Wheel pedestal",corRoom,40,475,24,80);stem.gameObject.AddComponent<Image>().color=new Color(.45f,.31f,.12f);Frame(stem,new Color(.16f,.1f,.08f));
             var foot=Rect("Wheel pedestal base",corRoom,40,515,60,16);foot.gameObject.AddComponent<Image>().color=new Color(.55f,.38f,.15f);Frame(foot,new Color(.16f,.1f,.08f));
             float[] wallX={-144,144,-93,93,-55,55,-26},wallY={345,345,370,370,390,390,405};
@@ -114,7 +114,7 @@ namespace Ascendant.CelestialDial
         {
             s.corridorPrompt=Cor.Prompt;s.corridorMessage=Cor.Message;s.corridorPlanet=Cor.Planet;s.corridorRuledSign=Cor.RuledSign;s.corridor=Flow.AtCorridor;s.corridorOpen=Flow.CorridorOpen;s.corridorPlaying=Flow.AtCorridor&&corPlaying;s.corridorPhase=Cor.Phase.ToString().ToLowerInvariant();s.corridorTarget=Cor.Target;s.corridorTurn=Cor.Turn;s.corridorHint=Cor.Hint;s.corridorNext=Cor.CanContinue;s.corridorRevealed=Cor.Reveal;s.corridorEvidence7=Cor.Progress.placementEvidence;s.corridorEvidence8=Cor.Progress.detrimentEvidence;s.corridorTraditional=Cor.Progress.traditional;s.corridorModern=Cor.Progress.modern;s.corridorDetriments=Cor.Progress.detriments;s.corridorCards=Cor.Progress.cards;
             var controls=(corInstrument.gameObject.activeInHierarchy?corInstrument.GetComponentsInChildren<Button>():corRoom.gameObject.activeInHierarchy?corRoom.GetComponentsInChildren<Button>():corArch.gameObject.activeInHierarchy?new[]{corArch}:new Button[0]).Where(b=>b.gameObject.activeInHierarchy&&b.interactable&&!busy).ToArray();
-            s.corridorControlIds=controls.Select(b=>b.name).ToArray();s.corridorControlLabels=controls.Select(b=>b==corArch?CorridorCopy.Title:b.GetComponentInChildren<Text>().text).ToArray();s.corridorControls=controls.SelectMany(PageBox).ToArray();
+            s.corridorControlIds=controls.Select(b=>b.name).ToArray();s.corridorControlLabels=controls.Select(b=>b==corArch?CorridorCopy.Title:b.name=="walk:rulership-wheel"?CorridorCopy.Wheel:b.name=="walk:observatory-door"?CorridorCopy.BackToObservatory:b.GetComponentInChildren<Text>()!=null?b.GetComponentInChildren<Text>().text:b.name).ToArray();s.corridorControls=controls.SelectMany(PageBox).ToArray();
             if(Flow.AtCorridor||Flow.RulerReview)s.caspar=Flow.AtCorridor&&!corPlaying?corRoomLine.text:corPrompt.text+" "+corMessage.text;
         }
     }
