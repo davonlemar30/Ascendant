@@ -6,7 +6,7 @@ namespace Ascendant.CelestialDial
 {
     // v0.4 tap-to-move greybox (Q06 phase 2 lock, September 12): two walkable rooms, a placeholder marker,
     // straight-line walking at a fixed speed along a floor band, no pathfinding. Pure state, no Unity types.
-    public enum Room { None, Atrium, Wing, Chamber }
+    public enum Room { None, Atrium, Wing, Chamber, Observatory }
 
     public sealed class PointOfInterest
     {
@@ -39,7 +39,8 @@ namespace Ascendant.CelestialDial
             new PointOfInterest("dial", "the Dial", 40),
             new PointOfInterest("shelf", "the bookshelf", 157),   // v0.3 revision: Part A lives here once the wheel is lit
         };
-        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : Array.Empty<PointOfInterest>();
+        public static readonly PointOfInterest[] Observatory = {new PointOfInterest("atrium-door","the doorway back to the Atrium",-138),new PointOfInterest("orrery","the orrery",40)};
+        public static PointOfInterest[] Of(Room room) => room == Room.Atrium ? Atrium : room == Room.Wing ? Wing : room == Room.Chamber ? Chamber : room == Room.Observatory ? Observatory : Array.Empty<PointOfInterest>();
         public static PointOfInterest Find(Room room, string id) => Of(room).FirstOrDefault(p => p.Id == id);
         public static IEnumerable<PointOfInterest> Visible(Room room) => Of(room).Where(p => p.Id != "entry");
     }
@@ -66,12 +67,13 @@ namespace Ascendant.CelestialDial
             Logged?.Invoke("room_entered:" + room.ToString().ToLowerInvariant());
         }
         public PointOfInterest Find(string id) => Rooms.Find(Room, id);
-        public bool CanWalkTo(string id) { var p = Find(id); return p != null && p.Walkable && !Walking; }
+        public Func<string,bool> Unlocked = id => false;
+        public bool CanWalkTo(string id) { var p = Find(id); return p != null && (p.Walkable || Unlocked(id)) && !Walking; }
         // Returns false for unknown or sealed points; the room says "sealed" instead of walking.
         public bool GoTo(string id)
         {
             var poi = Find(id);
-            if (poi == null || !poi.Walkable || Walking) return false;
+            if (poi == null || (!poi.Walkable && !Unlocked(id)) || Walking) return false;
             TargetId = poi.Id; TargetX = poi.X; Walking = true; Traveled = 0; At = "";
             if (Math.Abs(TargetX - X) > 0.5f) Facing = TargetX > X ? 1 : -1;
             Logged?.Invoke("walk_started:" + poi.Id);

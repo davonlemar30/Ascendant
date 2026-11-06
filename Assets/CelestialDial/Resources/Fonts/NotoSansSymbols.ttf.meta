@@ -11,7 +11,7 @@ TrueTypeFontImporter:
   fontNames:
   - Noto Sans Symbols
   fallbackFontReferences: []
-  customCharacters: "\u2648\u2649\u264A\u264B\u264C\u264D\u264E\u264F\u2650\u2651\u2652\u2653\u263D"
+  customCharacters: "\u2648\u2649\u264A\u264B\u264C\u264D\u264E\u264F\u2650\u2651\u2652\u2653\u263D\u263F\u2640\u2642\u2643\u2644\u2645\u2646"
   fontRenderingMode: 0
   ascentCalculationMode: 1
   useLegacyBoundsCalculation: 0

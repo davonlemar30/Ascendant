@@ -8,7 +8,7 @@ let the owner see every slot on the style page; they are not art. Run from the r
     python3 Tools/make-test-set.py
 
 Slot names, sizes, and the sound list mirror Assets/CelestialDial/Slots.cs; keep both in step."""
-import colorsys, math, os, random, struct, wave, zlib
+import colorsys, math, os, random, struct, wave, zlib, argparse
 
 ART = "Assets/CelestialDial/Resources/Art/test"
 AUDIO = "Assets/CelestialDial/Resources/Audio/test"
@@ -48,6 +48,8 @@ IMAGES = [
     ("intro-america", 180, 400), ("intro-newyork-state", 180, 400), ("intro-newyork-city", 180, 400), ("intro-brooklyn", 180, 400), ("intro-block", 180, 400),
     ("menu-city", 180, 400), ("menu-title", 136, 100), ("menu-rat-1", 48, 24), ("menu-rat-2", 48, 24), ("menu-rat-3", 48, 24), ("menu-rat-4", 48, 24),  # the main menu's background and title
 ]
+IMAGES += [('obs-room', 180, 400), ('obs-light', 180, 400), ('obs-orrery-frame', 300, 300), ('obs-rings', 300, 300), ('obs-sphere-moon', 48, 48), ('obs-sphere-sun', 48, 48), ('obs-sphere-mercury', 48, 48), ('obs-sphere-venus', 48, 48), ('obs-sphere-mars', 48, 48), ('obs-sphere-jupiter', 48, 48), ('obs-sphere-saturn', 48, 48), ('obs-sphere-uranus', 48, 48), ('obs-sphere-neptune', 48, 48), ('obs-sphere-pluto', 48, 48), ('obs-sphere-dark', 32, 32), ('obs-shell-worn', 180, 400), ('obs-shell-restored', 180, 400), ('obs-grime', 180, 400), ('obs-lectern-worn', 64, 100), ('obs-lectern-restored', 64, 100), ('obs-charts-worn', 100, 80), ('obs-charts-restored', 100, 80)]
+
 ROUND = {"dial-face", "floor-markings", "mechanism", "orb", "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs", "intro-wheel-lit", "intro-wheel-burning", "intro-earth"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
     "A": ("010", "101", "111", "101", "101"), "B": ("110", "101", "110", "101", "110"), "C": ("011", "100", "100", "100", "011"),
@@ -168,10 +170,11 @@ SOUNDS = {
 }
 
 if __name__ == "__main__":
+    parser=argparse.ArgumentParser(); parser.add_argument("--only-prefix",default=""); args=parser.parse_args()
     os.makedirs(ART, exist_ok=True); os.makedirs(AUDIO, exist_ok=True)
     for index, (name, width, height) in enumerate(IMAGES):
-        image(index, name, width, height)
+        if name.startswith(args.only_prefix): image(index, name, width, height)
     for name, samples in SOUNDS.items():
-        wav(os.path.join(AUDIO, name + ".wav"), samples)
+        if not args.only_prefix: wav(os.path.join(AUDIO, name + ".wav"), samples)
     total = sum(os.path.getsize(os.path.join(ART, f)) for f in os.listdir(ART)) + sum(os.path.getsize(os.path.join(AUDIO, f)) for f in os.listdir(AUDIO))
     print("test set: %d images, %d sounds, %.0f KB on disk" % (len(IMAGES), len(SOUNDS), total / 1024))

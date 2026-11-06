@@ -12,7 +12,7 @@ namespace Ascendant.CelestialDial
         public static readonly (string id, string label)[] All =
         {
             ("key1", "After Key 1"), ("wheel", "The whole wheel lit"), ("key2", "After Key 2"),
-            ("key3", "After Key 3"), ("key4", "After Key 4"), ("whole", "The Zodiac Wing whole"),
+            ("key3", "After Key 3"), ("key4", "After Key 4"), ("whole", "The Zodiac Wing whole"), ("key5","After Key 5"), ("key6","After Key 6"), ("obswhole","The Observatory whole"),
         };
         public static bool Known(string id) => All.Any(c => c.id == id);
 
@@ -85,7 +85,18 @@ namespace Ascendant.CelestialDial
 
             // The Zodiac Wing whole: the three Keys in hand spent in the Chamber.
             Must(flow.EnterChamber() && flow.SpendKey() && flow.SpendKey() && flow.SpendKey() && flow.WingWhole && flow.LeaveChamber() && flow.AtriumStage == 6, "three Keys spent: the Zodiac Wing whole");
-            return Stop();
+            if(id=="whole")return Stop();
+            Must(flow.RevealObservatoryDoor()&&flow.EnterObservatory()&&flow.Observatory.Begin()&&flow.Observatory.Continue(),"the Observatory opens");
+            var obs=flow.Observatory;
+            for(int i=0;i<10;i++){obs.AnswerName(i);obs.Continue();}
+            obs.Continue();for(int i=0;i<10;i++){obs.Select(i);obs.Seal();obs.Continue();}
+            Must(flow.Keys==5,"Key 5 earned");if(id=="key5")return Stop();
+            Must(flow.LeaveObservatory()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.EnterObservatory()&&obs.Begin()&&obs.Continue(),"Key 5 spent, rings open");
+            for(int i=0;i<10;i++){obs.Select(i);obs.Ring(Planets.All[i].Ring);obs.Continue();}
+            obs.Continue();obs.Continue();for(int i=0;i<10;i++){obs.Select(i);obs.Band(Planets.All[i].Band);obs.Continue();}
+            for(int i=0;i<2;i++){obs.AnswerQuestion(obs.Question.answer);obs.Continue();}
+            Must(flow.Keys==6,"Key 6 earned");if(id=="key6")return Stop();
+            Must(flow.LeaveObservatory()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.BooksOpen==2,"second Book open");return Stop();
         }
         static void Answer(DialLesson lesson)
         {

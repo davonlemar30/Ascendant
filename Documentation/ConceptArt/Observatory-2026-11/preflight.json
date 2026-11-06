@@ -1,0 +1,144 @@
+{
+  "base": "49c61f8",
+  "specStatus": "APPROVED (owner Nov5,2026)",
+  "glyphs": [
+    {
+      "seat": 0,
+      "name": "Moon",
+      "codepoint": "U+263D",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 1,
+      "name": "Sun",
+      "codepoint": "U+2609",
+      "font": "NotoSansSymbols2-Regular.ttf",
+      "present": true
+    },
+    {
+      "seat": 2,
+      "name": "Mercury",
+      "codepoint": "U+263F",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 3,
+      "name": "Venus",
+      "codepoint": "U+2640",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 4,
+      "name": "Mars",
+      "codepoint": "U+2642",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 5,
+      "name": "Jupiter",
+      "codepoint": "U+2643",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 6,
+      "name": "Saturn",
+      "codepoint": "U+2644",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 7,
+      "name": "Uranus",
+      "codepoint": "U+2645",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 8,
+      "name": "Neptune",
+      "codepoint": "U+2646",
+      "font": "NotoSansSymbols.ttf",
+      "present": true
+    },
+    {
+      "seat": 9,
+      "name": "Pluto",
+      "codepoint": "U+2BD3",
+      "font": "NotoSansSymbols2-Regular.ttf",
+      "present": true
+    }
+  ],
+  "retrograde": {
+    "codepoint": "U+211E",
+    "font": "EBGaramond-Bold.ttf",
+    "present": true,
+    "newFontNeeded": false
+  },
+  "concepts": [
+    {
+      "file": "observatory-dormant-draft.png",
+      "size": [
+        1003,
+        1568
+      ],
+      "md5": "ad92f379df785691db3bfdb204a61703",
+      "requestedSize": [
+        720,
+        1600
+      ],
+      "sizeRequirementMet": false
+    },
+    {
+      "file": "observatory-awake-draft.png",
+      "size": [
+        1003,
+        1568
+      ],
+      "md5": "95e07dacb464ca116ef390c32a13532f",
+      "requestedSize": [
+        720,
+        1600
+      ],
+      "sizeRequirementMet": false
+    }
+  ],
+  "hardStop": {
+    "status": "resolved by owner Nov5",
+    "id": "U22BandReveal",
+    "pose": "explain",
+    "line": "{Planet} belongs with {company}, apprentice. Mark it there and carry on."
+  },
+  "implementation": "in progress",
+  "normalizedConcepts": [
+    {
+      "file": "observatory-dormant.png",
+      "size": [
+        720,
+        1600
+      ],
+      "contentSize": [
+        720,
+        1126
+      ],
+      "md5": "bd57334a8f6a3347977271cc97b692b9"
+    },
+    {
+      "file": "observatory-awake.png",
+      "size": [
+        720,
+        1600
+      ],
+      "contentSize": [
+        720,
+        1126
+      ],
+      "md5": "ecb7e82095dc6b4e24078819926dfab2"
+    }
+  ],
+  "normalizationAuthorization": "owner Nov5: Use local resizing and padding"
+}

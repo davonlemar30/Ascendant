@@ -1,0 +1,10 @@
+[1s] mechanical checks; evidence: /Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Logs/validate-all.Zxyo9kl4
+[40s] WebGL build
+[461s] browser suite
+[461s] slice fixture starting: hands off the mouse until completion
+[650s] FAIL: browser subprocess exited nonzero
+[650s] FAIL: browser report missing, empty, or incomplete
+[650s] FAIL: browser success evidence invalid
+[756s] FAIL: fixture subprocess exited nonzero
+[756s] FAIL: fixture report missing, stale, empty, or incomplete
+[756s] FAIL: validation failed (evidence: /Users/damusthadon/Documents/Ascendant-worktrees/codex-safety-net/Logs/validate-all.Zxyo9kl4)
