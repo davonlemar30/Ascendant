@@ -51,13 +51,21 @@ const path=require('path');
     const snap=()=>pg.evaluate(()=>window.ascendantDial.snapshot());
     let zoomSeen=0;
     // the owner, Oct 9 ("fix that immediately"): a watcher in the page reads every state the game publishes through the burn and the transform
-    await pg.evaluate(()=>{window.__wheel={n:0,bad:[]};let last='';const tick=()=>{const s=window.ascendantDial?.snapshot();if(s&&(s.launchShotId==='burn'||s.launchShotId==='transform')){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
+    await pg.evaluate(()=>{window.__wheel={n:0,bad:[],glyphSample:null};let last='';const tick=()=>{const s=window.ascendantDial?.snapshot();if(s&&s.launchShotId==='glyphs'&&s.launchCamera?.[2]>0&&s.launchCamera[2]<1&&!window.__wheel.glyphSample)window.__wheel.glyphSample={state:s,skip:!document.getElementById('skip-prologue').disabled,said:document.getElementById('announcement').textContent};if(s&&(s.launchShotId==='burn'||s.launchShotId==='transform')){const key=JSON.stringify(s.launchLayers);if(key!==last){last=key;window.__wheel.n++;
       const ls=(s.launchLayers||[]).map(x=>x.split(':')),w=ls.filter(x=>x[0].startsWith('intro-wheel'));if(w.some(x=>Math.abs(((+x[1]-+w[0][1]+540)%360)-180)>.05))window.__wheel.bad.push(key);if(ls.some(x=>x[0]==='intro-earth'&&Math.abs(+x[1])>.05))window.__wheel.bad.push('earth turned: '+key);}}
       if(!s||s.screen==='logo'||s.screen==='intro')requestAnimationFrame(tick);};requestAnimationFrame(tick);});
     for(const [i,[id,frame,settle,line]] of LAUNCH.entries()){
-      await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
-      await pg.waitForTimeout(settle);
-      const s=await snap(),skip=await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo',said=await pg.locator('#announcement').textContent();
+      // Capture the brief glyph sweep in-page: screenshots and RPCs can outlast it on Linux.
+      // The subsequent alive/earth waits still require the animation to finish.
+      let sample=null;
+      if(!reduced&&id==='glyphs'){
+        await pg.waitForFunction(()=>!!window.__wheel.glyphSample,{},{timeout:20000});
+        sample=await pg.evaluate(()=>window.__wheel.glyphSample);
+      }else{
+        await pg.waitForFunction(([k,f])=>{const s=window.ascendantDial.snapshot();return s.launchShotId===k&&s.launchFrame===f;},[id,frame],{timeout:20000});
+        await pg.waitForTimeout(settle);
+      }
+      const s=sample?sample.state:await snap(),skip=sample?sample.skip:await pg.locator('#skip-prologue').isEnabled(),cam=s.launchCamera||[],logo=id==='logo',said=sample?sample.said:await pg.locator('#announcement').textContent();
       check(s.screen===(logo?'logo':'intro')&&s.launchShotId===id&&s.launchFrame===frame&&s.canSkip&&skip&&!s.gearShown&&s.caspar===line&&(line===''||said.includes(line))&&!s.canSliceContinue,'the launch'+(reduced?', reduced motion':'')+': '+id+' ('+frame+') on the '+(logo?'logo screen':'launch movie')+', its spoken line '+(line?'announced ("'+line+'")':'none')+', the semantic Skip offered, no gear, at '+where);
       if(reduced&&!logo)check(s.launchStill&&cam.length===3&&Math.abs(cam[0]-1)<.001&&Math.abs(cam[1])<.01&&Math.abs(cam[2]-1)<.001,'reduced motion: '+id+' held still and level, no sweep ('+JSON.stringify(cam)+') at '+where);
       if(!reduced&&id==='draw')check(cam.length===3&&cam[2]>.05&&cam[2]<.95,'the wheel draws itself: the sweep has revealed '+Math.round((cam[2]||0)*100)+'% of its lines at '+where);
@@ -88,9 +96,14 @@ const path=require('path');
       await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'-'+s.prologueShotId+'-'+want.replace('prologue-','')+'.png')});
       // the owner, Oct 9: slight animations as frame swaps; read from the frames the shot has shown, in order (the headphones' in-between lasts 0.14 s)
       if(shot===1&&frame==='prologue-notebook'){
-        await pg.waitForTimeout(1500);const seen=(await snap()).prologueShotFrames||[];const names=seen.map(f=>f.replace('prologue-','')).join(' ');
+        if(!reduced){
+          await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueFrame==='prologue-notebook-2',{},{timeout:10000});
+          await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'b-desk-notebook-2.png')});
+          await pg.waitForFunction(()=>{const s=window.ascendantDial.snapshot(),f=s.prologueShotFrames||[];return s.prologueShot===1&&f.includes('prologue-notebook-2')&&f.includes('prologue-notebook-3')&&f.lastIndexOf('prologue-notebook')>f.indexOf('prologue-notebook-3');},{},{timeout:10000});
+        }else await pg.waitForTimeout(1500);
+        const seen=(await snap()).prologueShotFrames||[];const names=seen.map(f=>f.replace('prologue-','')).join(' ');
         check(reduced?JSON.stringify(seen)==='["prologue-desk","prologue-notebook"]':seen.includes('prologue-notebook-2')&&seen.includes('prologue-notebook-3')&&seen.lastIndexOf('prologue-notebook')>seen.indexOf('prologue-notebook-3'),(reduced?'reduced motion: no writing loop, the notebook held':'the hand writes: the loop runs notebook, -2, -3 and round')+' ('+names+') at '+where);
-        if(!reduced){await pg.waitForFunction(()=>window.ascendantDial.snapshot().prologueFrame==='prologue-notebook-2',{},{timeout:5000});await pg.screenshot({path:path.join(out,prefix+'-'+String(i+1).padStart(2,'0')+'b-desk-notebook-2.png')});}}
+      }
       if(shot===2&&frame==='prologue-headphones'){
         const seen=(await snap()).prologueShotFrames||[];const want3=['prologue-desk','prologue-light','prologue-light-up','prologue-look'].concat(reduced?[]:['prologue-headphones-mid']).concat(['prologue-headphones']);
         check(JSON.stringify(seen)===JSON.stringify(want3),(reduced?'reduced motion: the head turns, the close-up, the headphones come down in one crossfade with no in-between':'shot 3 in order: desk, light, the head turned, the close-up, the headphones mid-fall, down')+' ('+seen.map(f=>f.replace('prologue-','')).join(' ')+') at '+where);}
