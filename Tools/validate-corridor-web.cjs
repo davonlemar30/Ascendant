@@ -29,7 +29,7 @@ const fs=require('fs'),path=require('path'),pw=require(process.env.PLAYWRIGHT_MO
   check((await snap()).corridorPlanet===planet,'classical tray order '+planet);
   if(!dragDone){
    const r=await pg.locator('#control-cor-planet-'+planet).evaluate(e=>({x:parseFloat(e.style.left),y:parseFloat(e.style.top),w:parseFloat(e.style.width),h:parseFloat(e.style.height)}));const d=await pg.locator('#control-cor-sign-'+sign).evaluate(e=>({x:parseFloat(e.style.left),y:parseFloat(e.style.top),w:parseFloat(e.style.width),h:parseFloat(e.style.height)}));
-   await pg.mouse.move(r.x+r.w/2,r.y+r.h/2);await pg.mouse.down();await pg.mouse.move(d.x+d.w/2,d.y+d.h/2,{steps:12});await pg.mouse.up();await pg.waitForTimeout(200);check((await snap()).corridorTraditional[sign],'native drag seats Moon in Cancer');dragDone=true;
+   await pg.mouse.move(r.x+r.w/2,r.y+r.h/2);await pg.mouse.down();await pg.waitForTimeout(150);await pg.mouse.move(d.x+d.w/2,d.y+d.h/2,{steps:12});await pg.waitForTimeout(150);await pg.mouse.up();await pg.waitForTimeout(200);check((await snap()).corridorTraditional[sign],'native drag seats Moon in Cancer');dragDone=true;
   }else await tap('cor-sign:'+sign);
   check((await snap()).corridorTraditional[sign],'traditional place '+signNames[sign]);await shot('traditional-'+sign);await tap('cor-next');
  }

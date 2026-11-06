@@ -54,8 +54,8 @@ namespace Ascendant.CelestialDial
             for(int i=0;i<10;i++){
                 int planet=i;corTray[i]=CorButton(corInstrument,"","cor-planet:"+i,-132+(i%7)*44,510+(i/7)*48,44,44,()=>{});PutPlanet(corTray[i].GetComponentInChildren<Text>(),i,30);
                 var trigger=corTray[i].gameObject.AddComponent<EventTrigger>();
-                var end=new EventTrigger.Entry{eventID=EventTriggerType.EndDrag};end.callback.AddListener(d=>{if(busy||Cor.Planet!=planet)return;var data=(PointerEventData)d;for(int n=0;n<12;n++)if(RectTransformUtility.RectangleContainsScreenPoint(corSigns[n].GetComponent<RectTransform>(),data.position,null)){int sign=n;CorChange(()=>Cor.Place(sign));break;}});trigger.triggers.Add(end);
-                var drag=new EventTrigger.Entry{eventID=EventTriggerType.Drag};drag.callback.AddListener(_=>{});trigger.triggers.Add(drag);
+                var end=new EventTrigger.Entry{eventID=EventTriggerType.EndDrag};end.callback.AddListener(d=>{if(busy||Cor.Planet!=planet)return;var data=(PointerEventData)d;for(int n=0;n<12;n++)if(RectTransformUtility.RectangleContainsScreenPoint(corSigns[n].GetComponent<RectTransform>(),data.position,null)){int sign=n;CorChange(()=>Cor.Place(sign));break;}ShowCorridor();});trigger.triggers.Add(end);
+                var drag=new EventTrigger.Entry{eventID=EventTriggerType.Drag};drag.callback.AddListener(d=>{if(busy||Cor.Planet!=planet||Cor.AwaitingNext)return;var data=(PointerEventData)d;Vector2 point;if(RectTransformUtility.ScreenPointToLocalPointInRectangle(corInstrument,data.position,null,out point))corTray[planet].GetComponent<RectTransform>().anchoredPosition=new Vector2(point.x,point.y-400);});trigger.triggers.Add(drag);
             }
             for(int i=0;i<4;i++){int slot=i;corCards[i]=CorButton(corInstrument,"","cor-card:"+i,0,235+i*66,312,60,()=>CorCard(slot));var text=corCards[i].GetComponentInChildren<Text>();text.resizeTextForBestFit=true;text.resizeTextMinSize=12;text.resizeTextMaxSize=16;}
             corLeft=CorButton(corInstrument,"<","cor-left",-90,494,52,44,()=>CorChange(()=>Cor.Rotate(-1)));
@@ -95,7 +95,7 @@ namespace Ascendant.CelestialDial
                 corPlaced[i].gameObject.SetActive(Cor.Progress.traditional[i]);if(Cor.Progress.traditional[i])PutPlanet(corPlaced[i],Rulership.TraditionalRuler(i),18);
                 int m=Rulership.ModernRuler(i);bool placed=m>=7&&Cor.Progress.modern[m-7];corModernPlaced[i].gameObject.SetActive(placed);if(placed)PutPlanet(corModernPlaced[i],m,18);
             }
-            for(int i=0;i<10;i++){corTray[i].gameObject.SetActive(traditional&&i<7||modern&&i>=7);corTray[i].interactable=!busy&&!Cor.AwaitingNext&&Cor.Planet==i;}
+            for(int i=0;i<10;i++){corTray[i].GetComponent<RectTransform>().anchoredPosition=new Vector2(-132+(i%7)*44,-(510+(i/7)*48));corTray[i].gameObject.SetActive(traditional&&i<7||modern&&i>=7);corTray[i].interactable=!busy&&!Cor.AwaitingNext&&Cor.Planet==i;}
             var choices=review?Flow.RulerReviewChoices:cards?Cor.CardChoices:new string[0];
             for(int i=0;i<4;i++){corCards[i].gameObject.SetActive(review||cards);corCards[i].GetComponentInChildren<Text>().text=choices.Length>i?choices[i]:"";corCards[i].interactable=!busy&&(review||!Cor.AwaitingNext);}
             corLeft.gameObject.SetActive(detriment);corRight.gameObject.SetActive(detriment);corSeal.gameObject.SetActive(detriment);corAsk.gameObject.SetActive(detriment&&Cor.Hint<2&&!Cor.AwaitingNext);
