@@ -714,9 +714,13 @@ namespace Ascendant.Build
             if(waitFor!=null)
             {
                 bool met=false; try{met=View!=null && waitFor();}catch(Exception){}
-                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;return;}
-                if(EditorApplication.timeSinceStartup<waitLimit)return;
-                var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+                if(met){waitFor=null;BusyStep=waitBusyOk;nextAt=EditorApplication.timeSinceStartup+waitThen;if(waitThen>0)return;}
+                else
+                {
+                    if(EditorApplication.timeSinceStartup<waitLimit)return;
+                    var what=waitWhat;waitFor=null;Steps.Clear();Steps.Enqueue(()=>Check(false,"timed out waiting for "+what));nextAt=0;return;
+                }
+                // A zero-delay observation and its assertion share this Editor tick; a short frame must not advance between them.
             }
             if(EditorApplication.timeSinceStartup<nextAt || Steps.Count==0)return;
             var view=View; if(view!=null && (view.Busy || view.Dial.Busy) && !BusyStep)return; // Beats own the frame.
