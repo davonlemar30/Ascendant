@@ -1,0 +1,151 @@
+{
+  "tool": "built-in image_gen",
+  "slots": 10,
+  "artifacts": [
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-bench-restored.png",
+      "size": [
+        512,
+        400
+      ],
+      "md5": "e405a7b145c939f4a1eb507985b187c9",
+      "bytes": 147283,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-bench-worn.png",
+      "size": [
+        512,
+        400
+      ],
+      "md5": "19676c57b4fb1c3960b6b855bf5eebac",
+      "bytes": 161777,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-grime.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "996762e9a2e9171c8a18757beecc6234",
+      "bytes": 140098,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-instrument.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "md5": "107be07e8c7db9c0284e0661442f2add",
+      "bytes": 738303,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-lectern-restored.png",
+      "size": [
+        512,
+        800
+      ],
+      "md5": "9f595be93237cca1340069d452c2bed9",
+      "bytes": 280770,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-lectern-worn.png",
+      "size": [
+        512,
+        800
+      ],
+      "md5": "497dc58b46090c4f29ade8525f52e381",
+      "bytes": 286099,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-light.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "5fce1a208e20f34b1b06c4753b712bfb",
+      "bytes": 337722,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-room.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "b5e66c0fe4c4134aea26ab2003d340a2",
+      "bytes": 1247997,
+      "alpha": null
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-shell-restored.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "84e86cb751105b115b73896c6bb42647",
+      "bytes": 1082506,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Assets/CelestialDial/Resources/Art/hoh-shell-worn.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "e45d43fa5e34d5f789788ec1d67ecd1c",
+      "bytes": 1006524,
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "Documentation/ConceptArt/Houses-2026-11/houses-dormant.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "411a063a15c593d73d1bd3a7c4e5c3e3",
+      "bytes": 1284280
+    },
+    {
+      "file": "Documentation/ConceptArt/Houses-2026-11/houses-awake.png",
+      "size": [
+        720,
+        1600
+      ],
+      "md5": "6be4ce6ea02d7ec0ddb0cfee83eebeb8",
+      "bytes": 1363856
+    }
+  ]
+}

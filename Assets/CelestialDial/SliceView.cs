@@ -216,7 +216,7 @@ namespace Ascendant.CelestialDial
             BuildIdentity(); BuildBirth(); BuildOrb(); // the orb rides over the opening's two screens (owner, Oct 8)
             atrium = BuildAtrium("Atrium", out atriumText, out atriumContinue, out atriumPose);
             atriumReturn = BuildAtrium("Atrium return", out returnText, out returnContinue, out returnPose);
-            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildObservatory(); BuildCorridor(); BuildAvatar(); BuildTravel(); BuildPrologue(); BuildMenu(); BuildFade(); // the prologue under the fade, which brings WHO ARE YOU? out of the dark; the menu and its slot list (owner, Oct 9) under it too
+            BuildChamber(); BuildHub(); BuildReview(); BuildGlyphs(); BuildGrid(); BuildWingExtras(); BuildWingRoom(); BuildJournal(); BuildObservatory(); BuildCorridor(); BuildHouses(); BuildAvatar(); BuildTravel(); BuildPrologue(); BuildMenu(); BuildFade(); // the prologue under the fade, which brings WHO ARE YOU? out of the dark; the menu and its slot list (owner, Oct 9) under it too
             var flashObject = new GameObject("White light", typeof(RectTransform), typeof(Canvas));
             flashObject.transform.SetParent(transform, false);
             flashCanvas = flashObject.GetComponent<Canvas>(); flashCanvas.renderMode = RenderMode.ScreenSpaceOverlay; flashCanvas.sortingOrder = 10;
@@ -255,7 +255,7 @@ namespace Ascendant.CelestialDial
             if (canvas.pixelRect.width >= 1) canvas.scaleFactor = Mathf.Min(canvas.pixelRect.width / 360f, canvas.pixelRect.height / 800f);
             foreach (var pair in contactShadows) pair.Value.alpha = pair.Key.alpha; // a contact shadow fades with its piece
             if (styleShown) return;
-            UpdateObservatory(); UpdateCorridor(); UpdatePrologue(); UpdateOrb(); // the opening scene's Skip (and the launch's), and the orb's bob and stars
+            UpdateObservatory(); UpdateCorridor(); UpdateHouses(); UpdatePrologue(); UpdateOrb(); // the opening scene's Skip (and the launch's), and the orb's bob and stars
             UpdateMenuLife(); // the menu's window pulse and its rat (owner, Oct 9)
             if (avatar != null && avatar.gameObject.activeInHierarchy) PlaceAvatar();
             if (Flow.Screen == SliceScreen.Wing && Dial.Lesson.KeyEarned && !revealStarted && !Dial.Busy) StartCoroutine(Reveal());
@@ -769,7 +769,7 @@ namespace Ascendant.CelestialDial
         // ---- actions (all input paths, including the Web bridge, arrive here) ----
         public void WebAction(string command)
         {
-            if (ObsAction(command) || CorAction(command)) return;
+            if (ObsAction(command) || CorAction(command) || HohAction(command)) return;
             if (command == "mute") { ToggleMute(); return; }
             if (command.StartsWith("sound:")) { Sound.Play(command.Substring(6)); Publish(); return; } // the style page plays a slot on request
             if (styleShown && command != "reload" && command != "relaunch") return; // the style page is not the game (a reload, test-only, still gets out of it)
@@ -1025,13 +1025,13 @@ namespace Ascendant.CelestialDial
                 Sound.Play("page");
                 yield return Tween(ReducedMotion ? 0 : .8f, k => { Slots.Paint(bookImages[book], Color.Lerp(Dim, BookOpen, k), Mathf.Lerp(ShutArt, 1f, k)); Slots.Paint(bookPages[book], new Color(Bone.r, Bone.g, Bone.b, .9f * k), 1f); bookPages[book].rectTransform.anchoredPosition = new Vector2(0, -35 + 18 * k); });
                 Candles(true);
-                chamberLine = spent==6 ? ObservatoryCopy.ChamberBook2 : "The first Book opens. Light spills from its pages and the room itself takes a breath.\nEvery lock it had is turned, and it answers to you now."; // owner (worksheet section 13)
+                chamberLine = spent==9 ? HousesCopy.Book3 : spent==6 ? ObservatoryCopy.ChamberBook2 : "The first Book opens. Light spills from its pages and the room itself takes a breath.\nEvery lock it had is turned, and it answers to you now."; // owner (worksheet section 13)
                 ShowChamberRoom(); Publish();
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 1.2f : 2.2f);
             }
             if (spent==4 || spent==6)
             {
-                chamberLine = CorridorMilestoneLine ?? (Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : ChamberWholeLine); ShowChamberRoom(); Publish();
+                chamberLine = HousesMilestoneLine ?? CorridorMilestoneLine ?? (Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : ChamberWholeLine); ShowChamberRoom(); Publish();
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 1f : 1.8f);
             }
             busy = false; Show(); Publish();
@@ -1050,13 +1050,13 @@ namespace Ascendant.CelestialDial
             bool canSpend = Flow.CanSpend && atBooks && !busy;
             insert.gameObject.SetActive(Flow.CanSpend && atBooks); insert.interactable = canSpend; insert.GetComponentInChildren<Text>().text = Flow.KeysInHand > 1 ? "Insert Key (" + Flow.KeysInHand + " in hand)" : "Insert Key"; // owner (worksheet section 13)
             if (!canSpend) insertGlow.color = new Color(Bone.r, Bone.g, Bone.b, 0);
-            chamberEnd.gameObject.SetActive(Flow.WingWhole && !busy); chamberEnd.text = Flow.KeysSpent>=8 ? CorridorCopy.End : Flow.ObservatoryWhole ? ObservatoryCopy.ChamberObsCard : ChamberEndCard; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -250); // between the mechanism and the Books, clear of the Keeper; the first visit's card sits lower
+            chamberEnd.gameObject.SetActive(Flow.WingWhole && !busy); chamberEnd.text = Flow.KeysSpent>=10 ? HousesCopy.End : Flow.KeysSpent>=9 ? HousesCopy.Book3 : Flow.KeysSpent>=8 ? CorridorCopy.End : Flow.ObservatoryWhole ? ObservatoryCopy.ChamberObsCard : ChamberEndCard; chamberEnd.rectTransform.anchoredPosition = new Vector2(0, -250); // between the mechanism and the Books, clear of the Keeper; the first visit's card sits lower
             if (string.IsNullOrEmpty(chamberLine)) chamberLine = DefaultChamberLine();
             chamberText.text = chamberLine;
             if(Flow.ObservatoryWhole)ChamberPose("moved");
         }
         // Caspar's line in the Chamber room: set on arrival at the doorway or the Books, and by each spend beat; a beat's line stays until the next move.
-        string DefaultChamberLine() => CorridorMilestoneLine ?? (Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : Flow.KeysSpent==5&&Flow.KeysInHand==0?ChamberQuietLine: Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, initiate. Bring them to the Books." : "You hold a Key, initiate. " + ChamberBringLine)); // owner (worksheet section 13)
+        string DefaultChamberLine() => HousesMilestoneLine ?? CorridorMilestoneLine ?? (Flow.ObservatoryWhole ? ObservatoryCopy.ChamberBook2 : Flow.KeysSpent==5&&Flow.KeysInHand==0?ChamberQuietLine: Flow.WingWhole && Flow.KeysInHand == 0 ? ChamberWholeLine : Flow.KeysInHand == 0 ? ChamberQuietLine : Flow.Walk.At == "books" ? ChamberChooseLine : (Flow.KeysInHand > 1 ? "You hold " + Flow.KeysInHand + " Keys, initiate. Bring them to the Books." : "You hold a Key, initiate. " + ChamberBringLine)); // owner (worksheet section 13)
         void Restart() { if (busy) return; SaveSlots.Clear(SaveSlots.InPlay); Reload(true); } // the slot in play (slot 1 if none), straight in, past the logo, the movie and the menu (owner, Oct 9)
         // Build W (DEV Mode, task 86bca0163): write the checkpoint's save, from one scripted run with this player's name and sign, and reload into it like Start over.
         void JumpTo(string id)
@@ -1230,17 +1230,18 @@ namespace Ascendant.CelestialDial
             MiniMenu.Here = TravelHere; MiniMenu.IsOpen = TravelOpen; MiniMenu.Busy = () => busy; MiniMenu.Go = id => StartCoroutine(TravelTo(id)); MiniMenu.Changed = Publish;
             MiniMenu.Build(root, font);
         }
-        string TravelHere() => Flow.Screen == SliceScreen.Hub ? "atrium" : Flow.Screen == SliceScreen.WingRoom ? "wing" : Flow.Screen == SliceScreen.ChamberRoom ? "chamber" : Flow.AtObservatory ? "observatory" : Flow.AtCorridor ? "corridor" : "";
-        bool TravelOpen(string id) => id == "corridor" && Flow.CorridorOpen || id == "observatory" && Flow.ObservatoryOpen || id == "atrium" || id == "wing" || (id == "chamber" && Flow.KeyInserted); // the Chamber is a room once Key 1 is in its lock; before, it folds into Sealed
+        string TravelHere() => Flow.Screen == SliceScreen.Hub ? "atrium" : Flow.Screen == SliceScreen.WingRoom ? "wing" : Flow.Screen == SliceScreen.ChamberRoom ? "chamber" : Flow.AtObservatory ? "observatory" : Flow.AtCorridor ? "corridor" : Flow.AtHouses ? "houses" : "";
+        bool TravelOpen(string id) => id == "houses" && Flow.HousesOpen || id == "corridor" && Flow.CorridorOpen || id == "observatory" && Flow.ObservatoryOpen || id == "atrium" || id == "wing" || (id == "chamber" && Flow.KeyInserted); // the Chamber is a room once Key 1 is in its lock; before, it folds into Sealed
         IEnumerator TravelTo(string id)
         {
             string here = TravelHere(); if (busy || here == "" || id == here || !TravelOpen(id)) yield break;
             busy = true; hubNote.text = ""; Show(); Publish();
             Sound.Play("door"); yield return FadeTo(1);
             if (Flow.Screen == SliceScreen.WingRoom) { Flow.LeaveWing(); Save(); } else if (Flow.Screen == SliceScreen.ChamberRoom) { Flow.LeaveChamber(); Save(); }
+            if(Flow.AtHouses){Flow.LeaveHouses();hohPlaying=false;Save();}
             if(Flow.AtCorridor){Flow.LeaveCorridor();corPlaying=false;}
             if(Flow.AtObservatory) {Flow.LeaveObservatory();obsPlaying=false;Save();}
-            if(id=="corridor"){Flow.EnterObservatory();Flow.EnterCorridor();} else if(id=="observatory") Flow.EnterObservatory(); else if (id == "wing") Flow.EnterWing(); else if (id == "chamber") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); }
+            if(id=="houses") Flow.EnterHouses(); else if(id=="corridor"){Flow.EnterObservatory();Flow.EnterCorridor();} else if(id=="observatory") Flow.EnterObservatory(); else if (id == "wing") Flow.EnterWing(); else if (id == "chamber") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); }
             Show(); PlaceAvatar(); Publish();
             yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
             yield return FadeTo(0);
@@ -1261,9 +1262,9 @@ namespace Ascendant.CelestialDial
         }
         void Walk(string id)
         {
-            if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom && Flow.Screen != SliceScreen.ChamberRoom && !Flow.AtObservatory && !Flow.AtCorridor)) return;
+            if (busy || (Flow.Screen != SliceScreen.Hub && Flow.Screen != SliceScreen.WingRoom && Flow.Screen != SliceScreen.ChamberRoom && !Flow.AtObservatory && !Flow.AtCorridor && !Flow.AtHouses)) return;
             var poi = Flow.Walk.Find(id); if (poi == null) return;
-            if ((!poi.Walkable && !(id=="sealed-left" && Flow.ObservatoryOpen || id=="corridor-door" && Flow.CorridorOpen)) || (id == "chamber-door" && Flow.Screen == SliceScreen.Hub && !Flow.CanEnterChamber)) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; } // Build T: before Key 1 the Chamber is sealed
+            if ((!poi.Walkable && !(id=="sealed-left" && Flow.ObservatoryOpen || id=="corridor-door" && Flow.CorridorOpen || id=="houses-door" && Flow.HousesOpen)) || (id == "chamber-door" && Flow.Screen == SliceScreen.Hub && !Flow.CanEnterChamber)) { if (Flow.TouchSealedDoor()) { hubNote.text = Flow.Note; Publish(); } return; } // Build T: before Key 1 the Chamber is sealed
             if (id == "shelf" && !Flow.WheelComplete) { if (Flow.TouchDarkShelf()) { wingRoomCaption.text = DialLesson.ShelfDark; Publish(); } return; }
             if (id == "grid" && !Flow.CanOpenGrid) { if (Flow.TouchDarkGrid()) { wingRoomCaption.text = GridModel.DarkLine; Publish(); } return; } // Build B: dark and tappable with a note before the unit
             if (!Flow.Walk.GoTo(id)) return;
@@ -1284,19 +1285,21 @@ namespace Ascendant.CelestialDial
         }
         IEnumerator Arrive(string id)
         {
-            if (id == "corridor-door" || id == "observatory-door" || id == "wing-door" || id == "atrium-door" || id == "chamber-door" || id == "sealed-left" && Flow.ObservatoryOpen)
+            if (id == "houses-door" || id == "corridor-door" || id == "observatory-door" || id == "wing-door" || id == "atrium-door" || id == "chamber-door" || id == "sealed-left" && Flow.ObservatoryOpen)
             {
                 if (Flow.Screen == SliceScreen.Hub && hubKit != null) yield return OpenDoor(hubKit, id);
-                if(id=="corridor-door")yield return OpenDoor(corDoorKit,id); // Build N: the unlocked door swings open as the Keeper reaches it
+                if(id=="corridor-door")yield return OpenDoor(corDoorKit,id);
+                if(id=="houses-door")yield return OpenDoor(hohDoorKit,id); // Build N: the unlocked door swings open as the Keeper reaches it
                 Sound.Play("door");
                 yield return FadeTo(1);
-                if(id=="corridor-door"){Flow.EnterCorridor();obsPlaying=false;} else if(id=="observatory-door"){Flow.LeaveCorridor();corPlaying=false;Save();} else if(id=="sealed-left") Flow.EnterObservatory(); else if(Flow.AtObservatory){Flow.LeaveObservatory();obsPlaying=false;Save();} else if (id == "wing-door") Flow.EnterWing(); else if (id == "chamber-door") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); } else if (Flow.Walk.Room == Room.Chamber) { Flow.LeaveChamber(); Save(); } else { Flow.LeaveWing(); Save(); }
+                if(id=="houses-door")Flow.EnterHouses(); else if(Flow.AtHouses){Flow.LeaveHouses();hohPlaying=false;Save();} else if(id=="corridor-door"){Flow.EnterCorridor();obsPlaying=false;} else if(id=="observatory-door"){Flow.LeaveCorridor();corPlaying=false;Save();} else if(id=="sealed-left") Flow.EnterObservatory(); else if(Flow.AtObservatory){Flow.LeaveObservatory();obsPlaying=false;Save();} else if (id == "wing-door") Flow.EnterWing(); else if (id == "chamber-door") { Flow.EnterChamber(); chamberLine = DefaultChamberLine(); } else if (Flow.Walk.Room == Room.Chamber) { Flow.LeaveChamber(); Save(); } else { Flow.LeaveWing(); Save(); }
                 Show(); PlaceAvatar(); Publish();
                 yield return new WaitForSecondsRealtime(ReducedMotion ? 0 : .12f);
                 yield return FadeTo(0);
             }
             else if(id=="orrery") ObsStart(true);
             else if(id=="rulership-wheel") CorStart(true);
+            else if(id=="local-sky") HohStart(true);
             else if (id == "desk") { Flow.ApproachDesk(); hubNote.text = Flow.Note; } // Build F: the desk is dressing; the journal is in the inventory
             else if (id == "caspar") { Flow.ApproachCaspar(); hubNote.text = Flow.Note; }
             else if (id == "dial") EnterDialNow();
@@ -1471,7 +1474,7 @@ namespace Ascendant.CelestialDial
         void StartReviewItem()
         {
             var task = Flow.CurrentReview;
-            reviewNote.text = "";if(Flow.RulerReview)Flow.ClearRulerReviewNote();if(Flow.PlanetReview)Flow.ClearPlanetReviewNote();
+            reviewNote.text = "";if(Flow.HousesReview)Flow.ClearHousesReviewNote();if(Flow.RulerReview)Flow.ClearRulerReviewNote();if(Flow.PlanetReview)Flow.ClearPlanetReviewNote();
             if (task == null) { Show(); Publish(); return; }
             if (task.Mode == ReviewMode.Dial || task.Mode == ReviewMode.DialModality)
             {
@@ -1548,10 +1551,10 @@ namespace Ascendant.CelestialDial
             shownScreen = s;
             gridScreen.gameObject.SetActive(s == SliceScreen.Grid); if (s == SliceScreen.Grid) ShowGrid();
             bool book = s == SliceScreen.Book;
-            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom || s == SliceScreen.Observatory && !obsPlaying || s == SliceScreen.Corridor && !corPlaying;
+            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom || s == SliceScreen.Observatory && !obsPlaying || s == SliceScreen.Corridor && !corPlaying || s == SliceScreen.Houses && !hohPlaying;
             ApplyLight(roomScreen); // Build H
             foreach (var k in atriumKits) if (k.Container.gameObject.activeInHierarchy) ApplyKit(k, true); // Build N: the Atrium shows its stage, turning what it newly restores
-            if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : s == SliceScreen.WingRoom ? wingRoom : s == SliceScreen.Observatory ? obsRoom : s == SliceScreen.Corridor ? corRoom : chamber, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
+            if (roomScreen) { avatar.SetParent(s == SliceScreen.Hub ? hub : s == SliceScreen.WingRoom ? wingRoom : s == SliceScreen.Observatory ? obsRoom : s == SliceScreen.Corridor ? corRoom : s == SliceScreen.Houses ? hohRoom : chamber, false); avatar.SetAsLastSibling(); PlaceAvatar(); }
             avatar.gameObject.SetActive(roomScreen);
             MiniMenu?.Refresh(roomScreen); // the mini-menu: rooms only, the instruments keep their own exits (owner, Oct 1)
             if (s == SliceScreen.WingRoom)
@@ -1593,7 +1596,7 @@ namespace Ascendant.CelestialDial
                 Dial.ForceRefresh();
             }
             if (s == SliceScreen.Hub) ShowHub();
-            ShowObservatory(); ShowCorridor();
+            ShowObservatory(); ShowCorridor(); ShowHouses();
             if (s == SliceScreen.Practice) ShowPractice();
             ShowPage();
             if (s == SliceScreen.Chamber || s == SliceScreen.ChamberRoom) ShowChamberRoom(); // after ShowPage: the room owns the Chamber's controls
@@ -1684,12 +1687,12 @@ namespace Ascendant.CelestialDial
             sealedLeftLight.color = new Color(.95f, .8f, .5f, stage >= 5 ? (HasArt(sealedLeftLight.transform.parent as RectTransform) ? .06f : .3f) : 0);
             // The caption is said once: on the first return, while the Atrium is at Stage 2. After that the room shows its own state (owner, Sept 26 playtest, note 9).
             hubCaption.text = stage == 2 ? "Stirring: one lamp lit, one desk uncovered, the Zodiac Wing open." : ""; // owner (worksheet section 1, kept as written, marked X)
-            if(!obsDoorBeat) hubText.text = CorridorMilestoneLine ?? (Flow.ObservatoryWhole ? ObservatoryCopy.HubObsWhole : Flow.Keys>=6 ? ObservatoryCopy.HubKey6 : Flow.KeysSpent>=5 ? ObservatoryCopy.HubSpent5 : Flow.Keys>=5 ? ObservatoryCopy.HubKey5 : stage == 1 ? HubOpeningLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine);
+            if(!obsDoorBeat) hubText.text = HousesMilestoneLine ?? CorridorMilestoneLine ?? (Flow.ObservatoryWhole ? ObservatoryCopy.HubObsWhole : Flow.Keys>=6 ? ObservatoryCopy.HubKey6 : Flow.KeysSpent>=5 ? ObservatoryCopy.HubSpent5 : Flow.Keys>=5 ? ObservatoryCopy.HubKey5 : stage == 1 ? HubOpeningLine : Flow.KeysInHand > 1 ? string.Format(HubKeysInHandLine, Flow.KeysInHand) : Flow.KeysInHand == 1 ? HubKeyInHandLine : Flow.WingWhole ? HubWholeLine : Flow.LocksFilled >= 3 ? HubSpent3Line : Flow.LocksFilled >= 2 ? HubSpent2Line : Flow.V02Complete ? HubCompleteLine : Resumed || Flow.Sittings > 0 ? HubLaterLine : HubFirstLine);
             enterChamber.interactable = !busy && Flow.CanEnterChamber; enterChamber.gameObject.SetActive(false); // the doors take the tap (86bcex5kc 1A); Build T: the sealed door itself answers a tap
             { var wingRect = (RectTransform)enterWing.transform; wingRect.anchoredPosition = new Vector2(stage >= 2 ? -78 : 0, wingRect.anchoredPosition.y); } // Build U: alone on the opening walk, the Zodiac Wing button sits centred
             journalHub.gameObject.SetActive(Flow.CanOpenJournal); journalHub.interactable = !busy; // Build F
             enterWing.GetComponentInChildren<Text>().text = "The Zodiac Wing";
-            endCard.text = Flow.KeysSpent>=8 ? CorridorCopy.End : Flow.ObservatoryWhole ? ObservatoryCopy.ChamberObsCard : Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber awaits them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber awaits them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber awaits them." : "The whole wheel burns. The symbols await you next."; // owner (worksheet sections 1 and 13)
+            endCard.text = Flow.KeysSpent>=10 ? HousesCopy.End : Flow.KeysSpent>=9 ? HousesCopy.Book3 : Flow.KeysSpent>=8 ? CorridorCopy.End : Flow.ObservatoryWhole ? ObservatoryCopy.ChamberObsCard : Flow.WingWhole ? ChamberEndCard : Flow.Keys >= 4 ? "Four Keys earned. The Chamber awaits them." : Flow.Keys >= 3 ? "Three Keys earned. The Chamber awaits them." : Flow.Keys >= 2 ? "Two Keys earned. The Chamber awaits them." : "The whole wheel burns. The symbols await you next."; // owner (worksheet sections 1 and 13)
             ObservatoryHubPose();
             hubNote.text = Flow.Note;
             endCard.gameObject.SetActive(Flow.V02Complete || Flow.Keys >= 2);
@@ -1883,9 +1886,9 @@ namespace Ascendant.CelestialDial
             state.inscriptionId = Flow.InscriptionId; state.inscriptionGroup = Flow.InscriptionGroup; state.inscriptionWriting = inscriptionWriting != null; state.inscriptionRecent = Flow.RecentInscriptions.ToArray(); // the living inscription (Oct 7)
             state.canJournalContents = Flow.CanJournalContents && at != JournalView.Title && !busy; state.canJournalHome = Flow.CanJournalHome && !busy; state.canJournalPractice = Flow.CanJournalPractice && !busy && journalBeat == null;
             state.journalDoors = state.journal && at == JournalView.Landing ? new[] { journalPracticeDoor, journalContentsDoor }.SelectMany(b => { var r = (RectTransform)b.transform; return new[] { r.anchoredPosition.x, -r.anchoredPosition.y, r.sizeDelta.x, r.sizeDelta.y }; }).ToArray() : new float[0];
-            state.journalChapters = state.journal && at == JournalView.Contents ? new[] { SliceFlow.WheelTitle, SliceFlow.MapTitle, "The Planets" }.Concat(Enumerable.Repeat(SliceFlow.SealedChapter, SliceFlow.SealedChapters)).ToArray() : new string[0];
+            state.journalChapters = state.journal && at == JournalView.Contents ? new[] { SliceFlow.WheelTitle, SliceFlow.MapTitle, "The Planets", Flow.Keys>=9?HousesCopy.Chapter:SliceFlow.SealedChapter }.ToArray() : new string[0];
             state.journalMapRooms = state.journal && at == JournalView.Map ? Enumerable.Range(0, journalMapNames.Length).Where(i => journalMapNames[i].gameObject.activeSelf).Select(i => TravelMenu.Rooms[i].name).ToArray() : new string[0];
-            state.journalLink = state.journal ? (at == JournalView.Contents || at == JournalView.Practice || at == JournalView.Birth ? SliceFlow.BackToJournal : at == JournalView.Wheel || at == JournalView.Planets || at == JournalView.Planet || at == JournalView.Map ? SliceFlow.BackToContents : at == JournalView.Quiz ? SliceFlow.BackToPractice : "") : "";
+            state.journalLink = state.journal ? (at == JournalView.Contents || at == JournalView.Practice || at == JournalView.Birth ? SliceFlow.BackToJournal : at == JournalView.Wheel || at == JournalView.Planets || at == JournalView.Planet || at == JournalView.Houses || at == JournalView.House || at == JournalView.Map ? SliceFlow.BackToContents : at == JournalView.Quiz ? SliceFlow.BackToPractice : "") : "";
             state.journalScriptFont = journalItalic != null ? journalItalic.name : "";
             // Oct 7, "Your Birth" as drawn: the rows, the lines under them, the buttons, and the Big Three's target on the landing
             bool onBirth = state.journal && at == JournalView.Birth;
@@ -1940,19 +1943,19 @@ namespace Ascendant.CelestialDial
             if (glyphItem) state.practiceMode = "glyph";
             state.v03Complete = Flow.V03Complete;
             // v0.4
-            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom || s == SliceScreen.Observatory && !obsPlaying || s == SliceScreen.Corridor && !corPlaying;
+            bool roomScreen = s == SliceScreen.Hub || s == SliceScreen.WingRoom || s == SliceScreen.ChamberRoom || s == SliceScreen.Observatory && !obsPlaying || s == SliceScreen.Corridor && !corPlaying || s == SliceScreen.Houses && !hohPlaying;
             var walk = Flow.Walk;
-            state.room = !roomScreen ? "" : walk.Room == Room.Atrium ? "atrium" : walk.Room == Room.Wing ? "wing" : walk.Room==Room.Observatory?"observatory":walk.Room==Room.Corridor?"corridor":"chamber";
+            state.room = !roomScreen ? "" : walk.Room == Room.Atrium ? "atrium" : walk.Room == Room.Wing ? "wing" : walk.Room==Room.Observatory?"observatory":walk.Room==Room.Corridor?"corridor":walk.Room==Room.Houses?"houses":"chamber";
             state.avatarX = walk.X; state.walking = walk.Walking; state.walkTarget = walk.TargetId; state.avatarAt = walk.At; state.walkSpeed = walk.SpeedName;
-            var pois = roomScreen ? Rooms.Visible(walk.Room).Where(p=>p.Id!="corridor-door"||Flow.KeysSpent>=6).ToArray() : new PointOfInterest[0];
-            FillObservatory(state); FillCorridor(state);
+            var pois = roomScreen ? Rooms.Visible(walk.Room).Where(p=>p.Id!="corridor-door"||Flow.KeysSpent>=6).Where(p=>p.Id!="houses-door"||Flow.KeysSpent>=8).ToArray() : new PointOfInterest[0];
+            FillObservatory(state); FillCorridor(state); FillHouses(state);
             state.pois = pois.Select(p => p.Id).ToArray(); state.poiLabels = pois.Select(p => (p.Walkable ? "Walk to " : "") + p.Label).ToArray();
             state.canWalk = roomScreen && !busy; state.canEnterDial = s == SliceScreen.WingRoom && !busy; state.canEnterShelf = s == SliceScreen.WingRoom && Flow.WheelComplete && !busy;
             if (s == SliceScreen.WingRoom) { state.caspar = wingRoomCaption.text; state.canLeaveWing = !busy; }
             // Build D
             state.keysInHand = Flow.KeysInHand; state.keysSpent = Flow.KeysSpent; state.booksOpen = Flow.BooksOpen; state.wingWhole = Flow.WingWhole;
             state.canEnterChamber = s == SliceScreen.Hub && Flow.CanEnterChamber && !busy; state.canLeaveChamber = s == SliceScreen.ChamberRoom && !busy; state.atBooks = s == SliceScreen.ChamberRoom && walk.At == "books";
-            if (s == SliceScreen.ChamberRoom) state.caspar = chamberText.text + (Flow.WingWhole && !busy ? " " + (Flow.ObservatoryWhole?ObservatoryCopy.ChamberObsCard:ChamberEndCard) : "");
+            if (s == SliceScreen.ChamberRoom) state.caspar = chamberText.text + (Flow.WingWhole && !busy ? " " + chamberEnd.text : "");
             state.canCloseBook = s == SliceScreen.Book && !busy;
             if (s == SliceScreen.Book && !partA) state.caspar = Dial.Lesson.Message;
             if (roomScreen && !busy) state.note = hubNote.text;
@@ -2193,12 +2196,12 @@ namespace Ascendant.CelestialDial
         public const float PlanTop = 106f, PlanWidth = 234f, PlanHeight = 350f; // the Library Map: the plan at its own 2x, centred on the page's column
         // each room's name on the plan (layout px from the plan's top-left) and the width it wraps to, in TravelMenu.Rooms' order: in the hall
         // under its star, in the Wing's lower half, in the Chamber under its crystal
-        public static readonly Vector3[] PlanNames = { new Vector3(116.5f, 262, 100), new Vector3(55.5f, 108, 52), new Vector3(178.5f, 113, 64), new Vector3(55,190,76),new Vector3(124,172,100) };
+        public static readonly Vector3[] PlanNames = { new Vector3(116.5f, 262, 100), new Vector3(55.5f, 108, 52), new Vector3(178.5f, 113, 64), new Vector3(55,190,76),new Vector3(124,172,100),new Vector3(180,210,100) };
         const float GaramondLift = .3545f, FrakLift = .267f;             // a line's baseline below its centre, per point: EB Garamond (ascender 1007, descender 298 of 1000) and UnifrakturMaguntia (1607 and 513 of 2048)
         static readonly Color GiltInk = new Color32(0xe3, 0xa3, 0x4a, 0xff), GiltDown = new Color32(0xb4, 0x80, 0x3a, 0xff), SilverInk = new Color32(0xc9, 0xcf, 0xdb, 0xff), SealedInk = new Color32(0x7d, 0x81, 0x8c, 0xff), SealedRing = new Color32(0x6d, 0x71, 0x7c, 0xcc); // the board's gilt (and pressed), silver, and the sealed grey
         RectTransform journalTitlePage, journalLanding, journalContents, journalMap, journalFlourishBottom; CanvasGroup journalTitlePageGroup, journalLandingGroup, journalTitleGroup;
-        Text journalKeeperHeading; readonly List<Text> keeperLines = new List<Text>(); readonly Text[] journalMapNames = new Text[5];
-        Button journalPracticeDoor, journalContentsDoor, journalHomeLink, journalContentsLink; readonly Button[] journalChapterRows = new Button[3];
+        Text journalKeeperHeading; readonly List<Text> keeperLines = new List<Text>(); readonly Text[] journalMapNames = new Text[6];
+        Button journalPracticeDoor, journalContentsDoor, journalHomeLink, journalContentsLink; readonly Button[] journalChapterRows = new Button[4];
         Font journalItalic; Coroutine journalBeat;
         // the Big Three's line (owner, Oct 2 evening: approved, unknowns A): each glyph in the font that carries it, gilt; the words in the italic
         RectTransform bigThreeLine; readonly Text[] bigThreeGlyphs = new Text[3], bigThreeWords = new Text[3]; Button journalBigThree; // Oct 7: the line opens "Your Birth" for every player
@@ -2208,7 +2211,7 @@ namespace Ascendant.CelestialDial
         public static readonly string[] BigThreeMarks = { "\u2609", "\u263d", "\u2191" }; // ☉ (Noto Sans Symbols 2), ☽ (Noto Sans Symbols), ↑ (EB Garamond)
         public static readonly int[] BigThreeMarkSizes = { 15, 19, 17 };                      // each drawn about the words' cap height
         static readonly float[] BigThreeMarkLift = { .2195f, .455f, .3545f };                 // each font's baseline below its line's centre, per point (its ascender and descender)
-        string JournalPageTitle(JournalView at) => at==JournalView.Planets?"The Planets":at==JournalView.Planet&&Flow.JournalPlanet>=0?Planets.All[Flow.JournalPlanet].Name: at == JournalView.Title || at == JournalView.Landing ? SliceFlow.JournalTitle : at == JournalView.Contents ? SliceFlow.ContentsTitle : at == JournalView.Map ? SliceFlow.MapTitle : at == JournalView.Birth ? SliceFlow.BirthPageTitle : at == JournalView.Practice ? SliceFlow.PracticeTitle : at == JournalView.Quiz ? (Flow.QuizConcept != null ? Flow.QuizConcept.name : SliceFlow.PracticeTitle) : SliceFlow.WheelTitle;
+        string JournalPageTitle(JournalView at) => at==JournalView.Houses||at==JournalView.House?HousesCopy.Chapter: at==JournalView.Planets?"The Planets":at==JournalView.Planet&&Flow.JournalPlanet>=0?Planets.All[Flow.JournalPlanet].Name: at == JournalView.Title || at == JournalView.Landing ? SliceFlow.JournalTitle : at == JournalView.Contents ? SliceFlow.ContentsTitle : at == JournalView.Map ? SliceFlow.MapTitle : at == JournalView.Birth ? SliceFlow.BirthPageTitle : at == JournalView.Practice ? SliceFlow.PracticeTitle : at == JournalView.Quiz ? (Flow.QuizConcept != null ? Flow.QuizConcept.name : SliceFlow.PracticeTitle) : SliceFlow.WheelTitle;
         // ---- Practice (owner, Oct 3: step 4 approved; the board on 86bcbn6w6, Oct 2). The list of concepts learned, each row a gilt star, its
         // name and its line; a question page: the counter, the ask (a sign's mark drawn large above it, for the Symbols), up to four choices in
         // the board's hairline frames, then right or wrong (the right one gilded with its star, a wrong pick in muted crimson with ×, the rest
@@ -2229,7 +2232,7 @@ namespace Ascendant.CelestialDial
         }
         static readonly Color CrimsonEdge = new Color32(176, 64, 70, 242), CrimsonInk = new Color32(0xc9, 0x88, 0x8a, 0xff), GiltWash = new Color(227 / 255f, 163 / 255f, 74 / 255f, .05f); // the board's wrong pick, and the right answer's wash (the board's .16 in a browser's blend; the game blends in linear colour, where .05 looks the same)
         RectTransform journalPractice, journalQuiz; Button journalPracticeLink, quizNext, quizBack; Text quizCounter, quizGlyph; CanvasGroup quizChoicesGroup;
-        readonly Button[] practiceRows = new Button[9]; readonly Text[] practiceRowLines = new Text[9]; readonly Image[] practiceRowRules = new Image[9];
+        readonly Button[] practiceRows = new Button[11]; readonly Text[] practiceRowLines = new Text[11]; readonly Image[] practiceRowRules = new Image[11];
         readonly Text[] quizAsk = new Text[4], quizFeedback = new Text[6], quizEnd = new Text[4], quizCrosses = new Text[4];
         readonly Button[] quizChoices = new Button[4]; readonly Image[] quizChoicePanels = new Image[4], quizStars = new Image[4]; readonly RectTransform[] quizThin = new RectTransform[4], quizThick = new RectTransform[4]; readonly CanvasGroup[] quizChoiceGroups = new CanvasGroup[4];
         // the board's four-point star (14 px, drawn at 4x and sampled 16 times a pixel): Practice's row marks and the right answer's
@@ -2590,14 +2593,14 @@ namespace Ascendant.CelestialDial
             journalTitlePage.gameObject.SetActive(at == JournalView.Title); journalLanding.gameObject.SetActive(at == JournalView.Landing || at == JournalView.Title);
             journalContents.gameObject.SetActive(at == JournalView.Contents); journalMap.gameObject.SetActive(at == JournalView.Map);
             journalPractice.gameObject.SetActive(at == JournalView.Practice); journalQuiz.gameObject.SetActive(at == JournalView.Quiz); journalBirth.gameObject.SetActive(at == JournalView.Birth);
-            journalHomeLink.gameObject.SetActive(at == JournalView.Contents || at == JournalView.Practice || at == JournalView.Birth); journalContentsLink.gameObject.SetActive(at == JournalView.Wheel || at == JournalView.Planets || at == JournalView.Planet || at == JournalView.Map); journalPracticeLink.gameObject.SetActive(at == JournalView.Quiz);
+            journalHomeLink.gameObject.SetActive(at == JournalView.Contents || at == JournalView.Practice || at == JournalView.Birth); journalContentsLink.gameObject.SetActive(at == JournalView.Wheel || at == JournalView.Planets || at == JournalView.Planet || at == JournalView.Houses || at == JournalView.House || at == JournalView.Map); journalPracticeLink.gameObject.SetActive(at == JournalView.Quiz);
             journalHomeLink.interactable = journalContentsLink.interactable = journalPracticeLink.interactable = !busy;
             if (inscriptionWriting != null && at != JournalView.Landing) FinishInscription(); // back from Contents, Practice or a chapter, it shows written
             if (at == JournalView.Landing || at == JournalView.Title) ShowJournalLanding();
             if (at == JournalView.Practice) ShowJournalPractice();
             if (at == JournalView.Quiz) ShowJournalQuiz();
             if (at == JournalView.Birth) ShowBirthPage();
-            ShowPlanetJournal();
+            ShowPlanetJournal(); ShowHouseJournal();
             foreach (var row in journalChapterRows) if (row != null) row.interactable = !busy;
             for (int i = 0; i < journalMapNames.Length; i++) journalMapNames[i].gameObject.SetActive(TravelOpen(TravelMenu.Rooms[i].id)); // only the rooms you have woken are named
             if (!beat) { journalTitlePageGroup.alpha = 1; journalLandingGroup.alpha = 1; journalTitleGroup.alpha = 1; journalLandingGroup.blocksRaycasts = true; }
@@ -2879,7 +2882,7 @@ namespace Ascendant.CelestialDial
             {
                 case JournalView.Title: return "Your journal. " + SliceFlow.KeeperHeading.Substring(0, 1) + SliceFlow.KeeperHeading.Substring(1).ToLowerInvariant() + ". " + SliceFlow.TitlePageLine;
                 case JournalView.Landing: return "Your journal. Keeper. " + Flow.InscriptionText + " " + SliceFlow.PracticeDoor + (SliceFlow.PracticeDoorLine != "" ? ": " + SliceFlow.PracticeDoorLine.ToLowerInvariant() : "") + (Flow.PracticeConcepts.Count > 0 ? ". " : ", not open yet. ") + SliceFlow.ContentsDoor + ": " + SliceFlow.ContentsDoorLine.ToLowerInvariant() + ".";
-                case JournalView.Contents: return "Your journal. " + SliceFlow.ContentsTitle + ". " + SliceFlow.WheelTitle + ": " + SliceFlow.WheelChapterLine.ToLowerInvariant() + ". " + SliceFlow.MapTitle + ": " + SliceFlow.MapChapterLine.ToLowerInvariant() + ". " + SliceFlow.SealedChapters + " chapters sealed.";
+                case JournalView.Contents: return "Your journal. " + SliceFlow.ContentsTitle + ". " + SliceFlow.WheelTitle + ": " + SliceFlow.WheelChapterLine.ToLowerInvariant() + ". " + SliceFlow.MapTitle + ": " + SliceFlow.MapChapterLine.ToLowerInvariant() + ". " + Flow.SealedChapterCount + " chapters sealed.";
                 case JournalView.Map: return "Your journal. " + SliceFlow.MapTitle + ". " + SliceFlow.MapChapterLine + ": " + string.Join(", ", TravelMenu.Rooms.Where(r => TravelOpen(r.id)).Select(r => r.name)) + ".";
                 case JournalView.Practice: return "Your journal. " + SliceFlow.PracticeTitle + ". " + string.Join(" ", Flow.PracticeConcepts.Select(c => c.name + ": " + c.line + "."));
                 case JournalView.Quiz: return QuizSpoken();

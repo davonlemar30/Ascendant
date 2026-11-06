@@ -105,6 +105,16 @@ namespace Ascendant.CelestialDial
             Nutation((jdUt - 2451545.0) / 36525, out _, out double eps); double ramc = Norm(Gmst(jdUt) + longitude) * Rad, e = eps * Rad, phi = latitude * Rad;
             return Norm(Math.Atan2(Math.Cos(ramc), -(Math.Sin(ramc) * Math.Cos(e) + Math.Tan(phi) * Math.Sin(e))) / Rad);
         }
+        // Intersection of the ecliptic with the upper meridian. Equatorial/ecliptic rotation gives
+        // The local sidereal angle and true obliquity set its longitude, retaining the quadrant.
+        // Formula cross-check: Astrodienst's swi_armc_to_mc (swehouse.c); independent implementation.
+        // This adds no point to existing personal saves and changes none of their settled signs.
+        public static double Midheaven(double jdUt, double longitude)
+        {
+            Nutation((jdUt-2451545.0)/36525,out _,out double eps);
+            double theta=Norm(Gmst(jdUt)+longitude)*Rad;
+            return Norm(Math.Atan2(Math.Sin(theta),Math.Cos(theta)*Math.Cos(eps*Rad))/Rad);
+        }
         // a UT moment as a Julian Day and its Julian Ephemeris Day
         public static double Ephemeris(double jdUt, int year, int month) => jdUt + DeltaT(year + (month - .5) / 12) / 86400;
     }

@@ -12,7 +12,7 @@ namespace Ascendant.CelestialDial
         public static readonly (string id, string label)[] All =
         {
             ("key1", "After Key 1"), ("wheel", "The whole wheel lit"), ("key2", "After Key 2"),
-            ("key3", "After Key 3"), ("key4", "After Key 4"), ("whole", "The Zodiac Wing whole"), ("key5","After Key 5"), ("key6","After Key 6"), ("obswhole","The Observatory whole"), ("key7","After Key 7"), ("key8","After Key 8"),
+            ("key3", "After Key 3"), ("key4", "After Key 4"), ("whole", "The Zodiac Wing whole"), ("key5","After Key 5"), ("key6","After Key 6"), ("obswhole","The Observatory whole"), ("key7","After Key 7"), ("key8","After Key 8"), ("key9","After Key 9"), ("key10","After Key 10"), ("houseswhole","The Hall of Houses whole"),
         };
         public static bool Known(string id) => All.Any(c => c.id == id);
 
@@ -105,7 +105,19 @@ namespace Ascendant.CelestialDial
             foreach(int sign in Rulership.ModernSigns){Must(cor.Place(sign),"modern place "+sign);cor.Continue();}
             cor.Continue();for(int i=0;i<6;i++){cor.Select(cor.DetrimentAnswer);Must(cor.Seal(),"detriment "+i);cor.Continue();}
             cor.Continue();for(int i=0;i<3;i++){Must(cor.AnswerCard(System.Array.IndexOf(cor.CardOrder,0)),"ruler card "+i);cor.Continue();}
-            Must(flow.Keys==8,"Key 8 earned");return Stop();
+            Must(flow.Keys==8,"Key 8 earned");if(id=="key8")return Stop();
+            Must(flow.LeaveCorridor()&&flow.LeaveObservatory()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.RevealHousesDoor()&&flow.EnterHouses()&&flow.Houses.Begin()&&flow.Houses.Continue(),"Key 8 spent, the Hall opens");
+            var houses=flow.Houses;
+            for(int i=0;i<4;i++){houses.SelectAngle(i);Must(houses.PlaceAngle(i),"angle "+i);houses.Continue();}
+            houses.Continue();for(int i=0;i<3;i++){houses.Select(houses.WheelAnswer);Must(houses.Seal(),"rising overlay "+i);houses.Continue();}
+            Must(flow.Keys==9,"Key 9 earned");if(id=="key9")return Stop();
+            Must(flow.LeaveHouses()&&flow.EnterChamber()&&flow.SpendKey()&&flow.BooksOpen==3&&flow.LeaveChamber()&&flow.EnterHouses()&&houses.Begin()&&houses.Continue(),"Key 9 opens Book 3, house assignment begins");
+            for(int i=0;i<9;i++){houses.Select(houses.WheelAnswer);Must(houses.Seal(),"house assignment "+i);houses.Continue();}
+            houses.Continue();foreach(int h in Ascendant.CelestialDial.Houses.AxisOrder){Must(houses.PickHouse(h),"topic house "+h);houses.Continue();}
+            houses.Continue();for(int h=1;h<=12;h++){Must(houses.PickGroup(Ascendant.CelestialDial.Houses.Group(h)),"house group "+h);houses.Continue();}
+            Must(houses.PickHouse(houses.Example.McHouse)&&houses.Continue(),"worked MC example");
+            Must(houses.AnswerDistinction(Array.IndexOf(houses.CardOrder,0))&&houses.Continue()&&flow.Keys==10,"Key 10 earned");if(id=="key10")return Stop();
+            Must(flow.LeaveHouses()&&flow.EnterChamber()&&flow.SpendKey()&&flow.LeaveChamber()&&flow.KeysSpent==10&&flow.BooksOpen==3,"ten locks, three Books");return Stop();
         }
         static void Answer(DialLesson lesson)
         {

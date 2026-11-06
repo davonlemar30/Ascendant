@@ -52,6 +52,8 @@ IMAGES += [('obs-room', 180, 400), ('obs-light', 180, 400), ('obs-orrery-frame',
 
 IMAGES += [('cor-room', 180, 400), ('cor-light', 180, 400), ('cor-shell-worn', 180, 400), ('cor-shell-restored', 180, 400), ('cor-grime', 180, 400), ('cor-wheel', 310, 310), ('cor-lectern-worn', 64, 100), ('cor-lectern-restored', 64, 100), ('cor-cabinet-worn', 100, 80), ('cor-cabinet-restored', 100, 80)]
 
+IMAGES += [('hoh-room', 180, 400), ('hoh-light', 180, 400), ('hoh-shell-worn', 180, 400), ('hoh-shell-restored', 180, 400), ('hoh-grime', 180, 400), ('hoh-instrument', 310, 310), ('hoh-lectern-worn', 64, 100), ('hoh-lectern-restored', 64, 100), ('hoh-bench-worn', 100, 80), ('hoh-bench-restored', 100, 80)]
+
 ROUND = {"dial-face", "floor-markings", "mechanism", "orb", "intro-wheel-pencil-lines", "intro-wheel-pencil-glyphs", "intro-wheel-lit", "intro-wheel-burning", "intro-earth"}
 FONT = {  # 3 x 5 capitals, digits, and the hyphen; one string per row
     "A": ("010", "101", "111", "101", "101"), "B": ("110", "101", "110", "101", "110"), "C": ("011", "100", "100", "100", "011"),

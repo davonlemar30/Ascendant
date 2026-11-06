@@ -1,4 +1,4 @@
-Codex draft (goal 03); owner rewrites. `{student}` alternates pupil / apprentice in teaching lines, including repeat hints.
+Codex draft (goal 03); owner rewrites. `{student}` alternates pupil / apprentice in teaching lines.
 
 | ID | Draft |
 | --- | --- |
@@ -31,6 +31,7 @@ Codex draft (goal 03); owner rewrites. `{student}` alternates pupil / apprentice
 | Hub8 | Eight Keys, seeker. Bring the new one to the Books. |
 | End | Eight locks turned, initiate. The Observatory's lower level is lit. |
 | Wheel | The rulership wheel |
+| BackToObservatory | The Observatory |
 | Back | Back |
 | Continue | Continue |
 | Seal | Seal |
@@ -40,93 +41,3 @@ Codex draft (goal 03); owner rewrites. `{student}` alternates pupil / apprentice
 | ModernRuler | Modern ruler |
 | Modern | Modern convention |
 | Sealed | The sealed door toward the Zodiac Wing |
-
-Rulers
-
-Which sign does the Moon rule?
-Cancer
-Leo
-Capricorn
-Aquarius
-The Moon rules Cancer in the traditional scheme.
-
-Which two signs does Mercury rule?
-Gemini and Virgo
-Cancer and Leo
-Aries and Scorpio
-Capricorn and Aquarius
-Mercury rules Gemini and Virgo.
-
-Which two signs does Venus rule?
-Taurus and Libra
-Gemini and Virgo
-Sagittarius and Pisces
-Aries and Scorpio
-Venus rules Taurus and Libra.
-
-Which planet traditionally rules Scorpio?
-Mars
-Pluto
-Venus
-Saturn
-Mars rules Scorpio traditionally. Pluto is its modern ruler in a convention that traditional practitioners do not all adopt.
-
-Does rulership say a planet is always in its ruled sign?
-Rulership names a relationship with a sign.
-Yes, a ruler stays there.
-Only the Moon stays there.
-Only Saturn stays there.
-Rulership assigns planets to signs; it makes no claim that the planet is always there.
-
-What comes after the lights in the traditional wheel?
-Mercury, Venus, Mars, Jupiter, Saturn
-Saturn, Jupiter, Mars, Venus, Mercury
-Uranus, Neptune, Pluto
-Venus, Moon, Sun, Mars, Pluto
-The traditional scheme moves outward in speed order around the Cancer and Leo axis.
-
-
-Detriment and modern rulers
-
-Where is the Sun in detriment?
-Aquarius
-Leo
-Cancer
-Virgo
-The Sun rules Leo. Aquarius is opposite Leo.
-
-Which are Mercury's detriment signs?
-Sagittarius and Pisces
-Gemini and Virgo
-Taurus and Libra
-Cancer and Leo
-Mercury rules Gemini and Virgo. Their opposites are Sagittarius and Pisces.
-
-Which planet is Aquarius's modern ruler?
-Uranus
-Neptune
-Pluto
-Mars
-Uranus rules Aquarius in a modern convention that traditional practitioners do not all adopt. Saturn remains its traditional ruler.
-
-Which planet is Pisces' modern ruler?
-Neptune
-Uranus
-Pluto
-Venus
-Neptune rules Pisces in the modern convention. Jupiter is its traditional ruler.
-
-Has modern rulership made traditional rulership obsolete?
-Traditional rulership continues alongside the modern convention.
-Yes, the older rulers were removed.
-Only the lights still have traditional rulerships.
-Scorpio has only Pluto.
-Traditional practitioners do not all adopt modern rulers. The traditional scheme remains in use.
-
-Which statement keeps Scorpio's two rulerships clear?
-Mars is traditional; Pluto is a modern convention.
-Pluto is its only ruler.
-Mars is its modern ruler.
-Neptune is its traditional ruler.
-Mars traditionally rules Aries and Scorpio. Pluto is placed beside Mars in Scorpio as a modern convention.
-

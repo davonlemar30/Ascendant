@@ -745,6 +745,180 @@
       "why": "Mars traditionally rules Aries and Scorpio. Pluto is placed beside Mars in Scorpio as a modern convention."
     }
   ]
+},
+{
+  "id": "angles",
+  "name": "The Angles",
+  "line": "The horizon and the meridian",
+  "unlock": "key9",
+  "end": "The horizon and meridian will be here when you return.",
+  "questions": [
+    {
+      "ask": "Where is the Ascendant on a conventional chart?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "The eastern horizon, on the left.",
+        "The western horizon, on the right.",
+        "The upper meridian, at the top.",
+        "The lower meridian, at the bottom."
+      ],
+      "answer": 0,
+      "why": "AC is the sign rising on the eastern horizon. Charts place east on the left."
+    },
+    {
+      "ask": "Which label belongs to the western horizon?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "DC",
+        "AC",
+        "MC",
+        "IC"
+      ],
+      "answer": 0,
+      "why": "The Descendant is setting at the western horizon, on the right of the chart."
+    },
+    {
+      "ask": "What is the Midheaven?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Where the ecliptic crosses the upper meridian.",
+        "The Sun's position.",
+        "The eastern horizon.",
+        "The whole tenth sign in every chart."
+      ],
+      "answer": 0,
+      "why": "The MC comes from the local meridian. It is calculated separately from the Sun and from whole-sign house assignment."
+    },
+    {
+      "ask": "Which label belongs at the lower meridian?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "IC",
+        "MC",
+        "AC",
+        "DC"
+      ],
+      "answer": 0,
+      "why": "IC, the Imum Coeli, is at the lower meridian, drawn at the bottom."
+    },
+    {
+      "ask": "Do the angles and Whole Sign Houses come from the same assignment?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Angles come from the local sky; Whole Sign Houses assign signs.",
+        "Every angle is a whole house.",
+        "The first house is always Aries.",
+        "The MC is always the tenth whole sign."
+      ],
+      "answer": 0,
+      "why": "The rising sign begins the Whole Sign House count. The angles belong to the local horizon and meridian."
+    },
+    {
+      "ask": "What does the Ascendant degree tell you in Whole Sign Houses?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "It lies somewhere inside the first house.",
+        "It always begins Aries.",
+        "It divides every sign into two houses.",
+        "It is always the Sun's degree."
+      ],
+      "answer": 0,
+      "why": "The entire sign containing the Ascendant is the first whole-sign house."
+    }
+  ]
+},
+{
+  "id": "houses",
+  "name": "The Houses",
+  "line": "Twelve places in the chart",
+  "unlock": "key10",
+  "end": "The twelve places are set. You can visit them again whenever you like.",
+  "questions": [
+    {
+      "ask": "With Cancer rising, which sign is the first whole-sign house?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Cancer",
+        "Aries",
+        "Capricorn",
+        "Libra"
+      ],
+      "answer": 0,
+      "why": "The sign containing the Ascendant is the first house. The first house changes with the rising sign."
+    },
+    {
+      "ask": "Are houses and signs the same thing?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "House is where; sign is how.",
+        "Every house is named after one fixed sign.",
+        "The seventh house is always Libra.",
+        "The first house is always Aries."
+      ],
+      "answer": 0,
+      "why": "Whole Sign Houses assign the signs to places counted from the rising sign. A house and a sign make different claims."
+    },
+    {
+      "ask": "Which short topic belongs to the eighth house?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Shared resources",
+        "Only death",
+        "Friends",
+        "Career"
+      ],
+      "answer": 0,
+      "why": "The eighth house covers shared resources, debts, endings and inheritance. Its topic includes more than death."
+    },
+    {
+      "ask": "Which short topic belongs to the twelfth house?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Retreat",
+        "Bad things",
+        "Possessions",
+        "Partners"
+      ],
+      "answer": 0,
+      "why": "The twelfth house covers retreat, solitude and what is hidden. That gives it a topic rather than a verdict."
+    },
+    {
+      "ask": "Can the MC fall outside the tenth whole-sign house?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "Yes. Its meridian position is calculated separately.",
+        "No. It is defined as the tenth whole sign.",
+        "Only if the Sun changes signs.",
+        "Only if every house is less than thirty degrees."
+      ],
+      "answer": 0,
+      "why": "The unnamed London example puts the computed MC in the ninth whole-sign house. The ninth, tenth and eleventh are examples, rather than a limit."
+    },
+    {
+      "ask": "Which set contains the angular houses?",
+      "glyph": -1,
+      "planet": -1,
+      "choices": [
+        "1, 4, 7, 10",
+        "2, 5, 8, 11",
+        "3, 6, 9, 12",
+        "1, 2, 3, 4"
+      ],
+      "answer": 0,
+      "why": "The angular houses are 1, 4, 7 and 10. Succedent houses are 2, 5, 8 and 11; cadent houses are 3, 6, 9 and 12."
+    }
+  ]
 }
 ]
 }

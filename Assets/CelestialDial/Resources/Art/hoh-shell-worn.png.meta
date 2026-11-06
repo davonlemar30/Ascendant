@@ -1,0 +1,1368 @@
+fileFormatVersion: 2
+guid: 020e6e38bb2cc4e2caa6e0d40c4d20b6
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3623487491190155221
+    second: hoh-shell-worn_0
+  - first:
+      213: 1545583791597373420
+    second: hoh-shell-worn_1
+  - first:
+      213: -2563689458609412770
+    second: hoh-shell-worn_2
+  - first:
+      213: 8182064512376794443
+    second: hoh-shell-worn_3
+  - first:
+      213: 776436439304915860
+    second: hoh-shell-worn_4
+  - first:
+      213: -9046854863218636117
+    second: hoh-shell-worn_5
+  - first:
+      213: -1683504515013666950
+    second: hoh-shell-worn_6
+  - first:
+      213: 5239730557508506988
+    second: hoh-shell-worn_7
+  - first:
+      213: -6636778287992455684
+    second: hoh-shell-worn_8
+  - first:
+      213: -2849415414527404749
+    second: hoh-shell-worn_9
+  - first:
+      213: -1701344209861264467
+    second: hoh-shell-worn_10
+  - first:
+      213: 1421331859879106187
+    second: hoh-shell-worn_11
+  - first:
+      213: -168720241893243844
+    second: hoh-shell-worn_12
+  - first:
+      213: -4689648781676118576
+    second: hoh-shell-worn_13
+  - first:
+      213: 4397738946282084717
+    second: hoh-shell-worn_14
+  - first:
+      213: 8733299151375882070
+    second: hoh-shell-worn_15
+  - first:
+      213: -5649691994287961378
+    second: hoh-shell-worn_16
+  - first:
+      213: 7487188850072649150
+    second: hoh-shell-worn_17
+  - first:
+      213: -981716296501077089
+    second: hoh-shell-worn_18
+  - first:
+      213: 8878680855172235929
+    second: hoh-shell-worn_19
+  - first:
+      213: 3373294557580791063
+    second: hoh-shell-worn_20
+  - first:
+      213: 8560536106984239389
+    second: hoh-shell-worn_21
+  - first:
+      213: -5975392688971057996
+    second: hoh-shell-worn_22
+  - first:
+      213: 3588825922449394029
+    second: hoh-shell-worn_23
+  - first:
+      213: 4250174102045204408
+    second: hoh-shell-worn_24
+  - first:
+      213: -2693007399232819187
+    second: hoh-shell-worn_25
+  - first:
+      213: 8260578375575718061
+    second: hoh-shell-worn_26
+  - first:
+      213: 7444066970612598700
+    second: hoh-shell-worn_27
+  - first:
+      213: -759511078379748560
+    second: hoh-shell-worn_28
+  - first:
+      213: 7611850141934901045
+    second: hoh-shell-worn_29
+  - first:
+      213: 2649907438174462074
+    second: hoh-shell-worn_30
+  - first:
+      213: -7408062172705056417
+    second: hoh-shell-worn_31
+  - first:
+      213: -5589569488290542196
+    second: hoh-shell-worn_32
+  - first:
+      213: 5347682884087514727
+    second: hoh-shell-worn_33
+  - first:
+      213: -2620565312235736522
+    second: hoh-shell-worn_34
+  - first:
+      213: 3063156205721994557
+    second: hoh-shell-worn_35
+  - first:
+      213: -2667095343774688007
+    second: hoh-shell-worn_36
+  - first:
+      213: 1634264570482905356
+    second: hoh-shell-worn_37
+  - first:
+      213: 258259022788378630
+    second: hoh-shell-worn_38
+  - first:
+      213: 5767287123203910809
+    second: hoh-shell-worn_39
+  - first:
+      213: 3354104184799741008
+    second: hoh-shell-worn_40
+  - first:
+      213: -3845605382691262996
+    second: hoh-shell-worn_41
+  - first:
+      213: -4487735440354850934
+    second: hoh-shell-worn_42
+  - first:
+      213: 5045098812098196957
+    second: hoh-shell-worn_43
+  - first:
+      213: -4813683228685201414
+    second: hoh-shell-worn_44
+  - first:
+      213: -2811943128112153973
+    second: hoh-shell-worn_45
+  - first:
+      213: -2746778158097040774
+    second: hoh-shell-worn_46
+  - first:
+      213: -2599772881086094918
+    second: hoh-shell-worn_47
+  - first:
+      213: 1418327714694434630
+    second: hoh-shell-worn_48
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 0
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: hoh-shell-worn_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 14
+        width: 720
+        height: 1586
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d7e578dca6394230800000000000000
+      internalID: 3623487491190155221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 418
+        width: 5
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce743c40544037510800000000000000
+      internalID: 1545583791597373420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_2
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 427
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e552c293502fb6cd0800000000000000
+      internalID: -2563689458609412770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_3
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 442
+        width: 68
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4d6c85d2588c8170800000000000000
+      internalID: 8182064512376794443
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_4
+      rect:
+        serializedVersion: 2
+        x: 130
+        y: 469
+        width: 8
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49b407be3d476ca00800000000000000
+      internalID: 776436439304915860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_5
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 439
+        width: 22
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: baa86572f6d137280800000000000000
+      internalID: -9046854863218636117
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_6
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 479
+        width: 21
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7718dc209df2a8e0800000000000000
+      internalID: -1683504515013666950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_7
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 451
+        width: 98
+        height: 68
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c65dd074e2347b840800000000000000
+      internalID: 5239730557508506988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_8
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 512
+        width: 28
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfd3f2b6f4d65e3a0800000000000000
+      internalID: -6636778287992455684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_9
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 563
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 335529ff6c7d478d0800000000000000
+      internalID: -2849415414527404749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_10
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 539
+        width: 23
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dab3d8a847c9368e0800000000000000
+      internalID: -1701344209861264467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_11
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 514
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b861a08cbc599b310800000000000000
+      internalID: 1421331859879106187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_12
+      rect:
+        serializedVersion: 2
+        x: 223
+        y: 544
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c34098b75d598adf0800000000000000
+      internalID: -168720241893243844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_13
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 456
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ddf9d6a7450beeb0800000000000000
+      internalID: -4689648781676118576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_14
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 485
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d695b0c7548e70d30800000000000000
+      internalID: 4397738946282084717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_15
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 449
+        width: 10
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 657daf2ae49e23970800000000000000
+      internalID: 8733299151375882070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_16
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 512
+        width: 36
+        height: 49
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eda091680134891b0800000000000000
+      internalID: -5649691994287961378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_17
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 470
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebd78de1796d7e760800000000000000
+      internalID: 7487188850072649150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_18
+      rect:
+        serializedVersion: 2
+        x: 298
+        y: 502
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9b57dcca3e3062f0800000000000000
+      internalID: -981716296501077089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_19
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 470
+        width: 32
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9924a9e4239673b70800000000000000
+      internalID: 8878680855172235929
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_20
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 539
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 71d8c53178950de20800000000000000
+      internalID: 3373294557580791063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_21
+      rect:
+        serializedVersion: 2
+        x: 323
+        y: 467
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1173bfcb322dc670800000000000000
+      internalID: 8560536106984239389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_22
+      rect:
+        serializedVersion: 2
+        x: 351
+        y: 495
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b4f9642204231da0800000000000000
+      internalID: -5975392688971057996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_23
+      rect:
+        serializedVersion: 2
+        x: 353
+        y: 537
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d694f4c79221ec130800000000000000
+      internalID: 3588825922449394029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_24
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 529
+        width: 39
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bf18f1d3d6abfa30800000000000000
+      internalID: 4250174102045204408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_25
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 468
+        width: 24
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d00ba3fd90480aad0800000000000000
+      internalID: -2693007399232819187
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_26
+      rect:
+        serializedVersion: 2
+        x: 376
+        y: 504
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da8c673244873a270800000000000000
+      internalID: 8260578375575718061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_27
+      rect:
+        serializedVersion: 2
+        x: 382
+        y: 502
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca7059b2873ae4760800000000000000
+      internalID: 7444066970612598700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_28
+      rect:
+        serializedVersion: 2
+        x: 391
+        y: 519
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0338332c2bca575f0800000000000000
+      internalID: -759511078379748560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_29
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 494
+        width: 28
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5375981ff59b2a960800000000000000
+      internalID: 7611850141934901045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_30
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 561
+        width: 6
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a70ed0476cc56c420800000000000000
+      internalID: 2649907438174462074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_31
+      rect:
+        serializedVersion: 2
+        x: 405
+        y: 480
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5918e914b6413990800000000000000
+      internalID: -7408062172705056417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_32
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 456
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8d841b4a2cdd62b0800000000000000
+      internalID: -5589569488290542196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_33
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 171
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7660975ff39c63a40800000000000000
+      internalID: 5347682884087514727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_34
+      rect:
+        serializedVersion: 2
+        x: 410
+        y: 478
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6327a7d9bb1e1abd0800000000000000
+      internalID: -2620565312235736522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_35
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 463
+        width: 62
+        height: 89
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d35c79df654828a20800000000000000
+      internalID: 3063156205721994557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_36
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 567
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fc163c6ae29cfad0800000000000000
+      internalID: -2667095343774688007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_37
+      rect:
+        serializedVersion: 2
+        x: 481
+        y: 429
+        width: 81
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c01d3a8d7f21ea610800000000000000
+      internalID: 1634264570482905356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_38
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 437
+        width: 47
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60047518635859300800000000000000
+      internalID: 258259022788378630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_39
+      rect:
+        serializedVersion: 2
+        x: 635
+        y: 447
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99ce0480515890050800000000000000
+      internalID: 5767287123203910809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_40
+      rect:
+        serializedVersion: 2
+        x: 637
+        y: 473
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 054c3aa3cfb2c8e20800000000000000
+      internalID: 3354104184799741008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_41
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 465
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ced6b52874aa1aac0800000000000000
+      internalID: -3845605382691262996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_42
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 488
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a87c7bfd46c58b1c0800000000000000
+      internalID: -4487735440354850934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_43
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 442
+        width: 13
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd5bbd7b3aac30640800000000000000
+      internalID: 5045098812098196957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_44
+      rect:
+        serializedVersion: 2
+        x: 656
+        y: 482
+        width: 39
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aff86f48b9c523db0800000000000000
+      internalID: -4813683228685201414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_45
+      rect:
+        serializedVersion: 2
+        x: 661
+        y: 537
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8a36409f98f9f8d0800000000000000
+      internalID: -2811943128112153973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_46
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 442
+        width: 36
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7af2d971db71e9d0800000000000000
+      internalID: -2746778158097040774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_47
+      rect:
+        serializedVersion: 2
+        x: 678
+        y: 479
+        width: 19
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab16b2eb650cbebd0800000000000000
+      internalID: -2599772881086094918
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: hoh-shell-worn_48
+      rect:
+        serializedVersion: 2
+        x: 682
+        y: 470
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64f0479ba89eea310800000000000000
+      internalID: 1418327714694434630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

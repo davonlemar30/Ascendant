@@ -301,7 +301,7 @@ Budget: at Build H the shipped test set (33 images, 7 sounds, 436 KB on disk) ad
 
 ## Stage 2 Observatory test slots
 
-Manifest total: 253 art slots (221 existing + 22 Observatory + 10 Corridor). Concept mockups are outside the game.
+Manifest total: 263 art slots (221 existing + 22 Observatory + 10 Corridor). Concept mockups are outside the game.
 
 - `obs-room`: 360 × 800; test placeholder.
 - `obs-light`: 360 × 800; test placeholder.
@@ -340,3 +340,18 @@ Room, light, shell and grime use 360 × 800 rects; wheel 310 × 310; lectern 64 
 - `cor-lectern-restored`
 - `cor-cabinet-worn`
 - `cor-cabinet-restored`
+
+## Hall of Houses (goal 03)
+
+All ten slots have finished primary art, distinct from the test set. Room and overlays are 720 × 1600, instrument 1024 × 1024, lectern 512 × 800 and bench 512 × 400. Dormant and awake mockups are 720 × 1600. Source hashes and dimensions: `Documentation/ConceptArt/Houses-2026-11/art-audit.json`.
+
+- `hoh-bench-restored`
+- `hoh-bench-worn`
+- `hoh-grime`
+- `hoh-instrument`
+- `hoh-lectern-restored`
+- `hoh-lectern-worn`
+- `hoh-light`
+- `hoh-room`
+- `hoh-shell-restored`
+- `hoh-shell-worn`
